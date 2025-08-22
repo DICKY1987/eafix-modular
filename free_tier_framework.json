@@ -1,0 +1,234 @@
+{
+  "framework": {
+    "name": "Free-Tier Multi-Agent Orchestrator",
+    "version": "1.0.0",
+    "description": "Cost-optimized framework combining free tiers with local-first tools"
+  },
+  
+  "quotaManagement": {
+    "enabled": true,
+    "trackingFile": ".ai/quota-tracker.json",
+    "resetSchedule": "0 0 * * *",
+    "warningThreshold": 0.8,
+    "services": {
+      "gemini": {
+        "dailyLimit": 1000,
+        "currentUsage": 0,
+        "resetTime": "00:00 UTC",
+        "priority": 1
+      },
+      "github_copilot_free": {
+        "monthlyLimit": 500,
+        "currentUsage": 0,
+        "resetTime": "1st of month",
+        "priority": 2
+      },
+      "codeium": {
+        "dailyLimit": "unlimited",
+        "currentUsage": 0,
+        "priority": 3
+      },
+      "amazon_q": {
+        "monthlyLimit": 1000,
+        "currentUsage": 0,
+        "resetTime": "1st of month",
+        "priority": 4
+      }
+    }
+  },
+
+  "localModels": {
+    "enabled": true,
+    "provider": "ollama",
+    "fallbackThreshold": 0.9,
+    "models": {
+      "coding": {
+        "name": "codellama:7b-instruct",
+        "use_case": "code generation, debugging",
+        "memory_gb": 8,
+        "speed": "medium"
+      },
+      "general": {
+        "name": "llama3.1:8b",
+        "use_case": "general reasoning, documentation",
+        "memory_gb": 10,
+        "speed": "medium"
+      },
+      "fast": {
+        "name": "codegemma:2b",
+        "use_case": "quick completions, simple tasks",
+        "memory_gb": 4,
+        "speed": "fast"
+      }
+    }
+  },
+
+  "serviceRotation": {
+    "strategy": "priority_with_quota",
+    "rotationRules": [
+      {
+        "condition": "quota_available",
+        "action": "use_highest_priority"
+      },
+      {
+        "condition": "quota_exceeded",
+        "action": "fallback_to_next"
+      },
+      {
+        "condition": "all_quotas_exceeded",
+        "action": "use_local_models"
+      }
+    ]
+  },
+
+  "lanes": {
+    "ai_coding": {
+      "name": "AI Code Generation",
+      "worktreePath": ".worktrees/ai-coding",
+      "branch": "lane/ai-coding",
+      "tools": {
+        "primary": {
+          "tool": "aider",
+          "config": {
+            "model_priority": ["gemini/gemini-1.5-pro", "ollama/codellama:7b-instruct"],
+            "auto_commit": false,
+            "edit_format": "diff"
+          }
+        },
+        "fallback": {
+          "tool": "continue",
+          "config": {
+            "provider": "ollama",
+            "model": "codellama:7b-instruct"
+          }
+        }
+      },
+      "allowedPatterns": ["src/**", "lib/**", "tests/**"],
+      "excludePatterns": ["*.md", "docs/**"],
+      "preCommit": ["ruff check .", "black --check ."],
+      "commitPrefix": "ai:"
+    },
+
+    "quality": {
+      "name": "Code Quality",
+      "worktreePath": ".worktrees/quality",
+      "branch": "lane/quality",
+      "tools": {
+        "linting": {
+          "javascript": "eslint --fix .",
+          "python": "ruff check --fix .",
+          "sql": "sqlfluff fix ."
+        },
+        "formatting": {
+          "javascript": "prettier --write .",
+          "python": "black .",
+          "json": "jq '.' --indent 2"
+        },
+        "analysis": "sonar-scanner"
+      },
+      "allowedPatterns": ["**/*.js", "**/*.py", "**/*.sql", "**/*.ts"],
+      "preCommit": ["npm test", "python -m pytest"],
+      "commitPrefix": "quality:"
+    },
+
+    "security": {
+      "name": "Security Scanning",
+      "worktreePath": ".worktrees/security",
+      "branch": "lane/security",
+      "tools": {
+        "sast": {
+          "general": "semgrep --config=auto .",
+          "python": "bandit -r .",
+          "javascript": "eslint --ext .js,.ts --config security ."
+        },
+        "dependencies": {
+          "npm": "npm audit --audit-level=moderate",
+          "python": "safety check",
+          "containers": "trivy fs ."
+        },
+        "secrets": "gitleaks detect --source ."
+      },
+      "allowedPatterns": ["**/*"],
+      "preCommit": ["echo 'Security scan complete'"],
+      "commitPrefix": "security:",
+      "failOnVulnerabilities": true,
+      "severityThreshold": "high"
+    },
+
+    "infrastructure": {
+      "name": "Infrastructure as Code",
+      "worktreePath": ".worktrees/infrastructure",
+      "branch": "lane/infrastructure",
+      "tools": {
+        "provisioning": "tofu",
+        "configuration": "ansible-playbook",
+        "validation": "checkov -d .",
+        "planning": "tofu plan"
+      },
+      "allowedPatterns": ["infrastructure/**", "*.tf", "*.yml", "*.yaml"],
+      "preCommit": ["tofu validate", "checkov -d . --check CKV_*"],
+      "commitPrefix": "infra:"
+    },
+
+    "documentation": {
+      "name": "Documentation Generation",
+      "worktreePath": ".worktrees/docs",
+      "branch": "lane/docs",
+      "tools": {
+        "api_docs": "swagger-codegen generate -i api-spec.yaml -l html2 -o docs/api",
+        "readme": "readme-generator",
+        "changelog": "conventional-changelog"
+      },
+      "allowedPatterns": ["docs/**", "*.md", "README*", "CHANGELOG*"],
+      "preCommit": ["markdownlint docs/"],
+      "commitPrefix": "docs:"
+    }
+  },
+
+  "integration": {
+    "testCommand": "npm test && python -m pytest",
+    "deployCommand": "echo 'Deploy to staging'",
+    "rollbackCommand": "git revert HEAD",
+    "notificationWebhook": null,
+    "slackChannel": null
+  },
+
+  "costOptimization": {
+    "strategies": [
+      {
+        "name": "Peak Hours Avoidance",
+        "description": "Use local models during peak API usage hours",
+        "schedule": "09:00-17:00 weekdays",
+        "action": "prefer_local"
+      },
+      {
+        "name": "Bulk Operations",
+        "description": "Batch API calls to reduce quota usage",
+        "batchSize": 10,
+        "action": "batch_requests"
+      },
+      {
+        "name": "Cache Results",
+        "description": "Cache API responses to avoid duplicate calls",
+        "ttl": "24h",
+        "action": "enable_cache"
+      }
+    ]
+  },
+
+  "monitoring": {
+    "quotaAlerts": {
+      "enabled": true,
+      "thresholds": [0.7, 0.9, 1.0],
+      "channels": ["console", "file"]
+    },
+    "performanceMetrics": {
+      "track": ["response_time", "quota_usage", "success_rate"],
+      "retention": "30d"
+    },
+    "healthChecks": {
+      "services": ["ollama", "git", "node", "python"],
+      "interval": "5m"
+    }
+  }
+}
