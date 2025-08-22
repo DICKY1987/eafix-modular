@@ -1,0 +1,325 @@
+# .ai/constraints/config.yaml
+version: 2
+name: "Python Edit Constraints"
+description: "Comprehensive constraint system for automated Python editing"
+
+# Tool routing configuration
+routing:
+  default_tool: aider_local
+  fallback_tool: vscode_editor
+  
+  # Smart routing based on characteristics
+  smart_routing:
+    enabled: true
+    rules:
+      - condition: "file_count > 8 OR total_lines > 2000"
+        route_to: claude_code
+        reason: "Large changeset requires sophisticated handling"
+      
+      - condition: "complexity == 'simple' AND file_count <= 3"
+        route_to: aider_local
+        reason: "Simple changes work well with local tools"
+      
+      - condition: "has_hard_blocks"
+        route_to: vscode_editor
+        reason: "Constraints require manual intervention"
+
+# Constraint set definitions
+constraint_sets:
+  pre_execution:
+    - git_state
+    - file_validation
+    - resource_limits
+  
+  tool_selection:
+    - capability_match
+    - quota_availability
+    - complexity_analysis
+  
+  post_execution:
+    - quality_validation
+    - security_check
+
+# Individual constraint definitions
+constraints:
+  git_state:
+    - id: git.clean_worktree
+      name: "Clean Git Worktree"
+      type: git.clean_worktree
+      severity: HARD_BLOCK
+      description: "Ensures working directory is clean before automated edits"
+      params:
+        allow_untracked: false
+        allow_staged: false
+      
+    - id: git.on_feature_branch
+      name: "Feature Branch Required"
+      type: git.branch_pattern
+      severity: SOFT_WARN
+      description: "Encourages working on feature branches"
+      params:
+        pattern: "^(feature/|fix/|hotfix/)"
+        exclude_branches: ["main", "master", "develop"]
+
+  file_validation:
+    - id: files.path_allowlist
+      name: "Path Allowlist"
+      type: files.path_allowlist
+      severity: HARD_BLOCK
+      description: "Restricts edits to approved directories"
+      params:
+        include:
+          - "src/**/*.py"
+          - "lib/**/*.py"
+          - "tests/**/*.py"
+          - "scripts/**/*.py"
+          - "*.py"
+          - "pyproject.toml"
+          - "requirements*.txt"
+        exclude:
+          - "migrations/**"
+          - "venv/**"
+          - ".venv/**"
+          - "build/**"
+          - "dist/**"
+          - "**/__pycache__/**"
+          - "*.pyc"
+    
+    - id: files.count_limit
+      name: "File Count Limit"
+      type: files.count_limit
+      severity: HARD_BLOCK
+      description: "Prevents overly large changesets"
+      params:
+        limit: 12
+        warning_threshold: 8
+    
+    - id: files.size_limit
+      name: "File Size Limit"
+      type: files.size_limit
+      severity: HARD_BLOCK
+      description: "Prevents editing extremely large files"
+      params:
+        max_bytes: 150000  # 150KB
+        warning_bytes: 100000  # 100KB
+    
+    - id: files.binary_check
+      name: "No Binary Files"
+      type: files.binary_check
+      severity: HARD_BLOCK
+      description: "Prevents accidental binary file modification"
+      params:
+        extensions_allowed: [".py", ".txt", ".md", ".yaml", ".yml", ".json", ".toml"]
+
+  resource_limits:
+    - id: system.memory_available
+      name: "Sufficient Memory"
+      type: system.memory_check
+      severity: SOFT_WARN
+      description: "Ensures adequate system resources"
+      params:
+        min_free_mb: 1024
+        check_swap: true
+    
+    - id: system.disk_space
+      name: "Sufficient Disk Space"
+      type: system.disk_check
+      severity: HARD_BLOCK
+      description: "Prevents disk space issues"
+      params:
+        min_free_gb: 1.0
+        path: "."
+
+  capability_match:
+    - id: python.syntax_valid
+      name: "Valid Python Syntax"
+      type: python.syntax_valid
+      severity: HARD_BLOCK
+      description: "All Python files must have valid syntax"
+      params:
+        python_version: "3.8+"
+        mode: "ast_parse"
+    
+    - id: python.imports_resolve
+      name: "Imports Resolve"
+      type: python.imports_resolve
+      severity: SOFT_WARN
+      description: "Import statements should resolve successfully"
+      params:
+        check_external: false
+        allow_relative: true
+    
+    - id: python.no_syntax_errors
+      name: "No Syntax Errors"
+      type: python.compile_check
+      severity: HARD_BLOCK
+      description: "Files must compile without errors"
+      params:
+        mode: "compile"
+        optimize: 0
+
+  quota_availability:
+    - id: quota.claude_available
+      name: "Claude Code Quota Available"
+      type: quota.service_available
+      severity: SOFT_WARN
+      description: "Checks Claude Code quota before use"
+      params:
+        service: "claude_code"
+        daily_limit: 50
+        threshold: 0.8
+        cost_per_request: 0.15
+    
+    - id: quota.gemini_available
+      name: "Gemini CLI Quota Available"
+      type: quota.service_available
+      severity: SOFT_WARN
+      description: "Checks Gemini CLI quota"
+      params:
+        service: "gemini_cli"
+        daily_limit: 1000
+        threshold: 0.9
+        cost_per_request: 0.0
+
+  complexity_analysis:
+    - id: complexity.cyclomatic
+      name: "Cyclomatic Complexity"
+      type: complexity.cyclomatic
+      severity: SOFT_WARN
+      description: "Warns on high complexity functions"
+      params:
+        max_complexity: 10
+        tool: "radon"
+    
+    - id: complexity.maintainability
+      name: "Maintainability Index"
+      type: complexity.maintainability
+      severity: SOFT_WARN
+      description: "Checks code maintainability"
+      params:
+        min_index: 20
+        tool: "radon"
+
+  quality_validation:
+    - id: quality.lint_clean
+      name: "Lint Clean"
+      type: quality.lint_clean
+      severity: SOFT_WARN
+      description: "Code should pass linting checks"
+      params:
+        tool: "ruff"
+        config: "pyproject.toml"
+        allow_warnings: true
+        max_errors: 5
+    
+    - id: quality.format_consistent
+      name: "Consistent Formatting"
+      type: quality.format_check
+      severity: SOFT_WARN
+      description: "Code should follow formatting standards"
+      params:
+        tool: "black"
+        config: "pyproject.toml"
+        check_only: true
+    
+    - id: quality.type_hints
+      name: "Type Hints Present"
+      type: quality.type_check
+      severity: SOFT_WARN
+      description: "Encourages type annotations"
+      params:
+        tool: "mypy"
+        config: "mypy.ini"
+        strict: false
+
+  security_check:
+    - id: security.no_secrets
+      name: "No Hardcoded Secrets"
+      type: security.secrets_scan
+      severity: HARD_BLOCK
+      description: "Prevents accidental secret commits"
+      params:
+        tools: ["detect-secrets", "gitleaks"]
+        patterns:
+          - "password\\s*="
+          - "api[_-]?key\\s*="
+          - "secret\\s*="
+          - "token\\s*="
+    
+    - id: security.no_vulnerabilities
+      name: "No Known Vulnerabilities"
+      type: security.vulnerability_scan
+      severity: SOFT_WARN
+      description: "Scans for known security issues"
+      params:
+        tool: "bandit"
+        config: ".bandit"
+        severity_threshold: "medium"
+
+# Violation handling strategies
+violation_handling:
+  auto_fix:
+    enabled: true
+    fixable_violations:
+      - "quality.format_consistent"
+      - "quality.lint_clean"
+    
+    fix_commands:
+      "quality.format_consistent": "black {{files}}"
+      "quality.lint_clean": "ruff check --fix {{files}}"
+  
+  escalation:
+    hard_blocks:
+      action: "route_to_fallback"
+      notify: true
+      log_level: "ERROR"
+    
+    soft_warnings:
+      action: "continue_with_warning"
+      notify: false
+      log_level: "WARN"
+    
+    quota_exceeded:
+      action: "route_to_local"
+      notify: true
+      log_level: "INFO"
+
+# Performance and caching
+performance:
+  caching:
+    enabled: true
+    ttl_seconds: 300
+    cache_location: ".ai/cache/constraints"
+  
+  parallel_execution:
+    enabled: true
+    max_workers: 4
+    constraint_groups_parallel: true
+  
+  timeouts:
+    per_constraint: 30  # seconds
+    total_evaluation: 120  # seconds
+
+# Monitoring and metrics
+monitoring:
+  metrics:
+    enabled: true
+    track:
+      - "constraint_evaluation_time"
+      - "violation_counts_by_type"
+      - "tool_selection_frequency"
+      - "auto_fix_success_rate"
+  
+  logging:
+    level: "INFO"
+    format: "json"
+    destination: ".ai/logs/constraints.log"
+    
+  alerts:
+    high_violation_rate:
+      threshold: 0.7
+      action: "notify"
+    
+    frequent_fallbacks:
+      threshold: 0.5
+      action: "review_constraints"
