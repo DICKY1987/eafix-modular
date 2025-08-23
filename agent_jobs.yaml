@@ -1,0 +1,31 @@
+version: 2
+defaults:
+  commit_on: tests_green
+  max_changes_per_commit: 50
+  shell: pwsh
+  precommit: true
+
+jobs:
+  - name: core-refactor
+    tool: claude_code
+    branch: refactor/core-claude
+    worktree: ../wt-core
+    watch: ["src/**/*.py"]
+    tests: "pytest -q"
+    commit_on: tests_green
+
+  - name: quality-fixes
+    tool: aider_local
+    branch: feat/quality-aider
+    worktree: ../wt-quality
+    watch: ["**/*.py"]
+    tests: "pytest -q && ruff check"
+    commit_on: tests_green
+
+  - name: triage-fixes
+    tool: auto_fixer
+    branch: chore/triage-fixes
+    worktree: ../wt-triage
+    watch: ["**/*.py"]
+    tests: "pytest -q"
+    commit_on: tests_green
