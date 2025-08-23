@@ -1,0 +1,46 @@
+--- CycleSync_Technical_Spec_v1.1_Patched.md
++++ CycleSync_Technical_Spec_v1.2_Agentic_Addendum.md
+@@ -249,3 +249,43 @@
+ ---
+ 
+ ## 🔚 End of Document
++
++# CycleSync Technical Spec — v1.2 Addendum (Agentic DevOps Integration)
++
++This addendum describes **non-invasive** integrations to adopt a **parallel, agentic CLI workflow** while keeping CycleSync's core intact.
++
++## A. Objectives
++- Enable parallel development with **Claude Code, Aider, Cline, Gemini CLI, ChatGPT Agent**, and **GitHub Copilot**.
++- Maintain **tight version control** via branches, worktrees, pre-commit, and merge queue.
++- Ensure **repeatability** with a declarative job manifest and CI policies.
++
++## B. New Operational Files (Repo Root)
++- `.ai/workflows/agent_jobs.yaml` — Declarative jobs (tool, branch, worktree, tests).
++- `.ai/scripts/orchestrate.ps1` — Orchestrates rebase → tool run → tests → auto-commit/push.
++- `.vscode/tasks.json` — VS Code tasks to launch jobs in parallel.
++- `.gitmessage.txt` — Enforced commit trailers (`Tool:`, `Job:`).
++- `.github/workflows/ci.yml` — Pre-commit, tests, coverage as required checks.
++
++## C. Branch & Worktree Conventions
++- One **branch/worktree per job**: `feat/ui-aider`, `fix/api-cline`, `refactor/core-claude`.
++- All agents run inside their worktree to avoid collisions.
++- Commits are **atomic** and **signed**; merge via **queue** only.
++
++## D. Quality Gates
++- **Pre-commit**: format, lint, type check, secrets scan.
++- **CI**: repeat the same checks; enforce coverage threshold.
++- **Commit policy**: commit on green tests (or time-boxed WIP with label).
++
++## E. Integration Points with CycleSync
++- **Build/Test Hooks**: orchestrator invokes CycleSync’s existing test commands.
++- **Docs/Specs**: ChatGPT/Gemini generate ADRs & specs → committed to `docs/` via dedicated generator branches.
++- **Artifacts**: Any generated files managed by a single `gen/*` branch to avoid conflicts.
++
++## F. Rollback & Safety
++- Cline snapshots workspace; Git handles reverts.
++- Feature flags guard risky changes; gradual rollout via PRs.
++
++## G. Next Steps
++1. Add files in Section B.
++2. Configure branch protection & merge queue on `main`.
++3. Start with 2–3 jobs in parallel and expand as stable.
