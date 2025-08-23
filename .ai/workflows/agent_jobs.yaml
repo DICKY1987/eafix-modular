@@ -1,0 +1,46 @@
+# Declarative jobs manifest for parallel agentic CLI workflows
+# One branch/worktree per job. Tests gate auto-commits.
+# Tool routing keys aligned with triage pack: auto_fixer | aider_local | claude_code | gemini_cli | chatgpt_agent
+version: 2
+defaults:
+  commit_on: tests_green          # tests_green | time_10min
+  max_changes_per_commit: 50
+  shell: pwsh                     # pwsh | bash
+  precommit: true
+jobs:
+  - name: ui-refactor
+    tool: aider_local             # was: aider
+    branch: feat/ui-aider
+    worktree: ../wt-aider
+    watch:
+      - apps/ui/**/*.tsx
+      - apps/ui/**/*.ts
+    tests: "pnpm -w apps/ui test"
+    commit_on: tests_green
+
+  - name: api-hardening
+    tool: claude_code             # was: cline (route complex/architecture tasks here)
+    branch: fix/api-cline
+    worktree: ../wt-cline
+    watch:
+      - services/api/**/*.py
+    tests: "pytest -q"
+    commit_on: tests_green
+
+  - name: core-refactor
+    tool: claude_code
+    branch: refactor/core-claude
+    worktree: ../wt-claude
+    watch:
+      - core/**/*
+    tests: "pytest -q"
+    commit_on: time_10min
+
+  - name: triage-py
+    tool: auto_fixer              # receives syntax/import/lint buckets from triage
+    branch: chore/triage-fixes
+    worktree: ../wt-triage
+    watch:
+      - "**/*.py"
+    tests: "pytest -q"
+    commit_on: tests_green

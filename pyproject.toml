@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cli-multi-rapid"
+version = "0.1.0"
+description = "A simple multi-rapid CLI scaffold"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    { name = "Automated Agent", email = "agent@example.com" },
+]
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/DICKY1987/cli_multi_rapid_DEV"
+Repository = "https://github.com/DICKY1987/cli_multi_rapid_DEV"
+
+[project.scripts]
+cli-multi-rapid = "cli_multi_rapid.cli:main"
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == '__main__':",
+]
