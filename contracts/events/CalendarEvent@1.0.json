@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CalendarEvent",
+  "version": "1.0",
+  "description": "Economic calendar event data",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique event identifier"
+    },
+    "start_ts": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Event start timestamp (UTC)"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "Currency code (USD, EUR, etc.)"
+    },
+    "impact": {
+      "type": "string",
+      "enum": ["LOW", "MED", "HIGH"],
+      "description": "Expected market impact"
+    },
+    "title": {
+      "type": "string",
+      "description": "Event title/name"
+    },
+    "forecast": {
+      "type": "string",
+      "description": "Forecasted value"
+    },
+    "actual": {
+      "type": "string",
+      "description": "Actual reported value"
+    },
+    "previous": {
+      "type": "string",
+      "description": "Previous period value"
+    },
+    "source": {
+      "type": "string",
+      "description": "Data source vendor"
+    },
+    "ingested_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Data ingestion timestamp"
+    }
+  },
+  "required": ["id", "start_ts", "currency", "impact", "title"],
+  "additionalProperties": false
+}

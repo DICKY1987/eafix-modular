@@ -1,0 +1,284 @@
+version: '3.8'
+
+services:
+  # Message Bus
+  redis:
+    image: redis:7-alpine
+    container_name: eafix-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: eafix-postgres
+    environment:
+      POSTGRES_DB: eafix_trading
+      POSTGRES_USER: eafix
+      POSTGRES_PASSWORD: eafix_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eafix -d eafix_trading"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Data Ingestor Service
+  data-ingestor:
+    build:
+      context: ../../services/data-ingestor
+      dockerfile: Dockerfile
+    container_name: eafix-data-ingestor
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=INFO
+    depends_on:
+      redis:
+        condition: service_healthy
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./config:/app/config:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Indicator Engine Service  
+  indicator-engine:
+    build:
+      context: ../../services/indicator-engine
+      dockerfile: Dockerfile
+    container_name: eafix-indicator-engine
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=INFO
+    depends_on:
+      redis:
+        condition: service_healthy
+      data-ingestor:
+        condition: service_healthy
+    ports:
+      - "8082:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Signal Generator Service
+  signal-generator:
+    build:
+      context: ../../services/signal-generator
+      dockerfile: Dockerfile
+    container_name: eafix-signal-generator
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - RISK_MANAGER_URL=http://risk-manager:8080
+      - LOG_LEVEL=INFO
+    depends_on:
+      redis:
+        condition: service_healthy
+      indicator-engine:
+        condition: service_healthy
+    ports:
+      - "8083:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Risk Manager Service
+  risk-manager:
+    build:
+      context: ../../services/risk-manager
+      dockerfile: Dockerfile
+    container_name: eafix-risk-manager
+    environment:
+      - DATABASE_URL=postgresql://eafix:eafix_password@postgres:5432/eafix_trading
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8084:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Execution Engine Service
+  execution-engine:
+    build:
+      context: ../../services/execution-engine
+      dockerfile: Dockerfile
+    container_name: eafix-execution-engine
+    environment:
+      - DATABASE_URL=postgresql://eafix:eafix_password@postgres:5432/eafix_trading
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+      risk-manager:
+        condition: service_healthy
+    ports:
+      - "8085:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Calendar Ingestor Service
+  calendar-ingestor:
+    build:
+      context: ../../services/calendar-ingestor
+      dockerfile: Dockerfile
+    container_name: eafix-calendar-ingestor
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://eafix:eafix_password@postgres:5432/eafix_trading
+      - LOG_LEVEL=INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8086:8080"
+    volumes:
+      - ./calendar_data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Reentry Matrix Service
+  reentry-matrix-svc:
+    build:
+      context: ../../services/reentry-matrix-svc
+      dockerfile: Dockerfile
+    container_name: eafix-reentry-matrix
+    environment:
+      - DATABASE_URL=postgresql://eafix:eafix_password@postgres:5432/eafix_trading
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8087:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Reporter Service
+  reporter:
+    build:
+      context: ../../services/reporter
+      dockerfile: Dockerfile
+    container_name: eafix-reporter
+    environment:
+      - DATABASE_URL=postgresql://eafix:eafix_password@postgres:5432/eafix_trading
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8088:8080"
+    volumes:
+      - ./reports:/app/reports
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # GUI Gateway Service
+  gui-gateway:
+    build:
+      context: ../../services/gui-gateway
+      dockerfile: Dockerfile
+    container_name: eafix-gui-gateway
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - SIGNAL_GENERATOR_URL=http://signal-generator:8080
+      - RISK_MANAGER_URL=http://risk-manager:8080
+      - EXECUTION_ENGINE_URL=http://execution-engine:8080
+      - REPORTER_URL=http://reporter:8080
+      - LOG_LEVEL=INFO
+    depends_on:
+      signal-generator:
+        condition: service_healthy
+      risk-manager:
+        condition: service_healthy
+      execution-engine:
+        condition: service_healthy
+      reporter:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: eafix-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: eafix-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+volumes:
+  redis_data:
+  postgres_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  default:
+    name: eafix-network

@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OrderIntent",
+  "version": "1.2",
+  "description": "Risk-approved order ready for execution",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique order intent identifier"
+    },
+    "signal_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Source signal identifier"
+    },
+    "symbol": {
+      "type": "string",
+      "pattern": "^[A-Z]{6}$",
+      "description": "Currency pair symbol"
+    },
+    "side": {
+      "type": "string",
+      "enum": ["BUY", "SELL"],
+      "description": "Trading direction"
+    },
+    "quantity": {
+      "type": "number",
+      "minimum": 0.01,
+      "description": "Position size in lots"
+    },
+    "stop_loss": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Stop loss price"
+    },
+    "take_profit": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Take profit price"
+    },
+    "time_in_force": {
+      "type": "string",
+      "enum": ["IOC", "FOK", "GTC", "DAY"],
+      "default": "GTC",
+      "description": "Order time in force"
+    },
+    "risk_parameters": {
+      "type": "object",
+      "properties": {
+        "max_risk_pct": {
+          "type": "number",
+          "description": "Maximum risk percentage of account"
+        },
+        "position_limit": {
+          "type": "number",
+          "description": "Position size limit for symbol"
+        }
+      },
+      "additionalProperties": false
+    },
+    "approved_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Risk approval timestamp"
+    }
+  },
+  "required": ["id", "signal_id", "symbol", "side", "quantity", "approved_timestamp"],
+  "additionalProperties": false
+}
