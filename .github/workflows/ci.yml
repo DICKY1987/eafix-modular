@@ -1,0 +1,212 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: 
+          - data-ingestor
+          - indicator-engine  
+          - signal-generator
+          - risk-manager
+          - execution-engine
+          - calendar-ingestor
+          - reentry-matrix-svc
+          - reporter
+          - gui-gateway
+
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Cache Poetry dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pypoetry
+        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-
+
+    - name: Install Poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+    - name: Configure Poetry
+      run: |
+        poetry config virtualenvs.create true
+        poetry config virtualenvs.in-project true
+
+    - name: Install dependencies
+      run: poetry install
+
+    - name: Run linting
+      run: |
+        poetry run black --check services/${{ matrix.service }}
+        poetry run isort --check-only services/${{ matrix.service }}
+        poetry run flake8 services/${{ matrix.service }}
+
+    - name: Run type checking
+      run: poetry run mypy services/${{ matrix.service }}/src
+
+    - name: Run tests
+      env:
+        REDIS_URL: redis://localhost:6379
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+      run: |
+        poetry run pytest services/${{ matrix.service }}/tests -v --cov=services/${{ matrix.service }}/src
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: ${{ matrix.service }}
+
+  contract-tests:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python  
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install JSON Schema validator
+      run: pip install jsonschema
+
+    - name: Validate event schemas
+      run: |
+        python -c "
+        import json
+        import jsonschema
+        import os
+        
+        # Validate all event schemas
+        schema_dir = 'contracts/events'
+        for filename in os.listdir(schema_dir):
+          if filename.endswith('.json'):
+            with open(os.path.join(schema_dir, filename)) as f:
+              schema = json.load(f)
+            try:
+              jsonschema.Draft7Validator.check_schema(schema)
+              print(f'✓ {filename} is valid')
+            except Exception as e:
+              print(f'✗ {filename} is invalid: {e}')
+              exit(1)
+        "
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: [test, contract-tests]
+    if: github.ref == 'refs/heads/master'
+
+    strategy:
+      matrix:
+        service:
+          - data-ingestor
+          - indicator-engine
+          - signal-generator
+          - risk-manager
+          - execution-engine
+          - calendar-ingestor
+          - reentry-matrix-svc
+          - reporter
+          - gui-gateway
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: services/${{ matrix.service }}
+        push: true
+        tags: |
+          ghcr.io/${{ github.repository }}/${{ matrix.service }}:latest
+          ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: docker-build
+    if: github.ref == 'refs/heads/master'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Start services with Docker Compose
+      run: |
+        cd deploy/compose
+        docker compose up -d
+        sleep 30
+
+    - name: Run integration tests
+      run: |
+        # Basic health checks
+        curl -f http://localhost:8080/healthz  # GUI Gateway
+        curl -f http://localhost:8081/healthz  # Data Ingestor
+        curl -f http://localhost:8082/healthz  # Indicator Engine
+
+    - name: Check service logs
+      if: failure()
+      run: |
+        cd deploy/compose
+        docker compose logs
+
+    - name: Cleanup
+      if: always()
+      run: |
+        cd deploy/compose
+        docker compose down -v
