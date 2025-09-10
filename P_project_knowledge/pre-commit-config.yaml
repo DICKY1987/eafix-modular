@@ -1,0 +1,13 @@
+repos:
+  - repo: local
+    hooks:
+      - id: apf-validate-master
+        name: APF: Validate master YAML
+        entry: python apf_apply_stub.py --validate-only spec/master.yaml
+        language: system
+        pass_filenames: false
+      - id: apf-validate-cr
+        name: APF: Validate change requests
+        entry: python apf_apply_stub.py --lint-cr changes/*.yaml
+        language: system
+        pass_filenames: false
