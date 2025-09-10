@@ -1,0 +1,57 @@
+name: Reentry CI
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+
+jobs:
+  test-validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest jsonschema pre-commit
+
+      - name: Run unit tests (pytest)
+        run: |
+          if [ -d tests ]; then
+            pytest -q
+          else
+            echo "No tests/ directory found. Skipping."
+          fi
+
+      - name: Validate indicators (if files present)
+        run: |
+          if [ -f reentry_helpers_cli.py ] && [ -f indicator_record.schema.json ] && [ -f indicator_records_full.json ]; then
+            python reentry_helpers_cli.py validate-indicators --records indicator_records_full.json --schema indicator_record.schema.json
+          else
+            echo "Indicator validation inputs not found. Skipping."
+          fi
+
+      - name: Validate reentry keys in CSVs (runtime/ and registries/)
+        run: |
+          if [ -f scripts/validate_keys_cli.py ]; then
+            python scripts/validate_keys_cli.py runtime registries
+          else
+            echo "scripts/validate_keys_cli.py not found. Skipping."
+          fi
+
+      - name: Pre-commit (optional)
+        run: |
+          if [ -f .pre-commit-config.yaml ]; then
+            pre-commit run --all-files || (echo 'pre-commit checks failed' && exit 1)
+          else
+            echo "No .pre-commit-config.yaml found. Skipping."
+          fi
