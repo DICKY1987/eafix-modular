@@ -66,10 +66,13 @@ pytest -q --cov=src --cov-report=term-missing --cov-fail-under=80
 |---------------------------|---------------------------------------------------------|
 | ``src/cli_multi_rapid``    | Source code for the CLI implementation.                 |
 | ``tests``                 | Unit tests written using ``unittest``.                  |
+| ``config/``               | Configuration files (Docker, YAML, JSON schemas).        |
+| ``scripts/``              | Setup and utility scripts.                               |
+| ``docs/``                 | Documentation organized by purpose.                      |
+| ``docs/specs/``           | Technical specifications and templates.                   |
+| ``docs/archive/``         | Archived and legacy documentation.                       |
 | ``.ai``                   | Agent orchestration scripts and job definitions.         |
 | ``.github/workflows``     | GitHub Actions workflows for automated CI.               |
-| ``framework_readme.md``   | Detailed documentation for the broader free‑tier agentic framework. |
-| ``*.md/.txt/.png/.pdf``   | Specifications, diagrams and supporting documentation.    |
 
 ## Contributing
 

@@ -47,11 +47,11 @@ The system consists of several integrated framework layers:
 pip install -r requirements.txt
 
 # Copy and configure environment
-cp env.example .env
+cp config/env.example .env
 # Edit .env with your API keys (ANTHROPIC_API_KEY, GOOGLE_API_KEY)
 
 # Start infrastructure services (Redis, Ollama, Monitoring)
-docker-compose up -d
+docker-compose -f config/docker-compose.yml up -d
 
 # Development environment setup with nox
 nox -s dev_setup
@@ -132,7 +132,7 @@ Services are defined in `SERVICES` dict with:
 - `fallback`: Fallback service when quota exceeded
 
 ### Lane Configuration
-Git worktree lanes are configured in `.ai/workflows/agent_jobs.yaml`:
+Git worktree lanes are configured in `.ai/workflows/agent_jobs.yaml` and `config/agent_jobs.yaml`:
 - **Tool routing**: Maps to triage pack (auto_fixer | aider_local | claude_code | gemini_cli)
 - **Branch/worktree isolation**: Each job runs in isolated git worktree
 - **Test gates**: Auto-commits on `tests_green` or `time_10min`
@@ -252,13 +252,19 @@ Access at http://localhost:3000 (admin/admin) after `docker-compose up`:
 ├── agentic_framework_v3.py    # Main framework orchestrator
 ├── langgraph_git_integration.py  # Git worktree management
 ├── noxfile.py                 # Testing and development automation
-├── docker-compose.yml         # Infrastructure services
 ├── requirements.txt           # Python dependencies
+├── config/                    # Configuration files
+│   ├── docker-compose.yml     # Infrastructure services
+│   ├── agent_jobs.yaml        # Declarative job definitions
+│   └── env.example           # Environment template
+├── scripts/                   # Setup and utility scripts
+├── docs/                      # Documentation
+│   ├── specs/                 # Technical specifications
+│   └── archive/               # Archived documentation
 ├── .ai/                       # Agent orchestration configs
-│   └── workflows/agent_jobs.yaml  # Declarative job definitions
-├── src/cli_multi_rapid/       # Legacy CLI scaffold
-├── tests/                     # Test suite
-└── monitoring/                # Prometheus/Grafana configs
+│   └── workflows/agent_jobs.yaml  # Primary job definitions
+├── src/cli_multi_rapid/       # CLI implementation
+└── tests/                     # Test suite
 ```
 
 This framework replaces expensive AI subscriptions with intelligent free-tier management, providing professional-grade multi-agent development capabilities at minimal cost.
