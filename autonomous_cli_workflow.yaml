@@ -1,0 +1,179 @@
+name: Symbiotic-CLI-Autonomous-Workflow
+version: 1.0
+purpose: >
+  An autonomous development pipeline that lets a single "cockpit" agent (Claude Code or
+  OpenAI Codex CLI) plan and edit code while OSS validators/gates enforce quality, security,
+  and performance. The pipeline runs end-to-end from plain-English feature request to tested,
+  documented commit.
+
+actors:
+  cockpit_agent:
+    options: [claude, codex]
+    manifest_contract:
+      plan: string
+      changed_files: [path]
+      followups: [string]
+  orchestrator:
+    impl: python_script # scripts/symbiotic.py
+  validators:
+    - ruff
+    - mypy
+    - semgrep
+    - bandit
+    - gitleaks
+    - pytest
+    - coverage
+    - hypothesis # property-based tests
+    - optional:
+        - hyperfine # perf gate
+        - pip-licenses # license gate
+
+artifacts:
+  audit_log: .ai-audit.jsonl
+  checkpoints:
+    - pre-implementation
+    - tested
+  branches:
+    - ai/feature
+    - symbiosis/feature
+
+triggers:
+  - manual: "Run VS Code task: Feature (prompt)"
+  - ci: "Repository dispatch / PR label"
+
+env:
+  allowlist_commands:
+    - "just validate"
+    - "just perf"
+    - "git status"
+    - "git add -A && git commit -m '<msg>'"
+  denylist_patterns:
+    - "os.system("
+    - "eval("
+    - "__import__"
+    - "DROP TABLE"
+  directory_allowlist: ["./src", "./app", "./tests"]
+  gates:
+    coverage_min: 0.85
+    complexity_max_delta: 0.20
+    license_allowlist: ["MIT", "Apache-2.0", "BSD"]
+    perf_regression_policy: "fail_if_slower"  # optional
+
+flow:
+  - id: preflight
+    name: Preflight Security Analysis
+    actor: orchestrator
+    actions:
+      - "create or reset git branch ai/feature"
+      - "snapshot pre-implementation state"
+  - id: plan
+    name: Strategic Planning
+    actor: cockpit_agent
+    actions:
+      - "analyze repo, plan edits"
+      - "emit JSON manifest {plan, changed_files, followups}"
+    outputs: ["manifest.json"]
+  - id: implement
+    name: Implementation
+    actor: cockpit_agent
+    actions:
+      - "apply code edits within allowlisted dirs"
+  - id: validate_parallel
+    name: Parallel Validation
+    actor: orchestrator
+    actions:
+      - "run ruff --fix"
+      - "run mypy"
+      - "run semgrep --config=auto"
+      - "run bandit"
+      - "run gitleaks"
+    concurrency: parallel
+  - id: repair_loop
+    name: AI Repair Loop
+    condition: "any(validator_failed)"
+    max_attempts: 1
+    actor: cockpit_agent
+    actions:
+      - "fix reported issues"
+      - "re-emit manifest"
+  - id: unit_tests
+    name: Targeted Unit Tests
+    actor: codex # preferred for test gen
+    inputs: ["manifest.changed_files"]
+    actions:
+      - "generate pytest tests for changed files (auto-edit)"
+  - id: coverage_check
+    name: Coverage Gate
+    actor: orchestrator
+    actions:
+      - "pytest --cov --cov-fail-under=${gates.coverage_min}"
+  - id: checkpoint_tested
+    name: Git Checkpoint (tested)
+    actor: orchestrator
+    actions:
+      - "commit/tag tested snapshot"
+  - id: perf_gate
+    name: Performance Gate
+    condition: "perf_regression_policy != null"
+    actor: orchestrator
+    actions:
+      - "hyperfine --warmup 3 --export-json perf.json 'python -m pytest tests/'"
+      - "python check_perf_regression.py perf.json"
+  - id: docs
+    name: Documentation Generation
+    actor: codex
+    actions:
+      - "generate docstrings/markdown for changed modules"
+  - id: finalize
+    name: Final Commit + Metrics
+    actor: orchestrator
+    actions:
+      - "commit changes"
+      - "append audit event to .ai-audit.jsonl"
+
+routing:
+  dynamic_pipeline:
+    api_or_auth: ["bandit", "semgrep", "mypy", "gitleaks"]
+    frontend: ["prettier", "eslint"]
+    data_etl: ["great-expectations", "dbt test"]
+
+vscode:
+  tasks:
+    feature_prompt: "PYTHONUNBUFFERED=1 python scripts/symbiotic.py "${input:featureDesc}""
+    validate_fast: "just validate"
+    perf_gate: "just perf"
+    monitors:
+      audit_log: "tail -f .ai-audit.jsonl | jq -r '.event | "\(.tool): \(.action) | files=\(.files_changed) lines=+\(.lines_added) Δ=\(.complexity_delta)"'"
+      git_diffs: "watch -n 1 'git --no-pager diff --stat'"
+      test_watch: "pytest -q -f"
+  cockpit_prompts:
+    claude: |
+      You are my repo cockpit. Rules:
+      - Edit only in ./src and ./app.
+      - After any edit, print JSON: {"plan":"...", "changed_files":["..."], "followups":["..."]}
+      - For shell, propose one safe command at a time from allowlist: just validate | just perf | git status | git add -A && git commit -m "<msg>"
+      - Security: bcrypt>=12, no logging secrets, constant-time compares, secrets via env/keystore.
+      - Never use eval(), os.system(), or destructive SQL.
+    codex: |
+      You are my repo cockpit.
+      - Edit only ./src ./app.
+      - After edits, emit {"plan":"...","changed_files":[...],"followups":[...]}.
+      - Shell proposals limited to: just validate | just perf | git status | git add -A && git commit -m "<msg>"
+      - Use approval-mode auto-edit for file edits; shell in suggest.
+mermaid: |
+  graph TD
+    A[Feature Request] --> B[Preflight Security Analysis]
+    B --> C[Claude: Strategic Planning]
+    C --> D[Git Checkpoint: pre-implementation]
+    D --> E[Claude: Implementation]
+    E --> F[Parallel Validation]
+    F --> G{Pass?}
+    G -->|No| H[AI Repair Loop]
+    H --> F
+    G -->|Yes| I[Codex: Test Generation]
+    I --> J[Property-Based Test Enhancement]
+    J --> K[Coverage Check]
+    K --> L[Git Checkpoint: tested]
+    L --> M[Performance Profiling]
+    M --> N[Documentation Generation]
+    N --> O[Final Commit + Metrics]
