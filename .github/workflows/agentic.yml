@@ -1,0 +1,17 @@
+name: agentic
+on: [pull_request]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: python -m venv .venv && . .venv/bin/activate && pip install -U pip
+      - run: . .venv/bin/activate && pip install ruff mypy bandit radon pytest coverage hypothesis semgrep pip-audit PyYAML gitleaks
+      - run: . .venv/bin/activate && semgrep --config=auto .
+      - run: . .venv/bin/activate && bandit -q -r src
+      - run: pip-audit
+      - run: . .venv/bin/activate && ruff format . && ruff check --fix .
+      - run: . .venv/bin/activate && pytest --cov=src --cov-fail-under=85 -q
+
