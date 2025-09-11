@@ -1,0 +1,824 @@
+Perfect, let’s brainstorm this out properly.
+You want a VS Code extension that provides a webview console (rich UI panel) and task integration (run orchestrator jobs, guardrails, or CLI agents directly from VS Code).
+
+🧩 Vision for the Extension
+1. Webview Console
+
+A dedicated VS Code side panel (via WebviewViewProvider).
+
+Displays:
+
+AI CLI Console – unified logs/output from aider-auto, claude-auto, codex-auto, etc.
+
+Guardrail Alerts – warnings if pre-commit/pre-push hooks would block a change.
+
+Lane Status – show current git lane/branch and allowed files (pulled from .ai/guard/allowed_patterns.txt).
+
+Task Monitor – live status of tasks kicked off via agentic_framework_v3.py (with progress bars from rich JSON output).
+
+UI components:
+
+Tabs: Console | Tasks | Guardrails | Config
+
+Color-coded messages (success, warning, error).
+
+Button controls:
+
+“Run Aider Task”
+
+“Claude Design Review”
+
+“Run Guardrail Check Now”
+
+“Push Lane → PR”
+
+2. Task Integration
+
+Integrates with VS Code Tasks API:
+
+Auto-generate tasks from .ai/framework-config.json.
+
+Example tasks:
+
+Run Orchestrator: Status → python agentic_framework_v3.py status
+
+Implement Task → python agentic_framework_v3.py execute "Implement user auth"
+
+Guardrail Check → run .git/hooks/pre-commit in dry-run mode.
+
+Configurable via tasks.json:
+
+{
+  "label": "Run Orchestrator: Status",
+  "type": "shell",
+  "command": "python",
+  "args": ["agentic_framework_v3.py", "status"],
+  "problemMatcher": []
+}
+
+
+Extension auto-updates tasks.json when guardrail config changes.
+
+3. Integration with Guardrails
+
+Before a task runs, the extension checks:
+
+Current branch prefix.
+
+Allowed file patterns vs. open editors.
+
+Conventional Commit compliance.
+
+Shows inline warnings in the webview and/or VS Code notifications:
+
+“⚠️ File docs/readme.md is outside allowed paths (src/**, tests/**) — commit will be blocked.”
+
+4. Developer Experience Enhancements
+
+Quick Picks (dropdowns):
+
+Choose “Lane” → creates a new branch with the right prefix (lane/ai-coding/...).
+
+Choose “Agent” → runs task with aider-auto, claude-auto, or codex-auto.
+
+Terminal Integration:
+
+“Run in Agent Terminal” spawns an integrated VS Code terminal, preloaded with the correct alias/env.
+
+Notifications:
+
+Task finished (✅ success, ❌ failure).
+
+Daily cost/quota warnings (hook into Redis metrics API from orchestrator).
+
+🛠️ Technical Architecture
+
+Backend (Node in VS Code extension):
+
+Manages webview lifecycle.
+
+Calls out to Python scripts (agentic framework) via child_process.spawn.
+
+Watches .ai/guard/* and .env for changes.
+
+Frontend (Webview React app):
+
+UI built with React + Tailwind.
+
+Communicates with extension backend via postMessage API.
+
+Displays logs in a console-like component.
+
+Data Flow:
+
+User clicks “Run Task” in webview → message to extension.
+
+Extension spawns python agentic_framework_v3.py execute ....
+
+Orchestrator outputs JSON logs → streamed to webview.
+
+Webview updates console/task cards in real-time.
+
+⚖️ Design Tradeoffs
+
+Webview Console vs. Integrated Terminal
+
+Webview allows richer UI + guardrail overlays.
+
+Terminal is simpler, but less integrated.
+
+Direct Git Hook vs. Extension Guardrail Check
+
+Git hook enforces in repo.
+
+Extension provides preview/feedback before commit, reducing frustration.
+
+Single Unified Console vs. Multiple Panels
+
+Single unified console = less clutter.
+
+Multiple panels = separation of concerns (logs vs. guardrails vs. tasks).
+
+🚀 Possible Roadmap
+
+MVP (2–3 weeks)
+
+Extension with webview console.
+
+Run orchestrator tasks (status, execute).
+
+Show logs.
+
+Guardrail dry-run check.
+
+Phase 2
+
+Lane picker + branch creation.
+
+Guardrail alerts inline in editor.
+
+Task templates auto-sync with .ai/config.
+
+Phase 3
+
+Live quota dashboard (Gemini vs. Claude vs. Aider usage).
+
+Direct PR creation from extension.
+
+Multi-agent orchestration preview (graph view of tasks → services → results).
+
+👉 Question for you:
+Do you want this extension to replace the Git hooks (move guardrail enforcement into VS Code UI), or should it co-exist (hooks stay for CLI, extension just shows pre-check results)?
+
+You said:
+Can it have the option for both view:
+
+Single Unified Console vs. Multiple Panels
+
+Single unified console = less clutter.
+
+Multiple panels = separation of concerns (logs vs. guardrails vs. tasks).
+ChatGPT said:
+
+Yep—build it to support both layouts and let the user switch anytime (or auto-choose based on screen width). Here’s a tight plan with concrete implementation details.
+
+How to support both modes
+1) One setting, two UIs
+
+Add a workspace setting:
+
+// package.json (contributes.configuration)
+{
+  "contributes": {
+    "configuration": {
+      "title": "Agentic Dev",
+      "properties": {
+        "agenticDev.layoutMode": {
+          "type": "string",
+          "default": "unified",
+          "enum": ["unified", "panels", "auto"],
+          "description": "Console layout: single unified view or multiple panels (logs/guardrails/tasks). 'auto' switches based on viewport."
+        }
+      }
+    }
+  }
+}
+
+2) View registrations
+
+Register both the unified webview and the panelized webviews; show/hide via context keys.
+
+// package.json (contributes.views)
+{
+  "contributes": {
+    "views": {
+      "agenticDev": [
+        { "id": "agentic.unified",   "name": "Agentic Console" },
+        { "id": "agentic.logs",      "name": "Agentic Logs" },
+        { "id": "agentic.guardrails","name": "Agentic Guardrails" },
+        { "id": "agentic.tasks",     "name": "Agentic Tasks" }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        { "id": "agenticDev", "title": "Agentic", "icon": "media/icon.svg" }
+      ]
+    }
+  }
+}
+
+
+In activate(), set a context key that controls visibility:
+
+// extension.ts
+import * as vscode from 'vscode';
+
+const CTX_MODE = 'agenticDev.layoutMode';
+
+export async function activate(ctx: vscode.ExtensionContext) {
+  const config = vscode.workspace.getConfiguration('agenticDev');
+  const mode = config.get<'unified'|'panels'|'auto'>('layoutMode', 'unified');
+  await applyLayoutMode(mode);
+
+  // respond to setting changes
+  ctx.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration(e => {
+      if (e.affectsConfiguration('agenticDev.layoutMode')) {
+        const m = vscode.workspace.getConfiguration('agenticDev').get<'unified'|'panels'|'auto'>('layoutMode', 'unified');
+        applyLayoutMode(m);
+      }
+    })
+  );
+
+  // register providers
+  ctx.subscriptions.push(
+    vscode.window.registerWebviewViewProvider('agentic.unified', new UnifiedViewProvider(ctx)),
+    vscode.window.registerWebviewViewProvider('agentic.logs', new LogsViewProvider(ctx)),
+    vscode.window.registerWebviewViewProvider('agentic.guardrails', new GuardrailsViewProvider(ctx)),
+    vscode.window.registerWebviewViewProvider('agentic.tasks', new TasksViewProvider(ctx))
+  );
+}
+
+async function applyLayoutMode(mode: 'unified'|'panels'|'auto') {
+  // if 'auto', decide by editor width (simple heuristic)
+  if (mode === 'auto') {
+    mode = (vscode.window.activeTextEditor?.viewColumn ? 'panels' : 'unified');
+  }
+  await vscode.commands.executeCommand('setContext', CTX_MODE, mode);
+}
+
+
+Then add when clauses to show/hide views:
+
+// package.json (enable/disable per mode)
+{
+  "views": {
+    "agenticDev": [
+      { "id": "agentic.unified", "name": "Agentic Console", "when": "agenticDev.layoutMode == unified" },
+      { "id": "agentic.logs", "name": "Agentic Logs", "when": "agenticDev.layoutMode == panels" },
+      { "id": "agentic.guardrails", "name": "Agentic Guardrails", "when": "agenticDev.layoutMode == panels" },
+      { "id": "agentic.tasks", "name": "Agentic Tasks", "when": "agenticDev.layoutMode == panels" }
+    ]
+  }
+}
+
+3) Commands to toggle quickly
+
+Expose palette commands to switch on the fly:
+
+// package.json (commands)
+{
+  "contributes": {
+    "commands": [
+      { "command": "agenticDev.switchToUnified", "title": "Agentic: Switch to Unified Console" },
+      { "command": "agenticDev.switchToPanels",  "title": "Agentic: Switch to Multiple Panels" },
+      { "command": "agenticDev.toggleLayout",    "title": "Agentic: Toggle Layout" }
+    ]
+  }
+}
+
+// extension.ts (register commands)
+ctx.subscriptions.push(
+  vscode.commands.registerCommand('agenticDev.switchToUnified', () => applyLayoutMode('unified')),
+  vscode.commands.registerCommand('agenticDev.switchToPanels',  () => applyLayoutMode('panels')),
+  vscode.commands.registerCommand('agenticDev.toggleLayout', async () => {
+    const cur = (await vscode.commands.executeCommand('getContextKeyInfo')) as any; // or track locally
+    const next = (cur?.[CTX_MODE] === 'unified') ? 'panels' : 'unified';
+    applyLayoutMode(next as any);
+  })
+);
+
+4) Unified webview vs multi-panel content
+Unified (one webview with tabs)
+
+Use a single React webview with tabs: Console | Guardrails | Tasks. The extension streams events/logs/guardrail checks to one frontend, which switches tabs client-side.
+
+Pros: fewer processes, less clutter; great for smaller screens.
+
+Panels (three webviews)
+
+Register three WebviewViewProviders—each focused:
+
+Logs: stream orchestrator/stdout with filters and search.
+
+Guardrails: show pre-commit dry run, allowed paths, branch rules, and inline file warnings.
+
+Tasks: start/stop tasks, progress, queue, history.
+
+Pros: separation of concerns, users can dock/resize independently, better for wide monitors and power users.
+
+5) Shared data & messaging
+
+Create a single backend AgenticService singleton to avoid duplicate work:
+
+class AgenticService {
+  private static _i: AgenticService;
+  static get i() { return this._i ??= new AgenticService(); }
+
+  // EventEmitters for logs/guardrails/tasks
+  onLog = new vscode.EventEmitter<string>();
+  onGuardrail = new vscode.EventEmitter<any>();
+  onTask = new vscode.EventEmitter<any>();
+
+  runOrchestrator(cmd: string, args: string[]) { /* spawn, stream lines -> onLog */ }
+  checkGuardrails() { /* run pre-commit dry run; parse -> onGuardrail */ }
+  runTask(request: TaskRequest) { /* orchestrator execute; update onTask */ }
+}
+
+
+Each webview subscribes to the events via postMessage. The unified view consumes all three; the panels consume one each.
+
+6) Tasks integration (so both modes re-use it)
+
+Provide VS Code tasks dynamically:
+
+vscode.tasks.registerTaskProvider('agentic', {
+  provideTasks: () => [
+    new vscode.Task(
+      { type: 'agentic', task: 'status' },
+      vscode.TaskScope.Workspace,
+      'Orchestrator: Status',
+      'agentic',
+      new vscode.ShellExecution('python', ['agentic_framework_v3.py', 'status'])
+    )
+  ],
+  resolveTask: t => t
+});
+
+
+Wire task kicks to also emit to the unified console/panels so UX is consistent.
+
+7) Smart “auto” mode (optional)
+
+If layoutMode=auto, switch when:
+
+panel width > X px → panels
+
+otherwise → unified
+Listen for onDidChangeVisibleTextEditors or the webview’s resize messages to re-apply setContext.
+
+8) Performance & polish
+
+Debounce noisy logs; batch updates (e.g., 60–120ms).
+
+Persist last selected tab per workspace (Memento).
+
+Theme with VS Code variables for perfect dark/light support.
+
+A11y: ARIA roles for tabs, focus management, keyboard navigation.
+
+Minimal provider skeletons (TypeScript)
+class UnifiedViewProvider implements vscode.WebviewViewProvider {
+  constructor(private ctx: vscode.ExtensionContext) {}
+  resolveWebviewView(view: vscode.WebviewView) {
+    view.webview.options = { enableScripts: true, localResourceRoots: [this.ctx.extensionUri] };
+    view.webview.html = getUnifiedHtml(this.ctx, view.webview);
+    const svc = AgenticService.i;
+
+    const sub1 = svc.onLog.event(line => view.webview.postMessage({ type: 'log', line }));
+    const sub2 = svc.onGuardrail.event(g => view.webview.postMessage({ type: 'guardrail', g }));
+    const sub3 = svc.onTask.event(t => view.webview.postMessage({ type: 'task', t }));
+    view.onDidDispose(() => { sub1.dispose(); sub2.dispose(); sub3.dispose(); });
+  }
+}
+
+class LogsViewProvider implements vscode.WebviewViewProvider { /* similar, subscribe only to onLog */ }
+class GuardrailsViewProvider implements vscode.WebviewViewProvider { /* subscribe onGuardrail */ }
+class TasksViewProvider implements vscode.WebviewViewProvider { /* subscribe onTask */ }
+
+UX summary
+
+Unified console: clean, tabbed, fewer moving parts—great when you want focus.
+
+Multiple panels: power-user layout—dock Logs left, Guardrails bottom, Tasks right; perfect for bigger screens and parallel work.
+
+You can have both, switch with:
+
+Command palette (Agentic: Toggle Layout)
+
+Settings (agenticDev.layoutMode)
+
+(Optional) Auto mode by viewport
+
+If you want, I can generate a starter extension scaffold with this exact wiring (package.json, extension.ts, and a minimal React webview) so you can open it in VS Code and run F5 to test immediately.
+
+You said:
+Brainstorm other features That would be beneficial to the and can be implemented within this framework
+ChatGPT said:
+
+Got it — let’s go beyond just the console/panels and brainstorm a feature roadmap that fits naturally into your framework (LangGraph orchestration, guardrails, agent lanes, cost-aware AI routing).
+I’ll bucket ideas into Developer Productivity, AI Orchestration, Guardrails & Compliance, and UX/Workflow Enhancements.
+
+🌟 Brainstormed Feature Set
+1. Developer Productivity
+
+One-Click Lane Management
+
+“Create Lane” → prompts for type (lane/ai-coding, lane/quality, etc.), auto-branches with naming rules.
+
+“Switch Lane” → updates env, tasks, and guardrails context automatically.
+
+AI-Enhanced File Explorer
+
+Context menu: “Ask AI About File” or “Refactor with Aider/Claude” → runs agent with current file path.
+
+Inline Guardrail Feedback
+
+Highlight disallowed files (outside src/** or tests/**) directly in Explorer with a red badge.
+
+Hover → shows “Guardrail: Commits blocked unless overridden.”
+
+Smart Diff Review Panel
+
+After AI changes, open a webview comparing original vs. new with AI rationale in a side panel.
+
+“Accept / Reject / Edit” buttons.
+
+2. AI Orchestration Integration
+
+Service Cost Dashboard
+
+Pulls from Redis/Prometheus metrics.
+
+Shows today’s usage: Gemini (247 calls), Claude (18 calls, $2.70), etc.
+
+Quota bar with warnings at thresholds.
+
+Task Flow Visualizer
+
+Render LangGraph workflow DAG in the webview (like a mini Node-Edge graph viewer).
+
+Each node shows status (pending, running, complete).
+
+Hybrid Execution Control
+
+Buttons: “Run locally (Ollama)”, “Run with cheapest cloud AI”, or “Force Claude.”
+
+Cached Task Library
+
+Save & replay common task prompts.
+
+Example: “Implement user auth” saved → run again later with single click.
+
+3. Guardrails & Compliance
+
+Pre-Commit Dry-Run Button
+
+Run pre-commit hook in preview mode, show all blocked files/messages before user commits.
+
+Policy Profiles
+
+Toggle between “Strict” (enforce everything) vs. “Relaxed” (allow docs edits, commit to develop).
+
+Commit Message Helper
+
+Pop-up that suggests a Conventional Commit message from staged diff using AI.
+
+Branch Naming Assistant
+
+Auto-suggests compliant lane name: lane/ai-coding/add_auth_jwt.
+
+4. UX/Workflow Enhancements
+
+Unified Notifications
+
+AI job completed → toast in VS Code: “✅ Claude finished design refactor (cost $0.15).”
+
+QuickPick Palette Commands
+
+“Run Agentic Task” → choose from saved templates or ad-hoc prompt.
+
+Contextual Recommendations
+
+If editing src/api/user.py, suggest “Run API tests” task.
+
+If editing .git/hooks, warn about guardrail tampering.
+
+Offline / Sandbox Mode
+
+Toggle to only allow local tools (Aider, Ollama) for secure/offline environments.
+
+Error Recovery Loop
+
+If AI task fails tests, automatically open webview with “Red Team vs. Blue Team” AI suggestions for fixing.
+
+Multi-Project Awareness
+
+If multiple repos are open, extension detects and shows guardrail config status for each.
+
+🚀 Advanced Ideas (Stretch Goals)
+
+LangGraph Node Editor in VS Code
+
+Visual node editor (drag-drop) to design workflows inside VS Code; saves back to YAML/JSON.
+
+PR Automation
+
+“Push Lane to PR” → runs all guardrails + tests, then opens GitHub PR with template.
+
+AI Pair Programming Mode
+
+Webview terminal connected to chosen agent → chat interface where edits auto-apply with guardrails enforced.
+
+Audit Log Explorer
+
+Pulls from .ai/logs/ → searchable history of AI changes, costs, and commit messages.
+
+Self-Healing Suggestions
+
+Detect failing tasks/tests, automatically propose fix branch + commit.
+
+✅ The sweet spot: Start with unified vs. panels, lane manager, guardrail preview, and cost dashboard. Those are low-friction, high-impact, and they leverage your existing orchestrator + guardrails system.
+
+Would you like me to sketch a feature prioritization roadmap (MVP → Phase 2 → Stretch Goals) so you can decide what’s worth implementing first in this extension?
+
+You said:
+What about the user configurable parameters of various parts of the system Is there a place where the user can edit that in the VS code extension UX
+ChatGPT said:
+
+Absolutely—let’s add a clean, Config UX to the extension so users can edit everything without touching raw files. Here’s a practical design that fits your stack and keeps source-of-truths in sync.
+
+What should be configurable (by users)
+
+Project-level (workspace)
+
+AI routing: default agent (auto/Claude/Gemini/Aider/Ollama), max cost per task, quota thresholds, offline-only toggle.
+
+Guardrails: allowed file patterns, protected branches, allowed branch prefixes, commit policy (Conventional Commits on/off).
+
+Lanes: lane types → default agent, allowed paths, preflight checks.
+
+Tasks: saved task templates (label, command, args, lane, cost cap).
+
+Observability: endpoints (Prometheus/Grafana), show cost widgets on/off.
+
+Orchestrator: paths to Python, virtualenv, extra args for agentic_framework_v3.py.
+
+User-level (machine)
+
+CLI paths/flags: aider default flags, Claude permission mode, Ollama base URL.
+
+API keys: optionally surfaced with masked UI (writes to .env).
+
+Where it lives (sources of truth)
+
+.ai/framework-config.json (project): routing, lanes, tasks, defaults.
+
+.ai/guard/allowed_patterns.txt, branches_allowed_prefixes.txt (project): guardrail data lists.
+
+.env (project): keys, Redis URL, etc.
+
+VS Code Settings (user/workspace): UI preferences & convenience defaults (e.g., default layout, show cost cards).
+
+UX options inside the extension
+1) Command palette: “Open Agentic Settings”
+
+Opens a webview settings editor (React) with tabs:
+
+General (routing, cost, offline mode)
+
+Lanes
+
+Guardrails
+
+Tasks
+
+Integrations (CLI paths, endpoints)
+
+Secrets (keys; masked input, write to .env)
+
+“Save” writes back to the relevant files (with schema validation + diff preview).
+
+“Reset to defaults” per section.
+
+2) Native VS Code Settings (quick tweaks)
+
+Expose common toggles in settings.json under a agenticDev.* namespace.
+
+// package.json (contributes.configuration)
+{
+  "contributes": {
+    "configuration": {
+      "title": "Agentic Dev",
+      "properties": {
+        "agenticDev.layoutMode": {
+          "type": "string",
+          "default": "unified",
+          "enum": ["unified", "panels", "auto"],
+          "description": "Console layout."
+        },
+        "agenticDev.defaultAgent": {
+          "type": "string",
+          "default": "auto",
+          "enum": ["auto","claude","gemini","aider","ollama"],
+          "description": "Default service for new tasks."
+        },
+        "agenticDev.maxTaskCost": {
+          "type": "number",
+          "default": 0.5,
+          "description": "Max cost per task (USD)."
+        },
+        "agenticDev.offlineOnly": {
+          "type": "boolean",
+          "default": false,
+          "description": "Force local tools only (Aider/Ollama)."
+        }
+      }
+    }
+  }
+}
+
+
+The extension mirrors these into .ai/framework-config.json on save (and vice-versa on load).
+
+3) File-backed editors (guardrails & tasks)
+
+Inline editors for your list files with contextual UI:
+
+Guardrails:
+
+List editor for allowed_patterns.txt with add/remove chips.
+
+List editor for branches_allowed_prefixes.txt.
+
+Toggle: “Block commits to main|master|develop”.
+
+Tasks:
+
+Table editor for saved tasks (label, cmd, args, lane, cap).
+
+“Run now” button next to each.
+
+Implementation outline (clean and robust)
+Webview configuration panel
+
+React UI with form components; schema-validated against a JSON Schema for framework-config.json.
+
+On “Save”:
+
+Validate (show inline errors).
+
+Preview diff (optional modal) before applying.
+
+Write to:
+
+.ai/framework-config.json
+
+.ai/guard/*.txt
+
+.env (only fields the user changed)
+
+On “Load”: read files + VS Code settings; merge with precedence:
+
+Workspace overrides (files) > VS Code settings > defaults.
+
+Handle workspace trust: if untrusted, open in read-only mode (VS Code API workspace.isTrusted).
+
+File I/O & conflict handling
+
+Keep an in-memory lastKnownHash of each file; if changed on disk, prompt to merge or reload.
+
+Use atomic writes: write to temp + rename.
+
+Git present? Optionally commit config changes to a chore/config-update lane.
+
+JSON schema (example sketch)
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Agentic Framework Config",
+  "type": "object",
+  "properties": {
+    "routing": {
+      "type": "object",
+      "properties": {
+        "defaultAgent": { "type": "string", "enum": ["auto","claude","gemini","aider","ollama"] },
+        "maxTaskCost": { "type": "number", "minimum": 0 },
+        "offlineOnly": { "type": "boolean" },
+        "quotaWarn": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "required": ["defaultAgent"]
+    },
+    "lanes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "branchPrefix": { "type": "string" },
+          "defaultAgent": { "type": "string" },
+          "allowedPaths": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["name","branchPrefix"]
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": { "type": "string" },
+          "command": { "type": "string" },
+          "args": { "type": "array", "items": { "type": "string" } },
+          "lane": { "type": "string" },
+          "maxCost": { "type": "number" }
+        },
+        "required": ["label","command"]
+      }
+    }
+  }
+}
+
+Reading/writing helpers (TypeScript)
+import { readFile, writeFile } from 'fs/promises';
+import * as vscode from 'vscode';
+import * as path from 'path';
+
+const ROOT = vscode.workspace.workspaceFolders?.[0].uri.fsPath ?? '';
+const CFG = path.join(ROOT, '.ai', 'framework-config.json');
+
+export async function readJson<T>(file: string): Promise<T|undefined> {
+  try { return JSON.parse(await readFile(file, 'utf8')); } catch { return undefined; }
+}
+export async function writeJson(file: string, data: any) {
+  const tmp = file + '.tmp';
+  await writeFile(tmp, JSON.stringify(data, null, 2), 'utf8');
+  await writeFile(file, await readFile(tmp), 'utf8');
+}
+
+Secrets / .env handling
+
+Show masked inputs.
+
+On save, append/update keys in .env (preserve comments & order when possible).
+
+Offer “Test connection” for Redis, Ollama, etc.
+
+Optional: write secrets to a VS Code secret store (good for user-level keys that shouldn’t be committed).
+
+Guardrails awareness in the Config UI
+
+Preview “What your current guardrails will block”:
+
+Scan workspace for files outside allowed patterns; list counts by folder.
+
+Detect current branch; show green/red badge based on allowed prefixes.
+
+“Fix it for me” buttons:
+
+Add a pattern to allowed_patterns.txt.
+
+Create a new lane branch with correct prefix and switch to it.
+
+Profiles (fast toggle strictness)
+
+Add a top-level Profiles selector in the Config webview:
+
+Strict: only src/**, tests/**; protected branches locked; enforce Conventional Commits; offlineOnly=false but cost cap low.
+
+Relaxed: allow docs/** and tools/**; permit develop branch commits.
+
+Local-Only: offlineOnly=true; defaultAgent=ollama/aider.
+
+Profiles are just JSON fragments merged into config; stored in .ai/profiles/*.json.
+
+Safety & audit
+
+Every “Save” can optionally create a commit (chore(config): update guardrails) on a config lane.
+
+Keep a change log file .ai/config-changelog.json with timestamp, user, diff summary.
+
+Respect .gitignore for sensitive files; warn if .env is staged.
+
+TL;DR
+
+Yes—put a first-class Config panel in the extension:
+
+Tabbed webview editor (General, Lanes, Guardrails, Tasks, Integrations, Secrets).
+
+Schema-validated saves to .ai/framework-config.json, guardrail lists, and .env.
+
+Mirror key toggles to VS Code Settings for quick changes.
+
+Add profiles, guardrail previews, and “fix it” actions.
+
+Back it with atomic file writes, conflict prompts, and optional auto-commit

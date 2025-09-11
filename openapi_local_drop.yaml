@@ -1,0 +1,28 @@
+openapi: 3.0.1
+info:
+  title: Local File Drop
+  version: "1.0.0"
+servers:
+  - url: https://YOUR-TUNNEL-HOST.example
+paths:
+  /save:
+    post:
+      summary: Save a file to the local workstation
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path, content_b64]
+              properties:
+                path: { type: string, description: "Relative path on disk (e.g., src/new_file.py)" }
+                content_b64: { type: string, description: "Base64 file content" }
+                message: { type: string, description: "Commit message if REPO_DIR is set" }
+                branch:  { type: string, description: "Branch name for auto-commit (lane/* etc.)" }
+      responses:
+        "201": { description: "Saved" }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer }

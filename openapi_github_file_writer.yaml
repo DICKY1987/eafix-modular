@@ -1,0 +1,42 @@
+openapi: 3.0.1
+info:
+  title: GitHub File Writer
+  version: 1.0.0
+servers:
+  - url: https://api.github.com
+paths:
+  /repos/{owner}/{repo}/contents/{path}:
+    put:
+      summary: Create or update a file
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: path
+          name: owner
+          required: true
+          schema: { type: string }
+        - in: path
+          name: repo
+          required: true
+          schema: { type: string }
+        - in: path
+          name: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message, content, branch]
+              properties:
+                message: { type: string }
+                content: { type: string, description: "Base64-encoded file content" }
+                branch:  { type: string }
+                sha:     { type: string, description: "Existing file sha for updates" }
+      responses:
+        "201": { description: "File created" }
+        "200": { description: "File updated" }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer }

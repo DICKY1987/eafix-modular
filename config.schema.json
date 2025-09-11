@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Agentic Framework Config",
+  "type": "object",
+  "properties": {
+    "routing": {
+      "type": "object",
+      "properties": {
+        "defaultAgent": { "type": "string", "enum": ["auto","claude","gemini","aider","ollama"] },
+        "maxTaskCost": { "type": "number", "minimum": 0 },
+        "offlineOnly": { "type": "boolean" },
+        "quotaWarn": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "required": ["defaultAgent"]
+    },
+    "lanes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "branchPrefix": { "type": "string" },
+          "defaultAgent": { "type": "string" },
+          "allowedPaths": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["name","branchPrefix"]
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": { "type": "string" },
+          "command": { "type": "string" },
+          "args": { "type": "array", "items": { "type": "string" } },
+          "lane": { "type": "string" },
+          "maxCost": { "type": "number" }
+        },
+        "required": ["label","command"]
+      }
+    },
+    "integrations": {
+      "type": "object",
+      "properties": {
+        "github": {
+          "type": "object",
+          "properties": {
+            "defaultOwner": { "type": "string" },
+            "defaultRepo": { "type": "string" },
+            "defaultBranch": { "type": "string", "default": "main" }
+          }
+        },
+        "localDrop": {
+          "type": "object",
+          "properties": {
+            "endpoint": { "type": "string", "description": "e.g. https://your-tunnel-host/save" },
+            "tokenSecret": { "type": "string", "description": "Secret name holding the bearer token" }
+          }
+        }
+      }
+    }
+  }
+}
