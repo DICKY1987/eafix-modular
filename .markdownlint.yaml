@@ -1,0 +1,45 @@
+# Markdownlint configuration for trading system documentation
+extends: default
+
+# Custom rules for technical documentation
+rules:
+  # Line length - accommodate technical content
+  MD013:
+    line_length: 120
+    heading_line_length: 120
+    code_block_line_length: 120
+    tables: false
+
+  # Allow raw HTML for trading system diagrams and technical content
+  MD033: false
+
+  # Allow inline HTML for specialized formatting
+  MD034: false
+
+  # Allow multiple consecutive blank lines for section separation
+  MD012:
+    maximum: 2
+
+  # Allow duplicate headings in different sections
+  MD024:
+    siblings_only: true
+
+  # Allow bare URLs in technical documentation
+  MD034: false
+
+  # Allow emphasis around punctuation for trading terminology
+  MD036: false
+
+  # Allow fenced code blocks without language for pseudocode
+  MD040: false
+
+  # Disable heading increment rule for flexible document structure
+  MD001: false
+
+# Exclude specific files
+ignore:
+  - "node_modules/"
+  - "**/.git/"
+  - "**/dist/"
+  - "**/*.log"
+  - ".secrets.baseline"
