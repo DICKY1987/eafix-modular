@@ -1,5 +1,8 @@
 # cli_multi_rapid_DEV
 
+![CI](https://github.com/DICKY1987/cli_multi_rapid_DEV/actions/workflows/ci.yml/badge.svg)
+![Coverage](https://img.shields.io/badge/coverage-80%25%2B-brightgreen)
+
 This repository serves as a proof‑of‑concept for a lightweight command‑line
 interface (CLI) that can be extended into a multi‑agent development tool. The
 initial scaffold demonstrates how to structure a Python project using a
@@ -36,6 +39,32 @@ cli-multi-rapid greet Alice
 The editable install will register a console script entry point named
 `cli-multi-rapid`. It simply forwards to the same functionality exposed in
 ``cli_multi_rapid.cli``.
+
+## New: run-job subcommand
+
+Inspect jobs defined in `tasks.json` and, when `PyYAML` is available, `agent_jobs.yaml`. This command prints job metadata only and does not execute external processes.
+
+Examples
+
+```bash
+# List all jobs (auto-discovers tasks.json and agent_jobs.yaml)
+cli-multi-rapid run-job
+
+# List from a specific manifest
+cli-multi-rapid run-job --file tasks.json
+cli-multi-rapid run-job --file agent_jobs.yaml
+
+# Filter by name and show detailed steps/fields
+cli-multi-rapid run-job --name "triage" --show steps
+```
+
+YAML support is optional. To enable it, install the package with the `yaml` extra:
+
+```bash
+pip install -e .[yaml]
+# or, after publishing to an index:
+pip install "cli-multi-rapid[yaml]"
+```
 
 ## Development guide
 

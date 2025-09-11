@@ -26,6 +26,9 @@ Repository = "https://github.com/DICKY1987/cli_multi_rapid_DEV"
 [project.scripts]
 cli-multi-rapid = "cli_multi_rapid.cli:main"
 
+[project.optional-dependencies]
+yaml = ["PyYAML>=6.0"]
+
 [tool.coverage.run]
 source = ["src"]
 branch = true
