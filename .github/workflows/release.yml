@@ -1,0 +1,18 @@
+name: release
+on:
+  workflow_dispatch:
+  push:
+    tags: [ "v*" ]
+jobs:
+  notes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create Release Notes
+        run: |
+          echo "# Release $GITHUB_REF_NAME" > RELEASE_NOTES.md
+          echo "
+Artifacts in build-publish workflow artifacts." >> RELEASE_NOTES.md
+      - uses: softprops/action-gh-release@v2
+        with:
+          body_path: RELEASE_NOTES.md

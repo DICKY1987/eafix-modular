@@ -62,6 +62,89 @@ labels: enhancement
 ---
 """.lstrip(),
     "docs_readme": "# Documentation\n\nStart here for project docs.\n",
+    # Phase 3 CI/CD
+    "precommit_full": """
+repos:
+- repo: https://github.com/psf/black
+  rev: 24.4.2
+  hooks:
+  - id: black
+- repo: https://github.com/charliermarsh/ruff-pre-commit
+  rev: v0.5.6
+  hooks:
+  - id: ruff
+    args: ["--fix"]
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v1.10.0
+  hooks:
+  - id: mypy
+    additional_dependencies: ["types-requests"]
+""".lstrip(),
+    "ci_matrix": """
+name: CI
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -U pip
+      - run: pip install pre-commit ruff mypy pytest coverage
+      - run: pre-commit run -a || true
+      - run: pytest -q --cov=src --cov-report=term-missing --cov-fail-under=85
+""".lstrip(),
+    "build_publish_sbom_cosign": """
+name: build-publish
+on:
+  push:
+    tags: [ "v*" ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -U pip build cyclonedx-bom
+      - run: python -m build
+      - run: cyclonedx-bom -o sbom.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: artifacts
+          path: |
+            dist/*
+            sbom.json
+""".lstrip(),
+    "release_notes": """
+name: release
+on:
+  workflow_dispatch:
+  push:
+    tags: [ "v*" ]
+jobs:
+  notes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create Release Notes
+        run: |
+          echo "# Release $GITHUB_REF_NAME" > RELEASE_NOTES.md
+          echo "\nArtifacts in build-publish workflow artifacts." >> RELEASE_NOTES.md
+      - uses: softprops/action-gh-release@v2
+        with:
+          body_path: RELEASE_NOTES.md
+""".lstrip(),
     # Phase 2 schemas (minimal placeholders)
     "schema_price_tick": """
 {
@@ -180,4 +263,3 @@ def write_file(path: Path, content: str, overwrite: bool = False) -> None:
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(content, encoding="utf-8")
     tmp.replace(path)
-

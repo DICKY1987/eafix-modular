@@ -1,0 +1,21 @@
+name: build-publish
+on:
+  push:
+    tags: [ "v*" ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -U pip build cyclonedx-bom
+      - run: python -m build
+      - run: cyclonedx-bom -o sbom.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: artifacts
+          path: |
+            dist/*
+            sbom.json
