@@ -84,6 +84,14 @@ python -m workflows.orchestrator run-stream stream-a             # execute
 cli-multi-rapid phase run phase1 --dry
 ```
 
+CLI alternatives
+
+```bash
+# Using the installed entry point
+cli-multi-rapid phase stream list
+cli-multi-rapid phase stream run stream-a --dry
+```
+
 Hooks setup
 
 - Configure Git to use bundled hooks (merge-safety, optional license gate):

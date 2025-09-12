@@ -81,6 +81,9 @@ class CLIArgs:
     phase_cmd: Optional[str] = None
     phase_id: Optional[str] = None
     dry: Optional[bool] = None
+    # Stream subcommands under phase
+    stream_cmd: Optional[str] = None
+    stream_id: Optional[str] = None
     # Workflow validation fields
     workflow_validate: Optional[bool] = None
     compliance_check: Optional[bool] = None
@@ -175,6 +178,15 @@ def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
     phase_run.add_argument("--dry", dest="dry", action="store_true", help="Dry run (no side effects)")
     # phase status
     phase_sub.add_parser("status", help="Show workflow status")
+    # phase stream ...
+    phase_stream = phase_sub.add_parser("stream", help="Stream operations")
+    stream_sub = phase_stream.add_subparsers(dest="stream_cmd", required=True)
+    # phase stream list
+    stream_sub.add_parser("list", help="List multi-stream definitions")
+    # phase stream run <stream_id> [--dry]
+    stream_run = stream_sub.add_parser("run", help="Run all phases in a stream")
+    stream_run.add_argument("stream_id", type=str, help="Stream ID to execute (e.g., stream-a)")
+    stream_run.add_argument("--dry", dest="dry", action="store_true", help="Dry run (no side effects)")
     
     # compliance subcommand
     compliance_parser = subparsers.add_parser("compliance", help="Compliance and validation commands")
@@ -198,6 +210,8 @@ def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
         phase_cmd=getattr(parsed, "phase_cmd", None),
         phase_id=getattr(parsed, "phase_id", None),
         dry=getattr(parsed, "dry", None),
+        stream_cmd=getattr(parsed, "stream_cmd", None),
+        stream_id=getattr(parsed, "stream_id", None),
         workflow_validate=getattr(parsed, "workflow_validate", None),
         compliance_check=getattr(parsed, "compliance_check", None),
         compliance_cmd=getattr(parsed, "compliance_cmd", None),
@@ -415,6 +429,32 @@ def main(argv: Optional[List[str]] = None) -> int:
                     return asyncio.run(_go())
                 except Exception as exc:
                     print(f"Error: {exc}", file=sys.stderr)
+                    return 1
+            elif phase_cmd == "stream":
+                stream_cmd = getattr(args, "stream_cmd", None)
+                if stream_cmd == "list":
+                    streams = orch.list_streams()
+                    print(json.dumps(streams, indent=2))
+                    return 0
+                elif stream_cmd == "run":
+                    stream_id = getattr(args, "stream_id", None)
+                    dry = bool(getattr(args, "dry", False))
+                    if not stream_id:
+                        print("Error: missing stream_id", file=sys.stderr)
+                        return 1
+                    try:
+                        import asyncio
+
+                        async def _go_stream():
+                            summary = await orch.execute_stream(str(stream_id), dry_run=dry)
+                            return 0 if summary.get("failed", 0) == 0 else 1
+
+                        return asyncio.run(_go_stream())
+                    except Exception as exc:
+                        print(f"Error: {exc}", file=sys.stderr)
+                        return 1
+                else:
+                    print("Error: unknown stream subcommand", file=sys.stderr)
                     return 1
             else:
                 print("Error: unknown phase subcommand", file=sys.stderr)
