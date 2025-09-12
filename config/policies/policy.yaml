@@ -1,0 +1,11 @@
+version: '1.0'
+name: base_policies
+lint:
+  pre_commit_required: true
+testing:
+  coverage_min: 0.85
+security:
+  deny_patterns:
+    - 'DROP TABLE'
+    - 'eval('
+    - 'os.system('
