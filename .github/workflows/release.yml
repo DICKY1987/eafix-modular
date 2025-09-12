@@ -4,15 +4,28 @@ on:
   push:
     tags: [ "v*" ]
 jobs:
-  notes:
+  build-and-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Build and SBOM
+        run: |
+          python -m pip install -U pip build cyclonedx-bom
+          python -m build
+          cyclonedx-bom -o sbom.json
       - name: Create Release Notes
         run: |
           echo "# Release $GITHUB_REF_NAME" > RELEASE_NOTES.md
-          echo "
-Artifacts in build-publish workflow artifacts." >> RELEASE_NOTES.md
-      - uses: softprops/action-gh-release@v2
+          echo "\nIncludes Python distribution artifacts (dist/) and CycloneDX SBOM (sbom.json)." >> RELEASE_NOTES.md
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
           body_path: RELEASE_NOTES.md
+          files: |
+            dist/*
+            sbom.json
