@@ -115,3 +115,6 @@ Contributions are welcome! Feel free to open issues or pull requests to
 discuss improvements, report bugs, or suggest new features. Please follow the
 commit message guidelines defined in ``.gitmessage.txt`` and aim to include
 tests for any new functionality.
+## VS Code
+
+See `VSCODE_SETUP.md` for available tasks, debug configurations, and how to optionally merge the Codex configuration package from `CODEX_IMPLEMENTATION/vscode_configuration/` into `.vscode` with a backup.
