@@ -87,6 +87,45 @@ def init_tracing(service_name: str = 'cli-multi-rapid') -> None:
     # Integrate OpenTelemetry SDK here if desired
     return None
 """.lstrip(),
+    # Phase 5a compliance
+    "compliance_rules_json": """
+{
+  "rules": [
+    {"id": "COV_MIN", "desc": "Coverage must be >=85%", "type": "coverage", "min": 0.85},
+    {"id": "NO_SECRETS", "desc": "No secrets committed", "type": "secrets"}
+  ]
+}
+""".lstrip(),
+    "runbook_emergency_recovery_md": """
+# Emergency Recovery Runbook
+
+1. Identify incident scope and impacted services.
+2. Roll back to last known-good release tag.
+3. Restore data from backups if corruption detected.
+4. Verify service health and notify stakeholders.
+""".lstrip(),
+    "compliance_service_py": """
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+
+def evaluate_rules(rules_path: str = "policy/compliance_rules.json") -> bool:
+    p = Path(rules_path)
+    if not p.exists():
+        return False
+    try:
+        data = json.loads(p.read_text(encoding="utf-8"))
+        return isinstance(data.get("rules", []), list)
+    except Exception:
+        return False
+
+
+if __name__ == "__main__":  # manual check
+    ok = evaluate_rules()
+    print({"ok": ok})
+""".lstrip(),
     "issue_bug": """
 ---
 name: Bug report

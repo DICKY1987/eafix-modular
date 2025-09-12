@@ -66,6 +66,9 @@ class ActionType(str, Enum):
     COMPOSE_PIN_DIGESTS = "compose_pin_digests"
     LIBS = "libs"
     DASHBOARDS = "dashboards"
+    SERVICE = "service"
+    CI_GATE = "ci_gate"
+    RUNBOOK = "runbook"
 
 @dataclass
 class ActionResult:
@@ -249,6 +252,12 @@ class WorkflowOrchestrator:
                 result = await self.execute_libs_action(action)
             elif action_type == ActionType.DASHBOARDS:
                 result = await self.execute_dashboards_action(action)
+            elif action_type == ActionType.SERVICE:
+                result = await self.execute_service_action(action)
+            elif action_type == ActionType.CI_GATE:
+                result = await self.execute_ci_gate_action(action)
+            elif action_type == ActionType.RUNBOOK:
+                result = await self.execute_runbook_action(action)
             elif action_type == ActionType.TESTS:
                 result = await self.execute_tests_action(action)
             else:
@@ -494,6 +503,51 @@ class WorkflowOrchestrator:
             write_file(dest, content, overwrite=False)
             created.append(str(dest))
         return ActionResult(success=True, message=f"Created {len(created)} dashboard specs", details={"created": created})
+
+    async def execute_service_action(self, action: Dict[str, Any]) -> ActionResult:
+        name = action.get("name", "")
+        created = []
+        if name == "compliance-svc":
+            svc_path = self.project_root / "src/compliance/service.py"
+            write_file(svc_path, render_template("compliance_service_py").content, overwrite=False)
+            created.append(str(svc_path))
+        # Write any declared outputs
+        rules_out = action.get("rules_out") or action.get("rules_out_path") or action.get("rules_out_file")
+        if rules_out:
+            dest = self.project_root / Path(rules_out)
+            write_file(dest, render_template("compliance_rules_json").content, overwrite=False)
+            created.append(str(dest))
+        return ActionResult(success=True, message=f"Service {name} prepared", details={"created": created})
+
+    async def execute_ci_gate_action(self, action: Dict[str, Any]) -> ActionResult:
+        rules_in = action.get("rules_in", "policy/compliance_rules.json")
+        wf = self.project_root / ".github/workflows/compliance-gate.yml"
+        wf.parent.mkdir(parents=True, exist_ok=True)
+        script = self.project_root / "scripts/compliance_gate.py"
+        script.parent.mkdir(parents=True, exist_ok=True)
+        script_content = (
+            "from pathlib import Path\nimport json, sys\n"
+            f"p=Path('{rules_in}')\n"
+            "sys.exit(0) if p.exists() and 'rules' in json.loads(p.read_text(encoding='utf-8')) else sys.exit(1)\n"
+        )
+        write_file(script, script_content, overwrite=False)
+        wf_content = (
+            "name: compliance-gate\n"
+            "on:\n  pull_request:\n    branches: [ main ]\n  push:\n    branches: [ main ]\n"
+            "jobs:\n  check:\n    runs-on: ubuntu-latest\n    steps:\n"
+            "      - uses: actions/checkout@v4\n"
+            "      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.11'\n"
+            "      - run: python scripts/compliance_gate.py\n"
+        )
+        write_file(wf, wf_content, overwrite=False)
+        return ActionResult(success=True, message="Compliance gate workflow created", details={"workflow": str(wf)})
+
+    async def execute_runbook_action(self, action: Dict[str, Any]) -> ActionResult:
+        path = action.get("path", "docs/runbooks/emergency_recovery.md")
+        dest = self.project_root / Path(path)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        write_file(dest, render_template("runbook_emergency_recovery_md").content, overwrite=False)
+        return ActionResult(success=True, message=f"Runbook written to {path}")
     
     def get_status_report(self) -> Dict[str, Any]:
         """Generate comprehensive status report"""
