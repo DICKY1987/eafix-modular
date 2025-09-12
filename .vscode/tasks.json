@@ -485,18 +485,70 @@
       "presentation": { "panel": "new" }
     },
     {
-      "label": "CLI: Phase Stream List",
+      "label": "🚀 CLI: System Help",
       "type": "shell",
-      "command": "python -m src.cli_multi_rapid.cli phase stream list",
+      "command": "cli-multi-rapid --help",
       "group": "build",
-      "presentation": { "panel": "new" }
+      "presentation": { 
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      }
     },
     {
-      "label": "CLI: Phase Stream A (dry-run)",
+      "label": "📋 CLI: List All Streams",
       "type": "shell",
-      "command": "python -m src.cli_multi_rapid.cli phase stream run stream-a --dry",
+      "command": "cli-multi-rapid phase stream list",
       "group": "build",
-      "presentation": { "panel": "new" }
+      "presentation": { 
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🏗️ CLI: Run Stream A (Foundation)",
+      "type": "shell",
+      "command": "cli-multi-rapid phase stream run stream-a --dry",
+      "group": "build",
+      "presentation": { 
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "📊 CLI: System Status",
+      "type": "shell",
+      "command": "cli-multi-rapid workflow-status",
+      "group": "build",
+      "presentation": { 
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "✅ CLI: Compliance Check",
+      "type": "shell",
+      "command": "cli-multi-rapid compliance check",
+      "group": "test",
+      "presentation": { 
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🎯 CLI: Quick Test",
+      "type": "shell",
+      "command": "cli-multi-rapid greet \"VS Code User\"",
+      "group": "test",
+      "presentation": { 
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      }
     }
   ]
 }

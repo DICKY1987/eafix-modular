@@ -400,6 +400,10 @@ def main(argv: Optional[List[str]] = None) -> int:
         elif args.command == "phase":
             # Lazy import to avoid hard dependency when not used
             try:
+                # Add current directory to Python path for workflow imports
+                current_dir = os.getcwd()
+                if current_dir not in sys.path:
+                    sys.path.insert(0, current_dir)
                 from workflows.orchestrator import WorkflowOrchestrator  # type: ignore
             except Exception as exc:  # pragma: no cover
                 print(f"Error: workflow orchestrator unavailable: {exc}", file=sys.stderr)
