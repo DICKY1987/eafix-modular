@@ -66,6 +66,12 @@ pip install -e .[yaml]
 pip install "cli-multi-rapid[yaml]"
 ```
 
+Hooks setup
+
+- Configure Git to use bundled hooks (merge-safety, optional license gate):
+  - POSIX: `bash scripts/install_hooks.sh`
+  - PowerShell: `./scripts/install_hooks.ps1`
+
 ## Development guide
 
 Development workflows emphasise high code quality, reproducibility and clear

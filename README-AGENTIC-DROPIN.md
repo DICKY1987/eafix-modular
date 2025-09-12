@@ -15,3 +15,9 @@ Windows note
 
 - The provided VS Code tasks use POSIX shells (e.g., `. .venv/bin/activate`, `tail`, `watch`). On Windows, adapt these commands to PowerShell equivalents (e.g., `./.venv/Scripts/Activate.ps1`, `Get-Content -Wait`, scheduled git diff).
 
+Hooks setup
+
+- Set repo hooks path and ensure executability of pre-push gate:
+  - POSIX: `bash scripts/install_hooks.sh`
+  - PowerShell: `./scripts/install_hooks.ps1`
+  - Manually: `git config core.hooksPath .githooks`
