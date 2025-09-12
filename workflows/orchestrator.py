@@ -69,6 +69,9 @@ class ActionType(str, Enum):
     HELM_SCAFFOLD = "helm_scaffold"
     NETPOL = "netpol"
     EXT_SECRETS = "ext_secrets"
+    BRIDGE_CONTRACTS = "bridge_contracts"
+    PS_MODULE = "ps_module"
+    SQL_STANDARDS = "sql_standards"
     SERVICE = "service"
     CI_GATE = "ci_gate"
     RUNBOOK = "runbook"
@@ -261,6 +264,12 @@ class WorkflowOrchestrator:
                 result = await self.execute_netpol_action(action)
             elif action_type == ActionType.EXT_SECRETS:
                 result = await self.execute_ext_secrets_action(action)
+            elif action_type == ActionType.BRIDGE_CONTRACTS:
+                result = await self.execute_bridge_contracts_action(action)
+            elif action_type == ActionType.PS_MODULE:
+                result = await self.execute_ps_module_action(action)
+            elif action_type == ActionType.SQL_STANDARDS:
+                result = await self.execute_sql_standards_action(action)
             elif action_type == ActionType.SERVICE:
                 result = await self.execute_service_action(action)
             elif action_type == ActionType.CI_GATE:
@@ -545,6 +554,34 @@ class WorkflowOrchestrator:
         dest = self.project_root / Path("deploy/k8s/external-secret.yaml")
         write_file(dest, render_template("external_secrets_eso_yaml").content, overwrite=False)
         return ActionResult(success=True, message=f"External secrets for {provider} created", details={"created": str(dest)})
+
+    async def execute_bridge_contracts_action(self, action: Dict[str, Any]) -> ActionResult:
+        align_with = action.get("align_with", "contracts/events")
+        doc = self.project_root / Path("docs/bridge_contracts.md")
+        content = f"# Bridge Contracts\n\nAligning with: {align_with}\n\nSchemas under `{align_with}` are the source of truth.\n"
+        write_file(doc, content, overwrite=False)
+        return ActionResult(success=True, message="Bridge contracts doc created", details={"created": str(doc)})
+
+    async def execute_ps_module_action(self, action: Dict[str, Any]) -> ActionResult:
+        name = action.get("name", "Module")
+        ops = action.get("ops", []) or []
+        base = self.project_root / Path(f"ps/{name}")
+        base.mkdir(parents=True, exist_ok=True)
+        psm1 = base / f"{name}.psm1"
+        psd1 = base / f"{name}.psd1"
+        funcs = []
+        for op in ops:
+            funcs.append(f"function {op} {{ [CmdletBinding()] param() Write-Output '{op} OK' }}")
+        write_file(psm1, "\n\n".join(funcs) or f"# {name} module", overwrite=False)
+        write_file(psd1, f"@{{ ModuleVersion = '0.1.0'; RootModule = '{name}.psm1' }}", overwrite=False)
+        return ActionResult(success=True, message=f"PowerShell module {name} created", details={"created": [str(psm1), str(psd1)]})
+
+    async def execute_sql_standards_action(self, action: Dict[str, Any]) -> ActionResult:
+        db = action.get("db", "PostgreSQL")
+        path = self.project_root / Path("docs/sql_standards.md")
+        content = f"# SQL Standards for {db}\n\n- Use id bigserial primary keys.\n- UTC timestamps with timezone.\n- Safe migrations with transactional DDL where supported.\n"
+        write_file(path, content, overwrite=False)
+        return ActionResult(success=True, message="SQL standards documented", details={"created": str(path)})
 
     async def execute_service_action(self, action: Dict[str, Any]) -> ActionResult:
         name = action.get("name", "")
