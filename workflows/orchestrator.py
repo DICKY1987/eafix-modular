@@ -75,6 +75,15 @@ class ActionType(str, Enum):
     PERSISTENCE = "persistence"
     CONSUMERS = "consumers"
     QUEUES = "queues"
+    RUNBOOKS = "runbooks"
+    ISSUE_TEMPLATES = "issue_templates"
+    LINK = "link"
+    DEVCONTAINER = "devcontainer"
+    TASK_TARGETS = "task_targets"
+    PR_AUTOMATION = "pr_automation"
+    DOCS = "docs"
+    CODEOWNERS_SET = "codeowners"
+    PROJECT_BOARD = "project_board"
     SERVICE = "service"
     CI_GATE = "ci_gate"
     RUNBOOK = "runbook"
@@ -279,6 +288,24 @@ class WorkflowOrchestrator:
                 result = await self.execute_consumers_action(action)
             elif action_type == ActionType.QUEUES:
                 result = await self.execute_queues_action(action)
+            elif action_type == ActionType.RUNBOOKS:
+                result = await self.execute_runbooks_action(action)
+            elif action_type == ActionType.ISSUE_TEMPLATES:
+                result = await self.execute_issue_templates_action(action)
+            elif action_type == ActionType.LINK:
+                result = await self.execute_link_action(action)
+            elif action_type == ActionType.DEVCONTAINER:
+                result = await self.execute_devcontainer_action(action)
+            elif action_type == ActionType.TASK_TARGETS:
+                result = await self.execute_task_targets_action(action)
+            elif action_type == ActionType.PR_AUTOMATION:
+                result = await self.execute_pr_automation_action(action)
+            elif action_type == ActionType.DOCS:
+                result = await self.execute_docs_action(action)
+            elif action_type == ActionType.CODEOWNERS_SET:
+                result = await self.execute_codeowners_set_action(action)
+            elif action_type == ActionType.PROJECT_BOARD:
+                result = await self.execute_project_board_action(action)
             elif action_type == ActionType.SERVICE:
                 result = await self.execute_service_action(action)
             elif action_type == ActionType.CI_GATE:
@@ -682,6 +709,118 @@ class WorkflowOrchestrator:
         )
         write_file(qmod, code, overwrite=False)
         return ActionResult(success=True, message="Queues stub created", details={"bounded": bounded, "cb_backoff": cb})
+
+    async def execute_runbooks_action(self, action: Dict[str, Any]) -> ActionResult:
+        paths = action.get("paths", []) or []
+        created = []
+        for p in paths:
+            dest = self.project_root / Path(p)
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            content = f"# Runbook for {Path(p).stem}\n\nSteps to diagnose and resolve common incidents.\n"
+            write_file(dest, content, overwrite=False)
+            created.append(str(dest))
+        return ActionResult(success=True, message=f"Runbooks created: {len(created)}", details={"created": created})
+
+    async def execute_issue_templates_action(self, action: Dict[str, Any]) -> ActionResult:
+        paths = action.get("paths", []) or []
+        created = []
+        bug = (
+            "---\nname: Incident\nabout: Report an operational incident\nlabels: incident\n---\n\n**Summary**\n\n**Impact**\n\n**Timeline**\n\n**Mitigation**\n\n"
+        )
+        post = (
+            "---\nname: Postmortem\nabout: Document an incident postmortem\nlabels: postmortem\n---\n\n**Summary**\n\n**Root Cause**\n\n**Action Items**\n\n"
+        )
+        for p in paths:
+            dest = self.project_root / Path(p)
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            content = bug if "incident" in p else post
+            write_file(dest, content, overwrite=False)
+            created.append(str(dest))
+        return ActionResult(success=True, message=f"Issue templates created", details={"created": created})
+
+    async def execute_link_action(self, action: Dict[str, Any]) -> ActionResult:
+        src = self.project_root / Path(action.get("from", ""))
+        to = action.get("to", "release_notes")
+        dest = self.project_root / Path(f"docs/{to}.md")
+        if src.exists():
+            content = src.read_text(encoding="utf-8")
+        else:
+            content = f"Linked content from {src}"
+        write_file(dest, content, overwrite=False)
+        return ActionResult(success=True, message=f"Linked {src} to {dest}")
+
+    async def execute_devcontainer_action(self, action: Dict[str, Any]) -> ActionResult:
+        versions = action.get("python", ["3.11"]) or ["3.11"]
+        poetry = bool(action.get("poetry", False))
+        precommit = bool(action.get("precommit", True))
+        dc_dir = self.project_root / ".devcontainer"
+        dc_dir.mkdir(parents=True, exist_ok=True)
+        cfg = {
+            "name": "cli-multi-rapid",
+            "image": f"mcr.microsoft.com/devcontainers/python:{versions[0]}",
+            "features": {},
+            "postCreateCommand": " && ".join(filter(None, [
+                "pip install -U pip",
+                "pip install pre-commit" if precommit else "",
+                "pip install poetry" if poetry else "",
+            ]))
+        }
+        content = json.dumps(cfg, indent=2)
+        write_file(dc_dir / "devcontainer.json", content, overwrite=False)
+        return ActionResult(success=True, message="Devcontainer configured", details={"python": versions})
+
+    async def execute_task_targets_action(self, action: Dict[str, Any]) -> ActionResult:
+        extend = action.get("extend", []) or []
+        taskfile = self.project_root / "Taskfile.yml"
+        existing = taskfile.read_text(encoding="utf-8") if taskfile.exists() else "version: '3'\ntasks:\n"
+        for t in extend:
+            if f"  {t}:" in existing:
+                continue
+            existing += f"  {t}:\n    cmds:\n      - echo '{t}'\n"
+        write_file(taskfile, existing, overwrite=True)
+        return ActionResult(success=True, message=f"Taskfile extended", details={"targets": extend})
+
+    async def execute_pr_automation_action(self, action: Dict[str, Any]) -> ActionResult:
+        features = action.get("features", []) or []
+        created = []
+        if "autolabeler" in features:
+            labeler = self.project_root / ".github/labeler.yml"
+            write_file(labeler, "bug: ['**/*bug*']\nchore: ['**/*.md']\n", overwrite=False)
+            created.append(str(labeler))
+        if "pr_title_lint" in features:
+            wf = self.project_root / ".github/workflows/pr-title-lint.yml"
+            content = (
+                "name: pr-title-lint\n"
+                "on: [pull_request]\n"
+                "jobs:\n  lint:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: amannn/action-semantic-pull-request@v5\n"
+            )
+            write_file(wf, content, overwrite=False)
+            created.append(str(wf))
+        return ActionResult(success=True, message="PR automation configured", details={"created": created})
+
+    async def execute_docs_action(self, action: Dict[str, Any]) -> ActionResult:
+        path = action.get("path", "docs/roadmap.md")
+        dest = self.project_root / Path(path)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        content = "# Roadmap\n\nTrack next two sprints here.\n"
+        write_file(dest, content, overwrite=False)
+        return ActionResult(success=True, message=f"Doc written to {path}")
+
+    async def execute_codeowners_set_action(self, action: Dict[str, Any]) -> ActionResult:
+        require_reviewers = bool(action.get("require_reviewers", False))
+        path = self.project_root / ".github/CODEOWNERS"
+        content = path.read_text(encoding="utf-8") if path.exists() else "* @DICKY1987\n"
+        if require_reviewers and "@DICKY1987" not in content:
+            content += "* @DICKY1987\n"
+        write_file(path, content, overwrite=True)
+        return ActionResult(success=True, message="CODEOWNERS updated", details={"require_reviewers": require_reviewers})
+
+    async def execute_project_board_action(self, action: Dict[str, Any]) -> ActionResult:
+        lanes = action.get("lanes", []) or []
+        dest = self.project_root / "docs/project_board.md"
+        content = "# Project Board\n\nLanes:\n" + "\n".join(f"- {l}" for l in lanes)
+        write_file(dest, content, overwrite=False)
+        return ActionResult(success=True, message="Project board documented", details={"lanes": lanes})
     
     def get_status_report(self) -> Dict[str, Any]:
         """Generate comprehensive status report"""
