@@ -11,6 +11,7 @@ Security:
 from flask import Flask, request, jsonify
 from pathlib import Path
 import os, base64, subprocess
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST  # type: ignore
 
 app = Flask(__name__)
 
@@ -127,6 +128,11 @@ def save():
             git_result = {"push": "failed", "stderr": e.stderr}
 
     return jsonify({"ok": True, "saved": str(dest), "git": git_result}), 201
+
+@app.get("/metrics")
+def metrics():  # pragma: no cover - integration endpoint
+    data = generate_latest()
+    return app.response_class(response=data, status=200, mimetype=CONTENT_TYPE_LATEST)
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5055"))

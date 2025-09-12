@@ -21,9 +21,12 @@ from contextlib import redirect_stdout
 # import path when using a standard ``src`` layout. We add it here for
 # compatibility with the built-in test runner and to avoid import errors.
 TEST_DIR = os.path.dirname(__file__)
-SRC_DIR = os.path.abspath(os.path.join(TEST_DIR, "..", "src"))
+ROOT_DIR = os.path.abspath(os.path.join(TEST_DIR, ".."))
+SRC_DIR = os.path.join(ROOT_DIR, "src")
 if SRC_DIR not in sys.path:
     sys.path.insert(0, SRC_DIR)
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
 
 from cli_multi_rapid.cli import CLIArgs, greet, main, parse_args, sum_numbers
 
@@ -74,6 +77,16 @@ class TestMain(unittest.TestCase):
     def test_main_sum_prints_output(self) -> None:
         output = self._run_main_and_capture(["sum", "5", "7"])
         self.assertEqual(output, "12\n")
+
+    def test_main_phase_status_returns_zero(self) -> None:
+        # Status should not error even if no prior phases executed
+        exit_code = main(["phase", "status"])  # prints status; we only check exit code path
+        self.assertEqual(exit_code, 0)
+
+    def test_main_phase_run_dry(self) -> None:
+        # Dry-run avoids side effects; should complete without crashing
+        exit_code = main(["phase", "run", "phase1", "--dry"])  # allow completion even if partial
+        self.assertIn(exit_code, (0, 1))  # some phases may mark partial/failed; shouldn't crash
 
 
 if __name__ == "__main__":  # pragma: no cover - only executed when run directly

@@ -77,6 +77,10 @@ class CLIArgs:
     # Optional fields used by specific subcommands
     file: Optional[str] = None
     show: Optional[str] = None
+    # Orchestrator-specific optional fields
+    phase_cmd: Optional[str] = None
+    phase_id: Optional[str] = None
+    dry: Optional[bool] = None
 
 
 def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
@@ -145,6 +149,16 @@ def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
         help="Show detailed steps/fields for each job",
     )
 
+    # phase subcommand (workflow orchestrator)
+    phase_parser = subparsers.add_parser("phase", help="Workflow orchestration commands")
+    phase_sub = phase_parser.add_subparsers(dest="phase_cmd", required=True)
+    # phase run <id> [--dry]
+    phase_run = phase_sub.add_parser("run", help="Run a workflow phase by id")
+    phase_run.add_argument("phase_id", type=str, help="Phase ID to execute (e.g., phase1)")
+    phase_run.add_argument("--dry", dest="dry", action="store_true", help="Dry run (no side effects)")
+    # phase status
+    phase_sub.add_parser("status", help="Show workflow status")
+
     parsed = parser.parse_args(argv)
     return CLIArgs(
         command=parsed.command,
@@ -153,6 +167,9 @@ def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
         b=getattr(parsed, "b", None),
         file=getattr(parsed, "file", None),
         show=getattr(parsed, "show", None),
+        phase_cmd=getattr(parsed, "phase_cmd", None),
+        phase_id=getattr(parsed, "phase_id", None),
+        dry=getattr(parsed, "dry", None),
     )
 
 
@@ -311,6 +328,42 @@ def main(argv: Optional[List[str]] = None) -> int:
             name_filter = getattr(args, "name", None)
             show = getattr(args, "show", None)
             return _list_jobs(file, name_filter, show)
+        elif args.command == "phase":
+            # Lazy import to avoid hard dependency when not used
+            try:
+                from workflows.orchestrator import WorkflowOrchestrator  # type: ignore
+            except Exception as exc:  # pragma: no cover
+                print(f"Error: workflow orchestrator unavailable: {exc}", file=sys.stderr)
+                return 1
+            phase_cmd = getattr(args, "phase_cmd", None)
+            orch = WorkflowOrchestrator()
+            if phase_cmd == "status":
+                # Print status table and JSON summary
+                orch.print_status_table()
+                status = orch.get_status_report()
+                print(status)
+                return 0
+            elif phase_cmd == "run":
+                phase_id = getattr(args, "phase_id", None)
+                dry = bool(getattr(args, "dry", False))
+                if not phase_id:
+                    print("Error: missing phase_id", file=sys.stderr)
+                    return 1
+                # Execute synchronously
+                try:
+                    import asyncio
+
+                    async def _go():
+                        res = await orch.execute_phase(str(phase_id), dry_run=dry)
+                        return 0 if res.status.name.lower() == "completed" else 1
+
+                    return asyncio.run(_go())
+                except Exception as exc:
+                    print(f"Error: {exc}", file=sys.stderr)
+                    return 1
+            else:
+                print("Error: unknown phase subcommand", file=sys.stderr)
+                return 1
         else:
             # This branch should be unreachable because of argparse's required subcommand
             print(f"Unknown command: {args.command}", file=sys.stderr)
