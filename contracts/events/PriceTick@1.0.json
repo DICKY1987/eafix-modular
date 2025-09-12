@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PriceTick",
+  "type": "object",
+  "properties": {
+    "symbol": {"type": "string"},
+    "bid": {"type": "number"},
+    "ask": {"type": "number"},
+    "ts": {"type": "string", "format": "date-time"}
+  },
+  "required": ["symbol", "bid", "ask", "ts"]
+}
