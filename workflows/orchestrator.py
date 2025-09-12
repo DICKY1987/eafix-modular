@@ -119,6 +119,7 @@ class WorkflowOrchestrator:
         self.config_path = config_path or Path("workflows/phase_definitions")
         self.results: List[PhaseResult] = []
         self.current_phase: Optional[str] = None
+        self.streams_config_path: Path = self.config_path / "multi_stream.yaml"
         
         # Integration with existing framework
         self.project_root = Path.cwd()
@@ -135,6 +136,69 @@ class WorkflowOrchestrator:
         for file_path in required_files:
             if not (self.project_root / file_path).exists():
                 logger.warning(f"Expected file not found: {file_path}")
+
+    def load_streams_map(self) -> Dict[str, Any]:
+        """Load multi-stream configuration mapping.
+
+        Returns a dict keyed by stream id with fields: name, phases, scope.
+        """
+        if not self.streams_config_path.exists():
+            # Provide a safe default structure if file is not present
+            logger.warning("multi_stream.yaml not found; no streams available")
+            return {"streams": []}
+        with open(self.streams_config_path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+        return data
+
+    async def execute_stream(self, stream_id: str, dry_run: bool = False) -> Dict[str, Any]:
+        """Execute all phases in the given stream sequentially.
+
+        Returns a summary dict with counts of completed/failed phases.
+        """
+        data = self.load_streams_map()
+        streams: List[Dict[str, Any]] = data.get("streams", [])
+        stream = next((s for s in streams if s.get("id") == stream_id), None)
+        if not stream:
+            raise ValueError(f"Stream not found: {stream_id}")
+
+        if console:
+            console.print(f"[blue]Starting Stream: {stream.get('label', stream_id)}[/blue]")
+        else:
+            print(f"Starting Stream: {stream.get('label', stream_id)}")
+
+        phases: List[str] = list(stream.get("phases", []))
+        completed = 0
+        failed = 0
+        for pid in phases:
+            res = await self.execute_phase(pid, dry_run=dry_run)
+            if res.status == PhaseStatus.COMPLETED:
+                completed += 1
+            else:
+                failed += 1
+
+        summary = {"stream_id": stream_id, "completed": completed, "failed": failed, "total": len(phases)}
+        if console:
+            status_color = "green" if failed == 0 else "yellow" if completed > 0 else "red"
+            console.print(f"[{status_color}]Stream {stream_id} done: {completed}/{len(phases)} completed, {failed} failed[/{status_color}]")
+        else:
+            print(f"Stream {stream_id} done: {completed}/{len(phases)} completed, {failed} failed")
+        return summary
+
+    def list_streams(self) -> List[Dict[str, Any]]:
+        """Return a list of streams with id, name, and phases."""
+        data = self.load_streams_map()
+        streams: List[Dict[str, Any]] = data.get("streams", [])
+        return [
+            {
+                "id": s.get("id"),
+                "label": s.get("label"),
+                "name": s.get("name"),
+                "owner": s.get("owner"),
+                "phase_count": len(s.get("phases", [])),
+                "phases": list(s.get("phases", [])),
+            }
+            for s in streams
+        ]
     
     async def load_phase_definition(self, phase_file: str) -> Dict[str, Any]:
         """Load phase definition from YAML file"""
@@ -890,9 +954,17 @@ async def main():
     
     # Status command
     status_parser = subparsers.add_parser("status", help="Show workflow status")
-    
+
     # Health check command
     health_parser = subparsers.add_parser("health-check", help="Validate project health")
+
+    # List streams
+    list_streams_parser = subparsers.add_parser("list-streams", help="List multi-stream definitions")
+
+    # Run stream
+    run_stream_parser = subparsers.add_parser("run-stream", help="Run all phases in a stream")
+    run_stream_parser.add_argument("stream_id", help="Stream ID to execute (e.g., stream-a)")
+    run_stream_parser.add_argument("--dry-run", action="store_true", help="Dry run mode")
     
     args = parser.parse_args()
     
@@ -918,6 +990,26 @@ async def main():
         else:
             print("Project structure validation completed")
         return 0
+
+    elif args.command == "list-streams":
+        streams = orchestrator.list_streams()
+        if console and RICH_AVAILABLE:
+            table = Table(title="Multi-Stream Map")
+            table.add_column("ID", style="cyan")
+            table.add_column("Label", style="magenta")
+            table.add_column("Owner", style="green")
+            table.add_column("Phases", style="yellow")
+            for s in streams:
+                table.add_row(s.get("id") or "", s.get("label") or "", s.get("owner") or "", ", ".join(s.get("phases", [])))
+            console.print(table)
+        # Always print a simple JSON for scripting
+        print(json.dumps(streams, indent=2))
+        return 0
+
+    elif args.command == "run-stream":
+        summary = await orchestrator.execute_stream(args.stream_id, dry_run=args.dry_run)
+        # Exit non-zero if any failed
+        return 0 if summary.get("failed", 0) == 0 else 1
     
     else:
         parser.print_help()

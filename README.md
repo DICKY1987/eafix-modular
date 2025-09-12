@@ -66,6 +66,24 @@ pip install -e .[yaml]
 pip install "cli-multi-rapid[yaml]"
 ```
 
+## Multi-Stream Workflows
+
+This repo groups phases into five streams (A–E) to enable conflict-free parallel work. See `workflows/phase_definitions/multi_stream.yaml` and `docs/specs/multi-stream.md`.
+
+Examples
+
+```bash
+# List streams and their phases
+python -m workflows.orchestrator list-streams
+
+# Run a specific stream (sequentially executes its phases)
+python -m workflows.orchestrator run-stream stream-a --dry-run   # plan only
+python -m workflows.orchestrator run-stream stream-a             # execute
+
+# Run a single phase
+cli-multi-rapid phase run phase1 --dry
+```
+
 Hooks setup
 
 - Configure Git to use bundled hooks (merge-safety, optional license gate):
