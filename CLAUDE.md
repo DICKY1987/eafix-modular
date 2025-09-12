@@ -75,6 +75,21 @@ python agentic_framework_v3.py status
 python agentic_framework_v3.py analyze "add JWT token validation"
 ```
 
+### Workflow Orchestration (NEW)
+```bash
+# Execute enterprise workflow phases
+python -m workflows.orchestrator run-phase phase0
+python -m workflows.orchestrator run-phase phase1 --dry-run
+
+# Workflow status and monitoring
+python -m workflows.orchestrator status
+python -m workflows.orchestrator health-check
+
+# Enhanced CLI with workflow integration
+cli-multi-rapid run-job --workflow-validate
+cli-multi-rapid run-job --compliance-check
+```
+
 ### FastAPI Server
 ```bash
 # Start FastAPI server
@@ -253,14 +268,25 @@ Access at http://localhost:3000 (admin/admin) after `docker-compose up`:
 ├── langgraph_git_integration.py  # Git worktree management
 ├── noxfile.py                 # Testing and development automation
 ├── requirements.txt           # Python dependencies
+├── workflows/                 # NEW: Enterprise workflow orchestration
+│   ├── orchestrator.py        # Workflow execution engine
+│   ├── phase_definitions/     # Phase specification files
+│   ├── templates/            # Executable templates
+│   └── validators/           # Compliance validation
+├── contracts/                 # NEW: Cross-system contracts
+│   ├── events/               # JSON schemas for all events
+│   ├── models/               # Generated model code
+│   └── validators/           # Contract validation
 ├── config/                    # Configuration files
 │   ├── docker-compose.yml     # Infrastructure services
 │   ├── agent_jobs.yaml        # Declarative job definitions
+│   ├── workflow-config.yaml   # NEW: Workflow orchestration settings
 │   └── env.example           # Environment template
 ├── scripts/                   # Setup and utility scripts
 ├── docs/                      # Documentation
 │   ├── specs/                 # Technical specifications
-│   └── archive/               # Archived documentation
+│   ├── archive/               # Archived documentation
+│   └── WORKFLOW_INTEGRATION_STRATEGY.md  # Integration documentation
 ├── .ai/                       # Agent orchestration configs
 │   └── workflows/agent_jobs.yaml  # Primary job definitions
 ├── src/cli_multi_rapid/       # CLI implementation
