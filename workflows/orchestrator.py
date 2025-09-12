@@ -20,6 +20,8 @@ from enum import Enum
 import yaml
 from glob import glob
 from workflows.templates.engine import render_template, write_file, has_template
+from glob import glob
+from workflows.templates.engine import render_template, write_file, has_template
 
 try:
     from rich.console import Console
@@ -58,6 +60,10 @@ class ActionType(str, Enum):
     AUDIT = "audit"
     MIGRATE = "migrate"
     UPDATE_IMPORTS = "update_imports"
+    ACTIONS_ENABLE = "actions_enable"
+    BRANCH_PROTECTION = "branch_protection"
+    DOCKER_HARDENING = "docker_hardening"
+    COMPOSE_PIN_DIGESTS = "compose_pin_digests"
 
 @dataclass
 class ActionResult:
@@ -229,6 +235,14 @@ class WorkflowOrchestrator:
                 result = await self.execute_mkdirs_action(action)
             elif action_type == ActionType.CODEGEN:
                 result = await self.execute_codegen_action(action)
+            elif action_type == ActionType.ACTIONS_ENABLE:
+                result = await self.execute_actions_enable_action(action)
+            elif action_type == ActionType.BRANCH_PROTECTION:
+                result = await self.execute_branch_protection_action(action)
+            elif action_type == ActionType.DOCKER_HARDENING:
+                result = await self.execute_docker_hardening_action(action)
+            elif action_type == ActionType.COMPOSE_PIN_DIGESTS:
+                result = await self.execute_compose_pin_digests_action(action)
             elif action_type == ActionType.TESTS:
                 result = await self.execute_tests_action(action)
             else:
@@ -375,10 +389,10 @@ class WorkflowOrchestrator:
         """Execute test suite action"""
         suite = action.get("suite", "default")
         paths = action.get("paths", ["tests/"])
-        
+
         # Convert paths to pytest arguments
         test_args = ["pytest", "-q"] + paths
-        
+
         try:
             result = subprocess.run(
                 test_args,
@@ -387,7 +401,6 @@ class WorkflowOrchestrator:
                 text=True,
                 timeout=300  # 5 minute timeout for tests
             )
-            
             if result.returncode == 0:
                 return ActionResult(
                     success=True,
@@ -399,12 +412,51 @@ class WorkflowOrchestrator:
                     success=False,
                     message=f"Test suite '{suite}' failed: {result.stderr}"
                 )
-                
         except subprocess.TimeoutExpired:
             return ActionResult(
                 success=False,
                 message="Test suite timed out"
             )
+
+    async def execute_actions_enable_action(self, action: Dict[str, Any]) -> ActionResult:
+        """Enable security features via workflows where applicable."""
+        features = action.get("features", []) or []
+        created = []
+
+        if "codeql" in features:
+            wf = self.project_root / ".github/workflows/codeql.yml"
+            wf.parent.mkdir(parents=True, exist_ok=True)
+            content = (
+                "name: CodeQL\n"
+                "on:\n  push:\n    branches: [ main ]\n  pull_request:\n    branches: [ main ]\n  schedule:\n    - cron: '0 8 * * 1'\n"
+                "jobs:\n  analyze:\n    runs-on: ubuntu-latest\n    permissions:\n      security-events: write\n      contents: read\n    steps:\n      - uses: actions/checkout@v4\n      - uses: github/codeql-action/init@v3\n        with:\n          languages: python\n      - uses: github/codeql-action/autobuild@v3\n      - uses: github/codeql-action/analyze@v3\n"
+            )
+            write_file(wf, content, overwrite=False)
+            created.append(str(wf))
+
+        if "scorecards" in features:
+            wf = self.project_root / ".github/workflows/scorecards.yml"
+            wf.parent.mkdir(parents=True, exist_ok=True)
+            content = (
+                "name: Scorecards\n"
+                "on:\n  branch_protection_rule:\n  schedule:\n    - cron: '0 0 * * 1'\n  push:\n    branches: [ main ]\n"
+                "permissions:\n  contents: read\n  security-events: write\n  id-token: write\n"
+                "jobs:\n  analysis:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: ossf/scorecard-action@v2.3.3\n        with:\n          results_file: results.sarif\n          results_format: sarif\n      - uses: github/codeql-action/upload-sarif@v3\n        with:\n          sarif_file: results.sarif\n"
+            )
+            write_file(wf, content, overwrite=False)
+            created.append(str(wf))
+
+        return ActionResult(success=True, message=f"Enabled features: {features}", details={"created": created})
+
+    async def execute_branch_protection_action(self, action: Dict[str, Any]) -> ActionResult:
+        return ActionResult(success=True, message="Branch protection acknowledged (no-op)")
+
+    async def execute_docker_hardening_action(self, action: Dict[str, Any]) -> ActionResult:
+        return ActionResult(success=True, message="Docker hardening policy acknowledged (no-op)")
+
+    async def execute_compose_pin_digests_action(self, action: Dict[str, Any]) -> ActionResult:
+        policy = action.get("policy", {})
+        return ActionResult(success=True, message="Compose digest policy acknowledged (no-op)", details={"policy": policy})
     
     def get_status_report(self) -> Dict[str, Any]:
         """Generate comprehensive status report"""
