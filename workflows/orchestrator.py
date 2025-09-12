@@ -66,6 +66,9 @@ class ActionType(str, Enum):
     COMPOSE_PIN_DIGESTS = "compose_pin_digests"
     LIBS = "libs"
     DASHBOARDS = "dashboards"
+    HELM_SCAFFOLD = "helm_scaffold"
+    NETPOL = "netpol"
+    EXT_SECRETS = "ext_secrets"
     SERVICE = "service"
     CI_GATE = "ci_gate"
     RUNBOOK = "runbook"
@@ -252,6 +255,12 @@ class WorkflowOrchestrator:
                 result = await self.execute_libs_action(action)
             elif action_type == ActionType.DASHBOARDS:
                 result = await self.execute_dashboards_action(action)
+            elif action_type == ActionType.HELM_SCAFFOLD:
+                result = await self.execute_helm_scaffold_action(action)
+            elif action_type == ActionType.NETPOL:
+                result = await self.execute_netpol_action(action)
+            elif action_type == ActionType.EXT_SECRETS:
+                result = await self.execute_ext_secrets_action(action)
             elif action_type == ActionType.SERVICE:
                 result = await self.execute_service_action(action)
             elif action_type == ActionType.CI_GATE:
@@ -503,6 +512,39 @@ class WorkflowOrchestrator:
             write_file(dest, content, overwrite=False)
             created.append(str(dest))
         return ActionResult(success=True, message=f"Created {len(created)} dashboard specs", details={"created": created})
+
+    async def execute_helm_scaffold_action(self, action: Dict[str, Any]) -> ActionResult:
+        paths = action.get("paths", ["deploy/k8s/helm/"])
+        created = []
+        for base in paths:
+            base_path = self.project_root / Path(base)
+            chart = base_path / "Chart.yaml"
+            values = base_path / "values.yaml"
+            helpers = base_path / "templates/_helpers.tpl"
+            depl = base_path / "templates/deployment.yaml"
+            svc = base_path / "templates/service.yaml"
+            # write files
+            write_file(chart, render_template("helm_chart_yaml").content, overwrite=False)
+            write_file(values, render_template("helm_values_yaml").content, overwrite=False)
+            write_file(helpers, render_template("helm_helpers_tpl").content, overwrite=False)
+            write_file(depl, render_template("helm_deployment_yaml").content, overwrite=False)
+            write_file(svc, render_template("helm_service_yaml").content, overwrite=False)
+            created.extend([str(p) for p in (chart, values, helpers, depl, svc)])
+        return ActionResult(success=True, message=f"Helm scaffold created", details={"created": created})
+
+    async def execute_netpol_action(self, action: Dict[str, Any]) -> ActionResult:
+        policy = action.get("policy", "allowlist_between_services")
+        dest = self.project_root / Path("deploy/k8s/networkpolicy.yaml")
+        if policy == "allowlist_between_services":
+            write_file(dest, render_template("k8s_networkpolicy_allowlist_yaml").content, overwrite=False)
+            return ActionResult(success=True, message="NetworkPolicy allowlist created", details={"created": str(dest)})
+        return ActionResult(success=True, message=f"NetworkPolicy policy '{policy}' acknowledged (no-op)")
+
+    async def execute_ext_secrets_action(self, action: Dict[str, Any]) -> ActionResult:
+        provider = action.get("provider", "ESO")
+        dest = self.project_root / Path("deploy/k8s/external-secret.yaml")
+        write_file(dest, render_template("external_secrets_eso_yaml").content, overwrite=False)
+        return ActionResult(success=True, message=f"External secrets for {provider} created", details={"created": str(dest)})
 
     async def execute_service_action(self, action: Dict[str, Any]) -> ActionResult:
         name = action.get("name", "")

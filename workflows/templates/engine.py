@@ -87,6 +87,112 @@ def init_tracing(service_name: str = 'cli-multi-rapid') -> None:
     # Integrate OpenTelemetry SDK here if desired
     return None
 """.lstrip(),
+    # Phase 7: Kubernetes/Helm
+    "helm_chart_yaml": """
+apiVersion: v2
+name: cli-multi-rapid
+description: A Helm chart for deploying cli-multi-rapid services
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+""".lstrip(),
+    "helm_values_yaml": """
+replicaCount: 1
+image:
+  repository: ghcr.io/dicky1987/cli-multi-rapid
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  port: 8080
+resources: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
+""".lstrip(),
+    "helm_deployment_yaml": """
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cli-multi-rapid.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "cli-multi-rapid.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "cli-multi-rapid.name" . }}
+    spec:
+      containers:
+        - name: app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+""".lstrip(),
+    "helm_service_yaml": """
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "cli-multi-rapid.fullname" . }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ include "cli-multi-rapid.name" . }}
+""".lstrip(),
+    "helm_helpers_tpl": """
+{{- define "cli-multi-rapid.name" -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "cli-multi-rapid.fullname" -}}
+{{- if .Values.fullnameOverride -}}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- $name := default .Chart.Name .Values.nameOverride -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+""".lstrip(),
+    "k8s_networkpolicy_allowlist_yaml": """
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allowlist-between-services
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+""".lstrip(),
+    "external_secrets_eso_yaml": """
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: sample-secret
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: default
+    kind: ClusterSecretStore
+  target:
+    name: app-secrets
+    creationPolicy: Owner
+  data:
+    - secretKey: DROP_TOKEN
+      remoteRef:
+        key: /cli-multi-rapid/drop-token
+""".lstrip(),
     # Phase 5a compliance
     "compliance_rules_json": """
 {
