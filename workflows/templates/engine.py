@@ -47,6 +47,46 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
 
 Please report suspected vulnerabilities privately per SECURITY.md guidance.
 """.lstrip(),
+    # Phase 5 libs
+    "logging_json": """
+import json, logging, sys
+
+class JsonFormatter(logging.Formatter):
+    def format(self, record: logging.LogRecord) -> str:
+        payload = {
+            "level": record.levelname,
+            "name": record.name,
+            "msg": record.getMessage(),
+            "time": self.formatTime(record, self.datefmt),
+        }
+        if record.exc_info:
+            payload["exc"] = self.formatException(record.exc_info)
+        return json.dumps(payload)
+
+def configure_json_logging(level: int = logging.INFO) -> None:
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(JsonFormatter())
+    root = logging.getLogger()
+    root.handlers[:] = [handler]
+    root.setLevel(level)
+""".lstrip(),
+    "metrics_prometheus": """
+from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+
+REQUEST_COUNT = Counter('app_requests_total', 'Total HTTP requests', ['route', 'method', 'code'])
+REQUEST_LATENCY = Histogram('app_request_latency_seconds', 'Request latency', ['route'])
+
+def prometheus_wsgi_app(environ, start_response):
+    data = generate_latest()
+    start_response('200 OK', [('Content-Type', CONTENT_TYPE_LATEST)])
+    return [data]
+""".lstrip(),
+    "otel_tracing_http": """
+# Placeholder for OpenTelemetry HTTP tracing setup
+def init_tracing(service_name: str = 'cli-multi-rapid') -> None:
+    # Integrate OpenTelemetry SDK here if desired
+    return None
+""".lstrip(),
     "issue_bug": """
 ---
 name: Bug report

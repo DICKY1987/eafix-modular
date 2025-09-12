@@ -64,6 +64,8 @@ class ActionType(str, Enum):
     BRANCH_PROTECTION = "branch_protection"
     DOCKER_HARDENING = "docker_hardening"
     COMPOSE_PIN_DIGESTS = "compose_pin_digests"
+    LIBS = "libs"
+    DASHBOARDS = "dashboards"
 
 @dataclass
 class ActionResult:
@@ -243,6 +245,10 @@ class WorkflowOrchestrator:
                 result = await self.execute_docker_hardening_action(action)
             elif action_type == ActionType.COMPOSE_PIN_DIGESTS:
                 result = await self.execute_compose_pin_digests_action(action)
+            elif action_type == ActionType.LIBS:
+                result = await self.execute_libs_action(action)
+            elif action_type == ActionType.DASHBOARDS:
+                result = await self.execute_dashboards_action(action)
             elif action_type == ActionType.TESTS:
                 result = await self.execute_tests_action(action)
             else:
@@ -457,6 +463,37 @@ class WorkflowOrchestrator:
     async def execute_compose_pin_digests_action(self, action: Dict[str, Any]) -> ActionResult:
         policy = action.get("policy", {})
         return ActionResult(success=True, message="Compose digest policy acknowledged (no-op)", details={"policy": policy})
+
+    async def execute_libs_action(self, action: Dict[str, Any]) -> ActionResult:
+        """Write observability libs from template registry."""
+        to_write = action.get("write", []) or []
+        created = []
+        mapping = {
+            "logging_json": (Path("src/observability/logging_json.py"), "logging_json"),
+            "metrics_prometheus": (Path("src/observability/metrics.py"), "metrics_prometheus"),
+            "otel_tracing_http": (Path("src/observability/tracing.py"), "otel_tracing_http"),
+        }
+        for key in to_write:
+            dest, tmpl = mapping.get(key, (None, None))
+            if dest is None or not has_template(tmpl):
+                continue
+            write_file(self.project_root / dest, render_template(tmpl).content, overwrite=False)
+            created.append(str(dest))
+        return ActionResult(success=True, message=f"Wrote libs: {to_write}", details={"created": created})
+
+    async def execute_dashboards_action(self, action: Dict[str, Any]) -> ActionResult:
+        """Create Grafana dashboard placeholders."""
+        stack = action.get("stack", "grafana")
+        panels = action.get("panels", []) or []
+        base = self.project_root / Path("dashboards") / stack
+        base.mkdir(parents=True, exist_ok=True)
+        created = []
+        for p in panels:
+            dest = base / f"{p}.json"
+            content = json.dumps({"title": p, "panels": [], "schemaVersion": 36}, indent=2)
+            write_file(dest, content, overwrite=False)
+            created.append(str(dest))
+        return ActionResult(success=True, message=f"Created {len(created)} dashboard specs", details={"created": created})
     
     def get_status_report(self) -> Dict[str, Any]:
         """Generate comprehensive status report"""
