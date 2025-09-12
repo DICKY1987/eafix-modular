@@ -549,6 +549,101 @@
         "showReuseMessage": false,
         "clear": true
       }
+    },
+    {
+      "label": "🤖 Gemini: Interactive Chat",
+      "type": "shell",
+      "command": "gemini",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🤖 Gemini: Run Prompt",
+      "type": "shell",
+      "command": "gemini -p \"${input:geminiPrompt}\"",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { 
+        "reveal": "always", 
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🔄 GitHub: PR Status",
+      "type": "shell",
+      "command": "gh pr status",
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🚀 GitHub: Create PR",
+      "type": "shell",
+      "command": "gh pr create -f -t \"${input:prTitle}\" -b \"${input:prBody}\" -B main -H ${input:branch}",
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🛠️ Bootstrap: Install GitHub CLI + Gemini CLI",
+      "type": "shell",
+      "command": "powershell -ExecutionPolicy Bypass -File .\\tools\\bootstrap\\install_gh_gemini.ps1",
+      "problemMatcher": [],
+      "presentation": {
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true,
+        "reveal": "always"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "featureDesc",
+      "type": "promptString",
+      "description": "One-sentence feature",
+      "default": "Add CSV export endpoint"
+    },
+    {
+      "id": "phaseId",
+      "type": "promptString",
+      "description": "Phase ID (e.g., phase1, phase2)",
+      "default": "phase1"
+    },
+    {
+      "id": "prTitle",
+      "type": "promptString",
+      "description": "PR title"
+    },
+    {
+      "id": "prBody",
+      "type": "promptString",
+      "description": "PR body/notes",
+      "default": "AI-generated improvements via CLI Multi-Rapid workflow system"
+    },
+    {
+      "id": "branch",
+      "type": "promptString",
+      "description": "Source branch",
+      "default": "feature/ai-enhancement"
+    },
+    {
+      "id": "geminiPrompt",
+      "type": "promptString",
+      "description": "Gemini prompt to run"
     }
   ]
 }

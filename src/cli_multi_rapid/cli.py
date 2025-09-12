@@ -25,6 +25,24 @@ import os
 import json
 
 
+def _safe_print(text: str) -> None:
+    """Print text safely across platforms by replacing unencodable chars.
+
+    On some Windows consoles, certain Unicode characters (e.g., arrows,
+    checkmarks) cannot be encoded with the active code page. This helper
+    avoids hard failures by replacing those characters during printing.
+    """
+    enc = getattr(sys.stdout, "encoding", None) or "utf-8"
+    try:
+        sys.stdout.write(text + "\n")
+    except UnicodeEncodeError:
+        try:
+            sys.stdout.buffer.write((text + "\n").encode(enc, errors="replace"))
+        except Exception:
+            # Last resort
+            print(text.encode("ascii", errors="replace").decode("ascii", errors="ignore"))
+
+
 def greet(name: str) -> str:
     """Return a greeting for the given ``name``.
 
@@ -334,22 +352,22 @@ def _list_jobs(file: Optional[str], name_filter: Optional[str], show: Optional[s
             
         if j.get("type") == "tasks.json":
             cmd = j.get("command")
-            print(f"{src}: {nm} (command: {cmd})")
+            _safe_print(f"{src}: {nm} (command: {cmd})")
             if show == "steps":
                 args = j.get("args") or []
                 depends = j.get("dependsOn")
-                print(f"  args: {args}")
+                _safe_print(f"  args: {args}")
                 if depends:
-                    print(f"  dependsOn: {depends}")
+                    _safe_print(f"  dependsOn: {depends}")
         else:
             tool = j.get("tool")
             branch = j.get("branch")
-            print(f"{src}: {nm} [tool: {tool}, branch: {branch}]")
+            _safe_print(f"{src}: {nm} [tool: {tool}, branch: {branch}]")
             if show == "steps":
                 worktree = j.get("worktree")
                 tests = j.get("tests")
-                print(f"  worktree: {worktree}")
-                print(f"  tests: {tests}")
+                _safe_print(f"  worktree: {worktree}")
+                _safe_print(f"  tests: {tests}")
     return 0
 
 
@@ -511,3 +529,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     except Exception as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
+
+
+if __name__ == "__main__":
+    # Allow running as a module: `python -m cli_multi_rapid.cli ...`
+    # Exit with the status code from main for proper CLI behavior.
+    sys.exit(main())

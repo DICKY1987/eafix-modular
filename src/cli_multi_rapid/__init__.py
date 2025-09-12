@@ -19,10 +19,27 @@ also be consumed programmatically. A convenience :func:`main` function is
 provided as the entry point for the CLI defined in :mod:`cli_multi_rapid.cli`.
 """
 
-from .cli import main, greet, sum_numbers  # noqa: F401 re-export for convenience
+__all__ = ["main", "greet", "sum_numbers"]
 
-__all__ = [
-    "main",
-    "greet",
-    "sum_numbers",
-]
+
+def main(*args, **kwargs):  # pragma: no cover - thin wrapper
+    """Lazy wrapper for `cli_multi_rapid.cli.main` to avoid import side effects.
+
+    Importing the CLI implementation only when used prevents `python -m`
+    warnings by ensuring the submodule isn't pre-imported during package init.
+    """
+    from .cli import main as _main
+
+    return _main(*args, **kwargs)
+
+
+def greet(name):  # pragma: no cover - thin wrapper
+    from .cli import greet as _greet
+
+    return _greet(name)
+
+
+def sum_numbers(a, b):  # pragma: no cover - thin wrapper
+    from .cli import sum_numbers as _sum
+
+    return _sum(a, b)
