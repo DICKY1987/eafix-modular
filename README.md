@@ -114,6 +114,12 @@ To run the test suite locally using the built‑in Python ``unittest`` runner:
 python -m unittest discover -s tests -v
 ```
 
+## Cost Reports
+
+- Emit tokens locally: `powershell -NoProfile -File scripts/emit_tokens.ps1 -Out artifacts/tokens.json`
+- Generate report: `powershell -NoProfile -File scripts/report_costs.ps1 -OutDir artifacts/cost`
+- CI: uploads cost artifacts and posts a PR summary; a scheduled budget check runs daily.
+
 Alternatively, if you have ``pytest`` available, you can benefit from its
 more expressive output and coverage reporting:
 

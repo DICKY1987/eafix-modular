@@ -42,6 +42,12 @@ jobs:
     needs: hello_world
     steps:
       - uses: actions/checkout@v5
+      - name: Emit sample token metrics (if missing)
+        shell: pwsh
+        run: |
+          if (-not (Test-Path 'artifacts/tokens.json')) {
+            pwsh -NoProfile -File scripts/emit_tokens.ps1 -Out artifacts/tokens.json
+          }
       - name: Generate cost reports
         shell: pwsh
         run: |

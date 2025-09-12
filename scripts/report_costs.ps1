@@ -9,14 +9,21 @@ $ErrorActionPreference = 'Stop'
 
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 
+function Sum-Tokens($value) {
+  if ($null -eq $value) { return 0 }
+  if ($value -is [array]) {
+    return ([int]((($value | ForEach-Object { [int]$_ }) | Measure-Object -Sum).Sum))
+  }
+  try { return [int]$value } catch { return 0 }
+}
+
 if (Test-Path $MetricsPath) {
   $metrics = Get-Content -Raw -Path $MetricsPath | ConvertFrom-Json
-  $input_tokens = [int]($metrics.input_tokens    | ForEach-Object { $_ } | Measure-Object -Sum).Sum
-  $output_tokens = [int]($metrics.output_tokens  | ForEach-Object { $_ } | Measure-Object -Sum).Sum
-  $cache_read_input_tokens = [int]($metrics.cache_read_input_tokens | ForEach-Object { $_ } | Measure-Object -Sum).Sum
-  $cache_creation_input_tokens = [int]($metrics.cache_creation_input_tokens | ForEach-Object { $_ } | Measure-Object -Sum).Sum
-}
-else {
+  $input_tokens = Sum-Tokens $metrics.input_tokens
+  $output_tokens = Sum-Tokens $metrics.output_tokens
+  $cache_read_input_tokens = Sum-Tokens $metrics.cache_read_input_tokens
+  $cache_creation_input_tokens = Sum-Tokens $metrics.cache_creation_input_tokens
+} else {
   $input_tokens = 0
   $output_tokens = 0
   $cache_read_input_tokens = 0

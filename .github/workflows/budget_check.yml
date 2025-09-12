@@ -1,0 +1,48 @@
+name: Budget Check
+
+on:
+  schedule:
+    - cron: "0 3 * * *"  # daily
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  budget:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Ensure tokens exist
+        shell: pwsh
+        run: |
+          if (-not (Test-Path 'artifacts/tokens.json')) {
+            pwsh -NoProfile -File scripts/emit_tokens.ps1 -Out artifacts/tokens.json
+          }
+      - name: Generate cost report
+        shell: pwsh
+        run: pwsh -NoProfile -File scripts/report_costs.ps1 -OutDir artifacts/cost
+      - name: Evaluate thresholds
+        shell: pwsh
+        run: |
+          $summary = ''
+          $budget = Get-Content -Raw -Path '.github/budget_alerts.yml' | ConvertFrom-Yaml
+          $report = Get-Content -Raw -Path 'artifacts/cost/cost_report.json' | ConvertFrom-Json
+          $total = [double]$report.total_cost
+          $daily = [double]$budget.thresholds.daily_usd
+          $weekly = [double]$budget.thresholds.weekly_usd
+          $monthly = [double]$budget.thresholds.monthly_usd
+          $status = 'OK'
+          if ($total -gt $daily) { $status = 'DAILY-BREACH' }
+          $summary = @(
+            '## Budget Check',
+            "Status: $status",
+            "Total Cost: $$total",
+            "Thresholds: daily=$$daily, weekly=$$weekly, monthly=$$monthly"
+          ) -join "`n"
+          $summary | Out-File -Encoding utf8 $env:GITHUB_STEP_SUMMARY
+      - name: Upload cost artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: budget-check-cost
+          path: artifacts/cost
