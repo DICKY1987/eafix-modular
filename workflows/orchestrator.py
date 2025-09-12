@@ -72,6 +72,9 @@ class ActionType(str, Enum):
     BRIDGE_CONTRACTS = "bridge_contracts"
     PS_MODULE = "ps_module"
     SQL_STANDARDS = "sql_standards"
+    PERSISTENCE = "persistence"
+    CONSUMERS = "consumers"
+    QUEUES = "queues"
     SERVICE = "service"
     CI_GATE = "ci_gate"
     RUNBOOK = "runbook"
@@ -270,6 +273,12 @@ class WorkflowOrchestrator:
                 result = await self.execute_ps_module_action(action)
             elif action_type == ActionType.SQL_STANDARDS:
                 result = await self.execute_sql_standards_action(action)
+            elif action_type == ActionType.PERSISTENCE:
+                result = await self.execute_persistence_action(action)
+            elif action_type == ActionType.CONSUMERS:
+                result = await self.execute_consumers_action(action)
+            elif action_type == ActionType.QUEUES:
+                result = await self.execute_queues_action(action)
             elif action_type == ActionType.SERVICE:
                 result = await self.execute_service_action(action)
             elif action_type == ActionType.CI_GATE:
@@ -627,6 +636,52 @@ class WorkflowOrchestrator:
         dest.parent.mkdir(parents=True, exist_ok=True)
         write_file(dest, render_template("runbook_emergency_recovery_md").content, overwrite=False)
         return ActionResult(success=True, message=f"Runbook written to {path}")
+    
+    async def execute_persistence_action(self, action: Dict[str, Any]) -> ActionResult:
+        keys = action.get("keys", []) or []
+        doc = self.project_root / Path("docs/idempotency.md")
+        lines = ["# Idempotency Keys", "", "Keys used for exactly-once semantics:"] + [f"- {k}" for k in keys]
+        write_file(doc, "\n".join(lines) + "\n", overwrite=False)
+        state = self.project_root / Path("src/idempotency/state.py")
+        code = (
+            "from __future__ import annotations\n\n"
+            "from typing import Tuple, Set\n\n"
+            "# In-memory idempotency set (replace with durable store in production)\n"
+            "_seen: Set[Tuple[str, str, str, int]] = set()\n\n"
+            "def mark_seen(account: str, symbol: str, strategy: str, nonce: int) -> bool:\n"
+            "    key = (account, symbol, strategy, nonce)\n"
+            "    if key in _seen:\n        return False\n"
+            "    _seen.add(key)\n    return True\n"
+        )
+        write_file(state, code, overwrite=False)
+        return ActionResult(success=True, message="Idempotency docs and state stub created", details={"created": [str(doc), str(state)]})
+
+    async def execute_consumers_action(self, action: Dict[str, Any]) -> ActionResult:
+        idem = action.get("idempotent", True)
+        consumer = self.project_root / Path("src/idempotency/consumer.py")
+        code = (
+            "from __future__ import annotations\n\n"
+            "from .state import mark_seen\n\n"
+            "def process(account: str, symbol: str, strategy: str, nonce: int) -> bool:\n"
+            "    \"\"\"Return True if processed; False if duplicate (idempotent).\"\"\"\n"
+            "    if not mark_seen(account, symbol, strategy, nonce):\n        return False\n"
+            "    # TODO: handle message\n    return True\n"
+        )
+        write_file(consumer, code, overwrite=False)
+        return ActionResult(success=True, message=f"Consumers stub (idempotent={idem}) created", details={"created": str(consumer)})
+
+    async def execute_queues_action(self, action: Dict[str, Any]) -> ActionResult:
+        bounded = action.get("bounded", True)
+        cb = action.get("cb_backoff", True)
+        qmod = self.project_root / Path("src/idempotency/queues.py")
+        code = (
+            "from __future__ import annotations\n\n"
+            "from collections import deque\n\n"
+            "QUEUE = deque(maxlen=1000)  # bounded queue\n"
+            "CB_BACKOFF = (1, 2, 5)      # seconds\n"
+        )
+        write_file(qmod, code, overwrite=False)
+        return ActionResult(success=True, message="Queues stub created", details={"bounded": bounded, "cb_backoff": cb})
     
     def get_status_report(self) -> Dict[str, Any]:
         """Generate comprehensive status report"""
