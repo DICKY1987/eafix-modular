@@ -1,0 +1,30 @@
+{
+  "database": {
+    "host": "localhost",
+    "port": 5432,
+    "name": "cli_multi_rapid",
+    "username": "user",
+    "password": "password"
+  },
+  "api": {
+    "host": "localhost",
+    "port": 8000,
+    "debug": false
+  },
+  "logging": {
+    "level": "INFO",
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "file": "application.log"
+  },
+  "features": {
+    "workflow_validation": true,
+    "compliance_checking": true,
+    "cross_language_bridge": true
+  },
+  "bridge": {
+    "enabled": true,
+    "timeout": 30,
+    "retry_attempts": 3,
+    "health_check_interval": 60
+  }
+}
