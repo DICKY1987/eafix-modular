@@ -1,0 +1,321 @@
+# Failover Maps & Automatic Reroute Configuration (MOD-008)
+# Defines fallback strategies for each capability
+
+version: "1.0"
+updated: "2025-09-13T01:30:00Z"
+
+# Global failover settings
+global_settings:
+  max_reroute_attempts: 3
+  reroute_delay_seconds: 2
+  health_check_required: true
+  cost_aware_routing: true
+  audit_reroutes: true
+
+# Capability-based failover maps
+capability_failover_maps:
+  
+  # Code Generation Capability
+  code_generation:
+    description: "Generate, modify, and refactor code"
+    primary_tools: ["claude_code"]
+    fallback_chain:
+      - tool: "claude_code"
+        priority: 1
+        cost_limit: 1.0
+        conditions:
+          - health_score: ">= 0.8"
+          - circuit_state: "closed"
+          - daily_quota: "> 0"
+      
+      - tool: "aider_local" 
+        priority: 2
+        cost_limit: 0.5
+        conditions:
+          - health_score: ">= 0.7"
+          - circuit_state: ["closed", "half_open"]
+          - tool_available: true
+      
+      - tool: "gemini_cli"
+        priority: 3
+        cost_limit: 0.1
+        conditions:
+          - health_score: ">= 0.6"
+          - circuit_state: ["closed", "half_open"]
+          - rate_limit: "> 10"
+      
+      - tool: "cursor"
+        priority: 4
+        cost_limit: 0.3
+        conditions:
+          - health_score: ">= 0.5"
+          - circuit_state: "closed"
+      
+      - tool: "ollama"
+        priority: 5
+        cost_limit: 0.0
+        conditions:
+          - tool_available: true
+        notes: "Final fallback - always available locally"
+    
+    reroute_triggers:
+      - circuit_breaker_open
+      - health_score_below_threshold
+      - quota_exceeded
+      - timeout_error
+      - authentication_failed
+    
+    compatibility_matrix:
+      # Defines which tools can substitute for each other
+      claude_code: ["aider_local", "gemini_cli", "cursor", "ollama"]
+      aider_local: ["gemini_cli", "cursor", "ollama"] 
+      gemini_cli: ["aider_local", "cursor", "ollama"]
+      cursor: ["aider_local", "ollama"]
+      ollama: []  # No fallback from final fallback
+
+  # Testing Capability  
+  testing:
+    description: "Run tests and generate test coverage"
+    primary_tools: ["pytest"]
+    fallback_chain:
+      - tool: "pytest"
+        priority: 1
+        cost_limit: 0.0
+        conditions:
+          - health_score: ">= 0.9"
+          - tool_available: true
+          - circuit_state: "closed"
+      
+      - tool: "unittest"
+        priority: 2
+        cost_limit: 0.0
+        conditions:
+          - health_score: ">= 0.8"
+          - tool_available: true
+      
+      - tool: "nose2"
+        priority: 3
+        cost_limit: 0.0
+        conditions:
+          - tool_available: true
+        notes: "Final fallback for Python testing"
+    
+    reroute_triggers:
+      - tool_not_found
+      - import_error
+      - configuration_error
+      - permission_denied
+    
+    compatibility_matrix:
+      pytest: ["unittest", "nose2"]
+      unittest: ["nose2"]
+      nose2: []
+
+  # Code Quality & Linting
+  code_quality:
+    description: "Lint, format, and analyze code quality"
+    primary_tools: ["ruff"]
+    fallback_chain:
+      - tool: "ruff"
+        priority: 1
+        cost_limit: 0.0
+        conditions:
+          - health_score: ">= 0.9"
+          - tool_available: true
+          - circuit_state: "closed"
+      
+      - tool: "flake8"
+        priority: 2
+        cost_limit: 0.0
+        conditions:
+          - health_score: ">= 0.8"
+          - tool_available: true
+      
+      - tool: "pylint"
+        priority: 3
+        cost_limit: 0.0
+        conditions:
+          - health_score: ">= 0.7"
+          - tool_available: true
+      
+      - tool: "black"
+        priority: 4
+        cost_limit: 0.0
+        conditions:
+          - tool_available: true
+        notes: "Formatting only fallback"
+    
+    reroute_triggers:
+      - tool_not_found
+      - configuration_file_missing
+      - syntax_error_in_config
+      - performance_degradation
+    
+    compatibility_matrix:
+      ruff: ["flake8", "pylint", "black"]
+      flake8: ["pylint", "black"] 
+      pylint: ["black"]
+      black: []
+
+  # Security Scanning
+  security_scanning:
+    description: "Scan for security vulnerabilities"
+    primary_tools: ["semgrep"]
+    fallback_chain:
+      - tool: "semgrep"
+        priority: 1
+        cost_limit: 0.0
+        conditions:
+          - health_score: ">= 0.8"
+          - tool_available: true
+          - circuit_state: "closed"
+      
+      - tool: "bandit"
+        priority: 2
+        cost_limit: 0.0
+        conditions:
+          - health_score: ">= 0.7"
+          - tool_available: true
+          - file_type: "python"
+      
+      - tool: "safety"
+        priority: 3
+        cost_limit: 0.0
+        conditions:
+          - tool_available: true
+          - scan_type: "dependencies"
+        notes: "Dependencies-only security scanner"
+    
+    reroute_triggers:
+      - api_rate_limit_exceeded
+      - network_connectivity_issue
+      - tool_update_required
+      - rule_database_outdated
+    
+    compatibility_matrix:
+      semgrep: ["bandit", "safety"]
+      bandit: ["safety"]
+      safety: []
+
+  # Version Control
+  version_control:
+    description: "Git operations and version management"
+    primary_tools: ["git"]
+    fallback_chain:
+      - tool: "git"
+        priority: 1
+        cost_limit: 0.0
+        conditions:
+          - health_score: ">= 0.95"
+          - tool_available: true
+          - repository_accessible: true
+    
+    # No fallbacks for git - critical system dependency
+    reroute_triggers:
+      - repository_locked
+      - network_connectivity_issue
+      - authentication_failed
+      - disk_space_full
+    
+    compatibility_matrix:
+      git: []  # No alternatives for git
+
+# Tool-specific reroute configurations
+tool_specific_configs:
+  
+  claude_code:
+    reroute_conditions:
+      quota_exhausted:
+        action: "reroute_immediately"
+        target: "aider_local"
+        message: "Claude quota exhausted, switching to Aider"
+      
+      cost_limit_exceeded:
+        action: "prompt_user"
+        options: ["increase_budget", "use_fallback", "cancel"]
+        default: "use_fallback"
+        fallback_target: "gemini_cli"
+      
+      rate_limit_hit:
+        action: "delay_and_retry"
+        delay_seconds: 300
+        max_retries: 2
+        fallback_after_retries: "aider_local"
+  
+  gemini_cli:
+    reroute_conditions:
+      api_error:
+        action: "reroute_immediately" 
+        target: "aider_local"
+        message: "Gemini API error, switching to local Aider"
+      
+      quota_exhausted:
+        action: "reroute_immediately"
+        target: "ollama"
+        message: "Gemini quota exhausted, switching to Ollama"
+  
+  aider_local:
+    reroute_conditions:
+      not_installed:
+        action: "install_and_retry"
+        install_command: "pip install aider-chat"
+        fallback_on_install_failure: "cursor"
+      
+      git_not_available:
+        action: "reroute_immediately"
+        target: "gemini_cli"
+        message: "Git not available, Aider requires git"
+
+# Audit and monitoring settings
+audit_settings:
+  log_all_reroutes: true
+  log_level: "INFO"
+  metrics_collection: true
+  alert_on_cascading_failures: true
+  max_cascading_depth: 3
+
+# Emergency fallback settings
+emergency_fallback:
+  enabled: true
+  trigger_conditions:
+    - "all_primary_tools_failed"
+    - "cascading_failure_detected"
+    - "system_health_critical"
+  
+  emergency_tools:
+    - tool: "ollama"
+      reason: "Local execution always available"
+    - tool: "basic_shell_commands"
+      reason: "System commands as last resort"
+  
+  notification_channels:
+    - "system_alerts"
+    - "admin_email"
+    - "slack_critical"
+
+# Performance and optimization settings
+performance_settings:
+  parallel_health_checks: true
+  cache_health_scores_seconds: 60
+  preemptive_warmup: true
+  load_balancing: true
+  circuit_breaker_integration: true
+
+# Cost optimization rules
+cost_optimization:
+  enabled: true
+  daily_budget_limit: 100.0  # USD
+  
+  cost_thresholds:
+    warning: 0.75  # 75% of budget
+    critical: 0.90  # 90% of budget
+  
+  cost_aware_routing:
+    enabled: true
+    prefer_free_tools: true
+    max_cost_increase_factor: 2.0
+  
+  budget_exhausted_behavior:
+    action: "force_free_tools_only"
+    allowed_tools: ["ollama", "pytest", "ruff", "git"]
+    notification_required: true

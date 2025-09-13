@@ -93,7 +93,7 @@ class GitLaneManager:
             worktree_path = Path(lane.worktree_path)
             
             if worktree_path.exists():
-                print(f"✅ Worktree already exists: {lane.name}")
+                print(f"OK Worktree already exists: {lane.name}")
                 return True
                 
             # Create parent directory
@@ -116,11 +116,11 @@ class GitLaneManager:
                     "git", "worktree", "add", str(worktree_path), "-b", lane.branch, "main"
                 ], check=True)
             
-            print(f"✅ Created worktree: {lane.name} -> {worktree_path}")
+            print(f"OK Created worktree: {lane.name} -> {worktree_path}")
             return True
             
         except subprocess.CalledProcessError as e:
-            print(f"❌ Failed to create worktree {lane.name}: {e}")
+            print(f"ERROR Failed to create worktree {lane.name}: {e}")
             return False
 
     def get_lane_status(self) -> Dict[str, Dict[str, str]]:
@@ -131,7 +131,7 @@ class GitLaneManager:
             worktree_path = Path(lane.worktree_path)
             
             if not worktree_path.exists():
-                status[lane_name] = {"status": "❌ Not initialized", "branch": "N/A"}
+                status[lane_name] = {"status": "Not initialized", "branch": "N/A"}
                 continue
                 
             try:
@@ -150,13 +150,13 @@ class GitLaneManager:
                 has_changes = len(status_result.stdout.strip()) > 0
                 
                 status[lane_name] = {
-                    "status": "✅ Ready" if not has_changes else "⚠️ Modified",
+                    "status": "Ready" if not has_changes else "Modified",
                     "branch": current_branch,
                     "changes": "Yes" if has_changes else "No"
                 }
                 
             except subprocess.CalledProcessError:
-                status[lane_name] = {"status": "❌ Error", "branch": "Unknown"}
+                status[lane_name] = {"status": "Error", "branch": "Unknown"}
                 
         return status
 
@@ -278,7 +278,7 @@ def add_git_commands(cli_group):
     def init_lanes():
         """Initialize all git worktree lanes"""
         git_manager = GitLaneManager()
-        print("🛤️  Lanes initialized successfully!")
+        print("Lanes initialized successfully!")
     
     @cli_group.command()
     def lane_status():
@@ -286,7 +286,7 @@ def add_git_commands(cli_group):
         git_manager = GitLaneManager()
         status = git_manager.get_lane_status()
         
-        print("\n🛤️  Lane Status:")
+        print("\nLane Status:")
         for lane_name, info in status.items():
             print(f"  {lane_name}: {info['status']} (Branch: {info['branch']})")
     
@@ -297,7 +297,7 @@ def add_git_commands(cli_group):
         git_manager = GitLaneManager()
         
         if lane_name not in git_manager.lanes:
-            print(f"❌ Lane '{lane_name}' not found")
+            print(f"ERROR Lane '{lane_name}' not found")
             return
             
         lane = git_manager.lanes[lane_name]
@@ -309,4 +309,4 @@ def add_git_commands(cli_group):
             print(f"   {vscode_cmd}")
             subprocess.run(["code", str(worktree_path)])
         else:
-            print(f"❌ Worktree not found: {worktree_path}")
+            print(f"ERROR Worktree not found: {worktree_path}")

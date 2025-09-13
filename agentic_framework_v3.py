@@ -22,7 +22,8 @@ from pydantic import BaseModel, Field
 from sqlmodel import SQLModel, Field as SQLField, create_engine, Session, select
 import redis.asyncio as redis
 from datetime import timedelta
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI, BackgroundTasks, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import typer
 from rich.console import Console
 from rich.progress import Progress
@@ -60,6 +61,15 @@ try:
 except ImportError:
     SELF_HEALING_AVAILABLE = False
     print("Warning: Self-healing system not available - continuing without it")
+
+# MOD-010 & Context Analysis Engine Integration
+try:
+    from lib.automated_merge_strategy import AutomatedMergeStrategy, MergeStrategy, ConflictComplexity
+    from lib.context_analysis_engine import ContextAnalysisEngine, TaskContext, WorkflowSuggestion
+    ENTERPRISE_MODULES_AVAILABLE = True
+except ImportError:
+    ENTERPRISE_MODULES_AVAILABLE = False
+    print("Warning: Enterprise modules (MOD-010, Context Analysis) not available - continuing without them")
 from pathlib import Path
 from fnmatch import fnmatch
 
@@ -289,6 +299,17 @@ class TaskRequest(BaseModel):
     complexity: Optional[TaskComplexity] = None
     max_cost: Optional[float] = None
     force_agent: Optional[ServiceType] = None
+
+class TaskExecutionRequest(BaseModel):
+    """Enhanced API request model for task execution with integrations"""
+    description: str
+    complexity: Optional[TaskComplexity] = None
+    max_cost: Optional[float] = None
+    force_agent: Optional[ServiceType] = None
+    user_id: Optional[str] = None
+    jira_project: Optional[str] = None
+    slack_channel: Optional[str] = None
+    github_repo: Optional[str] = None
     lane: Optional[str] = None
 
 class DevWorkflowState(BaseModel):
@@ -1107,6 +1128,14 @@ class AgenticFrameworkOrchestrator:
             self.agent_crew,
             self.git_manager
         )
+        
+        # Initialize enterprise modules (MOD-010 & Context Analysis)
+        if ENTERPRISE_MODULES_AVAILABLE:
+            self.merge_strategy = AutomatedMergeStrategy()
+            self.context_engine = ContextAnalysisEngine()
+        else:
+            self.merge_strategy = None
+            self.context_engine = None
     
     async def initialize(self):
         """Initialize the framework"""
@@ -1232,14 +1261,162 @@ class AgenticFrameworkOrchestrator:
             }
         
         return status
+    
+    async def analyze_task_context(self, task_description: str) -> Optional[Dict[str, Any]]:
+        """Analyze task context using Context Analysis Engine (MOD-011)"""
+        if not self.context_engine:
+            return None
+            
+        try:
+            task_context = await self.context_engine.analyze_task_context(task_description)
+            project_context = await self.context_engine.analyze_project_context()
+            workflow_suggestions = await self.context_engine.suggest_workflows(task_context)
+            
+            return {
+                "task_context": {
+                    "type": task_context.task_type.value,
+                    "complexity": task_context.complexity.value,
+                    "priority": task_context.priority.value,
+                    "estimated_effort_hours": task_context.estimated_effort_hours,
+                    "risk_level": task_context.risk_level,
+                    "suggested_approach": task_context.suggested_approach,
+                    "affected_files": task_context.affected_files
+                },
+                "project_context": {
+                    "type": project_context.project_type,
+                    "languages": list(project_context.languages),
+                    "frameworks": project_context.frameworks,
+                    "build_system": project_context.build_system
+                },
+                "workflow_suggestions": [
+                    {
+                        "name": ws.name,
+                        "description": ws.description,
+                        "steps": ws.steps,
+                        "tools": ws.tools,
+                        "estimated_cost": ws.estimated_cost,
+                        "estimated_time_minutes": ws.estimated_time_minutes,
+                        "success_probability": ws.success_probability,
+                        "risk_factors": ws.risk_factors
+                    }
+                    for ws in workflow_suggestions
+                ]
+            }
+        except Exception as e:
+            logger.error("context_analysis_failed", error=str(e))
+            return {"error": str(e)}
+    
+    async def analyze_merge_conflicts(self, base_branch: str, feature_branch: str) -> Optional[Dict[str, Any]]:
+        """Analyze merge conflicts and suggest merge strategy (MOD-010)"""
+        if not self.merge_strategy:
+            return None
+            
+        try:
+            conflicts = await self.merge_strategy.analyze_merge_conflicts(base_branch, feature_branch)
+            tool, strategy = await self.merge_strategy.select_optimal_merge_tool(conflicts)
+            
+            return {
+                "conflicts_found": len(conflicts),
+                "conflicts": [
+                    {
+                        "file_path": c.file_path,
+                        "complexity": c.complexity.value,
+                        "line_count": c.line_count,
+                        "conflict_type": c.conflict_type
+                    }
+                    for c in conflicts
+                ],
+                "recommended_tool": tool,
+                "recommended_strategy": strategy.value,
+                "merge_statistics": self.merge_strategy.get_merge_statistics()
+            }
+        except Exception as e:
+            logger.error("merge_analysis_failed", error=str(e))
+            return {"error": str(e)}
+    
+    async def execute_merge_strategy(self, base_branch: str, feature_branch: str, 
+                                   tool: Optional[str] = None, 
+                                   strategy: Optional[str] = None) -> Optional[Dict[str, Any]]:
+        """Execute automated merge strategy (MOD-010)"""
+        if not self.merge_strategy:
+            return None
+            
+        try:
+            # Analyze conflicts first
+            conflicts = await self.merge_strategy.analyze_merge_conflicts(base_branch, feature_branch)
+            
+            # Select tool and strategy if not provided
+            if not tool or not strategy:
+                selected_tool, selected_strategy = await self.merge_strategy.select_optimal_merge_tool(conflicts)
+            else:
+                selected_tool = tool
+                selected_strategy = MergeStrategy(strategy)
+            
+            # Execute the merge
+            result = await self.merge_strategy.execute_merge(
+                selected_tool, selected_strategy, conflicts, base_branch, feature_branch
+            )
+            
+            return result
+            
+        except Exception as e:
+            logger.error("merge_execution_failed", error=str(e))
+            return {"error": str(e)}
+    
+    async def get_enhanced_system_status(self) -> Dict[str, Any]:
+        """Get comprehensive system status including enterprise modules"""
+        base_status = await self.get_system_status()
+        
+        # Add enterprise module status
+        base_status["enterprise_modules"] = {
+            "available": ENTERPRISE_MODULES_AVAILABLE,
+            "mod_010_merge_strategy": self.merge_strategy is not None,
+            "context_analysis_engine": self.context_engine is not None
+        }
+        
+        if self.merge_strategy:
+            base_status["merge_strategy_stats"] = self.merge_strategy.get_merge_statistics()
+        
+        if self.context_engine:
+            base_status["context_analysis"] = {
+                "project_root": str(self.context_engine.project_root),
+                "cached_project_context": self.context_engine._project_context_cache is not None
+            }
+        
+        return base_status
 
 # FastAPI Application
 app = FastAPI(title="Agentic Framework v3.0", version="3.0.0")
+
+# Add CORS middleware for frontend integration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Configure appropriately for production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Import WebSocket and integration components
+from src.websocket.connection_manager import connection_manager
+from src.websocket.event_broadcaster import event_broadcaster
+from src.websocket.auth_middleware import auth_middleware
+from src.integrations.integration_manager import integration_manager
 orchestrator = AgenticFrameworkOrchestrator()
 
 @app.on_event("startup")
 async def startup():
     await orchestrator.initialize()
+    
+    # Load integration configuration
+    integration_manager.load_config("config/integrations.json")
+    
+    # Initialize integrations
+    try:
+        await integration_manager.initialize_integrations()
+        logger.info("Integration manager initialized successfully")
+    except Exception as e:
+        logger.warning(f"Some integrations failed to initialize: {e}")
 
 @app.post("/execute-task")
 async def api_execute_task(
@@ -1290,6 +1467,278 @@ async def api_get_daily_stats(date: Optional[str] = None) -> Dict[str, Any]:
         date_obj = None
     
     return orchestrator.db.get_daily_stats(date_obj)
+
+# WebSocket Endpoints
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket, token: Optional[str] = None):
+    """Main WebSocket endpoint for real-time communication."""
+    try:
+        # Authenticate connection if token provided
+        user_info = None
+        if token:
+            user_info = await auth_middleware.authenticate_token(token)
+        
+        # Accept connection
+        user_id = user_info.get("user_id") if user_info else None
+        client_id = await connection_manager.connect(websocket, user_id)
+        
+        try:
+            while True:
+                # Receive message from client
+                message = await websocket.receive_text()
+                
+                # Handle client message
+                await connection_manager.handle_client_message(client_id, message)
+                
+        except WebSocketDisconnect:
+            logger.info(f"Client {client_id} disconnected")
+        except Exception as e:
+            logger.error(f"WebSocket error for client {client_id}: {e}")
+        finally:
+            await connection_manager.disconnect(client_id)
+            
+    except Exception as e:
+        logger.error(f"WebSocket connection error: {e}")
+        await websocket.close(code=1003)
+
+@app.get("/ws/stats")
+async def websocket_stats():
+    """Get WebSocket connection statistics."""
+    return connection_manager.get_connection_stats()
+
+@app.get("/events/recent")
+async def get_recent_events(
+    workflow_id: Optional[str] = None,
+    event_type: Optional[str] = None,
+    limit: int = 50
+):
+    """Get recent events with optional filtering."""
+    from src.websocket.event_broadcaster import EventType
+    
+    event_type_enum = None
+    if event_type:
+        try:
+            event_type_enum = EventType(event_type)
+        except ValueError:
+            raise HTTPException(status_code=400, detail=f"Invalid event type: {event_type}")
+    
+    return event_broadcaster.get_recent_events(workflow_id, event_type_enum, limit)
+
+@app.get("/events/workflow/{workflow_id}")
+async def get_workflow_events(workflow_id: str):
+    """Get all events for a specific workflow."""
+    return await event_broadcaster.get_workflow_events(workflow_id)
+
+# Integration Endpoints
+@app.get("/integrations/status")
+async def integration_status():
+    """Get status of all integrations."""
+    return integration_manager.get_integration_status()
+
+@app.post("/integrations/initialize")
+async def initialize_integrations():
+    """Initialize all enabled integrations."""
+    try:
+        await integration_manager.initialize_integrations()
+        return {"status": "success", "message": "Integrations initialized"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/integrations/notify/error-recovery")
+async def notify_error_recovery(
+    error_code: str,
+    recovery_action: str,
+    success: bool
+):
+    """Send error recovery notification to all integrations."""
+    try:
+        await integration_manager.notify_error_recovery(error_code, recovery_action, success)
+        return {"status": "success", "message": "Notifications sent"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/integrations/notify/cost-alert")
+async def notify_cost_alert(
+    service: str,
+    cost_data: Dict[str, Any]
+):
+    """Send cost alert notification to all integrations."""
+    try:
+        await integration_manager.notify_cost_alert(service, cost_data)
+        return {"status": "success", "message": "Cost alert sent"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Enhanced execute endpoint with real-time updates
+@app.post("/execute-task-realtime")
+async def api_execute_task_realtime(
+    request: TaskExecutionRequest,
+    background_tasks: BackgroundTasks
+) -> Dict[str, Any]:
+    """Execute task with real-time progress updates."""
+    execution_id = f"exec_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    
+    # Start workflow with integrations
+    workflow_data = {
+        "name": request.description[:50] + "..." if len(request.description) > 50 else request.description,
+        "description": request.description,
+        "user_id": request.user_id,
+        "estimated_duration": "5-15 minutes",
+        "jira_project": request.jira_project,
+        "slack_channel": request.slack_channel,
+        "github_repo": request.github_repo
+    }
+    
+    # Notify integrations about workflow start
+    background_tasks.add_task(
+        integration_manager.notify_workflow_started,
+        execution_id,
+        workflow_data
+    )
+    
+    # Broadcast workflow started event
+    background_tasks.add_task(
+        event_broadcaster.broadcast_workflow_started,
+        execution_id,
+        workflow_data,
+        request.user_id
+    )
+    
+    # Execute task with progress updates
+    async def execute_with_progress():
+        try:
+            # Simulate progress updates
+            await asyncio.sleep(1)
+            await event_broadcaster.broadcast_workflow_progress(
+                execution_id,
+                {
+                    "overall_progress": 25,
+                    "current_phase": "Analysis",
+                    "completed_tasks": 1,
+                    "remaining_tasks": 3
+                },
+                request.user_id
+            )
+            
+            # Execute actual task
+            result = await orchestrator.execute_task(
+                request.description,
+                request.force_agent,
+                request.max_cost
+            )
+            
+            # Final progress update
+            await event_broadcaster.broadcast_workflow_progress(
+                execution_id,
+                {
+                    "overall_progress": 100,
+                    "current_phase": "Completed",
+                    "completed_tasks": 4,
+                    "remaining_tasks": 0
+                },
+                request.user_id
+            )
+            
+            # Notify completion
+            result_data = {
+                "duration": "8 minutes",
+                "tasks_completed": 4,
+                "files_modified": result.get("files_modified", 0),
+                "summary": result.get("output", "Task completed successfully")
+            }
+            
+            await integration_manager.notify_workflow_completed(execution_id, result_data)
+            await event_broadcaster.broadcast_workflow_completed(
+                execution_id,
+                result_data,
+                request.user_id
+            )
+            
+        except Exception as e:
+            # Notify failure
+            error_data = {
+                "error_message": str(e),
+                "failed_task": "Task execution",
+                "recovery_attempted": False
+            }
+            
+            await integration_manager.notify_workflow_failed(execution_id, error_data)
+            await event_broadcaster.broadcast_workflow_failed(
+                execution_id,
+                error_data,
+                request.user_id
+            )
+    
+    background_tasks.add_task(execute_with_progress)
+    
+    return {
+        "execution_id": execution_id,
+        "status": "started",
+        "message": "Task execution started with real-time updates",
+        "websocket_url": "/ws",
+        "events_url": f"/events/workflow/{execution_id}"
+    }
+
+# Enterprise Module Endpoints (MOD-010 & Context Analysis)
+
+@app.post("/analyze-task-context")
+async def api_analyze_task_context(request: Dict[str, str]) -> Dict[str, Any]:
+    """Analyze task context using Context Analysis Engine"""
+    task_description = request.get("description", "")
+    if not task_description:
+        raise HTTPException(status_code=400, detail="Task description is required")
+    
+    try:
+        result = await orchestrator.analyze_task_context(task_description)
+        if result is None:
+            raise HTTPException(status_code=503, detail="Context Analysis Engine not available")
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/analyze-merge-conflicts")
+async def api_analyze_merge_conflicts(request: Dict[str, str]) -> Dict[str, Any]:
+    """Analyze merge conflicts and suggest merge strategy"""
+    base_branch = request.get("base_branch", "main")
+    feature_branch = request.get("feature_branch", "")
+    
+    if not feature_branch:
+        raise HTTPException(status_code=400, detail="Feature branch is required")
+    
+    try:
+        result = await orchestrator.analyze_merge_conflicts(base_branch, feature_branch)
+        if result is None:
+            raise HTTPException(status_code=503, detail="Automated Merge Strategy not available")
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/execute-merge-strategy")
+async def api_execute_merge_strategy(request: Dict[str, str]) -> Dict[str, Any]:
+    """Execute automated merge strategy"""
+    base_branch = request.get("base_branch", "main")
+    feature_branch = request.get("feature_branch", "")
+    tool = request.get("tool")  # Optional
+    strategy = request.get("strategy")  # Optional
+    
+    if not feature_branch:
+        raise HTTPException(status_code=400, detail="Feature branch is required")
+    
+    try:
+        result = await orchestrator.execute_merge_strategy(base_branch, feature_branch, tool, strategy)
+        if result is None:
+            raise HTTPException(status_code=503, detail="Automated Merge Strategy not available")
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/enhanced-status")
+async def api_enhanced_status() -> Dict[str, Any]:
+    """Get enhanced system status including enterprise modules"""
+    try:
+        return await orchestrator.get_enhanced_system_status()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Typer CLI Application
 cli_app = typer.Typer(help="Agentic Framework v3.0 CLI")
@@ -1503,6 +1952,137 @@ def open_lane(
             console.print(f"❌ {result.get('error', 'Unknown error')}")
     
     asyncio.run(_open_lane())
+
+@cli_app.command()
+def analyze_context(
+    task_description: str = typer.Argument(..., help="Task description to analyze")
+):
+    """Analyze task context using Context Analysis Engine"""
+    async def _analyze():
+        orch = AgenticFrameworkOrchestrator()
+        await orch.initialize()
+        
+        if not orch.context_engine:
+            console.print("❌ Context Analysis Engine not available")
+            return
+        
+        with console.status("Analyzing task context..."):
+            result = await orch.analyze_task_context(task_description)
+        
+        if result and "error" not in result:
+            task_ctx = result["task_context"]
+            console.print(f"📋 Task Analysis for: [bold]{task_description}[/bold]")
+            console.print(f"   Type: {task_ctx['type']}")
+            console.print(f"   Complexity: {task_ctx['complexity']}")
+            console.print(f"   Priority: {task_ctx['priority']}")
+            console.print(f"   Estimated effort: {task_ctx['estimated_effort_hours']} hours")
+            console.print(f"   Risk level: {task_ctx['risk_level']}")
+            
+            if result["workflow_suggestions"]:
+                console.print("\n🔧 Suggested workflows:")
+                for ws in result["workflow_suggestions"]:
+                    console.print(f"   • {ws['name']}: {ws['estimated_time_minutes']} min ({ws['success_probability']:.1%} success)")
+        else:
+            error_msg = result.get("error") if result else "Analysis failed"
+            console.print(f"❌ {error_msg}")
+    
+    asyncio.run(_analyze())
+
+@cli_app.command()
+def analyze_merge(
+    feature_branch: str = typer.Argument(..., help="Feature branch to merge"),
+    base_branch: str = typer.Option("main", "--base", "-b", help="Base branch")
+):
+    """Analyze merge conflicts and suggest strategy"""
+    async def _analyze_merge():
+        orch = AgenticFrameworkOrchestrator()
+        await orch.initialize()
+        
+        if not orch.merge_strategy:
+            console.print("❌ Automated Merge Strategy not available")
+            return
+        
+        with console.status("Analyzing merge conflicts..."):
+            result = await orch.analyze_merge_conflicts(base_branch, feature_branch)
+        
+        if result and "error" not in result:
+            console.print(f"🔀 Merge Analysis: {base_branch} ← {feature_branch}")
+            console.print(f"   Conflicts found: {result['conflicts_found']}")
+            console.print(f"   Recommended tool: {result['recommended_tool']}")
+            console.print(f"   Recommended strategy: {result['recommended_strategy']}")
+            
+            if result['conflicts_found'] > 0:
+                console.print("\n⚠️ Conflict details:")
+                for conflict in result['conflicts']:
+                    console.print(f"   • {conflict['file_path']}: {conflict['complexity']} ({conflict['line_count']} lines)")
+        else:
+            error_msg = result.get("error") if result else "Analysis failed"
+            console.print(f"❌ {error_msg}")
+    
+    asyncio.run(_analyze_merge())
+
+@cli_app.command()
+def execute_merge(
+    feature_branch: str = typer.Argument(..., help="Feature branch to merge"),
+    base_branch: str = typer.Option("main", "--base", "-b", help="Base branch"),
+    tool: Optional[str] = typer.Option(None, "--tool", "-t", help="Merge tool to use"),
+    strategy: Optional[str] = typer.Option(None, "--strategy", "-s", help="Merge strategy")
+):
+    """Execute automated merge strategy"""
+    async def _execute_merge():
+        orch = AgenticFrameworkOrchestrator()
+        await orch.initialize()
+        
+        if not orch.merge_strategy:
+            console.print("❌ Automated Merge Strategy not available")
+            return
+        
+        with console.status("Executing merge strategy..."):
+            result = await orch.execute_merge_strategy(base_branch, feature_branch, tool, strategy)
+        
+        if result and "error" not in result:
+            if result['success']:
+                console.print(f"✅ Merge completed successfully")
+                console.print(f"   Tool used: {result['tool_used']}")
+                console.print(f"   Strategy: {result['strategy']}")
+                console.print(f"   Execution time: {result['execution_time']:.1f}s")
+                console.print(f"   Conflicts resolved: {result['conflicts_resolved']}")
+            else:
+                console.print(f"❌ Merge failed: {result.get('error', 'Unknown error')}")
+        else:
+            error_msg = result.get("error") if result else "Execution failed"
+            console.print(f"❌ {error_msg}")
+    
+    asyncio.run(_execute_merge())
+
+@cli_app.command()
+def enhanced_status():
+    """Get enhanced system status including enterprise modules"""
+    async def _status():
+        orch = AgenticFrameworkOrchestrator()
+        await orch.initialize()
+        
+        with console.status("Getting system status..."):
+            status = await orch.get_enhanced_system_status()
+        
+        console.print("🏗️ Enterprise Orchestration Platform Status")
+        console.print(f"   Total daily cost: ${status['total_cost_today']:.2f}")
+        console.print(f"   System health: {status['system_health']}")
+        
+        # Enterprise modules
+        em = status.get("enterprise_modules", {})
+        console.print(f"\n🚀 Enterprise Modules:")
+        console.print(f"   Available: {'✅' if em.get('available') else '❌'}")
+        console.print(f"   MOD-010 (Merge Strategy): {'✅' if em.get('mod_010_merge_strategy') else '❌'}")
+        console.print(f"   Context Analysis Engine: {'✅' if em.get('context_analysis_engine') else '❌'}")
+        
+        # Service status
+        console.print(f"\n🛠️ AI Services:")
+        for service, info in status["services"].items():
+            icon = "✅" if info["available"] else "❌"
+            console.print(f"   {icon} {service}: {info['status']} (${info['cost_today']:.3f})")
+    
+    asyncio.run(_status())
 
 if __name__ == "__main__":
     cli_app()
