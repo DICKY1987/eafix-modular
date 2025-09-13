@@ -37,6 +37,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -50,3 +57,30 @@ jobs:
         run: |
           pytest -q tests/test_gui_parity_optional.py
 
+  parity-ubuntu:
+    name: GUI Parity (Ubuntu Offscreen)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install PyQt6
+      - name: Parity smoke (xvfb)
+        env:
+          PYTHONPATH: gui_terminal/src
+          QT_QPA_PLATFORM: offscreen
+          GUI_PARITY: '1'
+        run: |
+          xvfb-run -a pytest -q tests/test_gui_parity_optional.py
