@@ -232,6 +232,9 @@ def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
     # workflow-status subcommand
     subparsers.add_parser("workflow-status", help="Enhanced workflow status with metrics")
 
+    # gui subcommand (optional GUI launcher)
+    subparsers.add_parser("gui", help="Launch the GUI Terminal (optional dependencies)")
+
     parsed = parser.parse_args(argv)
     return CLIArgs(
         command=parsed.command,
@@ -602,6 +605,20 @@ def main(argv: Optional[List[str]] = None) -> int:
                 return 0
             except Exception as exc:
                 print(f"Error: workflow system unavailable: {exc}", file=sys.stderr)
+                return 1
+        elif args.command == "gui":
+            # Attempt to run GUI terminal, fallback to headless message if missing
+            try:
+                import runpy
+                # Ensure GUI project path is available
+                repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+                gui_src = os.path.join(repo_root, "gui_terminal", "src")
+                os.environ.setdefault("PYTHONPATH", gui_src + os.pathsep + os.environ.get("PYTHONPATH", ""))
+                # Execute the GUI main module
+                runpy.run_module("gui_terminal.main", run_name="__main__")
+                return 0
+            except Exception as e:
+                _safe_print(f"GUI not available: {e}")
                 return 1
         else:
             # This branch should be unreachable because of argparse's required subcommand
