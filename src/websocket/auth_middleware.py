@@ -14,8 +14,19 @@ class WebSocketAuthMiddleware:
     
     def __init__(self, secret_key: str = "your-secret-key", redis_url: str = "redis://localhost:6379"):
         self.secret_key = secret_key
-        self.redis_client = redis.Redis.from_url(redis_url, decode_responses=True)
+        # Best-effort Redis; fall back to in-memory stores when unavailable
+        self.redis_client = None
+        try:
+            client = redis.Redis.from_url(redis_url, decode_responses=True)
+            client.ping()
+            self.redis_client = client
+        except Exception as e:
+            logger.warning(f"Redis unavailable for AuthMiddleware, using in-memory stores: {e}")
         self.algorithm = "HS256"
+        # In-memory fallbacks
+        self._api_keys: Dict[str, Any] = {}
+        self._sessions: Dict[str, Any] = {}
+        self._blacklist: set[str] = set()
         
     async def authenticate_token(self, token: Optional[str]) -> Optional[Dict[str, Any]]:
         """Authenticate JWT token and return user info."""
@@ -38,8 +49,15 @@ class WebSocketAuthMiddleware:
             
             # Check if token is blacklisted
             token_hash = hash(token)
-            if self.redis_client.get(f"blacklist:{token_hash}"):
-                logger.warning("Token is blacklisted")
+            try:
+                if self.redis_client is not None and self.redis_client.get(f"blacklist:{token_hash}"):
+                    logger.warning("Token is blacklisted")
+                    return None
+            except Exception as e:
+                logger.warning(f"Redis blacklist check failed, falling back to memory: {e}")
+                self.redis_client = None
+            if token in self._blacklist:
+                logger.warning("Token is blacklisted (memory)")
                 return None
                 
             return {
@@ -65,14 +83,21 @@ class WebSocketAuthMiddleware:
             return None
             
         try:
-            # Check API key in Redis
-            key_data = self.redis_client.get(f"api_key:{api_key}")
-            if not key_data:
+            import json
+            user_info: Optional[Dict[str, Any]] = None
+            try:
+                if self.redis_client is not None:
+                    key_data = self.redis_client.get(f"api_key:{api_key}")
+                    if key_data:
+                        user_info = json.loads(key_data)
+            except Exception as e:
+                logger.warning(f"Redis API key check failed, falling back to memory: {e}")
+                self.redis_client = None
+            if user_info is None:
+                user_info = self._api_keys.get(api_key)
+            if not user_info:
                 logger.warning("Invalid API key")
                 return None
-            
-            import json
-            user_info = json.loads(key_data)
             
             # Check if API key is active
             if not user_info.get("active", False):
@@ -81,7 +106,15 @@ class WebSocketAuthMiddleware:
                 
             # Update last used timestamp
             user_info["last_used"] = datetime.utcnow().isoformat()
-            self.redis_client.set(f"api_key:{api_key}", json.dumps(user_info))
+            try:
+                if self.redis_client is not None:
+                    self.redis_client.set(f"api_key:{api_key}", json.dumps(user_info))
+                else:
+                    self._api_keys[api_key] = user_info
+            except Exception as e:
+                logger.warning(f"Redis API key update failed, storing in memory: {e}")
+                self.redis_client = None
+                self._api_keys[api_key] = user_info
             
             return user_info
             
@@ -95,14 +128,21 @@ class WebSocketAuthMiddleware:
             return None
             
         try:
-            # Check session in Redis
-            session_data = self.redis_client.get(f"session:{session_id}")
-            if not session_data:
+            import json
+            session_info: Optional[Dict[str, Any]] = None
+            try:
+                if self.redis_client is not None:
+                    session_data = self.redis_client.get(f"session:{session_id}")
+                    if session_data:
+                        session_info = json.loads(session_data)
+            except Exception as e:
+                logger.warning(f"Redis session check failed, falling back to memory: {e}")
+                self.redis_client = None
+            if session_info is None:
+                session_info = self._sessions.get(session_id)
+            if not session_info:
                 logger.warning("Invalid session")
                 return None
-            
-            import json
-            session_info = json.loads(session_data)
             
             # Check session expiration
             expires_at = datetime.fromisoformat(session_info.get("expires_at", ""))
@@ -116,7 +156,15 @@ class WebSocketAuthMiddleware:
             
             # Extend session TTL
             ttl_seconds = int((expires_at - datetime.utcnow()).total_seconds())
-            self.redis_client.setex(f"session:{session_id}", ttl_seconds, json.dumps(session_info))
+            try:
+                if self.redis_client is not None:
+                    self.redis_client.setex(f"session:{session_id}", ttl_seconds, json.dumps(session_info))
+                else:
+                    self._sessions[session_id] = session_info
+            except Exception as e:
+                logger.warning(f"Redis session update failed, storing in memory: {e}")
+                self.redis_client = None
+                self._sessions[session_id] = session_info
             
             return session_info.get("user_info", {})
             
@@ -177,7 +225,15 @@ class WebSocketAuthMiddleware:
         
         import json
         ttl_seconds = expires_in_days * 24 * 60 * 60
-        self.redis_client.setex(f"api_key:{api_key}", ttl_seconds, json.dumps(key_data))
+        try:
+            if self.redis_client is not None:
+                self.redis_client.setex(f"api_key:{api_key}", ttl_seconds, json.dumps(key_data))
+            else:
+                self._api_keys[api_key] = key_data
+        except Exception as e:
+            logger.warning(f"Redis API key create failed, storing in memory: {e}")
+            self.redis_client = None
+            self._api_keys[api_key] = key_data
         
         return api_key
     
@@ -201,7 +257,15 @@ class WebSocketAuthMiddleware:
         
         import json
         ttl_seconds = expires_in_hours * 60 * 60
-        self.redis_client.setex(f"session:{session_id}", ttl_seconds, json.dumps(session_data))
+        try:
+            if self.redis_client is not None:
+                self.redis_client.setex(f"session:{session_id}", ttl_seconds, json.dumps(session_data))
+            else:
+                self._sessions[session_id] = session_data
+        except Exception as e:
+            logger.warning(f"Redis session create failed, storing in memory: {e}")
+            self.redis_client = None
+            self._sessions[session_id] = session_data
         
         return session_id
     
@@ -209,20 +273,52 @@ class WebSocketAuthMiddleware:
         """Add token to blacklist."""
         token_hash = hash(token)
         ttl_seconds = ttl_hours * 60 * 60
-        self.redis_client.setex(f"blacklist:{token_hash}", ttl_seconds, "revoked")
+        try:
+            if self.redis_client is not None:
+                self.redis_client.setex(f"blacklist:{token_hash}", ttl_seconds, "revoked")
+            else:
+                self._blacklist.add(token)
+        except Exception as e:
+            logger.warning(f"Redis blacklist write failed, storing in memory: {e}")
+            self.redis_client = None
+            self._blacklist.add(token)
     
     async def revoke_api_key(self, api_key: str):
         """Revoke API key."""
-        key_data = self.redis_client.get(f"api_key:{api_key}")
-        if key_data:
-            import json
-            data = json.loads(key_data)
-            data["active"] = False
-            self.redis_client.set(f"api_key:{api_key}", json.dumps(data))
+        try:
+            key_data = None
+            if self.redis_client is not None:
+                key_data = self.redis_client.get(f"api_key:{api_key}")
+            if key_data:
+                import json
+                data = json.loads(key_data)
+                data["active"] = False
+                if self.redis_client is not None:
+                    self.redis_client.set(f"api_key:{api_key}", json.dumps(data))
+                else:
+                    self._api_keys[api_key] = data
+            else:
+                # Update memory store if present
+                if api_key in self._api_keys:
+                    self._api_keys[api_key]["active"] = False
+        except Exception as e:
+            logger.warning(f"Redis API key revoke failed, updating memory: {e}")
+            self.redis_client = None
+            if api_key in self._api_keys:
+                self._api_keys[api_key]["active"] = False
     
     async def revoke_session(self, session_id: str):
         """Revoke session."""
-        self.redis_client.delete(f"session:{session_id}")
+        try:
+            if self.redis_client is not None:
+                self.redis_client.delete(f"session:{session_id}")
+            if session_id in self._sessions:
+                del self._sessions[session_id]
+        except Exception as e:
+            logger.warning(f"Redis session revoke failed, updating memory: {e}")
+            self.redis_client = None
+            if session_id in self._sessions:
+                del self._sessions[session_id]
     
     def check_permission(self, user_info: Dict[str, Any], required_permission: str) -> bool:
         """Check if user has required permission."""

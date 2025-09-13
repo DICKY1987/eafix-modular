@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from fastapi import WebSocket, WebSocketDisconnect
 import redis
 import uuid
+from typing import Optional as _Optional
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,18 @@ class ConnectionManager:
         self.connections: Dict[str, Connection] = {}
         self.user_connections: Dict[str, Set[str]] = {}  # user_id -> set of client_ids
         self.subscription_map: Dict[str, Set[str]] = {}  # topic -> set of client_ids
-        self.redis_client = redis.Redis.from_url(redis_url, decode_responses=True)
+        # Optional Redis client (not required for core functionality)
+        self.redis_client = None
+        try:
+            client = redis.Redis.from_url(redis_url, decode_responses=True)
+            client.ping()
+            self.redis_client = client
+        except Exception:
+            # Operate fully in-memory when Redis is unavailable
+            self.redis_client = None
+        # Register this instance as the active manager for the process
+        global active_connection_manager
+        active_connection_manager = self
         
     async def connect(self, websocket: WebSocket, user_id: Optional[str] = None) -> str:
         """Accept a new WebSocket connection."""
@@ -220,6 +232,17 @@ class ConnectionManager:
                 "type": "error",
                 "message": "Internal server error"
             })
+
+# Active manager registry (last instantiated instance wins)
+active_connection_manager: _Optional[ConnectionManager] = None
+
+def get_active_connection_manager() -> "ConnectionManager":
+    """Return the currently active ConnectionManager.
+
+    Falls back to the module-level singleton if no explicit instance
+    was created in this process.
+    """
+    return active_connection_manager or connection_manager
 
 # Global connection manager instance
 connection_manager = ConnectionManager()

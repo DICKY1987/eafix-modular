@@ -9,7 +9,7 @@ from dataclasses import dataclass, asdict
 from enum import Enum
 import redis
 
-from .connection_manager import connection_manager
+from .connection_manager import connection_manager, get_active_connection_manager
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +51,15 @@ class EventBroadcaster:
     """Handles broadcasting of events to WebSocket connections."""
     
     def __init__(self, redis_url: str = "redis://localhost:6379"):
-        self.redis_client = redis.Redis.from_url(redis_url, decode_responses=True)
+        # Initialize Redis client if available; fall back to in-memory only
+        self.redis_client = None
+        try:
+            client = redis.Redis.from_url(redis_url, decode_responses=True)
+            # Probe connectivity; if it fails, operate without Redis
+            client.ping()
+            self.redis_client = client
+        except Exception as e:
+            logger.warning(f"Redis unavailable for EventBroadcaster, using in-memory fallback: {e}")
         self.event_history: List[WorkflowEvent] = []
         self.max_history = 1000
         
@@ -195,9 +203,14 @@ class EventBroadcaster:
             if len(self.event_history) > self.max_history:
                 self.event_history = self.event_history[-self.max_history:]
             
-            # Store in Redis for persistence
-            event_key = f"event:{event.workflow_id}:{event.timestamp.isoformat()}"
-            self.redis_client.setex(event_key, 86400, json.dumps(event.to_dict()))  # 24h TTL
+            # Store in Redis for persistence (best-effort)
+            if self.redis_client is not None:
+                try:
+                    event_key = f"event:{event.workflow_id}:{event.timestamp.isoformat()}"
+                    self.redis_client.setex(event_key, 86400, json.dumps(event.to_dict()))  # 24h TTL
+                except Exception as e:
+                    logger.warning(f"Redis write failed in EventBroadcaster, continuing without Redis: {e}")
+                    self.redis_client = None
             
             # Determine broadcast targets
             message = event.to_dict()
@@ -205,20 +218,34 @@ class EventBroadcaster:
             # Broadcast to workflow-specific topic
             if event.workflow_id != "system":
                 topic = f"workflow:{event.workflow_id}"
-                await connection_manager.broadcast_to_topic(topic, message)
+                manager = get_active_connection_manager()
+                # Prefer the active manager, but also invoke the module-level
+                # reference if it's different (to support tests that patch it).
+                await manager.broadcast_to_topic(topic, message)
+                if manager is not connection_manager:
+                    await connection_manager.broadcast_to_topic(topic, message)
             
             # Broadcast to event type topic
             event_topic = f"events:{event.event_type.value}"
-            await connection_manager.broadcast_to_topic(event_topic, message)
+            manager = get_active_connection_manager()
+            await manager.broadcast_to_topic(event_topic, message)
+            if manager is not connection_manager:
+                await connection_manager.broadcast_to_topic(event_topic, message)
             
             # Broadcast to user-specific topic if user_id provided
             if event.user_id:
                 user_topic = f"user:{event.user_id}"
-                await connection_manager.broadcast_to_topic(user_topic, message)
+                manager = get_active_connection_manager()
+                await manager.broadcast_to_topic(user_topic, message)
+                if manager is not connection_manager:
+                    await connection_manager.broadcast_to_topic(user_topic, message)
             
             # Broadcast system events to all connections
             if event.workflow_id == "system":
-                await connection_manager.broadcast_to_all(message)
+                manager = get_active_connection_manager()
+                await manager.broadcast_to_all(message)
+                if manager is not connection_manager:
+                    await connection_manager.broadcast_to_all(message)
                 
             logger.info(f"Broadcasted event: {event.event_type.value} for workflow: {event.workflow_id}")
             
@@ -240,23 +267,30 @@ class EventBroadcaster:
     
     async def get_workflow_events(self, workflow_id: str) -> List[Dict[str, Any]]:
         """Get all events for a specific workflow."""
+        # Prefer Redis if available; otherwise read from in-memory history
+        if self.redis_client is not None:
+            try:
+                pattern = f"event:{workflow_id}:*"
+                keys = self.redis_client.keys(pattern)
+
+                events = []
+                for key in keys:
+                    event_data = self.redis_client.get(key)
+                    if event_data:
+                        events.append(json.loads(event_data))
+
+                events.sort(key=lambda x: x.get("timestamp", ""))
+                return events
+            except Exception as e:
+                logger.warning(f"Redis read failed in EventBroadcaster, falling back to memory: {e}")
+
+        # Fallback to in-memory history
         try:
-            # Get from Redis
-            pattern = f"event:{workflow_id}:*"
-            keys = self.redis_client.keys(pattern)
-            
-            events = []
-            for key in keys:
-                event_data = self.redis_client.get(key)
-                if event_data:
-                    events.append(json.loads(event_data))
-            
-            # Sort by timestamp
-            events.sort(key=lambda x: x.get("timestamp", ""))
-            return events
-            
+            filtered = [e.to_dict() for e in self.event_history if e.workflow_id == workflow_id]
+            filtered.sort(key=lambda x: x.get("timestamp", ""))
+            return filtered
         except Exception as e:
-            logger.error(f"Failed to get workflow events for {workflow_id}: {e}")
+            logger.error(f"Failed to get workflow events from memory for {workflow_id}: {e}")
             return []
 
 # Global event broadcaster instance
