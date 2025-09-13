@@ -92,6 +92,12 @@ cli-multi-rapid phase stream list
 cli-multi-rapid phase stream run stream-a --dry
 ```
 
+## Tool Registry and Event Bus (new)
+
+- Tool registry: define tools in `config/tools.yaml`.
+- Probe tools and write health snapshot: `python scripts/ipt_tools_ping.py` → `state/tool_health.json`.
+- Event bus (FastAPI + WebSocket): `uvicorn services.event_bus.main:app --reload` then publish JSON to `POST /publish`; subscribers connect to `/ws`.
+
 Hooks setup
 
 - Configure Git to use bundled hooks (merge-safety, optional license gate):
