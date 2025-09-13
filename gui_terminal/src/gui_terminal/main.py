@@ -10,8 +10,10 @@ except Exception:  # pragma: no cover - fallback import error handling
 
 try:
     from gui_terminal.security.policy_manager import PolicyManager
+    from gui_terminal.plugins.manager import PluginManager
 except Exception:
     PolicyManager = None  # type: ignore
+    PluginManager = None  # type: ignore
 
 def load_default_config() -> dict:
     cfg_path = Path(__file__).resolve().parents[2] / "config" / "default_config.yaml"
@@ -40,6 +42,21 @@ def main(argv: list[str] | None = None) -> int:
             _ = (ok, reason)
         except Exception:
             pass
+
+    # Initialize plugins if configured
+    cfg = _
+    try:
+        if PluginManager is not None and cfg:
+            plug_cfg = (cfg.get("plugins") or {})
+            if plug_cfg.get("enabled"):
+                dirs = plug_cfg.get("plugin_directories", []) or []
+                pmgr = PluginManager(dirs)
+                for rec in pmgr.discover():
+                    pmgr.load(rec)
+                pmgr.activate_all({"mode": "headless", "version": "0.1.0"})
+    except Exception:
+        # Non-fatal if plugin subsystem fails at this stage
+        pass
 
     try:
         # Import lazily so this module works without GUI deps installed.
