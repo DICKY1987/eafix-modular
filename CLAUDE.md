@@ -35,7 +35,14 @@ The system consists of several integrated framework layers:
 - **architecture lane**: System design and complex architecture (architecture/**, design/**, *.arch.md)
 - **quality lane**: Code quality and linting (**/*.js, **/*.py, **/*.sql)
 
-**4. Infrastructure Components**
+**4. Self-Healing System (`self_healing_manager.py`)**
+- **SelfHealingManager**: Automated error recovery with 45+ error types
+- **Exponential backoff**: Intelligent retry logic with configurable limits
+- **Security hardening**: Hard-fail protection for critical errors (signature validation)
+- **Resume points**: Checkpoint-based recovery from failed operations
+- **Resource management**: Disk space, memory, and port conflict resolution
+
+**5. Infrastructure Components**
 - **FastAPI Application**: RESTful API for programmatic access
 - **Typer CLI**: Rich command-line interface with progress indicators
 - **Docker Compose**: Complete containerized deployment with Redis, Ollama, Prometheus, Grafana
@@ -101,6 +108,27 @@ cli-multi-rapid run-job --compliance-check
 cli-multi-rapid compliance report
 cli-multi-rapid compliance check
 cli-multi-rapid workflow-status
+```
+
+### Self-Healing Operations (NEW)
+```bash
+# Check self-healing system status
+cli-multi-rapid self-healing status
+
+# Test self-healing for specific error types
+cli-multi-rapid self-healing test ERR_DISK_SPACE
+cli-multi-rapid self-healing test ERR_FILE_LOCKED
+cli-multi-rapid self-healing test ERR_PORT_BIND
+
+# View self-healing configuration
+cli-multi-rapid self-healing config
+
+# Available error codes for testing:
+# ERR_ELEVATION_REQUIRED, ERR_TOOLCHAIN_MISSING, ERR_AV_BLOCK
+# ERR_CLOCK_SKEW, ERR_PATH_DENIED, ERR_PATH_NOT_FOUND
+# ERR_DISK_SPACE, ERR_RESOURCE_STARVE, ERR_PORT_BIND
+# ERR_CONFIG_REGRESSION, ERR_STATE_DRIFT, ERR_FILE_LOCKED
+# (and 30+ more error types with automated recovery)
 ```
 
 ### Cross-Language Bridge System (NEW)
@@ -207,6 +235,14 @@ Services are defined in `SERVICES` dict with:
 - `priority`: Selection priority (lower = higher priority)
 - `complexity_match`: Supported task complexities ["simple", "moderate", "complex"]
 - `fallback`: Fallback service when quota exceeded
+
+### Self-Healing Configuration
+Self-healing system is configured in `config/self_healing/self_healing.yaml`:
+- **Error Recovery**: 45+ predefined error types with automated fixes
+- **Retry Logic**: Configurable max attempts (default: 3) with exponential backoff
+- **Security Controls**: Hard-fail list for critical errors (ERR_SIG_INVALID)
+- **Resume Points**: BUNDLE_VALIDATE and SAFEGUARDS_SNAPSHOT checkpoints
+- **Notification Integration**: Slack, PagerDuty, and email alerts for incidents
 
 ### Lane Configuration
 Git worktree lanes are configured in `.ai/workflows/agent_jobs.yaml` and `config/agent_jobs.yaml`:
@@ -385,6 +421,8 @@ Access at http://localhost:3000 (admin/admin) after `docker-compose up`:
 │   ├── docker-compose.yml     # Infrastructure services
 │   ├── agent_jobs.yaml        # Declarative job definitions
 │   ├── workflow-config.yaml   # NEW: Workflow orchestration settings
+│   ├── self_healing/          # NEW: Self-healing system configuration
+│   │   └── self_healing.yaml  # Error recovery and resilience config
 │   └── env.example           # Environment template
 ├── scripts/                   # Setup and utility scripts
 ├── docs/                      # Documentation
@@ -394,7 +432,11 @@ Access at http://localhost:3000 (admin/admin) after `docker-compose up`:
 ├── .ai/                       # Agent orchestration configs
 │   └── workflows/agent_jobs.yaml  # Primary job definitions
 ├── src/cli_multi_rapid/       # CLI implementation
-└── tests/                     # Test suite
+│   ├── cli.py                # Main CLI with self-healing commands
+│   └── self_healing_manager.py # NEW: Self-healing orchestration
+├── tests/                     # Test suite
+│   └── self_healing/         # NEW: Self-healing system tests
+└── docs/diagrams/            # NEW: Self-healing flow diagrams
 ```
 
 This framework replaces expensive AI subscriptions with intelligent free-tier management, providing professional-grade multi-agent development capabilities at minimal cost.

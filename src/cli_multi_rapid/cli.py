@@ -23,6 +23,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Any, Dict
 import os
 import json
+from .self_healing_manager import get_self_healing_manager, ErrorCode, SelfHealingResult
 
 
 def _safe_print(text: str) -> None:
@@ -107,6 +108,9 @@ class CLIArgs:
     compliance_check: Optional[bool] = None
     # Additional compliance fields
     compliance_cmd: Optional[str] = None
+    # Self-healing fields
+    healing_cmd: Optional[str] = None
+    error_code: Optional[str] = None
 
 
 def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
@@ -214,6 +218,17 @@ def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
     # compliance check
     compliance_sub.add_parser("check", help="Run compliance validation checks")
     
+    # self-healing subcommand
+    healing_parser = subparsers.add_parser("self-healing", help="Self-healing operations and diagnostics")
+    healing_sub = healing_parser.add_subparsers(dest="healing_cmd", required=True)
+    # self-healing status
+    healing_sub.add_parser("status", help="Show self-healing system status")
+    # self-healing test
+    healing_test = healing_sub.add_parser("test", help="Test self-healing for specific error")
+    healing_test.add_argument("error_code", type=str, help="Error code to test (e.g., ERR_DISK_SPACE)")
+    # self-healing config
+    healing_sub.add_parser("config", help="Show self-healing configuration")
+    
     # workflow-status subcommand
     subparsers.add_parser("workflow-status", help="Enhanced workflow status with metrics")
 
@@ -233,6 +248,8 @@ def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
         workflow_validate=getattr(parsed, "workflow_validate", None),
         compliance_check=getattr(parsed, "compliance_check", None),
         compliance_cmd=getattr(parsed, "compliance_cmd", None),
+        healing_cmd=getattr(parsed, "healing_cmd", None),
+        error_code=getattr(parsed, "error_code", None),
     )
 
 
@@ -515,6 +532,70 @@ def main(argv: Optional[List[str]] = None) -> int:
                 return 0
             else:
                 print("Error: unknown compliance subcommand", file=sys.stderr)
+                return 1
+        elif args.command == "self-healing":
+            healing_cmd = getattr(args, "healing_cmd", None)
+            healing_manager = get_self_healing_manager()
+            
+            if healing_cmd == "status":
+                print("=== Self-Healing System Status ===")
+                print(f"Configuration loaded: {healing_manager.config_path}")
+                print(f"Registered fixers: {len(healing_manager.fixers)}")
+                
+                # Show configuration summary
+                sh_config = healing_manager.config.get('self_healing', {})
+                print(f"Max attempts: {sh_config.get('max_attempts', 'N/A')}")
+                print(f"Base backoff: {sh_config.get('base_backoff_seconds', 'N/A')}s")
+                print(f"Max backoff: {sh_config.get('max_backoff_seconds', 'N/A')}s")
+                
+                security_hard_fail = sh_config.get('security_hard_fail', [])
+                print(f"Security hard fail codes: {len(security_hard_fail)}")
+                
+                # Show available error codes
+                print("\n=== Available Error Codes ===")
+                for error_code in ErrorCode:
+                    fixer_count = len(healing_manager.fixers.get(error_code, []))
+                    print(f"  {error_code.value}: {fixer_count} fixers")
+                
+                return 0
+                
+            elif healing_cmd == "test":
+                error_code_str = getattr(args, "error_code", None)
+                if not error_code_str:
+                    print("Error: missing error_code", file=sys.stderr)
+                    return 1
+                    
+                try:
+                    error_code = ErrorCode(error_code_str.upper())
+                except ValueError:
+                    print(f"Error: invalid error code '{error_code_str}'", file=sys.stderr)
+                    print("Available codes:")
+                    for code in ErrorCode:
+                        print(f"  {code.value}")
+                    return 1
+                
+                print(f"Testing self-healing for: {error_code.value}")
+                result = healing_manager.attempt_healing(error_code, {"test_mode": True})
+                
+                print(f"\n=== Healing Result ===")
+                print(f"Success: {result.success}")
+                print(f"Attempts: {result.attempts}")
+                print(f"Applied fixes: {result.applied_fixes}")
+                print(f"Total time: {result.total_time:.2f}s")
+                print(f"Message: {result.message}")
+                
+                return 0 if result.success else 1
+                
+            elif healing_cmd == "config":
+                print("=== Self-Healing Configuration ===")
+                print(f"Config file: {healing_manager.config_path}")
+                print("\nConfiguration:")
+                import yaml
+                print(yaml.dump(healing_manager.config, default_flow_style=False, indent=2))
+                return 0
+                
+            else:
+                print("Error: unknown self-healing subcommand", file=sys.stderr)
                 return 1
         elif args.command == "workflow-status":
             try:

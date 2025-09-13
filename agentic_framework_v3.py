@@ -48,6 +48,18 @@ import httpx
 import subprocess
 import os
 from urllib.parse import urljoin
+
+# Self-Healing Integration
+try:
+    from src.cli_multi_rapid.self_healing_manager import (
+        get_self_healing_manager, 
+        ErrorCode, 
+        SelfHealingResult
+    )
+    SELF_HEALING_AVAILABLE = True
+except ImportError:
+    SELF_HEALING_AVAILABLE = False
+    print("Warning: Self-healing system not available - continuing without it")
 from pathlib import Path
 from fnmatch import fnmatch
 
