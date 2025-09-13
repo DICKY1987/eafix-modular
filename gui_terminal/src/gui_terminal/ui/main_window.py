@@ -19,8 +19,9 @@ except Exception:  # pragma: no cover - allow headless import
 
 
 class MainWindow:  # pragma: no cover - constructed only when PyQt present
-    def __init__(self) -> None:
+    def __init__(self, config: dict | None = None) -> None:
         self.title = "CLI Multi-Rapid GUI Terminal"
+        self._cfg = config or {}
         if QtWidgets is None:
             # Headless placeholder retains API compatibility
             self._w = None
@@ -84,12 +85,18 @@ class MainWindow:  # pragma: no cover - constructed only when PyQt present
             text = data.decode(errors="replace")
         except Exception:
             text = str(data)
-        # Strip ANSI escape sequences for readability (basic)
+        # Optional: Strip ANSI escape sequences for readability
+        strip_ansi = False
         try:
-            import re
-            text = re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", text)
+            strip_ansi = bool(((self._cfg.get("ui") or {}).get("strip_ansi", False)))
         except Exception:
-            pass
+            strip_ansi = False
+        if strip_ansi:
+            try:
+                import re
+                text = re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", text)
+            except Exception:
+                pass
         # Handle carriage return overwrite (simple heuristic: replace last line)
         def _append():
             if "\r" in text:

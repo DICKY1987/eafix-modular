@@ -156,6 +156,11 @@ class PtyBackend:
             status = getattr(self._pty, "status", None)
             if status is not None:
                 return int(status)
+            # Other common attributes across wrappers
+            for attr in ("returncode", "exit_code", "exitStatus", "exit_status"):
+                val = getattr(self._pty, attr, None)
+                if val is not None:
+                    return int(val)
         except Exception:
             return None
         return None

@@ -64,7 +64,7 @@ def main(argv: list[str] | None = None) -> int:
         from gui_terminal.ui.main_window import MainWindow
 
         app = QtWidgets.QApplication([])
-        win = MainWindow()
+        win = MainWindow(_)
         if hasattr(win, "widget") and win.widget() is not None:
             win.show()
             return app.exec()
