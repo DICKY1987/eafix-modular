@@ -1,0 +1,64 @@
+# Security Policy Configuration
+command_filtering:
+  mode: "whitelist"  # whitelist, blacklist, or disabled
+  allowed_commands:
+    - "ls"
+    - "dir"
+    - "pwd"
+    - "cd"
+    - "echo"
+    - "cat"
+    - "type"
+    - "grep"
+    - "find"
+    - "python"
+    - "pip"
+    - "git"
+    - "node"
+    - "npm"
+    - "cli-multi-rapid"
+  blocked_commands:
+    - "rm -rf"
+    - "del /f /s /q"
+    - "format"
+    - "fdisk"
+    - "dd"
+    - "mkfs"
+    - "sudo rm"
+    - "su root"
+
+resource_limits:
+  enforce: true
+  max_processes: 10
+  max_memory_mb: 512
+  max_cpu_percent: 50
+  max_execution_time: 300
+  max_file_size_mb: 100
+
+audit_logging:
+  enabled: true
+  log_file: "./gui_terminal_audit.log"
+  log_commands: true
+  log_file_access: true
+  log_network_access: true
+  integrity_check: true
+
+network_access:
+  allowed_domains:
+    - "github.com"
+    - "pypi.org"
+    - "npmjs.com"
+  blocked_domains:
+    - "malicious-site.com"
+  allow_localhost: true
+
+file_system:
+  restricted_paths:
+    - "/etc/passwd"
+    - "/etc/shadow"
+    - "C:\\Windows\\System32"
+  allowed_paths:
+    - "/home"
+    - "/tmp"
+    - "C:\\Users"
+
