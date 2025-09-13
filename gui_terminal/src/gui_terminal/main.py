@@ -60,13 +60,18 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         # Import lazily so this module works without GUI deps installed.
-        import PyQt6  # type: ignore
+        from PyQt6 import QtWidgets  # type: ignore
+        from gui_terminal.ui.main_window import MainWindow
 
-        print(
-            "[gui_terminal] PyQt6 detected. GUI scaffolding present; "
-            "full UI and PTY integration to be implemented per plan."
-        )
-        # Note: Real UI startup will be wired in subsequent phases.
+        app = QtWidgets.QApplication([])
+        win = MainWindow()
+        if hasattr(win, "widget") and win.widget() is not None:
+            win.show()
+            return app.exec()
+        else:
+            # Fallback if PyQt present but window failed to construct fully
+            print("[gui_terminal] GUI could not initialize; running headless.")
+            return 0
     except Exception:
         print(
             "[gui_terminal] Running in headless mode (PyQt6 not available). "
