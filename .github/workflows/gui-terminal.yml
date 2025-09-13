@@ -55,7 +55,7 @@ jobs:
           QT_QPA_PLATFORM: offscreen
           GUI_PARITY: '1'
         run: |
-          pytest -q tests/test_gui_parity_optional.py
+          pytest -q tests/test_gui_parity_*_optional.py
 
   parity-ubuntu:
     name: GUI Parity (Ubuntu Offscreen)
@@ -83,4 +83,5 @@ jobs:
           QT_QPA_PLATFORM: offscreen
           GUI_PARITY: '1'
         run: |
-          xvfb-run -a pytest -q tests/test_gui_parity_optional.py
+          xvfb-run -a pytest -q tests/test_gui_parity_*_optional.py
+
