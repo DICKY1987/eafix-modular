@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/notification_rule.json",
+  "title": "Notification Rule",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string" },
+    "channel": { "type": "string", "enum": ["email", "slack", "webhook"] },
+    "pattern": { "type": "string" },
+    "enabled": { "type": "boolean" }
+  },
+  "required": ["id", "channel", "pattern"]
+}

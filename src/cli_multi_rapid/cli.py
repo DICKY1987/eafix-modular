@@ -1,4 +1,4 @@
-"""
+﻿"""
 Command-line interface for the ``cli_multi_rapid`` package.
 
 This module exposes a :func:`main` function which is intended to be used as
@@ -518,16 +518,6 @@ def main(argv: Optional[List[str]] = None) -> int:
                 print("- All governance files present")
                 print("- Branch protection enabled")
                 print("- Workflow orchestration operational")
-                print("[SUCCESS] All compliance checks passed")
-                return 0
-            elif compliance_cmd == "check":
-                print("[COMPLIANCE CHECK] Running validation checks...")
-                print("✓ Security scanning active")
-                print("✓ Code quality gates enforced") 
-                print("✓ Test coverage >= 85%")
-                print("✓ All governance files present")
-                print("✓ Branch protection enabled")
-                print("✓ Workflow orchestration operational")
                 print("[SUCCESS] All compliance checks passed")
                 return 0
             else:
