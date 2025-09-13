@@ -3,9 +3,7 @@ from __future__ import annotations
 import os
 import sys
 from dataclasses import dataclass
-from typing import Optional, Tuple
-import threading
-import time
+from typing import Optional
 
 
 @dataclass
@@ -24,6 +22,7 @@ class PtyBackend:
         self.shell = shell or self._default_shell()
         self.cwd = cwd or os.getcwd()
         self.process = PtyProcess()
+        self._pty = None  # underlying backend object
 
     def _default_shell(self) -> str:
         if os.name == "nt":  # Windows
@@ -72,6 +71,29 @@ class PtyBackend:
             pass
         self.process.pid = None
 
+    def is_alive(self) -> bool:
+        try:
+            if hasattr(self, "_pty") and self._pty is not None:
+                # ptyprocess exposes isalive(); winpty may not
+                alive = getattr(self._pty, "isalive", None)
+                if callable(alive):
+                    return bool(alive())
+        except Exception:
+            pass
+        # Fallback: if pid is None => not alive
+        return self.process.pid is not None
+
+    def send_ctrl_c(self) -> None:
+        try:
+            if os.name == "nt":
+                self._send_ctrl_c_windows()
+            else:
+                if hasattr(self, "_pty") and self._pty is not None:
+                    # Sending literal ETX over the pty usually triggers SIGINT on POSIX
+                    self._pty.write("\x03")
+        except Exception:
+            pass
+
     # --- Platform-specific helpers ---
 
     def _start_posix(self) -> None:
@@ -100,3 +122,31 @@ class PtyBackend:
             except Exception:
                 self._pty = None
                 self.process.pid = 0
+
+    def _send_ctrl_c_windows(self) -> None:
+        """Attempt to deliver Ctrl-C to the child process on Windows.
+
+        Prefer winpty/pywinpty behavior; otherwise, try using GenerateConsoleCtrlEvent.
+        """
+        # Try pty-provided write of ^C first
+        try:
+            if hasattr(self, "_pty") and self._pty is not None and hasattr(self._pty, "write"):
+                self._pty.write("\x03")
+                return
+        except Exception:
+            pass
+        # Fallback: use WinAPI GenerateConsoleCtrlEvent if pid known
+        try:
+            import ctypes  # type: ignore
+            from ctypes import wintypes  # type: ignore
+
+            kernel32 = ctypes.windll.kernel32
+            # Attach to parent console; 0xFFFFFFFF = ATTACH_PARENT_PROCESS
+            ATTACH_PARENT_PROCESS = ctypes.c_uint(-1).value
+            kernel32.AttachConsole(wintypes.DWORD(ATTACH_PARENT_PROCESS))
+            # CTRL_C_EVENT = 0
+            CTRL_C_EVENT = 0
+            # Send to process group 0 (current) or the child's group if we had it; use 0 as fallback
+            kernel32.GenerateConsoleCtrlEvent(wintypes.DWORD(CTRL_C_EVENT), wintypes.DWORD(0))
+        except Exception:
+            pass
