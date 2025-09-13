@@ -23,6 +23,7 @@ class PtyBackend:
         self.cwd = cwd or os.getcwd()
         self.process = PtyProcess()
         self._pty = None  # underlying backend object
+        self._exit_code: Optional[int] = None
 
     def _default_shell(self) -> str:
         if os.name == "nt":  # Windows
@@ -66,6 +67,13 @@ class PtyBackend:
     def terminate(self) -> None:
         try:
             if hasattr(self, "_pty") and self._pty is not None:
+                try:
+                    # Try to capture exit code before closing
+                    code = self._extract_exit_code()
+                    if code is not None:
+                        self._exit_code = int(code)
+                except Exception:
+                    pass
                 self._pty.close(True)
         except Exception:
             pass
@@ -135,6 +143,28 @@ class PtyBackend:
                 return
         except Exception:
             pass
+
+    # --- Exit code helpers ---
+    def _extract_exit_code(self) -> Optional[int]:
+        try:
+            if self._pty is None:
+                return self._exit_code
+            # ptyprocess exposes exitstatus and status
+            code = getattr(self._pty, "exitstatus", None)
+            if code is not None:
+                return int(code)
+            status = getattr(self._pty, "status", None)
+            if status is not None:
+                return int(status)
+        except Exception:
+            return None
+        return None
+
+    def get_exit_code(self) -> Optional[int]:
+        code = self._extract_exit_code()
+        if code is not None:
+            self._exit_code = int(code)
+        return self._exit_code
         # Fallback: use WinAPI GenerateConsoleCtrlEvent if pid known
         try:
             import ctypes  # type: ignore

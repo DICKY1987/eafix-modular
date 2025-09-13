@@ -65,6 +65,9 @@ class MainWindow:  # pragma: no cover - constructed only when PyQt present
         tb = self._w.addToolBar("Actions")
         act_clear = tb.addAction("Clear")
         act_clear.triggered.connect(self._output.clear)  # type: ignore[attr-defined]
+        act_sigint = tb.addAction("Ctrl-C")
+        act_sigint.setToolTip("Send Ctrl-C to the terminal session")
+        act_sigint.triggered.connect(self._send_ctrl_c)  # type: ignore[attr-defined]
 
     # --- Qt-backed methods ---
     def widget(self):  # return underlying QWidget for app wrapping
@@ -81,11 +84,27 @@ class MainWindow:  # pragma: no cover - constructed only when PyQt present
             text = data.decode(errors="replace")
         except Exception:
             text = str(data)
-        # Append text in the GUI thread
+        # Strip ANSI escape sequences for readability (basic)
+        try:
+            import re
+            text = re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", text)
+        except Exception:
+            pass
+        # Handle carriage return overwrite (simple heuristic: replace last line)
         def _append():
-            self._output.moveCursor(QtGui.QTextCursor.MoveOperation.End)  # type: ignore[attr-defined]
-            self._output.insertPlainText(text)
-            self._output.moveCursor(QtGui.QTextCursor.MoveOperation.End)  # type: ignore[attr-defined]
+            if "\r" in text:
+                parts = text.split("\r")
+                # Replace the last line with final segment
+                cursor = self._output.textCursor()
+                cursor.movePosition(QtGui.QTextCursor.MoveOperation.End)  # type: ignore[attr-defined]
+                # Select and remove current line
+                cursor.select(QtGui.QTextCursor.SelectionType.LineUnderCursor)  # type: ignore[attr-defined]
+                cursor.removeSelectedText()
+                cursor.insertText(parts[-1])
+            else:
+                self._output.moveCursor(QtGui.QTextCursor.MoveOperation.End)  # type: ignore[attr-defined]
+                self._output.insertPlainText(text)
+                self._output.moveCursor(QtGui.QTextCursor.MoveOperation.End)  # type: ignore[attr-defined]
 
         if QtWidgets:
             QtCore.QMetaObject.invokeMethod(  # type: ignore[attr-defined]
@@ -122,6 +141,11 @@ class MainWindow:  # pragma: no cover - constructed only when PyQt present
         try:
             if self._cost and self._cost.available():
                 ev = CostEvent(task_id="gui_session", tool="gui_terminal", action="command", tokens=len(line), amount=0.0)
-                self._cost.record(ev)
+            self._cost.record(ev)
         except Exception:
             pass
+
+    def _send_ctrl_c(self) -> None:
+        if self._term is not None:
+            self._term.send_ctrl_c()
+            self._on_data(b"^C\n")

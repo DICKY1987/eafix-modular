@@ -41,6 +41,21 @@ def run_server() -> int:
     if term is None:
         print(json.dumps({"ok": False, "error": "terminal backend unavailable"}))
         return 1
+    # Track basic events to a simple buffer for parity checks
+    buffer = []
+    def _evt_sink(evt: dict):
+        t = evt.get("type") or ""
+        if not t:
+            # Map by topic keys from EventBus usage
+            if "input.sent" in evt.get("topic", ""):
+                t = "input.sent"
+        buffer.append(evt)
+    try:
+        term.bus.subscribe("input.sent", lambda e: _evt_sink({"type":"input.sent","chars": e.get("chars") if isinstance(e, dict) else None}))
+        term.bus.subscribe("signal.sent", lambda e: _evt_sink({"type":"signal.sent","name":"SIGINT"}))
+        term.bus.subscribe("run.exited", lambda e: _evt_sink({"type":"run.exited"}))
+    except Exception:
+        pass
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((HOST, PORT))
@@ -75,6 +90,41 @@ def run_server() -> int:
                     text = win._output.toPlainText()
                     chunk = text[-maxb:]
                     conn.sendall(json.dumps({"ok": True, "data": chunk}).encode("utf-8"))
+                elif op == "events":
+                    # Return and clear buffered events
+                    evs = list(buffer)
+                    buffer.clear()
+                    conn.sendall(json.dumps({"ok": True, "events": evs}).encode("utf-8"))
+                elif op == "signal":
+                    name = (req.get("name") or "SIGINT").upper()
+                    if name == "SIGINT":
+                        try:
+                            term.send_ctrl_c()
+                            conn.sendall(b'{"ok":true}')
+                        except Exception:
+                            conn.sendall(b'{"ok":false}')
+                    else:
+                        conn.sendall(b'{"ok":false,"error":"unsupported signal"}')
+                elif op == "status":
+                    try:
+                        running = bool(term.backend.is_alive())
+                    except Exception:
+                        running = False
+                    conn.sendall(json.dumps({"ok": True, "status": "running" if running else "idle"}).encode("utf-8"))
+                elif op == "wait":
+                    # Busy-wait small intervals until process exits or timeout
+                    timeout = float(req.get("timeout", 5.0))
+                    start = time.time()
+                    exit_seen = False
+                    while time.time() - start < timeout:
+                        try:
+                            if not term.backend.is_alive():
+                                exit_seen = True
+                                break
+                        except Exception:
+                            break
+                        time.sleep(0.05)
+                    conn.sendall(json.dumps({"ok": True, "exited": exit_seen}).encode("utf-8"))
                 else:
                     conn.sendall(b'{"ok":false,"error":"unknown op"}')
     finally:
