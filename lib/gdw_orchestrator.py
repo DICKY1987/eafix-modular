@@ -3,9 +3,11 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
+import os
 
 from .audit_logger import log_action
+from .gdw_runner import execute_gdw
 
 
 @dataclass
@@ -41,3 +43,51 @@ def maybe_defer_to_gdw(task_description: str, repo_root: Path) -> Optional[Defer
                 return DeferDecision(workflow_id=wf, reason=str(r.get("reason", "rule_match")), inputs=dict(r.get("inputs", {})))
     return None
 
+
+def get_deferral_mode(repo_root: Path) -> str:
+    """Return deferral mode: off | prefer | only. Env overrides take precedence.
+
+    GDW_ONLY => only, GDW_PREFER => prefer.
+    """
+    env = os.environ
+    if env.get("GDW_ONLY") == "1":
+        return "only"
+    if env.get("GDW_PREFER") == "1":
+        return "prefer"
+    cfg = load_policies(repo_root)
+    deferral = cfg.get("deferral", {})
+    if not deferral or not deferral.get("enabled", False):
+        return "off"
+    mode = str(deferral.get("mode", "off")).lower()
+    return mode if mode in ("off", "prefer", "only") else "off"
+
+
+def should_fully_defer(decision: DeferDecision, repo_root: Path) -> bool:
+    mode = get_deferral_mode(repo_root)
+    if mode == "only":
+        return True
+    # Check rule hints (risk tier)
+    # Load original rule for force_defer if present
+    cfg = load_policies(repo_root)
+    for r in cfg.get("rules", []):
+        if str(r.get("workflow_id")) == decision.workflow_id:
+            if bool(r.get("force_defer", False)):
+                return True
+    return False
+
+
+def defer_and_capture(decision: DeferDecision, repo_root: Path, dry_run: bool = False) -> Dict[str, Any]:
+    spec = (repo_root / "gdw" / decision.workflow_id / "v1.0.0" / "spec.json")
+    result = {"error": "spec_not_found", "workflow": decision.workflow_id}
+    if spec.exists():
+        res = execute_gdw(spec, inputs=decision.inputs, dry_run=dry_run)
+        result = {"workflow": decision.workflow_id, **res}
+    log_action(
+        task_id=f"gdw:{decision.workflow_id}",
+        phase="defer",
+        action="gdw_execute",
+        details={"reason": decision.reason, "result": result},
+        cost_delta=0.0,
+        tool="gdw_runner",
+    )
+    return result

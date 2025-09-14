@@ -204,6 +204,8 @@ def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
     phase_run = phase_sub.add_parser("run", help="Run a workflow phase by id")
     phase_run.add_argument("phase_id", type=str, help="Phase ID to execute (e.g., phase1)")
     phase_run.add_argument("--dry", dest="dry", action="store_true", help="Dry run (no side effects)")
+    phase_run.add_argument("--gdw-only", dest="gdw_only", action="store_true", help="Force GDW deferral (skip agent services)")
+    phase_run.add_argument("--gdw-prefer", dest="gdw_prefer", action="store_true", help="Prefer GDW deferral when policies match")
     # phase status
     phase_sub.add_parser("status", help="Show workflow status")
     # phase stream ...
@@ -215,6 +217,8 @@ def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
     stream_run = stream_sub.add_parser("run", help="Run all phases in a stream")
     stream_run.add_argument("stream_id", type=str, help="Stream ID to execute (e.g., stream-a)")
     stream_run.add_argument("--dry", dest="dry", action="store_true", help="Dry run (no side effects)")
+    stream_run.add_argument("--gdw-only", dest="gdw_only", action="store_true")
+    stream_run.add_argument("--gdw-prefer", dest="gdw_prefer", action="store_true")
     
     # compliance subcommand
     compliance_parser = subparsers.add_parser("compliance", help="Compliance and validation commands")
@@ -486,6 +490,11 @@ def main(argv: Optional[List[str]] = None) -> int:
             elif phase_cmd == "run":
                 phase_id = getattr(args, "phase_id", None)
                 dry = bool(getattr(args, "dry", False))
+                # Propagate GDW preference via environment for orchestrator
+                if bool(getattr(args, "gdw_only", False)):
+                    os.environ["GDW_ONLY"] = "1"
+                elif bool(getattr(args, "gdw_prefer", False)):
+                    os.environ["GDW_PREFER"] = "1"
                 if not phase_id:
                     print("Error: missing phase_id", file=sys.stderr)
                     return 1
@@ -510,6 +519,10 @@ def main(argv: Optional[List[str]] = None) -> int:
                 elif stream_cmd == "run":
                     stream_id = getattr(args, "stream_id", None)
                     dry = bool(getattr(args, "dry", False))
+                    if bool(getattr(args, "gdw_only", False)):
+                        os.environ["GDW_ONLY"] = "1"
+                    elif bool(getattr(args, "gdw_prefer", False)):
+                        os.environ["GDW_PREFER"] = "1"
                     if not stream_id:
                         print("Error: missing stream_id", file=sys.stderr)
                         return 1

@@ -67,3 +67,24 @@ def run_gdw(spec_path: Path, inputs: Optional[Dict[str, Any]] = None, dry_run: b
     print(f"[GDW] Done rc={rc}")
     return rc
 
+
+def execute_gdw(spec_path: Path, inputs: Optional[Dict[str, Any]] = None, dry_run: bool = True) -> Dict[str, Any]:
+    """Execute a GDW and return a structured result without changing CLI compatibility.
+
+    Returns a dict with keys: id, version, rc, steps (list of {id, rc}).
+    """
+    spec = load_spec(spec_path)
+    env = os.environ.copy()
+    env["GDW_SPEC"] = str(spec_path)
+    env["GDW_INPUTS"] = json.dumps(inputs or {})
+    env["GDW_DRY_RUN"] = "1" if dry_run else "0"
+    step_results: List[Dict[str, Any]] = []
+    rc = 0
+    for step in spec.steps:
+        step_id = str(step.get("id"))
+        rc = run_step(step, env=env, dry_run=dry_run)
+        record_gdw_cost(spec.id, step_id, amount=0.0)
+        step_results.append({"id": step_id, "rc": rc})
+        if rc != 0:
+            break
+    return {"id": spec.id, "version": spec.version, "rc": rc, "steps": step_results}
