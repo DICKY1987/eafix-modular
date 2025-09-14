@@ -1,0 +1,12 @@
+rules:
+  timeouts:
+    default_seconds: 300
+  resources:
+    max_cpu: "1"
+    max_memory: "1Gi"
+  registries:
+    allowed:
+      - docker.io
+      - ghcr.io
+  secrets:
+    allow_plaintext: false

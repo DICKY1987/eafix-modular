@@ -1,0 +1,14 @@
+apiVersion: apf/v1
+kind: workflow
+metadata:
+  name: hello_world
+  labels:
+    lane: demo
+spec:
+  steps:
+    - id: validate_inputs
+      script: steps/00_validate_inputs.ps1
+    - id: run_task
+      script: steps/10_run_task.ps1
+    - id: publish_artifacts
+      script: steps/90_publish_artifacts.ps1
