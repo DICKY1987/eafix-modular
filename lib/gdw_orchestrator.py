@@ -8,6 +8,7 @@ import os
 
 from .audit_logger import log_action
 from .gdw_runner import execute_gdw
+from .event_bus_client import publish_event
 
 
 @dataclass
@@ -90,4 +91,11 @@ def defer_and_capture(decision: DeferDecision, repo_root: Path, dry_run: bool = 
         cost_delta=0.0,
         tool="gdw_runner",
     )
+    publish_event({
+        "type": "gdw.deferred",
+        "workflow": decision.workflow_id,
+        "reason": decision.reason,
+        "rc": result.get("rc"),
+        "steps": result.get("steps"),
+    })
     return result

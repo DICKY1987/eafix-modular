@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from .cost_tracker import record_gdw_cost
+from .event_bus_client import publish_event
 
 
 @dataclass
@@ -51,6 +52,7 @@ def run_step(step: Dict[str, Any], env: Dict[str, str], dry_run: bool = True) ->
 
 def run_gdw(spec_path: Path, inputs: Optional[Dict[str, Any]] = None, dry_run: bool = True) -> int:
     spec = load_spec(spec_path)
+    publish_event({"type": "gdw.start", "workflow": spec.id, "version": spec.version, "dry": dry_run})
     print(f"[GDW] Executing {spec.id}@{spec.version} dry={dry_run}")
     env = os.environ.copy()
     env["GDW_SPEC"] = str(spec_path)
@@ -64,6 +66,7 @@ def run_gdw(spec_path: Path, inputs: Optional[Dict[str, Any]] = None, dry_run: b
         if rc != 0:
             print(f"[GDW] Step failed: {step_id} rc={rc}", file=sys.stderr)
             break
+    publish_event({"type": "gdw.end", "workflow": spec.id, "version": spec.version, "rc": rc})
     print(f"[GDW] Done rc={rc}")
     return rc
 
@@ -83,6 +86,7 @@ def execute_gdw(spec_path: Path, inputs: Optional[Dict[str, Any]] = None, dry_ru
     for step in spec.steps:
         step_id = str(step.get("id"))
         rc = run_step(step, env=env, dry_run=dry_run)
+        publish_event({"type": "gdw.step", "workflow": spec.id, "step": step_id, "rc": rc})
         record_gdw_cost(spec.id, step_id, amount=0.0)
         step_results.append({"id": step_id, "rc": rc})
         if rc != 0:
