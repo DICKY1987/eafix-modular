@@ -10,6 +10,29 @@ This is the **CLI Multi-Rapid Enterprise Orchestration Platform** - a comprehens
 
 **Core Innovation**: Complete enterprise orchestration platform with Python↔MQL4↔PowerShell integration, advanced workflow management, and comprehensive validation systems.
 
+## Interface Architecture
+
+The platform now supports **dual interface options** with **Python GUI as the primary interface**:
+
+### **Primary Interface: Python GUI Terminal**
+- **Location**: `gui_terminal/` directory
+- **Technology**: PyQt6-based graphical terminal with headless fallback
+- **Features**: Real-time terminal widget, cost integration, plugin system, security policies
+- **Launch**: `cli-multi-rapid gui` or `cd gui_terminal && PYTHONPATH=src python -m gui_terminal.main`
+- **Dependencies**: PyQt6 (optional - gracefully degrades to headless mode)
+
+### **Alternative Interface: VS Code Extension**
+- **Location**: Available on `interface/vscode-only` branch
+- **Technology**: TypeScript-based VS Code extension with WebSocket integration
+- **Features**: Real-time workflow cockpit, command palette integration, WebView dashboard
+- **Switch Command**: `git checkout interface/vscode-only`
+- **Package**: `vscode-extension/cli-multi-rapid-cockpit-0.1.0.vsix`
+
+**Branch Strategy**:
+- **main branch**: Python GUI + complete GDW framework (current)
+- **interface/vscode-only**: VS Code extension without Python GUI components
+- **Backup branches**: `backup-gdw-vscode-YYYYMMDD` and `backup-vscode-interface-YYYYMMDD`
+
 ## Architecture
 
 ### Core Framework Components
@@ -84,6 +107,22 @@ nox -s dev_setup
 cli-multi-rapid --help
 ```
 
+### Primary Interface: Python GUI Terminal
+```bash
+# Launch Python GUI Terminal (primary interface)
+cli-multi-rapid gui
+
+# Alternative direct launch with proper Python path
+cd gui_terminal && PYTHONPATH=src python -m gui_terminal.main
+
+# GUI features available:
+# - Real-time terminal widget with PTY/ConPTY backend
+# - Cost integration and tracking
+# - Security policy enforcement
+# - Plugin system for extensions
+# - Headless fallback when PyQt6 not available
+```
+
 ### Core CLI Usage
 ```bash
 # Execute task with optimal routing (main interface)
@@ -100,6 +139,46 @@ python agentic_framework_v3.py status
 
 # Analyze task complexity without execution
 python agentic_framework_v3.py analyze "add JWT token validation"
+```
+
+### Generic Deterministic Workflows (GDW) - NEW
+```bash
+# List available workflows
+cli-multi-rapid gdw list
+
+# Execute individual GDW
+cli-multi-rapid gdw run git.commit_push.main --commit_message "feat: new feature"
+
+# Validate GDW specification
+cli-multi-rapid gdw validate gdw/git.commit_push.main/v1.0.0/spec.json
+
+# Execute workflow chains
+cli-multi-rapid gdw chain examples/dev-to-prod.yaml --dry-run
+
+# Available pre-built GDWs:
+# - git.commit_push.main: Git operations with multi-runner support
+# - k8s.deploy.rolling: Kubernetes deployment with rollout monitoring
+# - security.scan.trivy: Container security scanning
+# - version.bump.semver: Semantic version management
+# - build.container.sign: Container building and signing
+```
+
+### Alternative Interface: VS Code Extension
+```bash
+# Switch to VS Code-only branch (preserves current main)
+git checkout interface/vscode-only
+
+# Install and use VS Code extension
+code --install-extension vscode-extension/cli-multi-rapid-cockpit-0.1.0.vsix
+
+# VS Code extension features:
+# - Real-time workflow cockpit WebView
+# - Command palette integration
+# - WebSocket-based live updates
+# - TypeScript-based implementation
+
+# Return to Python GUI main branch
+git checkout main
 ```
 
 ### Enterprise Workflow Orchestration
