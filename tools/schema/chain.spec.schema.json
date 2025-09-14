@@ -1,0 +1,118 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GDW Chain Specification",
+  "type": "object",
+  "required": [
+    "id",
+    "version",
+    "summary",
+    "nodes",
+    "edges"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9._-]+$",
+      "description": "Unique chain identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version"
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "Brief description of chain purpose"
+    },
+    "maturity": {
+      "type": "string",
+      "enum": ["draft", "candidate", "validated"],
+      "default": "draft"
+    },
+    "owner": {
+      "type": "string",
+      "description": "Team or individual responsible"
+    },
+    "nodes": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z_][a-zA-Z0-9_]*$": {
+          "type": "object",
+          "required": ["ref"],
+          "properties": {
+            "ref": {
+              "type": "string",
+              "description": "Reference to GDW spec (id@version)"
+            },
+            "alias": {
+              "type": "string",
+              "description": "Optional alias for this node"
+            },
+            "inputs": {
+              "type": "object",
+              "description": "Input mappings for this node"
+            },
+            "outputs": {
+              "type": "object",
+              "description": "Output mappings from this node"
+            },
+            "when": {
+              "type": "string",
+              "description": "Conditional execution expression"
+            }
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from", "to"],
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "Source node ID"
+          },
+          "to": {
+            "type": "string",
+            "description": "Target node ID"
+          },
+          "data": {
+            "type": "object",
+            "description": "Data flow mappings between nodes"
+          },
+          "when": {
+            "type": "string",
+            "description": "Conditional edge expression"
+          }
+        }
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "description": "Chain-level inputs"
+    },
+    "outputs": {
+      "type": "object",
+      "description": "Chain-level outputs"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "tags": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "category": {
+          "type": "string"
+        },
+        "environment": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    }
+  }
+}

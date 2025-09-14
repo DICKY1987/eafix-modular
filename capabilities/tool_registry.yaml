@@ -1,0 +1,248 @@
+tools:
+  # Source Control Management
+  - id: git_cli
+    title: Git CLI
+    vendor: OSS
+    capabilities: [scm.commit, scm.branch, scm.merge, scm.tag]
+    os: [linux, mac, windows]
+    license: gpl-2.0
+    healthcheck:
+      cmd: ["git", "--version"]
+      timeout_s: 5
+      expect_pattern: "git version \\d+\\.\\d+\\.\\d+"
+    quotas:
+      rate_limit_per_min: null
+    cost:
+      model: "free"
+    priority: 1
+    telemetry: true
+
+  - id: gh_cli
+    title: GitHub CLI
+    vendor: GitHub
+    capabilities: [scm.pr.create, scm.pr.merge, scm.issue.create, scm.release]
+    os: [linux, mac, windows]
+    license: mit
+    healthcheck:
+      cmd: ["gh", "--version"]
+      timeout_s: 10
+      expect_pattern: "gh version \\d+\\.\\d+\\.\\d+"
+    quotas:
+      rate_limit_per_hour: 5000
+    cost:
+      model: "free_tier"
+      limit_per_hour: 5000
+    priority: 2
+    telemetry: true
+
+  # Container Tools
+  - id: docker_cli
+    title: Docker CLI
+    vendor: Docker
+    capabilities: [container.build, container.push, container.run]
+    os: [linux, mac, windows]
+    license: apache-2.0
+    healthcheck:
+      cmd: ["docker", "version", "--format", "{{.Server.Version}}"]
+      timeout_s: 10
+    quotas:
+      rate_limit_per_min: null
+    cost:
+      model: "free"
+    priority: 1
+    telemetry: true
+
+  - id: buildah
+    title: Buildah
+    vendor: OSS
+    capabilities: [container.build]
+    os: [linux]
+    license: apache-2.0
+    healthcheck:
+      cmd: ["buildah", "--version"]
+      timeout_s: 5
+    cost:
+      model: "free"
+    priority: 2
+
+  - id: kaniko
+    title: Kaniko
+    vendor: Google
+    capabilities: [container.build]
+    os: [linux]
+    license: apache-2.0
+    healthcheck:
+      cmd: ["kaniko", "--version"]
+      timeout_s: 5
+    cost:
+      model: "free"
+    priority: 3
+
+  # Security Scanning
+  - id: trivy
+    title: Trivy Scanner
+    vendor: Aqua Security
+    capabilities: [vuln.scan, sbom.generate, secret.scan]
+    os: [linux, mac, windows]
+    license: apache-2.0
+    healthcheck:
+      cmd: ["trivy", "--version"]
+      timeout_s: 10
+      expect_pattern: "Version: \\d+\\.\\d+\\.\\d+"
+    cost:
+      model: "free"
+    priority: 1
+    telemetry: true
+
+  - id: grype
+    title: Grype Scanner
+    vendor: Anchore
+    capabilities: [vuln.scan]
+    os: [linux, mac, windows]
+    license: apache-2.0
+    healthcheck:
+      cmd: ["grype", "version"]
+      timeout_s: 10
+    cost:
+      model: "free"
+    priority: 2
+
+  - id: semgrep
+    title: Semgrep SAST
+    vendor: Semgrep Inc
+    capabilities: [sast.scan, secret.scan]
+    os: [linux, mac]
+    license: mit
+    healthcheck:
+      cmd: ["semgrep", "--version"]
+      timeout_s: 10
+    quotas:
+      rate_limit_per_day: 10000
+    cost:
+      model: "free_tier"
+      limit_per_day: 10000
+    priority: 1
+
+  # Kubernetes
+  - id: kubectl
+    title: Kubernetes CLI
+    vendor: CNCF
+    capabilities: [k8s.apply, k8s.deploy, k8s.status]
+    os: [linux, mac, windows]
+    license: apache-2.0
+    healthcheck:
+      cmd: ["kubectl", "version", "--client"]
+      timeout_s: 10
+    cost:
+      model: "free"
+    priority: 1
+
+  - id: helm
+    title: Helm Package Manager
+    vendor: CNCF
+    capabilities: [k8s.package, k8s.deploy]
+    os: [linux, mac, windows]
+    license: apache-2.0
+    healthcheck:
+      cmd: ["helm", "version"]
+      timeout_s: 10
+    cost:
+      model: "free"
+    priority: 2
+
+  # AI/LLM Tools
+  - id: claude_code
+    title: Claude Code
+    vendor: Anthropic
+    capabilities: [code.generation, code.review, code.refactor]
+    os: [linux, mac, windows]
+    license: proprietary
+    quotas:
+      rate_limit_per_day: 25
+    cost:
+      model: "pay_per_use"
+      cost_per_request_usd: 0.015
+      daily_limit_usd: 50.0
+    priority: 1
+    requires_auth: true
+
+  - id: gemini_cli
+    title: Google Gemini
+    vendor: Google
+    capabilities: [code.generation, text.analysis]
+    os: [linux, mac, windows]
+    license: proprietary
+    quotas:
+      rate_limit_per_day: 1000
+    cost:
+      model: "free_tier"
+      daily_limit: 1000
+    priority: 2
+    requires_auth: true
+
+  - id: ollama_local
+    title: Ollama Local
+    vendor: OSS
+    capabilities: [code.generation, text.analysis]
+    os: [linux, mac, windows]
+    license: mit
+    healthcheck:
+      cmd: ["ollama", "list"]
+      timeout_s: 15
+    cost:
+      model: "free"
+    priority: 3
+
+  # Testing Tools
+  - id: pytest
+    title: PyTest
+    vendor: OSS
+    capabilities: [test.python, test.coverage]
+    os: [linux, mac, windows]
+    license: mit
+    healthcheck:
+      cmd: ["python", "-m", "pytest", "--version"]
+      timeout_s: 10
+    cost:
+      model: "free"
+    priority: 1
+
+  - id: jest
+    title: Jest Testing
+    vendor: Meta
+    capabilities: [test.javascript, test.coverage]
+    os: [linux, mac, windows]
+    license: mit
+    healthcheck:
+      cmd: ["npx", "jest", "--version"]
+      timeout_s: 10
+    cost:
+      model: "free"
+    priority: 1
+
+  # Build Tools
+  - id: python_build
+    title: Python Build Tools
+    vendor: OSS
+    capabilities: [build.python, package.python]
+    os: [linux, mac, windows]
+    license: various
+    healthcheck:
+      cmd: ["python", "-m", "build", "--help"]
+      timeout_s: 10
+    cost:
+      model: "free"
+    priority: 1
+
+  - id: npm_build
+    title: NPM Build
+    vendor: OpenJS
+    capabilities: [build.javascript, package.javascript]
+    os: [linux, mac, windows]
+    license: artistic-2.0
+    healthcheck:
+      cmd: ["npm", "--version"]
+      timeout_s: 10
+    cost:
+      model: "free"
+    priority: 1

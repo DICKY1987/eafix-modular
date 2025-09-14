@@ -6,6 +6,9 @@ try:
     from gui_terminal.security.policy_manager import PolicyManager
     from gui_terminal.core.cost_integration import CostTrackerBridge, CostEvent
     from gui_terminal.core.logging_config import StructuredLogger, LoggerConfig
+    from gui_terminal.ui.gdw_brick_builder import GDWBrickBuilderTab
+    from gui_terminal.ui.tool_registry_tab import ToolRegistryTab
+    from gui_terminal.ui.workflow_validator_tab import WorkflowValidatorTab
 except Exception:  # pragma: no cover - allow headless import
     QtWidgets = None  # type: ignore
     QtGui = None  # type: ignore
@@ -16,11 +19,14 @@ except Exception:  # pragma: no cover - allow headless import
     CostEvent = None  # type: ignore
     StructuredLogger = None  # type: ignore
     LoggerConfig = None  # type: ignore
+    GDWBrickBuilderTab = None  # type: ignore
+    ToolRegistryTab = None  # type: ignore
+    WorkflowValidatorTab = None  # type: ignore
 
 
 class MainWindow:  # pragma: no cover - constructed only when PyQt present
     def __init__(self, config: dict | None = None) -> None:
-        self.title = "CLI Multi-Rapid GUI Terminal"
+        self.title = "CLI Multi-Rapid GUI Terminal - GDW Brick Builder"
         self._cfg = config or {}
         if QtWidgets is None:
             # Headless placeholder retains API compatibility
@@ -30,45 +36,96 @@ class MainWindow:  # pragma: no cover - constructed only when PyQt present
         self._w = QtWidgets.QMainWindow()
         self._w.setWindowTitle(self.title)
 
-        # Central widget layout
-        central = QtWidgets.QWidget()
-        vbox = QtWidgets.QVBoxLayout(central)
-        self._output = QtWidgets.QPlainTextEdit()
-        self._output.setReadOnly(True)
-        self._input = QtWidgets.QLineEdit()
+        # Create tabbed interface
+        self.tab_widget = QtWidgets.QTabWidget()
+        self._w.setCentralWidget(self.tab_widget)
+
+        # Initialize component managers (for backward compatibility)
+        self._term = TerminalWidget() if TerminalWidget else None
+        self._policy = PolicyManager() if PolicyManager else None
+        self._logger = StructuredLogger(LoggerConfig(audit_log_file="./gui_terminal_audit.log")) if StructuredLogger else None
+        self._cost = CostTrackerBridge() if CostTrackerBridge else None
+
+        # Setup tabs
+        self._setup_tabs()
 
         # Status bar
         status = QtWidgets.QStatusBar()
         self._w.setStatusBar(status)
-        status.showMessage("Ready")
+        status.showMessage("GDW Brick Builder Ready - Drag files to create workflows")
 
-        vbox.addWidget(self._output, stretch=1)
-        vbox.addWidget(self._input)
-        self._w.setCentralWidget(central)
+        # Toolbar for global actions
+        toolbar = self._w.addToolBar("Global Actions")
 
-        # Terminal backend
-        self._term = TerminalWidget() if TerminalWidget else None
+        # Settings action
+        settings_action = toolbar.addAction("⚙️ Settings")
+        settings_action.setToolTip("Open application settings")
+        settings_action.triggered.connect(self._open_settings)  # type: ignore[attr-defined]
+
+        # Help action
+        help_action = toolbar.addAction("❓ Help")
+        help_action.setToolTip("Open help documentation")
+        help_action.triggered.connect(self._open_help)  # type: ignore[attr-defined]
+
+    def _setup_tabs(self):
+        """Setup the main tabbed interface"""
+        if not self.tab_widget:
+            return
+
+        # GDW Brick Builder tab
+        if GDWBrickBuilderTab:
+            self.gdw_tab = GDWBrickBuilderTab()
+            self.tab_widget.addTab(self.gdw_tab, "🧱 GDW Brick Builder")
+
+        # Tool Registry & Resolver tab
+        if ToolRegistryTab:
+            self.registry_tab = ToolRegistryTab()
+            self.tab_widget.addTab(self.registry_tab, "🔧 Tool Registry")
+
+        # Workflow Validator tab
+        if WorkflowValidatorTab:
+            self.validator_tab = WorkflowValidatorTab()
+            self.tab_widget.addTab(self.validator_tab, "✅ Workflow Validator")
+
+        # Terminal tab (backward compatibility)
+        self.terminal_tab = self._create_terminal_tab()
+        self.tab_widget.addTab(self.terminal_tab, "💻 Terminal")
+
+    def _create_terminal_tab(self):
+        """Create the terminal tab (legacy interface)"""
+        terminal_widget = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(terminal_widget)
+
+        # Terminal output and input
+        self._output = QtWidgets.QPlainTextEdit()
+        self._output.setReadOnly(True)
+        self._input = QtWidgets.QLineEdit()
+        self._input.returnPressed.connect(self._submit_line)  # type: ignore[attr-defined]
+
+        layout.addWidget(self._output, stretch=1)
+        layout.addWidget(self._input)
+
+        # Terminal controls
+        controls_layout = QtWidgets.QHBoxLayout()
+
+        clear_btn = QtWidgets.QPushButton("Clear")
+        clear_btn.clicked.connect(self._output.clear)  # type: ignore[attr-defined]
+        controls_layout.addWidget(clear_btn)
+
+        ctrl_c_btn = QtWidgets.QPushButton("Ctrl-C")
+        ctrl_c_btn.setToolTip("Send Ctrl-C to the terminal session")
+        ctrl_c_btn.clicked.connect(self._send_ctrl_c)  # type: ignore[attr-defined]
+        controls_layout.addWidget(ctrl_c_btn)
+
+        controls_layout.addStretch()
+        layout.addLayout(controls_layout)
+
+        # Start terminal backend
         if self._term:
             self._term.on_data = self._on_data
             self._term.start()
 
-        # Security policy manager and logger
-        self._policy = PolicyManager() if PolicyManager else None
-        self._logger = StructuredLogger(LoggerConfig(audit_log_file="./gui_terminal_audit.log")) if StructuredLogger else None
-
-        # Cost tracking bridge
-        self._cost = CostTrackerBridge() if CostTrackerBridge else None
-
-        # Connect input
-        self._input.returnPressed.connect(self._submit_line)  # type: ignore[attr-defined]
-
-        # Basic toolbar
-        tb = self._w.addToolBar("Actions")
-        act_clear = tb.addAction("Clear")
-        act_clear.triggered.connect(self._output.clear)  # type: ignore[attr-defined]
-        act_sigint = tb.addAction("Ctrl-C")
-        act_sigint.setToolTip("Send Ctrl-C to the terminal session")
-        act_sigint.triggered.connect(self._send_ctrl_c)  # type: ignore[attr-defined]
+        return terminal_widget
 
     # --- Qt-backed methods ---
     def widget(self):  # return underlying QWidget for app wrapping
@@ -76,8 +133,40 @@ class MainWindow:  # pragma: no cover - constructed only when PyQt present
 
     def show(self) -> None:
         if self._w:
-            self._w.resize(900, 600)
+            self._w.resize(1400, 800)  # Larger window for tabbed interface
             self._w.show()
+
+    def _open_settings(self):
+        """Open application settings dialog"""
+        from PyQt6.QtWidgets import QMessageBox  # type: ignore
+        QMessageBox.information(self._w, "Settings", "Settings dialog would open here.\nFuture: Configure API keys, tool paths, and preferences.")
+
+    def _open_help(self):
+        """Open help documentation"""
+        from PyQt6.QtWidgets import QMessageBox  # type: ignore
+        help_text = """GDW Brick Builder Help
+
+🧱 GDW Brick Builder:
+• Drag and drop files to create Generic Deterministic Workflows
+• Configure workflow specifications with the wizard
+• Validate workflows with AJV schema validation
+• Package workflows as ZIP files or create PRs
+
+🔧 Tool Registry:
+• Manage available tools and their capabilities
+• Configure tool priority and fallback policies
+• Simulate tool resolution for different scenarios
+• Monitor tool health and cost usage
+
+✅ Workflow Validator:
+• Validate APF JSON inputs against schema
+• Check AI workflow configurations
+• Apply quick fixes and defaults
+
+💻 Terminal:
+• Traditional terminal interface for CLI commands
+• Integrated with security policies and cost tracking"""
+        QMessageBox.information(self._w, "Help", help_text)
 
     # --- Terminal handling ---
     def _on_data(self, data: bytes) -> None:
@@ -156,3 +245,24 @@ class MainWindow:  # pragma: no cover - constructed only when PyQt present
         if self._term is not None:
             self._term.send_ctrl_c()
             self._on_data(b"^C\n")
+
+    # Additional methods for tab management
+    def switch_to_gdw_builder(self):
+        """Switch to GDW Brick Builder tab"""
+        if hasattr(self, 'tab_widget'):
+            self.tab_widget.setCurrentIndex(0)
+
+    def switch_to_tool_registry(self):
+        """Switch to Tool Registry tab"""
+        if hasattr(self, 'tab_widget'):
+            self.tab_widget.setCurrentIndex(1)
+
+    def switch_to_validator(self):
+        """Switch to Workflow Validator tab"""
+        if hasattr(self, 'tab_widget'):
+            self.tab_widget.setCurrentIndex(2)
+
+    def switch_to_terminal(self):
+        """Switch to Terminal tab"""
+        if hasattr(self, 'tab_widget'):
+            self.tab_widget.setCurrentIndex(3)

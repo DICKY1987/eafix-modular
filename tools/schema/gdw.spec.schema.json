@@ -1,0 +1,263 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generic Deterministic Workflow (GDW) Specification",
+  "type": "object",
+  "required": [
+    "id",
+    "version",
+    "summary",
+    "inputs",
+    "outputs",
+    "steps",
+    "determinism"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z]+\\.[a-z_]+\\.[a-z_]+$",
+      "description": "Unique identifier in format: domain.action.target"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version"
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "Brief description of workflow purpose"
+    },
+    "maturity": {
+      "type": "string",
+      "enum": ["draft", "candidate", "validated"],
+      "default": "draft"
+    },
+    "owner": {
+      "type": "string",
+      "description": "Team or individual responsible"
+    },
+    "outcome_statement": {
+      "type": "string",
+      "description": "What must be true after successful execution"
+    },
+    "inputs": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z_][a-zA-Z0-9_]*$": {
+          "type": "object",
+          "required": ["type"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "string",
+                "integer",
+                "boolean",
+                "array",
+                "object",
+                "git_url",
+                "git_sha",
+                "enum"
+              ]
+            },
+            "required": {
+              "type": "boolean",
+              "default": false
+            },
+            "default": {},
+            "description": {
+              "type": "string"
+            },
+            "values": {
+              "type": "array",
+              "description": "Valid values for enum type"
+            },
+            "pattern": {
+              "type": "string",
+              "description": "Regex validation pattern"
+            }
+          }
+        }
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z_][a-zA-Z0-9_]*$": {
+          "type": "string",
+          "description": "Output type"
+        }
+      }
+    },
+    "preconditions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Conditions that must be true before execution"
+      }
+    },
+    "postconditions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Conditions that must be true after execution"
+      }
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "runner", "cmd"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$"
+          },
+          "runner": {
+            "type": "string",
+            "enum": [
+              "git",
+              "gh",
+              "docker",
+              "python",
+              "powershell",
+              "bash",
+              "kubectl",
+              "terraform"
+            ]
+          },
+          "cmd": {
+            "type": "string",
+            "description": "Command to execute with variable substitution"
+          },
+          "when": {
+            "type": "string",
+            "description": "Conditional execution expression"
+          },
+          "timeout_sec": {
+            "type": "integer",
+            "default": 120
+          },
+          "retry_count": {
+            "type": "integer",
+            "default": 0
+          },
+          "on_fail": {
+            "type": "string",
+            "enum": ["abort", "rollback", "continue"],
+            "default": "abort"
+          }
+        }
+      }
+    },
+    "determinism": {
+      "type": "object",
+      "required": ["tool_versions"],
+      "properties": {
+        "tool_versions": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z_][a-zA-Z0-9_]*$": {
+              "type": "string"
+            }
+          }
+        },
+        "timeouts_sec": {
+          "type": "object",
+          "properties": {
+            "default": {
+              "type": "integer"
+            }
+          }
+        },
+        "retries": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z_]+$": {
+              "type": "integer"
+            }
+          }
+        },
+        "idempotency_key": {
+          "type": "string",
+          "description": "Expression to compute idempotency key"
+        }
+      }
+    },
+    "observability": {
+      "type": "object",
+      "properties": {
+        "emit_jsonl": {
+          "type": "boolean",
+          "default": true
+        },
+        "artifact_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "properties": {
+        "read_scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "write_scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "secrets_manifest": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rollback_notes": {
+          "type": "string"
+        },
+        "concurrency_policy": {
+          "type": "string",
+          "enum": ["allow", "forbid", "replace"]
+        }
+      }
+    },
+    "tests": {
+      "type": "object",
+      "properties": {
+        "fixtures": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "golden_inputs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "fitness_functions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
+
