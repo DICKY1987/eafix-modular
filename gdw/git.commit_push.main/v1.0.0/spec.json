@@ -1,0 +1,69 @@
+{
+  "id": "git.commit_push.main",
+  "version": "1.0.0",
+  "summary": "Commit changes and push to main branch with protection awareness",
+  "maturity": "validated",
+  "owner": "platform-team",
+  "outcome_statement": "Changes are committed to repository and pushed to main branch or PR created if protected",
+  "inputs": {
+    "repo": {"type": "git_url", "required": true, "description": "Git repository URL or path"},
+    "branch": {"type": "string", "default": "main", "description": "Target branch name"},
+    "paths": {"type": "array", "default": ["**/*"], "description": "Files to commit (glob patterns)"},
+    "commit_message": {"type": "string", "required": true, "description": "Commit message"},
+    "sign_commits": {"type": "boolean", "default": true, "description": "Whether to sign commits"},
+    "push_mode": {"type": "enum", "values": ["direct", "pr"], "default": "pr", "description": "Push directly or create PR"}
+  },
+  "outputs": {"commit_sha": "git_sha", "remote_ref": "string", "pr_url": "string"},
+  "preconditions": [
+    "git.remote_reachable(repo)",
+    "branch_exists(repo, branch)",
+    "working_tree_has_changes(paths)"
+  ],
+  "postconditions": [
+    "commit_exists(commit_sha)",
+    "commit_message_matches(commit_sha, commit_message)",
+    "changes_pushed_or_pr_created(push_mode)"
+  ],
+  "steps": [
+    {"id": "validate_repo", "runner": "git", "cmd": "status --porcelain=v1", "timeout_sec": 30},
+    {"id": "stage_changes", "runner": "git", "cmd": "add ${paths}", "timeout_sec": 60},
+    {"id": "commit_changes", "runner": "git", "cmd": "commit -m \"${commit_message}\" ${sign_commits ? '-S' : ''}", "timeout_sec": 30},
+    {"id": "push_direct", "runner": "git", "cmd": "push origin ${branch}", "when": "push_mode == 'direct'", "timeout_sec": 120, "retry_count": 2, "on_fail": "abort"},
+    {"id": "create_pr", "runner": "gh", "cmd": "pr create --fill --base ${branch} --head HEAD", "when": "push_mode == 'pr'", "timeout_sec": 60},
+    {"id": "auto_merge_pr", "runner": "gh", "cmd": "pr merge --squash --delete-branch", "when": "push_mode == 'pr' && auto_merge == true", "timeout_sec": 120}
+  ],
+  "determinism": {
+    "tool_versions": {"git": "2.46.0", "gh": "2.62.0"},
+    "timeouts_sec": {"default": 120},
+    "retries": {"network": 2, "git": 1},
+    "idempotency_key": "hash(paths, commit_message, tree_state)"
+  },
+  "observability": {
+    "emit_jsonl": true,
+    "artifact_paths": ["./artifacts/run.log.jsonl", "./artifacts/step-logs/", "./artifacts/commit-metadata.json"],
+    "metrics": ["execution_time_ms", "commit_size_bytes", "push_success_rate"]
+  },
+  "safety": {
+    "read_scopes": [".git/", "**/*"],
+    "write_scopes": [".git/", "./artifacts/"],
+    "secrets_manifest": ["GITHUB_TOKEN", "GPG_SIGNING_KEY"],
+    "rollback_notes": "Use 'git reset --hard HEAD~1' to undo commit. PR can be closed manually.",
+    "concurrency_policy": "forbid"
+  },
+  "tests": {
+    "fixtures": [
+      "tests/fixtures/clean-repo/",
+      "tests/fixtures/dirty-repo/",
+      "tests/fixtures/protected-branch/"
+    ],
+    "golden_inputs": [
+      {"repo": "tests/fixtures/clean-repo", "commit_message": "feat: test commit", "push_mode": "direct"}
+    ],
+    "fitness_functions": [
+      "assert_commit_exists(outputs.commit_sha)",
+      "assert_remote_updated(outputs.remote_ref)",
+      "assert_working_tree_clean()"
+    ]
+  }
+}
+

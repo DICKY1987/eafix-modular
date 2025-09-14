@@ -20,6 +20,22 @@ def tests(session):
         "tests/"
     )
 
+
+@nox.session(python=PYTHON_VERSIONS)
+def gdw_tests(session):
+    """Run GDW schema validation and lightweight tests"""
+    session.install("-r", "requirements.txt")
+    session.install("pytest", "jsonschema", "pyyaml")
+    # Validate example spec against schema
+    session.run(
+        "python",
+        "-m",
+        "schema.validators.python.gdw_validator",
+        "gdw/git.commit_push.main/v1.0.0/spec.json",
+    )
+    # Run any GDW-tagged tests if present
+    session.run("pytest", "-q", "-k", "gdw or GDW", external=False)
+
 @nox.session
 def integration_tests(session):
     """Run integration tests (cost-controlled)"""

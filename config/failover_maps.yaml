@@ -220,6 +220,36 @@ capability_failover_maps:
     compatibility_matrix:
       git: []  # No alternatives for git
 
+  # Generic Deterministic Workflows
+  gdw:
+    description: "Execute GDW specifications via runners"
+    primary_tools: ["gdw_runner"]
+    fallback_chain:
+      - tool: "gdw_runner"
+        priority: 1
+        cost_limit: 0.0
+        conditions:
+          - tool_available: true
+          - circuit_state: "closed"
+      - tool: "python"
+        priority: 2
+        cost_limit: 0.0
+        conditions:
+          - tool_available: true
+      - tool: "powershell"
+        priority: 3
+        cost_limit: 0.0
+        conditions:
+          - tool_available: true
+    reroute_triggers:
+      - tool_not_found
+      - configuration_error
+      - permission_denied
+    compatibility_matrix:
+      gdw_runner: ["python", "powershell"]
+      python: ["powershell"]
+      powershell: []
+
 # Tool-specific reroute configurations
 tool_specific_configs:
   
