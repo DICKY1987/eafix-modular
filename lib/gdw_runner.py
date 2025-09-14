@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional
 
 from .cost_tracker import record_gdw_cost
 from .event_bus_client import publish_event
+from .gdw_metrics import GDW_RUNS_TOTAL, GDW_RUN_DURATION
 
 
 @dataclass
@@ -53,11 +54,18 @@ def run_step(step: Dict[str, Any], env: Dict[str, str], dry_run: bool = True) ->
 def run_gdw(spec_path: Path, inputs: Optional[Dict[str, Any]] = None, dry_run: bool = True) -> int:
     spec = load_spec(spec_path)
     publish_event({"type": "gdw.start", "workflow": spec.id, "version": spec.version, "dry": dry_run})
+    if GDW_RUNS_TOTAL:
+        try:
+            GDW_RUNS_TOTAL.labels(workflow=spec.id).inc()
+        except Exception:
+            pass
     print(f"[GDW] Executing {spec.id}@{spec.version} dry={dry_run}")
     env = os.environ.copy()
     env["GDW_SPEC"] = str(spec_path)
     env["GDW_INPUTS"] = json.dumps(inputs or {})
     env["GDW_DRY_RUN"] = "1" if dry_run else "0"
+    import time
+    t0 = time.time()
     rc = 0
     for step in spec.steps:
         step_id = str(step.get("id"))
@@ -66,6 +74,11 @@ def run_gdw(spec_path: Path, inputs: Optional[Dict[str, Any]] = None, dry_run: b
         if rc != 0:
             print(f"[GDW] Step failed: {step_id} rc={rc}", file=sys.stderr)
             break
+    if GDW_RUN_DURATION:
+        try:
+            GDW_RUN_DURATION.labels(workflow=spec.id).observe(max(0.0, time.time() - t0))
+        except Exception:
+            pass
     publish_event({"type": "gdw.end", "workflow": spec.id, "version": spec.version, "rc": rc})
     print(f"[GDW] Done rc={rc}")
     return rc
@@ -91,4 +104,5 @@ def execute_gdw(spec_path: Path, inputs: Optional[Dict[str, Any]] = None, dry_ru
         step_results.append({"id": step_id, "rc": rc})
         if rc != 0:
             break
-    return {"id": spec.id, "version": spec.version, "rc": rc, "steps": step_results}
+    artifacts = list(spec.observability.get("artifact_paths", [])) if isinstance(spec.observability, dict) else []
+    return {"id": spec.id, "version": spec.version, "rc": rc, "steps": step_results, "artifacts": artifacts}

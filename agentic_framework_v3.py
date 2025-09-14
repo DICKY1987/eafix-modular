@@ -105,6 +105,7 @@ class ServiceType(str, Enum):
     CLAUDE_CODE = "claude_code"
     AIDER_LOCAL = "aider_local"
     OLLAMA_LOCAL = "ollama_local"
+    GDW = "gdw"
 
 class ExecutionStatus(str, Enum):
     """Workflow execution status"""
@@ -1231,15 +1232,47 @@ class AgenticFrameworkOrchestrator:
             analyzer = TaskComplexityAnalyzer()
             complexity = request.complexity or analyzer.classify_complexity(request.description)
             
-            # Determine service
+            # Determine service or handle GDW-only deferral upfront
             if request.force_agent:
                 selected_service = request.force_agent
             else:
-                selected_service, _ = await self.service_router.select_optimal_service(
-                    request.description,
-                    complexity,
-                    lane=request.lane
-                )
+                selected_service = None
+                if GDW_AVAILABLE:
+                    try:
+                        repo_root = _Path(os.getcwd())
+                        mode = get_deferral_mode(repo_root)
+                        decision = maybe_defer_to_gdw(request.description, repo_root)
+                        if decision and mode == "only":
+                            selected_service = ServiceType.GDW
+                            # Create DB record and persist GDW execution directly
+                            execution_record = self.db.create_execution(
+                                task_description=request.description,
+                                complexity=complexity,
+                                selected_service=selected_service,
+                            )
+                            self.db.update_execution_status(execution_record.id, ExecutionStatus.IN_PROGRESS)
+                            gdw_res = defer_and_capture(decision, repo_root, dry_run=False)
+                            result = {"gdw": gdw_res}
+                            self.db.update_execution_results(execution_record.id, result)
+                            self.db.update_execution_status(execution_record.id, ExecutionStatus.COMPLETED)
+                            execution_time = (datetime.utcnow() - start_time).total_seconds()
+                            return {
+                                "status": "completed",
+                                "task": request.description,
+                                "result": result,
+                                "execution_time": execution_time,
+                                "execution_id": execution_record.id,
+                                "database_record": True,
+                            }
+                    except Exception:
+                        # Fallback to normal flow on any GDW path error
+                        pass
+                if selected_service is None:
+                    selected_service, _ = await self.service_router.select_optimal_service(
+                        request.description,
+                        complexity,
+                        lane=request.lane
+                    )
             
             # Create database record
             execution_record = self.db.create_execution(

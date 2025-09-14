@@ -12,6 +12,7 @@ class Hub:
     def __init__(self) -> None:
         self.clients: Set[WebSocket] = set()
         self.queue: asyncio.Queue[str] = asyncio.Queue(maxsize=1000)
+        self.recent: List[str] = []
 
     async def connect(self, ws: WebSocket) -> None:
         await ws.accept()
@@ -28,6 +29,10 @@ class Hub:
             # drop oldest
             _ = await self.queue.get()
             await self.queue.put(data)
+        # keep ring buffer of recent messages (max 200)
+        self.recent.append(data)
+        if len(self.recent) > 200:
+            self.recent = self.recent[-200:]
 
     async def pump(self) -> None:
         while True:
@@ -71,3 +76,10 @@ async def publish(message: Dict):
 async def health():
     return PlainTextResponse("ok")
 
+
+@app.get("/events/recent")
+async def events_recent(limit: int = 50):
+    limit = max(1, min(200, limit))
+    # Return last N events
+    data = [json.loads(s) for s in hub.recent[-limit:]]
+    return {"ok": True, "events": data}

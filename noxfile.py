@@ -25,7 +25,7 @@ def tests(session):
 def gdw_tests(session):
     """Run GDW schema validation and lightweight tests"""
     session.install("-r", "requirements.txt")
-    session.install("pytest", "jsonschema", "pyyaml")
+    session.install("pytest", "jsonschema", "pyyaml", "requests")
     # Validate example spec against schema
     session.run(
         "python",
@@ -35,6 +35,9 @@ def gdw_tests(session):
     )
     # Run any GDW-tagged tests if present
     session.run("pytest", "-q", "-k", "gdw or GDW", external=False)
+    # Optional performance/chaos tests
+    if session.env.get("RUN_GDW_OPTIONAL") == "1":
+        session.run("pytest", "-q", "tests/test_gdw_performance_optional.py", external=False)
 
 @nox.session
 def integration_tests(session):
