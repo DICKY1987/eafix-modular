@@ -111,6 +111,12 @@ class CLIArgs:
     # Self-healing fields
     healing_cmd: Optional[str] = None
     error_code: Optional[str] = None
+    # GDW fields
+    gdw_cmd: Optional[str] = None
+    spec: Optional[str] = None
+    gdw_inputs: Optional[str] = None
+    gdw_dry: Optional[bool] = None
+    chain_dry: Optional[bool] = None
 
 
 def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
@@ -235,6 +241,24 @@ def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
     # gui subcommand (optional GUI launcher)
     subparsers.add_parser("gui", help="Launch the GUI Terminal (optional dependencies)")
 
+    # gdw subcommands
+    gdw_parser = subparsers.add_parser("gdw", help="Generic Deterministic Workflows")
+    gdw_sub = gdw_parser.add_subparsers(dest="gdw_cmd", required=True)
+    # gdw list
+    gdw_sub.add_parser("list", help="List available GDWs")
+    # gdw validate <spec>
+    gdw_val = gdw_sub.add_parser("validate", help="Validate a GDW spec.json")
+    gdw_val.add_argument("spec", nargs="?", help="Path to spec.json (optional)")
+    # gdw run <workflow|spec> [--inputs JSON] [--dry-run]
+    gdw_run = gdw_sub.add_parser("run", help="Run a GDW by id or spec path")
+    gdw_run.add_argument("workflow", help="Workflow id (e.g., git.commit_push.main) or spec path")
+    gdw_run.add_argument("--inputs", dest="gdw_inputs", help="Inputs JSON", required=False)
+    gdw_run.add_argument("--dry-run", dest="gdw_dry", action="store_true", help="Dry run only")
+    # gdw chain <file> [--dry-run]
+    gdw_chain = gdw_sub.add_parser("chain", help="Execute a GDW chain spec")
+    gdw_chain.add_argument("file", help="Chain JSON/YAML file")
+    gdw_chain.add_argument("--dry-run", dest="chain_dry", action="store_true", help="Dry run only")
+
     parsed = parser.parse_args(argv)
     return CLIArgs(
         command=parsed.command,
@@ -253,6 +277,11 @@ def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
         compliance_cmd=getattr(parsed, "compliance_cmd", None),
         healing_cmd=getattr(parsed, "healing_cmd", None),
         error_code=getattr(parsed, "error_code", None),
+        gdw_cmd=getattr(parsed, "gdw_cmd", None),
+        spec=getattr(parsed, "spec", None),
+        gdw_inputs=getattr(parsed, "gdw_inputs", None),
+        gdw_dry=getattr(parsed, "gdw_dry", None),
+        chain_dry=getattr(parsed, "chain_dry", None),
     )
 
 
@@ -606,7 +635,7 @@ def main(argv: Optional[List[str]] = None) -> int:
             except Exception as exc:
                 print(f"Error: workflow system unavailable: {exc}", file=sys.stderr)
                 return 1
-        elif args.command == "gui":
+        elif args.command == "gui":  # pragma: no cover - optional GUI path
             # Attempt to run GUI terminal, fallback to headless message if missing
             try:
                 import runpy
@@ -620,7 +649,43 @@ def main(argv: Optional[List[str]] = None) -> int:
             except Exception as e:
                 _safe_print(f"GUI not available: {e}")
                 return 1
-        else:
+        elif args.command == "gdw":
+            try:
+                repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+                from pathlib import Path as _P
+                root = _P(repo_root)
+                gdw_cmd = getattr(args, "gdw_cmd", None)
+                if gdw_cmd == "list":
+                    from .commands.gdw.list import cmd_list  # type: ignore
+                    return cmd_list(root)
+                elif gdw_cmd == "validate":
+                    from .commands.gdw.validate import cmd_validate  # type: ignore
+                    return cmd_validate(getattr(args, "spec", None), root)
+                elif gdw_cmd == "run":
+                    from .commands.gdw.run import cmd_run  # type: ignore
+                    return cmd_run(
+                        workflow=str(getattr(args, "workflow", "")),
+                        inputs=getattr(args, "gdw_inputs", None),
+                        dry=bool(getattr(args, "gdw_dry", False)),
+                        repo_root=root,
+                    )
+                elif gdw_cmd == "chain":
+                    from .commands.gdw.chain import cmd_chain  # type: ignore
+                    return cmd_chain(
+                        chain_file=str(getattr(args, "file", "")),
+                        dry=bool(getattr(args, "chain_dry", False)),
+                        repo_root=root,
+                    )
+                else:
+                    print("Error: unknown gdw subcommand", file=sys.stderr)
+                    return 1
+            except Exception as e:
+                # Be forgiving for dry-run developer scenarios
+                if bool(getattr(args, "gdw_dry", False)):
+                    _safe_print(f"[GDW] Non-fatal error in dry-run: {e}")
+                    return 0
+                raise
+        else:  # pragma: no cover - defensive fallback
             # This branch should be unreachable because of argparse's required subcommand
             print(f"Unknown command: {args.command}", file=sys.stderr)
             return 1
