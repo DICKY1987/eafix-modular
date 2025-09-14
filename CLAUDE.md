@@ -820,3 +820,15 @@ This repository has been transformed from a basic CLI scaffold into a comprehens
 4. Monitor WebSocket events via `curl http://localhost:8000/events/recent`
 
 This platform provides enterprise-grade orchestration capabilities while maintaining cost optimization through intelligent free-tier management and automatic failover to local tools when quotas are exceeded.
+### Generic Deterministic Workflows (GDW)
+
+- List GDWs: `cli-multi-rapid gdw list`
+- Validate: `cli-multi-rapid gdw validate gdw/<id>/v<ver>/spec.json`
+- Run dry: `cli-multi-rapid gdw run <id> --dry-run`
+- Chain: `cli-multi-rapid gdw chain examples/dev-to-prod.yaml --dry-run`
+- Orchestrator deferral:
+  - Prefer GDW: `cli-multi-rapid phase run <phase> --gdw-prefer`
+  - Only GDW: `cli-multi-rapid phase run <phase> --gdw-only`
+- Policies: `config/gdw_policies.json` (modes: off | prefer | only; risk tiers; capabilities)
+- Metrics: see `lib/gdw_metrics.py` and Prometheus/Grafana (`monitoring/*`)
+- Events: set `GDW_BROADCAST=1` and run `services/event_bus` (`/events/recent` tail endpoint)

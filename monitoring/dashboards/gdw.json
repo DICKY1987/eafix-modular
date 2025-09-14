@@ -1,0 +1,23 @@
+{
+  "title": "GDW Overview",
+  "schemaVersion": 38,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "GDW Runs Total",
+      "targets": [
+        { "expr": "sum(gdw_runs_total)" }
+      ],
+      "gridPos": {"x":0,"y":0,"w":12,"h":5}
+    },
+    {
+      "type": "graph",
+      "title": "GDW Run Duration (s)",
+      "targets": [
+        { "expr": "histogram_quantile(0.95, sum(rate(gdw_run_duration_seconds_bucket[5m])) by (le))" }
+      ],
+      "gridPos": {"x":0,"y":5,"w":24,"h":9}
+    }
+  ]
+}
+
