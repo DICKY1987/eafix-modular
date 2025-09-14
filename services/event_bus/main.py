@@ -6,6 +6,12 @@ from typing import Dict, List, Set
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import PlainTextResponse
+try:
+    from prometheus_client import generate_latest, CONTENT_TYPE_LATEST  # type: ignore
+except Exception:  # pragma: no cover - optional
+    generate_latest = None  # type: ignore
+    CONTENT_TYPE_LATEST = "text/plain"
+from fastapi.responses import PlainTextResponse
 
 
 class Hub:
@@ -75,6 +81,14 @@ async def publish(message: Dict):
 @app.get("/health")
 async def health():
     return PlainTextResponse("ok")
+
+
+@app.get("/metrics")
+async def metrics():  # pragma: no cover - integration endpoint
+    if generate_latest is None:
+        return PlainTextResponse("prometheus_client not installed", status_code=200)
+    data = generate_latest()
+    return app.response_class(response=data, status=200, media_type=CONTENT_TYPE_LATEST)
 
 
 @app.get("/events/recent")

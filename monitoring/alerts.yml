@@ -1,0 +1,11 @@
+groups:
+  - name: gdw-alerts
+    rules:
+      - alert: GDWRunSlowP95
+        expr: histogram_quantile(0.95, sum(rate(gdw_run_duration_seconds_bucket[10m])) by (le)) > 30
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "GDW run duration p95 high"
+          description: "GDW runs p95 > 30s for 10m"
