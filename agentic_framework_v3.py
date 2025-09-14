@@ -51,7 +51,11 @@ import os
 from urllib.parse import urljoin
 from pathlib import Path as _Path
 try:
-    from lib.gdw_orchestrator import maybe_defer_to_gdw  # type: ignore
+    from lib.gdw_orchestrator import (
+        maybe_defer_to_gdw,
+        get_deferral_mode,
+        defer_and_capture,
+    )  # type: ignore
     from lib.gdw_runner import run_gdw  # type: ignore
     GDW_AVAILABLE = True
 except Exception:
@@ -332,6 +336,8 @@ class DevWorkflowState(BaseModel):
     target_files: List[str] = Field(default_factory=list)
     results: Dict[str, Any] = Field(default_factory=dict)
     execution_id: Optional[int] = None
+    # GDW deferral integration
+    gdw_completed: bool = False
 
 class CostOptimizedQuotaManager:
     """Redis-based quota management with cost optimization"""
@@ -966,7 +972,15 @@ class LangGraphWorkflowEngine:
         workflow.add_edge(START, "analyze_task")
         workflow.add_edge("analyze_task", "select_lane")
         workflow.add_edge("select_lane", "route_service")
-        workflow.add_edge("route_service", "setup_worktree")
+        # After routing, either continue normal flow or short-circuit to metrics if GDW handled it
+        workflow.add_conditional_edges(
+            "route_service",
+            self._after_route_decision,
+            {
+                "continue": "setup_worktree",
+                "gdw": "update_metrics",
+            },
+        )
         workflow.add_conditional_edges(
             "setup_worktree",
             self._should_approve_cost,
@@ -1006,14 +1020,42 @@ class LangGraphWorkflowEngine:
     
     async def _route_service(self, state: DevWorkflowState) -> DevWorkflowState:
         """Route to optimal service considering git lane"""
+        # Optionally fully defer to GDW if policy dictates
+        if GDW_AVAILABLE:
+            try:
+                repo_root = _Path(os.getcwd())
+                mode = get_deferral_mode(repo_root)
+                decision = maybe_defer_to_gdw(state.task_description, repo_root)
+                if decision and mode == "only":
+                    if console:
+                        console.print(f"[cyan]GDW deferral (only)[/cyan]: {decision.workflow_id} ({decision.reason})")
+                    gdw_res = defer_and_capture(decision, repo_root, dry_run=False)
+                    # Persist on state; downstream will short-circuit to metrics and exit
+                    state.results["gdw"] = gdw_res
+                    # Mark completion to influence conditional edge
+                    setattr(state, "gdw_completed", True)
+                    # Set a neutral service to avoid quota updates later
+                    state.selected_service = ServiceType.OLLAMA_LOCAL
+                    state.cost_estimate = 0.0
+                    return state
+            except Exception:
+                # Non-fatal; continue normal routing
+                pass
+
         service, lane = await self.service_router.select_optimal_service(
             state.task_description,
             state.complexity,
-            lane=state.selected_lane
+            lane=state.selected_lane,
         )
         state.selected_service = service
         state.cost_estimate = SERVICES[service].cost_per_request
         return state
+
+    def _after_route_decision(self, state: DevWorkflowState) -> str:
+        # If GDW already handled the task, skip to metrics/END
+        if getattr(state, "gdw_completed", False):
+            return "gdw"
+        return "continue"
     
     async def _setup_worktree(self, state: DevWorkflowState) -> DevWorkflowState:
         """Set up git worktree for the selected lane"""
@@ -1114,9 +1156,11 @@ class LangGraphWorkflowEngine:
     
     async def _update_metrics(self, state: DevWorkflowState) -> DevWorkflowState:
         """Update usage metrics"""
-        await self.service_router.quota_manager.update_usage(
-            state.selected_service
-        )
+        # Skip service usage update if handled entirely via GDW
+        if not getattr(state, "gdw_completed", False):
+            await self.service_router.quota_manager.update_usage(
+                state.selected_service
+            )
         return state
     
     async def execute_workflow(self, task_description: str, lane: Optional[str] = None) -> Dict[str, Any]:
