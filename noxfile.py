@@ -23,8 +23,8 @@ def tests(session):
 
 @nox.session(python=PYTHON_VERSIONS)
 def gdw_tests(session):
-    """Run GDW schema validation and lightweight tests"""
-    session.install("-r", "requirements.txt")
+    """Run GDW schema validation and lightweight tests (no heavy deps)."""
+    # Avoid installing full requirements to keep Windows compatibility and speed
     session.install("pytest", "jsonschema", "pyyaml", "requests")
     # Validate example spec against schema
     session.run(
