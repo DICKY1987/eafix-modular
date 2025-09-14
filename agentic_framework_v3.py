@@ -49,6 +49,13 @@ import httpx
 import subprocess
 import os
 from urllib.parse import urljoin
+from pathlib import Path as _Path
+try:
+    from lib.gdw_orchestrator import maybe_defer_to_gdw  # type: ignore
+    from lib.gdw_runner import run_gdw  # type: ignore
+    GDW_AVAILABLE = True
+except Exception:
+    GDW_AVAILABLE = False
 
 # Self-Healing Integration
 try:
@@ -448,6 +455,21 @@ class CostOptimizedServiceRouter:
         lane: Optional[str] = None
     ) -> tuple[ServiceType, Optional[str]]:
         """Select optimal service based on complexity, cost, availability, and git lane"""
+
+        # Optional: consult GDW policies for potential deferral (dry-run)
+        try:
+            if GDW_AVAILABLE:
+                repo_root = _Path(os.getcwd())
+                decision = maybe_defer_to_gdw(task_description, repo_root)
+                if decision:
+                    if console:
+                        console.print(f"[cyan]GDW policy matched[/cyan]: {decision.workflow_id} ({decision.reason})")
+                    spec = (repo_root / "gdw" / decision.workflow_id / "v1.0.0" / "spec.json")
+                    if spec.exists():
+                        # Dry-run only here; keeps orchestrator behavior intact
+                        run_gdw(spec, inputs=decision.inputs, dry_run=True)
+        except Exception as _gdw_exc:  # pragma: no cover - non-fatal hook
+            pass
         
         # Select lane if not provided
         if lane is None:
