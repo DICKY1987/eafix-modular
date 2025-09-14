@@ -1,0 +1,25 @@
+name: GDW Tests
+
+on:
+  push:
+    branches: [ feature/gdw-framework-integration, main ]
+  pull_request:
+
+jobs:
+  gdw:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install nox
+      - name: Validate GDW spec and run tests
+        run: |
+          nox -s gdw_tests
+          pytest -q -k "gdw"
+

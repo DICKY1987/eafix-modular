@@ -14,6 +14,12 @@ def test_gdw_validate_default():
 
 
 def test_gdw_run_dry():
-    rc = main(["gdw", "run", "git.commit_push.main", "--dry-run"])
-    assert rc == 0
-
+    for wf in [
+        "git.commit_push.main",
+        "build.container.sign",
+        "security.scan.trivy",
+        "k8s.deploy.rolling",
+        "version.bump.semver",
+    ]:
+        rc = main(["gdw", "run", wf, "--dry-run"])
+        assert rc == 0
