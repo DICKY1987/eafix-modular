@@ -6,7 +6,6 @@ try:
     from gui_terminal.security.policy_manager import PolicyManager
     from gui_terminal.core.cost_integration import CostTrackerBridge, CostEvent
     from gui_terminal.core.logging_config import StructuredLogger, LoggerConfig
-    from gui_terminal.ui.gdw_brick_builder import GDWBrickBuilderTab
     from gui_terminal.ui.tool_registry_tab import ToolRegistryTab
     from gui_terminal.ui.workflow_validator_tab import WorkflowValidatorTab
 except Exception:  # pragma: no cover - allow headless import
@@ -19,14 +18,12 @@ except Exception:  # pragma: no cover - allow headless import
     CostEvent = None  # type: ignore
     StructuredLogger = None  # type: ignore
     LoggerConfig = None  # type: ignore
-    GDWBrickBuilderTab = None  # type: ignore
     ToolRegistryTab = None  # type: ignore
     WorkflowValidatorTab = None  # type: ignore
 
 
 class MainWindow:  # pragma: no cover - constructed only when PyQt present
     def __init__(self, config: dict | None = None) -> None:
-        self.title = "CLI Multi-Rapid GUI Terminal - GDW Brick Builder"
         self._cfg = config or {}
         if QtWidgets is None:
             # Headless placeholder retains API compatibility
@@ -52,7 +49,6 @@ class MainWindow:  # pragma: no cover - constructed only when PyQt present
         # Status bar
         status = QtWidgets.QStatusBar()
         self._w.setStatusBar(status)
-        status.showMessage("GDW Brick Builder Ready - Drag files to create workflows")
 
         # Toolbar for global actions
         toolbar = self._w.addToolBar("Global Actions")
@@ -72,10 +68,6 @@ class MainWindow:  # pragma: no cover - constructed only when PyQt present
         if not self.tab_widget:
             return
 
-        # GDW Brick Builder tab
-        if GDWBrickBuilderTab:
-            self.gdw_tab = GDWBrickBuilderTab()
-            self.tab_widget.addTab(self.gdw_tab, "🧱 GDW Brick Builder")
 
         # Tool Registry & Resolver tab
         if ToolRegistryTab:
@@ -144,9 +136,7 @@ class MainWindow:  # pragma: no cover - constructed only when PyQt present
     def _open_help(self):
         """Open help documentation"""
         from PyQt6.QtWidgets import QMessageBox  # type: ignore
-        help_text = """GDW Brick Builder Help
 
-🧱 GDW Brick Builder:
 • Drag and drop files to create Generic Deterministic Workflows
 • Configure workflow specifications with the wizard
 • Validate workflows with AJV schema validation
@@ -248,7 +238,6 @@ class MainWindow:  # pragma: no cover - constructed only when PyQt present
 
     # Additional methods for tab management
     def switch_to_gdw_builder(self):
-        """Switch to GDW Brick Builder tab"""
         if hasattr(self, 'tab_widget'):
             self.tab_widget.setCurrentIndex(0)
 

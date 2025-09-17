@@ -44,7 +44,6 @@ cli-multi-rapid gui
 ## Branch Structure
 
 ```
-main (Python GUI + GDW Framework)
 ├── gui_terminal/                    # Python GUI components
 ├── vscode-extension/                # VS Code extension (also available here)
 ├── gdw/                            # Generic Deterministic Workflows
@@ -56,13 +55,11 @@ interface/vscode-only (VS Code Extension Only)
 └── [enterprise framework without Python GUI]
 
 Backup Branches:
-├── backup-gdw-vscode-20240914      # GDW + VS Code backup
 └── backup-vscode-interface-20240914 # VS Code interface backup
 ```
 
 ## New Capabilities (Main Branch)
 
-### Generic Deterministic Workflows (GDW)
 ```bash
 cli-multi-rapid gdw list              # List available workflows
 cli-multi-rapid gdw run <workflow>    # Execute workflow
@@ -110,6 +107,5 @@ If you were using the VS Code extension:
 1. Your VS Code extension is preserved on `interface/vscode-only` branch
 2. The main branch now features the enhanced Python GUI system
 3. All enterprise features are available on both branches
-4. GDW framework adds deterministic workflow capabilities
 
 The Python GUI provides a more integrated, standalone experience while the VS Code extension offers tight IDE integration. Choose based on your workflow preferences.
