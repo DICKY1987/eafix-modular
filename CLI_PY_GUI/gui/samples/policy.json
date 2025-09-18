@@ -1,0 +1,25 @@
+{
+  "tool_concurrency": {
+    "aider": 2,
+    "claude-cli": 1,
+    "cursor": 1
+  },
+  "path_claims": [
+    {
+      "path": "src/core/**",
+      "mode": "exclusive"
+    },
+    {
+      "path": "docs/**",
+      "mode": "exclusive"
+    },
+    {
+      "path": "tests/**",
+      "mode": "exclusive"
+    },
+    {
+      "path": "data/cache/**",
+      "mode": "shared"
+    }
+  ]
+}
