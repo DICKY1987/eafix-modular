@@ -1,0 +1,103 @@
+groups:
+  - name: eafix-enterprise-alerts
+    rules:
+      # Template rules applied to all services
+      - alert: ServiceDown
+        expr: up{job=~"eafix-.*"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "EAFIX service {{ $labels.job }} is down"
+          description: "Service {{ $labels.job }} has been down for more than 1 minute"
+
+      - alert: HighErrorRate
+        expr: |
+          (
+            rate(eafix_errors_total[5m]) /
+            rate(eafix_requests_total[5m])
+          ) > 0.05
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate on {{ $labels.service }}"
+          description: "Error rate is {{ $value | humanizePercentage }} for service {{ $labels.service }}"
+
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95,
+            rate(eafix_request_duration_seconds_bucket[5m])
+          ) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High latency on {{ $labels.service }}"
+          description: "95th percentile latency is {{ $value }}s for service {{ $labels.service }}"
+
+  # Critical business alerts
+  - name: eafix-business-alerts
+    rules:
+      - alert: TradingHalted
+        expr: |
+          rate(execution_engine_business_events_total{event_type="order_executed"}[10m]) == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Trading appears to be halted - no orders executed"
+          description: "No order execution events detected in the last 10 minutes"
+
+      - alert: PriceDataStale
+        expr: |
+          time() - data_ingestor_business_events_total{event_type="price_tick_processed"} > 300
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Price data appears stale - no recent ticks"
+          description: "No price tick events detected in the last 5 minutes"
+
+      - alert: RiskManagerUnresponsive
+        expr: |
+          rate(risk_manager_requests_total[5m]) == 0
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Risk Manager not processing requests"
+          description: "Risk Manager service appears unresponsive - no requests processed in 3 minutes"
+
+  # Infrastructure alerts
+  - name: eafix-infrastructure-alerts
+    rules:
+      - alert: HighMemoryUsage
+        expr: |
+          (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 85% for {{ $labels.instance }}"
+
+      - alert: HighCPUUsage
+        expr: |
+          100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 80% for {{ $labels.instance }}"
+
+      - alert: DiskSpaceLow
+        expr: |
+          (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Low disk space"
+          description: "Disk space is below 10% for {{ $labels.instance }} on {{ $labels.mountpoint }}"

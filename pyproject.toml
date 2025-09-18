@@ -45,17 +45,61 @@ flake8 = "^6.1.0"
 mypy = "^1.7.1"
 pre-commit = "^3.5.0"
 
+[tool.poetry.group.security]
+optional = true
+
+[tool.poetry.group.security.dependencies]
+bandit = {extras = ["toml"], version = "^1.7.5"}
+safety = "^2.3.4"
+semgrep = "^1.45.0"
+
 [tool.pytest.ini_options]
-testpaths = ["services/*/tests"]
+testpaths = ["services/*/tests/unit", "services/*/tests/integration", "tests/e2e"]
 asyncio_mode = "auto"
 addopts = [
     "--strict-markers",
     "--strict-config",
     "--cov=services",
+    "--cov-fail-under=80",           # Blocking coverage threshold
     "--cov-report=term-missing:skip-covered",
     "--cov-report=html:reports/coverage",
-    "--cov-report=xml:reports/coverage.xml"
+    "--cov-report=xml:reports/coverage.xml",
+    "--cov-branch",                  # Branch coverage
+    "--maxfail=10"                   # Stop after 10 failures
 ]
+
+markers = [
+    "unit: Unit tests (fast, isolated)",
+    "integration: Integration tests (moderate speed, external deps)",
+    "e2e: End-to-end tests (slow, full system)",
+    "security: Security-focused tests",
+    "performance: Performance benchmarks"
+]
+
+# Critical path coverage - 100% required
+[tool.coverage.run]
+omit = [
+    "*/tests/*",
+    "*/migrations/*",
+    "*/venv/*",
+    "*/__pycache__/*"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError"
+]
+
+# Fail if critical modules below 80%
+fail_under = 80
+precision = 2
+show_missing = true
+
+[tool.coverage.html]
+directory = "reports/coverage"
 
 [tool.black]
 line-length = 88
@@ -102,3 +146,11 @@ strict_equality = true
 [[tool.mypy.overrides]]
 module = ["redis.*", "prometheus_client.*", "structlog.*"]
 ignore_missing_imports = true
+
+[tool.bandit]
+exclude_dirs = ["tests", "docs"]
+skips = ["B101"]  # Skip assert_used_in_tests
+severity_level = "medium"
+
+[tool.bandit.assert_used]
+skips = ["*/tests/*", "*/test_*.py"]
