@@ -1,0 +1,72 @@
+# CLI Multi-Rapid GUI Terminal - Default Configuration
+
+# Application settings
+application:
+  name: "CLI Multi-Rapid GUI Terminal"
+  version: "1.0.0"
+  debug_mode: false
+
+# Terminal configuration
+terminal:
+  default_shell: "auto"  # auto-detect system shell
+  startup_command: null
+  working_directory: "~"
+  rows: 24
+  cols: 80
+  font_family: "Consolas"
+  font_size: 12
+  enable_unicode: true
+  enable_ansi_colors: true
+
+# Security configuration
+security:
+  policy_file: "security_policies.yaml"
+  audit_logging: true
+  command_filtering_enabled: true
+  resource_limits:
+    max_memory_mb: 512
+    max_cpu_percent: 50
+    max_execution_time: 300
+  require_confirmation:
+    - "rm"
+    - "del"
+    - "format"
+    - "sudo"
+
+# Platform integration
+platform_integration:
+  websocket_url: "ws://localhost:8000/ws"
+  cost_tracking_enabled: true
+  api_key: ""
+  auth_token: ""
+  enterprise_integrations:
+    jira_enabled: false
+    slack_enabled: false
+    github_enabled: false
+    teams_enabled: false
+
+# User interface
+ui:
+  theme: "default"
+  show_status_bar: true
+  show_toolbar: true
+  enable_tabs: true
+  window_opacity: 1.0
+  always_on_top: false
+
+# Plugin system
+plugins:
+  enabled: true
+  auto_load: true
+  plugin_directories:
+    - "~/.gui_terminal/plugins"
+    - "/opt/gui_terminal/plugins"
+  disabled_plugins: []
+
+# Performance settings
+performance:
+  max_buffer_chars: 1000000
+  poll_interval_ms: 30
+  enable_lazy_loading: true
+  enable_virtual_scrolling: true
+  max_concurrent_sessions: 10

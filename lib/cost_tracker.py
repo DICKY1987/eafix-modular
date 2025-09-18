@@ -46,7 +46,6 @@ def get_total_cost(task_id: str) -> float:
 
 
 def record_gdw_cost(workflow_id: str, step_id: str | None, amount: float) -> None:
-    """Convenience wrapper to record GDW execution costs.
 
     Uses a synthetic task_id namespace "gdw:<workflow_id>" and action "gdw_step".
     """

@@ -51,15 +51,15 @@ import os
 from urllib.parse import urljoin
 from pathlib import Path as _Path
 try:
-    from lib.gdw_orchestrator import (
-        maybe_defer_to_gdw,
+    from lib.execution_orchestrator import (
+        maybe_defer_to_execution_pipeline,
         get_deferral_mode,
         defer_and_capture,
     )  # type: ignore
-    from lib.gdw_runner import run_gdw  # type: ignore
-    GDW_AVAILABLE = True
+    from lib.execution_runner import run_execution_pipeline  # type: ignore
+    EXECUTION_PIPELINE_AVAILABLE = True
 except Exception:
-    GDW_AVAILABLE = False
+    EXECUTION_PIPELINE_AVAILABLE = False
 
 # Self-Healing Integration
 try:
@@ -105,7 +105,7 @@ class ServiceType(str, Enum):
     CLAUDE_CODE = "claude_code"
     AIDER_LOCAL = "aider_local"
     OLLAMA_LOCAL = "ollama_local"
-    GDW = "gdw"
+    EXECUTION_PIPELINE = "execution_pipeline"
 
 class ExecutionStatus(str, Enum):
     """Workflow execution status"""
@@ -337,8 +337,8 @@ class DevWorkflowState(BaseModel):
     target_files: List[str] = Field(default_factory=list)
     results: Dict[str, Any] = Field(default_factory=dict)
     execution_id: Optional[int] = None
-    # GDW deferral integration
-    gdw_completed: bool = False
+    # Execution pipeline deferral integration
+    execution_completed: bool = False
 
 class CostOptimizedQuotaManager:
     """Redis-based quota management with cost optimization"""
@@ -463,18 +463,18 @@ class CostOptimizedServiceRouter:
     ) -> tuple[ServiceType, Optional[str]]:
         """Select optimal service based on complexity, cost, availability, and git lane"""
 
-        # Optional: consult GDW policies for potential deferral (dry-run)
+        # Optional: consult execution pipeline policies for potential deferral (dry-run)
         try:
-            if GDW_AVAILABLE:
+            if EXECUTION_PIPELINE_AVAILABLE:
                 repo_root = _Path(os.getcwd())
-                decision = maybe_defer_to_gdw(task_description, repo_root)
+                decision = maybe_defer_to_execution_pipeline(task_description, repo_root)
                 if decision:
                     if console:
-                        console.print(f"[cyan]GDW policy matched[/cyan]: {decision.workflow_id} ({decision.reason})")
-                    spec = (repo_root / "gdw" / decision.workflow_id / "v1.0.0" / "spec.json")
+                        console.print(f"[cyan]Execution pipeline policy matched[/cyan]: {decision.workflow_id} ({decision.reason})")
+                    spec = (repo_root / "execution_pipeline" / decision.workflow_id / "v1.0.0" / "spec.json")
                     if spec.exists():
                         # Dry-run only here; keeps orchestrator behavior intact
-                        run_gdw(spec, inputs=decision.inputs, dry_run=True)
+                        run_execution_pipeline(spec, inputs=decision.inputs, dry_run=True)
         except Exception as _gdw_exc:  # pragma: no cover - non-fatal hook
             pass
         
@@ -973,13 +973,13 @@ class LangGraphWorkflowEngine:
         workflow.add_edge(START, "analyze_task")
         workflow.add_edge("analyze_task", "select_lane")
         workflow.add_edge("select_lane", "route_service")
-        # After routing, either continue normal flow or short-circuit to metrics if GDW handled it
+        # After routing, either continue normal flow or short-circuit to metrics if execution pipeline handled it
         workflow.add_conditional_edges(
             "route_service",
             self._after_route_decision,
             {
                 "continue": "setup_worktree",
-                "gdw": "update_metrics",
+                "execution_pipeline": "update_metrics",
             },
         )
         workflow.add_conditional_edges(
@@ -1021,20 +1021,20 @@ class LangGraphWorkflowEngine:
     
     async def _route_service(self, state: DevWorkflowState) -> DevWorkflowState:
         """Route to optimal service considering git lane"""
-        # Optionally fully defer to GDW if policy dictates
-        if GDW_AVAILABLE:
+        # Optionally fully defer to execution pipeline if policy dictates
+        if EXECUTION_PIPELINE_AVAILABLE:
             try:
                 repo_root = _Path(os.getcwd())
                 mode = get_deferral_mode(repo_root)
-                decision = maybe_defer_to_gdw(state.task_description, repo_root)
+                decision = maybe_defer_to_execution_pipeline(state.task_description, repo_root)
                 if decision and mode == "only":
                     if console:
-                        console.print(f"[cyan]GDW deferral (only)[/cyan]: {decision.workflow_id} ({decision.reason})")
-                    gdw_res = defer_and_capture(decision, repo_root, dry_run=False)
+                        console.print(f"[cyan]Execution pipeline deferral (only)[/cyan]: {decision.workflow_id} ({decision.reason})")
+                    execution_res = defer_and_capture(decision, repo_root, dry_run=False)
                     # Persist on state; downstream will short-circuit to metrics and exit
-                    state.results["gdw"] = gdw_res
+                    state.results["execution_pipeline"] = execution_res
                     # Mark completion to influence conditional edge
-                    setattr(state, "gdw_completed", True)
+                    setattr(state, "execution_completed", True)
                     # Set a neutral service to avoid quota updates later
                     state.selected_service = ServiceType.OLLAMA_LOCAL
                     state.cost_estimate = 0.0
@@ -1053,9 +1053,9 @@ class LangGraphWorkflowEngine:
         return state
 
     def _after_route_decision(self, state: DevWorkflowState) -> str:
-        # If GDW already handled the task, skip to metrics/END
-        if getattr(state, "gdw_completed", False):
-            return "gdw"
+        # If execution pipeline already handled the task, skip to metrics/END
+        if getattr(state, "execution_completed", False):
+            return "execution_pipeline"
         return "continue"
     
     async def _setup_worktree(self, state: DevWorkflowState) -> DevWorkflowState:
@@ -1157,8 +1157,8 @@ class LangGraphWorkflowEngine:
     
     async def _update_metrics(self, state: DevWorkflowState) -> DevWorkflowState:
         """Update usage metrics"""
-        # Skip service usage update if handled entirely via GDW
-        if not getattr(state, "gdw_completed", False):
+        # Skip service usage update if handled entirely via execution pipeline
+        if not getattr(state, "execution_completed", False):
             await self.service_router.quota_manager.update_usage(
                 state.selected_service
             )
@@ -1232,27 +1232,27 @@ class AgenticFrameworkOrchestrator:
             analyzer = TaskComplexityAnalyzer()
             complexity = request.complexity or analyzer.classify_complexity(request.description)
             
-            # Determine service or handle GDW-only deferral upfront
+            # Determine service or handle execution pipeline-only deferral upfront
             if request.force_agent:
                 selected_service = request.force_agent
             else:
                 selected_service = None
-                if GDW_AVAILABLE:
+                if EXECUTION_PIPELINE_AVAILABLE:
                     try:
                         repo_root = _Path(os.getcwd())
                         mode = get_deferral_mode(repo_root)
-                        decision = maybe_defer_to_gdw(request.description, repo_root)
+                        decision = maybe_defer_to_execution_pipeline(request.description, repo_root)
                         if decision and mode == "only":
-                            selected_service = ServiceType.GDW
-                            # Create DB record and persist GDW execution directly
+                            selected_service = ServiceType.EXECUTION_PIPELINE
+                            # Create DB record and persist execution pipeline directly
                             execution_record = self.db.create_execution(
                                 task_description=request.description,
                                 complexity=complexity,
                                 selected_service=selected_service,
                             )
                             self.db.update_execution_status(execution_record.id, ExecutionStatus.IN_PROGRESS)
-                            gdw_res = defer_and_capture(decision, repo_root, dry_run=False)
-                            result = {"gdw": gdw_res}
+                            execution_res = defer_and_capture(decision, repo_root, dry_run=False)
+                            result = {"execution_pipeline": execution_res}
                             self.db.update_execution_results(execution_record.id, result)
                             self.db.update_execution_status(execution_record.id, ExecutionStatus.COMPLETED)
                             execution_time = (datetime.utcnow() - start_time).total_seconds()
@@ -1265,7 +1265,7 @@ class AgenticFrameworkOrchestrator:
                                 "database_record": True,
                             }
                     except Exception:
-                        # Fallback to normal flow on any GDW path error
+                        # Fallback to normal flow on any execution pipeline path error
                         pass
                 if selected_service is None:
                     selected_service, _ = await self.service_router.select_optimal_service(

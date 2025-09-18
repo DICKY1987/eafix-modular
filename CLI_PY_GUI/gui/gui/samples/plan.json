@@ -1,0 +1,29 @@
+{
+  "plan_id": "tsk_demo",
+  "branch_base": "main",
+  "nodes": [
+    {
+      "id": "n1",
+      "tool": "aider",
+      "goal": "Implement feature",
+      "deps": []
+    },
+    {
+      "id": "n2",
+      "tool": "claude-cli",
+      "goal": "Write tests",
+      "deps": [
+        "n1"
+      ]
+    },
+    {
+      "id": "n3",
+      "tool": "cursor",
+      "goal": "Docs",
+      "deps": [
+        "n1",
+        "n2"
+      ]
+    }
+  ]
+}

@@ -29,9 +29,9 @@ The platform now supports **dual interface options** with **Python GUI as the pr
 - **Package**: `vscode-extension/cli-multi-rapid-cockpit-0.1.0.vsix`
 
 **Branch Strategy**:
-- **main branch**: Python GUI + complete GDW framework (current)
+- **main branch**: Python GUI + complete execution framework (current)
 - **interface/vscode-only**: VS Code extension without Python GUI components
-- **Backup branches**: `backup-gdw-vscode-YYYYMMDD` and `backup-vscode-interface-YYYYMMDD`
+- **Backup branches**: `backup-vscode-YYYYMMDD` and `backup-vscode-interface-YYYYMMDD`
 
 ## Architecture
 
@@ -141,27 +141,6 @@ python agentic_framework_v3.py status
 python agentic_framework_v3.py analyze "add JWT token validation"
 ```
 
-### Generic Deterministic Workflows (GDW) - NEW
-```bash
-# List available workflows
-cli-multi-rapid gdw list
-
-# Execute individual GDW
-cli-multi-rapid gdw run git.commit_push.main --commit_message "feat: new feature"
-
-# Validate GDW specification
-cli-multi-rapid gdw validate gdw/git.commit_push.main/v1.0.0/spec.json
-
-# Execute workflow chains
-cli-multi-rapid gdw chain examples/dev-to-prod.yaml --dry-run
-
-# Available pre-built GDWs:
-# - git.commit_push.main: Git operations with multi-runner support
-# - k8s.deploy.rolling: Kubernetes deployment with rollout monitoring
-# - security.scan.trivy: Container security scanning
-# - version.bump.semver: Semantic version management
-# - build.container.sign: Container building and signing
-```
 
 ### Alternative Interface: VS Code Extension
 ```bash
@@ -899,15 +878,3 @@ This repository has been transformed from a basic CLI scaffold into a comprehens
 4. Monitor WebSocket events via `curl http://localhost:8000/events/recent`
 
 This platform provides enterprise-grade orchestration capabilities while maintaining cost optimization through intelligent free-tier management and automatic failover to local tools when quotas are exceeded.
-### Generic Deterministic Workflows (GDW)
-
-- List GDWs: `cli-multi-rapid gdw list`
-- Validate: `cli-multi-rapid gdw validate gdw/<id>/v<ver>/spec.json`
-- Run dry: `cli-multi-rapid gdw run <id> --dry-run`
-- Chain: `cli-multi-rapid gdw chain examples/dev-to-prod.yaml --dry-run`
-- Orchestrator deferral:
-  - Prefer GDW: `cli-multi-rapid phase run <phase> --gdw-prefer`
-  - Only GDW: `cli-multi-rapid phase run <phase> --gdw-only`
-- Policies: `config/gdw_policies.json` (modes: off | prefer | only; risk tiers; capabilities)
-- Metrics: see `lib/gdw_metrics.py` and Prometheus/Grafana (`monitoring/*`)
-- Events: set `GDW_BROADCAST=1` and run `services/event_bus` (`/events/recent` tail endpoint)

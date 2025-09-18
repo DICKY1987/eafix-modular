@@ -80,7 +80,7 @@ services:
       - prometheus
     restart: unless-stopped
 
-  # Event bus for real-time GDW events (FastAPI + WebSockets)
+  # Event bus for real-time execution pipeline events (FastAPI + WebSockets)
   event_bus:
     build: .
     command: bash -lc "python -m pip install --no-warn-script-location fastapi uvicorn prometheus_client && uvicorn services.event_bus.main:app --host 0.0.0.0 --port 8001"
