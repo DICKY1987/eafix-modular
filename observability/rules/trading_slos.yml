@@ -1,0 +1,275 @@
+# Trading System SLO Recording Rules and Alerts
+# Service Level Objectives for EAFIX Trading System
+
+groups:
+  - name: trading_system_slos
+    interval: 30s
+    rules:
+      # === SYSTEM AVAILABILITY SLO ===
+      # Target: 99.9% uptime during market hours (6 AM - 6 PM EST)
+      
+      - record: slo:system_availability:rate5m
+        expr: |
+          (
+            sum(rate(up{job=~"data-ingestor|indicator-engine|signal-generator|risk-manager|execution-engine"}[5m])) 
+            / 
+            count(up{job=~"data-ingestor|indicator-engine|signal-generator|risk-manager|execution-engine"})
+          )
+        labels:
+          slo: "system_availability"
+          target: "99.9"
+
+      - record: slo:system_availability:rate1h
+        expr: |
+          (
+            sum(rate(up{job=~"data-ingestor|indicator-engine|signal-generator|risk-manager|execution-engine"}[1h])) 
+            / 
+            count(up{job=~"data-ingestor|indicator-engine|signal-generator|risk-manager|execution-engine"})
+          )
+        labels:
+          slo: "system_availability"
+          target: "99.9"
+
+      # === PRICE FEED LATENCY SLO ===
+      # Target: p95 < 100ms from MT4/DDE to ingestion
+      
+      - record: slo:price_feed_latency:p95_5m
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(trading_price_feed_latency_seconds_bucket{service="data-ingestor"}[5m])) by (le)
+          )
+        labels:
+          slo: "price_feed_latency"
+          target: "0.1"  # 100ms
+
+      - record: slo:price_feed_latency:p99_5m
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(trading_price_feed_latency_seconds_bucket{service="data-ingestor"}[5m])) by (le)
+          )
+        labels:
+          slo: "price_feed_latency"
+          target: "0.2"  # 200ms for p99
+
+      # === SIGNAL GENERATION SLO ===
+      # Target: p95 < 500ms from price tick to signal
+      
+      - record: slo:signal_generation_latency:p95_5m
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(trading_signal_generation_duration_seconds_bucket{service="signal-generator"}[5m])) by (le)
+          )
+        labels:
+          slo: "signal_generation_latency"
+          target: "0.5"  # 500ms
+
+      - record: slo:signal_accuracy:rate5m
+        expr: |
+          (
+            sum(rate(trading_signals_accurate_total{service="signal-generator"}[5m])) 
+            / 
+            sum(rate(trading_signals_generated_total{service="signal-generator"}[5m]))
+          )
+        labels:
+          slo: "signal_accuracy"
+          target: "0.85"  # 85% accuracy
+
+      # === ORDER EXECUTION SLO ===
+      # Target: p95 < 2s from signal to broker submission
+      
+      - record: slo:order_execution_latency:p95_5m
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(trading_order_execution_duration_seconds_bucket{service="execution-engine"}[5m])) by (le)
+          )
+        labels:
+          slo: "order_execution_latency"
+          target: "2.0"  # 2 seconds
+
+      - record: slo:order_fill_rate:rate5m
+        expr: |
+          (
+            sum(rate(trading_orders_filled_total{service="execution-engine"}[5m])) 
+            / 
+            sum(rate(trading_orders_submitted_total{service="execution-engine"}[5m]))
+          )
+        labels:
+          slo: "order_fill_rate"
+          target: "0.95"  # 95% fill rate
+
+      # === RISK MANAGEMENT SLO ===
+      # Target: Risk checks < 100ms, 100% breach prevention
+      
+      - record: slo:risk_check_latency:p95_5m
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(trading_risk_check_duration_seconds_bucket{service="risk-manager"}[5m])) by (le)
+          )
+        labels:
+          slo: "risk_check_latency"
+          target: "0.1"  # 100ms
+
+      - record: slo:risk_breach_prevention:rate5m
+        expr: |
+          1 - (
+            sum(rate(trading_risk_breaches_total{service="risk-manager"}[5m])) 
+            / 
+            sum(rate(trading_risk_checks_total{service="risk-manager"}[5m]))
+          )
+        labels:
+          slo: "risk_breach_prevention"
+          target: "1.0"  # 100% prevention
+
+      # === DATA QUALITY SLO ===
+      # Target: > 99% data integrity, < 0.1% missing ticks
+      
+      - record: slo:data_integrity:rate5m
+        expr: |
+          (
+            sum(rate(trading_data_valid_total{service="data-ingestor"}[5m])) 
+            / 
+            sum(rate(trading_data_processed_total{service="data-ingestor"}[5m]))
+          )
+        labels:
+          slo: "data_integrity"
+          target: "0.99"  # 99% data integrity
+
+      - record: slo:tick_completeness:rate5m
+        expr: |
+          1 - (
+            sum(rate(trading_ticks_missing_total{service="data-ingestor"}[5m])) 
+            / 
+            sum(rate(trading_ticks_expected_total{service="data-ingestor"}[5m]))
+          )
+        labels:
+          slo: "tick_completeness"
+          target: "0.999"  # 99.9% tick completeness
+
+  - name: trading_system_slo_alerts
+    interval: 30s
+    rules:
+      # === CRITICAL SLO VIOLATIONS ===
+      
+      - alert: SystemAvailabilitySLOViolation
+        expr: slo:system_availability:rate5m < 0.999
+        for: 1m
+        labels:
+          severity: critical
+          slo: system_availability
+          team: trading-platform
+        annotations:
+          summary: "Trading system availability below SLO target"
+          description: "System availability {{ $value | humanizePercentage }} is below 99.9% SLO target for {{ $labels.service }}"
+          runbook_url: "https://runbooks.eafix.com/slo-violations/system-availability"
+          dashboard_url: "https://grafana.eafix.com/d/trading-slos"
+
+      - alert: PriceFeedLatencySLOViolation
+        expr: slo:price_feed_latency:p95_5m > 0.1
+        for: 2m
+        labels:
+          severity: critical
+          slo: price_feed_latency
+          team: data-platform
+        annotations:
+          summary: "Price feed latency exceeds SLO target"
+          description: "P95 price feed latency {{ $value }}s exceeds 100ms SLO target"
+          runbook_url: "https://runbooks.eafix.com/slo-violations/price-feed-latency"
+
+      - alert: SignalGenerationLatencySLOViolation
+        expr: slo:signal_generation_latency:p95_5m > 0.5
+        for: 2m
+        labels:
+          severity: critical
+          slo: signal_generation_latency
+          team: trading-algorithms
+        annotations:
+          summary: "Signal generation latency exceeds SLO target"
+          description: "P95 signal generation latency {{ $value }}s exceeds 500ms SLO target"
+          runbook_url: "https://runbooks.eafix.com/slo-violations/signal-generation-latency"
+
+      - alert: OrderExecutionLatencySLOViolation
+        expr: slo:order_execution_latency:p95_5m > 2.0
+        for: 1m
+        labels:
+          severity: critical
+          slo: order_execution_latency
+          team: execution-platform
+        annotations:
+          summary: "Order execution latency exceeds SLO target"
+          description: "P95 order execution latency {{ $value }}s exceeds 2s SLO target"
+          runbook_url: "https://runbooks.eafix.com/slo-violations/order-execution-latency"
+
+      # === WARNING SLO DEGRADATIONS ===
+      
+      - alert: SignalAccuracySLODegradation
+        expr: slo:signal_accuracy:rate5m < 0.85
+        for: 5m
+        labels:
+          severity: warning
+          slo: signal_accuracy
+          team: trading-algorithms
+        annotations:
+          summary: "Trading signal accuracy below SLO target"
+          description: "Signal accuracy {{ $value | humanizePercentage }} is below 85% SLO target"
+          runbook_url: "https://runbooks.eafix.com/slo-violations/signal-accuracy"
+
+      - alert: OrderFillRateSLODegradation
+        expr: slo:order_fill_rate:rate5m < 0.95
+        for: 3m
+        labels:
+          severity: warning
+          slo: order_fill_rate
+          team: execution-platform
+        annotations:
+          summary: "Order fill rate below SLO target"
+          description: "Order fill rate {{ $value | humanizePercentage }} is below 95% SLO target"
+          runbook_url: "https://runbooks.eafix.com/slo-violations/order-fill-rate"
+
+      - alert: RiskBreachDetected
+        expr: slo:risk_breach_prevention:rate5m < 1.0
+        for: 0s  # Immediate alert
+        labels:
+          severity: critical
+          slo: risk_breach_prevention
+          team: risk-management
+        annotations:
+          summary: "Risk management breach detected"
+          description: "Risk breach prevention rate {{ $value | humanizePercentage }} indicates system compromise"
+          runbook_url: "https://runbooks.eafix.com/incidents/risk-breach"
+          escalation: "immediate"
+
+      - alert: DataIntegritySLODegradation
+        expr: slo:data_integrity:rate5m < 0.99
+        for: 2m
+        labels:
+          severity: warning
+          slo: data_integrity
+          team: data-platform
+        annotations:
+          summary: "Data integrity below SLO target"
+          description: "Data integrity {{ $value | humanizePercentage }} is below 99% SLO target"
+          runbook_url: "https://runbooks.eafix.com/slo-violations/data-integrity"
+
+      # === MARKET HOURS CONTEXT ALERTS ===
+      
+      - alert: MarketHoursSLOViolation
+        expr: |
+          (
+            hour() >= 11 and hour() <= 23  # Market hours in UTC (6 AM - 6 PM EST)
+          ) and (
+            slo:system_availability:rate5m < 0.999 or
+            slo:price_feed_latency:p95_5m > 0.1 or
+            slo:signal_generation_latency:p95_5m > 0.5 or
+            slo:order_execution_latency:p95_5m > 2.0
+          )
+        for: 30s
+        labels:
+          severity: critical
+          context: market_hours
+          team: trading-platform
+          escalation: "immediate"
+        annotations:
+          summary: "Critical SLO violation during market hours"
+          description: "SLO violation detected during active trading hours - immediate attention required"
+          runbook_url: "https://runbooks.eafix.com/incidents/market-hours-violation"
+          pager_duty: "true"

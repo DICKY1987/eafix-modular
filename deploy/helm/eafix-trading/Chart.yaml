@@ -1,0 +1,43 @@
+apiVersion: v2
+name: eafix-trading
+description: A comprehensive trading system with microservices architecture
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+
+keywords:
+  - trading
+  - financial
+  - microservices
+  - kubernetes
+  - event-driven
+
+home: https://github.com/DICKY1987/eafix-modular
+sources:
+  - https://github.com/DICKY1987/eafix-modular
+
+maintainers:
+  - name: Trading Operations Team
+    email: trading-ops@eafix.com
+
+dependencies:
+  - name: redis
+    version: "^17.0.0"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: redis.enabled
+  - name: postgresql
+    version: "^12.0.0"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled
+  - name: prometheus
+    version: "^25.0.0"
+    repository: "https://prometheus-community.github.io/helm-charts"
+    condition: monitoring.prometheus.enabled
+  - name: grafana
+    version: "^7.0.0"
+    repository: "https://grafana.github.io/helm-charts"
+    condition: monitoring.grafana.enabled
+
+annotations:
+  category: Application
+  licenses: MIT

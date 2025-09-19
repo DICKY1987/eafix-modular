@@ -1,0 +1,299 @@
+# Business metrics recording rules for EAFIX Trading System
+# Trading performance and business KPI calculations
+
+groups:
+  - name: trading_performance_metrics
+    interval: 60s
+    rules:
+      # === TRADING VOLUME METRICS ===
+      
+      - record: trading:volume:total_daily
+        expr: |
+          sum(increase(trading_volume_usd_total[24h])) by (currency_pair)
+        labels:
+          metric_type: "business"
+          category: "volume"
+
+      - record: trading:volume:rate_5m
+        expr: |
+          sum(rate(trading_volume_usd_total[5m])) by (currency_pair, service)
+        labels:
+          metric_type: "business"
+          category: "volume"
+
+      # === PROFITABILITY METRICS ===
+      
+      - record: trading:pnl:realized_daily
+        expr: |
+          sum(increase(trading_pnl_realized_usd_total[24h])) by (currency_pair, strategy)
+        labels:
+          metric_type: "business"
+          category: "pnl"
+
+      - record: trading:pnl:unrealized_current
+        expr: |
+          sum(trading_pnl_unrealized_usd) by (currency_pair, strategy)
+        labels:
+          metric_type: "business"
+          category: "pnl"
+
+      - record: trading:pnl:total_current
+        expr: |
+          trading:pnl:realized_daily + trading:pnl:unrealized_current
+        labels:
+          metric_type: "business"
+          category: "pnl"
+
+      # === POSITION METRICS ===
+      
+      - record: trading:positions:count_current
+        expr: |
+          sum(trading_positions_open) by (currency_pair, strategy, direction)
+        labels:
+          metric_type: "business"
+          category: "positions"
+
+      - record: trading:positions:exposure_usd_current
+        expr: |
+          sum(trading_position_exposure_usd) by (currency_pair, strategy)
+        labels:
+          metric_type: "business"
+          category: "positions"
+
+      - record: trading:positions:avg_duration_minutes
+        expr: |
+          avg(trading_position_duration_seconds / 60) by (currency_pair, strategy)
+        labels:
+          metric_type: "business"  
+          category: "positions"
+
+      # === SIGNAL PERFORMANCE METRICS ===
+      
+      - record: trading:signals:accuracy_rate_1h
+        expr: |
+          (
+            sum(rate(trading_signals_accurate_total[1h])) by (signal_type, currency_pair)
+            /
+            sum(rate(trading_signals_generated_total[1h])) by (signal_type, currency_pair)
+          )
+        labels:
+          metric_type: "business"
+          category: "signals"
+
+      - record: trading:signals:generation_rate_5m
+        expr: |
+          sum(rate(trading_signals_generated_total[5m])) by (signal_type, currency_pair, confidence_level)
+        labels:
+          metric_type: "business"
+          category: "signals"
+
+      - record: trading:signals:conversion_rate_1h
+        expr: |
+          (
+            sum(rate(trading_signals_executed_total[1h])) by (signal_type, currency_pair)
+            /
+            sum(rate(trading_signals_generated_total[1h])) by (signal_type, currency_pair)
+          )
+        labels:
+          metric_type: "business"
+          category: "signals"
+
+      # === EXECUTION QUALITY METRICS ===
+      
+      - record: trading:execution:slippage_avg_5m
+        expr: |
+          avg(trading_execution_slippage_bps) by (currency_pair, venue)
+        labels:
+          metric_type: "business"
+          category: "execution"
+
+      - record: trading:execution:fill_rate_5m
+        expr: |
+          (
+            sum(rate(trading_orders_filled_total[5m])) by (currency_pair, order_type)
+            /
+            sum(rate(trading_orders_submitted_total[5m])) by (currency_pair, order_type)
+          )
+        labels:
+          metric_type: "business"
+          category: "execution"
+
+      - record: trading:execution:time_to_fill_p95_5m
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(trading_order_fill_duration_seconds_bucket[5m])) by (le, currency_pair)
+          )
+        labels:
+          metric_type: "business"
+          category: "execution"
+
+      # === RISK METRICS ===
+      
+      - record: trading:risk:var_current
+        expr: |
+          sum(trading_value_at_risk_usd) by (confidence_level, time_horizon)
+        labels:
+          metric_type: "business"
+          category: "risk"
+
+      - record: trading:risk:exposure_ratio_current
+        expr: |
+          (
+            sum(trading_position_exposure_usd) by (currency_pair)
+            /
+            trading_account_equity_usd
+          )
+        labels:
+          metric_type: "business"
+          category: "risk"
+
+      - record: trading:risk:drawdown_current
+        expr: |
+          (
+            (trading_account_equity_peak_usd - trading_account_equity_usd)
+            /
+            trading_account_equity_peak_usd
+          )
+        labels:
+          metric_type: "business"
+          category: "risk"
+
+  - name: system_performance_business_impact
+    interval: 300s  # 5 minute intervals for business impact metrics
+    rules:
+      # === BUSINESS IMPACT OF SYSTEM PERFORMANCE ===
+      
+      - record: business:latency_impact:missed_opportunities_5m
+        expr: |
+          sum(increase(trading_missed_opportunities_total{reason="latency"}[5m]))
+        labels:
+          metric_type: "business_impact"
+          category: "performance"
+
+      - record: business:downtime_impact:lost_revenue_5m
+        expr: |
+          (
+            sum(rate(trading_volume_usd_total[5m])) * 300  # 5 minutes in seconds
+            * 0.0005  # Assumed 5 bps revenue per trade
+          ) * (1 - avg(up{job=~".*-engine|.*-generator"}))
+        labels:
+          metric_type: "business_impact"
+          category: "availability"
+
+      - record: business:data_quality_impact:signal_degradation_5m
+        expr: |
+          (
+            1 - (
+              sum(rate(trading_data_valid_total[5m])) 
+              / 
+              sum(rate(trading_data_processed_total[5m]))
+            )
+          ) * sum(rate(trading_signals_generated_total[5m]))
+        labels:
+          metric_type: "business_impact"
+          category: "data_quality"
+
+  - name: regulatory_and_compliance_metrics
+    interval: 3600s  # Hourly for regulatory metrics
+    rules:
+      # === REGULATORY REPORTING METRICS ===
+      
+      - record: regulatory:trade_reporting:count_1h
+        expr: |
+          sum(increase(trading_trades_executed_total[1h])) by (venue, currency_pair)
+        labels:
+          metric_type: "regulatory"
+          category: "trade_reporting"
+
+      - record: regulatory:position_limits:utilization_current
+        expr: |
+          (
+            sum(abs(trading_position_size)) by (currency_pair)
+            /
+            trading_position_limit by (currency_pair)
+          )
+        labels:
+          metric_type: "regulatory"
+          category: "position_limits"
+
+      - record: regulatory:risk_limits:utilization_current
+        expr: |
+          (
+            trading:risk:var_current
+            /
+            trading_risk_limit_var_usd
+          )
+        labels:
+          metric_type: "regulatory"
+          category: "risk_limits"
+
+      # === AUDIT TRAIL METRICS ===
+      
+      - record: audit:event_completeness:rate_1h
+        expr: |
+          (
+            sum(increase(trading_audit_events_recorded_total[1h])) by (event_type)
+            /
+            sum(increase(trading_events_total[1h])) by (event_type)
+          )
+        labels:
+          metric_type: "audit"
+          category: "completeness"
+
+      - record: audit:data_integrity:checksum_validation_rate_1h
+        expr: |
+          (
+            sum(increase(trading_audit_checksums_valid_total[1h]))
+            /
+            sum(increase(trading_audit_checksums_checked_total[1h]))
+          )
+        labels:
+          metric_type: "audit"
+          category: "integrity"
+
+  - name: customer_and_market_impact
+    interval: 300s
+    rules:
+      # === MARKET IMPACT METRICS ===
+      
+      - record: market:impact:price_movement_bps_5m
+        expr: |
+          avg(abs(trading_market_impact_bps)) by (currency_pair, order_size_bucket)
+        labels:
+          metric_type: "market"
+          category: "impact"
+
+      - record: market:liquidity:consumed_percentage_5m
+        expr: |
+          (
+            sum(rate(trading_volume_usd_total[5m])) by (currency_pair)
+            /
+            sum(market_liquidity_available_usd) by (currency_pair)
+          ) * 100
+        labels:
+          metric_type: "market"
+          category: "liquidity"
+
+      # === OPERATIONAL EFFICIENCY METRICS ===
+      
+      - record: operations:straight_through_processing_rate_1h
+        expr: |
+          (
+            sum(increase(trading_stp_processed_total[1h]))
+            /
+            sum(increase(trading_trades_total[1h]))
+          )
+        labels:
+          metric_type: "operations"
+          category: "efficiency"
+
+      - record: operations:manual_intervention_rate_1h
+        expr: |
+          (
+            sum(increase(trading_manual_interventions_total[1h]))
+            /
+            sum(increase(trading_trades_total[1h]))
+          )
+        labels:
+          metric_type: "operations"
+          category: "efficiency"

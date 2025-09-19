@@ -97,3 +97,9 @@ repos:
         language: system
         files: ^(services/|shared/|contracts/|P_tests/)
         pass_filenames: false
+      - id: docker-digest-pinning
+        name: Docker Image Digest Pinning
+        entry: scripts/check-docker-digests.sh
+        language: script
+        files: ^(.*Dockerfile|.*docker-compose.*\.yml|\.github/workflows/.*\.yml)$
+        pass_filenames: false

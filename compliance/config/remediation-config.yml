@@ -1,0 +1,314 @@
+# Auto-Remediation Configuration for EAFIX Trading System
+# Defines automated response policies for compliance violations
+
+# System Configuration
+system:
+  redis_url: "redis://redis:6379"
+  trading_api_base: "http://gui-gateway:8080/api/v1"
+  metrics_port: 9200
+  log_level: "INFO"
+
+# Authorization Configuration
+authorization:
+  # Actions requiring explicit authorization
+  required_for_actions:
+    - "trading_halt"
+    - "system_shutdown"
+    - "position_reduction"
+    - "emergency_procedures"
+  
+  # Authorization sources (in priority order)
+  sources:
+    - type: "human_approval"
+      timeout_minutes: 15
+      contacts: ["trading-ops@eafix.com", "cto@eafix.com"]
+    - type: "automated_threshold"
+      conditions:
+        - "violation_severity == 'critical'"
+        - "market_hours == true"
+        - "business_impact > 'medium'"
+
+# Circuit Breaker Configuration
+circuit_breaker:
+  enabled: true
+  violation_threshold: 5         # Max violations in time window
+  time_window_minutes: 5        # Time window for threshold
+  cooldown_minutes: 30          # Recovery time after activation
+  escalation_immediate: true    # Immediately escalate when activated
+
+# Regulatory-Specific Configurations
+regulations:
+  mifid2:
+    name: "Markets in Financial Instruments Directive II"
+    jurisdiction: "EU"
+    escalation_time_seconds: 300
+    contact_email: "mifid-compliance@eafix.com"
+    business_hours_only: false
+    
+    requirements:
+      best_execution:
+        severity_thresholds:
+          warning: 5.0     # bps slippage
+          critical: 10.0   # bps slippage
+        remediation_actions:
+          warning: "parameter_adjustment"
+          critical: "parameter_adjustment"
+        parameters:
+          max_slippage_adjustment_factor: 0.8
+          
+      systematic_internalizer:
+        severity_thresholds:
+          warning: 0.12    # 120ms response time
+          critical: 0.15   # 150ms response time
+        remediation_actions:
+          warning: "alert_only"
+          critical: "parameter_adjustment"
+        parameters:
+          quote_timeout_ms: 100
+
+  cftc:
+    name: "Commodity Futures Trading Commission"
+    jurisdiction: "US"
+    escalation_time_seconds: 180
+    contact_email: "cftc-compliance@eafix.com"
+    business_hours_only: false
+    
+    requirements:
+      pre_trade_risk_controls:
+        severity_thresholds:
+          critical: 0.999  # 99.9% minimum coverage
+        remediation_actions:
+          critical: "trading_halt"
+        parameters:
+          halt_duration_minutes: 30
+          
+      kill_switch_testing:
+        severity_thresholds:
+          critical: 2592000  # 30 days in seconds
+        remediation_actions:
+          critical: "manual_intervention"
+        parameters:
+          priority: "urgent"
+          
+      position_limits:
+        severity_thresholds:
+          warning: 0.8     # 80% utilization
+          critical: 0.9    # 90% utilization
+        remediation_actions:
+          warning: "alert_only"
+          critical: "position_reduction"
+        parameters:
+          target_utilization: 0.75
+          reduction_method: "proportional"
+
+  sec:
+    name: "Securities and Exchange Commission"
+    jurisdiction: "US"
+    escalation_time_seconds: 240
+    contact_email: "sec-compliance@eafix.com"
+    business_hours_only: true
+    
+    requirements:
+      market_access_rule:
+        severity_thresholds:
+          warning: 0.85    # 85% credit utilization
+          critical: 0.95   # 95% credit utilization
+        remediation_actions:
+          warning: "parameter_adjustment"
+          critical: "parameter_adjustment"
+        parameters:
+          max_credit_reduction: 0.75
+
+  finra:
+    name: "Financial Industry Regulatory Authority"
+    jurisdiction: "US"
+    escalation_time_seconds: 300
+    contact_email: "finra-compliance@eafix.com"
+    business_hours_only: true
+    
+    requirements:
+      best_execution:
+        severity_thresholds:
+          warning: 3.0     # Execution quality score
+          critical: 2.0    # Execution quality score
+        remediation_actions:
+          warning: "alert_only"
+          critical: "manual_intervention"
+
+  internal:
+    name: "Internal Risk Management Policies"
+    jurisdiction: "Internal"
+    escalation_time_seconds: 600
+    contact_email: "risk-management@eafix.com"
+    business_hours_only: false
+    
+    requirements:
+      risk_management_policy:
+        severity_thresholds:
+          warning: 0.8     # 80% VaR utilization
+          critical: 0.9    # 90% VaR utilization
+        remediation_actions:
+          warning: "alert_only"
+          critical: "position_reduction"
+        parameters:
+          target_var_utilization: 0.7
+          
+      concentration_limits:
+        severity_thresholds:
+          warning: 0.2     # 20% concentration
+          critical: 0.25   # 25% concentration
+        remediation_actions:
+          warning: "alert_only"
+          critical: "position_reduction"
+        parameters:
+          target_concentration: 0.18
+          
+      data_retention:
+        severity_thresholds:
+          warning: 2190    # 6 years in days
+          critical: 2555   # 7 years in days
+        remediation_actions:
+          warning: "manual_intervention"
+          critical: "manual_intervention"
+
+# Action-Specific Configurations
+actions:
+  alert_only:
+    timeout_seconds: 30
+    retry_attempts: 3
+    notification_channels: ["slack", "email"]
+    
+  parameter_adjustment:
+    timeout_seconds: 120
+    retry_attempts: 2
+    rollback_on_failure: true
+    validation_required: true
+    
+  position_reduction:
+    timeout_seconds: 300
+    retry_attempts: 1
+    confirmation_required: true
+    max_reduction_per_action: 0.2  # 20% max reduction
+    
+  trading_halt:
+    timeout_seconds: 60
+    retry_attempts: 1
+    immediate_notification: true
+    escalation_required: true
+    
+  system_shutdown:
+    timeout_seconds: 30
+    retry_attempts: 0
+    immediate_notification: true
+    c_level_notification: true
+    
+  manual_intervention:
+    timeout_seconds: 900  # 15 minutes
+    escalation_time_minutes: 15
+    priority_levels: ["low", "medium", "high", "urgent", "critical"]
+
+# Business Hours Configuration (for jurisdictions that require it)
+business_hours:
+  timezone: "America/New_York"  # EST/EDT
+  market_hours:
+    start_time: "06:00"
+    end_time: "18:00"
+  trading_days: ["monday", "tuesday", "wednesday", "thursday", "friday"]
+  holidays:
+    - "2025-01-01"  # New Year's Day
+    - "2025-01-20"  # MLK Day
+    - "2025-02-17"  # Presidents Day
+    - "2025-03-30"  # Good Friday
+    - "2025-05-26"  # Memorial Day
+    - "2025-07-04"  # Independence Day
+    - "2025-09-01"  # Labor Day
+    - "2025-11-27"  # Thanksgiving
+    - "2025-12-25"  # Christmas
+
+# Notification Configuration
+notifications:
+  slack:
+    webhook_url_env: "SLACK_COMPLIANCE_WEBHOOK"
+    channels:
+      critical: "#compliance-critical"
+      warning: "#compliance-warnings"
+      escalation: "#compliance-escalation"
+      
+  email:
+    smtp_server: "smtp.company.com"
+    smtp_port: 587
+    from_address: "compliance-alerts@eafix.com"
+    templates:
+      violation: "templates/violation_notification.html"
+      remediation: "templates/remediation_notification.html"
+      escalation: "templates/escalation_notification.html"
+      
+  pagerduty:
+    service_key_env: "PAGERDUTY_COMPLIANCE_KEY"
+    escalation_policy: "compliance-escalation-policy"
+    severity_mapping:
+      critical: "critical"
+      warning: "warning"
+
+# Audit and Logging Configuration
+audit:
+  enabled: true
+  storage:
+    type: "redis_streams"
+    stream_name: "compliance_audit_trail"
+    retention_days: 2555  # 7 years
+    
+  fields:
+    - "timestamp"
+    - "violation_id"
+    - "action_id"
+    - "regulation"
+    - "requirement" 
+    - "action_type"
+    - "success"
+    - "duration_seconds"
+    - "parameters"
+    - "user_id"
+    - "authorization_method"
+    
+  encryption:
+    enabled: true
+    algorithm: "AES-256-GCM"
+    key_rotation_days: 90
+
+# Metrics and Monitoring
+metrics:
+  enabled: true
+  port: 9200
+  path: "/metrics"
+  
+  custom_metrics:
+    - name: "compliance_violations_by_regulation"
+      type: "counter"
+      labels: ["regulation", "requirement", "severity"]
+      
+    - name: "remediation_success_rate"
+      type: "gauge"
+      labels: ["regulation", "action_type"]
+      
+    - name: "compliance_audit_events"
+      type: "counter"
+      labels: ["event_type", "regulation"]
+      
+    - name: "authorization_latency"
+      type: "histogram"
+      labels: ["method", "action_type"]
+
+# Testing and Validation Configuration
+testing:
+  dry_run_mode: false
+  validation_checks:
+    - "parameter_bounds_check"
+    - "service_availability_check"
+    - "authorization_validation"
+    - "circuit_breaker_status"
+    
+  simulation_mode:
+    enabled: false  # Enable for testing
+    log_actions_only: true
+    notification_override: "test-compliance@eafix.com"

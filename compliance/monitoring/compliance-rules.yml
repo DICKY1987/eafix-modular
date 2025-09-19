@@ -1,0 +1,347 @@
+# Compliance Monitoring Rules for EAFIX Trading System
+# Automated compliance checking with regulatory requirements
+
+groups:
+  - name: regulatory_compliance
+    interval: 60s
+    rules:
+      # === MiFID II COMPLIANCE ===
+      
+      # Best Execution Monitoring
+      - record: compliance:mifid2:execution_quality:slippage_p95_1h
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(trading_execution_slippage_bps_bucket[1h])) by (le, currency_pair, venue)
+          )
+        labels:
+          regulation: "mifid2"
+          requirement: "best_execution"
+          
+      - record: compliance:mifid2:execution_quality:fill_rate_1h
+        expr: |
+          (
+            sum(rate(trading_orders_filled_total[1h])) by (venue, currency_pair)
+            /
+            sum(rate(trading_orders_submitted_total[1h])) by (venue, currency_pair)
+          )
+        labels:
+          regulation: "mifid2"
+          requirement: "best_execution"
+
+      # Systematic Internalizer Requirements
+      - record: compliance:mifid2:si:quote_response_time_p95_5m
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(trading_quote_response_duration_seconds_bucket[5m])) by (le)
+          )
+        labels:
+          regulation: "mifid2"
+          requirement: "systematic_internalizer"
+          threshold: "0.15"  # 150ms requirement
+
+      - record: compliance:mifid2:si:quote_availability_5m
+        expr: |
+          (
+            sum(rate(trading_quotes_provided_total[5m]))
+            /
+            sum(rate(trading_quote_requests_total[5m]))
+          )
+        labels:
+          regulation: "mifid2"
+          requirement: "systematic_internalizer"
+          threshold: "0.95"  # 95% availability
+
+      # === CFTC COMPLIANCE ===
+      
+      # Automated Trading System Requirements
+      - record: compliance:cftc:ats:pre_trade_risk_check_coverage_1h
+        expr: |
+          (
+            sum(rate(trading_orders_risk_checked_total[1h]))
+            /
+            sum(rate(trading_orders_submitted_total[1h]))
+          )
+        labels:
+          regulation: "cftc"
+          requirement: "pre_trade_risk_controls"
+          threshold: "1.0"  # 100% coverage required
+
+      - record: compliance:cftc:ats:kill_switch_test_frequency
+        expr: |
+          time() - max(trading_kill_switch_last_test_timestamp)
+        labels:
+          regulation: "cftc"
+          requirement: "kill_switch_testing"
+          threshold: "2592000"  # 30 days in seconds
+
+      - record: compliance:cftc:ats:system_safeguards_uptime_24h
+        expr: |
+          avg(up{job=~"risk-manager|execution-engine"}) over_time(24h)
+        labels:
+          regulation: "cftc"
+          requirement: "system_safeguards"
+          threshold: "0.99"  # 99% uptime
+
+      # Position Limits Monitoring
+      - record: compliance:cftc:position_limits:utilization_current
+        expr: |
+          (
+            sum(abs(trading_position_size)) by (currency_pair, contract_month)
+            /
+            trading_position_limit_cftc by (currency_pair, contract_month)
+          )
+        labels:
+          regulation: "cftc"
+          requirement: "position_limits"
+          threshold: "0.8"  # 80% utilization warning
+
+      # === SEC COMPLIANCE ===
+      
+      # Market Access Rule Requirements
+      - record: compliance:sec:market_access:credit_threshold_monitoring
+        expr: |
+          (
+            trading_account_used_credit_usd
+            /
+            trading_account_credit_limit_usd
+          )
+        labels:
+          regulation: "sec"
+          requirement: "market_access_rule"
+          threshold: "0.85"  # 85% utilization warning
+
+      - record: compliance:sec:market_access:order_validation_rate_1h
+        expr: |
+          (
+            sum(rate(trading_orders_validated_total[1h]))
+            /
+            sum(rate(trading_orders_received_total[1h]))
+          )
+        labels:
+          regulation: "sec"
+          requirement: "market_access_rule"
+          threshold: "1.0"  # 100% validation required
+
+      # === FINRA COMPLIANCE ===
+      
+      # Order Audit Trail (OATS) Requirements
+      - record: compliance:finra:oats:order_lifecycle_completeness_1h
+        expr: |
+          (
+            sum(rate(trading_audit_order_lifecycle_events_total[1h])) by (event_type)
+            /
+            sum(rate(trading_orders_total[1h]))
+          )
+        labels:
+          regulation: "finra"
+          requirement: "oats"
+
+      # Best Execution Monitoring
+      - record: compliance:finra:best_execution:venue_analysis_current
+        expr: |
+          avg(trading_execution_quality_score) by (venue, security_type)
+        labels:
+          regulation: "finra"
+          requirement: "best_execution"
+
+      # === ESMA COMPLIANCE (EU) ===
+      
+      # RTS 6 Market Making Requirements
+      - record: compliance:esma:rts6:market_making_uptime_daily
+        expr: |
+          (
+            sum(increase(trading_market_making_active_time_seconds[24h])) by (instrument)
+            /
+            86400  # 24 hours in seconds
+          )
+        labels:
+          regulation: "esma"
+          requirement: "rts6_market_making"
+          threshold: "0.5"  # 50% minimum presence
+
+      # === INTERNAL COMPLIANCE POLICIES ===
+      
+      # Risk Management Policy Compliance
+      - record: compliance:internal:risk:var_limit_utilization_current
+        expr: |
+          (
+            trading_value_at_risk_usd
+            /
+            trading_risk_limit_var_usd
+          )
+        labels:
+          regulation: "internal"
+          requirement: "risk_management_policy"
+          threshold: "0.8"  # 80% utilization warning
+
+      - record: compliance:internal:risk:concentration_limit_current
+        expr: |
+          max(
+            sum(abs(trading_position_exposure_usd)) by (currency_pair)
+            /
+            trading_account_equity_usd
+          )
+        labels:
+          regulation: "internal"
+          requirement: "concentration_limits"
+          threshold: "0.25"  # 25% max concentration
+
+      # Data Retention Policy
+      - record: compliance:internal:data_retention:audit_log_age_days
+        expr: |
+          (time() - min(trading_audit_log_oldest_timestamp)) / 86400
+        labels:
+          regulation: "internal"
+          requirement: "data_retention"
+          threshold: "2555"  # 7 years in days
+
+  - name: compliance_violations
+    interval: 60s
+    rules:
+      # === CRITICAL COMPLIANCE VIOLATIONS ===
+      
+      - alert: MiFID2BestExecutionViolation
+        expr: |
+          compliance:mifid2:execution_quality:slippage_p95_1h > 10
+        for: 5m
+        labels:
+          severity: critical
+          regulation: mifid2
+          requirement: best_execution
+          team: compliance
+        annotations:
+          summary: "MiFID II best execution violation detected"
+          description: "Execution slippage {{ $value }} bps exceeds 10 bps threshold for {{ $labels.venue }}"
+          remediation: "Review execution algorithm parameters and venue selection"
+          regulatory_impact: "Potential regulatory fine and client compensation"
+          runbook_url: "https://runbooks.eafix.com/compliance/mifid2-best-execution"
+
+      - alert: CFTCPreTradeRiskControlsViolation
+        expr: |
+          compliance:cftc:ats:pre_trade_risk_check_coverage_1h < 1.0
+        for: 1m
+        labels:
+          severity: critical
+          regulation: cftc
+          requirement: pre_trade_risk_controls
+          team: compliance
+        annotations:
+          summary: "CFTC pre-trade risk controls violation"
+          description: "Risk check coverage {{ $value | humanizePercentage }} below 100% requirement"
+          remediation: "Immediately halt trading until risk controls are restored"
+          regulatory_impact: "Potential trading suspension and significant penalties"
+          runbook_url: "https://runbooks.eafix.com/compliance/cftc-risk-controls"
+
+      - alert: CFTCKillSwitchTestingOverdue
+        expr: |
+          compliance:cftc:ats:kill_switch_test_frequency > 2592000  # 30 days
+        for: 1h
+        labels:
+          severity: critical
+          regulation: cftc
+          requirement: kill_switch_testing
+          team: compliance
+        annotations:
+          summary: "CFTC kill switch testing overdue"
+          description: "Kill switch last tested {{ $value | humanizeDuration }} ago, exceeding 30-day requirement"
+          remediation: "Schedule immediate kill switch test with trading operations"
+          regulatory_impact: "Non-compliance with CFTC system safeguards requirements"
+          runbook_url: "https://runbooks.eafix.com/compliance/kill-switch-testing"
+
+      - alert: SECMarketAccessCreditLimitViolation
+        expr: |
+          compliance:sec:market_access:credit_threshold_monitoring > 0.85
+        for: 2m
+        labels:
+          severity: warning
+          regulation: sec
+          requirement: market_access_rule
+          team: risk-management
+        annotations:
+          summary: "SEC market access credit limit approaching threshold"
+          description: "Credit utilization {{ $value | humanizePercentage }} exceeds 85% warning threshold"
+          remediation: "Review open positions and consider position reduction"
+          regulatory_impact: "Potential breach of SEC market access rule requirements"
+          runbook_url: "https://runbooks.eafix.com/compliance/sec-market-access"
+
+      # === POSITION LIMITS VIOLATIONS ===
+      
+      - alert: CFTCPositionLimitViolation
+        expr: |
+          compliance:cftc:position_limits:utilization_current > 0.8
+        for: 1m
+        labels:
+          severity: critical
+          regulation: cftc
+          requirement: position_limits
+          team: risk-management
+        annotations:
+          summary: "CFTC position limit utilization high"
+          description: "Position utilization {{ $value | humanizePercentage }} for {{ $labels.currency_pair }} exceeds 80% threshold"
+          remediation: "Consider position reduction or limit increase request"
+          regulatory_impact: "Potential position limit violation and regulatory action"
+          runbook_url: "https://runbooks.eafix.com/compliance/position-limits"
+
+      # === INTERNAL POLICY VIOLATIONS ===
+      
+      - alert: InternalRiskLimitViolation
+        expr: |
+          compliance:internal:risk:var_limit_utilization_current > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          regulation: internal
+          requirement: risk_management_policy
+          team: risk-management
+        annotations:
+          summary: "Internal VaR limit utilization high"
+          description: "VaR utilization {{ $value | humanizePercentage }} exceeds 80% internal threshold"
+          remediation: "Review portfolio risk and consider position adjustments"
+          regulatory_impact: "Internal risk policy violation"
+          runbook_url: "https://runbooks.eafix.com/risk/var-limits"
+
+      - alert: ConcentrationLimitViolation
+        expr: |
+          compliance:internal:risk:concentration_limit_current > 0.25
+        for: 3m
+        labels:
+          severity: critical
+          regulation: internal
+          requirement: concentration_limits
+          team: risk-management
+        annotations:
+          summary: "Portfolio concentration limit exceeded"
+          description: "Single currency pair exposure {{ $value | humanizePercentage }} exceeds 25% limit"
+          remediation: "Immediate position diversification required"
+          regulatory_impact: "Internal risk policy breach - potential client impact"
+          runbook_url: "https://runbooks.eafix.com/risk/concentration-limits"
+
+  - name: compliance_data_quality
+    interval: 300s  # 5 minute intervals for data quality checks
+    rules:
+      # Data quality metrics for compliance reporting
+      - record: compliance:data_quality:audit_trail_completeness_1h
+        expr: |
+          (
+            sum(rate(trading_audit_events_recorded_total[1h])) by (event_type)
+            /
+            sum(rate(trading_events_generated_total[1h])) by (event_type)
+          )
+        labels:
+          compliance_area: "audit_trail"
+
+      - record: compliance:data_quality:trade_reporting_timeliness_1h
+        expr: |
+          avg(
+            (trading_trade_report_timestamp - trading_trade_execution_timestamp) / 60
+          )
+        labels:
+          compliance_area: "trade_reporting"
+          unit: "minutes"
+
+      - record: compliance:data_quality:reference_data_freshness_hours
+        expr: |
+          (time() - max(trading_reference_data_last_update_timestamp)) / 3600
+        labels:
+          compliance_area: "reference_data"
+          unit: "hours"

@@ -1,0 +1,195 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: trading-ingress
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: trading-ingress
+    app.kubernetes.io/component: ingress
+    app.kubernetes.io/part-of: eafix-trading-system
+  annotations:
+    # NGINX Ingress Controller specific annotations
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    
+    # Rate limiting for trading operations
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    
+    # Load balancing configuration
+    nginx.ingress.kubernetes.io/load-balance: "round_robin"
+    
+    # Security headers
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      add_header X-Frame-Options "SAMEORIGIN" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header X-XSS-Protection "1; mode=block" always;
+      add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+      add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';" always;
+    
+    # SSL/TLS configuration
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    cert-manager.io/acme-challenge-type: "http01"
+    
+    # Monitoring annotations
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "10254"
+    prometheus.io/path: "/metrics"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - trading.eafix.com
+    - api.trading.eafix.com
+    secretName: trading-eafix-tls
+  rules:
+  # Main trading application UI
+  - host: trading.eafix.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: gui-gateway
+            port:
+              number: 8080
+      - path: /health
+        pathType: Prefix
+        backend:
+          service:
+            name: gui-gateway
+            port:
+              number: 8080
+      - path: /metrics
+        pathType: Prefix
+        backend:
+          service:
+            name: gui-gateway
+            port:
+              number: 8080
+  
+  # API endpoints for external integrations
+  - host: api.trading.eafix.com
+    http:
+      paths:
+      # Data ingestion endpoints
+      - path: /api/v1/data/ingest
+        pathType: Prefix
+        backend:
+          service:
+            name: data-ingestor
+            port:
+              number: 8081
+      - path: /api/v1/data/health
+        pathType: Prefix
+        backend:
+          service:
+            name: data-ingestor
+            port:
+              number: 8081
+      
+      # Signal generation endpoints
+      - path: /api/v1/signals
+        pathType: Prefix
+        backend:
+          service:
+            name: signal-generator
+            port:
+              number: 8083
+      
+      # Risk management endpoints
+      - path: /api/v1/risk
+        pathType: Prefix
+        backend:
+          service:
+            name: risk-manager
+            port:
+              number: 8084
+      
+      # Execution endpoints
+      - path: /api/v1/execution
+        pathType: Prefix
+        backend:
+          service:
+            name: execution-engine
+            port:
+              number: 8085
+      
+      # Calendar endpoints
+      - path: /api/v1/calendar
+        pathType: Prefix
+        backend:
+          service:
+            name: calendar-ingestor
+            port:
+              number: 8086
+      
+      # Re-entry matrix endpoints
+      - path: /api/v1/reentry
+        pathType: Prefix
+        backend:
+          service:
+            name: reentry-matrix-svc
+            port:
+              number: 8087
+      
+      # Reporting endpoints
+      - path: /api/v1/reports
+        pathType: Prefix
+        backend:
+          service:
+            name: reporter
+            port:
+              number: 8088
+      
+      # Compliance monitoring endpoints
+      - path: /api/v1/compliance
+        pathType: Prefix
+        backend:
+          service:
+            name: compliance-monitor
+            port:
+              number: 8080
+
+---
+# Network Policy to allow ingress traffic
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-traffic
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: allow-ingress-traffic
+    app.kubernetes.io/component: network-policy
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 8081
+    - protocol: TCP
+      port: 8082
+    - protocol: TCP
+      port: 8083
+    - protocol: TCP
+      port: 8084
+    - protocol: TCP
+      port: 8085
+    - protocol: TCP
+      port: 8086
+    - protocol: TCP
+      port: 8087
+    - protocol: TCP
+      port: 8088

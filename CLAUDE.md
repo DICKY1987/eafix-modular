@@ -58,6 +58,14 @@ poetry run pytest -k "test_price_tick"
 
 # Contract tests (schema validation)
 poetry run pytest tests/contracts/
+
+# Contract testing specific commands
+make contracts-test             # Run all contract and scenario tests
+make contracts-consumer         # Consumer contract tests only
+make contracts-provider         # Provider verification tests only
+make contracts-scenarios        # Scenario-based integration tests
+make contracts-properties       # Property-based contract tests
+make contracts-coverage         # Contract tests with coverage reporting
 ```
 
 ### Code Quality
@@ -94,19 +102,56 @@ docker logs eafix-data-ingestor
 docker exec -it eafix-data-ingestor /bin/bash
 ```
 
-### Schema Management
+### Production Operations (Make Targets)
 ```bash
-# Validate event schemas
-python -c "
-import json, jsonschema, os
-for f in os.listdir('contracts/events'):
-    with open(f'contracts/events/{f}') as file:
-        jsonschema.Draft7Validator.check_schema(json.load(file))
-    print(f'✓ {f}')
-"
+# Essential production commands
+make help                    # Show all available targets
+make install                 # Install dependencies and pre-commit hooks
+make docker-up              # Start entire system with Docker Compose
+make docker-down            # Stop all services
+make docker-logs            # Follow container logs
 
-# Generate code from schemas (if tooling exists)
-# This would be service-specific implementation
+# Testing and validation
+make test-all               # Run full test suite across all services
+make smoke                  # End-to-end health verification
+make contracts-validate     # Validate JSON schemas
+make contracts-compat       # Check schema backward compatibility
+make replay-test            # Performance testing with tick replay
+
+# Code quality
+make format                 # Format code with black and isort
+make lint                   # Run linting and type checks
+
+# Production readiness
+make gaps-check             # Review production readiness gaps and SLOs
+```
+
+### Contract & Schema Management
+```bash
+# Comprehensive contract validation (JSON + CSV + re-entry library)
+make contracts-validate-full
+
+# Individual validation targets
+make contracts-validate        # Validate JSON schemas only
+make csv-validate             # Validate CSV artifacts
+make reentry-validate         # Test shared re-entry library
+make contracts-test           # Run contract integration tests
+make contracts-compat         # Check schema backward compatibility
+
+# Manual validation tools
+python ci/validate_schemas.py                                    # Schema metaschema validation
+python contracts/validate_json_schemas.py --report              # Full JSON validation report
+python contracts/validate_csv_artifacts.py --directory <path>   # CSV structure validation
+python tests/contracts/test_integration.py                      # End-to-end contract tests
+```
+
+### Performance Testing
+```bash
+# Run tick replay performance test
+make replay-test
+
+# Custom replay test with options
+python scripts/replay/replay_ticks.py data.csv --url http://localhost:8081/ingest/manual --delay 0.001 --verbose
 ```
 
 ## Architecture Overview
@@ -158,9 +203,22 @@ services/<service-name>/
 └── requirements.txt   # Service-specific dependencies
 ```
 
-### Event Schemas & Contracts
+### Contract System & Schema Registry
 
-All inter-service communication uses **versioned schemas** in `contracts/events/`:
+The system uses a **centralized contract registry** with comprehensive validation:
+
+**Contract Structure**:
+```
+contracts/
+├── schemas/json/          # JSON schemas (orders_in/out, indicator_record, hybrid_id)
+├── schemas/csv/           # CSV format documentation with atomic write policies
+├── identifiers/           # Identifier specifications (hybrid_id, cal8, cal5_legacy) 
+├── policies/             # Data integrity policies (csv_atomic_write)
+├── models/               # Pydantic models for runtime validation
+└── validate_*.py         # Validation tools and fixtures
+```
+
+**Event Schemas** (in `contracts/events/` and `contracts/schemas/json/`):
 - **PriceTick@1.0**: Market price data
 - **IndicatorVector@1.1**: Technical indicator results
 - **Signal@1.0**: Trading signals with confidence scores
@@ -169,7 +227,27 @@ All inter-service communication uses **versioned schemas** in `contracts/events/
 - **CalendarEvent@1.0**: Economic calendar events
 - **ReentryDecision@1.0**: Matrix-based re-entry decisions
 
-Schema validation is enforced in CI/CD pipeline and at runtime.
+**Data Integrity**: All CSV files follow atomic write policies with checksums and sequence validation. Schema validation is enforced in CI/CD pipeline and at runtime.
+
+### Shared Libraries
+
+**Shared Re-entry Library** (`shared/reentry/`):
+- **hybrid_id.py**: Compose, parse, and validate hybrid IDs with cross-language parity (Python/MQL4)
+- **vocab.py**: Canonical vocabulary management for trading outcomes, durations, proximity states
+- **indicator_validator.py**: Indicator record validation against JSON schemas
+
+**Usage**:
+```python
+from shared.reentry import compose, parse, validate_key, comment_suffix_hash
+
+# Compose hybrid ID
+hybrid_id = compose('W1', 'QUICK', 'AT_EVENT', 'CAL8_USD_NFP_H', 'LONG', 1)
+
+# Parse and validate
+components = parse(hybrid_id)
+is_valid = validate_key(hybrid_id)
+comment_hash = comment_suffix_hash(hybrid_id)  # 6-char deterministic hash
+```
 
 ## Development Patterns
 
@@ -201,14 +279,47 @@ class Settings(BaseSettings):
 ### Testing Strategy
 
 **Unit Tests**: Each service has isolated unit tests
-**Contract Tests**: Validate event schema compliance
+**Contract Tests**: Consumer-driven contract testing with Pact-like semantics (`tests/contracts/`)
 **Integration Tests**: End-to-end pipeline testing with Docker Compose
 **Service Tests**: Health checks and API endpoint validation
+**Cross-Language Parity Tests**: Validate Python/MQL4 shared library consistency
+**Property-Based Tests**: Hypothesis-driven contract validation with random data generation
+**Scenario Tests**: Complete trading flow validation with mock services
 
-Test configuration in `pyproject.toml` enables:
+**Contract Testing Framework**:
+- **Consumer-Driven Contracts**: Services define contracts from consumer perspective
+- **Provider Verification**: Providers verify they satisfy consumer contracts
+- **Scenario Testing**: End-to-end trading workflows (signal generation → execution)
+- **Property-Based Testing**: Domain-specific data generation and invariant testing
+- **Flexible Matching**: Regex, type, numeric, datetime, and array matchers
+
+**Test Structure**:
+```
+tests/contracts/
+├── framework/                    # Pact-like contract testing framework
+│   └── contract_testing.py      # Core testing infrastructure
+├── consumer/                     # Consumer contract definitions
+│   ├── test_signal_generator_contracts.py   # Signal generator contracts
+│   └── test_execution_engine_contracts.py   # Execution engine contracts
+├── provider/                     # Provider contract verification
+│   └── test_risk_manager_provider.py        # Risk manager provider tests
+├── scenarios/                    # End-to-end scenario tests
+│   └── test_trading_flow_scenarios.py       # Complete trading workflows
+├── properties/                   # Property-based testing
+│   └── test_property_based_contracts.py     # Hypothesis-based validation
+├── fixtures/                     # Golden test data and shared fixtures
+├── conftest.py                   # Pytest configuration and fixtures
+└── README.md                     # Contract testing documentation
+```
+
+**Test Configuration Features**:
 - Async testing with `pytest-asyncio`
-- Coverage reporting across all services
+- Coverage reporting across all services  
 - Parallel test execution per service
+- Contract validation in CI/CD pipeline
+- Property-based testing with Hypothesis framework
+- Consumer-driven contract verification workflow
+- Scenario-based integration testing with mock services
 
 ### Observability
 
@@ -240,13 +351,90 @@ Test configuration in `pyproject.toml` enables:
 ## Key Principles
 
 **Determinism & Idempotence**: All operations are repeatable with identical inputs
-**Single Source of Truth**: Event schemas in `contracts/` are canonical
+**Single Source of Truth**: Contract registry in `contracts/` and shared libraries in `shared/` are canonical
 **Defensive Posture**: Fail closed on integrity errors, validate all inputs
 **Explicit Fallbacks**: Tiered parameter resolution with audit trails
+
+## Production Readiness & Gap Management
+
+### Gap Analysis Framework
+The system includes comprehensive production readiness documentation in `docs/gaps/`:
+- **Gap Register**: Active gap tracking with Risk Priority Numbers (RPN scoring)
+- **FMEA Analysis**: Failure Mode and Effects Analysis with mitigation strategies
+- **SLOs**: Service Level Objectives with specific trading system metrics
+- **Invariants**: 6 executable system specifications with monitoring
+
+### Key Production Gaps (Current)
+- **G-003**: Position reconciliation (RPN: 105) - *Critical priority*
+- **G-001**: Signal TTL enforcement (RPN: 96) - *High priority*
+- **G-004**: Duplicate order prevention (RPN: 48) - *Medium priority*
+
+### Service Level Objectives
+- **System Availability**: 99.9% uptime during market hours (6 AM - 6 PM EST)
+- **Price Feed Latency**: p95 < 100ms from MT4/DDE to ingestion
+- **Signal Generation**: p95 < 500ms from price tick to signal
+- **Order Execution**: p95 < 2s from signal to broker submission
+
+### Operational Templates
+- Incident response template with escalation procedures
+- Post-mortem template with root cause analysis framework
+- Game day runbook for disaster recovery testing
+
+## Service Port Mapping
+
+**Production Ports** (Docker Compose):
+- **gui-gateway**: 8080 (main API gateway)
+- **data-ingestor**: 8081 (price feed ingestion)
+- **indicator-engine**: 8082 (technical indicators)
+- **signal-generator**: 8083 (trading signals)
+- **risk-manager**: 8084 (risk validation)
+- **execution-engine**: 8085 (order execution)
+- **calendar-ingestor**: 8086 (economic calendar)
+- **reentry-matrix-svc**: 8087 (re-entry decisions)
+- **reporter**: 8088 (reporting and analytics)
+
+**Infrastructure Services**:
+- **Redis**: 6379 (message bus)
+- **PostgreSQL**: 5432 (persistent storage)
+- **Prometheus**: 9090 (metrics)
+- **Grafana**: 3000 (monitoring dashboards)
 
 ## Configuration Management
 
 **Environment Variables**: Service configuration via environment variables
-**Docker Compose**: Local development environment configuration
+**Docker Compose**: Local development environment configuration  
 **Secrets**: Never commit sensitive data; use environment variables or secret management
 **Feature Flags**: Configuration-driven feature enablement per service
+**Health Checks**: All services expose `/healthz` (liveness) and `/readyz` (readiness) endpoints
+
+## Data Integrity & Atomic Operations
+
+### CSV Atomic Write Policy
+
+All CSV files follow strict atomic write procedures defined in `contracts/policies/csv_atomic_write.md`:
+
+1. **Temporary File Creation**: Write to `*.tmp` file first
+2. **Data Validation**: Compute SHA-256 checksums for integrity
+3. **Metadata Columns**: Required `file_seq` (monotonic) and `checksum_sha256` fields
+4. **Atomic Rename**: `fsync()` then rename to final filename
+5. **Sequence Validation**: Monotonically increasing `file_seq` for ordering
+
+**Implementation**:
+```python
+from contracts.models.csv_models import BaseCSVModel
+
+# All CSV models inherit atomic write capabilities
+class TradeResult(BaseCSVModel):
+    # Automatic checksum computation and validation
+    def verify_checksum(self) -> bool:
+        return self.checksum_sha256 == self.compute_checksum()
+```
+
+### Hybrid ID System
+
+**Format**: `{OUTCOME}_{DURATION}_{PROXIMITY}_{CALENDAR}_{DIRECTION}_{GENERATION}[_{SUFFIX}]`
+
+- **Cross-Language Consistency**: Identical results from Python and MQL4 implementations
+- **Chain Enforcement**: O(1)→R1(2)→R2(3) re-entry progression
+- **Comment Suffixes**: Deterministic 6-character hashes for MT4 trade comments
+- **Vocabulary Validation**: All tokens validated against canonical specifications

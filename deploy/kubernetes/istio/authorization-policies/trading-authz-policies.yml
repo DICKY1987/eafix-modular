@@ -1,0 +1,259 @@
+---
+# Default deny-all policy for the namespace
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: deny-all
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: deny-all
+    app.kubernetes.io/component: authorization-policy
+    app.kubernetes.io/part-of: eafix-trading-system
+spec:
+  {}  # Empty spec denies all access
+---
+# Allow ingress traffic to GUI Gateway
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-gui-gateway-ingress
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: allow-gui-gateway-ingress
+    app.kubernetes.io/component: authorization-policy
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gui-gateway
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+        paths: ["/*"]
+    when:
+    - key: source.ip
+      notValues: ["127.0.0.1", "::1"]
+---
+# Allow API traffic from ingress gateway
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-api-ingress
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: allow-api-ingress
+    app.kubernetes.io/component: authorization-policy
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: ingestion
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account"]
+    to:
+    - operation:
+        methods: ["GET", "POST"]
+        paths: ["/api/v1/data/*", "/healthz", "/metrics"]
+---
+# Allow signal generator to call risk manager
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-signal-to-risk
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: allow-signal-to-risk
+    app.kubernetes.io/component: authorization-policy
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: risk-manager
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/eafix-trading/sa/eafix-trading"]
+    to:
+    - operation:
+        methods: ["POST"]
+        paths: ["/validate", "/position-size"]
+    when:
+    - key: source.workload
+      values: ["signal-generator"]
+---
+# Allow risk manager to call execution engine
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-risk-to-execution
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: allow-risk-to-execution
+    app.kubernetes.io/component: authorization-policy
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: execution-engine
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/eafix-trading/sa/eafix-trading"]
+    to:
+    - operation:
+        methods: ["POST"]
+        paths: ["/execute", "/cancel"]
+    when:
+    - key: source.workload
+      values: ["risk-manager"]
+---
+# Allow all services to access Redis
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-redis-access
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: allow-redis-access
+    app.kubernetes.io/component: authorization-policy
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redis
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/eafix-trading/sa/eafix-trading"]
+    to:
+    - operation:
+        ports: ["6379"]
+---
+# Allow reporter and services to access PostgreSQL
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-postgres-access
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: allow-postgres-access
+    app.kubernetes.io/component: authorization-policy
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/eafix-trading/sa/eafix-trading"]
+    to:
+    - operation:
+        ports: ["5432"]
+    when:
+    - key: source.workload
+      values: ["reporter", "execution-engine", "risk-manager"]
+---
+# Allow Prometheus to scrape metrics
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-prometheus-scraping
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: allow-prometheus-scraping
+    app.kubernetes.io/component: authorization-policy
+spec:
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/eafix-monitoring/sa/prometheus"]
+    to:
+    - operation:
+        methods: ["GET"]
+        paths: ["/metrics"]
+---
+# Allow health checks from Kubernetes
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-health-checks
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: allow-health-checks
+    app.kubernetes.io/component: authorization-policy
+spec:
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/kube-system/sa/generic-garbage-collector"]
+    to:
+    - operation:
+        methods: ["GET"]
+        paths: ["/healthz", "/readyz"]
+---
+# Allow compliance monitor webhook access
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-compliance-webhook
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: allow-compliance-webhook
+    app.kubernetes.io/component: authorization-policy
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: compliance-monitor
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/eafix-monitoring/sa/alertmanager"]
+    to:
+    - operation:
+        methods: ["POST"]
+        paths: ["/webhook/alertmanager"]
+---
+# Restrict execution engine access (most critical service)
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: restrict-execution-engine
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: restrict-execution-engine
+    app.kubernetes.io/component: authorization-policy
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: execution-engine
+  rules:
+  # Only risk manager can execute orders
+  - from:
+    - source:
+        principals: ["cluster.local/ns/eafix-trading/sa/eafix-trading"]
+    to:
+    - operation:
+        methods: ["POST"]
+        paths: ["/execute"]
+    when:
+    - key: source.workload
+      values: ["risk-manager"]
+    - key: request.headers[x-request-id]
+      notValues: [""]
+  # Health checks allowed from infrastructure
+  - from:
+    - source:
+        principals: ["cluster.local/ns/kube-system/sa/generic-garbage-collector"]
+    to:
+    - operation:
+        methods: ["GET"]
+        paths: ["/healthz", "/readyz"]
+  # Metrics scraping
+  - from:
+    - source:
+        principals: ["cluster.local/ns/eafix-monitoring/sa/prometheus"]
+    to:
+    - operation:
+        methods: ["GET"]
+        paths: ["/metrics"]

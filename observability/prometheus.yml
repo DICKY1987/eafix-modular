@@ -1,0 +1,188 @@
+# Prometheus Configuration for EAFIX Trading System
+# Comprehensive monitoring for financial trading operations
+
+global:
+  scrape_interval: 15s     # Frequent scraping for trading system metrics
+  evaluation_interval: 15s # Frequent rule evaluation for SLA monitoring
+  external_labels:
+    cluster: 'eafix-trading'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Load recording and alerting rules
+rule_files:
+  - "rules/trading_slos.yml"
+  - "rules/system_alerts.yml"
+  - "rules/business_metrics.yml"
+  - "../compliance/monitoring/compliance-rules.yml"
+
+# Scrape configurations for all EAFIX services
+scrape_configs:
+  # Core Trading Services
+  - job_name: 'data-ingestor'
+    static_configs:
+      - targets: ['data-ingestor:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 5s  # High frequency for price feed monitoring
+    scrape_timeout: 4s
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'data-ingestor'
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'trading_(price_feed_latency|tick_processing_duration|market_data_quality).*'
+        target_label: __tmp_trading_critical
+        replacement: 'true'
+
+  - job_name: 'indicator-engine'
+    static_configs:
+      - targets: ['indicator-engine:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'indicator-engine'
+
+  - job_name: 'signal-generator'
+    static_configs:
+      - targets: ['signal-generator:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 5s  # Critical for signal timing SLOs
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'signal-generator'
+
+  - job_name: 'risk-manager'
+    static_configs:
+      - targets: ['risk-manager:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 5s  # Real-time risk monitoring
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'risk-manager'
+
+  - job_name: 'execution-engine'
+    static_configs:
+      - targets: ['execution-engine:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 5s  # Critical for order execution SLOs
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'execution-engine'
+
+  - job_name: 'calendar-ingestor'
+    static_configs:
+      - targets: ['calendar-ingestor:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'calendar-ingestor'
+
+  - job_name: 'reentry-matrix-svc'
+    static_configs:
+      - targets: ['reentry-matrix-svc:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'reentry-matrix-svc'
+
+  - job_name: 'reporter'
+    static_configs:
+      - targets: ['reporter:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'reporter'
+
+  - job_name: 'gui-gateway'
+    static_configs:
+      - targets: ['gui-gateway:8080']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'gui-gateway'
+
+  # Infrastructure Services
+  - job_name: 'redis-exporter'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 15s
+
+  - job_name: 'postgres-exporter'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+    scrape_interval: 15s
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 15s
+
+  # Blackbox monitoring for external dependencies
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+        - http://gui-gateway:8080/healthz
+        - http://data-ingestor:8080/healthz
+        - http://signal-generator:8080/healthz
+        - http://risk-manager:8080/healthz
+        - http://execution-engine:8080/healthz
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+
+  # Trading system specific metrics
+  - job_name: 'trading-metrics'
+    static_configs:
+      - targets: ['trading-metrics-exporter:9200']
+    scrape_interval: 5s
+    metrics_path: '/metrics'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'trading-metrics'
+
+  # Compliance monitoring service
+  - job_name: 'compliance-monitor'
+    static_configs:
+      - targets: ['compliance-monitor:9201']
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: service
+        replacement: 'compliance-monitor'
+
+# Remote write for long-term storage (optional)
+remote_write:
+  - url: "http://thanos-receive:19291/api/v1/receive"
+    queue_config:
+      max_samples_per_send: 1000
+      max_shards: 10
+      capacity: 2500

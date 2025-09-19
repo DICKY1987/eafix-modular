@@ -1,0 +1,234 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: data-ingestor-dr
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: data-ingestor-dr
+    app.kubernetes.io/component: destination-rule
+spec:
+  host: data-ingestor.eafix-trading.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    loadBalancer:
+      simple: LEAST_CONN
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        http1MaxPendingRequests: 50
+        http2MaxRequests: 100
+        maxRequestsPerConnection: 2
+        maxRetries: 3
+        consecutiveGatewayErrors: 5
+        interval: 30s
+        baseEjectionTime: 30s
+        maxEjectionPercent: 50
+    outlierDetection:
+      consecutive5xxErrors: 3
+      consecutiveGatewayErrors: 3
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: indicator-engine-dr
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: indicator-engine-dr
+    app.kubernetes.io/component: destination-rule
+spec:
+  host: indicator-engine.eafix-trading.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    loadBalancer:
+      simple: ROUND_ROBIN
+    connectionPool:
+      tcp:
+        maxConnections: 50
+      http:
+        http1MaxPendingRequests: 25
+        http2MaxRequests: 50
+        maxRequestsPerConnection: 2
+        maxRetries: 3
+    outlierDetection:
+      consecutive5xxErrors: 3
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: signal-generator-dr
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: signal-generator-dr
+    app.kubernetes.io/component: destination-rule
+spec:
+  host: signal-generator.eafix-trading.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    loadBalancer:
+      simple: LEAST_CONN
+    connectionPool:
+      tcp:
+        maxConnections: 75
+      http:
+        http1MaxPendingRequests: 30
+        http2MaxRequests: 75
+        maxRequestsPerConnection: 2
+        maxRetries: 3
+    outlierDetection:
+      consecutive5xxErrors: 3
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: risk-manager-dr
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: risk-manager-dr
+    app.kubernetes.io/component: destination-rule
+spec:
+  host: risk-manager.eafix-trading.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    loadBalancer:
+      simple: LEAST_CONN
+    connectionPool:
+      tcp:
+        maxConnections: 100
+        connectTimeout: 3s
+      http:
+        http1MaxPendingRequests: 40
+        http2MaxRequests: 100
+        maxRequestsPerConnection: 2
+        maxRetries: 2
+        timeout: 5s
+    outlierDetection:
+      consecutive5xxErrors: 2
+      interval: 15s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 30
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: execution-engine-dr
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: execution-engine-dr
+    app.kubernetes.io/component: destination-rule
+spec:
+  host: execution-engine.eafix-trading.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    loadBalancer:
+      simple: LEAST_CONN
+    connectionPool:
+      tcp:
+        maxConnections: 50
+        connectTimeout: 2s
+      http:
+        http1MaxPendingRequests: 20
+        http2MaxRequests: 50
+        maxRequestsPerConnection: 1
+        maxRetries: 1
+        timeout: 3s
+    outlierDetection:
+      consecutive5xxErrors: 2
+      interval: 10s
+      baseEjectionTime: 20s
+      maxEjectionPercent: 25
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: gui-gateway-dr
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: gui-gateway-dr
+    app.kubernetes.io/component: destination-rule
+spec:
+  host: gui-gateway.eafix-trading.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    loadBalancer:
+      simple: ROUND_ROBIN
+    connectionPool:
+      tcp:
+        maxConnections: 200
+      http:
+        http1MaxPendingRequests: 100
+        http2MaxRequests: 200
+        maxRequestsPerConnection: 5
+        maxRetries: 3
+    outlierDetection:
+      consecutive5xxErrors: 5
+      interval: 60s
+      baseEjectionTime: 60s
+      maxEjectionPercent: 30
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: redis-dr
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: redis-dr
+    app.kubernetes.io/component: destination-rule
+spec:
+  host: redis.eafix-trading.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: DISABLE  # Redis uses custom authentication
+    loadBalancer:
+      simple: LEAST_CONN
+    connectionPool:
+      tcp:
+        maxConnections: 200
+        connectTimeout: 5s
+        tcpNoDelay: true
+    outlierDetection:
+      consecutive5xxErrors: 3
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: postgres-dr
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: postgres-dr
+    app.kubernetes.io/component: destination-rule
+spec:
+  host: postgres.eafix-trading.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: DISABLE  # PostgreSQL uses custom TLS
+    loadBalancer:
+      simple: LEAST_CONN
+    connectionPool:
+      tcp:
+        maxConnections: 50
+        connectTimeout: 10s
+    outlierDetection:
+      consecutive5xxErrors: 3
+      interval: 60s
+      baseEjectionTime: 60s
+      maxEjectionPercent: 25
