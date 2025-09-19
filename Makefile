@@ -253,3 +253,24 @@ release-dry:
 	@echo "✓ Branch protection check"
 	@echo "✓ Makefile targets available" 
 	@echo "✓ Docker compose configuration valid"
+
+# Signal Flow Testing Framework (Friday Morning Updates)
+signal-flow-test:
+	@echo "🧪 Running end-to-end signal flow tests..."
+	cd tests/signal_flow_testing && python signal_flow_tester.py --mt4-data "$(MT4_DATA_PATH)"
+
+signal-simulation:
+	@echo "📊 Running indicator signal simulation..."
+	cd tests/signal_flow_testing && python indicator_signal_simulator.py
+
+calendar-simulation:
+	@echo "📅 Running calendar event simulation..."
+	cd tests/signal_flow_testing && python calendar_event_simulator.py
+
+manual-test-panel:
+	@echo "🎛️ Starting manual testing control panel..."
+	cd tests/signal_flow_testing && python manual_testing_control_panel.py
+
+# Combined testing target  
+test-signal-flow-all: signal-flow-test signal-simulation calendar-simulation
+	@echo "✅ All signal flow tests completed"
