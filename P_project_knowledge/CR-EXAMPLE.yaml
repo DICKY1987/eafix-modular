@@ -1,0 +1,32 @@
+change_id: CR-20250822-034500-add-normalize-step
+title: "Insert Normalize Inputs step after 1.001; update 1.002 description; finalize renumber"
+author: "Your Name <you@example.com>"
+created_utc: "2025-08-22T08:45:00Z"
+target_file: "spec/master.yaml"
+rationale: "Make preprocessing explicit; clarify step purpose"
+apf_schema_version: "1.0.0"
+preconditions:
+  expected_master_sha256: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+  expected_stepkey_precision: 3
+ops:
+  - op_id: op-001
+    op: insert_step_after
+    comment: "Add Normalize Inputs after 1.001"
+    target_step: "1.001"
+    step:
+      actor: "SYSTEM"
+      action: "TRANSFORM"
+      description: "Normalize incoming inputs (trim, case, dtype)"
+      inputs: ["raw_inputs/*"]
+      outputs: ["normalized_inputs/*"]
+      tags: ["preprocess"]
+  - op_id: op-002
+    op: update_field
+    comment: "Clarify description of 1.002"
+    target_step: "1.002"
+    field: "/description"
+    value: "Validate normalized inputs and reject records with fatal issues"
+  - op_id: op-003
+    op: finalize_renumber
+    precision: 3
+signing: {}

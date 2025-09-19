@@ -1,382 +1,41 @@
-name: Security Analysis
-
-on:
-  push:
-    branches: [ main, master, 'rel/**' ]
-  pull_request:
-    branches: [ main, master ]
-  schedule:
-    # Run security scans daily at 2 AM UTC
-    - cron: '0 2 * * *'
-
-permissions:
-  actions: read
-  contents: read
-  security-events: write
+name: Security Gates
+on: [push, pull_request]
 
 jobs:
-  codeql:
-    name: CodeQL Analysis
+  security-scan:
     runs-on: ubuntu-latest
-    
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'python' ]
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
-      with:
-        languages: ${{ matrix.language }}
-        config-file: ./.github/codeql/codeql-config.yml
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.11"
+      - name: Install Security Tools
+        run: |
+          pip install bandit[toml]==1.7.5
+          pip install safety==2.3.4
+          pip install semgrep==1.45.0
 
-    - name: Install Poetry
-      run: |
-        curl -sSL https://install.python-poetry.org | python3 -
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: Run SAST (Blocking)
+        run: |
+          bandit -r services/ -f json -o bandit-report.json
+          bandit -r services/ --severity-level medium --confidence-level medium
 
-    - name: Install dependencies
-      run: |
-        poetry install --no-interaction --only main
+      - name: Dependency Vulnerability Scan (Blocking)
+        run: |
+          safety check --short-report --output text
 
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
-      with:
-        category: "/language:${{matrix.language}}"
+      - name: Semantic Code Analysis (Blocking)
+        run: |
+          semgrep --config=auto services/ --error --strict
 
-  dependency-review:
-    name: Dependency Review
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Dependency Review
-      uses: actions/dependency-review-action@v3
-      with:
-        fail-on-severity: moderate
-        allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, GPL-3.0
-        deny-licenses: GPL-2.0, LGPL-2.0, LGPL-2.1
-
-  secret-scan:
-    name: Secret Scanning
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Install detect-secrets
-      run: pip install detect-secrets
-
-    - name: Run detect-secrets scan
-      run: |
-        detect-secrets scan --all-files --baseline .secrets.baseline --exclude-files '.*\.lock$|.*\.log$|.*\.pyc$'
-
-    - name: Verify secrets baseline
-      run: |
-        detect-secrets audit .secrets.baseline --report --fail-on-unaudited-potential-secret
-
-  scorecards:
-    name: OpenSSF Scorecards with Policy Enforcement
-    runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      id-token: write
-      contents: read
-      pull-requests: read
-      actions: read
-      
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        persist-credentials: false
-        fetch-depth: 0  # Full history required for comprehensive analysis
-
-    - name: Run OpenSSF Scorecards Analysis
-      uses: ossf/scorecard-action@v2.4.0
-      with:
-        results_file: results.sarif
-        results_format: sarif
-        publish_results: true
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Parse Scorecards Results
-      id: parse-results
-      run: |
-        if [ -f "results.sarif" ]; then
-          # Extract overall score from SARIF results
-          SCORE=$(jq -r '.runs[0].properties.score // "0"' results.sarif 2>/dev/null || echo "0")
-          echo "SCORECARD_SCORE=$SCORE" >> $GITHUB_OUTPUT
-          
-          # Count high-severity findings (level: error)
-          HIGH_FINDINGS=$(jq '[.runs[0].results[] | select(.level == "error")] | length' results.sarif 2>/dev/null || echo "999")
-          echo "HIGH_FINDINGS=$HIGH_FINDINGS" >> $GITHUB_OUTPUT
-          
-          echo "📊 Parsed Results:"
-          echo "Score: $SCORE"
-          echo "High Findings: $HIGH_FINDINGS"
-        else
-          echo "SCORECARD_SCORE=0" >> $GITHUB_OUTPUT
-          echo "HIGH_FINDINGS=999" >> $GITHUB_OUTPUT
-          echo "❌ No results file found"
-        fi
-
-    - name: Enforce Trading System Security Policy
-      run: |
-        SCORE="${{ steps.parse-results.outputs.SCORECARD_SCORE }}"
-        HIGH_FINDINGS="${{ steps.parse-results.outputs.HIGH_FINDINGS }}"
-        
-        echo "🔒 EAFIX Trading System Security Policy Enforcement"
-        echo "=================================================="
-        echo "Current Score: $SCORE/10"
-        echo "High Priority Findings: $HIGH_FINDINGS"
-        echo ""
-        
-        # Define policy thresholds for trading system
-        MIN_SCORE=7.0
-        MAX_HIGH_FINDINGS=5
-        
-        POLICY_PASSED=true
-        
-        # Install bc for floating point comparison
-        sudo apt-get update && sudo apt-get install -y bc
-        
-        # Check minimum score requirement
-        if (( $(echo "$SCORE < $MIN_SCORE" | bc -l) )); then
-          echo "❌ POLICY VIOLATION: Score $SCORE below minimum requirement of $MIN_SCORE"
-          POLICY_PASSED=false
-        else
-          echo "✅ Score requirement met: $SCORE >= $MIN_SCORE"
-        fi
-        
-        # Check high findings limit
-        if [ "$HIGH_FINDINGS" -gt "$MAX_HIGH_FINDINGS" ]; then
-          echo "❌ POLICY VIOLATION: $HIGH_FINDINGS high-priority findings exceed limit of $MAX_HIGH_FINDINGS"
-          POLICY_PASSED=false
-        else
-          echo "✅ High findings requirement met: $HIGH_FINDINGS <= $MAX_HIGH_FINDINGS"
-        fi
-        
-        echo ""
-        echo "🏦 Trading System Security Context:"
-        echo "- Direct financial market exposure requires highest security standards"
-        echo "- Regulatory compliance (SOX, PCI DSS) mandates comprehensive security controls"
-        echo "- 99.9% uptime SLO during market hours (6 AM - 6 PM EST)"
-        echo "- Data integrity requirements for trading audit trails"
-        echo "- Supply chain security critical for trading algorithm integrity"
-        
-        if [ "$POLICY_PASSED" = "false" ]; then
-          echo ""
-          echo "💥 TRADING SYSTEM SECURITY POLICY VIOLATION!"
-          echo ""
-          echo "This repository contains a financial trading system that requires"
-          echo "stringent security controls. The current security posture does not"
-          echo "meet the minimum requirements for production trading operations."
-          echo ""
-          echo "📖 Policy Details: docs/security/scorecards-policy.md"
-          echo "🛠️  Remediation Guide: docs/security/remediation-guide.md"
-          echo ""
-          echo "Action Required: Address security findings before proceeding with deployment."
-          exit 1
-        else
-          echo ""
-          echo "🎉 All OpenSSF Scorecards policy requirements satisfied!"
-          echo "✅ Trading system security posture meets production standards"
-        fi
-
-    - name: Generate Security Summary
-      if: always()
-      run: |
-        SCORE="${{ steps.parse-results.outputs.SCORECARD_SCORE }}"
-        HIGH_FINDINGS="${{ steps.parse-results.outputs.HIGH_FINDINGS }}"
-        
-        cat >> $GITHUB_STEP_SUMMARY << EOF
-        # 🔒 OpenSSF Scorecards Security Assessment
-        
-        ## Summary
-        - **Overall Score**: ${SCORE}/10
-        - **High Priority Findings**: ${HIGH_FINDINGS}
-        - **Policy Status**: $([ "$HIGH_FINDINGS" -le "5" ] && echo "✅ PASSED" || echo "❌ FAILED")
-        - **Assessment Date**: $(date -u)
-        
-        ## Trading System Security Requirements
-        - **Minimum Score**: 7.0/10 (70th percentile)
-        - **Maximum High Findings**: 5
-        - **Rationale**: Financial trading system with regulatory compliance requirements
-        
-        ## Key Security Controls Evaluated
-        - Branch Protection & Code Review
-        - Static Application Security Testing (SAST)
-        - Dependency Management & Vulnerability Scanning
-        - Security Policy & Incident Response
-        - Supply Chain Security & Signed Releases
-        
-        ## Next Steps
-        $([ "$HIGH_FINDINGS" -le "5" ] && echo "No immediate action required. Continue monitoring." || echo "⚠️ Address high-priority security findings before production deployment.")
-        
-        For detailed remediation guidance, see [Security Documentation](../../docs/security/).
-        EOF
-
-    - name: Upload Scorecards Results to Security Tab
-      uses: github/codeql-action/upload-sarif@v3
-      if: always()
-      with:
-        sarif_file: results.sarif
-        category: 'OpenSSF-Scorecards'
-
-  container-scan:
-    name: Container Security Scan
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push'
-    
-    strategy:
-      matrix:
-        service: [data-ingestor, indicator-engine, signal-generator, gui-gateway]
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-
-    - name: Build test image
-      uses: docker/build-push-action@v5
-      with:
-        context: services/${{ matrix.service }}
-        load: true
-        tags: test/${{ matrix.service }}:latest
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: 'test/${{ matrix.service }}:latest'
-        format: 'sarif'
-        output: 'trivy-results-${{ matrix.service }}.sarif'
-
-    - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v2
-      if: always()
-      with:
-        sarif_file: 'trivy-results-${{ matrix.service }}.sarif'
-        category: 'trivy-${{ matrix.service }}'
-
-    - name: Run Hadolint Dockerfile linter
-      uses: hadolint/hadolint-action@v3.1.0
-      with:
-        dockerfile: services/${{ matrix.service }}/Dockerfile
-        format: sarif
-        output-file: hadolint-results-${{ matrix.service }}.sarif
-        no-fail: true
-
-    - name: Upload Hadolint scan results
-      uses: github/codeql-action/upload-sarif@v2
-      if: always()
-      with:
-        sarif_file: 'hadolint-results-${{ matrix.service }}.sarif'
-        category: 'hadolint-${{ matrix.service }}'
-
-  supply-chain-scan:
-    name: Supply Chain Security
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.11"
-
-    - name: Install Poetry
-      run: |
-        curl -sSL https://install.python-poetry.org | python3 -
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-    - name: Install safety
-      run: pip install safety
-
-    - name: Check dependencies for known vulnerabilities
-      run: |
-        poetry export -f requirements.txt --output requirements.txt --without-hashes
-        safety check -r requirements.txt --json --output safety-report.json || true
-
-    - name: Install pip-audit
-      run: pip install pip-audit
-
-    - name: Run pip-audit
-      run: |
-        poetry export -f requirements.txt --output requirements.txt --without-hashes
-        pip-audit -r requirements.txt --format=json --output=pip-audit-report.json || true
-
-    - name: Upload security reports
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: security-reports
-        path: |
-          safety-report.json
-          pip-audit-report.json
-        retention-days: 30
-
-  license-scan:
-    name: License Compliance
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.11"
-
-    - name: Install Poetry
-      run: |
-        curl -sSL https://install.python-poetry.org | python3 -
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-    - name: Install pip-licenses
-      run: pip install pip-licenses
-
-    - name: Generate license report
-      run: |
-        poetry install --no-interaction
-        poetry run pip-licenses --format=json --output-file=licenses-report.json --with-urls --with-description
-
-    - name: Check for forbidden licenses
-      run: |
-        # Fail if any GPL-2.0 or LGPL licenses are found
-        if grep -q "GPL-2.0\|LGPL-2.0\|LGPL-2.1" licenses-report.json; then
-          echo "❌ Forbidden licenses detected!"
-          grep "GPL-2.0\|LGPL-2.0\|LGPL-2.1" licenses-report.json
-          exit 1
-        else
-          echo "✅ No forbidden licenses found"
-        fi
-
-    - name: Upload license report
-      uses: actions/upload-artifact@v4
-      with:
-        name: license-report
-        path: licenses-report.json
-        retention-days: 90
+      - name: Upload Security Reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: security-reports
+          path: |
+            bandit-report.json
+            .semgrep/

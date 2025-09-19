@@ -122,3 +122,5 @@ CMD ["python", "-m", "uvicorn", "src.main:app", \
      "--workers", "1", \
      "--access-log", \
      "--log-level", "info"]
+# Enterprise capabilities - additional port for enterprise features
+EXPOSE 8001

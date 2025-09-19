@@ -1,0 +1,64 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alert-rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # EAFIX Services - Auto-discovery via Docker DNS
+  - job_name: 'eafix-data-ingestor'
+    static_configs:
+      - targets: ['data-ingestor:9001']  # Metrics port (8001 + 1000)
+    metrics_path: '/metrics'
+
+  - job_name: 'eafix-indicator-engine'
+    static_configs:
+      - targets: ['indicator-engine:9002']  # Metrics port (8002 + 1000)
+    metrics_path: '/metrics'
+
+  - job_name: 'eafix-signal-generator'
+    static_configs:
+      - targets: ['signal-generator:9004']  # Metrics port (8004 + 1000)
+    metrics_path: '/metrics'
+
+  - job_name: 'eafix-risk-manager'
+    static_configs:
+      - targets: ['risk-manager:9005']  # Metrics port (8005 + 1000)
+    metrics_path: '/metrics'
+
+  - job_name: 'eafix-execution-engine'
+    static_configs:
+      - targets: ['execution-engine:9006']  # Metrics port (8006 + 1000)
+    metrics_path: '/metrics'
+
+  - job_name: 'eafix-calendar-ingestor'
+    static_configs:
+      - targets: ['calendar-ingestor:9007']  # Metrics port (8007 + 1000)
+    metrics_path: '/metrics'
+
+  - job_name: 'eafix-reentry-matrix-svc'
+    static_configs:
+      - targets: ['reentry-matrix-svc:9008']  # Metrics port (8008 + 1000)
+    metrics_path: '/metrics'
+
+  - job_name: 'eafix-reporter'
+    static_configs:
+      - targets: ['reporter:9009']  # Metrics port (8009 + 1000)
+    metrics_path: '/metrics'
+
+  - job_name: 'eafix-gui-gateway'
+    static_configs:
+      - targets: ['gui-gateway:9010']  # Metrics port (8010 + 1000)
+    metrics_path: '/metrics'
