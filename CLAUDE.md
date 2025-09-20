@@ -305,6 +305,7 @@ The system has been enhanced with Friday Morning Updates components:
 **Enhanced Services (11 total now):**
 - **calendar-downloader**: Automated ForexFactory calendar download with enterprise monitoring
 - **dashboard-backend**: Real-time trading dashboard with WebSocket streaming and BaseEnterpriseService
+- **indicators**: Advanced currency strength and multi-timeframe analysis service
 
 ### Signal Flow Testing Framework
 ```bash

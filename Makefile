@@ -1,4 +1,4 @@
-.PHONY: contracts-validate contracts-validate-full contracts-test csv-validate reentry-validate smoke test-all docker-up docker-down replay-test
+.PHONY: contracts-validate contracts-validate-full contracts-test csv-validate reentry-validate smoke test-all docker-up docker-down replay-test signal-flow-test signal-simulation calendar-simulation manual-test-panel test-signal-flow-all
 
 # Contract validation (comprehensive)
 contracts-validate-full:
@@ -257,19 +257,19 @@ release-dry:
 # Signal Flow Testing Framework (Friday Morning Updates)
 signal-flow-test:
 	@echo "🧪 Running end-to-end signal flow tests..."
-	cd tests/signal_flow_testing && python signal_flow_tester.py --mt4-data "$(MT4_DATA_PATH)"
+	cd tests/integration && python signal_flow_tester.py --mt4-data "$(MT4_DATA_PATH)"
 
 signal-simulation:
 	@echo "📊 Running indicator signal simulation..."
-	cd tests/signal_flow_testing && python indicator_signal_simulator.py
+	cd tests/fixtures && python indicator_signal_simulator.py
 
 calendar-simulation:
 	@echo "📅 Running calendar event simulation..."
-	cd tests/signal_flow_testing && python calendar_event_simulator.py
+	cd tests/fixtures && python calendar_event_simulator.py
 
 manual-test-panel:
 	@echo "🎛️ Starting manual testing control panel..."
-	cd tests/signal_flow_testing && python manual_testing_control_panel.py
+	cd P_GUI/testing && python manual_testing_control_panel.py
 
 # Combined testing target  
 test-signal-flow-all: signal-flow-test signal-simulation calendar-simulation
