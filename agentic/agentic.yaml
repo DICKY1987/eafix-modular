@@ -1,9 +1,0 @@
-version: 1
-paths: { allowlist: ["src/", "app/", "tests/"], audit_log: ".ai/.ai-audit.jsonl" }
-routing: { provider_priority: ["oss","claude"], max_tokens_per_task: 30000, min_confidence_for_llm: 0.6, forbid_shell_from_ai: true, ai_edit_single_writer: true }
-cost: { warn_usd_per_task: 2.0, hard_cap_usd_per_task: 5.0 }
-gates: { coverage_min: 0.85, complexity_budget_delta: 20, secrets: true, sast: ["semgrep","bandit"], sca: ["pip-audit"], license_allowlist: ["MIT","BSD","Apache-2.0"] }
-retries: { attempts: 2, backoff_seconds: [2,5] }
-validators: { read_only_parallel: ["semgrep --config=auto .","bandit -q -r src","gitleaks detect --no-banner --redact","mypy --hide-error-context src","radon cc -s -a src"] }
-mutators_serial: ["ruff format .","ruff check --fix ."]
-
