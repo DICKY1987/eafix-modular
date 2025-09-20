@@ -3,13 +3,13 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cli-multi-rapid"
-version = "0.1.1"
-description = "A simple multi-rapid CLI scaffold"
+name = "eafix-trading-system"
+version = "1.0.0"
+description = "EAFIX Trading System - Python & MT4 trading platform with Guardian protection"
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [
-    { name = "Automated Agent", email = "agent@example.com" },
+    { name = "EAFIX Trading System", email = "trading@eafix.com" },
 ]
 license = { text = "MIT" }
 classifiers = [
@@ -17,14 +17,17 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Topic :: Office/Business :: Financial :: Investment",
 ]
 
 [project.urls]
-Homepage = "https://github.com/DICKY1987/cli_multi_rapid_DEV"
-Repository = "https://github.com/DICKY1987/cli_multi_rapid_DEV"
+Homepage = "https://github.com/DICKY1987/eafix-modular"
+Repository = "https://github.com/DICKY1987/eafix-modular"
 
 [project.scripts]
-cli-multi-rapid = "cli_multi_rapid.cli:main"
+eafix = "eafix.apps.cli.main:main"
 
 [project.optional-dependencies]
 yaml = ["PyYAML>=6.0"]

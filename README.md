@@ -1,30 +1,27 @@
-# cli_multi_rapid_DEV
+# EAFIX Trading System
 
-![CI](https://github.com/DICKY1987/cli_multi_rapid_DEV/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/DICKY1987/eafix-modular/actions/workflows/ci.yml/badge.svg)
 ![Coverage](https://img.shields.io/badge/coverage-80%25%2B-brightgreen)
 
-This repository serves as a proof‑of‑concept for a lightweight command‑line
-interface (CLI) that can be extended into a multi‑agent development tool. The
-initial scaffold demonstrates how to structure a Python project using a
-``src`` layout, provides a simple CLI with subcommands, and sets up a basic
-test harness.
+**EAFIX Trading System** is a production-ready trading platform that combines Python intelligence with MT4 execution power. The system features advanced Guardian protection mechanisms, sophisticated signal generation, and comprehensive risk management for professional forex trading.
 
-The goal of this project is to establish repeatable development workflows and
-quality gates. As future iterations introduce more complex functionality the
-existing scaffolding can be built upon without reinventing the wheel.
+The platform is designed for traders who demand reliability, performance, and intelligent automation in their trading operations.
 
 ## Quick start
 
-You can run the CLI directly with the Python interpreter without any
+You can run the trading system CLI directly with the Python interpreter without any
 installation steps. The examples below assume you are executing commands in
 the repository root.
 
 ```bash
-# Print a friendly greeting
-python -m cli_multi_rapid.cli greet Alice
+# Check trading system status
+python -m eafix.apps.cli.main status
 
-# Compute the sum of two integers
-python -m cli_multi_rapid.cli sum 3 5
+# View active trading signals
+python -m eafix.apps.cli.main trade signals --active
+
+# Monitor Guardian protection system
+python -m eafix.apps.cli.main guardian status
 ```
 
 If you prefer to install the package into your current environment, you can
@@ -33,64 +30,67 @@ required to run the examples above:
 
 ```bash
 pip install -e .
-cli-multi-rapid greet Alice
+eafix status
 ```
 
 The editable install will register a console script entry point named
-`cli-multi-rapid`. It simply forwards to the same functionality exposed in
-``cli_multi_rapid.cli``.
+`eafix`. This provides access to all trading system functionality through
+a unified command-line interface.
 
-## New: run-job subcommand
+## Trading System Features
 
-Inspect jobs defined in `tasks.json` and, when `PyYAML` is available, `agent_jobs.yaml`. This command prints job metadata only and does not execute external processes.
+The EAFIX system provides comprehensive trading functionality:
 
-Examples
+**Core Trading Operations:**
+- Real-time signal generation and analysis
+- MT4 integration for order execution
+- Advanced risk management and position sizing
+- Multi-timeframe technical analysis
 
+**Guardian Protection System:**
+- Automated risk monitoring and intervention
+- Account protection mechanisms
+- Emergency position closure capabilities
+- Drawdown and exposure limits
+
+**System Management:**
+- Health monitoring and diagnostics
+- Configuration management
+- Performance analytics and reporting
+- Integration with external services (Slack, Teams, Jira)
+
+**Command Examples:**
 ```bash
-# List all jobs (auto-discovers tasks.json and agent_jobs.yaml)
-cli-multi-rapid run-job
+# Trading operations
+eafix trade signals --symbol EURUSD --export
+eafix trade positions --active
 
-# List from a specific manifest
-cli-multi-rapid run-job --file tasks.json
-cli-multi-rapid run-job --file agent_jobs.yaml
+# Guardian system
+eafix guardian enable --max-drawdown 5.0
+eafix guardian rules --list
 
-# Filter by name and show detailed steps/fields
-cli-multi-rapid run-job --name "triage" --show steps
+# System management
+eafix system health --detailed
+eafix analyze performance --period 30d
 ```
 
-YAML support is optional. To enable it, install the package with the `yaml` extra:
+## Architecture Overview
 
-```bash
-pip install -e .[yaml]
-# or, after publishing to an index:
-pip install "cli-multi-rapid[yaml]"
-```
+The EAFIX Trading System follows a modular architecture designed for reliability and maintainability:
 
-## Multi-Stream Workflows
+**Core Components:**
+- `src/eafix/` - Main trading system with signal generation, indicators, and system management
+- `src/contracts/` - Trading data models (Signal, PriceTick, OrderIntent, etc.)
+- `src/integrations/` - External service connectors (GitHub, Slack, Teams, Jira)
+- `src/websocket/` - Event broadcasting and real-time communication
+- `src/compliance/` - Regulatory compliance and reporting
 
-This repo groups phases into five streams (A–E) to enable conflict-free parallel work. See `workflows/phase_definitions/multi_stream.yaml` and `docs/specs/multi-stream.md`.
-
-Examples
-
-```bash
-# List streams and their phases
-python -m workflows.orchestrator list-streams
-
-# Run a specific stream (sequentially executes its phases)
-python -m workflows.orchestrator run-stream stream-a --dry-run   # plan only
-python -m workflows.orchestrator run-stream stream-a             # execute
-
-# Run a single phase
-cli-multi-rapid phase run phase1 --dry
-```
-
-CLI alternatives
-
-```bash
-# Using the installed entry point
-cli-multi-rapid phase stream list
-cli-multi-rapid phase stream run stream-a --dry
-```
+**Key Modules:**
+- **Signal Processing**: Advanced technical analysis and pattern recognition
+- **Guardian System**: Risk management and account protection
+- **MT4 Integration**: Direct broker connectivity and order execution
+- **Event System**: WebSocket-based real-time updates
+- **Health Monitoring**: System diagnostics and performance tracking
 
 ## Tool Registry and Event Bus (new)
 
@@ -137,15 +137,17 @@ pytest -q --cov=src --cov-report=term-missing --cov-fail-under=80
 
 | Path                       | Purpose                                                 |
 |---------------------------|---------------------------------------------------------|
-| ``src/cli_multi_rapid``    | Source code for the CLI implementation.                 |
-| ``tests``                 | Unit tests written using ``unittest``.                  |
-| ``config/``               | Configuration files (Docker, YAML, JSON schemas).        |
-| ``scripts/``              | Setup and utility scripts.                               |
-| ``docs/``                 | Documentation organized by purpose.                      |
-| ``docs/specs/``           | Technical specifications and templates.                   |
-| ``docs/archive/``         | Archived and legacy documentation.                       |
-| ``.ai``                   | Agent orchestration scripts and job definitions.         |
-| ``.github/workflows``     | GitHub Actions workflows for automated CI.               |
+| ``src/eafix/``            | Core trading system with CLI, signals, and indicators   |
+| ``src/contracts/``        | Trading data models and type definitions                |
+| ``src/integrations/``     | External service connectors and APIs                    |
+| ``src/websocket/``        | Real-time event broadcasting system                      |
+| ``src/compliance/``       | Regulatory compliance and reporting                      |
+| ``tests/``               | Comprehensive unit and integration tests                 |
+| ``config/``              | System configuration files (YAML, JSON schemas)         |
+| ``scripts/``             | Setup, deployment, and utility scripts                  |
+| ``docs/``                | Trading system documentation                             |
+| ``workflows/``           | Multi-stream workflow definitions                        |
+| ``.github/workflows``    | CI/CD pipelines for automated testing and deployment    |
 
 ## Contributing
 
