@@ -1,0 +1,59 @@
+budgets:
+  daily_usd_ceiling: 50.0
+  weekly_usd_ceiling: 200.0
+  monthly_usd_ceiling: 500.0
+
+tools:
+  claude_code:
+    unit_cost_usd: 0.015
+    hard_ceiling_usd: 25.0
+    soft_ceiling_usd: 15.0
+    alerts:
+      warn_at_pct: 70
+      block_at_pct: 90
+    quotas:
+      daily_requests: 25
+      hourly_requests: 10
+
+  gemini_cli:
+    unit_cost_usd: 0.0
+    hard_ceiling_usd: 0.0
+    quotas:
+      daily_requests: 1000
+      hourly_requests: 100
+    alerts:
+      warn_at_pct: 80
+
+  gh_cli:
+    unit_cost_usd: 0.0
+    hard_ceiling_usd: 0.0
+    quotas:
+      hourly_requests: 5000
+      daily_requests: 50000
+    alerts:
+      warn_at_pct: 80
+
+  semgrep:
+    unit_cost_usd: 0.0
+    hard_ceiling_usd: 0.0
+    quotas:
+      daily_scans: 10000
+    alerts:
+      warn_at_pct: 80
+
+# Emergency fallback configuration
+emergency_fallback:
+  enable_local_only_mode: true
+  local_tools: [git_cli, docker_cli, kubectl, pytest, jest, python_build, npm_build, ollama_local]
+  notification_channels: [slack, email]
+  escalation_threshold_failures: 5
+
+# Cost tracking configuration
+cost_tracking:
+  enable: true
+  granularity: "per_request"
+  retention_days: 90
+  export_formats: [json, csv]
+  alerts:
+    budget_threshold_pct: [50, 75, 90, 100]
+    notification_frequency: "daily"

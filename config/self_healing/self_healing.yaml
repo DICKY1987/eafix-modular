@@ -1,0 +1,48 @@
+schema_version: "1.0"
+self_healing:
+  max_attempts: 3
+  base_backoff_seconds: 10
+  max_backoff_seconds: 300
+  resume_points:
+    fail_fast: BUNDLE_VALIDATE
+    post_apply: SAFEGUARDS_SNAPSHOT
+  security_hard_fail: [ERR_SIG_INVALID]
+  fixers:
+    ERR_ELEVATION_REQUIRED: [FixElevateOrServiceAccount]
+    ERR_TOOLCHAIN_MISSING: [FixInstallToolchain]
+    ERR_AV_BLOCK: [FixCreateAVExclusion, FixMoveStagingPath]
+    ERR_CLOCK_SKEW: [FixSyncTime]
+    ERR_PATH_DENIED: [FixAcquireAcl, FixExpandTildeEnv]
+    ERR_PATH_NOT_FOUND: [FixExpandTildeEnv]
+    ERR_PATH_UNICODE: [FixNormalizeUnicodeCase]
+    ERR_RESERVED_NAME: [FixSanitizeFilenames]
+    ERR_ZONE_IDENTIFIER: [FixStripADS]
+    ERR_READONLY_ATTR: [FixClearReadonly, FixStopOwningService]
+    ERR_FILE_LOCKED: [FixStopOwningService, FixLockBreaker]
+    ERR_YAML_JSON_PARSE: [FixNormalizeEncodingUtf8, FixRepairYamlJson]
+    ERR_SCHEMA: [FixSchemaAutofill, FixSchemaCoerceEnums]
+    ERR_SCHEMA_EVOLUTION: [FixSchemaMigrateFields]
+    ERR_ARCHIVE_CORRUPT: [FixReCopyWithChecksum]
+    ERR_CHECKSUM: [FixRecomputeChecksumsIfSigned, FixReFetchBundle]
+    ERR_SIG_INVALID: [FixReFetchBundle]
+    ERR_CONFLICTS: [FixServiceQuiesce, FixLockBreaker, FixRenameStrategy]
+    ERR_DISK_SPACE: [FixPurgeCaches, FixRotateLogs, FixUseStagingVolume]
+    ERR_STATE_DRIFT: [FixRePlanWithSnapshot]
+    ERR_VERSION_CONSTRAINTS: [FixSelectCompatibleVariant]
+    ERR_SNAPSHOT_FAIL: [FixFallbackBackup, FixPruneSnapshots]
+    ERR_BACKUP_INTEGRITY: [FixRetakeBackup]
+    ERR_PARTIAL_APPLY: [FixResumeFromJournal]
+    ERR_MIGRATION_DEPENDENCY: [FixGrantDbPerms, FixReduceBatch, FixOffPeakRetry]
+    ERR_RESOURCE_STARVE: [FixThrottle, FixSpillToVolume, FixRotateLogs]
+    ERR_HEALTH_FLAKY: [FixQuorumHealth, FixWarmupDelay]
+    ERR_PORT_BIND: [FixAltPort, FixServiceOrder]
+    ERR_CONFIG_REGRESSION: [FixRevertConfig]
+    ERR_ROLLBACK_FAIL: [FixSecondaryRestore, OpenIncident]
+    ERR_POST_ROLLBACK_DRIFT: [FixBaselineRepair, OpenIncident]
+    ERR_REENTRANT_RUN: [FixAcquireDistributedLease]
+    ERR_POLICY_VIOLATION: [FixAutoScheduleWindow, FixRequestApproval]
+    ERR_AUDIT_WRITE_FAIL: [FixRotateAudit, FixSecondarySink]
+    ERR_METRICS_EXPORT: [FixBufferMetrics, FixRetryMetrics]
+notifications:
+  on_quarantine: [ops-slack, email-oncall]
+  on_incident: [pagerduty, email-sev1]

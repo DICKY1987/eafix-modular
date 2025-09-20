@@ -1,0 +1,113 @@
+# Development Profile for CLI Multi-Rapid
+profile: dev
+name: Local Development Profile
+description: Configuration for local development and testing
+
+# Runtime configuration
+runtime:
+  python: "3.11"
+  nodejs: "18"
+  powershell: "7"
+
+# Orchestrator settings
+orchestrator:
+  default_stream: stream-a
+  max_concurrent_jobs: 3
+  timeout_minutes: 10
+  retry_attempts: 2
+
+# Workflow configuration
+workflow:
+  artifacts_dir: artifacts/hello_world
+  logs_dir: logs
+  temp_dir: temp
+  auto_cleanup: false
+
+# Environment variables
+env:
+  ENVIRONMENT: development
+  DEBUG: true
+  LOG_LEVEL: DEBUG
+  ARTIFACT_DIR: artifacts
+  RUNTIME_TIMEOUT_SECONDS: 600
+
+# Service endpoints (local development)
+services:
+  api:
+    url: http://localhost:8000
+    timeout: 30
+  
+  database:
+    host: localhost
+    port: 5432
+    name: cli_multi_rapid
+    ssl: false
+  
+  redis:
+    url: redis://localhost:6379
+    timeout: 5
+  
+  minio:
+    endpoint: localhost:9000
+    access_key: minioadmin
+    secret_key: minioadmin
+    secure: false
+
+# AI service configuration
+ai_services:
+  gemini:
+    enabled: true
+    quota_limit: 1000
+    model: gemini-pro
+  
+  claude:
+    enabled: true
+    quota_limit: 25
+    model: claude-3-sonnet
+  
+  local_ollama:
+    enabled: true
+    endpoint: http://localhost:11434
+
+# Development tools
+tools:
+  pre_commit:
+    enabled: true
+    auto_install: true
+  
+  docker_compose:
+    file: local/docker-compose.yml
+    auto_start: false
+  
+  vs_code:
+    workspace: workflow-vscode.code-workspace
+    extensions_auto_install: true
+
+# Policy overrides for development
+policies:
+  profile_overrides_allowed: true
+  security:
+    allow_plaintext_secrets: true
+    skip_vulnerability_blocking: false
+  
+  testing:
+    coverage_min: 0.80  # Relaxed for development
+    skip_integration_tests: false
+  
+  quality:
+    enforce_type_hints: true
+    max_line_length: 88
+
+# Feature flags
+features:
+  ai_assistance: true
+  github_integration: true
+  workflow_validation: true
+  cost_monitoring: true
+  cross_language_bridge: true
+
+# Monitoring
+monitoring:
+  health_checks: true
+  metrics_collection: false  # Minimal for dev
+  log_aggregation: false    # Local only

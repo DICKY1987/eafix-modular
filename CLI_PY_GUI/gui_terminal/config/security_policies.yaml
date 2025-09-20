@@ -1,0 +1,305 @@
+# Security Policy Configuration
+# CLI Multi-Rapid GUI Terminal
+
+# Command filtering settings
+command_filtering:
+  mode: "whitelist"  # whitelist, blacklist, or disabled
+
+  # Allowed commands in whitelist mode
+  allowed_commands:
+    # Basic shell commands
+    - "ls"
+    - "dir"
+    - "pwd"
+    - "cd"
+    - "echo"
+    - "cat"
+    - "type"
+    - "head"
+    - "tail"
+    - "grep"
+    - "find"
+    - "which"
+    - "whereis"
+
+    # File operations (safe)
+    - "cp"
+    - "copy"
+    - "mv"
+    - "move"
+    - "mkdir"
+    - "touch"
+
+    # Development tools
+    - "python"
+    - "python3"
+    - "pip"
+    - "pip3"
+    - "git"
+    - "node"
+    - "npm"
+    - "yarn"
+    - "docker"
+    - "kubectl"
+
+    # CLI Multi-Rapid platform
+    - "cli-multi-rapid"
+
+    # Text editors (safe ones)
+    - "nano"
+    - "vim"
+    - "emacs"
+    - "code"
+
+    # System info
+    - "whoami"
+    - "id"
+    - "ps"
+    - "top"
+    - "htop"
+    - "df"
+    - "du"
+    - "free"
+    - "uptime"
+
+  # Blocked commands (applies in all modes)
+  blocked_commands:
+    # Dangerous file operations
+    - "rm"
+    - "del"
+    - "rmdir"
+    - "rd"
+
+    # Destructive operations
+    - "format"
+    - "fdisk"
+    - "dd"
+    - "mkfs"
+    - "parted"
+    - "gdisk"
+
+    # Privilege escalation
+    - "sudo"
+    - "su"
+    - "runas"
+    - "doas"
+
+    # System modification
+    - "chmod 777"
+    - "chown"
+    - "passwd"
+    - "useradd"
+    - "userdel"
+    - "groupadd"
+    - "groupdel"
+
+    # Network attacks
+    - "nmap"
+    - "nikto"
+    - "sqlmap"
+    - "metasploit"
+
+# Resource limits
+resource_limits:
+  enforce: true
+  max_processes: 10
+  max_memory_mb: 512
+  max_cpu_percent: 50
+  max_execution_time: 300
+  max_file_size_mb: 100
+  max_network_connections: 10
+
+# Audit logging configuration
+audit_logging:
+  enabled: true
+  log_file: "/var/log/gui_terminal_audit.log"
+  log_commands: true
+  log_file_access: true
+  log_network_access: true
+  integrity_check: true
+  max_log_size_mb: 100
+  log_rotation_count: 5
+
+# Network access controls
+network_access:
+  # Allowed domains for network operations
+  allowed_domains:
+    - "github.com"
+    - "gitlab.com"
+    - "pypi.org"
+    - "npmjs.com"
+    - "docker.io"
+    - "registry.hub.docker.com"
+    - "cli-multi-rapid.com"
+
+  # Blocked domains
+  blocked_domains:
+    - "malicious-site.example"
+
+  # Allow connections to localhost
+  allow_localhost: true
+
+  # Block common attack ports
+  blocked_ports:
+    - 22    # SSH
+    - 23    # Telnet
+    - 3389  # RDP
+    - 5900  # VNC
+
+# File system access controls
+file_system:
+  # Restricted paths that cannot be accessed
+  restricted_paths:
+    # Unix system files
+    - "/etc/passwd"
+    - "/etc/shadow"
+    - "/etc/sudoers"
+    - "/boot"
+    - "/sys"
+    - "/proc/[0-9]*/mem"
+
+    # Windows system files
+    - "C:\\Windows\\System32"
+    - "C:\\Windows\\SysWOW64"
+    - "C:\\Program Files"
+    - "C:\\Program Files (x86)"
+
+    # Sensitive directories
+    - "/root"
+    - "C:\\Users\\Administrator"
+
+  # Allowed paths for file operations
+  allowed_paths:
+    # User directories
+    - "/home"
+    - "/Users"
+    - "C:\\Users"
+
+    # Temporary directories
+    - "/tmp"
+    - "/var/tmp"
+    - "C:\\Temp"
+    - "C:\\Windows\\Temp"
+
+    # Development directories
+    - "/opt"
+    - "/usr/local"
+
+# Compliance rules
+compliance_rules:
+  # Prevent privilege escalation
+  prevent_privilege_escalation:
+    enabled: true
+    name: "Privilege Escalation Prevention"
+    description: "Blocks commands that attempt privilege escalation"
+    patterns:
+      - "sudo"
+      - "su"
+      - "runas"
+      - "gsudo"
+    severity: "critical"
+    action: "block"
+
+  # Prevent destructive commands
+  prevent_destructive_commands:
+    enabled: true
+    name: "Destructive Command Prevention"
+    description: "Blocks potentially destructive file operations"
+    patterns:
+      - "rm -rf"
+      - "del /f /s /q"
+      - "format"
+      - "fdisk"
+      - "dd if="
+    severity: "high"
+    action: "block"
+
+  # Detect suspicious patterns
+  detect_suspicious_patterns:
+    enabled: true
+    name: "Suspicious Pattern Detection"
+    description: "Detects potentially malicious command patterns"
+    patterns:
+      - "base64 -d"
+      - "curl.*|.*sh"
+      - "wget.*|.*sh"
+      - "python -c.*exec"
+      - "eval.*input"
+    severity: "medium"
+    action: "warn"
+
+  # Prevent information disclosure
+  prevent_info_disclosure:
+    enabled: true
+    name: "Information Disclosure Prevention"
+    description: "Prevents access to sensitive system information"
+    patterns:
+      - "cat /etc/passwd"
+      - "cat /etc/shadow"
+      - "type C:\\Windows\\System32\\config\\SAM"
+    severity: "medium"
+    action: "block"
+
+  # Network security
+  network_security:
+    enabled: true
+    name: "Network Security Controls"
+    description: "Controls network-related operations"
+    patterns:
+      - "nc -l"
+      - "netcat -l"
+      - "python -m http.server"
+      - "python -m SimpleHTTPServer"
+    severity: "medium"
+    action: "warn"
+
+# User behavior monitoring
+user_monitoring:
+  # Enable session recording
+  session_recording: false
+
+  # Track command frequency
+  command_frequency_tracking: true
+
+  # Anomaly detection
+  anomaly_detection: true
+
+  # Baseline learning period (days)
+  learning_period: 7
+
+  # Alert thresholds
+  alert_thresholds:
+    commands_per_minute: 20
+    failed_commands_per_hour: 50
+    unique_commands_per_session: 100
+
+# Incident response
+incident_response:
+  # Automatically block user on critical violations
+  auto_block_critical: false
+
+  # Notification settings
+  notifications:
+    email_enabled: false
+    email_recipients: []
+    webhook_url: ""
+    slack_webhook: ""
+
+  # Escalation rules
+  escalation:
+    critical_violations: 1
+    high_violations: 3
+    medium_violations: 10
+
+# Integration settings
+integration:
+  # SIEM integration
+  siem_enabled: false
+  siem_endpoint: ""
+
+  # Threat intelligence feeds
+  threat_intel_enabled: false
+  threat_intel_feeds: []
+
+  # Vulnerability scanning
+  vuln_scan_enabled: false

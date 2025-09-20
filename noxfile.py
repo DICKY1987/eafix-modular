@@ -20,6 +20,21 @@ def tests(session):
         "tests/"
     )
 
+
+@nox.session(python=PYTHON_VERSIONS)
+def gdw_tests(session):
+    # Avoid installing full requirements to keep Windows compatibility and speed
+    session.install("pytest", "jsonschema", "pyyaml", "requests")
+    # Validate example spec against schema
+    session.run(
+        "python",
+        "-m",
+        "schema.validators.python.gdw_validator",
+        "gdw/git.commit_push.main/v1.0.0/spec.json",
+    )
+    # Optional performance/chaos tests
+        session.run("pytest", "-q", "tests/test_gdw_performance_optional.py", external=False)
+
 @nox.session
 def integration_tests(session):
     """Run integration tests (cost-controlled)"""

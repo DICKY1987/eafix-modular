@@ -999,13 +999,9 @@ function Install-Docker {
             if ($Admin) { 
                 Winget-Install 'Docker.DockerDesktop' 'machine' 
             } else {
-                Write-Log 'Docker Desktop requires admin; attempting elevation for Docker-only install…' 'WARNING'
-                try {
-                    Start-Process -FilePath 'pwsh' -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-File', $MyInvocation.MyCommand.Path, '-InstallDocker') -Verb RunAs | Out-Null
-                    Write-Log 'Elevated child process started for Docker install. Continuing user-scope steps.' 'INFO'
-                } catch { 
-                    Write-Log 'Elevation failed; skip Docker install.' 'ERROR' 
-                }
+                Write-Log 'Docker Desktop requires admin privileges. Please run installer manually or use winget:' 'WARNING'
+                Write-Log 'winget install --id Docker.DockerDesktop -e -h --accept-source-agreements --accept-package-agreements' 'INFO'
+                Write-Log 'Skipping Docker installation to avoid privilege escalation' 'INFO'
             }
         }
     } catch {

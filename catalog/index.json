@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "workflows": [
+    {
+      "id": "git.commit_push.main",
+      "version": "1.0.0",
+      "path": "gdw/git.commit_push.main/v1.0.0/spec.json",
+      "domain": "git",
+      "maturity": "validated",
+      "summary": "Commit changes and push to main or PR"
+    },
+    {
+      "id": "build.container.sign",
+      "version": "1.0.0",
+      "path": "gdw/build.container.sign/v1.0.0/spec.json",
+      "domain": "build",
+      "maturity": "candidate",
+      "summary": "Build container image and create signature"
+    },
+    {
+      "id": "security.scan.trivy",
+      "version": "1.0.0",
+      "path": "gdw/security.scan.trivy/v1.0.0/spec.json",
+      "domain": "security",
+      "maturity": "candidate",
+      "summary": "Run trivy scan and export report"
+    },
+    {
+      "id": "k8s.deploy.rolling",
+      "version": "1.0.0",
+      "path": "gdw/k8s.deploy.rolling/v1.0.0/spec.json",
+      "domain": "k8s",
+      "maturity": "candidate",
+      "summary": "Apply manifests and wait for rollout"
+    },
+    {
+      "id": "version.bump.semver",
+      "version": "1.0.0",
+      "path": "gdw/version.bump.semver/v1.0.0/spec.json",
+      "domain": "versioning",
+      "maturity": "candidate",
+      "summary": "Bump semver in file and commit"
+    }
+  ]
+}

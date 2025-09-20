@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: api
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: api=ghcr.io/OWNER/REPO/huey-p-api
+    argocd-image-updater.argoproj.io/api.update-strategy: digest
+    # Easiest start: let the updater write back to the Argo CD Application (no Git creds needed)
+    argocd-image-updater.argoproj.io/write-back-method: argocd
+    # To switch to Git write-back (recommended for GitOps parity), comment the line above and use:
+    # argocd-image-updater.argoproj.io/write-back-method: git
+    # argocd-image-updater.argoproj.io/git-branch: main
+    # argocd-image-updater.argoproj.io/git-username: github-actions[bot]
+    # argocd-image-updater.argoproj.io/git-email: 41898282+github-actions[bot]@users.noreply.github.com
+spec:
+  project: default
+  source:
+    repoURL: REPLACE_WITH_YOUR_GIT_REPO_URL
+    targetRevision: HEAD
+    path: k8s/api
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: platform
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

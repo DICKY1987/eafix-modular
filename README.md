@@ -92,6 +92,12 @@ cli-multi-rapid phase stream list
 cli-multi-rapid phase stream run stream-a --dry
 ```
 
+## Tool Registry and Event Bus (new)
+
+- Tool registry: define tools in `config/tools.yaml`.
+- Probe tools and write health snapshot: `python scripts/ipt_tools_ping.py` → `state/tool_health.json`.
+- Event bus (FastAPI + WebSocket): `uvicorn services.event_bus.main:app --reload` then publish JSON to `POST /publish`; subscribers connect to `/ws`.
+
 Hooks setup
 
 - Configure Git to use bundled hooks (merge-safety, optional license gate):
@@ -113,6 +119,12 @@ To run the test suite locally using the built‑in Python ``unittest`` runner:
 ```bash
 python -m unittest discover -s tests -v
 ```
+
+## Cost Reports
+
+- Emit tokens locally: `powershell -NoProfile -File scripts/emit_tokens.ps1 -Out artifacts/tokens.json`
+- Generate report: `powershell -NoProfile -File scripts/report_costs.ps1 -OutDir artifacts/cost`
+- CI: uploads cost artifacts and posts a PR summary; a scheduled budget check runs daily.
 
 Alternatively, if you have ``pytest`` available, you can benefit from its
 more expressive output and coverage reporting:

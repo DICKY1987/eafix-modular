@@ -1,0 +1,11 @@
+steps:
+  - workflow: git.commit_push.main
+    inputs:
+      repo: .
+      branch: main
+      commit_message: "ci: run checks"
+      push_mode: pr
+  - workflow: security.scan.trivy
+    inputs:
+      target: .
+

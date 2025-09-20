@@ -1,0 +1,93 @@
+# CLI Multi-Rapid Component Registry
+# Declarative catalog of external tools, runtimes, and dependencies
+
+version: '1.0'
+metadata:
+  name: cli-multi-rapid-components
+  description: Component registry for CLI Multi-Rapid Enterprise Orchestration Platform
+
+# Legacy workflow components (preserved)
+components:
+  orchestrator:
+    path: workflows/orchestrator.py
+  hello_world_workflow:
+    path: workflows/hello_world/workflow.yaml
+
+# Runtime and tool dependencies
+runtimes:
+  python:
+    type: runtime
+    description: Python runtime for CLI Multi-Rapid framework and validators
+    command: python
+    version_constraint: ">=3.11"
+    install:
+      windows: "winget install Python.Python.3.11"
+      linux: "apt-get install python3.11"
+      macos: "brew install python@3.11"
+    validation:
+      command: "python --version"
+      expected_pattern: "Python 3.1[1-9]"
+
+  powershell:
+    type: runtime
+    description: PowerShell 7 (pwsh) for cross-platform task automation
+    command: pwsh
+    version_constraint: ">=7.0"
+    install:
+      windows: "winget install Microsoft.PowerShell"
+      linux: "snap install powershell --classic"
+      macos: "brew install --cask powershell"
+
+  nodejs:
+    type: runtime
+    description: Node.js runtime for Gemini CLI and JavaScript tooling
+    command: node
+    version_constraint: ">=18.0"
+    install:
+      windows: "winget install OpenJS.NodeJS.LTS"
+      linux: "curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -"
+      macos: "brew install node"
+
+# CLI Tools
+tools:
+  github-cli:
+    type: cli
+    description: GitHub CLI for PR management and repository operations
+    command: gh
+    version_constraint: ">=2.0"
+    install:
+      windows: "winget install GitHub.cli"
+      linux: "apt-get install gh"
+      macos: "brew install gh"
+
+  gemini-cli:
+    type: cli
+    description: Google Gemini CLI for AI-assisted development
+    command: gemini
+    version_constraint: ">=1.0"
+    install:
+      all: "npm install -g @google/gemini-cli@latest"
+
+  docker:
+    type: container
+    description: Docker container runtime for local development stack
+    command: docker
+    version_constraint: ">=20.0"
+    install:
+      windows: "winget install Docker.DockerDesktop"
+      linux: "curl -fsSL https://get.docker.com | sh"
+      macos: "brew install --cask docker"
+
+# Component groups for bulk operations
+groups:
+  core:
+    description: Essential runtime components
+    components: [python, powershell, nodejs]
+  
+  development:
+    description: Development tools and CLI utilities
+    components: [github-cli, gemini-cli]
+    
+  containers:
+    description: Container and orchestration tools
+    components: [docker]

@@ -1,4 +1,4 @@
-"""
+﻿"""
 Command-line interface for the ``cli_multi_rapid`` package.
 
 This module exposes a :func:`main` function which is intended to be used as
@@ -23,6 +23,25 @@ from dataclasses import dataclass
 from typing import List, Optional, Any, Dict
 import os
 import json
+from .self_healing_manager import get_self_healing_manager, ErrorCode, SelfHealingResult
+
+
+def _safe_print(text: str) -> None:
+    """Print text safely across platforms by replacing unencodable chars.
+
+    On some Windows consoles, certain Unicode characters (e.g., arrows,
+    checkmarks) cannot be encoded with the active code page. This helper
+    avoids hard failures by replacing those characters during printing.
+    """
+    enc = getattr(sys.stdout, "encoding", None) or "utf-8"
+    try:
+        sys.stdout.write(text + "\n")
+    except UnicodeEncodeError:
+        try:
+            sys.stdout.buffer.write((text + "\n").encode(enc, errors="replace"))
+        except Exception:
+            # Last resort
+            print(text.encode("ascii", errors="replace").decode("ascii", errors="ignore"))
 
 
 def greet(name: str) -> str:
@@ -89,6 +108,15 @@ class CLIArgs:
     compliance_check: Optional[bool] = None
     # Additional compliance fields
     compliance_cmd: Optional[str] = None
+    # Self-healing fields
+    healing_cmd: Optional[str] = None
+    error_code: Optional[str] = None
+    # Execution pipeline fields
+    pipeline_cmd: Optional[str] = None
+    spec: Optional[str] = None
+    pipeline_inputs: Optional[str] = None
+    pipeline_dry: Optional[bool] = None
+    chain_dry: Optional[bool] = None
 
 
 def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
@@ -176,6 +204,8 @@ def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
     phase_run = phase_sub.add_parser("run", help="Run a workflow phase by id")
     phase_run.add_argument("phase_id", type=str, help="Phase ID to execute (e.g., phase1)")
     phase_run.add_argument("--dry", dest="dry", action="store_true", help="Dry run (no side effects)")
+    phase_run.add_argument("--pipeline-only", dest="pipeline_only", action="store_true", help="Force execution pipeline deferral (skip agent services)")
+    phase_run.add_argument("--pipeline-prefer", dest="pipeline_prefer", action="store_true", help="Prefer execution pipeline deferral when policies match")
     # phase status
     phase_sub.add_parser("status", help="Show workflow status")
     # phase stream ...
@@ -187,6 +217,8 @@ def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
     stream_run = stream_sub.add_parser("run", help="Run all phases in a stream")
     stream_run.add_argument("stream_id", type=str, help="Stream ID to execute (e.g., stream-a)")
     stream_run.add_argument("--dry", dest="dry", action="store_true", help="Dry run (no side effects)")
+    stream_run.add_argument("--pipeline-only", dest="pipeline_only", action="store_true")
+    stream_run.add_argument("--pipeline-prefer", dest="pipeline_prefer", action="store_true")
     
     # compliance subcommand
     compliance_parser = subparsers.add_parser("compliance", help="Compliance and validation commands")
@@ -196,8 +228,23 @@ def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
     # compliance check
     compliance_sub.add_parser("check", help="Run compliance validation checks")
     
+    # self-healing subcommand
+    healing_parser = subparsers.add_parser("self-healing", help="Self-healing operations and diagnostics")
+    healing_sub = healing_parser.add_subparsers(dest="healing_cmd", required=True)
+    # self-healing status
+    healing_sub.add_parser("status", help="Show self-healing system status")
+    # self-healing test
+    healing_test = healing_sub.add_parser("test", help="Test self-healing for specific error")
+    healing_test.add_argument("error_code", type=str, help="Error code to test (e.g., ERR_DISK_SPACE)")
+    # self-healing config
+    healing_sub.add_parser("config", help="Show self-healing configuration")
+    
     # workflow-status subcommand
     subparsers.add_parser("workflow-status", help="Enhanced workflow status with metrics")
+
+    # gui subcommand (optional GUI launcher)
+    subparsers.add_parser("gui", help="Launch the GUI Terminal (optional dependencies)")
+
 
     parsed = parser.parse_args(argv)
     return CLIArgs(
@@ -215,6 +262,13 @@ def parse_args(argv: Optional[List[str]] = None) -> CLIArgs:
         workflow_validate=getattr(parsed, "workflow_validate", None),
         compliance_check=getattr(parsed, "compliance_check", None),
         compliance_cmd=getattr(parsed, "compliance_cmd", None),
+        healing_cmd=getattr(parsed, "healing_cmd", None),
+        error_code=getattr(parsed, "error_code", None),
+        pipeline_cmd=getattr(parsed, "pipeline_cmd", None),
+        spec=getattr(parsed, "spec", None),
+        pipeline_inputs=getattr(parsed, "pipeline_inputs", None),
+        pipeline_dry=getattr(parsed, "pipeline_dry", None),
+        chain_dry=getattr(parsed, "chain_dry", None),
     )
 
 
@@ -334,22 +388,22 @@ def _list_jobs(file: Optional[str], name_filter: Optional[str], show: Optional[s
             
         if j.get("type") == "tasks.json":
             cmd = j.get("command")
-            print(f"{src}: {nm} (command: {cmd})")
+            _safe_print(f"{src}: {nm} (command: {cmd})")
             if show == "steps":
                 args = j.get("args") or []
                 depends = j.get("dependsOn")
-                print(f"  args: {args}")
+                _safe_print(f"  args: {args}")
                 if depends:
-                    print(f"  dependsOn: {depends}")
+                    _safe_print(f"  dependsOn: {depends}")
         else:
             tool = j.get("tool")
             branch = j.get("branch")
-            print(f"{src}: {nm} [tool: {tool}, branch: {branch}]")
+            _safe_print(f"{src}: {nm} [tool: {tool}, branch: {branch}]")
             if show == "steps":
                 worktree = j.get("worktree")
                 tests = j.get("tests")
-                print(f"  worktree: {worktree}")
-                print(f"  tests: {tests}")
+                _safe_print(f"  worktree: {worktree}")
+                _safe_print(f"  tests: {tests}")
     return 0
 
 
@@ -400,6 +454,10 @@ def main(argv: Optional[List[str]] = None) -> int:
         elif args.command == "phase":
             # Lazy import to avoid hard dependency when not used
             try:
+                # Add current directory to Python path for workflow imports
+                current_dir = os.getcwd()
+                if current_dir not in sys.path:
+                    sys.path.insert(0, current_dir)
                 from workflows.orchestrator import WorkflowOrchestrator  # type: ignore
             except Exception as exc:  # pragma: no cover
                 print(f"Error: workflow orchestrator unavailable: {exc}", file=sys.stderr)
@@ -415,6 +473,11 @@ def main(argv: Optional[List[str]] = None) -> int:
             elif phase_cmd == "run":
                 phase_id = getattr(args, "phase_id", None)
                 dry = bool(getattr(args, "dry", False))
+                # Propagate execution pipeline preference via environment for orchestrator
+                if bool(getattr(args, "pipeline_only", False)):
+                    os.environ["PIPELINE_ONLY"] = "1"
+                elif bool(getattr(args, "pipeline_prefer", False)):
+                    os.environ["PIPELINE_PREFER"] = "1"
                 if not phase_id:
                     print("Error: missing phase_id", file=sys.stderr)
                     return 1
@@ -439,6 +502,10 @@ def main(argv: Optional[List[str]] = None) -> int:
                 elif stream_cmd == "run":
                     stream_id = getattr(args, "stream_id", None)
                     dry = bool(getattr(args, "dry", False))
+                    if bool(getattr(args, "pipeline_only", False)):
+                        os.environ["PIPELINE_ONLY"] = "1"
+                    elif bool(getattr(args, "pipeline_prefer", False)):
+                        os.environ["PIPELINE_PREFER"] = "1"
                     if not stream_id:
                         print("Error: missing stream_id", file=sys.stderr)
                         return 1
@@ -473,16 +540,80 @@ def main(argv: Optional[List[str]] = None) -> int:
                 return 0
             elif compliance_cmd == "check":
                 print("[COMPLIANCE CHECK] Running validation checks...")
-                print("✓ Security scanning active")
-                print("✓ Code quality gates enforced") 
-                print("✓ Test coverage >= 85%")
-                print("✓ All governance files present")
-                print("✓ Branch protection enabled")
-                print("✓ Workflow orchestration operational")
+                print("- Security scanning active")
+                print("- Code quality gates enforced")
+                print("- Test coverage >= 85%")
+                print("- All governance files present")
+                print("- Branch protection enabled")
+                print("- Workflow orchestration operational")
                 print("[SUCCESS] All compliance checks passed")
                 return 0
             else:
                 print("Error: unknown compliance subcommand", file=sys.stderr)
+                return 1
+        elif args.command == "self-healing":
+            healing_cmd = getattr(args, "healing_cmd", None)
+            healing_manager = get_self_healing_manager()
+            
+            if healing_cmd == "status":
+                print("=== Self-Healing System Status ===")
+                print(f"Configuration loaded: {healing_manager.config_path}")
+                print(f"Registered fixers: {len(healing_manager.fixers)}")
+                
+                # Show configuration summary
+                sh_config = healing_manager.config.get('self_healing', {})
+                print(f"Max attempts: {sh_config.get('max_attempts', 'N/A')}")
+                print(f"Base backoff: {sh_config.get('base_backoff_seconds', 'N/A')}s")
+                print(f"Max backoff: {sh_config.get('max_backoff_seconds', 'N/A')}s")
+                
+                security_hard_fail = sh_config.get('security_hard_fail', [])
+                print(f"Security hard fail codes: {len(security_hard_fail)}")
+                
+                # Show available error codes
+                print("\n=== Available Error Codes ===")
+                for error_code in ErrorCode:
+                    fixer_count = len(healing_manager.fixers.get(error_code, []))
+                    print(f"  {error_code.value}: {fixer_count} fixers")
+                
+                return 0
+                
+            elif healing_cmd == "test":
+                error_code_str = getattr(args, "error_code", None)
+                if not error_code_str:
+                    print("Error: missing error_code", file=sys.stderr)
+                    return 1
+                    
+                try:
+                    error_code = ErrorCode(error_code_str.upper())
+                except ValueError:
+                    print(f"Error: invalid error code '{error_code_str}'", file=sys.stderr)
+                    print("Available codes:")
+                    for code in ErrorCode:
+                        print(f"  {code.value}")
+                    return 1
+                
+                print(f"Testing self-healing for: {error_code.value}")
+                result = healing_manager.attempt_healing(error_code, {"test_mode": True})
+                
+                print(f"\n=== Healing Result ===")
+                print(f"Success: {result.success}")
+                print(f"Attempts: {result.attempts}")
+                print(f"Applied fixes: {result.applied_fixes}")
+                print(f"Total time: {result.total_time:.2f}s")
+                print(f"Message: {result.message}")
+                
+                return 0 if result.success else 1
+                
+            elif healing_cmd == "config":
+                print("=== Self-Healing Configuration ===")
+                print(f"Config file: {healing_manager.config_path}")
+                print("\nConfiguration:")
+                import yaml
+                print(yaml.dump(healing_manager.config, default_flow_style=False, indent=2))
+                return 0
+                
+            else:
+                print("Error: unknown self-healing subcommand", file=sys.stderr)
                 return 1
         elif args.command == "workflow-status":
             try:
@@ -500,10 +631,30 @@ def main(argv: Optional[List[str]] = None) -> int:
             except Exception as exc:
                 print(f"Error: workflow system unavailable: {exc}", file=sys.stderr)
                 return 1
-        else:
+        elif args.command == "gui":  # pragma: no cover - optional GUI path
+            # Attempt to run GUI terminal, fallback to headless message if missing
+            try:
+                import runpy
+                # Ensure GUI project path is available
+                repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+                gui_src = os.path.join(repo_root, "gui_terminal", "src")
+                os.environ.setdefault("PYTHONPATH", gui_src + os.pathsep + os.environ.get("PYTHONPATH", ""))
+                # Execute the GUI main module
+                runpy.run_module("gui_terminal.main", run_name="__main__")
+                return 0
+            except Exception as e:
+                _safe_print(f"GUI not available: {e}")
+                return 1
+        else:  # pragma: no cover - defensive fallback
             # This branch should be unreachable because of argparse's required subcommand
             print(f"Unknown command: {args.command}", file=sys.stderr)
             return 1
     except Exception as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
+
+
+if __name__ == "__main__":
+    # Allow running as a module: `python -m cli_multi_rapid.cli ...`
+    # Exit with the status code from main for proper CLI behavior.
+    sys.exit(main())

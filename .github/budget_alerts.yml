@@ -1,0 +1,12 @@
+version: '1.0'
+thresholds:
+  daily_usd: 25.0
+  weekly_usd: 150.0
+  monthly_usd: 600.0
+notifications:
+  channels:
+    - type: github_summary
+    - type: artifact_only
+notes: |
+  Update thresholds to match your environment. A scheduled job can parse
+  artifacts/cost/cost_report.json and compare against thresholds.

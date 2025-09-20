@@ -1,0 +1,18 @@
+[run]
+omit =
+    src/integrations/*
+    src/components/*
+    src/services/*
+    src/websocket/*
+    src/contracts/*
+    src/observability/*
+    src/idempotency/*
+    src/compliance/*
+
+[report]
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.
+    @overload
+    @abstractmethod
+    raise NotImplementedError
