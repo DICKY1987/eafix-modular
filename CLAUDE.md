@@ -4,151 +4,140 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is the **EAFIX Trading System** - a professional trading platform that combines Python intelligence with MT4 execution:
+This is the **CLI Orchestrator** - a deterministic, schema-driven CLI orchestrator that stitches together multiple developer tools and AI agents into predefined, auditable workflows. It prioritizes scripts first, escalates to AI only where judgment is required, and emits machine-readable artifacts with gates and verification at every hop.
 
-- **EAFIX Core**: Complete trading system with Guardian protection (`src/eafix/`)
-- **Trading CLI**: Professional command-line interface for system management
-- **Signal Processing**: Advanced technical analysis and pattern recognition
-- **Guardian System**: Automated risk management and account protection
-- **MT4 Integration**: Direct broker connectivity and order execution
+## Core Architecture
+
+### Key Components
+- **Workflow Runner**: Executes schema-validated YAML workflows (`src/cli_multi_rapid/workflow_runner.py:1`)
+- **Router System**: Routes steps between deterministic tools and AI adapters (`src/cli_multi_rapid/router.py:1`)
+- **Adapter Framework**: Unified interface for tools and AI services (`src/cli_multi_rapid/adapters/`)
+- **Schema Validation**: JSON Schema validation for workflows and artifacts (`.ai/schemas/`)
+- **Cost Tracking**: Token usage and budget enforcement (`src/cli_multi_rapid/cost_tracker.py:1`)
+- **Gate System**: Verification and quality gates (`src/cli_multi_rapid/verifier.py:1`)
+
+### Directory Structure
+- `src/cli_multi_rapid/`: Core orchestrator implementation
+- `.ai/workflows/`: YAML workflow definitions (schema-validated)
+- `.ai/schemas/`: JSON Schema definitions for validation
+- `adapters/`: Tool and AI adapter implementations
+- `artifacts/`: Workflow execution artifacts (patches, reports)
+- `logs/`: JSONL execution logs and telemetry
+- `cost/`: Token usage tracking and budget reports
 
 ## Common Development Commands
 
-### Testing
+### Installation and Setup
 ```bash
-# Run all tests with unittest
-python -m unittest discover -s tests -v
+# Install in development mode
+pip install -e .
 
-# Run tests with pytest (if available)
-pytest -q --cov=src --cov-report=term-missing --cov-fail-under=80
+# Install with AI tools support
+pip install -e .[ai]
 
-# Run specific test file
-python -m unittest tests.test_cli.py -v
-pytest tests/test_cli.py -v
+# Install with development tools
+pip install -e .[dev]
 ```
 
-### Code Quality
+### CLI Usage
 ```bash
-# Run all pre-commit hooks (ruff, black, isort, mypy, bandit, yamllint, etc.)
-pre-commit run --all-files
+# Run a workflow with dry-run
+cli-orchestrator run .ai/workflows/PY_EDIT_TRIAGE.yaml --files "src/**/*.py" --lane lane/ai-coding/fix-imports --dry-run
 
-# Manual linting and formatting
+# Execute workflow
+cli-orchestrator run .ai/workflows/PY_EDIT_TRIAGE.yaml --files "src/**/*.py"
+
+# Verify an artifact against schema
+cli-orchestrator verify artifacts/diagnostics.json --schema .ai/schemas/diagnostics.schema.json
+
+# Create PR from artifacts
+cli-orchestrator pr create --from artifacts/ --title "Auto triage & fixes" --lane lane/ai-coding/fix-imports
+
+# Generate cost report
+cli-orchestrator cost report --last-run
+```
+
+### Development Tools
+```bash
+# Run tests
+python -m pytest tests/ -v --cov=src
+
+# Run code quality checks
 ruff check src/ tests/ --fix
 black src/ tests/
 isort src/ tests/ --profile black
 mypy src/ --ignore-missing-imports
 
-# Security scanning
-bandit -r src/ -f json -o bandit-report.json
+# Run pre-commit hooks
+pre-commit run --all-files
 ```
 
-### Build and Package
-```bash
-# Install in development mode
-pip install -e .
+## Workflow Development
 
-# With optional dependencies
-pip install -e .[yaml]
+### Creating Workflows
+Workflows are defined in `.ai/workflows/*.yaml` and validated against `.ai/schemas/workflow.schema.json`:
 
-# Build package
-python -m build
+```yaml
+name: "Python Edit + Triage"
+inputs:
+  files: ["src/**/*.py"]
+  lane: "lane/ai-coding/fix-imports"
+policy:
+  max_tokens: 120000
+  prefer_deterministic: true
+steps:
+  - id: "1.001"
+    name: "VS Code Diagnostic Analysis"
+    actor: vscode_diagnostics
+    with:
+      analyzers: ["python", "ruff", "mypy"]
+    emits: ["artifacts/diagnostics.json"]
 ```
 
-### CLI Usage
-```bash
-# EAFIX Trading System CLI
-python -m eafix.apps.cli.main status
-python -m eafix.apps.cli.main trade signals --active --symbol EURUSD
-python -m eafix.apps.cli.main guardian status
-python -m eafix.apps.cli.main system health --detailed
-python -m eafix.apps.cli.main analyze performance --period 30d
+### Available Actors
+- **vscode_diagnostics**: Run diagnostic analysis (ruff, mypy, etc.)
+- **code_fixers**: Apply deterministic fixes (black, isort, ruff --fix)
+- **ai_editor**: AI-powered code editing (aider, claude, gemini)
+- **pytest_runner**: Run tests with coverage reporting
+- **verifier**: Check gates and validate artifacts
+- **git_ops**: Git operations and PR creation
 
-# Additional trading commands
-python -m eafix.apps.cli.main setup install-dependencies
-python -m eafix.apps.cli.main setup configure --broker-settings
-python -m eafix.apps.cli.main launch  # Launch GUI interface
+### Gate Types
+- **tests_pass**: Verify tests pass from test report
+- **diff_limits**: Check diff size within bounds
+- **schema_valid**: Validate artifacts against schemas
 
-# APF (Atomic Process Framework) commands
-python -m eafix.apps.cli.main apf status
-python -m eafix.apps.cli.main apf run --workflow trading-pipeline
-```
+## Architecture Principles
 
-### Installation
-```bash
-# Local editable install
-pip install -e .
+1. **Determinism First**: Prefer scripts and static analyzers over AI
+2. **Schema-Driven**: All workflows validated by JSON Schema
+3. **Idempotent & Safe**: Dry-run, patch previews, rollback support
+4. **Auditable**: Every step emits structured artifacts and logs
+5. **Cost-Aware**: Track token spend, enforce budgets
+6. **Git Integration**: Lane-based development, signed commits
 
-# With YAML support for enhanced job management
-pip install -e .[yaml]
+## Extending the System
 
-# Use installed CLI
-eafix status
-eafix trade positions --active
-```
+### Adding New Adapters
+1. Extend `BaseAdapter` in `src/cli_multi_rapid/adapters/base_adapter.py`
+2. Implement `execute()` method returning `AdapterResult`
+3. Register in `Router._initialize_adapters()`
+4. Add actor to workflow schema enum
 
-## Architecture
+### Adding New Gate Types
+1. Add gate logic to `Verifier._check_single_gate()`
+2. Update workflow schema with new gate type
+3. Create corresponding JSON schema for artifacts
 
-### Core Structure
-- `src/eafix/`: Trading system core with CLI commands (trading, guardian, system, analysis, setup)
-- `src/contracts/`: Trading data models (Signal, Pricetick, OrderIntent, Executionreport, etc.)
-- `src/integrations/`: External service connectors (GitHub, Slack, Teams, Jira)
-- `src/websocket/`: Event broadcasting and connection management (WebSocket + FastAPI)
-- `src/compliance/`: Regulatory compliance and reporting services
-- `src/observability/`: Metrics, tracing, and JSON logging
-- `src/idempotency/`: State management, queues, and consumer patterns
-- `workflows/`: Multi-stream workflow definitions and deployment configurations
+## Testing Strategy
 
-### Key Components
-- **Health Checker**: System status monitoring (`src/eafix/system/health_checker.py:1`)
-- **Trading Commands**: Core trading operations (`src/eafix/apps/cli/commands/trading.py:1`)
-- **Guardian System**: Risk management and protection (`src/eafix/apps/cli/commands/guardian.py:1`)
-- **System Management**: Health and diagnostics (`src/eafix/apps/cli/commands/system.py:1`)
-- **Event Broadcasting**: WebSocket real-time updates (`src/websocket/event_broadcaster.py:1`)
-- **Integration Manager**: External service coordination (`src/integrations/integration_manager.py:1`)
-- **Compliance Service**: Regulatory reporting (`src/compliance/service.py:1`)
-
-### Configuration
-- `config/tools.yaml`: Tool registry and health monitoring definitions
-- `config/self_healing/self_healing.yaml`: Self-healing policies and recovery strategies
-- `config/policies/policy.yaml`: System-wide operational policies
-- `config/profiles/dev.yaml`: Development environment configuration
-- `config/integrations.json`: External service integration settings
-- `config/failover_maps.yaml`: Failover and redundancy configurations
-
-### Multi-Stream Workflow
-The system supports parallel development workflows:
-- Stream-based phase execution with conflict prevention
-- Kubernetes deployment configurations in `workflows/TONIGHT9325DEPLOY/`
-- ArgoCD integration for GitOps deployment patterns
-- Tool health monitoring with snapshot generation (`python scripts/ipt_tools_ping.py`)
-
-## Development Workflow
-
-1. **Pre-commit Hooks**: All changes must pass comprehensive quality gates:
-   - Code formatting (black, isort, ruff)
-   - Type checking (mypy)
-   - Security scanning (bandit, detect-secrets)
-   - YAML/JSON validation (yamllint)
-   - Markdown linting (markdownlint)
-2. **Testing**: Maintain 80%+ test coverage with unittest/pytest
-3. **Build System**: Uses pyproject.toml with setuptools build backend
-4. **Package Structure**: Editable installs with optional dependencies (PyYAML)
-5. **CI/CD**: GitHub Actions with automated testing and deployment
-
-## Scripts
-
-Key PowerShell scripts in `scripts/`:
-- `emit_tokens.ps1`: Token usage tracking
-- `report_costs.ps1`: Cost analysis and reporting
-- `install_hooks.ps1`: Git hooks installation
-- `run_workflow.ps1`: Workflow execution
+- Unit tests for core components (`tests/`)
+- Integration tests for workflow execution
+- Schema validation tests for all artifacts
+- Mock adapters for isolated testing
 
 ## Dependencies
 
-- **Core**: Python 3.9+, typer, FastAPI, uvicorn, pydantic, rich
-- **Trading**: CrewAI, LangGraph, LangChain (Anthropic, Google GenAI, Community)
-- **Data**: SQLModel, Redis, PyYAML (optional)
-- **Monitoring**: prometheus-client, structlog
-- **Development**: pre-commit, ruff, black, isort, mypy, bandit, pytest, coverage
-- **Security**: detect-secrets, gitleaks, pip-audit, semgrep
-- **Optional**: docker, hydra-core, hypothesis, jsonschema
+- **Core**: typer, pydantic, rich, PyYAML, jsonschema
+- **Optional AI**: aider-chat (for AI-powered editing)
+- **Development**: pytest, black, isort, ruff, mypy

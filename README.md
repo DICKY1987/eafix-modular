@@ -108,13 +108,13 @@ Hooks setup
 
 Development workflows emphasise high code quality, reproducibility and clear
 communication. The repository includes a commit message template
-(``.gitmessage.txt``) and a sample CI workflow (``.github/workflows/ci.yml``)
-that installs common development tools such as ``pre-commit``, ``ruff`` and
-``pytest``. Although these tools may not be available in all environments,
+(`.gitmessage.txt`) and a sample CI workflow (`.github/workflows/ci.yml`)
+that installs common development tools such as `pre-commit`, `ruff` and
+`pytest`. Although these tools may not be available in all environments,
 they are preconfigured so that continuous integration (CI) pipelines can
 enforce formatting, linting, static type checking and unit test execution.
 
-To run the test suite locally using the built‑in Python ``unittest`` runner:
+To run the test suite locally using the built‑in Python `unittest` runner:
 
 ```bash
 python -m unittest discover -s tests -v
@@ -126,7 +126,7 @@ python -m unittest discover -s tests -v
 - Generate report: `powershell -NoProfile -File scripts/report_costs.ps1 -OutDir artifacts/cost`
 - CI: uploads cost artifacts and posts a PR summary; a scheduled budget check runs daily.
 
-Alternatively, if you have ``pytest`` available, you can benefit from its
+Alternatively, if you have `pytest` available, you can benefit from its
 more expressive output and coverage reporting:
 
 ```bash
@@ -137,23 +137,23 @@ pytest -q --cov=src --cov-report=term-missing --cov-fail-under=80
 
 | Path                       | Purpose                                                 |
 |---------------------------|---------------------------------------------------------|
-| ``src/eafix/``            | Core trading system with CLI, signals, and indicators   |
-| ``src/contracts/``        | Trading data models and type definitions                |
-| ``src/integrations/``     | External service connectors and APIs                    |
-| ``src/websocket/``        | Real-time event broadcasting system                      |
-| ``src/compliance/``       | Regulatory compliance and reporting                      |
-| ``tests/``               | Comprehensive unit and integration tests                 |
-| ``config/``              | System configuration files (YAML, JSON schemas)         |
-| ``scripts/``             | Setup, deployment, and utility scripts                  |
-| ``docs/``                | Trading system documentation                             |
-| ``workflows/``           | Multi-stream workflow definitions                        |
-| ``.github/workflows``    | CI/CD pipelines for automated testing and deployment    |
+| `src/eafix/`            | Core trading system with CLI, signals, and indicators   |
+| `src/contracts/`        | Trading data models and type definitions                |
+| `src/integrations/`     | External service connectors and APIs                    |
+| `src/websocket/`        | Real-time event broadcasting system                      |
+| `src/compliance/`       | Regulatory compliance and reporting                      |
+| `tests/`               | Comprehensive unit and integration tests                 |
+| `config/`              | System configuration files (YAML, JSON schemas)         |
+| `scripts/`             | Setup, deployment, and utility scripts                  |
+| `docs/`                | Trading system documentation                             |
+| `workflows/`           | Multi-stream workflow definitions                        |
+| `.github/workflows`    | CI/CD pipelines for automated testing and deployment    |
 
 ## Contributing
 
 Contributions are welcome! Feel free to open issues or pull requests to
 discuss improvements, report bugs, or suggest new features. Please follow the
-commit message guidelines defined in ``.gitmessage.txt`` and aim to include
+commit message guidelines defined in `.gitmessage.txt` and aim to include
 tests for any new functionality.
 ## VS Code
 
