@@ -1,6 +1,6 @@
 # Multi-stage build for data-ingestor service
 # Pin to specific digest for security (updated as of 2025-01-15)
-FROM python:3.11-slim@sha256:f52d14c7d0e87b6be38fdf5a5f6c7ae19a04e95e7dfd8cad073ad5063d80d3d0 as builder
+FROM python:3.14-slim@sha256:4ed33101ee7ec299041cc41dd268dae17031184be94384b1ce7936dc4e5dead3 as builder
 
 # Build arguments for security labeling
 ARG BUILD_DATE
@@ -46,7 +46,7 @@ RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
 # Production stage
-FROM python:3.11-slim@sha256:f52d14c7d0e87b6be38fdf5a5f6c7ae19a04e95e7dfd8cad073ad5063d80d3d0 as production
+FROM python:3.14-slim@sha256:4ed33101ee7ec299041cc41dd268dae17031184be94384b1ce7936dc4e5dead3 as production
 
 # Build arguments for security labeling
 ARG BUILD_DATE
