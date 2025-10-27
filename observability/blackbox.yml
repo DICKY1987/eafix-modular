@@ -1,0 +1,151 @@
+# Blackbox Exporter configuration for EAFIX Trading System
+# Health check probes for external dependencies and service endpoints
+
+modules:
+  # HTTP 2xx response check
+  http_2xx:
+    prober: http
+    timeout: 10s
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+      valid_status_codes: [200, 201, 202]
+      fail_if_ssl: false
+      fail_if_not_ssl: false
+      tls_config:
+        insecure_skip_verify: false
+      headers:
+        User-Agent: "EAFIX-Blackbox-Exporter/1.0"
+        Accept: "application/json,text/plain"
+
+  # HTTPS 2xx with SSL verification  
+  https_2xx:
+    prober: http
+    timeout: 10s
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+      valid_status_codes: [200, 201, 202]
+      fail_if_not_ssl: true
+      tls_config:
+        insecure_skip_verify: false
+      headers:
+        User-Agent: "EAFIX-Blackbox-Exporter/1.0"
+
+  # Trading system health check (specific response validation)
+  trading_health:
+    prober: http
+    timeout: 5s
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+      valid_status_codes: [200]
+      fail_if_body_not_matches_regexp:
+        - '\"status\":\s*\"healthy\"'
+        - '\"service\":\s*\"\w+\"'
+      headers:
+        User-Agent: "EAFIX-Health-Monitor/1.0"
+        Accept: "application/json"
+
+  # Database connectivity check
+  postgres_tcp:
+    prober: tcp
+    timeout: 5s
+    tcp:
+      preferred_ip_protocol: ip4
+      query_response:
+        - expect: "^\\x00"  # PostgreSQL connection response
+          send: "\\x00"
+
+  # Redis connectivity check  
+  redis_tcp:
+    prober: tcp
+    timeout: 5s
+    tcp:
+      preferred_ip_protocol: ip4
+      query_response:
+        - send: "PING\r\n"
+        - expect: "^\\+PONG"
+
+  # Market data feed check (simulated)
+  market_data_feed:
+    prober: http
+    timeout: 15s
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+      valid_status_codes: [200]
+      fail_if_body_not_matches_regexp:
+        - 'price|quote|tick'  # Market data should contain price information
+      headers:
+        User-Agent: "EAFIX-Market-Monitor/1.0"
+
+  # SSL certificate expiry check
+  ssl_expiry:
+    prober: http
+    timeout: 10s
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      fail_if_not_ssl: true
+      tls_config:
+        insecure_skip_verify: false
+      headers:
+        User-Agent: "EAFIX-SSL-Monitor/1.0"
+
+  # DNS resolution check
+  dns_check:
+    prober: dns
+    timeout: 5s
+    dns:
+      preferred_ip_protocol: ip4
+      query_name: "example.com"
+      query_type: "A"
+      valid_rcodes:
+        - NOERROR
+      validate_answer_rrs:
+        fail_if_not_matches_regexp:
+          - ".*"
+
+  # ICMP ping check
+  icmp_check:
+    prober: icmp
+    timeout: 5s
+    icmp:
+      preferred_ip_protocol: ip4
+
+  # Custom trading system readiness check
+  trading_readiness:
+    prober: http
+    timeout: 10s
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+      valid_status_codes: [200]
+      fail_if_body_not_matches_regexp:
+        - '\"ready\":\s*true'
+        - '\"dependencies\":\s*\{.*\}'
+        - '\"last_heartbeat\":'
+      headers:
+        User-Agent: "EAFIX-Readiness-Monitor/1.0"
+        Accept: "application/json"
+
+  # External broker connectivity check
+  broker_connectivity:
+    prober: http
+    timeout: 20s
+    http:
+      method: GET
+      preferred_ip_protocol: ip4
+      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+      valid_status_codes: [200, 401, 403]  # 401/403 indicates service is up but requires auth
+      fail_if_not_ssl: true
+      tls_config:
+        insecure_skip_verify: false
+      headers:
+        User-Agent: "EAFIX-Broker-Monitor/1.0"

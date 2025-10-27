@@ -1,0 +1,355 @@
+# Alertmanager configuration for EAFIX Trading System
+# Comprehensive alert routing and notification management
+
+global:
+  # SMTP configuration for email notifications
+  smtp_smarthost: 'smtp.company.com:587'
+  smtp_from: 'trading-alerts@eafix.com'
+  smtp_auth_username: 'trading-alerts@eafix.com'
+  smtp_auth_password_file: '/etc/alertmanager/smtp_password'
+  
+  # Default notification templates
+  smtp_subject: '[{{ .Status | toUpper }}] EAFIX Trading Alert: {{ .GroupLabels.alertname }}'
+  
+  # Slack webhook URL (stored in file for security)
+  slack_api_url_file: '/etc/alertmanager/slack_webhook'
+
+# Alert routing configuration
+route:
+  group_by: ['alertname', 'severity', 'slo', 'team']
+  group_wait: 10s        # Wait before sending initial notification
+  group_interval: 5m     # Wait before sending additional notifications for same group
+  repeat_interval: 1h    # Wait before resending same alert
+  receiver: 'default'
+  
+  routes:
+    # === COMPLIANCE VIOLATIONS - AUTO-REMEDIATION ===
+    - matchers:
+        - team="compliance"
+      receiver: 'compliance-auto-remediation'
+      group_wait: 5s       # Immediate processing for compliance
+      group_interval: 30s  # Fast follow-up for compliance issues
+      repeat_interval: 10m # Regular reminders
+      continue: true       # Also send to other matching routes
+
+    # === CRITICAL TRADING SYSTEM ALERTS ===
+    - matchers:
+        - severity=~"critical"
+        - team=~"trading-platform|execution-platform|data-platform"
+      receiver: 'trading-critical'
+      group_wait: 5s       # Immediate notification for critical trading issues
+      group_interval: 2m   # Faster follow-up for critical issues
+      repeat_interval: 15m # More frequent reminders
+      continue: true       # Also send to other matching routes
+      
+    # Market Hours - Escalated Priority
+    - matchers:
+        - context="market_hours"
+      receiver: 'market-hours-critical'
+      group_wait: 0s       # No delay during market hours
+      group_interval: 1m   # Very fast follow-up
+      repeat_interval: 5m  # Frequent reminders during trading
+      continue: true
+      
+    # SLO Violations - Business Impact
+    - matchers:
+        - slo=~"system_availability|price_feed_latency|signal_generation_latency|order_execution_latency"
+      receiver: 'slo-violations'
+      group_wait: 30s
+      group_interval: 3m
+      repeat_interval: 30m
+      continue: true
+      
+    # Risk Management Alerts - Immediate Escalation
+    - matchers:
+        - team="risk-management"
+        - severity="critical"
+      receiver: 'risk-management-critical'
+      group_wait: 0s       # No delay for risk breaches
+      group_interval: 30s  # Immediate follow-up
+      repeat_interval: 5m  # Constant monitoring
+      continue: true
+      
+    # Infrastructure Alerts
+    - matchers:
+        - team="platform"
+        - severity=~"warning|critical"
+      receiver: 'infrastructure-team'
+      group_wait: 1m
+      group_interval: 5m
+      repeat_interval: 2h
+      
+    # Security Alerts
+    - matchers:
+        - team="security"
+      receiver: 'security-team'
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 1h
+      continue: true
+      
+    # Business Impact Alerts
+    - matchers:
+        - impact="business"
+      receiver: 'business-stakeholders'
+      group_wait: 2m
+      group_interval: 10m
+      repeat_interval: 4h
+
+# Notification receivers
+receivers:
+  # Default receiver for non-specific alerts
+  - name: 'default'
+    email_configs:
+      - to: 'trading-ops@eafix.com'
+        subject: '{{ template "email.subject" . }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Severity: {{ .Labels.severity }}
+          Service: {{ .Labels.service }}
+          Time: {{ .StartsAt }}
+          {{ end }}
+
+  # Compliance auto-remediation webhook
+  - name: 'compliance-auto-remediation'
+    webhook_configs:
+      - url: 'http://compliance-monitor:8080/webhook/alertmanager'
+        send_resolved: true
+        http_config:
+          tls_config:
+            insecure_skip_verify: false
+        max_alerts: 0  # Send all alerts
+    slack_configs:
+      - api_url_file: '/etc/alertmanager/slack_webhook'
+        channel: '#compliance-auto-remediation'
+        username: 'ComplianceBot'
+        icon_emoji: ':robot_face:'
+        title: 'Auto-Remediation Triggered'
+        text: |
+          {{ range .Alerts }}
+          *Regulation:* {{ .Labels.regulation | title }}
+          *Requirement:* {{ .Labels.requirement | title }}
+          *Severity:* {{ .Labels.severity | title }}
+          *Auto-remediation initiated*
+          {{ end }}
+          
+  # Critical trading system alerts
+  - name: 'trading-critical'
+    slack_configs:
+      - api_url_file: '/etc/alertmanager/slack_webhook'
+        channel: '#trading-critical'
+        username: 'AlertManager'
+        icon_emoji: ':rotating_light:'
+        title: 'CRITICAL: Trading System Alert'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity | title }}
+          *Service:* {{ .Labels.service }}
+          *SLO:* {{ .Labels.slo | default "N/A" }}
+          *Runbook:* {{ .Annotations.runbook_url | default "No runbook available" }}
+          *Dashboard:* {{ .Annotations.dashboard_url | default "No dashboard available" }}
+          {{ end }}
+        actions:
+          - type: button
+            text: 'View Dashboard'
+            url: '{{ .Annotations.dashboard_url }}'
+          - type: button  
+            text: 'View Runbook'
+            url: '{{ .Annotations.runbook_url }}'
+            style: 'primary'
+    email_configs:
+      - to: 'trading-critical@eafix.com'
+        subject: '[CRITICAL] Trading System: {{ .GroupLabels.alertname }}'
+        body: |
+          CRITICAL ALERT: Immediate attention required for trading system
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Service: {{ .Labels.service }}
+          SLO Impact: {{ .Labels.slo | default "None" }}
+          
+          Runbook: {{ .Annotations.runbook_url | default "No runbook available" }}
+          Dashboard: {{ .Annotations.dashboard_url | default "No dashboard available" }}
+          
+          Started: {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+          {{ end }}
+    pagerduty_configs:
+      - service_key_file: '/etc/alertmanager/pagerduty_service_key'
+        description: '{{ .GroupLabels.alertname }}: {{ .CommonAnnotations.summary }}'
+        details:
+          severity: '{{ .CommonLabels.severity }}'
+          service: '{{ .CommonLabels.service }}'
+          runbook: '{{ .CommonAnnotations.runbook_url }}'
+          
+  # Market hours critical alerts with immediate escalation
+  - name: 'market-hours-critical'
+    slack_configs:
+      - api_url_file: '/etc/alertmanager/slack_webhook'
+        channel: '#trading-war-room'
+        username: 'TradingAlert'
+        icon_emoji: ':warning:'
+        title: '🚨 MARKET HOURS CRITICAL ALERT 🚨'
+        text: |
+          *IMMEDIATE ATTENTION REQUIRED*
+          Critical issue detected during active trading hours
+          
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Service:* {{ .Labels.service }}
+          *Impact:* Business operations affected
+          *Time:* {{ .StartsAt.Format "15:04:05 UTC" }}
+          {{ end }}
+        actions:
+          - type: button
+            text: 'WAR ROOM'
+            url: 'https://meet.company.com/trading-war-room'
+            style: 'danger'
+    webhook_configs:
+      - url: 'https://api.pagerduty.com/integration/v1/enqueue'
+        send_resolved: true
+        http_config:
+          bearer_token_file: '/etc/alertmanager/pagerduty_token'
+          
+  # SLO violation alerts
+  - name: 'slo-violations'
+    slack_configs:
+      - api_url_file: '/etc/alertmanager/slack_webhook'
+        channel: '#slo-violations'
+        username: 'SLOMonitor'
+        icon_emoji: ':chart_with_downwards_trend:'
+        title: 'SLO Violation: {{ .GroupLabels.slo | title }}'
+        text: |
+          {{ range .Alerts }}
+          *SLO:* {{ .Labels.slo | title | replace "_" " " }}
+          *Current Value:* {{ .Annotations.current_value | default "Unknown" }}
+          *Target:* {{ .Labels.target | default "Unknown" }}
+          *Service:* {{ .Labels.service }}
+          *Error Budget Impact:* {{ .Annotations.error_budget_impact | default "Calculating..." }}
+          {{ end }}
+    email_configs:
+      - to: 'sre-team@eafix.com, trading-management@eafix.com'
+        subject: 'SLO Violation: {{ .GroupLabels.slo | title | replace "_" " " }}'
+        
+  # Risk management critical alerts
+  - name: 'risk-management-critical'
+    slack_configs:
+      - api_url_file: '/etc/alertmanager/slack_webhook'
+        channel: '#risk-alerts'
+        username: 'RiskMonitor'
+        icon_emoji: ':exclamation:'
+        title: '🔴 RISK MANAGEMENT ALERT'
+        text: |
+          {{ range .Alerts }}
+          *RISK BREACH DETECTED*
+          
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Service:* {{ .Labels.service }}
+          *Time:* {{ .StartsAt.Format "15:04:05 UTC" }}
+          
+          *IMMEDIATE ACTION REQUIRED*
+          {{ end }}
+    email_configs:
+      - to: 'risk-management@eafix.com, cro@eafix.com, cto@eafix.com'
+        subject: '[RISK BREACH] Immediate Attention Required'
+        body: |
+          CRITICAL RISK MANAGEMENT ALERT
+          
+          A risk management breach has been detected in the trading system.
+          Immediate investigation and action required.
+          
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Service: {{ .Labels.service }}
+          Time: {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+          {{ end }}
+          
+  # Infrastructure team alerts
+  - name: 'infrastructure-team'
+    slack_configs:
+      - api_url_file: '/etc/alertmanager/slack_webhook'
+        channel: '#infrastructure'
+        username: 'InfraAlert'
+        icon_emoji: ':gear:'
+        title: 'Infrastructure Alert: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Component:* {{ .Labels.component | default .Labels.service }}
+          *Issue:* {{ .Annotations.summary }}
+          *Severity:* {{ .Labels.severity }}
+          *Instance:* {{ .Labels.instance }}
+          {{ end }}
+    email_configs:
+      - to: 'infrastructure@eafix.com'
+        
+  # Security team alerts  
+  - name: 'security-team'
+    slack_configs:
+      - api_url_file: '/etc/alertmanager/slack_webhook'
+        channel: '#security-alerts'
+        username: 'SecurityAlert'
+        icon_emoji: ':lock:'
+        title: 'Security Alert: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Security Issue:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
+          *Service:* {{ .Labels.service }}
+          {{ end }}
+    email_configs:
+      - to: 'security@eafix.com, ciso@eafix.com'
+        
+  # Business stakeholder notifications
+  - name: 'business-stakeholders'
+    email_configs:
+      - to: 'trading-management@eafix.com, operations@eafix.com'
+        subject: 'Trading System Business Impact: {{ .GroupLabels.alertname }}'
+        body: |
+          Business Impact Alert
+          
+          The trading system is experiencing issues that may affect business operations:
+          
+          {{ range .Alerts }}
+          Issue: {{ .Annotations.summary }}
+          Impact: {{ .Annotations.business_impact | default "Under assessment" }}
+          Service: {{ .Labels.service }}
+          Started: {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+          
+          {{ end }}
+          
+          Technical teams have been notified and are investigating.
+          Updates will be provided as more information becomes available.
+
+# Inhibition rules to reduce alert noise
+inhibit_rules:
+  # If a service is down, don't alert on high latency for the same service
+  - source_matchers:
+      - alertname="ServiceDown"
+    target_matchers:
+      - alertname="ServiceHighLatency"
+    equal: ['service', 'instance']
+    
+  # If system availability SLO is violated, don't alert on individual service SLOs
+  - source_matchers:
+      - slo="system_availability"
+    target_matchers:
+      - slo=~"price_feed_latency|signal_generation_latency|order_execution_latency"
+    equal: ['service']
+    
+  # If Redis is down, don't alert on message queue issues
+  - source_matchers:
+      - alertname="RedisDown"
+    target_matchers:
+      - alertname="MessageQueueBacklog"
+    equal: ['instance']
+
+# Silence configuration templates  
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'

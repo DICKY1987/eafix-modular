@@ -1,0 +1,106 @@
+version: 2
+
+updates:
+  # Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps-dev"
+    reviewers:
+      - "DICKY1987"
+    assignees:
+      - "DICKY1987"
+    open-pull-requests-limit: 5
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    ignore:
+      # Ignore major version updates for critical trading dependencies
+      - dependency-name: "fastapi"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "pydantic"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "redis"
+        update-types: ["version-update:semver-major"]
+
+  # Docker dependencies
+  - package-ecosystem: "docker"
+    directory: "/services/data-ingestor"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "docker"
+    reviewers:
+      - "DICKY1987"
+
+  - package-ecosystem: "docker" 
+    directory: "/services/indicator-engine"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "docker"
+
+  - package-ecosystem: "docker"
+    directory: "/services/signal-generator"
+    schedule:
+      interval: "weekly" 
+    commit-message:
+      prefix: "docker"
+
+  - package-ecosystem: "docker"
+    directory: "/services/risk-manager"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "docker"
+
+  - package-ecosystem: "docker"
+    directory: "/services/execution-engine"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "docker"
+
+  - package-ecosystem: "docker"
+    directory: "/services/gui-gateway"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "docker"
+
+  - package-ecosystem: "docker"
+    directory: "/services/reporter"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "docker"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "10:00"
+      timezone: "UTC"
+    commit-message:
+      prefix: "ci"
+    reviewers:
+      - "DICKY1987"
+    assignees:
+      - "DICKY1987"
+    open-pull-requests-limit: 3
+
+  # Docker Compose files  
+  - package-ecosystem: "docker"
+    directory: "/deploy/compose"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deploy"

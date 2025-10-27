@@ -1,0 +1,28 @@
+{
+  "IndicatorID": "FRI_MOVE_PCT",
+  "Concept": "Friday session movement percentage indicator",
+  "Indicator_Computation": "Calculate percentage move from session open to close on Fridays",
+  "Signal_Logic": "Signal when Friday move exceeds historical volatility threshold",
+  "OutputType": "percent",
+  "Thresholds": {
+    "kind": "percent_change",
+    "abs_change_gte": 2.5,
+    "direction": "both",
+    "one_shot": false,
+    "window": {
+      "tz": "UTC",
+      "start": "21:00",
+      "end": "21:00",
+      "days": ["Friday"]
+    }
+  },
+  "Inputs": {
+    "symbol_scope": ["EURUSD", "GBPUSD", "USDJPY"],
+    "timeframe": "H1",
+    "price_source": "close",
+    "provider": "MT4",
+    "update_freq": "hourly",
+    "notes": "Friday session volatility analysis"
+  },
+  "Notes": "Tracks unusual Friday movements for weekend gap analysis"
+}

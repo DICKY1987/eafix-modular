@@ -1,0 +1,329 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-ingestor
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: data-ingestor
+    app.kubernetes.io/component: ingestion
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/part-of: eafix-trading-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: data-ingestor
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: data-ingestor
+        app.kubernetes.io/component: ingestion
+        app.kubernetes.io/version: "0.1.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8081"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: data-ingestor
+        image: ghcr.io/dicky1987/eafix-modular/data-ingestor:v0.1.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8081
+          name: http
+        env:
+        - name: SERVICE_REDIS_URL
+          value: "redis://redis:6379"
+        - name: SERVICE_LOG_LEVEL
+          value: "INFO"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: trading-secrets
+              key: REDIS_PASSWORD
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: indicator-engine
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: indicator-engine
+    app.kubernetes.io/component: analysis
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/part-of: eafix-trading-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: indicator-engine
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: indicator-engine
+        app.kubernetes.io/component: analysis
+        app.kubernetes.io/version: "0.1.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8082"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: indicator-engine
+        image: ghcr.io/dicky1987/eafix-modular/indicator-engine:v0.1.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8082
+          name: http
+        env:
+        - name: SERVICE_REDIS_URL
+          value: "redis://redis:6379"
+        - name: SERVICE_LOG_LEVEL
+          value: "INFO"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: trading-secrets
+              key: REDIS_PASSWORD
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8082
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8082
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "300m"
+          limits:
+            memory: "1Gi"
+            cpu: "700m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: signal-generator
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: signal-generator
+    app.kubernetes.io/component: signals
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/part-of: eafix-trading-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: signal-generator
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: signal-generator
+        app.kubernetes.io/component: signals
+        app.kubernetes.io/version: "0.1.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8083"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: signal-generator
+        image: ghcr.io/dicky1987/eafix-modular/signal-generator:v0.1.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8083
+          name: http
+        env:
+        - name: SERVICE_REDIS_URL
+          value: "redis://redis:6379"
+        - name: SERVICE_RISK_MANAGER_URL
+          value: "http://risk-manager:8084"
+        - name: SERVICE_LOG_LEVEL
+          value: "INFO"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: trading-secrets
+              key: REDIS_PASSWORD
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8083
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8083
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: risk-manager
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: risk-manager
+    app.kubernetes.io/component: risk
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/part-of: eafix-trading-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: risk-manager
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: risk-manager
+        app.kubernetes.io/component: risk
+        app.kubernetes.io/version: "0.1.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8084"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: risk-manager
+        image: ghcr.io/dicky1987/eafix-modular/risk-manager:v0.1.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8084
+          name: http
+        env:
+        - name: SERVICE_REDIS_URL
+          value: "redis://redis:6379"
+        - name: SERVICE_EXECUTION_ENGINE_URL
+          value: "http://execution-engine:8085"
+        - name: SERVICE_LOG_LEVEL
+          value: "INFO"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: trading-secrets
+              key: REDIS_PASSWORD
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8084
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8084
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "300m"
+          limits:
+            memory: "1Gi"
+            cpu: "700m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: execution-engine
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: execution-engine
+    app.kubernetes.io/component: execution
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/part-of: eafix-trading-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: execution-engine
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: execution-engine
+        app.kubernetes.io/component: execution
+        app.kubernetes.io/version: "0.1.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8085"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: execution-engine
+        image: ghcr.io/dicky1987/eafix-modular/execution-engine:v0.1.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8085
+          name: http
+        env:
+        - name: SERVICE_REDIS_URL
+          value: "redis://redis:6379"
+        - name: SERVICE_LOG_LEVEL
+          value: "INFO"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: trading-secrets
+              key: REDIS_PASSWORD
+        - name: MT4_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: trading-secrets
+              key: MT4_API_KEY
+        - name: BROKER_API_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: trading-secrets
+              key: BROKER_API_SECRET
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8085
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8085
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

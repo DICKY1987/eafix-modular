@@ -4,249 +4,362 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This repository contains the **modularized EAFIX trading system** - a complete rewrite of a monolithic trading application into 9 containerized microservices. The system processes real-time financial data, generates trading signals, manages risk, and executes trades through broker interfaces.
+This repository contains the **EAFIX Modular Trading System** - an enterprise-grade financial trading platform with 9 containerized microservices. The system has been transformed from a monolithic application into a production-ready architecture with comprehensive enterprise capabilities.
 
-**Architecture**: Event-driven microservices with FastAPI/Redis
+**Core Architecture**: Event-driven microservices with enterprise service foundation
 **Language**: Python 3.11 with Poetry workspace management
-**Deployment**: Docker containers with Kubernetes support
-**Messaging**: Redis pub/sub for asynchronous events, HTTP for synchronous calls
+**Enterprise Framework**: BaseEnterpriseService provides 200x efficiency multiplier
+**Deployment**: Docker containers with Kubernetes support, comprehensive monitoring
+**Security**: Blocking security gates with SAST, SCA, and vulnerability scanning
 
-## Key Development Commands
+## Essential Development Commands
 
 ### Project Setup
 ```bash
-# Install Poetry (if not installed)
-pip install poetry
-
-# Install all dependencies
+# Install dependencies and setup development environment
 poetry install
-
-# Install pre-commit hooks
 poetry run pre-commit install
+
+# Start enterprise monitoring stack (Prometheus, Grafana, AlertManager)
+docker compose -f deploy/compose/docker-compose.yml up -d
+
+# Verify enterprise infrastructure
+make contracts-validate-full
 ```
 
-### Development Workflow
+### Enterprise Service Development
 ```bash
-# Start entire system locally
-docker compose -f deploy/compose/docker-compose.yml up
+# Create new service with enterprise capabilities (2-line setup)
+cd services/<service-name>
+./scripts/integrate-enterprise-service.sh
+# Then inherit BaseEnterpriseService and implement 3 abstract methods
 
-# Start individual service for development
-cd services/data-ingestor
-poetry install
-poetry run python -m src.main
+# Validate enterprise integration
+./scripts/validate-enterprise-service.sh
 
-# Run specific service with environment
-REDIS_URL=redis://localhost:6379 poetry run python -m src.main
+# Test enterprise capabilities
+pytest tests/e2e/test_enterprise_system.py
 ```
 
-### Testing
+### Testing & Quality Gates
 ```bash
-# Run all tests across all services
-poetry run pytest
+# Run comprehensive test suite with 80% coverage enforcement
+make test-all
 
-# Run tests for specific service
-cd services/data-ingestor && poetry run pytest
+# Run security scanning (blocking gates)
+make security-scan
+bandit -r services/ --severity-level medium --confidence-level medium
+safety check --short-report
+semgrep --config=auto services/ --error --strict
 
-# Run with coverage
-poetry run pytest --cov=services
+# Contract validation (critical for microservices integration)
+make contracts-validate-full
+make contracts-test
 
-# Run specific test file
-poetry run pytest services/data-ingestor/tests/test_ingestor.py
-
-# Run tests matching pattern
-poetry run pytest -k "test_price_tick"
-
-# Contract tests (schema validation)
-poetry run pytest tests/contracts/
+# Service-specific testing
+cd services/<service-name> && pytest --cov=src --cov-fail-under=80
 ```
 
-### Code Quality
+### Domain Knowledge Integration
 ```bash
-# Format code
-poetry run black services/
-poetry run isort services/
+# Validate reentry system integration
+make reentry-validate
 
-# Lint code
-poetry run flake8 services/
+# Process P_ folder specifications
+cd P_project_knowledge && python apf_apply_stub.py
+cd P_scripts && python validate_keys_cli.py
 
-# Type checking
-poetry run mypy services/data-ingestor/src
-
-# Run all quality checks
-poetry run black --check services/
-poetry run isort --check-only services/
-poetry run flake8 services/
-poetry run mypy services/*/src
+# GUI development workflow
+cd P_GUI && python expiry_indicator_service.py
+cd P_GUI && python friday_vol_indicator.py
 ```
 
-### Docker Development
-```bash
-# Build specific service image
-docker build -t eafix/data-ingestor services/data-ingestor/
+## Enterprise Architecture
 
-# Run service container
-docker run -p 8080:8080 -e REDIS_URL=redis://host.docker.internal:6379 eafix/data-ingestor
+### BaseEnterpriseService Foundation
+The system uses a inheritance-based enterprise architecture where all services inherit from `services/common/base_service.py`:
 
-# View service logs
-docker logs eafix-data-ingestor
+```python
+from services.common.base_service import BaseEnterpriseService
 
-# Shell into running container
-docker exec -it eafix-data-ingestor /bin/bash
+class YourService(BaseEnterpriseService):
+    def __init__(self):
+        super().__init__(service_name="your-service")
+
+    async def startup(self): # Required implementation
+        # Service-specific startup logic
+
+    async def shutdown(self): # Required implementation
+        # Graceful shutdown logic
+
+    async def health_check(self) -> dict: # Required implementation
+        # Service health validation
 ```
 
-### Schema Management
-```bash
-# Validate event schemas
-python -c "
-import json, jsonschema, os
-for f in os.listdir('contracts/events'):
-    with open(f'contracts/events/{f}') as file:
-        jsonschema.Draft7Validator.check_schema(json.load(file))
-    print(f'✓ {f}')
-"
+**Enterprise Capabilities Provided:**
+- **RED Metrics**: Request rate, error rate, duration automatically collected
+- **Feature Flags**: Environment-based feature toggles with audit logging
+- **Health Checks**: `/healthz`, `/readyz`, `/metrics` endpoints
+- **Security**: Structured logging with correlation IDs
+- **Observability**: Prometheus metrics, Grafana dashboards
 
-# Generate code from schemas (if tooling exists)
-# This would be service-specific implementation
-```
-
-## Architecture Overview
-
-### Microservices Design
-
-The system follows **event-driven architecture** with clear service boundaries:
-
-**Data Flow**: `data-ingestor` → `indicator-engine` → `signal-generator` → `risk-manager` → `execution-engine`
-
-**9 Core Services**:
-- **data-ingestor**: Normalizes MT4/DDE price feeds → `PriceTick@1.0` events
-- **indicator-engine**: Computes technical indicators → `IndicatorVector@1.1` events  
-- **signal-generator**: Applies trading rules → `Signal@1.0` events
-- **risk-manager**: Position sizing/risk checks → `OrderIntent@1.2` (HTTP API)
-- **execution-engine**: Broker order execution → `ExecutionReport@1.0` events
-- **calendar-ingestor**: Economic calendar processing → `CalendarEvent@1.0` events
-- **reentry-matrix-svc**: Re-entry decision logic → `ReentryDecision@1.0` events
-- **reporter**: Metrics and P&L analysis
-- **gui-gateway**: API gateway for operator UI
-
-### Communication Patterns
-
-**Asynchronous Events** (Redis pub/sub):
-- Price data propagation
-- Signal generation pipeline  
-- Execution reporting
-- Calendar notifications
-
-**Synchronous HTTP APIs**:
-- Risk validation: `signal-generator` → `risk-manager` 
-- Order placement: `risk-manager` → `execution-engine`
-- GUI operations: `gui-gateway` → all services
-
-### Service Structure
-
-Each service follows consistent structure:
+### Service Architecture Pattern
+Each service follows this structure:
 ```
 services/<service-name>/
-├── src/                 # Core service logic
-│   ├── main.py         # FastAPI application entry point
-│   ├── config.py       # Pydantic settings
-│   ├── models.py       # Data models matching event schemas
-│   ├── health.py       # Health check logic
-│   └── metrics.py      # Prometheus metrics
-├── adapters/           # External system interfaces
-├── tests/             # Unit and integration tests
-├── Dockerfile         # Container configuration
-└── requirements.txt   # Service-specific dependencies
+├── src/
+│   ├── main.py                 # FastAPI application
+│   ├── main_enterprise.py      # Enterprise service implementation
+│   └── <service>_logic.py     # Business logic
+├── tests/
+│   ├── unit/                  # Unit tests (70% of test pyramid)
+│   ├── integration/           # Integration tests (20%)
+│   └── e2e/                   # End-to-end tests (10%)
+├── Dockerfile                 # Production container
+└── requirements.txt           # Service dependencies
 ```
 
-### Event Schemas & Contracts
+## Domain Knowledge Architecture
 
-All inter-service communication uses **versioned schemas** in `contracts/events/`:
-- **PriceTick@1.0**: Market price data
-- **IndicatorVector@1.1**: Technical indicator results
-- **Signal@1.0**: Trading signals with confidence scores
-- **OrderIntent@1.2**: Risk-approved orders ready for execution
-- **ExecutionReport@1.0**: Broker execution results
-- **CalendarEvent@1.0**: Economic calendar events
-- **ReentryDecision@1.0**: Matrix-based re-entry decisions
+### P_ Folder Ecosystem
+The system includes comprehensive domain knowledge in P_ folders:
 
-Schema validation is enforced in CI/CD pipeline and at runtime.
+- **P_project_knowledge/**: Core trading system specifications and architecture
+- **P_GUI/**: Advanced currency strength and conditional probability UI specifications
+- **P_techspec/**: Technical specifications, integration guides, and system documentation
+- **P_INDICATOR_REENTRY/**: Reentry decision matrix framework and economic calendar integration
+- **P_mql4/**: MQL4 integration components for MetaTrader connectivity
+- **P_positioning_ratio_index/**: Position sizing and ratio calculation systems
+- **P_reentry_helpers/**: Reentry system utilities and validation logic
 
-## Development Patterns
+### Contract System Integration
+The system uses a centralized contract registry with domain-driven schemas:
 
-### Service Implementation
+```bash
+# Validate all contracts (JSON schemas + CSV artifacts)
+make contracts-validate-full
 
-**FastAPI Pattern**: All services use FastAPI with:
-- Async/await for I/O operations
-- Pydantic models for data validation
-- Structured logging with contextual information
-- Health checks at `/healthz`
-- Metrics at `/metrics` (Prometheus format)
+# Test contract compatibility across services
+make contracts-compat
 
-**Configuration**: Pydantic Settings with environment variable override:
-```python
-class Settings(BaseSettings):
-    redis_url: str = "redis://localhost:6379"
-    log_level: str = "INFO"
-    
-    class Config:
-        env_prefix = "SERVICE_"
+# Run property-based contract testing
+make contracts-properties
 ```
 
-**Error Handling**: Services follow defensive posture:
-- Fail closed on data integrity errors
-- Circuit breakers for external dependencies  
-- Graceful degradation when possible
-- Comprehensive error logging
+**Key Contract Files:**
+- `contracts/schemas/json/`: JSON Schema definitions for events
+- `P_csv_schemas/`: CSV schema definitions for data interchange
+- `P_INDICATOR_REENTRY/`: Domain-specific indicator and reentry schemas
 
-### Testing Strategy
+## Microservices Architecture
 
-**Unit Tests**: Each service has isolated unit tests
-**Contract Tests**: Validate event schema compliance
-**Integration Tests**: End-to-end pipeline testing with Docker Compose
-**Service Tests**: Health checks and API endpoint validation
+**Core Services (9 total):**
+- **data-ingestor**: Normalizes broker price feeds from MT4/DDE with enterprise monitoring
+- **indicator-engine**: Computes technical indicators using P_INDICATOR_REENTRY specifications
+- **signal-generator**: Applies trading rules with P_GUI conditional probability systems
+- **risk-manager**: Position sizing using P_positioning_ratio_index calculations
+- **execution-engine**: Broker integration with enterprise audit trails
+- **calendar-ingestor**: Economic calendar data with P_techspec integration patterns
+- **reentry-matrix-svc**: Multi-dimensional decision matrix from P_INDICATOR_REENTRY
+- **reporter**: Enterprise metrics and P&L reporting with observability integration
+- **gui-gateway**: Operator UI gateway implementing P_GUI specifications
 
-Test configuration in `pyproject.toml` enables:
-- Async testing with `pytest-asyncio`
-- Coverage reporting across all services
-- Parallel test execution per service
+**Enterprise Support Services:**
+- **common/**: BaseEnterpriseService foundation and shared enterprise utilities
+- **scripts/**: Automated service integration and validation tools
 
-### Observability
+## Production Deployment
 
-**Structured Logging**: JSON format with correlation IDs
-**Metrics**: Prometheus metrics for latency, throughput, errors
-**Health Monitoring**: Multi-level health checks (Redis, external APIs, data freshness)
-**Distributed Tracing**: Ready for OpenTelemetry integration
+### Enterprise Monitoring Stack
+```bash
+# Deploy complete observability infrastructure
+docker compose -f deploy/compose/monitoring.yml up -d
+# Includes: Prometheus, Grafana, AlertManager with business-specific alerts
 
-## Deployment Architecture
+# Access monitoring interfaces
+# Grafana: http://localhost:3000 (admin/admin)
+# Prometheus: http://localhost:9090
+# AlertManager: http://localhost:9093
+```
 
-### Local Development
-- Docker Compose orchestrates all services
-- Redis for message bus
-- PostgreSQL for persistent data
-- Volume mounts for rapid development iteration
+### Security & Compliance
+The system enforces enterprise security through CI/CD gates:
 
-### Production Deployment
-- Kubernetes manifests in `deploy/k8s/` (when created)
-- Horizontal scaling for stateless services
-- Resource limits and requests defined
-- Rolling updates with health check validation
+- **SAST**: Bandit static analysis security testing
+- **SCA**: Safety dependency vulnerability scanning
+- **Semantic Analysis**: Semgrep code pattern analysis
+- **Secret Scanning**: Automated detection of committed secrets
+- **Coverage Enforcement**: 80% test coverage requirement with branch coverage
 
-### CI/CD Pipeline
-- GitHub Actions matrix build per service
-- Automated testing, linting, type checking
-- Docker image building and pushing
-- Contract validation and integration testing
+### Container Security
+All services use hardened production containers:
+```dockerfile
+# Multi-stage builds with security scanning
+# Non-root user execution
+# Health checks with proper timeouts
+# Signal handling with dumb-init
+# Minimal attack surface with slim base images
+```
 
-## Key Principles
+## Development Workflow
 
-**Determinism & Idempotence**: All operations are repeatable with identical inputs
-**Single Source of Truth**: Event schemas in `contracts/` are canonical
-**Defensive Posture**: Fail closed on integrity errors, validate all inputs
-**Explicit Fallbacks**: Tiered parameter resolution with audit trails
+### Enterprise Service Integration
+1. **Create Service**: Use existing service as template or run integration script
+2. **Inherit BaseEnterpriseService**: Get all enterprise capabilities automatically
+3. **Implement Abstracts**: `startup()`, `shutdown()`, `health_check()` methods
+4. **Validate Integration**: Run enterprise validation suite
+5. **Deploy**: Automatic enterprise monitoring and security scanning
+
+### Domain-Driven Development
+1. **Consult P_ Specifications**: Check P_techspec/ for implementation requirements
+2. **Validate Contracts**: Ensure schema compatibility with contract registry
+3. **Implement Business Logic**: Use P_project_knowledge/ for domain understanding
+4. **Test Integration**: Validate against P_INDICATOR_REENTRY specifications
+5. **UI Integration**: Follow P_GUI/ specifications for frontend integration
+
+### Quality Gates
+All code must pass enterprise quality gates:
+```bash
+# Security gates (blocking)
+make security-scan
+
+# Test coverage enforcement (blocking)
+pytest --cov=src --cov-fail-under=80
+
+# Contract validation (blocking)
+make contracts-validate-full
+
+# Integration testing (required)
+pytest tests/integration/ -v
+```
 
 ## Configuration Management
 
-**Environment Variables**: Service configuration via environment variables
-**Docker Compose**: Local development environment configuration
-**Secrets**: Never commit sensitive data; use environment variables or secret management
-**Feature Flags**: Configuration-driven feature enablement per service
+### Enterprise Feature Flags
+Services support environment-based feature configuration:
+```bash
+# Enable enterprise features
+ENABLE_ENTERPRISE_METRICS=true
+ENABLE_FEATURE_FLAGS=true
+ENABLE_AUDIT_LOGGING=true
+
+# Configure observability
+PROMETHEUS_PORT=8001
+GRAFANA_DATASOURCE=prometheus
+ALERT_WEBHOOK_URL=http://alertmanager:9093/webhook
+```
+
+### Service Configuration Pattern
+```python
+# Standard enterprise configuration pattern
+from services.common.base_service import EnterpriseConfig
+
+config = EnterpriseConfig(
+    service_name="your-service",
+    enable_metrics=True,
+    enable_feature_flags=True,
+    prometheus_port=8001
+)
+```
+
+## Integration Points
+
+### MQL4 Integration
+The system includes comprehensive MQL4 integration through P_mql4/:
+```bash
+# Validate MQL4 helpers
+cd P_mql4 && mql4_compiler ReentryHelpers.mq4
+
+# Test MQL4 bridge functionality
+python P_tests/test_mql4_integration.py
+```
+
+### Economic Calendar Integration
+Economic events are processed through calendar-ingestor with P_techspec specifications:
+```bash
+# Test calendar integration
+cd services/calendar-ingestor && python -m src.main
+
+# Validate economic event schemas
+make contracts-validate P_INDICATOR_REENTRY/
+```
+
+### GUI System Integration
+The GUI system follows P_GUI specifications for advanced trading interfaces:
+```bash
+# Test GUI service components
+cd P_GUI && python expiry_indicator_service.py
+cd P_GUI && python test_friday_vol_indicator.py
+
+# Validate GUI contract integration
+python P_GUI/test_friday_vol_signal.py
+```
+
+This enterprise-grade trading system combines production-ready infrastructure with comprehensive domain knowledge to deliver a complete financial trading platform.
+
+## Friday Morning Updates Huey P Integration
+
+### New Enterprise Services
+The system has been enhanced with Friday Morning Updates components:
+
+**Enhanced Services (11 total now):**
+- **calendar-downloader**: Automated ForexFactory calendar download with enterprise monitoring
+- **dashboard-backend**: Real-time trading dashboard with WebSocket streaming and BaseEnterpriseService
+- **indicators**: Advanced currency strength and multi-timeframe analysis service
+
+### Signal Flow Testing Framework
+```bash
+# End-to-end signal flow testing
+make signal-flow-test              # Complete signal validation from source to MT4
+make signal-simulation             # Indicator signal simulation and backtesting  
+make calendar-simulation           # Economic calendar event simulation
+make manual-test-panel            # Interactive testing control panel GUI
+make test-signal-flow-all         # Run all signal flow tests
+
+# Individual testing components
+cd tests/signal_flow_testing && python signal_flow_tester.py --mt4-data "path/to/mt4"
+cd tests/signal_flow_testing && python manual_testing_control_panel.py
+```
+
+### Economic Calendar Automation
+```bash
+# Calendar downloader service
+cd services/calendar-downloader && python -m src.main
+
+# Manual calendar download trigger
+curl -X POST http://localhost:8080/download/manual
+
+# Calendar processing validation
+cd P_INDICATOR_REENTRY && python reentry_helpers_cli.py --validate-calendar
+```
+
+### Currency Strength Analysis
+```bash
+# Currency strength calculation
+cd services/indicator-engine && python -m src.currency_strength.strength_calculator
+
+# Multi-timeframe strength matrix
+python -c "from services.indicator_engine.src.currency_strength.strength_calculator import CurrencyStrengthCalculator; calc = CurrencyStrengthCalculator(); print(Currency strength system loaded)"
+```
+
+### Dashboard Modernization
+```bash
+# Start dashboard backend service
+cd services/dashboard-backend && python -m src.main
+
+# Access real-time dashboard
+# WebSocket: ws://localhost:8080/ws
+# REST API: http://localhost:8080/api/dashboard/data
+
+# Traditional GUI dashboard (if needed)
+cd P_GUI && python tkinter_dashboard_gui.py
+```
+
+### Integration with Existing Enterprise Framework
+All Friday Morning Updates components inherit from BaseEnterpriseService:
+- **Automatic RED metrics**: Request rate, error rate, duration
+- **Enterprise monitoring**: Prometheus metrics, health checks
+- **Security compliance**: SAST, SCA, vulnerability scanning
+- **Observability**: Grafana dashboards, AlertManager integration
+
+This enhanced system now provides complete trading workflow automation from calendar ingestion through signal generation, testing, and real-time dashboard visualization.

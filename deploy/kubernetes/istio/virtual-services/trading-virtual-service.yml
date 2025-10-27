@@ -1,0 +1,213 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: trading-ui-vs
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: trading-ui-vs
+    app.kubernetes.io/component: virtual-service
+    app.kubernetes.io/part-of: eafix-trading-system
+spec:
+  hosts:
+  - trading.eafix.com
+  gateways:
+  - trading-gateway
+  http:
+  # Main trading application UI
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: gui-gateway.eafix-trading.svc.cluster.local
+        port:
+          number: 8080
+    fault:
+      delay:
+        percentage:
+          value: 0.1
+        fixedDelay: 5ms
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+      retryOn: 5xx,gateway-error,connect-failure,refused-stream
+    timeout: 30s
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: trading-api-vs
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: trading-api-vs
+    app.kubernetes.io/component: virtual-service
+    app.kubernetes.io/part-of: eafix-trading-system
+spec:
+  hosts:
+  - api.trading.eafix.com
+  gateways:
+  - trading-gateway
+  http:
+  # Data ingestion API
+  - match:
+    - uri:
+        prefix: /api/v1/data
+    route:
+    - destination:
+        host: data-ingestor.eafix-trading.svc.cluster.local
+        port:
+          number: 8081
+    retries:
+      attempts: 2
+      perTryTimeout: 5s
+      retryOn: 5xx,gateway-error
+    timeout: 10s
+    
+  # Signals API  
+  - match:
+    - uri:
+        prefix: /api/v1/signals
+    route:
+    - destination:
+        host: signal-generator.eafix-trading.svc.cluster.local
+        port:
+          number: 8083
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+      retryOn: 5xx,gateway-error
+    timeout: 15s
+    
+  # Risk management API
+  - match:
+    - uri:
+        prefix: /api/v1/risk
+    route:
+    - destination:
+        host: risk-manager.eafix-trading.svc.cluster.local
+        port:
+          number: 8084
+    retries:
+      attempts: 2
+      perTryTimeout: 5s
+      retryOn: 5xx,gateway-error
+    timeout: 10s
+    
+  # Execution API (critical - shorter timeout)
+  - match:
+    - uri:
+        prefix: /api/v1/execution
+    route:
+    - destination:
+        host: execution-engine.eafix-trading.svc.cluster.local
+        port:
+          number: 8085
+    retries:
+      attempts: 1
+      perTryTimeout: 2s
+      retryOn: 5xx
+    timeout: 5s
+    
+  # Calendar API
+  - match:
+    - uri:
+        prefix: /api/v1/calendar
+    route:
+    - destination:
+        host: calendar-ingestor.eafix-trading.svc.cluster.local
+        port:
+          number: 8086
+    timeout: 30s
+    
+  # Re-entry matrix API
+  - match:
+    - uri:
+        prefix: /api/v1/reentry
+    route:
+    - destination:
+        host: reentry-matrix-svc.eafix-trading.svc.cluster.local
+        port:
+          number: 8087
+    retries:
+      attempts: 3
+      perTryTimeout: 10s
+      retryOn: 5xx,gateway-error
+    timeout: 15s
+    
+  # Reporting API
+  - match:
+    - uri:
+        prefix: /api/v1/reports
+    route:
+    - destination:
+        host: reporter.eafix-trading.svc.cluster.local
+        port:
+          number: 8088
+    timeout: 60s
+    
+  # Compliance monitoring API
+  - match:
+    - uri:
+        prefix: /api/v1/compliance
+    route:
+    - destination:
+        host: compliance-monitor.eafix-trading.svc.cluster.local
+        port:
+          number: 8080
+    timeout: 30s
+---
+# Internal service-to-service routing
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: signal-to-risk-vs
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: signal-to-risk-vs
+    app.kubernetes.io/component: virtual-service
+spec:
+  hosts:
+  - risk-manager.eafix-trading.svc.cluster.local
+  http:
+  - match:
+    - headers:
+        x-request-source:
+          exact: signal-generator
+    route:
+    - destination:
+        host: risk-manager.eafix-trading.svc.cluster.local
+        port:
+          number: 8084
+    retries:
+      attempts: 2
+      perTryTimeout: 3s
+      retryOn: 5xx,gateway-error
+    timeout: 5s
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: risk-to-execution-vs
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: risk-to-execution-vs
+    app.kubernetes.io/component: virtual-service
+spec:
+  hosts:
+  - execution-engine.eafix-trading.svc.cluster.local
+  http:
+  - match:
+    - headers:
+        x-request-source:
+          exact: risk-manager
+    route:
+    - destination:
+        host: execution-engine.eafix-trading.svc.cluster.local
+        port:
+          number: 8085
+    retries:
+      attempts: 1
+      perTryTimeout: 1s
+      retryOn: 5xx
+    timeout: 3s

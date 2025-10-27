@@ -1,0 +1,105 @@
+repos:
+  # Code formatting and linting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.7
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^(services/.*\.py|shared/.*\.py|contracts/.*\.py|P_tests/.*\.py)$
+      - id: ruff-format
+        files: ^(services/.*\.py|shared/.*\.py|contracts/.*\.py|P_tests/.*\.py)$
+
+  - repo: https://github.com/psf/black
+    rev: 24.8.0
+    hooks:
+      - id: black
+        files: ^(services/.*\.py|shared/.*\.py|contracts/.*\.py|P_tests/.*\.py)$
+        args: [--line-length=88]
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        files: ^(services/.*\.py|shared/.*\.py|contracts/.*\.py|P_tests/.*\.py)$
+        args: [--profile=black]
+
+  # Type checking with strict mode
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        files: ^(services/.*\.py|shared/.*\.py|contracts/.*\.py)$
+        args: [--strict, --ignore-missing-imports, --no-error-summary]
+        additional_dependencies: [pydantic>=2.0.0]
+
+  # Security and secrets detection
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: [--baseline, .secrets.baseline]
+        exclude: ^(.secrets.baseline|.*\.lock|.*\.log)$
+
+  # Git hooks for commit hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^(.*\.md|.*\.mq4)$
+      - id: end-of-file-fixer
+        exclude: ^(.*\.md|.*\.mq4)$
+      - id: check-yaml
+      - id: check-json
+        exclude: ^(.*\.ipynb)$
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: check-merge-conflict
+      - id: check-case-conflict
+
+  # Documentation and configuration validation  
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.41.0
+    hooks:
+      - id: markdownlint
+        args: [--fix, --config, .markdownlint.yaml]
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: [-d, relaxed]
+
+  # Contract schema validation
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.29.1
+    hooks:
+      - id: check-jsonschema
+        name: validate-contract-schemas
+        files: ^contracts/events/.*\.json$
+        args: [--check-metaschema]
+      - id: check-jsonschema
+        name: validate-json-schemas
+        files: ^contracts/schemas/json/.*\.json$
+        args: [--check-metaschema]
+
+  # Trading system specific validations
+  - repo: local
+    hooks:
+      - id: contract-validation
+        name: Trading System Contract Validation
+        entry: make contracts-validate-full
+        language: system
+        files: ^contracts/
+        pass_filenames: false
+      - id: p-tests-integration
+        name: P_ Folder Integration Tests
+        entry: python P_tests/integration/test_p_folder_integration.py
+        language: system
+        files: ^(services/|shared/|contracts/|P_tests/)
+        pass_filenames: false
+      - id: docker-digest-pinning
+        name: Docker Image Digest Pinning
+        entry: scripts/check-docker-digests.sh
+        language: script
+        files: ^(.*Dockerfile|.*docker-compose.*\.yml|\.github/workflows/.*\.yml)$
+        pass_filenames: false

@@ -1,0 +1,58 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: trading-gateway
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: trading-gateway
+    app.kubernetes.io/component: gateway
+    app.kubernetes.io/part-of: eafix-trading-system
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  # HTTPS configuration
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: trading-eafix-tls
+    hosts:
+    - trading.eafix.com
+    - api.trading.eafix.com
+  # HTTP to HTTPS redirect
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - trading.eafix.com
+    - api.trading.eafix.com
+    tls:
+      httpsRedirect: true
+---
+# Internal gateway for service-to-service communication
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: internal-gateway
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: internal-gateway
+    app.kubernetes.io/component: gateway
+    app.kubernetes.io/part-of: eafix-trading-system
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 15443
+      name: tls-internal
+      protocol: TLS
+    tls:
+      mode: ISTIO_MUTUAL
+    hosts:
+    - "*.eafix-trading.svc.cluster.local"

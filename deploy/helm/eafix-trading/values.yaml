@@ -1,0 +1,387 @@
+# Default values for eafix-trading
+# This is a YAML-formatted file.
+
+# Global configuration
+global:
+  imageRegistry: "ghcr.io"
+  imagePullSecrets: []
+  storageClass: ""
+  
+# Image configuration
+image:
+  registry: "ghcr.io"
+  repository: "dicky1987/eafix-modular"
+  tag: "v0.1.0"
+  pullPolicy: Always
+  pullSecrets: []
+
+# Service account
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+
+# Container security context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Network policies
+networkPolicy:
+  enabled: true
+  ingress: []
+  egress: []
+
+# Resource limits and requests
+resources:
+  # Default resource configuration for all services
+  default:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  
+  # Service-specific resource overrides
+  dataIngestor:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+      
+  indicatorEngine:
+    requests:
+      memory: "512Mi"
+      cpu: "300m"
+    limits:
+      memory: "1Gi"
+      cpu: "700m"
+      
+  signalGenerator:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+      
+  riskManager:
+    requests:
+      memory: "512Mi"
+      cpu: "300m"
+    limits:
+      memory: "1Gi"
+      cpu: "700m"
+      
+  executionEngine:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+      
+  guiGateway:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+# Service configuration
+services:
+  dataIngestor:
+    enabled: true
+    replicas: 2
+    port: 8081
+    targetPort: 8081
+    type: ClusterIP
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8081"
+      prometheus.io/path: "/metrics"
+    
+  indicatorEngine:
+    enabled: true
+    replicas: 2
+    port: 8082
+    targetPort: 8082
+    type: ClusterIP
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8082"
+      prometheus.io/path: "/metrics"
+    
+  signalGenerator:
+    enabled: true
+    replicas: 2
+    port: 8083
+    targetPort: 8083
+    type: ClusterIP
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8083"
+      prometheus.io/path: "/metrics"
+    
+  riskManager:
+    enabled: true
+    replicas: 2
+    port: 8084
+    targetPort: 8084
+    type: ClusterIP
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8084"
+      prometheus.io/path: "/metrics"
+    
+  executionEngine:
+    enabled: true
+    replicas: 2
+    port: 8085
+    targetPort: 8085
+    type: ClusterIP
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8085"
+      prometheus.io/path: "/metrics"
+    
+  calendarIngestor:
+    enabled: true
+    replicas: 1
+    port: 8086
+    targetPort: 8086
+    type: ClusterIP
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8086"
+      prometheus.io/path: "/metrics"
+    
+  reentryMatrixSvc:
+    enabled: true
+    replicas: 2
+    port: 8087
+    targetPort: 8087
+    type: ClusterIP
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8087"
+      prometheus.io/path: "/metrics"
+    
+  reporter:
+    enabled: true
+    replicas: 1
+    port: 8088
+    targetPort: 8088
+    type: ClusterIP
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8088"
+      prometheus.io/path: "/metrics"
+    
+  guiGateway:
+    enabled: true
+    replicas: 3
+    port: 8080
+    targetPort: 8080
+    type: ClusterIP
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8080"
+      prometheus.io/path: "/metrics"
+    
+  complianceMonitor:
+    enabled: true
+    replicas: 1
+    port: 8080
+    targetPort: 8080
+    type: ClusterIP
+    metricsPort: 9201
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "9201"
+      prometheus.io/path: "/metrics"
+
+# Infrastructure services
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: true
+    password: ""  # Set via secret
+  master:
+    persistence:
+      enabled: true
+      size: 20Gi
+      storageClass: ""
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+  metrics:
+    enabled: true
+
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: ""  # Set via secret
+    database: "eafix_trading"
+  primary:
+    persistence:
+      enabled: true
+      size: 100Gi
+      storageClass: ""
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "1"
+      limits:
+        memory: "4Gi"
+        cpu: "2"
+  metrics:
+    enabled: true
+
+# Monitoring
+monitoring:
+  prometheus:
+    enabled: true
+  grafana:
+    enabled: true
+  alertmanager:
+    enabled: true
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: trading.eafix.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: gui-gateway
+          port: 8080
+        - path: /api/data
+          pathType: Prefix
+          service: data-ingestor
+          port: 8081
+        - path: /api/signals
+          pathType: Prefix
+          service: signal-generator
+          port: 8083
+        - path: /api/risk
+          pathType: Prefix
+          service: risk-manager
+          port: 8084
+  tls:
+    - secretName: trading-eafix-tls
+      hosts:
+        - trading.eafix.com
+
+# Horizontal Pod Autoscaler
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Secrets management
+secrets:
+  # Use external secret management systems in production
+  create: false
+  external:
+    enabled: true
+    backendType: vault  # vault, k8s, gcp, aws, azure
+    secretStore: "vault-backend"
+
+# Environment-specific configurations
+environment:
+  name: "production"
+  logLevel: "INFO"
+  
+  # Redis configuration
+  redisUrl: "redis://redis:6379"
+  
+  # Database configuration
+  postgresUrl: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres:5432/$(POSTGRES_DB)"
+  
+  # Service URLs
+  serviceUrls:
+    riskManager: "http://risk-manager:8084"
+    executionEngine: "http://execution-engine:8085"
+
+# Health checks
+healthcheck:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Node selection
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity rules
+affinity:
+  # Prefer to schedule pods on different nodes for high availability
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - eafix-trading
+        topologyKey: kubernetes.io/hostname
+
+# Service mesh (Istio)
+serviceMesh:
+  enabled: false
+  istio:
+    sidecarInjection: true
+    virtualServices:
+      enabled: true
+    destinationRules:
+      enabled: true
+    peerAuthentication:
+      enabled: true
+      mtlsMode: STRICT
+
+# Backup configuration
+backup:
+  enabled: false
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention: "7d"

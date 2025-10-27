@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Strength Indicator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            padding: 20px;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: #2d2d2d;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            border-bottom: 2px solid #00aa00;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-connected {
+            color: #00aa00;
+        }
+
+        .status-alert {
+            color: #ff6600;
+        }
+
+        .content-area {
+            background: #262626;
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+        }
+
+        .controls-panel {
+            background: #333333;
+            padding: 15px;
+            border-bottom: 1px solid #555;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            background: #404040;
+            color: #ffffff;
+            border: 1px solid #666;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn:hover {
+            background: #505050;
+        }
+
+        .btn.active {
+            background: #00aa00;
+            border-color: #00aa00;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .panel {
+            background: #2d2d2d;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+
+        .panel-header {
+            background: #383838;
+            padding: 12px 15px;
+            border-bottom: 1px solid #555;
+            font-weight: bold;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px 8px;
+            text-align: right;
+            border-bottom: 1px solid #444;
+            font-size: 12px;
+        }
+
+        th {
+            background: #383838;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+        }
+
+        th:first-child, td:first-child {
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .positive {
+            color: #00aa00;
+        }
+
+        .negative {
+            color: #ff4444;
+        }
+
+        .neutral {
+            color: #cccccc;
+        }
+
+        .trend-up::after {
+            content: " ↗️";
+        }
+
+        .trend-down::after {
+            content: " ↘️";
+        }
+
+        .trend-flat::after {
+            content: " →";
+        }
+
+        .alert-yellow {
+            background: #ffaa0020;
+        }
+
+        .alert-red {
+            background: #ff444420;
+        }
+
+        .strength-meter {
+            display: inline-block;
+            width: 60px;
+            height: 12px;
+            background: #444;
+            border-radius: 6px;
+            position: relative;
+            margin-left: 5px;
+        }
+
+        .strength-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+
+        .strength-strong {
+            background: linear-gradient(90deg, #00aa00, #66bb00);
+        }
+
+        .strength-weak {
+            background: linear-gradient(90deg, #ff6600, #ff0000);
+        }
+
+        .strength-neutral {
+            background: #666666;
+        }
+
+        .probability-panel {
+            grid-column: span 2;
+            margin-top: 20px;
+        }
+
+        .best-match {
+            background: #1a4d1a;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px;
+            border-left: 4px solid #00aa00;
+        }
+
+        .best-match-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #00aa00;
+            margin-bottom: 8px;
+        }
+
+        .probability-table {
+            margin: 15px;
+        }
+
+        .confidence-high {
+            color: #00aa00;
+            font-weight: bold;
+        }
+
+        .confidence-medium {
+            color: #ffa500;
+            font-weight: bold;
+        }
+
+        .confidence-low {
+            color: #ff6600;
+            font-weight: bold;
+        }
+
+        .sparkline {
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            margin-left: 5px;
+        }
+
+        .sparkline svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header Status Bar -->
+        <div class="header">
+            <div class="status-bar">
+                <div class="status-item">
+                    <span style="color: #00aa00;">🔴</span>
+                    <span class="status-connected">DDE: Connected</span>
+                </div>
+                <div class="status-item">
+                    <span>⏱️</span>
+                    <span>Last Update: 12:34:56</span>
+                </div>
+                <div class="status-item">
+                    <span>📊</span>
+                    <span>Active: 8 pairs</span>
+                </div>
+                <div class="status-item">
+                    <span>🚨</span>
+                    <span class="status-alert">Alerts: 2</span>
+                </div>
+                <div class="status-item">
+                    <span>📈</span>
+                    <span class="positive">Strongest: EUR (+1.23%)</span>
+                </div>
+                <div class="status-item">
+                    <span>📉</span>
+                    <span class="negative">Weakest: JPY (-0.89%)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <!-- Controls Panel -->
+            <div class="controls-panel">
+                <div class="controls-row">
+                    <div class="control-group">
+                        <button class="btn">🔄 Refresh</button>
+                        <button class="btn">⚙️ Settings</button>
+                        <button class="btn">📊 Charts</button>
+                        <button class="btn">🔔 Alerts</button>
+                        <button class="btn">📤 Export</button>
+                    </div>
+                    <div class="control-group">
+                        <span>Windows:</span>
+                        <button class="btn active">15m</button>
+                        <button class="btn active">1h</button>
+                        <button class="btn active">4h</button>
+                        <button class="btn active">8h</button>
+                        <button class="btn active">12h</button>
+                        <button class="btn active">24h</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="main-grid">
+                <!-- Currency Pair % Changes Panel -->
+                <div class="panel">
+                    <div class="panel-header">
+                        Currency Pair % Changes
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Pair</th>
+                                    <th>15m</th>
+                                    <th>1h</th>
+                                    <th>4h</th>
+                                    <th>8h</th>
+                                    <th>12h</th>
+                                    <th>24h</th>
+                                    <th>Trend</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="alert-yellow">
+                                    <td>EURUSD</td>
+                                    <td class="positive">+0.23%</td>
+                                    <td class="positive">+0.45%</td>
+                                    <td class="negative">-0.12%</td>
+                                    <td class="positive">+0.67%</td>
+                                    <td class="positive">+1.23%</td>
+                                    <td class="positive">+2.34%</td>
+                                    <td class="trend-up positive">UP</td>
+                                </tr>
+                                <tr>
+                                    <td>GBPUSD</td>
+                                    <td class="negative">-0.15%</td>
+                                    <td class="positive">+0.33%</td>
+                                    <td class="positive">+0.78%</td>
+                                    <td class="positive">+1.12%</td>
+                                    <td class="positive">+0.45%</td>
+                                    <td class="negative">-0.23%</td>
+                                    <td class="trend-up positive">UP</td>
+                                </tr>
+                                <tr class="alert-red">
+                                    <td>USDJPY</td>
+                                    <td class="positive">+0.67%</td>
+                                    <td class="negative">-0.23%</td>
+                                    <td class="negative">-1.45%</td>
+                                    <td class="negative">-2.34%</td>
+                                    <td class="negative">-3.12%</td>
+                                    <td class="negative">-4.56%</td>
+                                    <td class="trend-down negative">DOWN</td>
+                                </tr>
+                                <tr>
+                                    <td>USDCHF</td>
+                                    <td class="positive">+0.12%</td>
+                                    <td class="negative">-0.05%</td>
+                                    <td class="positive">+0.34%</td>
+                                    <td class="positive">+0.78%</td>
+                                    <td class="positive">+1.45%</td>
+                                    <td class="positive">+2.12%</td>
+                                    <td class="trend-up positive">UP</td>
+                                </tr>
+                                <tr>
+                                    <td>AUDUSD</td>
+                                    <td class="negative">-0.34%</td>
+                                    <td class="negative">-0.56%</td>
+                                    <td class="negative">-0.23%</td>
+                                    <td class="positive">+0.12%</td>
+                                    <td class="negative">-0.45%</td>
+                                    <td class="negative">-0.89%</td>
+                                    <td class="trend-down negative">DOWN</td>
+                                </tr>
+                                <tr>
+                                    <td>USDCAD</td>
+                                    <td class="positive">+0.08%</td>
+                                    <td class="positive">+0.23%</td>
+                                    <td class="positive">+0.45%</td>
+                                    <td class="positive">+0.67%</td>
+                                    <td class="positive">+0.34%</td>
+                                    <td class="positive">+1.23%</td>
+                                    <td class="trend-up positive">UP</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Currency Strength Index Panel -->
+                <div class="panel">
+                    <div class="panel-header">
+                        Currency Strength Index (Averaged)
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Currency</th>
+                                    <th>15m</th>
+                                    <th>1h</th>
+                                    <th>4h</th>
+                                    <th>8h</th>
+                                    <th>12h</th>
+                                    <th>24h</th>
+                                    <th>Strength</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>USD</td>
+                                    <td class="positive">+0.45%</td>
+                                    <td class="positive">+0.67%</td>
+                                    <td class="positive">+0.23%</td>
+                                    <td class="positive">+1.12%</td>
+                                    <td class="positive">+0.89%</td>
+                                    <td class="positive">+1.45%</td>
+                                    <td>
+                                        <div class="strength-meter">
+                                            <div class="strength-fill strength-strong" style="width: 85%;"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>EUR</td>
+                                    <td class="positive">+0.23%</td>
+                                    <td class="positive">+0.34%</td>
+                                    <td class="negative">-0.12%</td>
+                                    <td class="positive">+0.45%</td>
+                                    <td class="positive">+0.67%</td>
+                                    <td class="positive">+0.78%</td>
+                                    <td>
+                                        <div class="strength-meter">
+                                            <div class="strength-fill strength-strong" style="width: 70%;"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>GBP</td>
+                                    <td class="negative">-0.12%</td>
+                                    <td class="positive">+0.23%</td>
+                                    <td class="positive">+0.45%</td>
+                                    <td class="positive">+0.34%</td>
+                                    <td class="positive">+0.12%</td>
+                                    <td class="negative">-0.23%</td>
+                                    <td>
+                                        <div class="strength-meter">
+                                            <div class="strength-fill strength-neutral" style="width: 55%;"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>JPY</td>
+                                    <td class="negative">-0.67%</td>
+                                    <td class="negative">-0.89%</td>
+                                    <td class="negative">-1.23%</td>
+                                    <td class="negative">-1.45%</td>
+                                    <td class="negative">-2.34%</td>
+                                    <td class="negative">-3.12%</td>
+                                    <td>
+                                        <div class="strength-meter">
+                                            <div class="strength-fill strength-weak" style="width: 20%;"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>CHF</td>
+                                    <td class="negative">-0.12%</td>
+                                    <td class="positive">+0.05%</td>
+                                    <td class="negative">-0.34%</td>
+                                    <td class="negative">-0.78%</td>
+                                    <td class="negative">-1.45%</td>
+                                    <td class="negative">-2.12%</td>
+                                    <td>
+                                        <div class="strength-meter">
+                                            <div class="strength-fill strength-weak" style="width: 30%;"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>AUD</td>
+                                    <td class="negative">-0.34%</td>
+                                    <td class="negative">-0.56%</td>
+                                    <td class="negative">-0.23%</td>
+                                    <td class="negative">-0.12%</td>
+                                    <td class="negative">-0.45%</td>
+                                    <td class="negative">-0.89%</td>
+                                    <td>
+                                        <div class="strength-meter">
+                                            <div class="strength-fill strength-weak" style="width: 25%;"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>CAD</td>
+                                    <td class="negative">-0.08%</td>
+                                    <td class="negative">-0.23%</td>
+                                    <td class="negative">-0.45%</td>
+                                    <td class="negative">-0.67%</td>
+                                    <td class="negative">-0.34%</td>
+                                    <td class="negative">-1.23%</td>
+                                    <td>
+                                        <div class="strength-meter">
+                                            <div class="strength-fill strength-weak" style="width: 35%;"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Conditional Probability Panel -->
+                <div class="panel probability-panel">
+                    <div class="panel-header">
+                        Conditional Edge & Probability Analysis
+                    </div>
+                    
+                    <div class="best-match">
+                        <div class="best-match-title">🎯 Live Best Match</div>
+                        <div><strong>M≥15@10m UP | →25@60m | p=67.5% n=234</strong></div>
+                        <div style="margin-top: 8px; font-size: 12px;">
+                            Symbol: EURUSD | State: RSI:30-70, ATR:normal | Confidence: <span class="confidence-high">HIGH</span>
+                        </div>
+                    </div>
+
+                    <div class="probability-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Trigger</th>
+                                    <th>Outcome</th>
+                                    <th>Dir</th>
+                                    <th>State</th>
+                                    <th>Probability</th>
+                                    <th>Samples</th>
+                                    <th>Confidence</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>M≥15@10m</td>
+                                    <td>→25@60m</td>
+                                    <td class="positive">UP</td>
+                                    <td>RSI:30-70</td>
+                                    <td class="positive"><strong>67.5%</strong></td>
+                                    <td>234</td>
+                                    <td class="confidence-high">HIGH</td>
+                                    <td><button class="btn">Pin</button></td>
+                                </tr>
+                                <tr>
+                                    <td>M≥10@15m</td>
+                                    <td>→15@180m</td>
+                                    <td class="positive">UP</td>
+                                    <td>MACD:+,ATR:hi</td>
+                                    <td class="positive"><strong>64.2%</strong></td>
+                                    <td>187</td>
+                                    <td class="confidence-medium">MEDIUM</td>
+                                    <td><button class="btn">Pin</button></td>
+                                </tr>
+                                <tr>
+                                    <td>M≥15@15m</td>
+                                    <td>→25@60m</td>
+                                    <td class="negative">DN</td>
+                                    <td>BB:%B<20</td>
+                                    <td class="positive"><strong>71.8%</strong></td>
+                                    <td>156</td>
+                                    <td class="confidence-medium">MEDIUM</td>
+                                    <td><button class="btn">Pin</button></td>
+                                </tr>
+                                <tr>
+                                    <td>M≥20@10m</td>
+                                    <td>→30@120m</td>
+                                    <td class="positive">UP</td>
+                                    <td>Volume:high</td>
+                                    <td class="positive"><strong>59.3%</strong></td>
+                                    <td>203</td>
+                                    <td class="confidence-high">HIGH</td>
+                                    <td><button class="btn">Pin</button></td>
+                                </tr>
+                                <tr>
+                                    <td>M≥12@20m</td>
+                                    <td>→20@90m</td>
+                                    <td class="negative">DN</td>
+                                    <td>RSI:>70</td>
+                                    <td class="positive"><strong>55.7%</strong></td>
+                                    <td>89</td>
+                                    <td class="confidence-low">LOW</td>
+                                    <td><button class="btn">Pin</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulate real-time updates
+        function simulateDataUpdate() {
+            // This would be connected to your DDE feed in the real implementation
+            const timestamp = new Date().toLocaleTimeString();
+            document.querySelector('.status-bar .status-item:nth-child(2) span:last-child').textContent = `Last Update: ${timestamp}`;
+            
+            // Add some visual feedback for updates
+            const tables = document.querySelectorAll('table tbody tr');
+            tables.forEach(row => {
+                if (Math.random() > 0.8) {
+                    row.style.backgroundColor = '#00aa0010';
+                    setTimeout(() => {
+                        row.style.backgroundColor = '';
+                    }, 500);
+                }
+            });
+        }
+
+        // Update every 5 seconds to simulate real-time feed
+        setInterval(simulateDataUpdate, 5000);
+
+        // Add click handlers for interactive elements
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.textContent.includes('m') || this.textContent.includes('h')) {
+                    this.classList.toggle('active');
+                }
+                console.log('Button clicked:', this.textContent);
+            });
+        });
+    </script>
+</body>
+</html>

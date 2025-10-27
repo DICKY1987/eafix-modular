@@ -1,0 +1,313 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "EAFIX Trading System - Overview",
+    "tags": ["trading", "overview", "slo"],
+    "timezone": "browser",
+    "refresh": "30s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "System Availability SLO",
+        "type": "stat",
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "slo:system_availability:rate5m * 100",
+            "legendFormat": "Current"
+          },
+          {
+            "expr": "99.9",
+            "legendFormat": "SLO Target"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 99,
+            "max": 100,
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 99.5},
+                {"color": "green", "value": 99.9}
+              ]
+            }
+          }
+        },
+        "options": {
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"]
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Price Feed Latency SLO",
+        "type": "stat",
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0},
+        "targets": [
+          {
+            "expr": "slo:price_feed_latency:p95_5m * 1000",
+            "legendFormat": "P95 Latency"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ms",
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 80},
+                {"color": "red", "value": 100}
+              ]
+            }
+          }
+        },
+        "options": {
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"]
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Signal Generation Latency SLO",
+        "type": "stat",
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "slo:signal_generation_latency:p95_5m * 1000",
+            "legendFormat": "P95 Latency"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ms",
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 400},
+                {"color": "red", "value": 500}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Order Execution Latency SLO",
+        "type": "stat",
+        "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0},
+        "targets": [
+          {
+            "expr": "slo:order_execution_latency:p95_5m",
+            "legendFormat": "P95 Latency"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 1.5},
+                {"color": "red", "value": 2}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Trading Pipeline Health",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "up{job=\"data-ingestor\"}",
+            "legendFormat": "Data Ingestor"
+          },
+          {
+            "expr": "up{job=\"indicator-engine\"}",
+            "legendFormat": "Indicator Engine"
+          },
+          {
+            "expr": "up{job=\"signal-generator\"}",
+            "legendFormat": "Signal Generator"
+          },
+          {
+            "expr": "up{job=\"risk-manager\"}",
+            "legendFormat": "Risk Manager"
+          },
+          {
+            "expr": "up{job=\"execution-engine\"}",
+            "legendFormat": "Execution Engine"
+          }
+        ],
+        "yAxes": [
+          {
+            "min": 0,
+            "max": 1,
+            "unit": "short"
+          }
+        ],
+        "alert": {
+          "conditions": [
+            {
+              "query": {"queryType": "", "refId": "A"},
+              "reducer": {"type": "last", "params": []},
+              "evaluator": {"params": [1], "type": "lt"}
+            }
+          ],
+          "executionErrorState": "alerting",
+          "for": "30s",
+          "frequency": "10s",
+          "handler": 1,
+          "name": "Trading Service Down",
+          "noDataState": "no_data",
+          "notifications": []
+        }
+      },
+      {
+        "id": 6,
+        "title": "Daily P&L by Currency Pair",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {
+            "expr": "trading:pnl:realized_daily",
+            "legendFormat": "{{ currency_pair }}"
+          }
+        ],
+        "yAxes": [
+          {
+            "unit": "currencyUSD"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Signal Accuracy by Type",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "targets": [
+          {
+            "expr": "trading:signals:accuracy_rate_1h * 100",
+            "legendFormat": "{{ signal_type }} - {{ currency_pair }}"
+          }
+        ],
+        "yAxes": [
+          {
+            "min": 0,
+            "max": 100,
+            "unit": "percent"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Current Positions by Strategy",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "targets": [
+          {
+            "expr": "trading:positions:count_current",
+            "legendFormat": "{{ strategy }} - {{ currency_pair }}"
+          }
+        ],
+        "yAxes": [
+          {
+            "min": 0,
+            "unit": "short"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Risk Exposure by Currency",
+        "type": "piechart",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+        "targets": [
+          {
+            "expr": "trading:positions:exposure_usd_current",
+            "legendFormat": "{{ currency_pair }}"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "System Resource Utilization",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+        "targets": [
+          {
+            "expr": "100 - (avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+            "legendFormat": "CPU %"
+          },
+          {
+            "expr": "((node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes) * 100",
+            "legendFormat": "Memory %"
+          }
+        ],
+        "yAxes": [
+          {
+            "min": 0,
+            "max": 100,
+            "unit": "percent"
+          }
+        ]
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "currency_pair",
+          "type": "query",
+          "query": "label_values(trading_volume_usd_total, currency_pair)",
+          "refresh": 1,
+          "includeAll": true,
+          "multi": true
+        },
+        {
+          "name": "service",
+          "type": "query", 
+          "query": "label_values(up{job=~\".*-engine|.*-generator|.*-manager|.*-ingestor\"}, job)",
+          "refresh": 1,
+          "includeAll": true,
+          "multi": true
+        }
+      ]
+    },
+    "annotations": {
+      "list": [
+        {
+          "name": "Deployments",
+          "datasource": "Prometheus",
+          "enable": true,
+          "expr": "changes(trading_deployment_info[1h])",
+          "iconColor": "blue",
+          "titleFormat": "Deployment",
+          "textFormat": "{{ service }} deployed"
+        },
+        {
+          "name": "Market Events",
+          "datasource": "Prometheus", 
+          "enable": true,
+          "expr": "trading_calendar_event_high_impact == 1",
+          "iconColor": "orange",
+          "titleFormat": "High Impact Event",
+          "textFormat": "{{ event_name }}"
+        }
+      ]
+    }
+  }
+}

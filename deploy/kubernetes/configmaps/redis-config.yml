@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: redis
+    app.kubernetes.io/component: message-bus
+    app.kubernetes.io/version: "7.2"
+data:
+  redis.conf: |
+    # Redis configuration for EAFIX Trading System
+    
+    # Memory and persistence
+    maxmemory 2gb
+    maxmemory-policy allkeys-lru
+    save 900 1
+    save 300 10
+    save 60 10000
+    
+    # Network and security
+    bind 0.0.0.0
+    port 6379
+    protected-mode yes
+    requirepass ${REDIS_PASSWORD}
+    
+    # Performance tuning for trading workloads
+    tcp-keepalive 300
+    timeout 0
+    tcp-backlog 511
+    
+    # Pub/sub configuration
+    client-output-buffer-limit pubsub 32mb 8mb 60
+    
+    # Logging
+    loglevel notice
+    logfile "/var/log/redis/redis-server.log"
+    
+    # Append only file for durability
+    appendonly yes
+    appendfsync everysec
+    
+    # Slow log
+    slowlog-log-slower-than 10000
+    slowlog-max-len 128

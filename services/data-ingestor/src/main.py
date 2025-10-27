@@ -13,7 +13,7 @@ from typing import AsyncGenerator
 import structlog
 import uvicorn
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 
 from .ingestor import DataIngestor
 from .config import Settings
@@ -88,6 +88,25 @@ async def health_check():
         logger.error("Health check failed", error=str(e))
         return JSONResponse(
             content={"status": "unhealthy", "error": str(e)}, 
+            status_code=503
+        )
+
+
+@app.get("/readyz")
+async def readiness_check():
+    """Readiness check endpoint"""
+    try:
+        # Check if service has been running for at least 2 seconds
+        uptime = app.state.metrics.get_uptime()
+        ready = uptime > 2.0
+        return JSONResponse(
+            content={"ready": ready, "uptime": uptime},
+            status_code=200 if ready else 503
+        )
+    except Exception as e:
+        logger.error("Readiness check failed", error=str(e))
+        return JSONResponse(
+            content={"ready": False, "error": str(e)},
             status_code=503
         )
 

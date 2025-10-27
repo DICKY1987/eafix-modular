@@ -1,0 +1,253 @@
+# System-level alerts for EAFIX Trading System
+# Infrastructure and service health monitoring
+
+groups:
+  - name: system_health
+    interval: 30s
+    rules:
+      # === SERVICE HEALTH ALERTS ===
+      
+      - alert: ServiceDown
+        expr: up{job=~"data-ingestor|indicator-engine|signal-generator|risk-manager|execution-engine|gui-gateway"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Critical trading service {{ $labels.job }} is down"
+          description: "Service {{ $labels.job }} on {{ $labels.instance }} has been down for more than 30 seconds"
+          runbook_url: "https://runbooks.eafix.com/service-recovery/{{ $labels.job }}"
+          dashboard_url: "https://grafana.eafix.com/d/service-health"
+
+      - alert: ServiceHighLatency
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket{job=~".*-engine|.*-generator|.*-manager|.*-ingestor"}[5m]))
+            by (job, le)
+          ) > 1.0
+        for: 2m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High latency detected for {{ $labels.job }}"
+          description: "P95 latency {{ $value }}s for {{ $labels.job }} exceeds 1s threshold"
+          runbook_url: "https://runbooks.eafix.com/performance/high-latency"
+
+      - alert: ServiceHighErrorRate
+        expr: |
+          sum(rate(http_requests_total{status=~"5.."}[5m])) by (job)
+          /
+          sum(rate(http_requests_total[5m])) by (job)
+          > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "High error rate for {{ $labels.job }}"
+          description: "Error rate {{ $value | humanizePercentage }} for {{ $labels.job }} exceeds 5% threshold"
+          runbook_url: "https://runbooks.eafix.com/incidents/high-error-rate"
+
+      # === INFRASTRUCTURE ALERTS ===
+      
+      - alert: RedisDown
+        expr: redis_up == 0
+        for: 30s
+        labels:
+          severity: critical
+          team: platform
+          component: redis
+        annotations:
+          summary: "Redis message bus is down"
+          description: "Redis instance {{ $labels.instance }} is unreachable"
+          runbook_url: "https://runbooks.eafix.com/infrastructure/redis-recovery"
+
+      - alert: RedisHighMemoryUsage
+        expr: |
+          (redis_memory_used_bytes / redis_memory_max_bytes) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+          component: redis
+        annotations:
+          summary: "Redis memory usage is high"
+          description: "Redis memory usage {{ $value }}% on {{ $labels.instance }} exceeds 80%"
+          runbook_url: "https://runbooks.eafix.com/infrastructure/redis-memory"
+
+      - alert: PostgreSQLDown
+        expr: pg_up == 0
+        for: 30s
+        labels:
+          severity: critical
+          team: platform
+          component: postgresql
+        annotations:
+          summary: "PostgreSQL database is down"
+          description: "PostgreSQL instance {{ $labels.instance }} is unreachable"
+          runbook_url: "https://runbooks.eafix.com/infrastructure/postgres-recovery"
+
+      - alert: PostgreSQLHighConnections
+        expr: |
+          (pg_stat_database_numbackends / pg_settings_max_connections) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+          component: postgresql
+        annotations:
+          summary: "PostgreSQL connection usage is high"
+          description: "PostgreSQL connections {{ $value }}% on {{ $labels.instance }} exceeds 80%"
+          runbook_url: "https://runbooks.eafix.com/infrastructure/postgres-connections"
+
+      # === RESOURCE UTILIZATION ALERTS ===
+      
+      - alert: HighCPUUsage
+        expr: |
+          100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance) * 100) > 85
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+          component: compute
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage {{ $value }}% on {{ $labels.instance }} exceeds 85%"
+          runbook_url: "https://runbooks.eafix.com/infrastructure/high-cpu"
+
+      - alert: HighMemoryUsage
+        expr: |
+          ((node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+          component: memory
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage {{ $value }}% on {{ $labels.instance }} exceeds 85%"
+          runbook_url: "https://runbooks.eafix.com/infrastructure/high-memory"
+
+      - alert: DiskSpaceLow
+        expr: |
+          ((node_filesystem_size_bytes - node_filesystem_avail_bytes) / node_filesystem_size_bytes) * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+          component: storage
+        annotations:
+          summary: "Disk space low on {{ $labels.instance }}"
+          description: "Disk usage {{ $value }}% on {{ $labels.device }} exceeds 85%"
+          runbook_url: "https://runbooks.eafix.com/infrastructure/disk-space"
+
+      # === NETWORK ALERTS ===
+      
+      - alert: NetworkLatencyHigh
+        expr: |
+          histogram_quantile(0.95, 
+            sum(rate(net_conntrack_dialer_conn_established_total[5m])) by (le)
+          ) > 0.1
+        for: 3m
+        labels:
+          severity: warning
+          team: platform
+          component: network
+        annotations:
+          summary: "Network latency is high"
+          description: "P95 network latency {{ $value }}s exceeds 100ms threshold"
+          runbook_url: "https://runbooks.eafix.com/infrastructure/network-latency"
+
+      # === TRADING SPECIFIC SYSTEM ALERTS ===
+      
+      - alert: MessageQueueBacklog
+        expr: |
+          redis_list_length{key=~"trading:.*:queue"} > 1000
+        for: 2m
+        labels:
+          severity: warning
+          team: trading-platform
+          component: messaging
+        annotations:
+          summary: "Trading message queue backlog detected"
+          description: "Queue {{ $labels.key }} has {{ $value }} messages pending"
+          runbook_url: "https://runbooks.eafix.com/trading/queue-backlog"
+
+      - alert: EventProcessingDelay
+        expr: |
+          time() - trading_last_event_timestamp{service=~".*-engine|.*-generator"} > 300
+        for: 1m
+        labels:
+          severity: critical
+          team: trading-platform
+          component: event-processing
+        annotations:
+          summary: "Event processing delay in {{ $labels.service }}"
+          description: "Last event processed {{ $value }}s ago, indicating processing delay"
+          runbook_url: "https://runbooks.eafix.com/trading/event-delay"
+
+      - alert: TradingCircuitBreaker
+        expr: |
+          trading_circuit_breaker_state{service=~".*-engine|.*-generator"} == 1
+        for: 0s  # Immediate alert
+        labels:
+          severity: critical
+          team: trading-platform
+          component: circuit-breaker
+        annotations:
+          summary: "Trading circuit breaker activated for {{ $labels.service }}"
+          description: "Circuit breaker protection activated due to failures in {{ $labels.service }}"
+          runbook_url: "https://runbooks.eafix.com/trading/circuit-breaker"
+
+  - name: business_continuity
+    interval: 60s
+    rules:
+      # === BUSINESS IMPACT ALERTS ===
+      
+      - alert: TradingSystemDegradation
+        expr: |
+          (
+            count(up{job=~"data-ingestor|signal-generator|risk-manager|execution-engine"} == 0) > 0
+          ) or (
+            slo:system_availability:rate5m < 0.99
+          )
+        for: 1m
+        labels:
+          severity: critical
+          team: trading-platform
+          impact: business
+          escalation: immediate
+        annotations:
+          summary: "Trading system experiencing degradation"
+          description: "Critical trading components are down or system availability below 99%"
+          runbook_url: "https://runbooks.eafix.com/incidents/trading-degradation"
+          pager_duty: "true"
+
+      - alert: MarketDataFeedDisruption
+        expr: |
+          increase(trading_ticks_received_total{service="data-ingestor"}[5m]) == 0 
+          and 
+          hour() >= 11 and hour() <= 23  # Market hours
+        for: 2m
+        labels:
+          severity: critical
+          team: data-platform
+          impact: business
+        annotations:
+          summary: "Market data feed disruption during trading hours"
+          description: "No price ticks received in the last 5 minutes during market hours"
+          runbook_url: "https://runbooks.eafix.com/incidents/market-data-disruption"
+
+      - alert: OrderExecutionFailure
+        expr: |
+          rate(trading_orders_failed_total{service="execution-engine"}[5m]) > 0.1
+        for: 1m
+        labels:
+          severity: critical
+          team: execution-platform
+          impact: business
+        annotations:
+          summary: "High order execution failure rate"
+          description: "Order execution failures {{ $value }}/sec exceed acceptable threshold"
+          runbook_url: "https://runbooks.eafix.com/incidents/execution-failure"

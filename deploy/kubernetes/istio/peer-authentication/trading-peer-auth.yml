@@ -1,0 +1,83 @@
+---
+# Strict mTLS for the entire namespace
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: default-peer-auth
+    app.kubernetes.io/component: peer-authentication
+    app.kubernetes.io/part-of: eafix-trading-system
+spec:
+  mtls:
+    mode: STRICT
+---
+# Permissive mode for Redis (custom authentication)
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: redis-peer-auth
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: redis-peer-auth
+    app.kubernetes.io/component: peer-authentication
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redis
+  mtls:
+    mode: PERMISSIVE
+  portLevelMtls:
+    6379:
+      mode: DISABLE
+---
+# Permissive mode for PostgreSQL (custom TLS)
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: postgres-peer-auth
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: postgres-peer-auth
+    app.kubernetes.io/component: peer-authentication
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres
+  mtls:
+    mode: PERMISSIVE
+  portLevelMtls:
+    5432:
+      mode: DISABLE
+---
+# Strict mTLS for trading services with high security requirements
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: trading-services-strict
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: trading-services-strict
+    app.kubernetes.io/component: peer-authentication
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: execution
+  mtls:
+    mode: STRICT
+---
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: risk-manager-strict
+  namespace: eafix-trading
+  labels:
+    app.kubernetes.io/name: risk-manager-strict
+    app.kubernetes.io/component: peer-authentication
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: risk
+  mtls:
+    mode: STRICT
