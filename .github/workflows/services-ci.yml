@@ -13,7 +13,7 @@ jobs:
       matrix:
         service: ["data-ingestor", "indicator-engine", "signal-generator", "risk-manager", "execution-engine", "calendar-ingestor", "reentry-matrix-svc", "reporter", "gui-gateway"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
