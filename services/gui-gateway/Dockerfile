@@ -1,6 +1,6 @@
 # Multi-stage build for security and size optimization
 # Use specific Python version with digest pinning (to be updated with actual digests)
-FROM python:3.11-slim@sha256:f52d14c7d0e87b6be38fdf5a5f6c7ae19a04e95e7dfd8cad073ad5063d80d3d0 as builder
+FROM python:3.14-slim@sha256:4ed33101ee7ec299041cc41dd268dae17031184be94384b1ce7936dc4e5dead3 as builder
 
 # Set build arguments for security scanning
 ARG BUILD_DATE
@@ -45,7 +45,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip list --format=json > /app/installed-packages.json
 
 # Production stage
-FROM python:3.11-slim@sha256:f52d14c7d0e87b6be38fdf5a5f6c7ae19a04e95e7dfd8cad073ad5063d80d3d0 as production
+FROM python:3.14-slim@sha256:4ed33101ee7ec299041cc41dd268dae17031184be94384b1ce7936dc4e5dead3 as production
 
 # Set build arguments for labels
 ARG BUILD_DATE
