@@ -77,6 +77,8 @@ Successfully analyzed the EAFIX Modular Trading System's atomic process flow and
 | 6 | `maintenance` | 12-13.000 | Midnight/Threshold | No | 6,500ms |
 | 7 | `testing` | 14.000 | CI/Commit | No (blocking in CI) | 10,000ms |
 
+**Note:** Signal processing SLA (2,000ms) is the per-workstream budget. The total critical path SLA is 7,000ms across all phases including EA execution.
+
 ### Parallel Execution Groups
 
 | Group | Workstreams | Trigger |

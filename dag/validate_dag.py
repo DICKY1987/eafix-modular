@@ -10,9 +10,23 @@ from typing import Any
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
-    """Load and parse a YAML file."""
+    """Load and parse a YAML file.
+
+    Args:
+        path: Path to the YAML file.
+
+    Returns:
+        Parsed YAML content as a dictionary.
+
+    Raises:
+        ValueError: If the YAML content is not a dictionary.
+        FileNotFoundError: If the file does not exist.
+    """
     with open(path, "r") as f:
-        return yaml.safe_load(f)
+        content = yaml.safe_load(f)
+    if not isinstance(content, dict):
+        raise ValueError(f"Expected dictionary at root of {path}, got {type(content).__name__}")
+    return content
 
 
 def validate_dag_graph(dag: dict[str, Any]) -> list[str]:
@@ -26,7 +40,9 @@ def validate_dag_graph(dag: dict[str, Any]) -> list[str]:
         errors.append("DAG missing 'nodes' field")
         return errors
 
-    node_ids = {node["id"] for node in dag["nodes"]}
+    # Build node lookup dictionary for O(1) access
+    node_lookup = {node["id"]: node for node in dag["nodes"]}
+    node_ids = set(node_lookup.keys())
 
     # Check for orphan references
     for node in dag["nodes"]:
@@ -34,7 +50,7 @@ def validate_dag_graph(dag: dict[str, Any]) -> list[str]:
             if child not in node_ids:
                 errors.append(f"Node '{node['id']}' references unknown child '{child}'")
 
-    # Check for cycles (simplified DFS)
+    # Check for cycles using DFS with O(N) node lookup
     visited = set()
     rec_stack = set()
 
@@ -42,7 +58,7 @@ def validate_dag_graph(dag: dict[str, Any]) -> list[str]:
         visited.add(node_id)
         rec_stack.add(node_id)
 
-        node = next((n for n in dag["nodes"] if n["id"] == node_id), None)
+        node = node_lookup.get(node_id)
         if node:
             for child in node.get("children", []):
                 if child not in visited:

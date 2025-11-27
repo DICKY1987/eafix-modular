@@ -60,7 +60,7 @@ workstreams:
       - "VERIFY_STATE_TRANSITIONS"
     critical_path: true
     schedule: "continuous"
-    sla_budget_ms: 1000
+    sla_budget_ms: 2000  # Note: Total critical path SLA is 7000ms across all phases
     
     nodes:
       - "signal_detection_loop"

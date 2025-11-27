@@ -129,7 +129,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run DAG Tests
-        run: python dag/tests/test_dag_validation.py
+        run: python dag/validate_dag.py
 ```
 </ci_integration>
 

@@ -91,7 +91,9 @@ gates:
         
     validations:
       - name: "signal_valid"
-        check: "signal.combination_id matches grammar"
+        check: "validate_combination_id(signal.combination_id)"
+        # Grammar: <SIGNAL_TYPE>_<PROXIMITY>_<GEN>[_<OUTCOME>[_<DURATION>]]
+        # Validated by: shared/reentry/hybrid_id.py::HybridIdHelper
         severity: "critical"
         
       - name: "parameters_valid"
