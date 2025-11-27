@@ -1,0 +1,275 @@
+# EAFIX Workstream Definitions
+# Derived from DAG analysis - independent subgraphs that can execute in parallel
+
+version: "1.0"
+workstream_registry_id: "eafix-workstreams"
+
+workstreams:
+  # ============================================================================
+  # WORKSTREAM 1: Calendar Ingestion (Isolated)
+  # ============================================================================
+  - id: "calendar-ingest"
+    name: "Economic Calendar Ingestion"
+    description: "Hourly ingestion and transformation of economic calendar data"
+    phase_range: "1.000"
+    parallelizable: true
+    entry_node: "calendar_ingestion_start"
+    exit_node: "calendar_ingestion_complete"
+    service_owners:
+      - "calendar-ingestor"
+      - "calendar-downloader"
+    dependencies: []
+    verification_patterns:
+      - "VERIFY_STATE_TRANSITIONS"
+    critical_path: false
+    schedule: "hourly"
+    sla_budget_ms: 6700
+    
+    nodes:
+      - "calendar_ingestion_start"
+      - "copy_raw_calendar"
+      - "hash_raw_file"
+      - "transform_calendar"
+      - "verify_calendar_transform"
+      - "write_calendar_csv"
+      - "update_calendar_index"
+      - "calendar_ingestion_complete"
+
+  # ============================================================================
+  # WORKSTREAM 2: Signal Processing (Critical Path)
+  # ============================================================================
+  - id: "signal-processing"
+    name: "Signal Detection & Processing Pipeline"
+    description: "Core trading signal detection, routing, and bridge communication"
+    phase_range: "2.000-5.000,9.000"
+    parallelizable: false  # Sequential critical path
+    entry_node: "signal_detection_loop"
+    exit_node: "chain_closed_or_continue"
+    service_owners:
+      - "indicator-engine"
+      - "signal-generator"
+      - "risk-manager"
+      - "reentry-matrix-svc"
+    dependencies:
+      - "calendar-ingest"  # Requires calendar data
+    verification_patterns:
+      - "VERIFY_INVARIANT_ASSERTIONS"
+      - "VERIFY_BOUNDARY_COVERAGE"
+      - "VERIFY_INTEGRATION_SEAMS"
+      - "VERIFY_ERROR_HANDLING"
+      - "VERIFY_STATE_TRANSITIONS"
+    critical_path: true
+    schedule: "continuous"
+    sla_budget_ms: 1000
+    
+    nodes:
+      - "signal_detection_loop"
+      - "build_candidate_signals"
+      - "debounce_signals"
+      - "compose_combination_id"
+      - "verify_signal_composition"
+      - "emit_new_signal_ready"
+      - "matrix_routing"
+      - "load_parameter_template"
+      - "compute_effective_risk"
+      - "validate_parameter_json"
+      - "verify_parameter_bounds"
+      - "emit_to_bridge"
+      - "verify_bridge_emission"
+      - "consume_responses"
+      - "verify_response_handling"
+      - "signal_processing_complete"
+      - "chain_progression"
+      - "verify_chain_state"
+      - "chain_closed_or_continue"
+
+  # ============================================================================
+  # WORKSTREAM 3: EA Execution (External Dependency)
+  # ============================================================================
+  - id: "ea-execution"
+    name: "Expert Advisor Order Execution"
+    description: "MT4 Expert Advisor validation and order execution workflow"
+    phase_range: "6.000-8.000"
+    parallelizable: true  # Runs on EA side in parallel
+    entry_node: "ea_validation_start"
+    exit_node: "ea_execution_complete"
+    service_owners:
+      - "execution-engine"
+    dependencies:
+      - "signal-processing"  # Triggered by bridge emission
+    verification_patterns:
+      - "VERIFY_STATE_TRANSITIONS"
+      - "VERIFY_INVARIANT_ASSERTIONS"
+    critical_path: true
+    schedule: "on-demand"
+    sla_budget_ms: 6000
+    
+    nodes:
+      - "ea_validation_start"
+      - "ea_validate_json"
+      - "verify_ea_validation"
+      - "ea_append_ack"
+      - "ea_order_workflow"
+      - "verify_order_execution"
+      - "ea_post_entry"
+      - "ea_execution_complete"
+
+  # ============================================================================
+  # WORKSTREAM 4: Health Monitoring (Parallel)
+  # ============================================================================
+  - id: "health-monitoring"
+    name: "Heartbeat & Health Monitoring"
+    description: "Continuous health monitoring and heartbeat exchange"
+    phase_range: "10.000"
+    parallelizable: true
+    entry_node: "heartbeat_monitor"
+    exit_node: "health_monitoring_complete"
+    service_owners:
+      - "telemetry-daemon"
+      - "flow-monitor"
+    dependencies: []
+    verification_patterns:
+      - "VERIFY_STATE_TRANSITIONS"
+    critical_path: false
+    schedule: "every_30s"
+    sla_budget_ms: 90100
+    
+    nodes:
+      - "heartbeat_monitor"
+      - "send_heartbeat"
+      - "await_heartbeat_echo"
+      - "verify_heartbeat_health"
+      - "health_monitoring_complete"
+
+  # ============================================================================
+  # WORKSTREAM 5: Error Recovery (On-Demand)
+  # ============================================================================
+  - id: "error-recovery"
+    name: "Error Handling & Recovery"
+    description: "Error detection, handling, and recovery paths"
+    phase_range: "11.000"
+    parallelizable: true  # Can recover independently
+    entry_node: "error_handling_entry"
+    exit_node: "error_recovery_complete"
+    service_owners:
+      - "flow-orchestrator"
+    dependencies: []
+    verification_patterns:
+      - "VERIFY_ERROR_HANDLING"
+    critical_path: false
+    schedule: "on-error"
+    sla_budget_ms: 11000
+    
+    nodes:
+      - "error_handling_entry"
+      - "csv_parse_error_handler"
+      - "file_lock_handler"
+      - "reject_handler"
+      - "verify_error_recovery"
+      - "error_recovery_complete"
+
+  # ============================================================================
+  # WORKSTREAM 6: Maintenance (Scheduled)
+  # ============================================================================
+  - id: "maintenance"
+    name: "Log Rotation & Shutdown"
+    description: "System maintenance including log rotation and graceful shutdown"
+    phase_range: "12.000-13.000"
+    parallelizable: true
+    entry_node: "log_rotation_trigger"
+    exit_node: "shutdown_complete"
+    service_owners:
+      - "reporter"
+    dependencies: []
+    verification_patterns:
+      - "VERIFY_RESOURCE_HANDLING"
+    critical_path: false
+    schedule: "midnight_or_threshold"
+    sla_budget_ms: 6500
+    
+    nodes:
+      - "log_rotation_trigger"
+      - "rotate_csvs"
+      - "verify_resource_cleanup"
+      - "maintenance_complete"
+      - "graceful_shutdown"
+      - "flush_handles"
+      - "persist_checkpoints"
+      - "shutdown_complete"
+
+  # ============================================================================
+  # WORKSTREAM 7: Testing (CI/CD Integration)
+  # ============================================================================
+  - id: "testing"
+    name: "Automated Test Suite"
+    description: "Atomic test cases for system validation"
+    phase_range: "14.000"
+    parallelizable: true  # Tests can run in parallel
+    entry_node: "test_cues_entry"
+    exit_node: "testing_complete"
+    service_owners:
+      - "data-validator"
+    dependencies: []
+    verification_patterns: []  # Tests ARE the verification
+    critical_path: false
+    schedule: "on-commit"
+    sla_budget_ms: 10000
+    
+    nodes:
+      - "test_cues_entry"
+      - "test_invalid_risk"
+      - "test_invalid_sltp"
+      - "test_invalid_atr"
+      - "test_clamp_warning"
+      - "test_r3_progression"
+      - "testing_complete"
+
+# ============================================================================
+# PARALLEL EXECUTION GROUPS
+# ============================================================================
+parallel_groups:
+  - group_id: "startup"
+    description: "Initial parallel execution after bootstrap"
+    workstreams:
+      - "calendar-ingest"
+      - "health-monitoring"
+    trigger: "bootstrap_complete"
+    
+  - group_id: "steady-state"
+    description: "Normal operation parallel workstreams"
+    workstreams:
+      - "signal-processing"
+      - "health-monitoring"
+      - "error-recovery"
+    trigger: "calendar_ingestion_complete"
+    
+  - group_id: "testing"
+    description: "CI/CD test execution"
+    workstreams:
+      - "testing"
+    trigger: "manual_or_ci"
+
+# ============================================================================
+# CRITICAL PATH DEFINITION
+# ============================================================================
+critical_path:
+  id: "trading-critical-path"
+  description: "Primary trading workflow that must complete within SLA"
+  total_sla_ms: 7000  # 7 seconds max
+  sequence:
+    - "bootstrap_init"
+    - "bootstrap_complete"
+    - "signal_detection_loop"
+    - "signal_processing_complete"
+    - "chain_closed_or_continue"
+  verification_gates:
+    - node: "verify_signal_composition"
+      required: true
+    - node: "verify_parameter_bounds"
+      required: true
+    - node: "verify_bridge_emission"
+      required: true
+    - node: "verify_response_handling"
+      required: true
+    - node: "verify_chain_state"
+      required: true

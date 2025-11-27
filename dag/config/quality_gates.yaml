@@ -1,0 +1,413 @@
+# EAFIX Quality Gate Configuration
+# Defines quality gates at critical points in the DAG
+
+version: "1.0"
+quality_gate_id: "eafix-quality-gates"
+
+# ============================================================================
+# QUALITY GATE DEFINITIONS
+# ============================================================================
+gates:
+  # Bootstrap Phase Gate
+  - id: "bootstrap_complete"
+    name: "Bootstrap Completion Gate"
+    description: "Ensures all bootstrap operations completed successfully"
+    phase: "0.007"
+    type: "hard"  # Blocks execution on failure
+    timeout_ms: 5000
+    
+    prerequisites:
+      - node: "verify_schema_integrity"
+        required: true
+      - node: "verify_resource_handles"
+        required: true
+      - node: "load_matrix_map"
+        required: true
+      - node: "init_health_timers"
+        required: true
+        
+    validations:
+      - name: "schema_valid"
+        check: "schema_integrity_check.passed == true"
+        severity: "critical"
+        
+      - name: "resources_acquired"
+        check: "file_handles.count >= 3"
+        severity: "critical"
+        
+      - name: "matrix_loaded"
+        check: "matrix_map.loaded == true"
+        severity: "critical"
+        
+    on_failure:
+      action: "halt"
+      notification: "ops-critical"
+      
+  # Calendar Ingestion Gate
+  - id: "calendar_ingestion_complete"
+    name: "Calendar Ingestion Gate"
+    description: "Validates calendar data transformation"
+    phase: "1.010"
+    type: "soft"  # Logs warning but continues
+    timeout_ms: 10000
+    
+    prerequisites:
+      - node: "verify_calendar_transform"
+        required: true
+      - node: "update_calendar_index"
+        required: true
+        
+    validations:
+      - name: "calendar_transformed"
+        check: "calendar_transform.state == 'complete'"
+        severity: "warning"
+        
+      - name: "index_updated"
+        check: "calendar_index.entries > 0"
+        severity: "warning"
+        
+    on_failure:
+      action: "log_and_continue"
+      notification: "ops-warning"
+      fallback: "use_cached_calendar"
+
+  # Signal Processing Gate
+  - id: "signal_processing_complete"
+    name: "Signal Processing Gate"
+    description: "Critical gate for trading signal validation"
+    phase: "5.007"
+    type: "hard"
+    timeout_ms: 2000
+    
+    prerequisites:
+      - node: "verify_signal_composition"
+        required: true
+      - node: "verify_parameter_bounds"
+        required: true
+      - node: "verify_bridge_emission"
+        required: true
+      - node: "verify_response_handling"
+        required: true
+        
+    validations:
+      - name: "signal_valid"
+        check: "signal.combination_id matches grammar"
+        severity: "critical"
+        
+      - name: "parameters_valid"
+        check: "parameters.effective_risk <= 3.50"
+        severity: "critical"
+        
+      - name: "bridge_ack_received"
+        check: "bridge.ack_status == 'OK'"
+        severity: "critical"
+        
+      - name: "no_rejections"
+        check: "response.status != 'REJECT'"
+        severity: "critical"
+        
+    on_failure:
+      action: "halt_chain"
+      notification: "trading-critical"
+      
+  # EA Execution Gate
+  - id: "ea_execution_complete"
+    name: "EA Execution Gate"
+    description: "Validates EA order execution"
+    phase: "8.005"
+    type: "hard"
+    timeout_ms: 10000
+    
+    prerequisites:
+      - node: "verify_ea_validation"
+        required: true
+      - node: "verify_order_execution"
+        required: true
+        
+    validations:
+      - name: "ea_validated"
+        check: "ea_validation.state == 'valid'"
+        severity: "critical"
+        
+      - name: "order_placed"
+        check: "order.status in ['filled', 'pending']"
+        severity: "critical"
+        
+    on_failure:
+      action: "halt_chain"
+      notification: "trading-critical"
+
+  # Health Monitoring Gate
+  - id: "health_monitoring_complete"
+    name: "Health Monitoring Gate"
+    description: "Validates heartbeat health"
+    phase: "10.003"
+    type: "soft"
+    timeout_ms: 90000
+    
+    prerequisites:
+      - node: "verify_heartbeat_health"
+        required: true
+        
+    validations:
+      - name: "heartbeat_received"
+        check: "heartbeat.echo_received == true"
+        severity: "warning"
+        
+      - name: "within_timeout"
+        check: "heartbeat.latency_ms < 90000"
+        severity: "warning"
+        
+    on_failure:
+      action: "alert"
+      notification: "ops-warning"
+      
+  # Error Recovery Gate
+  - id: "error_recovery_complete"
+    name: "Error Recovery Gate"
+    description: "Validates error recovery paths"
+    phase: "11.020"
+    type: "soft"
+    timeout_ms: 15000
+    
+    prerequisites:
+      - node: "verify_error_recovery"
+        required: true
+        
+    validations:
+      - name: "errors_handled"
+        check: "error_handler.unhandled_count == 0"
+        severity: "warning"
+        
+    on_failure:
+      action: "escalate"
+      notification: "ops-critical"
+
+  # Maintenance Gate
+  - id: "maintenance_complete"
+    name: "Maintenance Gate"
+    description: "Validates maintenance operations"
+    phase: "12.003"
+    type: "soft"
+    timeout_ms: 5000
+    
+    prerequisites:
+      - node: "verify_resource_cleanup"
+        required: true
+        
+    validations:
+      - name: "logs_rotated"
+        check: "log_rotation.status == 'complete'"
+        severity: "info"
+        
+      - name: "old_files_purged"
+        check: "archive.purge_status == 'complete'"
+        severity: "info"
+        
+    on_failure:
+      action: "log"
+      notification: "ops-info"
+
+  # Shutdown Gate
+  - id: "shutdown_complete"
+    name: "Shutdown Gate"
+    description: "Validates graceful shutdown"
+    phase: "13.004"
+    type: "hard"
+    timeout_ms: 2000
+    
+    prerequisites:
+      - node: "flush_handles"
+        required: true
+      - node: "persist_checkpoints"
+        required: true
+        
+    validations:
+      - name: "handles_flushed"
+        check: "handles.open_count == 0"
+        severity: "critical"
+        
+      - name: "checkpoints_saved"
+        check: "checkpoint.status == 'saved'"
+        severity: "critical"
+        
+    on_failure:
+      action: "force_shutdown"
+      notification: "ops-critical"
+
+  # Testing Gate
+  - id: "testing_complete"
+    name: "Testing Gate"
+    description: "Validates test suite completion"
+    phase: "14.005"
+    type: "hard"  # In CI context
+    timeout_ms: 30000
+    
+    prerequisites:
+      - node: "test_invalid_risk"
+        required: true
+      - node: "test_invalid_sltp"
+        required: true
+      - node: "test_invalid_atr"
+        required: true
+      - node: "test_clamp_warning"
+        required: true
+      - node: "test_r3_progression"
+        required: true
+        
+    validations:
+      - name: "all_tests_passed"
+        check: "tests.failed_count == 0"
+        severity: "critical"
+        
+      - name: "expected_results_match"
+        check: "tests.all_expectations_met == true"
+        severity: "critical"
+        
+    on_failure:
+      action: "fail_ci"
+      notification: "dev-team"
+
+# ============================================================================
+# VERIFICATION INJECTION POINTS
+# ============================================================================
+verification_injections:
+  - target_node: "load_schema"
+    injected_node: "verify_schema_integrity"
+    pattern: "VERIFY_BOUNDARY_COVERAGE"
+    position: "after"
+    rewire_children: true
+    
+  - target_node: "open_file_handles"
+    injected_node: "verify_resource_handles"
+    pattern: "VERIFY_RESOURCE_HANDLING"
+    position: "after"
+    rewire_children: true
+    
+  - target_node: "transform_calendar"
+    injected_node: "verify_calendar_transform"
+    pattern: "VERIFY_STATE_TRANSITIONS"
+    position: "after"
+    rewire_children: true
+    
+  - target_node: "compose_combination_id"
+    injected_node: "verify_signal_composition"
+    pattern: "VERIFY_INVARIANT_ASSERTIONS"
+    position: "after"
+    rewire_children: true
+    
+  - target_node: "validate_parameter_json"
+    injected_node: "verify_parameter_bounds"
+    pattern: "VERIFY_BOUNDARY_COVERAGE"
+    position: "after"
+    rewire_children: true
+    
+  - target_node: "emit_to_bridge"
+    injected_node: "verify_bridge_emission"
+    pattern: "VERIFY_INTEGRATION_SEAMS"
+    position: "after"
+    rewire_children: true
+    
+  - target_node: "consume_responses"
+    injected_node: "verify_response_handling"
+    pattern: "VERIFY_ERROR_HANDLING"
+    position: "after"
+    rewire_children: true
+    
+  - target_node: "ea_validate_json"
+    injected_node: "verify_ea_validation"
+    pattern: "VERIFY_STATE_TRANSITIONS"
+    position: "after"
+    rewire_children: true
+    
+  - target_node: "ea_order_workflow"
+    injected_node: "verify_order_execution"
+    pattern: "VERIFY_INVARIANT_ASSERTIONS"
+    position: "after"
+    rewire_children: true
+    
+  - target_node: "chain_progression"
+    injected_node: "verify_chain_state"
+    pattern: "VERIFY_STATE_TRANSITIONS"
+    position: "after"
+    rewire_children: true
+    
+  - target_node: "await_heartbeat_echo"
+    injected_node: "verify_heartbeat_health"
+    pattern: "VERIFY_STATE_TRANSITIONS"
+    position: "after"
+    rewire_children: true
+    
+  - target_node: "reject_handler"
+    injected_node: "verify_error_recovery"
+    pattern: "VERIFY_ERROR_HANDLING"
+    position: "after"
+    rewire_children: true
+    
+  - target_node: "rotate_csvs"
+    injected_node: "verify_resource_cleanup"
+    pattern: "VERIFY_RESOURCE_HANDLING"
+    position: "after"
+    rewire_children: true
+
+# ============================================================================
+# SLA ENFORCEMENT
+# ============================================================================
+sla_enforcement:
+  global:
+    max_total_latency_ms: 7000
+    warning_threshold_percent: 80
+    
+  per_workstream:
+    - workstream: "calendar-ingest"
+      max_latency_ms: 10000
+      mandatory: false
+      
+    - workstream: "signal-processing"
+      max_latency_ms: 2000
+      mandatory: true
+      
+    - workstream: "ea-execution"
+      max_latency_ms: 6000
+      mandatory: true
+      
+    - workstream: "health-monitoring"
+      max_latency_ms: 90100
+      mandatory: false
+      
+    - workstream: "error-recovery"
+      max_latency_ms: 15000
+      mandatory: false
+      
+    - workstream: "maintenance"
+      max_latency_ms: 10000
+      mandatory: false
+      
+    - workstream: "testing"
+      max_latency_ms: 30000
+      mandatory: true  # In CI
+
+# ============================================================================
+# NOTIFICATION CHANNELS
+# ============================================================================
+notification_channels:
+  - id: "ops-critical"
+    type: "pagerduty"
+    priority: "P1"
+    
+  - id: "ops-warning"
+    type: "slack"
+    channel: "#ops-alerts"
+    
+  - id: "ops-info"
+    type: "slack"
+    channel: "#ops-info"
+    
+  - id: "trading-critical"
+    type: "pagerduty"
+    priority: "P1"
+    additional_channel: "sms"
+    
+  - id: "dev-team"
+    type: "slack"
+    channel: "#dev-alerts"
