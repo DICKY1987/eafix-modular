@@ -1,0 +1,123 @@
+# EAFIX Prompt Block Index
+# Index of prompt blocks for agentic workstream execution
+
+version: "1.0"
+index_id: "eafix-prompt-index"
+
+# ============================================================================
+# PROMPT BLOCK REGISTRY
+# ============================================================================
+prompt_blocks:
+  # Master Orchestrator
+  - id: "PB-000"
+    name: "Master Orchestrator"
+    file: "dag/prompts/blocks/master_orchestrator.md"
+    purpose: "Top-level orchestration of all workstreams"
+    triggers: ["system_start", "manual_invoke"]
+    
+  # Workstream-specific blocks
+  - id: "PB-001"
+    name: "Calendar Ingestion Workstream"
+    file: "dag/prompts/blocks/workstream_calendar.md"
+    purpose: "Drive calendar ingestion workstream"
+    workstream: "calendar-ingest"
+    triggers: ["scheduler_tick", "manual_invoke"]
+    
+  - id: "PB-002"
+    name: "Signal Processing Workstream"
+    file: "dag/prompts/blocks/workstream_signal.md"
+    purpose: "Drive signal detection and processing"
+    workstream: "signal-processing"
+    triggers: ["calendar_ready", "continuous_loop"]
+    
+  - id: "PB-003"
+    name: "EA Execution Workstream"
+    file: "dag/prompts/blocks/workstream_ea.md"
+    purpose: "Drive EA validation and order execution"
+    workstream: "ea-execution"
+    triggers: ["bridge_signal_emitted"]
+    
+  - id: "PB-004"
+    name: "Health Monitoring Workstream"
+    file: "dag/prompts/blocks/workstream_health.md"
+    purpose: "Drive health monitoring and heartbeat"
+    workstream: "health-monitoring"
+    triggers: ["interval_30s"]
+    
+  - id: "PB-005"
+    name: "Error Recovery Workstream"
+    file: "dag/prompts/blocks/workstream_error.md"
+    purpose: "Drive error handling and recovery"
+    workstream: "error-recovery"
+    triggers: ["error_detected"]
+    
+  - id: "PB-006"
+    name: "Maintenance Workstream"
+    file: "dag/prompts/blocks/workstream_maintenance.md"
+    purpose: "Drive log rotation and shutdown"
+    workstream: "maintenance"
+    triggers: ["midnight_utc", "size_threshold", "shutdown_signal"]
+    
+  - id: "PB-007"
+    name: "Testing Workstream"
+    file: "dag/prompts/blocks/workstream_testing.md"
+    purpose: "Drive automated test execution"
+    workstream: "testing"
+    triggers: ["ci_pipeline", "manual_invoke"]
+
+  # Verification Pattern Blocks
+  - id: "PB-V01"
+    name: "Verify Boundary Coverage"
+    file: "dag/prompts/blocks/verify_boundary.md"
+    purpose: "Execute boundary verification pattern"
+    pattern: "VERIFY_BOUNDARY_COVERAGE"
+    
+  - id: "PB-V02"
+    name: "Verify State Transitions"
+    file: "dag/prompts/blocks/verify_state.md"
+    purpose: "Execute state transition verification"
+    pattern: "VERIFY_STATE_TRANSITIONS"
+    
+  - id: "PB-V03"
+    name: "Verify Error Handling"
+    file: "dag/prompts/blocks/verify_error.md"
+    purpose: "Execute error handling verification"
+    pattern: "VERIFY_ERROR_HANDLING"
+    
+  - id: "PB-V04"
+    name: "Verify Integration Seams"
+    file: "dag/prompts/blocks/verify_integration.md"
+    purpose: "Execute integration seam verification"
+    pattern: "VERIFY_INTEGRATION_SEAMS"
+    
+  - id: "PB-V05"
+    name: "Verify Resource Handling"
+    file: "dag/prompts/blocks/verify_resource.md"
+    purpose: "Execute resource handling verification"
+    pattern: "VERIFY_RESOURCE_HANDLING"
+    
+  - id: "PB-V06"
+    name: "Verify Invariant Assertions"
+    file: "dag/prompts/blocks/verify_invariant.md"
+    purpose: "Execute invariant assertion verification"
+    pattern: "VERIFY_INVARIANT_ASSERTIONS"
+
+# ============================================================================
+# EXECUTION CONTEXTS
+# ============================================================================
+contexts:
+  production:
+    enabled_blocks: ["PB-000", "PB-001", "PB-002", "PB-003", "PB-004", "PB-005", "PB-006"]
+    verification_level: "full"
+    
+  staging:
+    enabled_blocks: ["PB-000", "PB-001", "PB-002", "PB-003", "PB-004", "PB-005", "PB-006", "PB-007"]
+    verification_level: "full"
+    
+  development:
+    enabled_blocks: ["PB-000", "PB-002", "PB-007"]
+    verification_level: "minimal"
+    
+  ci:
+    enabled_blocks: ["PB-007"]
+    verification_level: "full"

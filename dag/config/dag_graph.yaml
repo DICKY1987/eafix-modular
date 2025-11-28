@@ -1,0 +1,771 @@
+# EAFIX Modular Trading System - DAG Graph Configuration
+# Source of Truth: Derived from atomic_process_flow_reentry_trading_system_v_3.md
+# 
+# This DAG defines the execution graph for the trading system with verification
+# patterns injected at critical nodes.
+
+version: "1.0"
+dag_id: "eafix-trading-dag"
+description: "Directed Acyclic Graph for EAFIX Modular Trading System"
+
+# ============================================================================
+# PHASE 0: SYSTEM BOOTSTRAP
+# ============================================================================
+nodes:
+  - id: "bootstrap_init"
+    name: "System Bootstrap Initialization"
+    phase: "0.000"
+    kind: "system_initialization"
+    owner: "PY"
+    sla_ms: 1000
+    children:
+      - "load_schema"
+      - "ensure_directories"
+    
+  - id: "load_schema"
+    name: "Load Parameters Schema"
+    phase: "0.001-0.002"
+    kind: "config_loading"
+    owner: "PY"
+    sla_ms: 700
+    children:
+      - "verify_schema_integrity"
+    
+  - id: "verify_schema_integrity"
+    name: "Verify Schema Self-Integrity"
+    phase: "0.002"
+    kind: "VERIFY_BOUNDARY_COVERAGE"
+    owner: "PY"
+    sla_ms: 200
+    injected: true
+    verification_type: "schema_validation"
+    children:
+      - "open_file_handles"
+
+  - id: "ensure_directories"
+    name: "Ensure Directory Tree"
+    phase: "0.003"
+    kind: "filesystem_operation"
+    owner: "PY"
+    sla_ms: 1000
+    children:
+      - "open_file_handles"
+
+  - id: "open_file_handles"
+    name: "Open File Handles"
+    phase: "0.004-0.005"
+    kind: "resource_acquisition"
+    owner: "PY"
+    sla_ms: 1000
+    children:
+      - "verify_resource_handles"
+
+  - id: "verify_resource_handles"
+    name: "Verify Resource Handles"
+    phase: "0.004"
+    kind: "VERIFY_RESOURCE_HANDLING"
+    owner: "PY"
+    sla_ms: 100
+    injected: true
+    verification_type: "resource_lifecycle"
+    children:
+      - "load_matrix_map"
+      - "init_health_timers"
+
+  - id: "load_matrix_map"
+    name: "Load Matrix Map CSV"
+    phase: "0.006"
+    kind: "data_loading"
+    owner: "PY"
+    sla_ms: 500
+    children:
+      - "bootstrap_complete"
+
+  - id: "init_health_timers"
+    name: "Initialize Health Timers"
+    phase: "0.007"
+    kind: "timer_initialization"
+    owner: "PY"
+    sla_ms: 50
+    children:
+      - "bootstrap_complete"
+
+  - id: "bootstrap_complete"
+    name: "Bootstrap Complete Gate"
+    phase: "0.007"
+    kind: "quality_gate"
+    owner: "PY"
+    sla_ms: 10
+    children:
+      - "calendar_ingestion_start"
+      - "signal_detection_loop"
+      - "heartbeat_monitor"
+
+# ============================================================================
+# PHASE 1: ECONOMIC CALENDAR INGESTION (WORKSTREAM: calendar-ingest)
+# ============================================================================
+  - id: "calendar_ingestion_start"
+    name: "Calendar Ingestion Scheduler Tick"
+    phase: "1.001"
+    kind: "scheduler_trigger"
+    owner: "PY"
+    sla_ms: 1000
+    workstream: "calendar-ingest"
+    children:
+      - "copy_raw_calendar"
+
+  - id: "copy_raw_calendar"
+    name: "Copy Raw Calendar (Atomic)"
+    phase: "1.002"
+    kind: "filesystem_operation"
+    owner: "PY"
+    sla_ms: 500
+    workstream: "calendar-ingest"
+    children:
+      - "hash_raw_file"
+
+  - id: "hash_raw_file"
+    name: "Hash Raw File & Compare"
+    phase: "1.003"
+    kind: "data_processing"
+    owner: "PY"
+    sla_ms: 300
+    workstream: "calendar-ingest"
+    children:
+      - "transform_calendar"
+
+  - id: "transform_calendar"
+    name: "Transform Raw to Normalized"
+    phase: "1.004-1.008"
+    kind: "data_transformation"
+    owner: "PY"
+    sla_ms: 3600
+    workstream: "calendar-ingest"
+    children:
+      - "verify_calendar_transform"
+
+  - id: "verify_calendar_transform"
+    name: "Verify Calendar Transform State"
+    phase: "1.008"
+    kind: "VERIFY_STATE_TRANSITIONS"
+    owner: "PY"
+    sla_ms: 100
+    injected: true
+    verification_type: "data_transformation"
+    workstream: "calendar-ingest"
+    children:
+      - "write_calendar_csv"
+
+  - id: "write_calendar_csv"
+    name: "Write Calendar CSV (Atomic)"
+    phase: "1.009"
+    kind: "filesystem_operation"
+    owner: "PY"
+    sla_ms: 300
+    workstream: "calendar-ingest"
+    children:
+      - "update_calendar_index"
+
+  - id: "update_calendar_index"
+    name: "Update In-Memory Calendar Index"
+    phase: "1.010"
+    kind: "cache_update"
+    owner: "PY"
+    sla_ms: 200
+    workstream: "calendar-ingest"
+    children:
+      - "calendar_ingestion_complete"
+
+  - id: "calendar_ingestion_complete"
+    name: "Calendar Ingestion Complete"
+    phase: "1.010"
+    kind: "quality_gate"
+    owner: "PY"
+    sla_ms: 10
+    workstream: "calendar-ingest"
+    children: []
+
+# ============================================================================
+# PHASE 2-5: SIGNAL DETECTION & BRIDGE (WORKSTREAM: signal-processing)
+# ============================================================================
+  - id: "signal_detection_loop"
+    name: "Signal Detection Loop Start"
+    phase: "2.001"
+    kind: "continuous_loop"
+    owner: "PY"
+    sla_ms: 50
+    workstream: "signal-processing"
+    children:
+      - "build_candidate_signals"
+
+  - id: "build_candidate_signals"
+    name: "Build Candidate Signals"
+    phase: "2.002-2.004"
+    kind: "signal_generation"
+    owner: "PY"
+    sla_ms: 250
+    workstream: "signal-processing"
+    children:
+      - "debounce_signals"
+
+  - id: "debounce_signals"
+    name: "Debounce Duplicate Signals"
+    phase: "2.003"
+    kind: "deduplication"
+    owner: "PY"
+    sla_ms: 100
+    workstream: "signal-processing"
+    children:
+      - "compose_combination_id"
+
+  - id: "compose_combination_id"
+    name: "Compose Combination ID"
+    phase: "2.005-2.007"
+    kind: "id_generation"
+    owner: "PY"
+    sla_ms: 80
+    workstream: "signal-processing"
+    children:
+      - "verify_signal_composition"
+
+  - id: "verify_signal_composition"
+    name: "Verify Signal Composition Invariants"
+    phase: "2.007"
+    kind: "VERIFY_INVARIANT_ASSERTIONS"
+    owner: "PY"
+    sla_ms: 20
+    injected: true
+    verification_type: "signal_invariants"
+    workstream: "signal-processing"
+    children:
+      - "emit_new_signal_ready"
+
+  - id: "emit_new_signal_ready"
+    name: "Emit NEW_SIGNAL_READY Event"
+    phase: "2.008"
+    kind: "event_emission"
+    owner: "PY"
+    sla_ms: 10
+    workstream: "signal-processing"
+    children:
+      - "matrix_routing"
+
+# ============================================================================
+# PHASE 3: MATRIX ROUTING (WORKSTREAM: signal-processing)
+# ============================================================================
+  - id: "matrix_routing"
+    name: "Matrix Routing Lookup"
+    phase: "3.001-3.003"
+    kind: "routing_decision"
+    owner: "PY"
+    sla_ms: 50
+    workstream: "signal-processing"
+    children:
+      - "load_parameter_template"
+
+  - id: "load_parameter_template"
+    name: "Load Parameter Template"
+    phase: "3.004-3.005"
+    kind: "config_loading"
+    owner: "PY"
+    sla_ms: 80
+    workstream: "signal-processing"
+    children:
+      - "compute_effective_risk"
+
+  - id: "compute_effective_risk"
+    name: "Compute Effective Risk"
+    phase: "3.006"
+    kind: "calculation"
+    owner: "PY"
+    sla_ms: 5
+    workstream: "signal-processing"
+    children:
+      - "validate_parameter_json"
+
+  - id: "validate_parameter_json"
+    name: "Validate Parameter JSON"
+    phase: "3.007-3.008"
+    kind: "schema_validation"
+    owner: "PY"
+    sla_ms: 40
+    workstream: "signal-processing"
+    children:
+      - "verify_parameter_bounds"
+
+  - id: "verify_parameter_bounds"
+    name: "Verify Parameter Boundary Coverage"
+    phase: "3.008"
+    kind: "VERIFY_BOUNDARY_COVERAGE"
+    owner: "PY"
+    sla_ms: 30
+    injected: true
+    verification_type: "parameter_bounds"
+    workstream: "signal-processing"
+    children:
+      - "emit_to_bridge"
+
+# ============================================================================
+# PHASE 4: EMIT TO BRIDGE (WORKSTREAM: signal-processing)
+# ============================================================================
+  - id: "emit_to_bridge"
+    name: "Emit to Bridge"
+    phase: "4.001-4.006"
+    kind: "bridge_communication"
+    owner: "PY"
+    sla_ms: 160
+    workstream: "signal-processing"
+    children:
+      - "verify_bridge_emission"
+
+  - id: "verify_bridge_emission"
+    name: "Verify Bridge Integration Seams"
+    phase: "4.006"
+    kind: "VERIFY_INTEGRATION_SEAMS"
+    owner: "PY"
+    sla_ms: 50
+    injected: true
+    verification_type: "bridge_integration"
+    workstream: "signal-processing"
+    children:
+      - "consume_responses"
+
+# ============================================================================
+# PHASE 5: CONSUME RESPONSES (WORKSTREAM: signal-processing)
+# ============================================================================
+  - id: "consume_responses"
+    name: "Consume EA Responses"
+    phase: "5.001-5.007"
+    kind: "response_handling"
+    owner: "PY"
+    sla_ms: 170
+    workstream: "signal-processing"
+    children:
+      - "verify_response_handling"
+
+  - id: "verify_response_handling"
+    name: "Verify Error Handling Paths"
+    phase: "5.007"
+    kind: "VERIFY_ERROR_HANDLING"
+    owner: "PY"
+    sla_ms: 50
+    injected: true
+    verification_type: "error_paths"
+    workstream: "signal-processing"
+    children:
+      - "signal_processing_complete"
+
+  - id: "signal_processing_complete"
+    name: "Signal Processing Gate"
+    phase: "5.007"
+    kind: "quality_gate"
+    owner: "PY"
+    sla_ms: 10
+    workstream: "signal-processing"
+    children:
+      - "chain_progression"
+
+# ============================================================================
+# PHASE 6-8: EA SIDE (WORKSTREAM: ea-execution)
+# ============================================================================
+  - id: "ea_validation_start"
+    name: "EA Validation Start"
+    phase: "6.001"
+    kind: "ea_processing"
+    owner: "EA"
+    sla_ms: 5000
+    workstream: "ea-execution"
+    children:
+      - "ea_validate_json"
+
+  - id: "ea_validate_json"
+    name: "EA Validate JSON Schema"
+    phase: "6.002-6.007"
+    kind: "ea_validation"
+    owner: "EA"
+    sla_ms: 100
+    workstream: "ea-execution"
+    children:
+      - "verify_ea_validation"
+
+  - id: "verify_ea_validation"
+    name: "Verify EA Validation State"
+    phase: "6.007"
+    kind: "VERIFY_STATE_TRANSITIONS"
+    owner: "EA"
+    sla_ms: 50
+    injected: true
+    verification_type: "ea_validation_state"
+    workstream: "ea-execution"
+    children:
+      - "ea_append_ack"
+
+  - id: "ea_append_ack"
+    name: "EA Append ACK_UPDATE"
+    phase: "6.008"
+    kind: "ea_response"
+    owner: "EA"
+    sla_ms: 50
+    workstream: "ea-execution"
+    children:
+      - "ea_order_workflow"
+
+  - id: "ea_order_workflow"
+    name: "EA Order Workflow"
+    phase: "7.001-7.007"
+    kind: "ea_order_execution"
+    owner: "EA"
+    sla_ms: 800
+    workstream: "ea-execution"
+    children:
+      - "verify_order_execution"
+
+  - id: "verify_order_execution"
+    name: "Verify Order Execution Invariants"
+    phase: "7.007"
+    kind: "VERIFY_INVARIANT_ASSERTIONS"
+    owner: "EA"
+    sla_ms: 50
+    injected: true
+    verification_type: "order_invariants"
+    workstream: "ea-execution"
+    children:
+      - "ea_post_entry"
+
+  - id: "ea_post_entry"
+    name: "EA Post-Entry Management"
+    phase: "8.001-8.005"
+    kind: "ea_trade_management"
+    owner: "EA"
+    sla_ms: 5000
+    workstream: "ea-execution"
+    children:
+      - "ea_execution_complete"
+
+  - id: "ea_execution_complete"
+    name: "EA Execution Complete Gate"
+    phase: "8.005"
+    kind: "quality_gate"
+    owner: "EA"
+    sla_ms: 100
+    workstream: "ea-execution"
+    children: []
+
+# ============================================================================
+# PHASE 9: CHAIN PROGRESSION (WORKSTREAM: signal-processing)
+# ============================================================================
+  - id: "chain_progression"
+    name: "Chain Progression Logic"
+    phase: "9.001-9.005"
+    kind: "chain_management"
+    owner: "PY"
+    sla_ms: 50
+    workstream: "signal-processing"
+    children:
+      - "verify_chain_state"
+
+  - id: "verify_chain_state"
+    name: "Verify Chain State Transitions"
+    phase: "9.005"
+    kind: "VERIFY_STATE_TRANSITIONS"
+    owner: "PY"
+    sla_ms: 20
+    injected: true
+    verification_type: "chain_state"
+    workstream: "signal-processing"
+    children:
+      - "chain_closed_or_continue"
+
+  - id: "chain_closed_or_continue"
+    name: "Chain Decision Point"
+    phase: "9.010"
+    kind: "decision_gate"
+    owner: "PY"
+    sla_ms: 10
+    workstream: "signal-processing"
+    children: []
+
+# ============================================================================
+# PHASE 10: HEARTBEAT MONITORING (WORKSTREAM: health-monitoring)
+# ============================================================================
+  - id: "heartbeat_monitor"
+    name: "Heartbeat Monitor Start"
+    phase: "10.001"
+    kind: "health_monitoring"
+    owner: "PY"
+    sla_ms: 50
+    workstream: "health-monitoring"
+    children:
+      - "send_heartbeat"
+
+  - id: "send_heartbeat"
+    name: "Send Heartbeat Row"
+    phase: "10.001"
+    kind: "heartbeat_emission"
+    owner: "PY"
+    sla_ms: 50
+    workstream: "health-monitoring"
+    children:
+      - "await_heartbeat_echo"
+
+  - id: "await_heartbeat_echo"
+    name: "Await Heartbeat Echo"
+    phase: "10.002-10.003"
+    kind: "heartbeat_validation"
+    owner: "PY"
+    sla_ms: 90000
+    workstream: "health-monitoring"
+    children:
+      - "verify_heartbeat_health"
+
+  - id: "verify_heartbeat_health"
+    name: "Verify Health Monitoring State"
+    phase: "10.003"
+    kind: "VERIFY_STATE_TRANSITIONS"
+    owner: "PY"
+    sla_ms: 10
+    injected: true
+    verification_type: "health_state"
+    workstream: "health-monitoring"
+    children:
+      - "health_monitoring_complete"
+
+  - id: "health_monitoring_complete"
+    name: "Health Monitoring Gate"
+    phase: "10.003"
+    kind: "quality_gate"
+    owner: "PY"
+    sla_ms: 10
+    workstream: "health-monitoring"
+    children: []
+
+# ============================================================================
+# PHASE 11: ERROR HANDLING (WORKSTREAM: error-recovery)
+# ============================================================================
+  - id: "error_handling_entry"
+    name: "Error Handling Entry"
+    phase: "11.001"
+    kind: "error_entry"
+    owner: "PY"
+    sla_ms: 1
+    workstream: "error-recovery"
+    children:
+      - "csv_parse_error_handler"
+      - "file_lock_handler"
+      - "reject_handler"
+
+  - id: "csv_parse_error_handler"
+    name: "CSV Parse Error Handler"
+    phase: "11.001"
+    kind: "error_handling"
+    owner: "PY"
+    sla_ms: 1
+    workstream: "error-recovery"
+    children:
+      - "verify_error_recovery"
+
+  - id: "file_lock_handler"
+    name: "File Lock Retry Handler"
+    phase: "11.002"
+    kind: "error_handling"
+    owner: "PY"
+    sla_ms: 10000
+    workstream: "error-recovery"
+    children:
+      - "verify_error_recovery"
+
+  - id: "reject_handler"
+    name: "Rejection Policy Handler"
+    phase: "11.003-11.005"
+    kind: "error_handling"
+    owner: "PY"
+    sla_ms: 100
+    workstream: "error-recovery"
+    children:
+      - "verify_error_recovery"
+
+  - id: "verify_error_recovery"
+    name: "Verify Error Recovery Paths"
+    phase: "11.005"
+    kind: "VERIFY_ERROR_HANDLING"
+    owner: "PY"
+    sla_ms: 50
+    injected: true
+    verification_type: "error_recovery"
+    workstream: "error-recovery"
+    children:
+      - "error_recovery_complete"
+
+  - id: "error_recovery_complete"
+    name: "Error Recovery Gate"
+    phase: "11.020"
+    kind: "quality_gate"
+    owner: "PY"
+    sla_ms: 500
+    workstream: "error-recovery"
+    children: []
+
+# ============================================================================
+# PHASE 12-13: LOG ROTATION & SHUTDOWN (WORKSTREAM: maintenance)
+# ============================================================================
+  - id: "log_rotation_trigger"
+    name: "Log Rotation Trigger"
+    phase: "12.001"
+    kind: "maintenance"
+    owner: "PY"
+    sla_ms: 2000
+    workstream: "maintenance"
+    children:
+      - "rotate_csvs"
+
+  - id: "rotate_csvs"
+    name: "Rotate CSVs & Compress"
+    phase: "12.001-12.003"
+    kind: "filesystem_operation"
+    owner: "PY"
+    sla_ms: 3100
+    workstream: "maintenance"
+    children:
+      - "verify_resource_cleanup"
+
+  - id: "verify_resource_cleanup"
+    name: "Verify Resource Cleanup"
+    phase: "12.003"
+    kind: "VERIFY_RESOURCE_HANDLING"
+    owner: "PY"
+    sla_ms: 100
+    injected: true
+    verification_type: "resource_cleanup"
+    workstream: "maintenance"
+    children:
+      - "maintenance_complete"
+
+  - id: "maintenance_complete"
+    name: "Maintenance Gate"
+    phase: "12.003"
+    kind: "quality_gate"
+    owner: "PY"
+    sla_ms: 10
+    workstream: "maintenance"
+    children: []
+
+  - id: "graceful_shutdown"
+    name: "Graceful Shutdown Start"
+    phase: "13.001"
+    kind: "shutdown"
+    owner: "PY"
+    sla_ms: 300
+    workstream: "maintenance"
+    children:
+      - "flush_handles"
+      - "persist_checkpoints"
+
+  - id: "flush_handles"
+    name: "Flush & Close Handles"
+    phase: "13.001"
+    kind: "resource_release"
+    owner: "PY"
+    sla_ms: 300
+    workstream: "maintenance"
+    children:
+      - "shutdown_complete"
+
+  - id: "persist_checkpoints"
+    name: "Persist Checkpoints"
+    phase: "13.003"
+    kind: "state_persistence"
+    owner: "PY"
+    sla_ms: 300
+    workstream: "maintenance"
+    children:
+      - "shutdown_complete"
+
+  - id: "shutdown_complete"
+    name: "Shutdown Complete"
+    phase: "13.004"
+    kind: "quality_gate"
+    owner: "PY"
+    sla_ms: 1000
+    workstream: "maintenance"
+    children: []
+
+# ============================================================================
+# PHASE 14: TEST CUES (WORKSTREAM: testing)
+# ============================================================================
+  - id: "test_cues_entry"
+    name: "Test Cues Entry"
+    phase: "14.001"
+    kind: "test_execution"
+    owner: "TEST"
+    sla_ms: 2000
+    workstream: "testing"
+    children:
+      - "test_invalid_risk"
+      - "test_invalid_sltp"
+      - "test_invalid_atr"
+      - "test_clamp_warning"
+      - "test_r3_progression"
+
+  - id: "test_invalid_risk"
+    name: "Test Invalid Risk Rejection"
+    phase: "14.001"
+    kind: "test_case"
+    owner: "TEST"
+    sla_ms: 2000
+    workstream: "testing"
+    expected_result: "REJECT_SET (E1001)"
+    children:
+      - "testing_complete"
+
+  - id: "test_invalid_sltp"
+    name: "Test SL/TP Validation"
+    phase: "14.002"
+    kind: "test_case"
+    owner: "TEST"
+    sla_ms: 2000
+    workstream: "testing"
+    expected_result: "REJECT_SET (E1012)"
+    children:
+      - "testing_complete"
+
+  - id: "test_invalid_atr"
+    name: "Test ATR Range Check"
+    phase: "14.003"
+    kind: "test_case"
+    owner: "TEST"
+    sla_ms: 2000
+    workstream: "testing"
+    expected_result: "REJECT_SET (E1020)"
+    children:
+      - "testing_complete"
+
+  - id: "test_clamp_warning"
+    name: "Test Timeout Clamp Warning"
+    phase: "14.004"
+    kind: "test_case"
+    owner: "TEST"
+    sla_ms: 2000
+    workstream: "testing"
+    expected_result: "W2003"
+    children:
+      - "testing_complete"
+
+  - id: "test_r3_progression"
+    name: "Test R3 Progression Block"
+    phase: "14.005"
+    kind: "test_case"
+    owner: "TEST"
+    sla_ms: 2000
+    workstream: "testing"
+    expected_result: "REJECT_TRADE (E1030)"
+    children:
+      - "testing_complete"
+
+  - id: "testing_complete"
+    name: "Testing Gate"
+    phase: "14.005"
+    kind: "quality_gate"
+    owner: "TEST"
+    sla_ms: 100
+    workstream: "testing"
+    children: []

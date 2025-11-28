@@ -1,4 +1,4 @@
-.PHONY: contracts-validate contracts-validate-full contracts-test csv-validate reentry-validate smoke test-all docker-up docker-down replay-test signal-flow-test signal-simulation calendar-simulation manual-test-panel test-signal-flow-all
+.PHONY: contracts-validate contracts-validate-full contracts-test csv-validate reentry-validate smoke test-all docker-up docker-down replay-test signal-flow-test signal-simulation calendar-simulation manual-test-panel test-signal-flow-all dag-validate dag-report dag-workstreams dag-patterns dag-gates
 
 # Contract validation (comprehensive)
 contracts-validate-full:
@@ -274,3 +274,24 @@ manual-test-panel:
 # Combined testing target  
 test-signal-flow-all: signal-flow-test signal-simulation calendar-simulation
 	@echo "✅ All signal flow tests completed"
+
+# DAG-based Verification Framework
+dag-validate:
+	@echo "🔍 Validating DAG configuration..."
+	python dag/validate_dag.py
+
+dag-report:
+	@echo "📊 Generating DAG execution report..."
+	@cat dag/EXECUTION_REPORT.md
+
+dag-workstreams:
+	@echo "📋 Listing workstreams..."
+	@python -c "import yaml; ws = yaml.safe_load(open('dag/workstreams/workstream_definitions.yaml')); print('\n'.join([f\"  {w['id']}: {w['name']} (SLA: {w['sla_budget_ms']}ms)\" for w in ws['workstreams']]))"
+
+dag-patterns:
+	@echo "🧩 Listing verification patterns..."
+	@python -c "import yaml; p = yaml.safe_load(open('dag/patterns/pattern_registry.yaml')); print('\n'.join([f\"  {v['id']}: {v['description']}\" for v in p['verification_patterns']]))"
+
+dag-gates:
+	@echo "🚧 Listing quality gates..."
+	@python -c "import yaml; g = yaml.safe_load(open('dag/config/quality_gates.yaml')); print('\n'.join([f\"  {gate['id']}: {gate['type']} ({gate['timeout_ms']}ms)\" for gate in g['gates']]))"
