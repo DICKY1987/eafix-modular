@@ -4,27 +4,38 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This repository contains the **EAFIX Modular Trading System** - an enterprise-grade financial trading platform with 9 containerized microservices. The system has been transformed from a monolithic application into a production-ready architecture with comprehensive enterprise capabilities.
+This repository contains the **EAFIX Modular Trading System** - an enterprise-grade financial trading platform with containerized microservices. The system has been transformed from a monolithic application into a production-ready architecture with comprehensive enterprise capabilities.
 
 **Core Architecture**: Event-driven microservices with enterprise service foundation
 **Language**: Python 3.11 with Poetry workspace management
-**Enterprise Framework**: BaseEnterpriseService provides 200x efficiency multiplier
+**Enterprise Framework**: BaseEnterpriseService (services/common/base_service.py) provides standardized observability
 **Deployment**: Docker containers with Kubernetes support, comprehensive monitoring
-**Security**: Blocking security gates with SAST, SCA, and vulnerability scanning
+**Security**: Blocking security gates with SAST, SCA, and vulnerability scanning via pre-commit hooks
+**Task Runners**: Both Makefile and Taskfile.yml supported (use either `make` or `task` commands)
 
 ## Essential Development Commands
 
 ### Project Setup
 ```bash
 # Install dependencies and setup development environment
-poetry install
-poetry run pre-commit install
+poetry install                    # Installs all dependencies from pyproject.toml
+poetry install --with security    # Also install security tools (bandit, safety, semgrep)
+poetry run pre-commit install     # Install git pre-commit hooks
 
 # Start enterprise monitoring stack (Prometheus, Grafana, AlertManager)
 docker compose -f deploy/compose/docker-compose.yml up -d
+# or: make docker-up (or: task up)
 
 # Verify enterprise infrastructure
 make contracts-validate-full
+
+# Format code before committing
+make format  # Runs black and isort on services/
+# or: task format
+
+# Lint code
+make lint    # Runs flake8 and mypy on services/*/src
+# or: task lint
 ```
 
 ### Enterprise Service Development
@@ -43,21 +54,35 @@ pytest tests/e2e/test_enterprise_system.py
 
 ### Testing & Quality Gates
 ```bash
-# Run comprehensive test suite with 80% coverage enforcement
-make test-all
+# Run comprehensive test suite with 80% coverage enforcement (BLOCKING)
+make test-all  # or: task test
+# This runs: pytest with --cov-fail-under=80 and --cov-branch enabled
 
-# Run security scanning (blocking gates)
-make security-scan
-bandit -r services/ --severity-level medium --confidence-level medium
-safety check --short-report
-semgrep --config=auto services/ --error --strict
+# Pre-commit hooks (runs automatically on git commit, or manually):
+poetry run pre-commit run --all-files
+# Includes: ruff, black, isort, mypy --strict, detect-secrets, markdownlint, yamllint
+
+# Run security scanning (use pyproject.toml security group)
+poetry install --with security
+poetry run bandit -r services/ --severity-level medium --confidence-level medium
+poetry run safety check --short-report
+poetry run semgrep --config=auto services/ --error --strict
 
 # Contract validation (critical for microservices integration)
-make contracts-validate-full
-make contracts-test
+make contracts-validate-full  # Comprehensive: JSON schemas + CSV artifacts + re-entry helpers
+make contracts-test           # Run contract and scenario tests with pytest
+make contracts-compat         # Schema compatibility checking
+make contracts-properties     # Property-based contract testing
 
 # Service-specific testing
 cd services/<service-name> && pytest --cov=src --cov-fail-under=80
+
+# Test markers available (see pyproject.toml):
+pytest -m unit          # Fast, isolated unit tests
+pytest -m integration   # Integration tests with external deps
+pytest -m e2e          # End-to-end system tests
+pytest -m security     # Security-focused tests
+pytest -m performance  # Performance benchmarks
 ```
 
 ### Domain Knowledge Integration
@@ -76,8 +101,22 @@ cd P_GUI && python friday_vol_indicator.py
 
 ## Enterprise Architecture
 
+### Architectural Decision Records
+**Key ADR**: `docs/adr/ADR-0001-service-decomposition.md` documents the microservices decomposition strategy.
+
+**Core Principles** (from ADR-0001):
+- **Determinism & Idempotence**: Identical inputs must produce identical outputs
+- **Single Source of Truth**: All components validate against canonical schemas (contracts/)
+- **Defensive Posture**: Fail closed on integrity errors, suppress decisions until healthy
+- **Explicit Fallbacks**: Tiered parameter resolution with audit trails
+
+**Communication Patterns**:
+- **Asynchronous Events** (Redis pub/sub): data-ingestor → indicator-engine → signal-generator
+- **Synchronous HTTP APIs**: For risk validation, order placement, UI operations
+- **Event Sourcing**: All state changes captured as immutable events with versioned schemas
+
 ### BaseEnterpriseService Foundation
-The system uses a inheritance-based enterprise architecture where all services inherit from `services/common/base_service.py`:
+The system uses an inheritance-based enterprise architecture where all services inherit from `services/common/base_service.py`:
 
 ```python
 from services.common.base_service import BaseEnterpriseService
@@ -153,22 +192,49 @@ make contracts-properties
 
 ## Microservices Architecture
 
-**Core Services (9 total):**
-- **data-ingestor**: Normalizes broker price feeds from MT4/DDE with enterprise monitoring
-- **indicator-engine**: Computes technical indicators using P_INDICATOR_REENTRY specifications
-- **signal-generator**: Applies trading rules with P_GUI conditional probability systems
-- **risk-manager**: Position sizing using P_positioning_ratio_index calculations
-- **execution-engine**: Broker integration with enterprise audit trails
-- **calendar-ingestor**: Economic calendar data with P_techspec integration patterns
+**Active Services** (in services/ directory):
+- **calendar-downloader**: Automated ForexFactory calendar download
+- **calendar-ingestor**: Economic calendar data processing and P_techspec integration
+- **compliance-monitor**: Regulatory compliance monitoring service
+- **dashboard**: Dashboard frontend components
+- **dashboard-backend**: Real-time trading dashboard with WebSocket streaming
+- **data-ingestor**: Normalizes broker price feeds from MT4/DDE
+- **data-validator**: Data quality validation service
+- **event-gateway**: Event routing and transformation gateway
+- **flow-monitor**: Signal flow monitoring and observability
+- **flow-orchestrator**: Workflow orchestration and coordination
+- **gui-gateway**: Operator UI API gateway implementing P_GUI specifications
+- **indicator-engine** / **indicators**: Technical indicator computation (P_INDICATOR_REENTRY specs)
+- **reentry-engine**: Re-entry logic engine
 - **reentry-matrix-svc**: Multi-dimensional decision matrix from P_INDICATOR_REENTRY
-- **reporter**: Enterprise metrics and P&L reporting with observability integration
-- **gui-gateway**: Operator UI gateway implementing P_GUI specifications
+- **telemetry-daemon**: Centralized telemetry collection and aggregation
+- **transport-router**: Message routing and transport layer
 
-**Enterprise Support Services:**
-- **common/**: BaseEnterpriseService foundation and shared enterprise utilities
-- **scripts/**: Automated service integration and validation tools
+**Enterprise Support:**
+- **common/**: BaseEnterpriseService foundation (services/common/base_service.py) and shared utilities
+- **scripts/**: Service integration, validation, chaos engineering, and replay testing tools
 
 ## Production Deployment
+
+### Docker Operations
+```bash
+# Start all services
+make docker-up  # or: task up
+# Runs: docker compose -f deploy/compose/docker-compose.yml up -d --build
+
+# Stop all services
+make docker-down  # or: task down
+
+# View logs
+make docker-logs  # or: task docker-logs
+# Runs: docker compose logs -f
+
+# Build service images
+make build  # or: task build
+
+# View Docker status
+docker compose -f deploy/compose/docker-compose.yml ps --format table
+```
 
 ### Enterprise Monitoring Stack
 ```bash
@@ -183,13 +249,18 @@ docker compose -f deploy/compose/monitoring.yml up -d
 ```
 
 ### Security & Compliance
-The system enforces enterprise security through CI/CD gates:
+The system enforces enterprise security through pre-commit hooks and CI/CD gates:
 
-- **SAST**: Bandit static analysis security testing
+- **Pre-commit Hooks** (.pre-commit-config.yaml):
+  - **Code Quality**: Ruff, Black, isort for consistent formatting
+  - **Type Safety**: MyPy with --strict mode enabled
+  - **SAST**: Bandit static analysis (skips test assertions)
+  - **Secret Scanning**: detect-secrets with baseline (.secrets.baseline)
+  - **Contract Validation**: Automatic schema validation on contract changes
+  - **Docker Security**: Image digest pinning verification (scripts/check-docker-digests.sh)
 - **SCA**: Safety dependency vulnerability scanning
 - **Semantic Analysis**: Semgrep code pattern analysis
-- **Secret Scanning**: Automated detection of committed secrets
-- **Coverage Enforcement**: 80% test coverage requirement with branch coverage
+- **Coverage Enforcement**: 80% test coverage requirement with branch coverage (blocking in pyproject.toml)
 
 ### Container Security
 All services use hardened production containers:
@@ -218,20 +289,40 @@ All services use hardened production containers:
 5. **UI Integration**: Follow P_GUI/ specifications for frontend integration
 
 ### Quality Gates
-All code must pass enterprise quality gates:
+All code must pass enterprise quality gates before commit and in CI:
+
+**Pre-commit (automatic on `git commit`):**
 ```bash
-# Security gates (blocking)
-make security-scan
+# Install hooks first (done in setup)
+poetry run pre-commit install
 
-# Test coverage enforcement (blocking)
-pytest --cov=src --cov-fail-under=80
+# Manual execution
+poetry run pre-commit run --all-files
+```
 
-# Contract validation (blocking)
+**Test Gates (blocking):**
+```bash
+# 80% coverage enforcement (blocking) - configured in pyproject.toml
+make test-all  # Fails if coverage < 80% or branch coverage insufficient
+
+# Contract validation (blocking on contract changes)
 make contracts-validate-full
 
-# Integration testing (required)
-pytest tests/integration/ -v
+# Integration testing
+pytest tests/integration/ -v -m integration
+
+# Security scanning (should be run before release)
+poetry install --with security
+poetry run bandit -r services/ --severity-level medium
+poetry run safety check --short-report
 ```
+
+**CI Pipeline Gates:**
+1. Pre-commit hooks (all)
+2. Test suite with coverage (80% threshold)
+3. Contract validation
+4. Security scanning (SAST + SCA)
+5. Docker image building and digest verification
 
 ## Configuration Management
 
@@ -297,15 +388,95 @@ python P_GUI/test_friday_vol_signal.py
 
 This enterprise-grade trading system combines production-ready infrastructure with comprehensive domain knowledge to deliver a complete financial trading platform.
 
+## Quick Reference
+
+### Key Configuration Files
+- **pyproject.toml**: Poetry workspace configuration, dependencies, test configuration (80% coverage threshold), tool configs (black, isort, mypy, bandit, pytest)
+- **.pre-commit-config.yaml**: Pre-commit hook configuration (ruff, black, isort, mypy --strict, detect-secrets, contract validation)
+- **Makefile**: Primary task runner with comprehensive commands (use `make help` to see all targets)
+- **Taskfile.yml**: Alternative task runner (supports Windows better, use `task --list`)
+- **deploy/compose/docker-compose.yml**: Docker Compose service definitions
+- **contracts/**: Canonical schemas (JSON and CSV) for all events and data interchange
+- **VERSION**: Single source of truth for version number
+
+### Important Directories
+- **services/**: All microservice implementations
+- **services/common/base_service.py**: BaseEnterpriseService foundation class
+- **contracts/**: Schema definitions and validation scripts
+- **P_*/**: Domain knowledge folders (specifications, GUI, indicators, reentry logic, MQL4)
+- **docs/adr/**: Architectural Decision Records
+- **docs/runbooks/**: Operational runbooks and incident response procedures
+- **docs/gaps/**: Production readiness gaps, SLOs, and FMEA
+- **scripts/**: Automation scripts (replay, chaos, integration, validation)
+- **tests/**: Test suites (contracts/, e2e/, integration/)
+- **shared/**: Shared libraries (reentry helpers, common utilities)
+
+### Getting Help
+```bash
+# View all Makefile targets
+make help
+
+# View Taskfile targets
+task --list
+
+# Check production readiness gaps
+make gaps-check
+
+# Access runbooks
+make runbooks
+```
+
+## Operations & Runbooks
+
+### Emergency Operations
+```bash
+# Emergency trading halt (critical)
+make emergency-stop
+# Sends POST to http://localhost:8080/emergency/stop-trading
+
+# Emergency system restart (requires CONFIRM)
+make emergency-restart
+# Stops all services, waits 10s, restarts, runs health check
+
+# Comprehensive health check
+make health-check
+# Checks all service ports (8080-8088), system resources, Docker status, DB, Redis
+
+# View available runbooks
+make runbooks
+# Opens docs/runbooks/index.md
+# Key runbooks: incident-response.md, trading-incidents.md, common-issues.md, escalation-procedures.md
+```
+
+### Performance Testing
+```bash
+# Tick replay performance testing
+make replay-test
+# Runs: python scripts/replay/replay_ticks.py scripts/replay/sample_ticks.csv --verbose
+
+# k6 load testing (requires k6 installed)
+make perf-k6 K6_TARGET_URL=http://localhost:8080/healthz K6_VUS=5 K6_DURATION=30s
+
+# Locust load testing (requires locust: pip install locust)
+make perf-locust LOCUST_HOST=http://localhost:8080 LOCUST_USERS=20 LOCUST_DURATION=1m
+```
+
+### Chaos Engineering
+```bash
+# Chaos testing tools available in scripts/chaos/
+# Use to test system resilience and failure modes
+```
+
 ## Friday Morning Updates Huey P Integration
 
-### New Enterprise Services
-The system has been enhanced with Friday Morning Updates components:
+### Enhanced Signal Flow Testing
+The system includes comprehensive signal flow testing from the "Friday Morning Updates Huey P" integration:
 
-**Enhanced Services (11 total now):**
-- **calendar-downloader**: Automated ForexFactory calendar download with enterprise monitoring
-- **dashboard-backend**: Real-time trading dashboard with WebSocket streaming and BaseEnterpriseService
-- **indicators**: Advanced currency strength and multi-timeframe analysis service
+**Friday Updates Location**: `Friday Morning Updates Huey P/` directory contains:
+- `UPDARE P_Testing_signal/`: Signal flow testing enhancements
+- `UPDATE_Economic_calendar/`: Economic calendar updates
+- `UPDATEP_Currency strengthen indicator/`: Currency strength indicator improvements
+- `UPDATP_Python_huey P_dashboard/`: Python Huey dashboard updates
 
 ### Signal Flow Testing Framework
 ```bash
