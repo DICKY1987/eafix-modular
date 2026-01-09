@@ -1,0 +1,105 @@
+# DOC_ID: DOC-CONFIG-0001
+# EAFIX Plugin System Configuration
+# Replaces docker-compose.yml
+
+plugin_directories:
+  - ./services
+
+# Global shared configuration
+global:
+  log_level: INFO
+  redis:
+    host: localhost
+    port: 6379
+    db: 0
+  postgres:
+    host: localhost
+    port: 5432
+    database: eafix
+    user: eafix_user
+  
+# Plugin-specific configurations
+plugins:
+  # Core data ingestion
+  data-ingestor:
+    enabled: true
+    mt4_dde_path: "C:\\MT4\\Data"
+    tick_buffer_size: 1000
+    publish_interval_ms: 100
+  
+  data-validator:
+    enabled: true
+  
+  # Event infrastructure
+  event-gateway:
+    enabled: true
+  
+  telemetry-daemon:
+    enabled: true
+    collection_interval_sec: 15
+  
+  flow-orchestrator:
+    enabled: true
+  
+  # Trading logic
+  indicator-engine:
+    enabled: false  # TODO: Migrate to plugin
+    update_interval_ms: 500
+    indicators:
+      - ema
+      - rsi
+      - macd
+      - bollinger
+  
+  signal-generator:
+    enabled: false  # TODO: Migrate to plugin
+    strategy: "trend_following"
+    thresholds:
+      rsi_overbought: 70
+      rsi_oversold: 30
+  
+  risk-manager:
+    enabled: false  # TODO: Migrate to plugin
+    max_position_size: 1.0
+    max_drawdown_pct: 5.0
+    daily_loss_limit: 1000
+  
+  execution-engine:
+    enabled: false  # TODO: Migrate to plugin
+    broker_api: "mt4"
+    order_timeout_sec: 30
+  
+  # Re-entry system
+  reentry-engine:
+    enabled: true
+  
+  reentry-matrix-svc:
+    enabled: true
+    reentry_window_hours: 4
+  
+  # Calendar & reporting
+  calendar-ingestor:
+    enabled: true
+    update_interval_hours: 24
+    data_source: "investing.com"
+  
+  reporter:
+    enabled: false  # TODO: Migrate to plugin
+    report_interval_min: 15
+  
+  # UI & Dashboard
+  gui-gateway:
+    enabled: true
+    http_port: 8080
+    websocket_enabled: true
+  
+  dashboard-backend:
+    enabled: true
+
+# Plugin loading order (optional - auto-resolved by dependencies)
+# load_order:
+#   - data-ingestor
+#   - indicator-engine
+#   - signal-generator
+#   - risk-manager
+#   - execution-engine
