@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0053
+---
+
 # Friday Morning Updates Integration Summary
 
 ## Overview

@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0031
+---
+
 # Diagnostics Schema & Testing
 
 > Standardized diagnostic format and testing infrastructure for error reporting and validation.

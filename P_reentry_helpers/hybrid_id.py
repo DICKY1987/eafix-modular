@@ -1,3 +1,4 @@
+# DOC_ID: DOC-LEGACY-0011
 """
 hybrid_id.py — Compose, parse, and validate the Reentry Hybrid Identifier.
 

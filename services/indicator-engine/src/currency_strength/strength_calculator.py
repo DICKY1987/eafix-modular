@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# DOC_ID: DOC-SERVICE-0069
 """
 Currency Strength Calculator - Enterprise Edition
 Advanced currency strength analysis with BaseEnterpriseService integration

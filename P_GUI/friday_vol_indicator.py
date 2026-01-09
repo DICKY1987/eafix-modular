@@ -1,3 +1,4 @@
+# DOC_ID: DOC-LEGACY-0004
 # indicators/friday_vol_indicator.py
 from dataclasses import dataclass
 from datetime import datetime, time

@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0043
+---
+
 # Tests & System Rules
 
 > Test infrastructure and system-wide rules and invariants.

@@ -1,4 +1,5 @@
 {
+  "doc_id": "DOC-CONTRACT-0015",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "ReentryDecision",
   "version": "1.0",
@@ -26,7 +27,12 @@
     },
     "action": {
       "type": "string",
-      "enum": ["ENTER", "WAIT", "EXIT", "ADJUST"],
+      "enum": [
+        "ENTER",
+        "WAIT",
+        "EXIT",
+        "ADJUST"
+      ],
       "description": "Recommended action"
     },
     "rationale": {
@@ -62,6 +68,13 @@
       "description": "Decision confidence score"
     }
   },
-  "required": ["id", "timestamp", "symbol", "state", "action", "rationale"],
+  "required": [
+    "id",
+    "timestamp",
+    "symbol",
+    "state",
+    "action",
+    "rationale"
+  ],
   "additionalProperties": false
 }

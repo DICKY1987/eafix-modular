@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# DOC_ID: DOC-LEGACY-0017
 """
 Manual Testing Control Panel
 Interactive tool for testing all signal system branches

@@ -1,3 +1,4 @@
+# DOC_ID: DOC-TEST-0028
 """
 Consumer contract tests for signal-generator service.
 Defines contracts that signal-generator expects from its dependencies.

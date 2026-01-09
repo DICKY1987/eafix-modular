@@ -1,3 +1,4 @@
+# DOC_ID: DOC-CONTRACT-0006
 """
 Pydantic models for JSON data structures.
 

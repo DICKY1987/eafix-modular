@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# DOC_ID: DOC-SERVICE-0027
 """
 Calendar Downloader Service - Enterprise Edition
 Automated ForexFactory calendar download with BaseEnterpriseService capabilities

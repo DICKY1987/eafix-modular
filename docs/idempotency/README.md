@@ -1,3 +1,7 @@
+---
+doc_id: DOC-DOC-0012
+---
+
 # EAFIX Trading System - Idempotency & Exactly-Once Semantics
 
 This document describes the comprehensive idempotency and exactly-once execution framework implemented for the EAFIX trading system. This framework ensures reliable operation in distributed environments by preventing duplicate operations and guaranteeing exactly-once execution of critical trading operations.

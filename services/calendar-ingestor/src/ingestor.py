@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0032
 """
 Calendar Ingestor Core Logic
 Processes economic calendar events and generates ActiveCalendarSignal CSV files using contracts

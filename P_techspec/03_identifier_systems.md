@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0048
+---
+
 # Identifier Systems (Standardization)
 
 **Status:** Updated • **Scope:** Canonical IDs used across Calendar → Matrix → Re‑Entry → EA flows.

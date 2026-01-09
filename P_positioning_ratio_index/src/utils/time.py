@@ -1,3 +1,4 @@
+# DOC_ID: DOC-LEGACY-0020
 import pandas as pd
 
 def robust_resample(df: pd.DataFrame, freq: str, how: str = "last"):

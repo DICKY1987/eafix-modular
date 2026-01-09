@@ -1,3 +1,7 @@
+---
+doc_id: DOC-DOC-0002
+---
+
 # EAFIX Trading System Documentation
 
 This directory contains comprehensive documentation for the EAFIX Trading System microservices architecture.

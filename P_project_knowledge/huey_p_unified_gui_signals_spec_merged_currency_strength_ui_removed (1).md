@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0033
+---
+
 # HUEY_P Unified GUI & Signals Specification
 
 **Status:** Draft merged spec  

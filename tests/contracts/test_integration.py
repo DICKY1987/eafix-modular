@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# DOC_ID: DOC-TEST-0020
 """
 Integration tests for the complete contract system.
 

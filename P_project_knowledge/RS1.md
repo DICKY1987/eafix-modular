@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0040
+---
+
 Definitive Archival Summary
 
 Cross-Asset Signal Generation & Feature Engineering (sig2/sig3)

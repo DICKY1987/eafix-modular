@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0024
+---
+
 Love this—here’s how I’d refactor that “Friday 7:30→2:00 CST %-move” concept so it cleanly fits your current architecture (single MT4 Execution Engine EA, Python analytics brain, no Excel, MT4↔Python comms, DDE/price feed into Python, signals out of Python).
 
 Plan (tight + production-oriented)

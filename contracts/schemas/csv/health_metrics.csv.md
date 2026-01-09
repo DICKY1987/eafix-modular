@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONTRACT-0035
+---
+
 # Health Metrics CSV Schema
 
 ## Description

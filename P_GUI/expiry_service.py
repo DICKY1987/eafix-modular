@@ -1,3 +1,4 @@
+# DOC_ID: DOC-LEGACY-0003
 
 """
 Expiry Service (Python + FastAPI) — FX Options Expiry → MT4

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# DOC_ID: DOC-SERVICE-0044
 """
 Data Ingestor Service - Enterprise Integration Example
 Demonstrates how to integrate existing service with BaseEnterpriseService

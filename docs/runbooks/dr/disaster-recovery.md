@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0100
+---
+
 # Disaster Recovery Runbook
 
 Purpose: Document procedures to recover services in a regional or cluster failure.

@@ -1,3 +1,4 @@
+# DOC_ID: DOC-LEGACY-0012
 """
 indicator_validator.py — Validate indicator records against JSON Schema.
 

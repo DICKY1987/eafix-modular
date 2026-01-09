@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0044
+---
+
 # Scope Overview
 
 **Status:** Updated • **Masters:** `integrated_economic_calendar_matrix_re_entry_system_spec_UPDATED__rev2.md`, `huey_p_unified_gui_signals_spec_merged_currency_strength_ui_removed.md`  

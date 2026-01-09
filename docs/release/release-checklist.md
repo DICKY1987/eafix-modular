@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0081
+---
+
 # Release Checklist - EAFIX Trading System
 
 ## Pre-Release Validation

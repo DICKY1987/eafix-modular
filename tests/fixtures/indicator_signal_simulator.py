@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# DOC_ID: DOC-SERVICE-0117
 """
 Manual Indicator Signal Simulator
 Simulates technical indicator triggers to test the complete signal flow

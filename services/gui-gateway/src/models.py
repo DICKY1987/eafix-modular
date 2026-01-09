@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0068
 """
 Data models for GUI Gateway API responses
 """

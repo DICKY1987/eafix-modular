@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0064
+---
+
 Dde + Currency Strength Tab — Brainstorm Spec
 DDE + Currency Strength Tab — Brainstorm Spec
 

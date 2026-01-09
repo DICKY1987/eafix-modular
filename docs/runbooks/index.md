@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0089
+---
+
 # EAFIX Runbooks Index
 
 ## 📚 Complete Runbook Library

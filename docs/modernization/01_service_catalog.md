@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0072
+---
+
 # Service Catalog
 
 ## Overview

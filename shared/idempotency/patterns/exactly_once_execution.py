@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0111
 """
 Exactly-once execution semantics for EAFIX trading operations.
 Ensures critical trading operations execute exactly once, even in the presence of failures and retries.

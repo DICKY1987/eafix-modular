@@ -1,4 +1,5 @@
 {
+  "doc_id": "DOC-CONTRACT-0016",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Signal",
   "version": "1.0",
@@ -22,7 +23,10 @@
     },
     "side": {
       "type": "string",
-      "enum": ["BUY", "SELL"],
+      "enum": [
+        "BUY",
+        "SELL"
+      ],
       "description": "Trading direction"
     },
     "confidence": {
@@ -48,6 +52,12 @@
       "description": "Signal expiry timestamp"
     }
   },
-  "required": ["id", "timestamp", "symbol", "side", "confidence"],
+  "required": [
+    "id",
+    "timestamp",
+    "symbol",
+    "side",
+    "confidence"
+  ],
   "additionalProperties": false
 }

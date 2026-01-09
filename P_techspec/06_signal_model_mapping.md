@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0054
+---
+
 # Signal Model & Matrix Mapping
 
 **Status:** Updated • **Goal:** Deterministic lookup from Hybrid context → ParameterSet with auditable fallbacks. (Master §3.5–§3.6, §5.1–§5.10, §6.8) fileciteturn2file0

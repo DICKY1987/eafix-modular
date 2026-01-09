@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0102
+---
+
 Dde + Currency Strength Tab — Brainstorm Spec
 DDE + Currency Strength Tab — Brainstorm Spec
 

@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0022
+---
+
 # Indicator Integration Guide
 
 ## Overview

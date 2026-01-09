@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0045
+---
+
 # Scope Principles
 
 **Status:** Updated • **Intent:** Provide the guardrails that shape design decisions and reviews.

@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0047
+---
+
 # Runtime Architecture
 
 **Status:** Updated • **Goal:** Clear process topology, start‑up/shutdown, failure domains, and recovery.

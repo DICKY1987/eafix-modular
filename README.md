@@ -1,3 +1,7 @@
+---
+doc_id: DOC-DOC-0001
+---
+
 # EAFIX Trading System - Modularized Architecture
 
 This repository contains the modularized version of the EAFIX trading system, decomposed from a monolithic application into containerized microservices.

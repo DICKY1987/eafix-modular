@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# DOC_ID: DOC-CONTRACT-0003
 """
 JSON Schema Validator
 

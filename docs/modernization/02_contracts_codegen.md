@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONTRACT-0038
+---
+
 # Contract System & Code Generation
 
 **Last Updated:** 2025-01-15  

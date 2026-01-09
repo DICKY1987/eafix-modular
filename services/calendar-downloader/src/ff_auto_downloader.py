@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# DOC_ID: DOC-SERVICE-0026
 """
 Automated ForexFactory Calendar Downloader & Processor
 Fully automated solution that:

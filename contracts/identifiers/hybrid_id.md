@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONTRACT-0032
+---
+
 # Hybrid ID Format Specification
 
 ## Overview

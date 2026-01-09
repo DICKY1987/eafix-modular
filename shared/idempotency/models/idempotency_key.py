@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0110
 """
 Idempotency key models for EAFIX trading system.
 Provides deterministic, collision-resistant keys for trading operations.

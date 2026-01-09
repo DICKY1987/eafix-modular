@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0049
+---
+
 # Plugin Model (Indicators & Transforms)
 
 **Status:** Updated • **Goal:** Add features without touching core by using declarative manifests and strict interfaces.

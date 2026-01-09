@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# DOC_ID: DOC-SERVICE-0119
 """
 End-to-End Signal Flow Tester
 Validates complete signal flow from source to MT4 execution

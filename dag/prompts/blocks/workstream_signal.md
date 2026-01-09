@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0065
+---
+
 # Signal Processing Workstream Prompt Block
 ## PB-002 | Workstream: signal-processing
 

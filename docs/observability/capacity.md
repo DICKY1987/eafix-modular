@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0073
+---
+
 # Capacity Planning Guide
 
 This document captures baseline capacity assumptions and guidance for sizing services.

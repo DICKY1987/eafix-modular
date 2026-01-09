@@ -1,3 +1,4 @@
+# DOC_ID: DOC-TEST-0031
 """
 Scenario-based integration tests for EAFIX trading system.
 Tests complete end-to-end trading scenarios with contract verification.

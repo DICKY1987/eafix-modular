@@ -1,3 +1,4 @@
+# DOC_ID: DOC-TEST-0029
 """
 Property-based testing for EAFIX trading system contracts.
 Uses Hypothesis to generate test data and verify contract properties.

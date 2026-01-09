@@ -1,3 +1,4 @@
+# DOC_ID: DOC-TEST-0005
 \
 import os, sys, re
 sys.path.insert(0, os.path.abspath("."))

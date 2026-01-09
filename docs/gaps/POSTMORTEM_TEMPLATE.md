@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0071
+---
+
 # Postmortem Checklist
 
 - [ ] Root cause verified with evidence

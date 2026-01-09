@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0050
+---
+
 # GUI Layout & Navigation
 
 **Status:** Updated • **Goal:** Minimal, operator‑first layout aligned to contracts and health telemetry.

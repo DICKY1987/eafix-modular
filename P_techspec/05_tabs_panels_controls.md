@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0052
+---
+
 # Tabs, Panels & Controls
 
 **Status:** Updated • **Goal:** Document every on‑screen control with its function, contract, and acceptance cues.

@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONTRACT-0037
+---
+
 # Trade Results CSV Schema
 
 ## Description

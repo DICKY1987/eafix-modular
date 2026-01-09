@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0045
 """
 Metrics collection for the Data Ingestor service
 """

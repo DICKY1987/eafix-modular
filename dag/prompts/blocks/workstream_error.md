@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0062
+---
+
 # Error Recovery Workstream Prompt Block
 ## PB-005 | Workstream: error-recovery
 

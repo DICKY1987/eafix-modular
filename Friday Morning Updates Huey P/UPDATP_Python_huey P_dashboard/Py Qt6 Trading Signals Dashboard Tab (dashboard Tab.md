@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0105
+---
+
 Py Qt6 Trading Signals Dashboard Tab (dashboard Tab
 · python
 from __future__ import annotations

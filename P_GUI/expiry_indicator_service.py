@@ -1,3 +1,4 @@
+# DOC_ID: DOC-LEGACY-0002
 """
 Expiry Indicator Service (Python + FastAPI) — FX Options Expiry Indicators
 - Serves expiry records and computed indicator states as JSON or CSV

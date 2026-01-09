@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONTRACT-0036
+---
+
 # Re-entry Decisions CSV Schema
 
 ## Description

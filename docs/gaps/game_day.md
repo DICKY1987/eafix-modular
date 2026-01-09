@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0068
+---
+
 # Chaos Game Day (1 hour)
 
 - [ ] Start system with Compose

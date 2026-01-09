@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0067
 """
 GUI Gateway Service - API Gateway for Operator Interface
 

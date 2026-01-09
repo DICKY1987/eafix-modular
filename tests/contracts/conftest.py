@@ -1,3 +1,4 @@
+# DOC_ID: DOC-CONTRACT-0008
 """
 Contract testing pytest configuration and shared fixtures.
 """

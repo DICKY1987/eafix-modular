@@ -1,3 +1,7 @@
+---
+doc_id: DOC-DOC-0018
+---
+
 # Locust Performance Tests
 
 Quick-start to run Locust for HTTP load.

@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0057
 """
 Event Gateway Metrics Collection
 

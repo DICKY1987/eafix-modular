@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0029
+---
+
 # Atomic Process Flow — Reentry Trading System (v3.0)
 
 **Date:** 2025-08-21  

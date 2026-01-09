@@ -1,3 +1,4 @@
+# DOC_ID: DOC-CONTRACT-0007
 """
 Pydantic models for contract validation.
 

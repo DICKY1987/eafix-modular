@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONTRACT-0025
+---
+
 # Contract Validation Report
 Generated at: "2025-09-10 09:04:32.739212"
 

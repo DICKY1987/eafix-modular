@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# DOC_ID: DOC-TEST-0009
 """
 Integration tests for P_ folder content integration.
 

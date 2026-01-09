@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# DOC_ID: DOC-SERVICE-0016
 """
 Economic Calendar to Signal System - Python Implementation
 Converting Excel-VBA system to pure Python solution

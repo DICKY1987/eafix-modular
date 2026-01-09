@@ -1,3 +1,7 @@
+---
+doc_id: DOC-DOC-0009
+---
+
 # EAFIX Trading System - Kubernetes Deployment
 
 This directory contains comprehensive Kubernetes manifests for deploying the EAFIX trading system in production environments with enterprise-grade security, observability, and resilience features.

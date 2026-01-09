@@ -1,4 +1,5 @@
 {
+  "doc_id": "DOC-CONTRACT-0010",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "CalendarEvent",
   "version": "1.0",
@@ -21,7 +22,11 @@
     },
     "impact": {
       "type": "string",
-      "enum": ["LOW", "MED", "HIGH"],
+      "enum": [
+        "LOW",
+        "MED",
+        "HIGH"
+      ],
       "description": "Expected market impact"
     },
     "title": {
@@ -50,6 +55,12 @@
       "description": "Data ingestion timestamp"
     }
   },
-  "required": ["id", "start_ts", "currency", "impact", "title"],
+  "required": [
+    "id",
+    "start_ts",
+    "currency",
+    "impact",
+    "title"
+  ],
   "additionalProperties": false
 }

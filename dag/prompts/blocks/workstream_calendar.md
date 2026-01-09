@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0060
+---
+
 # Calendar Ingestion Workstream Prompt Block
 ## PB-001 | Workstream: calendar-ingest
 

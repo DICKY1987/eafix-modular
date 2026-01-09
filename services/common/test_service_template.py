@@ -1,3 +1,4 @@
+# DOC_ID: DOC-TEST-0010
 """
 Test templates for consistent testing across all services.
 Copy-paste and customize for each service.

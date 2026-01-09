@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0094
+---
+
 # OpenSSF Scorecards Security Policy
 
 ## Overview

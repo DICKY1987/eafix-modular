@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONTRACT-0027
+---
+
 # Bootstrap & Contracts
 
 > Foundation components that define schemas, configurations, and core contracts for the APF system.

@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0021
+---
+
 # GUI Specification – Controls & Actions + Key Additions
 
 _Export generated: 2025-09-05T20:48:26Z_

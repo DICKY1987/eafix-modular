@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0042
 """
 Core data ingestion logic for the Data Ingestor service
 """

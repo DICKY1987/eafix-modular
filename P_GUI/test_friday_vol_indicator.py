@@ -1,3 +1,4 @@
+# DOC_ID: DOC-TEST-0003
 # tests/test_friday_vol_indicator.py
 import pytest
 from datetime import datetime

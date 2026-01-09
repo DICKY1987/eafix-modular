@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0030
+---
+
 # Core Foundation & Models
 
 > Essential utilities, logging, configuration, and the core data models with validation.

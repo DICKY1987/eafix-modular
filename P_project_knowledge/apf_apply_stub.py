@@ -1,3 +1,4 @@
+# DOC_ID: DOC-LEGACY-0010
 """
 apf_apply_stub.py — Minimal skeleton to apply an APF Change Request (Edit Script)
 NOTE: This is a stub for wiring and audit flow demonstration.

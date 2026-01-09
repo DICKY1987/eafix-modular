@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0103
+---
+
 # Economic Calendar Enhancement Plan
 **Auto-Download Implementation & Critical Gap Fixes**
 

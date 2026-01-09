@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONTRACT-0030
+---
+
 # CAL5 Legacy Calendar Identifier Specification
 
 ## Overview

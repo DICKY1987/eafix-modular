@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0064
+---
+
 # Maintenance Workstream Prompt Block
 ## PB-006 | Workstream: maintenance
 

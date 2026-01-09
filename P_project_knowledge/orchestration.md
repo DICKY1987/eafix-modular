@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0035
+---
+
 # Orchestration
 
 > Job coordination, state machines, and high-level execution planning.

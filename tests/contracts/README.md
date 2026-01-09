@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONTRACT-0039
+---
+
 # Contract & Scenario Testing Framework
 
 This directory contains the comprehensive contract and scenario testing suite for the EAFIX trading system. The testing framework implements consumer-driven contract testing (Pact-like), property-based testing, and end-to-end scenario validation.

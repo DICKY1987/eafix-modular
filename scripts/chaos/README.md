@@ -1,3 +1,7 @@
+---
+doc_id: DOC-DOC-0016
+---
+
 # Chaos Scripts
 
 This folder contains helpers and docs to run small, safe chaos experiments in staging.

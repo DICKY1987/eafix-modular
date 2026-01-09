@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0020
 # tkinter_dashboard_gui.py - Integration with your existing tkinter GUI
 import tkinter as tk
 from tkinter import ttk, messagebox

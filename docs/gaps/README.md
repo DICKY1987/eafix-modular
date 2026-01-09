@@ -1,3 +1,7 @@
+---
+doc_id: DOC-DOC-0010
+---
+
 # Production Readiness Gap Analysis
 
 This directory contains production readiness documentation for the EAFIX modular trading system.

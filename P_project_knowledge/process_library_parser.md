@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0037
+---
+
 # Process Library & Parser
 
 > Reusable step templates and document parsing capabilities.

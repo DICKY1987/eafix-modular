@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0038
 # dashboard_backend.py - Scalable Trading Dashboard Backend
 import asyncio
 import json

@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0036
+---
+
 # First-Party Plugins
 
 > Core functionality plugins that implement import, export, validation, and standardization capabilities.

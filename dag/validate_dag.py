@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0006
 """
 DAG Configuration Validation Script
 Validates the DAG graph, workstreams, patterns, and quality gates.

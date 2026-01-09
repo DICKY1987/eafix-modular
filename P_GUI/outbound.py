@@ -1,3 +1,4 @@
+# DOC_ID: DOC-LEGACY-0006
 
 # bridge/outbound.py (optional illustrative stub)
 import json, os, time

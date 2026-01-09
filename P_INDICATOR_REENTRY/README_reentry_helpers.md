@@ -1,3 +1,7 @@
+---
+doc_id: DOC-DOC-0005
+---
+
 # Reentry Helpers (Python)
 
 Stdlib-only utilities for the Reentry Trading System.

@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0098
+---
+
 # Chaos Experiments
 
 Objective: Validate resilience to common failure modes in staging before production.

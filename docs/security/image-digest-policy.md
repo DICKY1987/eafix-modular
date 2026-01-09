@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0093
+---
+
 # Container Image Digest Pinning Policy
 
 ## Overview

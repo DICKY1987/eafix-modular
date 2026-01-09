@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0059
+---
+
 # Master Orchestrator Prompt Block
 ## PB-000 | EAFIX Trading System
 

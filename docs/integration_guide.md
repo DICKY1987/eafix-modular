@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0057
+---
+
 # Trading Dashboard Integration Guide
 
 ## Overview

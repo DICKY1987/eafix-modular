@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0027
+---
+
 # APF Monorepo Build Order — Deep Descriptions
 
 > Dependency‑aware order with richer, implementation‑ready descriptions. Each entry notes **Purpose**, **Key responsibilities**, **Depends on**, **Used by**, and **Notes/Interfaces** so teams can wire modules correctly on first pass.

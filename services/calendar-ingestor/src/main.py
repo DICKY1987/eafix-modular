@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# DOC_ID: DOC-SERVICE-0033
 """
 Calendar Ingestor Service - Main Entry Point
 Processes economic calendar events and generates ActiveCalendarSignal CSV files

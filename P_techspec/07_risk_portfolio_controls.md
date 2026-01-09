@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0055
+---
+
 # Risk & Portfolio Controls
 
 **Status:** Updated • **Goal:** Bound exposure at symbol and portfolio levels with automatic brakes and overlays.

@@ -1,3 +1,7 @@
+---
+doc_id: DOC-DOC-0008
+---
+
 # EAFIX Trading System - Helm Chart
 
 This Helm chart deploys the EAFIX trading system with comprehensive production-ready configurations including security, observability, and scalability features.

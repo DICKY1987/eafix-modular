@@ -1,3 +1,4 @@
+# DOC_ID: DOC-TEST-0030
 """
 Provider contract tests for risk-manager service.
 Verifies that risk-manager satisfies contracts expected by its consumers.

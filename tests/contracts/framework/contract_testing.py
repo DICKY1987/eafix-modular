@@ -1,3 +1,4 @@
+# DOC_ID: DOC-CONTRACT-0009
 """
 Contract testing framework for EAFIX trading system.
 Implements consumer-driven contract testing with Pact-like semantics.

@@ -1,3 +1,4 @@
+# DOC_ID: DOC-CONTRACT-0005
 """
 Pydantic models for event schemas.
 

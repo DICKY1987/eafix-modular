@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0101
 """
 EAFIX Trading System - Idempotency & Exactly-Once Semantics
 

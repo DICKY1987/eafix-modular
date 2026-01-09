@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0066
+---
+
 # Testing Workstream Prompt Block
 ## PB-007 | Workstream: testing
 

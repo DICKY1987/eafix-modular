@@ -1,8 +1,13 @@
 {
+  "doc_id": "DOC-CONFIG-0046",
   "dashboard": {
     "id": null,
     "title": "EAFIX Trading System - Overview",
-    "tags": ["trading", "overview", "slo"],
+    "tags": [
+      "trading",
+      "overview",
+      "slo"
+    ],
     "timezone": "browser",
     "refresh": "30s",
     "time": {
@@ -14,7 +19,12 @@
         "id": 1,
         "title": "System Availability SLO",
         "type": "stat",
-        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0},
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 0,
+          "y": 0
+        },
         "targets": [
           {
             "expr": "slo:system_availability:rate5m * 100",
@@ -32,9 +42,18 @@
             "max": 100,
             "thresholds": {
               "steps": [
-                {"color": "red", "value": 0},
-                {"color": "yellow", "value": 99.5},
-                {"color": "green", "value": 99.9}
+                {
+                  "color": "red",
+                  "value": 0
+                },
+                {
+                  "color": "yellow",
+                  "value": 99.5
+                },
+                {
+                  "color": "green",
+                  "value": 99.9
+                }
               ]
             }
           }
@@ -43,7 +62,9 @@
           "orientation": "horizontal",
           "reduceOptions": {
             "values": false,
-            "calcs": ["lastNotNull"]
+            "calcs": [
+              "lastNotNull"
+            ]
           }
         }
       },
@@ -51,7 +72,12 @@
         "id": 2,
         "title": "Price Feed Latency SLO",
         "type": "stat",
-        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0},
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 6,
+          "y": 0
+        },
         "targets": [
           {
             "expr": "slo:price_feed_latency:p95_5m * 1000",
@@ -63,9 +89,18 @@
             "unit": "ms",
             "thresholds": {
               "steps": [
-                {"color": "green", "value": 0},
-                {"color": "yellow", "value": 80},
-                {"color": "red", "value": 100}
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "yellow",
+                  "value": 80
+                },
+                {
+                  "color": "red",
+                  "value": 100
+                }
               ]
             }
           }
@@ -74,7 +109,9 @@
           "orientation": "horizontal",
           "reduceOptions": {
             "values": false,
-            "calcs": ["lastNotNull"]
+            "calcs": [
+              "lastNotNull"
+            ]
           }
         }
       },
@@ -82,7 +119,12 @@
         "id": 3,
         "title": "Signal Generation Latency SLO",
         "type": "stat",
-        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0},
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 12,
+          "y": 0
+        },
         "targets": [
           {
             "expr": "slo:signal_generation_latency:p95_5m * 1000",
@@ -94,9 +136,18 @@
             "unit": "ms",
             "thresholds": {
               "steps": [
-                {"color": "green", "value": 0},
-                {"color": "yellow", "value": 400},
-                {"color": "red", "value": 500}
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "yellow",
+                  "value": 400
+                },
+                {
+                  "color": "red",
+                  "value": 500
+                }
               ]
             }
           }
@@ -106,7 +157,12 @@
         "id": 4,
         "title": "Order Execution Latency SLO",
         "type": "stat",
-        "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0},
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 18,
+          "y": 0
+        },
         "targets": [
           {
             "expr": "slo:order_execution_latency:p95_5m",
@@ -118,9 +174,18 @@
             "unit": "s",
             "thresholds": {
               "steps": [
-                {"color": "green", "value": 0},
-                {"color": "yellow", "value": 1.5},
-                {"color": "red", "value": 2}
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "yellow",
+                  "value": 1.5
+                },
+                {
+                  "color": "red",
+                  "value": 2
+                }
               ]
             }
           }
@@ -130,7 +195,12 @@
         "id": 5,
         "title": "Trading Pipeline Health",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        },
         "targets": [
           {
             "expr": "up{job=\"data-ingestor\"}",
@@ -163,9 +233,20 @@
         "alert": {
           "conditions": [
             {
-              "query": {"queryType": "", "refId": "A"},
-              "reducer": {"type": "last", "params": []},
-              "evaluator": {"params": [1], "type": "lt"}
+              "query": {
+                "queryType": "",
+                "refId": "A"
+              },
+              "reducer": {
+                "type": "last",
+                "params": []
+              },
+              "evaluator": {
+                "params": [
+                  1
+                ],
+                "type": "lt"
+              }
             }
           ],
           "executionErrorState": "alerting",
@@ -181,7 +262,12 @@
         "id": 6,
         "title": "Daily P&L by Currency Pair",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 8
+        },
         "targets": [
           {
             "expr": "trading:pnl:realized_daily",
@@ -198,7 +284,12 @@
         "id": 7,
         "title": "Signal Accuracy by Type",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 16
+        },
         "targets": [
           {
             "expr": "trading:signals:accuracy_rate_1h * 100",
@@ -217,7 +308,12 @@
         "id": 8,
         "title": "Current Positions by Strategy",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 16
+        },
         "targets": [
           {
             "expr": "trading:positions:count_current",
@@ -235,7 +331,12 @@
         "id": 9,
         "title": "Risk Exposure by Currency",
         "type": "piechart",
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 24
+        },
         "targets": [
           {
             "expr": "trading:positions:exposure_usd_current",
@@ -247,7 +348,12 @@
         "id": 10,
         "title": "System Resource Utilization",
         "type": "graph",
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 24
+        },
         "targets": [
           {
             "expr": "100 - (avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
@@ -279,7 +385,7 @@
         },
         {
           "name": "service",
-          "type": "query", 
+          "type": "query",
           "query": "label_values(up{job=~\".*-engine|.*-generator|.*-manager|.*-ingestor\"}, job)",
           "refresh": 1,
           "includeAll": true,
@@ -300,7 +406,7 @@
         },
         {
           "name": "Market Events",
-          "datasource": "Prometheus", 
+          "datasource": "Prometheus",
           "enable": true,
           "expr": "trading_calendar_event_high_impact == 1",
           "iconColor": "orange",

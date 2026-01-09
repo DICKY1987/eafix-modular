@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0109
 """
 FastAPI middleware for idempotency support in EAFIX trading system.
 Automatically handles idempotency for HTTP requests with idempotency keys.

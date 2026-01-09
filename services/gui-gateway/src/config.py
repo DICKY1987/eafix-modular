@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0066
 """
 Configuration for GUI Gateway Service
 """

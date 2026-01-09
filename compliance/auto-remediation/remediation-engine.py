@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# DOC_ID: DOC-SERVICE-0009
 """
 EAFIX Trading System - Compliance Auto-Remediation Engine
 

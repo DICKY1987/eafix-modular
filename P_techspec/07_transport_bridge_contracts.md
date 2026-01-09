@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONTRACT-0029
+---
+
 # Transport & EA Bridge Contracts
 
 **Status:** Updated • **Goal:** CSV‑first bridge with optional DLL socket and strict ingestion on EA side. (Master §2.7–§2.10, §16.4–§17) fileciteturn2file0

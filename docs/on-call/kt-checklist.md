@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0075
+---
+
 # Knowledge Transfer Checklist
 
 Use this checklist to complete handover:

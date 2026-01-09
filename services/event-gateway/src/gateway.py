@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0054
 """
 Event Gateway Core
 

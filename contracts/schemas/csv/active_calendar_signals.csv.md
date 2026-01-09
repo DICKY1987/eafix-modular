@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONTRACT-0034
+---
+
 # Active Calendar Signals CSV Schema
 
 ## Description

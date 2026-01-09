@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0063
+---
+
 # Health Monitoring Workstream Prompt Block
 ## PB-004 | Workstream: health-monitoring
 

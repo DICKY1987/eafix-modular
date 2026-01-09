@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0112
 """
 Outbox pattern implementation for reliable event publishing in EAFIX trading system.
 Ensures exactly-once delivery of events by storing them in the same transaction as business data.

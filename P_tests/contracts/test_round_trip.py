@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# DOC_ID: DOC-TEST-0008
 """
 Round-trip tests for Python ⇄ MQL4 contract compatibility.
 

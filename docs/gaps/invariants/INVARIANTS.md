@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0096
+---
+
 # Invariants (Executable Specifications)
 
 Each invariant must include: **Context**, **Statement**, **Proof (test)**, **Signals (metrics)**, **Alert**.

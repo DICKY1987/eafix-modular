@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0051
+---
+
 # EAFIX Modular System - Enterprise Implementation Summary
 
 ## 🎉 Implementation Complete: Token-Efficient Enterprise Transformation

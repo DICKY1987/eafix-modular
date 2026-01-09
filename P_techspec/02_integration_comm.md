@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0046
+---
+
 # Integration & Communication Layer (PCL)
 
 **Status:** Updated • **Goal:** Unified, pluggable transport with automatic failover and health reporting. (Master §2.6–§2.9) fileciteturn2file0

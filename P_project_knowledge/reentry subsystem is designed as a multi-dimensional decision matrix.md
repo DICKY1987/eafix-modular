@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0039
+---
+
 Current System Understanding
 Core Architecture Overview
 Your reentry subsystem is designed as a multi-dimensional decision matrix that determines trade reentry actions based on:

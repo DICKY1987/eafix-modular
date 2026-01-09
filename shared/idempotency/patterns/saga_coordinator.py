@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0113
 """
 Saga pattern coordinator for distributed transactions in EAFIX trading system.
 Implements distributed transaction coordination with compensation actions.

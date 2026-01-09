@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0074
+---
+
 # Service Level Objectives (SLOs) for EAFIX Trading System
 
 ## Overview

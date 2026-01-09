@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# DOC_ID: DOC-SERVICE-0043
 """
 Data Ingestor Service - Main Entry Point
 Normalizes broker price feeds from MT4/DDE and publishes PriceTick events

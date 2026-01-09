@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0061
+---
+
 # EA Execution Workstream Prompt Block
 ## PB-003 | Workstream: ea-execution
 

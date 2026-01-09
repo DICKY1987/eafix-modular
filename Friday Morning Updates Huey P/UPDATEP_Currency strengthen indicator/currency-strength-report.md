@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0101
+---
+
 #### Scalping Strategy Visualization and Analysis Framework
 
 ```python

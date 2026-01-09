@@ -1,0 +1,55 @@
+doc_id: DOC-CONFIG-DIR-CONTRACT-296
+meta:
+  dir_id: DIR-SUB-DOC-ID-4da6cfc1
+  version: 1.0.0
+  updated_utc: '2025-12-28T05:50:00Z'
+inputs:
+  required: []
+  optional:
+    - name: trace_id
+      type: string
+      description: Unique identifier for tracing operations across components
+    - name: run_id
+      type: string
+      description: Unique identifier for a specific execution run
+outputs:
+  guaranteed:
+    - name: registry_v3_database
+      type: sqlite_database
+      path: migration_v3/data/registry_v3.db
+      description: Registry V3 database with Tier 0-3 fields populated
+  conditional:
+    - name: backfill_report
+      type: json
+      path: .runs/<run_id>/backfill_report.json
+      condition: Backfill runner executed
+    - name: v3_dashboard
+      type: html
+      path: 4_REPORTING_MONITORING/v3_dashboard.html
+      condition: Dashboard generator executed
+    - name: health_check_report
+      type: json
+      path: .runs/<run_id>/health_check_report.json
+      condition: Health check executed
+invariants:
+  pre_conditions:
+    - Registry V3 database schema version >= 1.0
+    - Python 3.8+ with sqlite3, yaml, json libraries
+  post_conditions:
+    - Tier 2 canonical_hash coverage >= 90% for JSON/YAML files
+    - Tier 3 structure_signals coverage >= 80% for supported files
+    - No doc_id conflicts in vw_doc_id_conflicts view
+  constraints:
+    - All database operations use BEGIN IMMEDIATE for transaction safety
+    - All output written to .runs/<run_id>/ per SYSTEM_DETERMINISM_CONTRACT.json
+    - All tools accept trace_id and run_id parameters
+side_effects:
+  filesystem:
+    - path: migration_v3/data/registry_v3.db
+      operation: read_write
+      description: Database updated with Tier 2/3 metadata
+    - path: .runs/<run_id>/
+      operation: write
+      description: Logs and reports written to run-specific directory
+  network: []
+  external_systems: []

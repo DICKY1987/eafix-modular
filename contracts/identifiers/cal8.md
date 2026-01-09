@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONTRACT-0031
+---
+
 # CAL8 Calendar Identifier Specification
 
 ## Overview

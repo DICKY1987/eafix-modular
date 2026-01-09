@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0041
+---
+
 # Runtime & Security
 
 > Plugin system, execution environment, and security policy enforcement.

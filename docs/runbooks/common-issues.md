@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0085
+---
+
 # Common Issues & Solutions
 
 ## 🔧 Quick Troubleshooting Guide

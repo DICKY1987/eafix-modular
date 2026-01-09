@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0034
+---
+
 # Import/Export Engine
 
 > Components responsible for converting between different formats (YAML ↔ human-readable ↔ draw.io XML).

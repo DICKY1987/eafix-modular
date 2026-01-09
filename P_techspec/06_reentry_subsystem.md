@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0053
+---
+
 # Re‑Entry Subsystem
 
 **Status:** Updated • **Goal:** Classify outcomes and issue governed follow‑ups with overlays and generation limits. (Master §6.*, §9.200) fileciteturn2file0

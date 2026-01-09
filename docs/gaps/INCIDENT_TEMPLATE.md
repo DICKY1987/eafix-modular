@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0070
+---
+
 # Incident Report Template
 
 **Incident ID:** INC-YYYYMMDD-XXX  

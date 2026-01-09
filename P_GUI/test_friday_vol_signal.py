@@ -1,3 +1,4 @@
+# DOC_ID: DOC-TEST-0004
 
 # tests/test_friday_vol_signal.py
 from datetime import datetime

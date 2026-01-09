@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# DOC_ID: DOC-SERVICE-0011
 """
 Manual Economic Calendar Event Simulator
 Creates synthetic calendar events to test the complete signal flow

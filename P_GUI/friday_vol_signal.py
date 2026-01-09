@@ -1,3 +1,4 @@
+# DOC_ID: DOC-LEGACY-0005
 
 # signals/friday_vol_signal.py
 from dataclasses import dataclass

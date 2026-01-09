@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0023
+---
+
 
 ### Integration Guide (Friday Move Signal)
 

@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0057
+---
+
 # QC, Acceptance, Telemetry & Alerts
 
 **Status:** Updated • **Goal:** Make health and coverage visible; gate releases with deterministic checks. (Master §9.700, §11–§15) fileciteturn2file0

@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0091
+---
+
 # Service Health & Monitoring Runbook
 
 ## 🏥 Health Check Overview

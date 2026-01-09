@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0067
+---
+
 # ADR-0001: Service Decomposition Strategy
 
 ## Status

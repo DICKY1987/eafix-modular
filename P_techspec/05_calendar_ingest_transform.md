@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0051
+---
+
 # Economic Calendar — Ingest & Transform
 
 **Status:** Updated • **Goal:** Robust weekly intake → normalized events → active signals with revisions and proximity. (Master §4.1–§4.14, §9.100) fileciteturn2file0

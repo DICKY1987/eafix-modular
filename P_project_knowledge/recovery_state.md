@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0038
+---
+
 # Recovery & State Management
 
 > State management, transactions, snapshots, and audit trails for system reliability.

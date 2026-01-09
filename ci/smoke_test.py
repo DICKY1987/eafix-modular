@@ -1,3 +1,4 @@
+# DOC_ID: DOC-TEST-0002
 # Simple smoke test: verify /healthz for expected services on known ports.
 import time, sys
 import urllib.request

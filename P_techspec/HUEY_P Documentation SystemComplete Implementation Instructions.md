@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0060
+---
+
 HUEY_P Documentation System: Complete Implementation Instructions
 Target: Transform the current partially-implemented system into a fully functioning, production-ready documentation governance platform.
 📋 Phase 1: Configuration Fixes & Foundation

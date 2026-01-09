@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0050
+---
+
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
@@ -43,7 +47,6 @@ make lint    # Runs flake8 and mypy on services/*/src
 # Create new service with enterprise capabilities (2-line setup)
 cd services/<service-name>
 ./scripts/integrate-enterprise-service.sh
-# Then inherit BaseEnterpriseService and implement 3 abstract methods
 
 # Validate enterprise integration
 ./scripts/validate-enterprise-service.sh
@@ -386,8 +389,6 @@ cd P_GUI && python test_friday_vol_indicator.py
 python P_GUI/test_friday_vol_signal.py
 ```
 
-This enterprise-grade trading system combines production-ready infrastructure with comprehensive domain knowledge to deliver a complete financial trading platform.
-
 ## Quick Reference
 
 ### Key Configuration Files
@@ -482,7 +483,7 @@ The system includes comprehensive signal flow testing from the "Friday Morning U
 ```bash
 # End-to-end signal flow testing
 make signal-flow-test              # Complete signal validation from source to MT4
-make signal-simulation             # Indicator signal simulation and backtesting  
+make signal-simulation             # Indicator signal simulation and backtesting
 make calendar-simulation           # Economic calendar event simulation
 make manual-test-panel            # Interactive testing control panel GUI
 make test-signal-flow-all         # Run all signal flow tests
@@ -510,7 +511,7 @@ cd P_INDICATOR_REENTRY && python reentry_helpers_cli.py --validate-calendar
 cd services/indicator-engine && python -m src.currency_strength.strength_calculator
 
 # Multi-timeframe strength matrix
-python -c "from services.indicator_engine.src.currency_strength.strength_calculator import CurrencyStrengthCalculator; calc = CurrencyStrengthCalculator(); print(Currency strength system loaded)"
+python -c "from services.indicator_engine.src.currency_strength.strength_calculator import CurrencyStrengthCalculator; calc = CurrencyStrengthCalculator(); print('Currency strength system loaded')"
 ```
 
 ### Dashboard Modernization
@@ -533,4 +534,33 @@ All Friday Morning Updates components inherit from BaseEnterpriseService:
 - **Security compliance**: SAST, SCA, vulnerability scanning
 - **Observability**: Grafana dashboards, AlertManager integration
 
-This enhanced system now provides complete trading workflow automation from calendar ingestion through signal generation, testing, and real-time dashboard visualization.
+## DAG-based Verification Framework
+
+### Workstreams and Quality Gates
+The system includes a DAG-based verification framework for complex multi-stage processing:
+
+```bash
+# Validate DAG configuration
+make dag-validate
+
+# Generate DAG execution report
+make dag-report
+
+# List workstreams
+make dag-workstreams
+
+# List verification patterns
+make dag-patterns
+
+# List quality gates
+make dag-gates
+```
+
+**Key DAG Components:**
+- **dag/config/**: Quality gate definitions and DAG configuration
+- **dag/workstreams/**: Workstream definitions with SLA budgets
+- **dag/patterns/**: Verification pattern registry
+- **dag/prompts/**: Prompt templates for verification tasks
+- **dag/EXECUTION_REPORT.md**: DAG execution summary and metrics
+
+This enterprise-grade trading system combines production-ready infrastructure with comprehensive domain knowledge to deliver a complete financial trading platform.

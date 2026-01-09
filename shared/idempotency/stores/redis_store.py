@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0114
 """
 Redis-based idempotency store for EAFIX trading system.
 Provides distributed idempotency storage with expiration and atomic operations.

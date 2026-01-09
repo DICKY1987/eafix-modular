@@ -1,3 +1,7 @@
+---
+doc_id: DOC-DOC-0007
+---
+
 
 # Positioning Ratio Index (COT + Retail Sentiment)
 

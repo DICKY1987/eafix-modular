@@ -1,3 +1,7 @@
+---
+doc_id: DOC-DOC-0014
+---
+
 # EAFIX Trading System Runbooks
 
 This directory contains operational runbooks for the EAFIX trading system. These runbooks provide step-by-step procedures for common operational tasks, incident response, and system maintenance.

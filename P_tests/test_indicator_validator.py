@@ -1,3 +1,4 @@
+# DOC_ID: DOC-TEST-0006
 \
 import os, sys, json, tempfile
 sys.path.insert(0, os.path.abspath("."))

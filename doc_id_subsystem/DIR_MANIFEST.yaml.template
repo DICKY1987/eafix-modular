@@ -1,0 +1,49 @@
+doc_id: DOC-CONFIG-DIR-MANIFEST-297
+meta:
+  dir_id: DIR-SUB-DOC-ID-4da6cfc1
+  version: 1.0.0
+  updated_utc: '2025-12-28T05:50:00Z'
+  schema_version: 1.0.0
+directory:
+  name: SUB_DOC_ID
+  path: SUB_DOC_ID
+  purpose: Document ID management system with auto-scanning and validation
+  status: active
+ownership:
+  owned_files:
+    - migration_v3/schema/migrations/001_add_tier2_tables.sql
+    - migration_v3/extractors/tier2_canonical_hash.py
+    - migration_v3/extractors/tier2_symbols.py
+    - migration_v3/extractors/tier2_edges.py
+    - migration_v3/tools/backfill_tier2_tier3.py
+    - migration_v3/tools/v3_dashboard.py
+    - migration_v3/tools/v3_health_check.py
+    - 6_TESTS/test_tier2_canonical_hash.py
+    - 6_TESTS/test_tier2_symbols.py
+    - 6_TESTS/test_tier2_edges.py
+    - 6_TESTS/test_backfill_runner.py
+    - 6_TESTS/test_v3_dashboard.py
+    - 6_TESTS/test_v3_health_check.py
+  owned_artifacts:
+    - WORK-REGV3-001
+    - A-REGV3-SCHEMA-001
+    - A-REGV3-EXTRACT-002
+    - A-REGV3-EXTRACT-003
+    - A-REGV3-EXTRACT-004
+    - A-REGV3-BACKFILL-005
+    - A-REGV3-AUTOMATE-006
+    - A-REGV3-MONITOR-007
+    - R-REGV3-SCHEMA-001
+    - R-REGV3-HASH-002
+    - R-REGV3-SYMBOLS-003
+    - R-REGV3-EDGES-004
+    - R-REGV3-BACKFILL-005
+    - R-REGV3-AUTO-006
+dependencies:
+  required_directories:
+  - schemas
+  - data
+  required_artifacts: []
+contracts:
+  provides: []
+  requires: []

@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0056
+---
+
 # Monitoring, Testing & Governance
 
 **Status:** Updated • **Goal:** Make reliability measurable and releases predictable.

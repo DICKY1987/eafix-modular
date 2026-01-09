@@ -1,3 +1,7 @@
+---
+doc_id: DOC-DOC-0006
+---
+
 \
 # Tests & Hooks for Reentry Helpers
 

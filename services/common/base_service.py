@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0024
 """
 Enterprise base service providing monitoring, health checks, and feature flags.
 Inherit once, get all enterprise capabilities.

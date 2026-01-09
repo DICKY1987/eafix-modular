@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0042
+---
+
 # Sequencing & Editing
 
 > Components that handle StepKey management, renumbering, and programmatic editing operations.

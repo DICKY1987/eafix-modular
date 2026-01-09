@@ -1,3 +1,7 @@
+---
+doc_id: DOC-DOC-0017
+---
+
 # k6 Performance Tests
 
 Quick-start to run baseline and stress tests with k6.

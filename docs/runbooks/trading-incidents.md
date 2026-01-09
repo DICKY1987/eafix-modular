@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0092
+---
+
 # Trading-Specific Incident Response
 
 ## 🎯 Trading System Critical Path

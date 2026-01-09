@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0062
+---
+
 # HUEY_P Trading System - Unified Complete Specification
 
 **Status:** Production Specification v3.0  

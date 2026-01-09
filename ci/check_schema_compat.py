@@ -1,3 +1,4 @@
+# DOC_ID: DOC-SERVICE-0004
 # Simple backward-compatibility checker for JSON Schemas in contracts/events.
 # Compares current working tree files vs a base git ref (default: origin/main).
 #

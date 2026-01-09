@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0095
+---
+
 # Mini-FMEA (Failure Modes & Effects Analysis)
 
 | Failure | Cause | Detection | Effect | Mitigation | Residual Risk |

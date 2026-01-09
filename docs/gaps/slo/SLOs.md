@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0097
+---
+
 # SLOs & Alerts (EAFIX Trading System)
 
 ## Core Trading SLOs

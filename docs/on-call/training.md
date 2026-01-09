@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0076
+---
+
 # On-Call Training
 
 Purpose: Prepare operators for on-call responsibilities.

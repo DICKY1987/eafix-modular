@@ -1,3 +1,4 @@
+# DOC_ID: DOC-LEGACY-0013
 """
 vocab.py — Canonical tokens for GUI, Matrix, and Hybrid IDs.
 

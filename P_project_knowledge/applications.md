@@ -1,3 +1,7 @@
+---
+doc_id: DOC-LEGACY-0028
+---
+
 # Applications
 
 > User-facing applications: CLI tools, web service, and desktop interface.

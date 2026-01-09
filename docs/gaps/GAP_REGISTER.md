@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0069
+---
+
 # Gap Register
 
 | ID | Area (Logic/Arch/Process) | Title | Evidence | Impact | Root Cause | RPN (S×O×D) | Owner | Fix PR/Plan | Due |

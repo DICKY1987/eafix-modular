@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0077
+---
+
 # EAFIX Trading Desktop Application
 ## Product Design Requirements (PDR)
 

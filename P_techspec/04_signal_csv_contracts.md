@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONTRACT-0028
+---
+
 # CSV Contracts & Atomic Write Policy
 
 **Status:** Updated • **Transport:** CSV is **primary**; Socket optional. (Master §2.1–§2.3) fileciteturn2file0

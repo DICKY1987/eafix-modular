@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# DOC_ID: DOC-SERVICE-0039
 """
 Dashboard Backend Service - Enterprise Edition
 Scalable trading dashboard with BaseEnterpriseService integration

@@ -1,3 +1,7 @@
+---
+doc_id: DOC-CONFIG-0090
+---
+
 # Market Open/Close Procedures
 
 ## 🌅 Pre-Market Preparation (5:00 - 9:30 AM EST)
