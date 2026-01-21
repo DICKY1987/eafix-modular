@@ -59,7 +59,7 @@ class FileWatcher:
         Returns:
             True if should ignore
         """
-        path_str = str(path)
+        path_str = str(path).replace("\\", "/")  # Normalize path separators
         for pattern in self.ignore_patterns:
             if pattern in path_str:
                 return True
