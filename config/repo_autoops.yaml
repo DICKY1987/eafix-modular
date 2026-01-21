@@ -1,0 +1,60 @@
+# doc_id: DOC-AUTOOPS-041
+# RepoAutoOps Configuration
+
+repository_root: "."
+
+watch:
+  enabled: true
+  roots:
+    - "."
+  ignore_patterns:
+    - ".git/"
+    - "__pycache__/"
+    - "*.pyc"
+    - ".tmp"
+    - ".swp"
+    - "~*"
+    - "_evidence/"
+    - "_quarantine/"
+    - ".repo_autoops_queue.db"
+  file_patterns:
+    - "*.py"
+    - "*.md"
+    - "*.yaml"
+    - "*.json"
+  recursive: true
+  processing_delay_seconds: 2
+
+identity:
+  numeric_prefix_enabled: true
+  numeric_prefix_mode: "draft"  # draft | auto-commit
+  doc_id_enabled: true
+  max_assign_per_scan: 50
+
+policy:
+  contracts_dir: "config/module_contracts"
+  quarantine_root: "_quarantine"
+  generated_root: "_generated"
+  evidence_root: "_evidence"
+
+git:
+  enabled: true
+  commit_batching_enabled: true
+  idle_window_seconds: 300
+  max_files_threshold: 20
+  push_retry_max_attempts: 3
+  push_retry_backoff_seconds:
+    - 5
+    - 15
+    - 45
+
+safety:
+  max_actions_per_cycle: 100
+  max_commits_per_hour: 20
+  single_writer: true
+  repo_lock_path: ".repo_lock"
+  dry_run_default: true
+
+audit:
+  enabled: true
+  logs_dir: "_evidence/audit"

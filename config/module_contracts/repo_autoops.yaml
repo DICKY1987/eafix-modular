@@ -1,0 +1,48 @@
+# doc_id: DOC-AUTOOPS-043
+# Example Module Contract for repo_autoops package
+
+module_id: "repo_autoops"
+root: "repo_autoops"
+description: "Core RepoAutoOps package"
+
+canonical_allowlist:
+  - "*.py"
+  - "__init__.py"
+  - "models/*.py"
+
+required_paths:
+  - "__init__.py"
+  - "__main__.py"
+  - "config.py"
+  - "queue.py"
+  - "orchestrator.py"
+
+optional_paths:
+  - "watcher.py"
+  - "git_adapter.py"
+  - "policy_gate.py"
+  - "identity_pipeline.py"
+  - "validators.py"
+  - "loop_prevention.py"
+
+generated_patterns:
+  - "__pycache__/*"
+  - "*.pyc"
+  - "*.pyo"
+
+run_artifact_patterns:
+  - "*.log"
+  - "*.tmp"
+
+forbidden_patterns:
+  - "*.exe"
+  - "*.dll"
+  - "secrets.*"
+
+quarantine_path: "_quarantine/repo_autoops"
+
+validation_rules:
+  - name: "doc_id_present"
+    enabled: true
+  - name: "no_secrets"
+    enabled: true
