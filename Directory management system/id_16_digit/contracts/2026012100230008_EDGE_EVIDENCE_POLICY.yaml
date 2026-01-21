@@ -1,0 +1,364 @@
+# doc_id: 2026012100230008
+# title: Edge Evidence Policy
+# version: 1.0
+# date: 2026-01-21T00:23:14Z
+# status: AUTHORITATIVE
+# purpose: Define minimum evidence requirements for edge auditability
+
+schema_version: "1.0"
+policy_version: "1.0"
+last_updated: "2026-01-21T00:23:14Z"
+doc_id: "2026012100230008"
+
+# =============================================================================
+# EVIDENCE METHODS
+# =============================================================================
+
+evidence_methods:
+  static_parse:
+    description: "Extracted via AST/static analysis"
+    confidence_range: [0.8, 1.0]
+    required_fields:
+      - evidence_locator  # e.g., "source_file.py:42" or "source_file.py:42:15"
+      - observed_utc
+      - tool_version
+    optional_fields:
+      - evidence_snippet  # code fragment showing the relationship
+      - notes
+    validation:
+      - confidence >= 0.8
+      - evidence_locator matches pattern "file:line" OR "file:line:col"
+      - tool_version not empty
+    auto_flags: []
+    status_default: active
+    examples:
+      - evidence_locator: "core/registry.py:42"
+        evidence_snippet: "from validation import validate_identity"
+        rel_type: "IMPORTS"
+        confidence: 0.95
+  
+  dynamic_trace:
+    description: "Observed at runtime via instrumentation"
+    confidence_range: [0.9, 1.0]
+    required_fields:
+      - evidence_locator  # e.g., "trace_id:12345" or "execution:run-001"
+      - observed_utc
+      - tool_version
+    optional_fields:
+      - evidence_snippet  # stack trace fragment
+      - notes
+    validation:
+      - confidence >= 0.9
+      - evidence_locator contains "trace" or "execution" identifier
+    auto_flags:
+      - runtime_observed
+    status_default: active
+    examples:
+      - evidence_locator: "trace_id:ae3f92b1"
+        evidence_snippet: "Call stack: main() -> process() -> validate()"
+        rel_type: "CALLS"
+        confidence: 1.0
+  
+  user_asserted:
+    description: "Manually declared by user"
+    confidence_range: [0.5, 1.0]
+    required_fields:
+      - evidence_locator  # e.g., "manual_review:2026-01-21" or "user:alice"
+      - observed_utc
+      - notes  # must explain why edge exists
+    optional_fields:
+      - evidence_snippet
+    validation:
+      - notes not empty
+      - evidence_locator contains "manual" or "user" prefix
+      - observed_utc within last 90 days (warn if older)
+    auto_flags:
+      - requires_review
+    status_default: active
+    examples:
+      - evidence_locator: "manual_review:2026-01-21"
+        notes: "Architectural dependency declared in design doc"
+        rel_type: "DEPENDS_ON"
+        confidence: 0.8
+  
+  heuristic:
+    description: "Inferred via pattern matching or naming conventions"
+    confidence_range: [0.0, 0.6]
+    required_fields:
+      - evidence_locator  # e.g., "heuristic:naming_pattern" or "heuristic:directory_proximity"
+      - observed_utc
+      - tool_version
+      - notes  # must document heuristic used
+    optional_fields:
+      - evidence_snippet
+    validation:
+      - confidence <= 0.6
+      - notes contains "heuristic:" prefix
+      - evidence_locator starts with "heuristic:"
+    auto_flags:
+      - heuristic
+      - requires_confirmation
+    status_default: quarantined  # auto-quarantine until confirmed
+    examples:
+      - evidence_locator: "heuristic:naming_pattern"
+        notes: "heuristic: Files with similar names assumed related"
+        rel_type: "RELATED_TO"
+        confidence: 0.4
+  
+  config_declared:
+    description: "Specified in build config or manifest"
+    confidence_range: [0.9, 1.0]
+    required_fields:
+      - evidence_locator  # e.g., "package.json:dependencies.lodash" or "pom.xml:line:42"
+      - observed_utc
+    optional_fields:
+      - evidence_snippet  # config fragment
+      - tool_version
+      - notes
+    validation:
+      - confidence >= 0.9
+      - evidence_locator contains config file reference
+    auto_flags:
+      - config_driven
+    status_default: active
+    examples:
+      - evidence_locator: "package.json:dependencies.react"
+        evidence_snippet: '"react": "^18.2.0"'
+        rel_type: "DEPENDS_ON"
+        confidence: 1.0
+
+# =============================================================================
+# VALIDATION RULES
+# =============================================================================
+
+validation_rules:
+  - rule: "ALL edges MUST have evidence_method field"
+    enforcement: reject
+    reason: "Cannot validate edge without knowing how it was discovered"
+    
+  - rule: "Required fields for evidence_method MUST be present"
+    enforcement: reject
+    reason: "Evidence requirements vary by method"
+    
+  - rule: "Confidence MUST be within allowed range for method"
+    enforcement: reject
+    reason: "Confidence scores indicate reliability"
+    
+  - rule: "Heuristic edges MUST be quarantined by default"
+    enforcement: auto_set_status
+    reason: "Heuristic edges require confirmation before use"
+    
+  - rule: "Edges missing required evidence MUST be rejected"
+    enforcement: reject
+    reason: "Cannot trace edge provenance without evidence"
+    
+  - rule: "evidence_locator format MUST match method requirements"
+    enforcement: reject
+    reason: "Locator must be parseable for auditing"
+    
+  - rule: "User-asserted edges older than 90 days SHOULD trigger review"
+    enforcement: warning
+    reason: "Manual assertions may become stale"
+
+# =============================================================================
+# QUARANTINE POLICY
+# =============================================================================
+
+quarantine_policy:
+  auto_quarantine_when:
+    - evidence_method = heuristic
+    - confidence < 0.5 (any method)
+    - evidence_locator is null or empty
+    - observed_utc older than 180 days (warn, don't auto-quarantine)
+    - required fields missing for evidence_method
+  
+  exit_quarantine_requires:
+    - status change to active (manual or automated)
+    - evidence_method changed to non-heuristic OR
+    - confidence raised above threshold OR
+    - user confirmation in notes field (contains "confirmed:")
+  
+  quarantine_review_frequency: quarterly
+  
+  quarantine_reporting:
+    include_in_default_queries: false
+    warn_on_usage: true
+    require_explicit_flag: true  # --include-quarantined
+
+# =============================================================================
+# CONFIDENCE SCORING
+# =============================================================================
+
+confidence_scoring:
+  high:
+    range: [0.8, 1.0]
+    description: "High confidence - suitable for automated decisions"
+    display: "✓ High confidence"
+    color: green
+  
+  medium:
+    range: [0.5, 0.79]
+    description: "Medium confidence - suitable for informational use"
+    display: "⚠ Medium confidence"
+    color: yellow
+  
+  low:
+    range: [0.0, 0.49]
+    description: "Low confidence - requires review"
+    display: "⚠ Low confidence"
+    color: red
+  
+  display_rules:
+    - Edges with confidence < 0.5 shown with warning icon
+    - Quarantined edges excluded from default queries unless explicit flag
+    - Heuristic edges marked prominently in visualizations
+
+# =============================================================================
+# EDGE FLAGS
+# =============================================================================
+
+edge_flags:
+  heuristic:
+    description: "Edge discovered via heuristic method"
+    requires_review: true
+    auto_quarantine: true
+  
+  requires_confirmation:
+    description: "Edge needs manual confirmation"
+    requires_review: true
+    auto_quarantine: false
+  
+  requires_review:
+    description: "Edge needs periodic review"
+    requires_review: true
+    auto_quarantine: false
+  
+  runtime_observed:
+    description: "Edge observed during execution"
+    requires_review: false
+    auto_quarantine: false
+  
+  config_driven:
+    description: "Edge declared in config file"
+    requires_review: false
+    auto_quarantine: false
+  
+  deprecated:
+    description: "Edge is deprecated but still tracked"
+    requires_review: true
+    auto_quarantine: false
+
+# =============================================================================
+# EVIDENCE LOCATOR PATTERNS
+# =============================================================================
+
+evidence_locator_patterns:
+  static_parse:
+    - "^[^:]+:\\d+$"  # file:line
+    - "^[^:]+:\\d+:\\d+$"  # file:line:col
+  
+  dynamic_trace:
+    - "^trace_id:[a-f0-9]+$"
+    - "^execution:[^:]+$"
+    - "^run_id:[^:]+$"
+  
+  user_asserted:
+    - "^manual_review:\\d{4}-\\d{2}-\\d{2}$"
+    - "^user:[a-zA-Z0-9_]+$"
+  
+  heuristic:
+    - "^heuristic:.+$"
+  
+  config_declared:
+    - "^[^:]+\\.(json|yaml|yml|xml|toml):.+$"
+
+# =============================================================================
+# AUDIT REQUIREMENTS
+# =============================================================================
+
+audit:
+  log_edge_creation: true
+  log_evidence_changes: true
+  log_quarantine_changes: true
+  log_confidence_changes: true
+  include_tool_version: true
+  include_actor: true
+  
+  retention:
+    active_edges: indefinite
+    deleted_edges: 90_days
+    quarantined_edges: indefinite
+
+# =============================================================================
+# ENFORCEMENT POLICY
+# =============================================================================
+
+enforcement:
+  validator_mode: strict
+  reject_on_violation: true
+  auto_quarantine_heuristic: true
+  warn_on_low_confidence: true
+  require_evidence_for_new_edges: true
+  
+  exceptions:
+    allow_null_evidence_for_import: false
+    grace_period_days: 0
+
+# =============================================================================
+# MIGRATION SUPPORT
+# =============================================================================
+
+migration:
+  existing_edges_without_evidence:
+    action: warn  # or 'quarantine' or 'reject'
+    message: "Existing edge missing evidence - consider adding via backfill"
+    
+  backfill_recommendations:
+    - "Scan source code for static_parse evidence"
+    - "Add user_asserted evidence with notes for known relationships"
+    - "Quarantine edges with no identifiable evidence source"
+
+# =============================================================================
+# USAGE EXAMPLES
+# =============================================================================
+
+usage_examples:
+  - description: "Create edge with static parse evidence"
+    code: |
+      edge = {
+        "record_kind": "edge",
+        "edge_id": "EDGE-20260121-000001",
+        "source_entity_id": "0199900001260118",
+        "target_entity_id": "0199900002260118",
+        "rel_type": "IMPORTS",
+        "evidence_method": "static_parse",
+        "evidence_locator": "core/registry.py:42",
+        "evidence_snippet": "from validation import validate_identity",
+        "observed_utc": "2026-01-21T00:23:14Z",
+        "tool_version": "scanner-v2.1.0",
+        "confidence": 0.95,
+        "status": "active"
+      }
+  
+  - description: "Create edge with user assertion"
+    code: |
+      edge = {
+        "record_kind": "edge",
+        "edge_id": "EDGE-20260121-000002",
+        "source_entity_id": "MOD-CORE",
+        "target_entity_id": "MOD-VALIDATION",
+        "rel_type": "DEPENDS_ON",
+        "evidence_method": "user_asserted",
+        "evidence_locator": "manual_review:2026-01-21",
+        "notes": "Architectural dependency per design doc section 3.2",
+        "observed_utc": "2026-01-21T00:23:14Z",
+        "confidence": 0.8,
+        "status": "active",
+        "edge_flags": ["requires_review"]
+      }
+  
+  - description: "Query edges by confidence tier"
+    code: |
+      high_confidence_edges = query_edges(min_confidence=0.8)
+      medium_confidence_edges = query_edges(min_confidence=0.5, max_confidence=0.79)
+      low_confidence_edges = query_edges(max_confidence=0.49)
