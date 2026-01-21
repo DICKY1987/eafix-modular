@@ -1,0 +1,59 @@
+# doc_id: DOC-AUTOOPS-080
+[project]
+name = "repo-autoops"
+version = "0.1.0"
+description = "Automated Git operations with file watching and policy enforcement"
+requires-python = ">=3.10"
+dependencies = [
+    "watchfiles>=0.21.0",
+    "pydantic>=2.5.0",
+    "pyyaml>=6.0",
+    "click>=8.1.0",
+    "structlog>=24.1.0",
+    "jsonschema>=4.20.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.23.0",
+    "mypy>=1.8.0",
+    "ruff>=0.1.0",
+    "types-PyYAML",
+]
+
+[project.scripts]
+repo-autoops = "repo_autoops.__main__:cli"
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["repo_autoops*", "plugins*"]
+exclude = ["tests*", "docs*", "scripts*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+select = ["E", "F", "I", "N", "UP", "S", "B", "A", "C4", "DTZ", "T10", "EM", "ISC", "ICN", "PIE", "PT", "RET", "SIM", "ARG", "PTH", "PD", "PGH", "PL", "TRY", "NPY", "RUF"]
+ignore = ["S101", "PLR0913", "TRY003", "EM101"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = false
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["repo_autoops"]
+omit = ["tests/*", "**/__pycache__/*"]
