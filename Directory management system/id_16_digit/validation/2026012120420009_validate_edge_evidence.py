@@ -111,17 +111,16 @@ class EdgeEvidenceValidator:
             if not notes:
                 errors.append("User-asserted edges must have notes explaining the rationale")
         
-        # Rule 6: evidence_locator format validation
+        # Rule 6: evidence_locator format validation (simplified)
         evidence_locator = edge.get("evidence_locator", "")
-        validation_rules = method_spec.get("validation_rules", [])
-        for rule in validation_rules:
-            if isinstance(rule, str) and "evidence_locator matches pattern" in rule:
-                # Extract pattern
-                match = re.search(r'pattern "(.*?)"', rule)
-                if match:
-                    pattern = match.group(1)
-                    if not re.match(pattern, evidence_locator):
-                        errors.append(f"evidence_locator '{evidence_locator}' doesn't match expected pattern: {pattern}")
+        if evidence_method == "static_parse":
+            # Format: "file:line" or "file:line:col"
+            if evidence_locator and not re.match(r'^[^:]+:\d+(:\d+)?$', evidence_locator):
+                errors.append(f"evidence_locator '{evidence_locator}' should be 'file:line' or 'file:line:col' format")
+        elif evidence_method == "heuristic":
+            # Format: "heuristic:rule_name"
+            if evidence_locator and not evidence_locator.startswith("heuristic:"):
+                errors.append(f"evidence_locator '{evidence_locator}' should start with 'heuristic:'")
         
         # Auto-quarantine checks
         status = edge.get("status", "active")

@@ -57,7 +57,10 @@ class DerivationEngine:
     def _dirname(self, path: str) -> str:
         """Extract directory, root returns '.'"""
         dirname = str(Path(path).parent)
-        return "." if dirname in ("", ".") else dirname
+        if dirname in ("", "."):
+            return "."
+        # Normalize to forward slashes
+        return dirname.replace('\\', '/')
     
     def _extension(self, filename: str) -> str:
         """Extract extension without dot, lowercase."""

@@ -1,0 +1,651 @@
+# GIT AUTOMATION SYSTEM - GAP ANALYSIS
+# Generated: 2026-01-21 14:59:05
+
+═══════════════════════════════════════════════════════════════════════════════
+CRITICAL GAPS (System Won't Work Without These)
+═══════════════════════════════════════════════════════════════════════════════
+
+## GAP 1: NO ACTUAL IMPLEMENTATION EXISTS
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SEVERITY: CRITICAL ⛔                                                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ ISSUE:                                                                      │
+│   - Architecture documented in TXT files only                              │
+│   - No Python modules implementing RepoAutoOps components                   │
+│   - Only fragments exist:                                                   │
+│     ✓ services/transport-router/src/watcher.py (CSV-specific, not Git)     │
+│     ✓ SAFE_MERGE_PLAN.md (manual procedures only)                          │
+│   - No GitAdapter, PolicyGate, IdentityPipeline, SafeMerge modules         │
+│                                                                             │
+│ IMPACT:                                                                     │
+│   - 0% automation currently functional                                     │
+│   - Cannot trigger any automated Git operations                            │
+│                                                                             │
+│ REQUIRED:                                                                   │
+│   1. repo_autoops/ package structure                                       │
+│   2. Core modules: watcher.py, git_adapter.py, policy_gate.py             │
+│   3. CLI entry point: repo_autoops/__main__.py                             │
+│   4. Configuration loader: config.py                                       │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+## GAP 2: NO MODULE CONTRACTS DEFINED
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SEVERITY: CRITICAL ⛔                                                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ ISSUE:                                                                      │
+│   - Architecture requires MODULE_CONTRACT.yaml per module                  │
+│   - Zero contracts exist in config/module_contracts/                       │
+│   - No canonical_allowlist defined anywhere                                │
+│   - PolicyGate cannot classify files without contracts                     │
+│                                                                             │
+│ SEARCHED:                                                                   │
+│   - No MODULE_CONTRACT.yaml files found                                    │
+│   - No DIR_CONTRACT.yaml with allowlist sections                           │
+│   - No authoritative tree specification                                    │
+│                                                                             │
+│ IMPACT:                                                                     │
+│   - Every file will be quarantined (no allowlist to match against)         │
+│   - Cannot distinguish canonical from generated                            │
+│   - Cannot enforce "authoritative tree" concept                            │
+│                                                                             │
+│ REQUIRED:                                                                   │
+│   1. Define contracts for each module (core/, services/, docs/, etc.)      │
+│   2. Specify canonical_allowlist per module                                │
+│   3. Define generated_patterns, run_artifact_patterns                      │
+│   4. Identify required vs optional files                                   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+## GAP 3: NO IDENTITY PIPELINE INTEGRATION
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SEVERITY: HIGH 🔴                                                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ ISSUE:                                                                      │
+│   - Architecture assumes IdentityPipeline runs before Git staging          │
+│   - 16-digit prefix assignment system exists but NOT integrated            │
+│   - Doc_ID assignment system referenced but location unclear               │
+│   - No bridge between watcher events → identity → Git                      │
+│                                                                             │
+│ FOUND:                                                                      │
+│   ✓ Directory management system/id_16_digit/ (registry exists)             │
+│   ✓ ID_REGISTRY.json present                                               │
+│   ✗ No watcher integration with prefix assignment                          │
+│   ✗ No automated Doc_ID injection                                          │
+│                                                                             │
+│ IMPACT:                                                                     │
+│   - Files committed without proper identity                                │
+│   - Registry not updated on new files                                      │
+│   - Doc_ID validation will fail (no doc_id assigned)                       │
+│                                                                             │
+│ REQUIRED:                                                                   │
+│   1. Import/refactor prefix assignment logic into repo_autoops            │
+│   2. Create IdentityPipeline orchestrator                                  │
+│   3. Hook: FileEvent → assign_prefix → assign_doc_id → PolicyGate          │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+## GAP 4: VALIDATION HOOKS NOT IMPLEMENTED
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SEVERITY: HIGH 🔴                                                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ ISSUE:                                                                      │
+│   - Architecture defines ValidationHooks plugin system                     │
+│   - Zero validator plugins exist                                           │
+│   - No plugin discovery mechanism                                          │
+│   - No pre-commit hook installed in .git/hooks/                            │
+│                                                                             │
+│ SEARCHED:                                                                   │
+│   ✗ No plugins/validators/ directory                                       │
+│   ✗ No .git/hooks/pre-commit script                                        │
+│   ✗ No plugin_manifest.yaml                                                │
+│   ✓ gitleaks plugin exists (RUNTIME/recovery/.../plugins/gitleaks)         │
+│     but not integrated                                                     │
+│                                                                             │
+│ IMPACT:                                                                     │
+│   - No validation before staging/committing                                │
+│   - Secrets could be committed                                             │
+│   - Invalid files pass through unchecked                                   │
+│                                                                             │
+│ REQUIRED:                                                                   │
+│   1. Create plugins/validators/ directory                                  │
+│   2. Implement: doc_id_validator.py, secret_scanner.py,                    │
+│      path_compliance.py                                                    │
+│   3. Plugin discovery loader                                               │
+│   4. Install pre-commit hook                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+MAJOR LOGIC GAPS (Design Issues)
+═══════════════════════════════════════════════════════════════════════════════
+
+## LOGIC GAP 1: CIRCULAR DEPENDENCY - Watcher Triggers Itself
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SEVERITY: HIGH 🔴                                                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ PROBLEM:                                                                    │
+│   FileWatcher detects change                                               │
+│   → IdentityPipeline renames file (adds prefix)                           │
+│   → FileWatcher detects rename as new "modified" event                     │
+│   → Loop risk: re-process same file infinitely                             │
+│                                                                             │
+│ CURRENT MITIGATION (documented but not implemented):                       │
+│   - "Loop prevention: detect self-induced changes"                         │
+│   - Suppress re-processing for N seconds                                   │
+│                                                                             │
+│ MISSING IMPLEMENTATION:                                                     │
+│   1. How to detect "self-induced" vs "external" change?                   │
+│      Options:                                                              │
+│      a) Track operations in progress (in-memory set)                       │
+│      b) Compare file hash (if hash unchanged after rename, skip)           │
+│      c) Timestamp-based suppression (ignore events < N seconds old)        │
+│                                                                             │
+│   2. What if file genuinely modified during suppression window?            │
+│      - Could miss real changes                                             │
+│      - Need reconcile scan to catch missed events                          │
+│                                                                             │
+│ RECOMMENDED SOLUTION:                                                       │
+│   `python                                                                │
+│   class LoopPrevention:                                                    │
+│       def __init__(self):                                                  │
+│           self.operations_in_progress = {}  # path -> operation_id         │
+│                                                                             │
+│       def mark_operation_start(self, path, op_id):                         │
+│           self.operations_in_progress[path] = {                            │
+│               'op_id': op_id,                                              │
+│               'started': time.time()                                       │
+│           }                                                                │
+│                                                                             │
+│       def is_self_induced(self, path, event_time):                         │
+│           if path not in self.operations_in_progress:                      │
+│               return False                                                 │
+│           op = self.operations_in_progress[path]                           │
+│           # If event within 5s of operation start, it's self-induced       │
+│           return (event_time - op['started']) < 5.0                        │
+│   `                                                                      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+## LOGIC GAP 2: BATCH COMMIT WINDOW - Race Condition
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SEVERITY: MEDIUM 🟡                                                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ PROBLEM:                                                                    │
+│   Architecture says: "Commit after idle window (5 min) OR max files (20)"  │
+│                                                                             │
+│   Scenario:                                                                │
+│   T+0:00 - File A modified → staged                                        │
+│   T+0:10 - File B modified → staged                                        │
+│   T+2:00 - File C modified → staged                                        │
+│   T+4:50 - File D modified → staged                                        │
+│   T+5:00 - Idle timer fires (5 min since last event? Or since first?)      │
+│                                                                             │
+│ AMBIGUITY:                                                                  │
+│   - Is idle window "since first staged file" or "since last event"?        │
+│   - If "since last event", batch never commits if events < 5min apart      │
+│   - If "since first staged file", could commit mid-burst                   │
+│                                                                             │
+│ MISSING LOGIC:                                                              │
+│   - How to handle new file arriving during commit operation?               │
+│   - Lock staging area during commit?                                       │
+│   - Queue new events for next batch?                                       │
+│                                                                             │
+│ RECOMMENDED SOLUTION:                                                       │
+│   - Idle window = "since LAST event"                                       │
+│   - Lock EventQueue during commit (mark as 'processing')                   │
+│   - New events enqueue to separate "next batch"                            │
+│   - Max wait: 15 minutes (safety timeout)                                  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+## LOGIC GAP 3: CONFLICT RESOLUTION - No Automatic Strategy
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SEVERITY: HIGH 🔴                                                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ PROBLEM:                                                                    │
+│   Architecture says: "On conflict → create branch + quarantine"            │
+│   SafeMerge defines "structural merges" for JSON/YAML                      │
+│   But: No logic for when to use automatic resolution vs manual             │
+│                                                                             │
+│ SCENARIOS NOT COVERED:                                                      │
+│                                                                             │
+│   1. Simple append conflicts (both sides add to same list)                 │
+│      → Should auto-resolve: merge both additions                           │
+│      → Architecture: always quarantine                                     │
+│                                                                             │
+│   2. Whitespace-only conflicts                                             │
+│      → Should auto-resolve: normalize whitespace                           │
+│      → Architecture: always quarantine                                     │
+│                                                                             │
+│   3. JSON merge: both sides add different keys                             │
+│      → Should auto-resolve: merge both key sets                            │
+│      → Architecture: structural merge exists but not clear when used       │
+│                                                                             │
+│   4. Conflict in generated file (_generated/)                              │
+│      → Should auto-resolve: regenerate from source                         │
+│      → Architecture: no regeneration trigger                               │
+│                                                                             │
+│ MISSING DECISION TREE:                                                      │
+│   if conflict in file:                                                     │
+│       if file in generated_patterns:                                       │
+│           → regenerate_from_source()                                       │
+│       elif conflict_type == "structural" and file.endswith('.json'):       │
+│           → structural_json_merge()                                        │
+│       elif conflict_complexity < threshold:                                │
+│           → attempt_auto_resolve()                                         │
+│       else:                                                                │
+│           → quarantine()                                                   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+## LOGIC GAP 4: QUARANTINE EXPLOSION - No Expiry/Cleanup
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SEVERITY: MEDIUM 🟡                                                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ PROBLEM:                                                                    │
+│   - Every unknown file → _quarantine/                                      │
+│   - Every validation failure → _quarantine/validation_failed/              │
+│   - Every conflict → _quarantine/conflicts/                                │
+│   - No expiry policy documented                                            │
+│   - No automatic cleanup                                                   │
+│                                                                             │
+│ OUTCOME:                                                                    │
+│   - _quarantine/ grows unbounded                                           │
+│   - Becomes new junk drawer (the problem we're trying to solve!)           │
+│   - Review queue becomes unmanageable                                      │
+│                                                                             │
+│ MISSING POLICIES:                                                           │
+│   1. Retention: how long to keep quarantined files?                        │
+│      Options:                                                              │
+│      - 7 days for validation failures (re-run fixes)                       │
+│      - 30 days for unknowns (time to review)                               │
+│      - 90 days for conflicts (longer review)                               │
+│                                                                             │
+│   2. Promotion: what happens to old quarantined files?                     │
+│      - Auto-delete after retention period?                                 │
+│      - Move to archive?                                                    │
+│      - Notify human for review?                                            │
+│                                                                             │
+│   3. Priority: which quarantined files to review first?                    │
+│      - Security failures (secrets detected) = P0                           │
+│      - Unknown files in critical modules = P1                              │
+│      - Whitespace conflicts = P3                                           │
+│                                                                             │
+│ RECOMMENDED SOLUTION:                                                       │
+│   `yaml                                                                  │
+│   quarantine:                                                              │
+│     retention_days:                                                        │
+│       validation_failed: 7                                                 │
+│       unknown: 30                                                          │
+│       conflicts: 90                                                        │
+│     cleanup_schedule: daily                                                │
+│     notify_before_delete: true                                             │
+│   `                                                                      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+MEDIUM GAPS (Usability/Robustness)
+═══════════════════════════════════════════════════════════════════════════════
+
+## GAP 5: NO ERROR RECOVERY STRATEGY
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SEVERITY: MEDIUM 🟡                                                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ SCENARIOS NOT HANDLED:                                                      │
+│                                                                             │
+│   1. Git push fails (network timeout)                                      │
+│      - Architecture: retry with exponential backoff                        │
+│      - Missing: what if all retries fail?                                  │
+│      - Missing: how to resume after daemon restart?                        │
+│                                                                             │
+│   2. Validation hook crashes                                               │
+│      - Architecture: timeout after 30s                                     │
+│      - Missing: what happens to the commit?                                │
+│      - Missing: retry logic? Skip hook? Fail commit?                       │
+│                                                                             │
+│   3. Registry lock held indefinitely (process crashed while locked)        │
+│      - Architecture: file lock with timeout                                │
+│      - Missing: stale lock detection                                       │
+│      - Missing: force-unlock mechanism                                     │
+│                                                                             │
+│   4. Disk full during commit                                               │
+│      - Missing: detection                                                  │
+│      - Missing: graceful degradation                                       │
+│                                                                             │
+│   5. EventQueue DB corruption                                              │
+│      - Missing: validation                                                 │
+│      - Missing: rebuild from audit logs                                    │
+│                                                                             │
+│ REQUIRED:                                                                   │
+│   - Error classification: transient vs permanent                           │
+│   - Retry policy per error type                                            │
+│   - Dead-letter queue for unrecoverable errors                             │
+│   - Health checks + self-healing                                           │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+## GAP 6: NO ROLLBACK TESTING
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SEVERITY: MEDIUM 🟡                                                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ ISSUE:                                                                      │
+│   - Architecture creates rollback tags: autobot/snapshot/{timestamp}       │
+│   - SAFE_MERGE_PLAN has rollback procedures                                │
+│   - But: No verification that rollback actually works                      │
+│                                                                             │
+│ MISSING:                                                                    │
+│   1. Rollback simulation (dry-run)                                         │
+│   2. Rollback testing in CI                                                │
+│   3. Rollback validation (did we restore correct state?)                   │
+│                                                                             │
+│ RISK:                                                                       │
+│   - Rollback procedure exists but untested                                 │
+│   - Discover it's broken only during disaster recovery                     │
+│                                                                             │
+│ RECOMMENDED:                                                                │
+│   - Add 'repo-autoops rollback --dry-run' command                          │
+│   - Weekly scheduled rollback test (create snapshot, commit change,        │
+│     rollback, verify identical)                                            │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+## GAP 7: MULTI-REPO COORDINATION MISSING
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SEVERITY: MEDIUM 🟡                                                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ ISSUE:                                                                      │
+│   - Architecture designed for single repo                                  │
+│   - eafix-modular has submodules (ccpm, legacy/AI_MANGER_archived)         │
+│   - No coordination between parent repo and submodules                     │
+│                                                                             │
+│ PROBLEMS:                                                                   │
+│   1. File change in submodule                                              │
+│      → Parent watcher doesn't see it                                       │
+│      → Or: sees submodule pointer change, commits that                     │
+│                                                                             │
+│   2. Submodule updated externally                                          │
+│      → Parent repo has outdated pointer                                    │
+│      → Automation doesn't update pointer                                   │
+│                                                                             │
+│   3. Contract enforcement in submodules                                    │
+│      → No MODULE_CONTRACT for submodule contents                           │
+│                                                                             │
+│ REQUIRED:                                                                   │
+│   - Detect submodules (parse .gitmodules)                                  │
+│   - Decision: watch submodules or ignore them?                             │
+│   - If watch: coordinate commits (submodule first, then parent)            │
+│   - If ignore: suppress submodule events                                   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+## GAP 8: NO OBSERVABILITY DASHBOARD
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SEVERITY: LOW 🟢                                                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ ISSUE:                                                                      │
+│   - Architecture logs everything to JSONL                                  │
+│   - But: no way to visualize/query easily                                  │
+│   - User must parse JSONL manually                                         │
+│                                                                             │
+│ MISSING:                                                                    │
+│   1. Real-time status: is watcher running? last commit time?               │
+│   2. Metrics: commits/hour, quarantine rate, validation pass rate          │
+│   3. Alerts: quarantine backlog growing, errors increasing                 │
+│   4. Query UI: "show me all quarantined files from last week"              │
+│                                                                             │
+│ NICE-TO-HAVE:                                                               │
+│   - Web dashboard (Flask/FastAPI)                                          │
+│   - Or: CLI status command with rich formatting                            │
+│   - Or: Export to Prometheus/Grafana                                       │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+CONFIGURATION GAPS
+═══════════════════════════════════════════════════════════════════════════════
+
+## GAP 9: NO CONFIG SCHEMA VALIDATION
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SEVERITY: MEDIUM 🟡                                                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ ISSUE:                                                                      │
+│   - Example configs shown (repo_autoops.yaml, MODULE_CONTRACT.yaml)        │
+│   - But: no JSON Schema or Pydantic models to validate them                │
+│   - Typos in config will cause runtime errors                              │
+│                                                                             │
+│ EXAMPLES OF ISSUES:                                                         │
+│   - User writes 'recursive: yes' instead of 'recursive: true'              │
+│   - User forgets 'canonical_allowlist' key in contract                     │
+│   - User sets invalid path pattern (bad regex)                             │
+│                                                                             │
+│ REQUIRED:                                                                   │
+│   - JSON Schema for each config file                                       │
+│   - Validation on load: config.validate() before use                       │
+│   - Helpful error messages: "Expected List[str] for ignore_patterns"       │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+## GAP 10: NO DEFAULT CONFIGURATION
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SEVERITY: LOW 🟢                                                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ ISSUE:                                                                      │
+│   - Architecture requires extensive YAML configuration                     │
+│   - New user must write all configs from scratch                           │
+│   - High barrier to adoption                                               │
+│                                                                             │
+│ MISSING:                                                                    │
+│   - repo-autoops init command                                              │
+│   - Generates default config files with sensible defaults                  │
+│   - Interactive prompts: "Watch which directories?"                        │
+│                                                                             │
+│ RECOMMENDED:                                                                │
+│   `ash                                                                  │
+│   repo-autoops init                                                        │
+│   → Detected Python project                                                │
+│   → Created config/repo_autoops.yaml                                       │
+│   → Created config/module_contracts/                                       │
+│   → Created plugins/validators/ (with examples)                            │
+│   → Run 'repo-autoops watch' to start                                      │
+│   `                                                                      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+DEPENDENCY GAPS
+═══════════════════════════════════════════════════════════════════════════════
+
+## GAP 11: EXTERNAL TOOL DEPENDENCIES NOT SPECIFIED
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SEVERITY: MEDIUM 🟡                                                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ ISSUE:                                                                      │
+│   Architecture references external tools but no version/install specs:     │
+│                                                                             │
+│   - gitleaks (secret scanner) - Where installed? Which version?            │
+│   - git (obviously) - Minimum version? (need --no-pager, etc.)             │
+│   - Python - 3.10+? 3.11+?                                                 │
+│   - watchfiles vs watchdog - Which library? Both mentioned                 │
+│                                                                             │
+│ MISSING:                                                                    │
+│   - requirements.txt or pyproject.toml                                     │
+│   - Dependency version pins                                                │
+│   - Installation instructions                                              │
+│   - Compatibility matrix                                                   │
+│                                                                             │
+│ REQUIRED:                                                                   │
+│   `	oml                                                                  │
+│   [project]                                                                │
+│   requires-python = ">=3.10"                                               │
+│   dependencies = [                                                         │
+│       "watchfiles>=0.21.0",                                                │
+│       "pydantic>=2.0",                                                     │
+│       "pyyaml>=6.0",                                                       │
+│       "click>=8.0",  # for CLI                                             │
+│   ]                                                                        │
+│   `                                                                      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+TESTING GAPS
+═══════════════════════════════════════════════════════════════════════════════
+
+## GAP 12: NO AUTOMATED TESTS
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SEVERITY: HIGH 🔴                                                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ ISSUE:                                                                      │
+│   - Complex system with many edge cases                                    │
+│   - Zero test coverage                                                     │
+│   - No way to verify correctness before deployment                         │
+│                                                                             │
+│ MISSING TEST CATEGORIES:                                                    │
+│                                                                             │
+│   1. Unit Tests                                                            │
+│      - EventQueue: enqueue/dequeue logic                                   │
+│      - PolicyGate: file classification                                     │
+│      - GitAdapter: precondition checks                                     │
+│      - LoopPrevention: self-induced detection                              │
+│                                                                             │
+│   2. Integration Tests                                                     │
+│      - Full flow: file event → commit → push                               │
+│      - Conflict handling: merge conflict → branch creation                 │
+│      - Quarantine: unknown file → quarantine → promote                     │
+│                                                                             │
+│   3. End-to-End Tests                                                      │
+│      - Spin up test repo, trigger file changes, verify Git operations      │
+│                                                                             │
+│   4. Chaos Tests                                                           │
+│      - Kill process mid-commit (does EventQueue recover?)                  │
+│      - Network fails during push (does retry work?)                        │
+│      - Simulate merge conflicts (does quarantine work?)                    │
+│                                                                             │
+│ REQUIRED:                                                                   │
+│   - tests/ directory with pytest tests                                     │
+│   - CI pipeline running tests on every commit                              │
+│   - Minimum 80% code coverage                                              │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+SECURITY GAPS
+═══════════════════════════════════════════════════════════════════════════════
+
+## GAP 13: SECRETS IN CONFIG FILES
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SEVERITY: HIGH 🔴                                                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ ISSUE:                                                                      │
+│   - Config files likely contain sensitive data:                            │
+│     - GitHub tokens (for API access)                                       │
+│     - Remote Git URLs with embedded credentials                            │
+│     - SSH key paths                                                        │
+│   - No guidance on secure config management                                │
+│                                                                             │
+│ RISK:                                                                       │
+│   - Automation commits config files with secrets                           │
+│   - Secrets leaked to Git history                                          │
+│   - Violates "don't commit secrets" principle                              │
+│                                                                             │
+│ REQUIRED:                                                                   │
+│   1. Separate sensitive config (secrets.yaml) from main config             │
+│   2. Add secrets.yaml to .gitignore                                        │
+│   3. Use environment variables or secret manager                           │
+│   4. Document: "Never put tokens in repo_autoops.yaml"                     │
+│                                                                             │
+│   Example:                                                                 │
+│   `yaml                                                                  │
+│   # repo_autoops.yaml (committed)                                          │
+│   github:                                                                  │
+│     token: \  # from env var                                 │
+│                                                                             │
+│   # secrets.yaml (gitignored)                                              │
+│   GITHUB_TOKEN: ghp_abc123...                                              │
+│   `                                                                      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+SUMMARY: PRIORITY GAPS TO FIX
+═══════════════════════════════════════════════════════════════════════════════
+
+IMMEDIATE BLOCKERS (Must fix to have ANY automation):
+  ⛔ GAP 1: Implement core modules (no code exists)
+  ⛔ GAP 2: Define module contracts (no allowlists)
+  🔴 GAP 3: Integrate identity pipeline
+  🔴 GAP 4: Implement validation hooks
+
+DESIGN FIXES (Logic issues that will cause failures):
+  🔴 LOGIC GAP 1: Prevent watcher loop
+  🟡 LOGIC GAP 2: Clarify batch commit window
+  🔴 LOGIC GAP 3: Define conflict resolution strategy
+  🟡 LOGIC GAP 4: Quarantine cleanup policy
+
+ROBUSTNESS (Prevent operational failures):
+  🟡 GAP 5: Error recovery strategy
+  🟡 GAP 6: Rollback testing
+  🟡 GAP 7: Multi-repo/submodule handling
+  🔴 GAP 12: Add automated tests
+  🔴 GAP 13: Secure config management
+
+USABILITY (Lower priority but important):
+  🟡 GAP 9: Config schema validation
+  🟢 GAP 10: Default config generator
+  🟡 GAP 11: Dependency specification
+  🟢 GAP 8: Observability dashboard
+
+═══════════════════════════════════════════════════════════════════════════════
+RECOMMENDED BUILD ORDER
+═══════════════════════════════════════════════════════════════════════════════
+
+Phase 1: Minimum Viable Product (MVP)
+  1. Create repo_autoops/ package structure
+  2. Implement FileWatcher (copy from transport-router, adapt)
+  3. Implement EventQueue (SQLite-backed)
+  4. Implement PolicyGate with one test contract
+  5. Implement GitAdapter (stage + commit only, no push)
+  6. Add loop prevention logic
+  7. Write unit tests for each component
+  8. Run in dry-run mode, verify logs
+
+Phase 2: Identity Integration
+  1. Refactor 16-digit prefix assignment into repo_autoops
+  2. Create IdentityPipeline orchestrator
+  3. Hook into FileWatcher event processing
+  4. Test: file created → prefix assigned → staged
+
+Phase 3: Validation & Safety
+  1. Implement plugin system
+  2. Create doc_id_validator plugin
+  3. Create secret_scanner plugin (integrate gitleaks)
+  4. Install pre-commit hook
+  5. Add blast radius limiter
+  6. Test: invalid file → validation fails → quarantine
+
+Phase 4: Git Operations
+  1. Add pull/rebase to GitAdapter
+  2. Implement conflict detection
+  3. Add branch creation for conflicts
+  4. Enable push (with retry logic)
+  5. Test: conflict scenario → branch created
+
+Phase 5: Merge Automation
+  1. Implement SafeMerge component
+  2. Define merge policies (.merge-policy.yaml)
+  3. Add structural merge drivers (JSON/YAML)
+  4. Test merge train workflow
+
+Phase 6: Production Hardening
+  1. Add error recovery
+  2. Add rollback testing
+  3. Add observability dashboard
+  4. Document all configs
+  5. Create 'repo-autoops init' command
+  6. Deploy to Task Scheduler
+
+═══════════════════════════════════════════════════════════════════════════════
+END OF GAP ANALYSIS
+═══════════════════════════════════════════════════════════════════════════════

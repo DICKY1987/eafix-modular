@@ -1,0 +1,1190 @@
+# GIT AUTOMATION SYSTEM - COMPLETE ARCHITECTURE MAP
+# Generated: 2026-01-21 13:27:23
+# Repository: eafix-modular
+
+═══════════════════════════════════════════════════════════════════════════════
+PART 1: SYSTEM OVERVIEW & TRIGGER POINTS
+═══════════════════════════════════════════════════════════════════════════════
+
+## TRIGGER/ENTRYPOINT TAXONOMY
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ PRIMARY TRIGGER CATEGORIES                                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│ 1. FILE SYSTEM TRIGGERS (Real-time + Reconciliation)                       │
+│    ├─ Watchdog Events: CREATE, MODIFY, DELETE, MOVE                        │
+│    ├─ Debounce Window: Coalesce rapid changes                              │
+│    ├─ Stability Check: Wait for write completion                           │
+│    └─ Periodic Reconcile: Catch missed events                              │
+│                                                                             │
+│ 2. SCHEDULED TRIGGERS (Task Scheduler / Cron)                              │
+│    ├─ Periodic Reconciliation Scan                                         │
+│    ├─ Registry Integrity Check                                             │
+│    ├─ Batch Commit Window                                                  │
+│    └─ Cleanup & Archive Tasks                                              │
+│                                                                             │
+│ 3. GIT TRIGGERS (Hooks + CI/CD)                                            │
+│    ├─ Pre-commit Hook: Validation gate                                     │
+│    ├─ Pre-push Hook: Final checks                                          │
+│    ├─ Post-merge Hook: Reconcile state                                     │
+│    └─ GitHub Actions: CI validation                                        │
+│                                                                             │
+│ 4. MANUAL TRIGGERS (CLI Commands)                                          │
+│    ├─ Explicit reconcile command                                           │
+│    ├─ Quarantine promotion                                                 │
+│    ├─ Conflict resolution                                                  │
+│    └─ Force sync / rollback                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+PART 2: END-TO-END PROCESS FLOW (Detailed Path Mapping)
+═══════════════════════════════════════════════════════════════════════════════
+
+## FLOW 1: FILE SYSTEM EVENT → GIT COMMIT/PUSH
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│  [FILE EVENT]                                                               │
+│       │                                                                     │
+│       ├─→ FS Event (watchdog/watchfiles)                                   │
+│       │      Location: services/transport-router/src/watcher.py            │
+│       │      Triggers: CREATE, MODIFY, DELETE, MOVE                        │
+│       │      Filters: ignore_patterns [.tmp, .swp, ~, .git/]               │
+│       │                                                                     │
+│       ├─→ Event Queue (Coalesce)                                           │
+│       │      Dedupe per-path events                                        │
+│       │      Window: configurable (default 2s)                             │
+│       │                                                                     │
+│       ├─→ Stability Check                                                  │
+│       │      Wait for: file size stable + min age threshold                │
+│       │      Prevents: committing half-written files                       │
+│       │      References: DOC-GUIDE-FILE-WATCHER-GUIDE-63                   │
+│       │                                                                     │
+│       ├─→ [DECISION GATE 1: Identity Pipeline]                             │
+│       │      ├─ Layer 1: Numeric Prefix Assignment                         │
+│       │      │   - Check: Has 16-digit prefix?                             │
+│       │      │   - Action: Allocate + atomic rename if missing             │
+│       │      │   - Registry: Update ID_REGISTRY.json                       │
+│       │      │   - Lock: Cross-platform file lock                          │
+│       │      │   - Mode: Draft by default (--auto-commit to enable)        │
+│       │      │                                                             │
+│       │      └─ Layer 2: Doc_ID Assignment                                 │
+│       │          - Check: Has DOC-xxxxxx pattern?                          │
+│       │          - Classify: 5-layer category detection                    │
+│       │          - Map: Explicit folder mapping + fallback                 │
+│       │          - Inject: Update frontmatter/header                       │
+│       │          - Blast Radius: --max-assign cap enforced                 │
+│       │                                                                     │
+│       ├─→ [DECISION GATE 2: PolicyGate / Allowlist]                        │
+│       │      Query: MODULE_CONTRACT.yaml (per module)                      │
+│       │      ├─ Match: canonical_allowlist                                 │
+│       │      │   → ROUTE TO: Stage for commit                              │
+│       │      │                                                             │
+│       │      ├─ Match: generated_patterns                                  │
+│       │      │   → ROUTE TO: _generated/ (commit optional)                 │
+│       │      │                                                             │
+│       │      ├─ Match: run_artifact_patterns                               │
+│       │      │   → ROUTE TO: _evidence/run_{timestamp}/                    │
+│       │      │                                                             │
+│       │      └─ No match                                                   │
+│       │          → ROUTE TO: _quarantine/ + emit JSONL record              │
+│       │          → Reason: "not in allowlist", "unexpected location"       │
+│       │                                                                     │
+│       ├─→ [DECISION GATE 3: Validation Hooks]                              │
+│       │      Before Stage:                                                 │
+│       │      ├─ Doc_ID format validator                                    │
+│       │      ├─ Secret scanner (gitleaks)                                  │
+│       │      ├─ Path compliance checker                                    │
+│       │      └─ Module contract validator                                  │
+│       │                                                                     │
+│       │      On Failure:                                                   │
+│       │      └─→ Move to _quarantine/validation_failed/                    │
+│       │          Emit: validation_failure.jsonl                            │
+│       │                                                                     │
+│       ├─→ Stage Allowlisted Files                                          │
+│       │      Command: git add <canonical_paths_only>                       │
+│       │      Never: git add -A (too risky)                                 │
+│       │      Scope: Per-module or per-workstream                           │
+│       │                                                                     │
+│       ├─→ Commit Batching                                                  │
+│       │      Batch Strategy:                                               │
+│       │      ├─ Idle window: N minutes no new changes                      │
+│       │      └─ Max files: >= M staged files                               │
+│       │                                                                     │
+│       │      Commit Message Template:                                      │
+│       │      AUTO: run_id={timestamp} module={name} files={count}          │
+│       │      - {file1}: {reason}                                           │
+│       │      - {file2}: {reason}                                           │
+│       │                                                                     │
+│       ├─→ Pre-Commit Hook Execution                                        │
+│       │      Hook: .git/hooks/pre-commit                                   │
+│       │      ├─ Validate staged files                                      │
+│       │      ├─ Check doc_id presence                                      │
+│       │      ├─ Run linters/formatters (if configured)                     │
+│       │      └─ Block commit on failure                                    │
+│       │                                                                     │
+│       ├─→ Pull + Rebase (SafeMerge)                                        │
+│       │      Command: git pull --rebase origin main                        │
+│       │      Safety:                                                       │
+│       │      ├─ Assert branch: verify expected branch                      │
+│       │      ├─ Clean tree: refuse if dirty                                │
+│       │      └─ Snapshot: create rollback tag                              │
+│       │                                                                     │
+│       │      On Conflict:                                                  │
+│       │      ├─→ Create branch: autobot/conflict/{timestamp}               │
+│       │      ├─→ Commit pre-rebase state                                   │
+│       │      ├─→ Push conflict branch                                      │
+│       │      ├─→ Quarantine conflicted files                               │
+│       │      └─→ Emit: requires_human.jsonl                                │
+│       │                                                                     │
+│       ├─→ Push to Remote                                                   │
+│       │      Command: git push origin {branch}                             │
+│       │      Retry: exponential backoff on network errors                  │
+│       │                                                                     │
+│       └─→ Audit Ledger (JSONL)                                             │
+│            Write: git_operations.jsonl                                     │
+│            Fields:                                                         │
+│            - run_id, timestamp, event_type                                 │
+│            - files_staged, files_committed                                 │
+│            - commit_hash, push_status                                      │
+│            - duration_ms, conflicts_detected                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+PART 3: COMPONENT ARCHITECTURE
+═══════════════════════════════════════════════════════════════════════════════
+
+## COMPONENT 1: FileWatcher (Event Ingestion)
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ FileWatcher                                                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Purpose: Monitor filesystem, emit stable change events                     │
+│                                                                             │
+│ Implementation:                                                             │
+│   - Library: watchfiles (async) / watchdog                                 │
+│   - Location: services/transport-router/src/watcher.py                     │
+│   - Config: watch_targets.yaml                                             │
+│                                                                             │
+│ Entry Points:                                                               │
+│   [1] async watch_directories() → AsyncIterator[FileEvent]                 │
+│       - Watches multiple roots recursively                                 │
+│       - Filters by ignore_patterns                                         │
+│       - Applies processing_delay for stability                             │
+│                                                                             │
+│   [2] Periodic reconcile_scan()                                             │
+│       - Scheduled: every N minutes                                         │
+│       - Compares: FS state vs last-known-state DB                          │
+│       - Emits: missed events                                               │
+│                                                                             │
+│ Config Parameters:                                                          │
+│   - watched_paths: List[Path]                                              │
+│   - ignore_patterns: [.tmp, .swp, ~, .git/, __pycache__]                   │
+│   - processing_delay_seconds: 2                                            │
+│   - watch_recursive: true                                                  │
+│   - watch_file_patterns: [*.py, *.md, *.yaml, *.json]                      │
+│                                                                             │
+│ Output Events:                                                              │
+│   {                                                                         │
+│     event_id: uuid,                                                         │
+│     event_type: created|modified|deleted|moved,                            │
+│     file_path: Path,                                                        │
+│     timestamp: datetime,                                                    │
+│     stable: bool,                                                           │
+│     hash: Optional[str]                                                     │
+│   }                                                                         │
+│                                                                             │
+│ Safety Mechanisms:                                                          │
+│   ✓ Debounce: coalesce rapid changes                                       │
+│   ✓ Stability: wait for size/mtime stable                                  │
+│   ✓ Loop prevention: detect self-induced changes                           │
+│   ✓ Draft mode default: --auto-apply to enable actions                     │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+## COMPONENT 2: EventQueue (Coalescing & Deduplication)
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ EventQueue (SQLite-backed)                                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Purpose: Deduplicate, batch, persist events                                │
+│                                                                             │
+│ Schema:                                                                     │
+│   work_items (                                                              │
+│     work_item_id TEXT PRIMARY KEY,                                          │
+│     path TEXT NOT NULL,                                                     │
+│     event_type TEXT,                                                        │
+│     first_seen INTEGER,                                                     │
+│     last_seen INTEGER,                                                      │
+│     attempts INTEGER DEFAULT 0,                                             │
+│     status TEXT DEFAULT 'pending',  -- pending|processing|done|failed       │
+│     error TEXT                                                              │
+│   )                                                                         │
+│                                                                             │
+│ Entry Points:                                                               │
+│   [1] enqueue(event: FileEvent) → work_item_id                             │
+│       - Dedupes by path                                                    │
+│       - Updates last_seen if duplicate                                     │
+│                                                                             │
+│   [2] dequeue_batch(limit: int) → List[WorkItem]                           │
+│       - Returns oldest pending items                                       │
+│       - Marks as 'processing'                                              │
+│                                                                             │
+│   [3] mark_done(work_item_id)                                              │
+│   [4] mark_failed(work_item_id, error)                                     │
+│                                                                             │
+│ Benefits:                                                                   │
+│   ✓ Survives restarts                                                      │
+│   ✓ Enables retry logic                                                    │
+│   ✓ Prevents duplicate processing                                          │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+## COMPONENT 3: IdentityPipeline (Numeric Prefix + Doc_ID)
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ IdentityPipeline                                                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Purpose: Enforce file naming + identity conventions                        │
+│                                                                             │
+│ Phase 1: Numeric Prefix Assignment                                         │
+│   Entry Point: assign_prefix(path: Path) → Result                          │
+│   Location: Directory management system/id_16_digit/                       │
+│   Process:                                                                  │
+│     1. Check: Does file have 16-digit prefix?                              │
+│     2. If No:                                                               │
+│        a. Acquire registry lock                                            │
+│        b. Allocate next ID from ID_REGISTRY.json                           │
+│        c. Atomic rename: {orig} → {prefix}_{orig}                          │
+│        d. Update registry                                                  │
+│        e. Release lock                                                     │
+│     3. Record audit: identity_audit_log.jsonl                              │
+│                                                                             │
+│   Config:                                                                   │
+│     - mode: draft (default) | auto-commit                                  │
+│     - collision_retry_max: 3                                               │
+│     - prefix_format: CCSSTTTTCCCCCCCC (16 digits)                          │
+│                                                                             │
+│ Phase 2: Doc_ID Assignment                                                 │
+│   Entry Point: assign_doc_id(path: Path) → Result                          │
+│   Location: Directory management system/id_16_digit/ (referenced)          │
+│   Process:                                                                  │
+│     1. Classify: 5-layer category detection                                │
+│        - Explicit folder mapping                                           │
+│        - Fallback path heuristics                                          │
+│     2. Allocate: DOC-{category}-{seq}                                      │
+│     3. Inject: Update frontmatter/header                                   │
+│     4. Validate: Format compliance                                         │
+│                                                                             │
+│   Blast Radius Control:                                                    │
+│     - max_assign_per_scan: 50 (configurable)                               │
+│     - dry_run_default: true                                                │
+│                                                                             │
+│ Safety:                                                                     │
+│   ✓ Cross-platform locking (Windows + Unix)                                │
+│   ✓ Atomic renames only                                                    │
+│   ✓ Rollback on error                                                      │
+│   ✓ Idempotent (skip already-compliant)                                    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+## COMPONENT 4: PolicyGate (Allowlist & Routing)
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ PolicyGate                                                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Purpose: Enforce authoritative file tree contracts                         │
+│                                                                             │
+│ Contract Schema (MODULE_CONTRACT.yaml):                                    │
+│   module_id: str                                                            │
+│   root: Path                                                                │
+│   canonical_allowlist:                                                      │
+│     - path: str | glob pattern                                             │
+│       required: bool                                                        │
+│       file_kind: source|spec|test|doc                                      │
+│   generated_patterns:                                                       │
+│     - "**/__pycache__/*"                                                    │
+│     - "_generated/**"                                                       │
+│   run_artifact_patterns:                                                    │
+│     - "_evidence/**"                                                        │
+│     - "runs/**"                                                             │
+│   forbidden_patterns:                                                       │
+│     - "*.tmp"                                                               │
+│     - ".DS_Store"                                                           │
+│   quarantine_path: "_quarantine/"                                          │
+│                                                                             │
+│ Entry Point:                                                                │
+│   [1] classify_file(path: Path) → Classification                           │
+│       Returns:                                                              │
+│         - canonical (commit)                                               │
+│         - generated (optional commit)                                      │
+│         - run_artifact (never commit)                                      │
+│         - quarantine (unknown/forbidden)                                   │
+│                                                                             │
+│   [2] enforce_contract(module_id) → ComplianceReport                       │
+│       - Scans module root                                                  │
+│       - Compares to contract                                               │
+│       - Moves violations to quarantine                                     │
+│       - Emits report: module_compliance.json                               │
+│                                                                             │
+│ Quarantine Record (JSONL):                                                 │
+│   {                                                                         │
+│     timestamp: datetime,                                                    │
+│     file_path: str,                                                         │
+│     reason: "not_in_allowlist" | "forbidden_pattern" | "validation_fail",  │
+│     suggested_action: "add_to_contract" | "delete" | "relocate",          │
+│     quarantine_path: str                                                    │
+│   }                                                                         │
+│                                                                             │
+│ Promotion Workflow:                                                         │
+│   [3] promote_from_quarantine(path: Path, decision: Decision)              │
+│       - Decision: accept | reject | relocate                               │
+│       - If accept: patch MODULE_CONTRACT.yaml                              │
+│       - Move file back to canonical location                               │
+│       - Emit: contract_patch.yaml                                          │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+## COMPONENT 5: ValidationHooks (Pre-Stage/Pre-Commit Gates)
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ ValidationHooks                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Purpose: Enforce quality gates before Git operations                       │
+│                                                                             │
+│ Hook Points (Plugin Architecture):                                         │
+│   - before_stage                                                            │
+│   - before_commit                                                           │
+│   - before_push                                                             │
+│   - before_pull                                                             │
+│   - on_conflict                                                             │
+│   - after_merge                                                             │
+│                                                                             │
+│ Built-in Validators:                                                        │
+│                                                                             │
+│   [1] Doc_ID Validator                                                     │
+│       Entry: validate_doc_id(file: Path) → Result                          │
+│       Checks:                                                               │
+│         - Has doc_id in frontmatter/header                                 │
+│         - Format: DOC-[A-Z0-9]+-[0-9]+                                     │
+│         - Unique in registry                                               │
+│       On Fail: Block commit, emit suggestion                               │
+│                                                                             │
+│   [2] Secret Scanner (gitleaks)                                            │
+│       Entry: scan_secrets(file: Path) → List[Secret]                       │
+│       Location: RUNTIME/recovery/.../plugins/gitleaks                      │
+│       Checks:                                                               │
+│         - API keys, tokens, passwords                                      │
+│         - Private keys, certificates                                       │
+│       On Detect: Block commit, quarantine file                             │
+│                                                                             │
+│   [3] Path Compliance Checker                                              │
+│       Entry: validate_path(file: Path) → Result                            │
+│       Checks:                                                               │
+│         - Naming conventions (snake_case, kebab-case)                      │
+│         - No spaces, special chars                                         │
+│         - Depth limits                                                     │
+│       On Fail: Block or warn                                               │
+│                                                                             │
+│   [4] Module Contract Validator                                            │
+│       Entry: validate_contract(file: Path) → Result                        │
+│       Checks:                                                               │
+│         - File in canonical_allowlist                                      │
+│         - Required dependencies present                                    │
+│       On Fail: Quarantine                                                  │
+│                                                                             │
+│ Hook Execution:                                                             │
+│   - Run sequentially                                                        │
+│   - Fail-fast: first failure blocks                                        │
+│   - Timeout per hook: 30s                                                  │
+│   - Audit: log all hook results                                            │
+│                                                                             │
+│ Plugin Discovery:                                                           │
+│   - plugins/ directory                                                      │
+│   - plugin_manifest.yaml                                                    │
+│   - Entry point: validate(context) → Result                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+## COMPONENT 6: GitAdapter (Safe Git Operations)
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ GitAdapter                                                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Purpose: Wrap Git operations with safety preconditions                     │
+│                                                                             │
+│ Entry Points:                                                               │
+│                                                                             │
+│   [1] stage_files(paths: List[Path]) → Result                              │
+│       Preconditions:                                                        │
+│         - Assert expected branch                                           │
+│         - Check working tree clean                                         │
+│         - Validate paths in allowlist                                      │
+│       Command: git add <paths>                                             │
+│       Never: git add -A                                                    │
+│                                                                             │
+│   [2] commit(message: str) → CommitHash                                    │
+│       Preconditions:                                                        │
+│         - Stage not empty                                                  │
+│         - Pre-commit hooks pass                                            │
+│         - No unexpected staged files                                       │
+│       Command: git commit -m "{message}"                                   │
+│       Message template enforced                                            │
+│                                                                             │
+│   [3] safe_pull_rebase() → Result                                          │
+│       Preconditions:                                                        │
+│         - Working tree clean                                               │
+│         - On expected branch                                               │
+│         - Create rollback tag                                              │
+│       Command: git pull --rebase origin {branch}                           │
+│       On Conflict:                                                          │
+│         → create_conflict_branch()                                         │
+│         → quarantine_conflicted_files()                                    │
+│                                                                             │
+│   [4] push(branch: str) → Result                                           │
+│       Preconditions:                                                        │
+│         - Pre-push hooks pass                                              │
+│         - Branch exists on remote                                          │
+│       Command: git push origin {branch}                                    │
+│       Retry: 3x with exponential backoff                                   │
+│                                                                             │
+│   [5] create_conflict_branch(prefix="autobot/conflict") → BranchName       │
+│       - Branch name: {prefix}/{timestamp}                                  │
+│       - Commit pre-rebase state                                            │
+│       - Push to origin                                                     │
+│       - Emit: conflict_notification.json                                   │
+│                                                                             │
+│   [6] assert_branch(expected: str) → None                                  │
+│       - Command: git rev-parse --abbrev-ref HEAD                           │
+│       - Raises: BranchMismatchError if wrong                               │
+│                                                                             │
+│   [7] is_tree_clean() → bool                                               │
+│       - Command: git status --porcelain                                    │
+│       - Returns: True if empty output                                      │
+│                                                                             │
+│ Safety Mechanisms:                                                          │
+│   ✓ Explicit concurrency model: single writer                              │
+│   ✓ Repo lock: only one GitAdapter instance                                │
+│   ✓ Never delete .git/index.lock (fatal error instead)                     │
+│   ✓ Branch assertions before dangerous commands                            │
+│   ✓ Clean tree preconditions                                               │
+│   ✓ Snapshot tags for rollback                                             │
+│                                                                             │
+│ References:                                                                 │
+│   - Git failure modes analysis (prevents P1-P5 issues)                     │
+│   - Deterministic git guide                                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+## COMPONENT 7: SafeMerge (Deterministic Merge Automation)
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ SafeMerge (Merge Train / CI Integration)                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Purpose: Automate merges to main with deterministic conflict resolution    │
+│                                                                             │
+│ Policy Files:                                                               │
+│   - .merge-policy.yaml                                                      │
+│   - .merge-automation.yaml                                                  │
+│   - .gitattributes (merge drivers)                                         │
+│                                                                             │
+│ Entry Points:                                                               │
+│                                                                             │
+│   [1] merge_to_main(branch: str) → MergeResult                             │
+│       Process:                                                              │
+│         1. Preflight: predict conflicts                                    │
+│         2. Validate: policy checks pass                                    │
+│         3. Execute: structural merge (JSON/YAML drivers)                   │
+│         4. Verify: baseline validation                                     │
+│         5. Audit: record in merge-audit.jsonl                              │
+│                                                                             │
+│   [2] preflight_check(source_branch, target_branch) → ConflictPrediction   │
+│       - Dry-run merge                                                      │
+│       - Detect potential conflicts                                         │
+│       - Estimate resolution complexity                                     │
+│                                                                             │
+│   [3] structural_merge(file: Path, strategy: str) → Result                 │
+│       Strategies:                                                           │
+│         - json: merge by key, conflict on duplicate keys                   │
+│         - yaml: merge by path, preserve comments                           │
+│         - csv: append rows, conflict on schema change                      │
+│                                                                             │
+│   [4] quarantine_branch(branch: str, reason: str) → None                   │
+│       - Move to: needs-human/{branch}                                      │
+│       - Tag with: reason, complexity score                                 │
+│       - Notify: via GitHub issue / Slack                                   │
+│                                                                             │
+│   [5] rollback_merge(commit_hash: str) → None                              │
+│       - Revert: git revert {commit}                                        │
+│       - Or: git reset --hard {pre_merge_tag}                               │
+│                                                                             │
+│ Quarantine Rules (from policy):                                            │
+│   - Conflict complexity > threshold                                        │
+│   - Security-sensitive paths touched                                       │
+│   - No deterministic resolution rule                                       │
+│   - Manual changes in generated files                                      │
+│                                                                             │
+│ Learning Layer:                                                             │
+│   - git rerere: recorded resolution reuse                                  │
+│   - merge-audit.jsonl: history of merge decisions                          │
+│   - policy evolution: promote successful patterns                          │
+│                                                                             │
+│ CI Integration:                                                             │
+│   - GitHub Actions: merge-queue workflow                                   │
+│   - Trigger: PR approved + checks pass                                     │
+│   - Batching: merge multiple PRs in sequence                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+## COMPONENT 8: AuditLedger (Observability)
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ AuditLedger (JSONL Append-Only Log)                                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Purpose: Full audit trail of all decisions and actions                     │
+│                                                                             │
+│ Log Files:                                                                  │
+│   - git_operations.jsonl         (Git commands executed)                   │
+│   - identity_audit_log.jsonl     (Prefix/Doc_ID assignments)              │
+│   - policy_decisions.jsonl       (Allowlist/quarantine routing)           │
+│   - validation_results.jsonl     (Hook outcomes)                           │
+│   - merge_audit.jsonl            (Merge operations)                        │
+│   - quarantine_log.jsonl         (Files quarantined + reason)             │
+│                                                                             │
+│ Schema (git_operations.jsonl):                                             │
+│   {                                                                         │
+│     run_id: str,                                                            │
+│     timestamp_utc: str,                                                     │
+│     operation: "stage"|"commit"|"push"|"pull"|"merge",                     │
+│     branch: str,                                                            │
+│     files_affected: List[str],                                             │
+│     commit_hash: Optional[str],                                            │
+│     success: bool,                                                          │
+│     error: Optional[str],                                                   │
+│     duration_ms: int,                                                       │
+│     metadata: Dict                                                          │
+│   }                                                                         │
+│                                                                             │
+│ Entry Points:                                                               │
+│   [1] log_operation(operation: GitOp) → None                               │
+│   [2] log_decision(decision: PolicyDecision) → None                        │
+│   [3] query_logs(filter: Dict) → List[LogEntry]                            │
+│                                                                             │
+│ Benefits:                                                                   │
+│   ✓ Full traceability: who/what/when/why                                   │
+│   ✓ Debugging: reconstruct state at any point                              │
+│   ✓ Compliance: evidence of automated decisions                            │
+│   ✓ Metrics: success rates, error patterns                                 │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+PART 4: EXECUTION PATHS (All Trigger Scenarios)
+═══════════════════════════════════════════════════════════════════════════════
+
+## PATH 1: Real-Time File Change → Auto-Commit
+
+TRIGGER: User saves file in watched directory
+
+START → FileWatcher.watch_directories()
+     → Event: {type: modified, path: "core/utils.py"}
+     → EventQueue.enqueue(event)
+     → [Debounce: wait 2s for more changes]
+     → [Stability: verify size stable]
+     → IdentityPipeline.process(path)
+        → assign_prefix() [if needed]
+        → assign_doc_id() [if needed]
+     → PolicyGate.classify_file(path)
+        → Result: canonical (allowed)
+     → ValidationHooks.run("before_stage", path)
+        → doc_id_validator: PASS
+        → secret_scanner: PASS
+     → [Batch: wait for idle window or max files]
+     → GitAdapter.stage_files([path])
+     → GitAdapter.commit("AUTO: update core/utils.py")
+     → GitAdapter.safe_pull_rebase()
+     → GitAdapter.push("main")
+     → AuditLedger.log_operation(...)
+END
+
+## PATH 2: Scheduled Reconciliation Scan
+
+TRIGGER: Windows Task Scheduler (every 15 minutes)
+
+START → FileWatcher.reconcile_scan()
+     → Compare: current FS state vs state.db
+     → Emit: missed events
+     → [Process as PATH 1]
+END
+
+## PATH 3: Quarantine & Promotion
+
+TRIGGER: Unknown file detected
+
+START → FileWatcher detects new file
+     → IdentityPipeline.process(path)
+     → PolicyGate.classify_file(path)
+        → Result: quarantine (not in allowlist)
+     → Move: file → _quarantine/YYYYMMDD/{filename}
+     → Emit: quarantine_log.jsonl
+        {
+          reason: "not_in_allowlist",
+          suggested_action: "add_to_contract"
+        }
+END
+
+MANUAL PROMOTION:
+START → User: repo-autoops promote _quarantine/.../file.md
+     → PolicyGate.promote_from_quarantine(path, decision="accept")
+     → Patch: MODULE_CONTRACT.yaml (add to allowlist)
+     → Move: file → canonical location
+     → GitAdapter.stage_files([file, contract])
+     → GitAdapter.commit("chore: promote file from quarantine")
+     → GitAdapter.push()
+END
+
+## PATH 4: Pre-Commit Hook Validation
+
+TRIGGER: git commit (manual or automated)
+
+START → Git pre-commit hook: .git/hooks/pre-commit
+     → ValidationHooks.run("before_commit", staged_files)
+        → For each file:
+           → doc_id_validator.validate(file)
+           → secret_scanner.scan(file)
+           → path_compliance.validate(file)
+        → If ANY fail:
+           → Print: validation errors
+           → Exit: 1 (block commit)
+     → If ALL pass:
+        → Exit: 0 (allow commit)
+END
+
+## PATH 5: Conflict Detection & Resolution
+
+TRIGGER: git pull --rebase detects conflict
+
+START → GitAdapter.safe_pull_rebase()
+     → git pull --rebase origin main
+     → Exit code: 1 (conflict)
+     → GitAdapter.detect_conflict()
+        → Parse: git status --porcelain
+        → Extract: conflicted files
+     → GitAdapter.create_conflict_branch("autobot/conflict/20260121_1922")
+     → GitAdapter.commit("conflict: pre-rebase state")
+     → GitAdapter.push("autobot/conflict/20260121_1922")
+     → PolicyGate.quarantine_files(conflicted_files)
+     → Emit: requires_human.jsonl
+        {
+          branch: "autobot/conflict/...",
+          files: [...],
+          resolution_url: "https://github.com/.../compare/..."
+        }
+END
+
+## PATH 6: Merge Train (PR → Main)
+
+TRIGGER: PR approved + CI checks pass
+
+START → GitHub Actions: .github/workflows/merge-train.yml
+     → SafeMerge.preflight_check(pr_branch, "main")
+        → Predict conflicts
+        → Estimate complexity score
+     → If complexity > threshold:
+        → SafeMerge.quarantine_branch(pr_branch, "complexity_high")
+        → Create issue: "Manual merge required"
+        → EXIT
+     → SafeMerge.merge_to_main(pr_branch)
+        → git checkout main
+        → git pull origin main
+        → git merge pr_branch --no-ff
+        → [Use structural merge drivers for JSON/YAML]
+     → SafeMerge.validate_baseline()
+        → Run: test suite
+        → Run: linters
+     → If validation fails:
+        → SafeMerge.rollback_merge()
+        → EXIT
+     → git push origin main
+     → SafeMerge.audit_merge(...)
+END
+
+═══════════════════════════════════════════════════════════════════════════════
+PART 5: CONFIGURATION FILES
+═══════════════════════════════════════════════════════════════════════════════
+
+## Config File 1: repo_autoops.yaml
+
+location: {repo_root}/config/repo_autoops.yaml
+
+`yaml
+# Repository Git Automation Configuration
+
+repository:
+  root: .
+  remote: origin
+  default_branch: main
+
+watch:
+  enabled: true
+  roots:
+    - .
+  ignore_patterns:
+    - ".git/"
+    - "__pycache__/"
+    - "*.pyc"
+    - ".tmp"
+    - ".swp"
+    - "~*"
+    - "_evidence/"
+    - "_quarantine/"
+  file_patterns:
+    - "*.py"
+    - "*.md"
+    - "*.yaml"
+    - "*.json"
+  recursive: true
+  processing_delay_seconds: 2
+
+identity_pipeline:
+  numeric_prefix:
+    enabled: true
+    mode: draft  # draft | auto-commit
+    collision_retry_max: 3
+    registry_path: Directory management system/id_16_digit/registry/ID_REGISTRY.json
+  doc_id:
+    enabled: true
+    max_assign_per_scan: 50
+    dry_run_default: true
+
+policy:
+  contracts_dir: config/module_contracts/
+  quarantine_root: _quarantine/
+  generated_root: _generated/
+  evidence_root: _evidence/
+
+git:
+  commit_batching:
+    enabled: true
+    idle_window_seconds: 300  # 5 minutes
+    max_files_threshold: 20
+  commit_message_template: |
+    AUTO: run_id={run_id} module={module} files={file_count}
+    
+    {file_list}
+  push_retry:
+    max_attempts: 3
+    backoff_seconds: [5, 15, 45]
+
+validation:
+  hooks_enabled: true
+  plugins_dir: plugins/validators/
+  timeout_seconds: 30
+
+safety:
+  blast_radius:
+    max_actions_per_cycle: 100
+    max_commits_per_hour: 20
+  concurrency:
+    single_writer: true
+    repo_lock_path: .repo_lock
+  snapshots:
+    enabled: true
+    tag_prefix: "autobot/snapshot"
+
+audit:
+  enabled: true
+  logs_dir: _evidence/audit/
+  log_files:
+    - git_operations.jsonl
+    - identity_audit_log.jsonl
+    - policy_decisions.jsonl
+    - validation_results.jsonl
+    - quarantine_log.jsonl
+
+scheduling:
+  reconcile_scan_minutes: 15
+  registry_check_minutes: 60
+  cleanup_days: 30
+`
+
+## Config File 2: MODULE_CONTRACT.yaml (example)
+
+location: config/module_contracts/core_module.yaml
+
+`yaml
+# Module Contract: Core Module
+
+module_id: core
+root: core/
+description: Core functionality and utilities
+
+canonical_allowlist:
+  # Required files
+  - path: __init__.py
+    required: true
+    file_kind: source
+  - path: config.py
+    required: true
+    file_kind: source
+  - path: state.py
+    required: true
+    file_kind: source
+  
+  # Optional files
+  - path: utils/*.py
+    required: false
+    file_kind: source
+  - path: tests/test_*.py
+    required: false
+    file_kind: test
+
+generated_patterns:
+  - "**/__pycache__/*"
+  - "**/*.pyc"
+  - ".pytest_cache/*"
+
+run_artifact_patterns:
+  - "runs/**"
+  - "_evidence/**"
+
+forbidden_patterns:
+  - "*.tmp"
+  - "*.swp"
+  - ".DS_Store"
+  - "desktop.ini"
+
+quarantine_path: _quarantine/core/
+
+validation_rules:
+  - name: require_doc_id
+    enabled: true
+  - name: require_tests
+    enabled: true
+    threshold: 80  # coverage %
+`
+
+## Config File 3: .merge-policy.yaml
+
+location: {repo_root}/.merge-policy.yaml
+
+`yaml
+# Deterministic Merge Policy
+
+merge_strategies:
+  json:
+    driver: structural_json_merge
+    rules:
+      - merge_by: key
+      - conflict_on: duplicate_key
+      - preserve: order
+  
+  yaml:
+    driver: structural_yaml_merge
+    rules:
+      - merge_by: path
+      - preserve: comments
+      - conflict_on: same_path_different_value
+  
+  markdown:
+    driver: text_merge
+    rules:
+      - strategy: three_way
+      - conflict_markers: true
+
+quarantine_rules:
+  max_complexity_score: 100
+  security_paths:
+    - ".github/workflows/*"
+    - "config/secrets.yaml"
+  manual_review_paths:
+    - "contracts/**"
+    - "schemas/**"
+
+rollback:
+  snapshot_tag_prefix: "pre-merge"
+  retain_snapshots: 10
+
+audit:
+  log_file: _evidence/audit/merge_audit.jsonl
+  fields:
+    - timestamp
+    - source_branch
+    - target_branch
+    - strategy_used
+    - conflicts_count
+    - resolution_method
+    - success
+`
+
+═══════════════════════════════════════════════════════════════════════════════
+PART 6: CLI COMMANDS (Manual Triggers)
+═══════════════════════════════════════════════════════════════════════════════
+
+## Command Suite: repo-autoops CLI
+
+`
+repo-autoops watch
+  Start file watcher (daemon mode)
+  Options:
+    --dry-run: Log actions without executing
+    --verbose: Detailed logging
+
+repo-autoops reconcile
+  Run one-time reconciliation scan
+  Options:
+    --full: Scan entire repo, not just changes
+    --fix: Apply corrections automatically
+
+repo-autoops validate
+  Validate repo state against contracts
+  Options:
+    --module <name>: Validate specific module
+    --report <path>: Output compliance report
+
+repo-autoops promote <quarantine_path>
+  Promote file from quarantine
+  Options:
+    --decision <accept|reject|relocate>
+    --reason <string>
+
+repo-autoops quarantine-review
+  Interactive review of quarantined files
+  Shows:
+    - File path
+    - Quarantine reason
+    - Suggested action
+  Actions:
+    - Accept (add to contract)
+    - Reject (delete)
+    - Relocate (move to different module)
+
+repo-autoops commit
+  Manual commit with validation
+  Options:
+    --message <msg>
+    --batch: Include all staged files
+    --force: Skip validation hooks
+
+repo-autoops rollback <commit|tag>
+  Rollback to previous state
+  Options:
+    --dry-run: Show what would be rolled back
+    --create-branch: Create branch from rollback point
+
+repo-autoops audit
+  Query audit logs
+  Options:
+    --since <datetime>
+    --operation <stage|commit|push>
+    --format <json|table>
+
+repo-autoops merge <branch>
+  Safe merge with policy enforcement
+  Options:
+    --preflight: Show conflict prediction
+    --strategy <auto|manual>
+`
+
+═══════════════════════════════════════════════════════════════════════════════
+PART 7: DEPLOYMENT & SCHEDULING
+═══════════════════════════════════════════════════════════════════════════════
+
+## Windows Deployment (Task Scheduler)
+
+Task 1: File Watcher (Always Running)
+`xml
+<Task>
+  <Triggers>
+    <BootTrigger />
+  </Triggers>
+  <Actions>
+    <Exec>
+      <Command>python</Command>
+      <Arguments>-m repo_autoops watch</Arguments>
+      <WorkingDirectory>C:\repos\eafix-modular</WorkingDirectory>
+    </Exec>
+  </Actions>
+  <Settings>
+    <RestartOnFailure>
+      <Interval>PT5M</Interval>
+      <Count>3</Count>
+    </RestartOnFailure>
+  </Settings>
+</Task>
+`
+
+Task 2: Reconciliation Scan (Every 15 minutes)
+`xml
+<Task>
+  <Triggers>
+    <CalendarTrigger>
+      <Interval>PT15M</Interval>
+    </CalendarTrigger>
+  </Triggers>
+  <Actions>
+    <Exec>
+      <Command>python</Command>
+      <Arguments>-m repo_autoops reconcile</Arguments>
+    </Exec>
+  </Actions>
+</Task>
+`
+
+Task 3: Registry Check (Hourly)
+`xml
+<Task>
+  <Triggers>
+    <CalendarTrigger>
+      <Interval>PT1H</Interval>
+    </CalendarTrigger>
+  </Triggers>
+  <Actions>
+    <Exec>
+      <Command>python</Command>
+      <Arguments>-m repo_autoops validate --full</Arguments>
+    </Exec>
+  </Actions>
+</Task>
+`
+
+═══════════════════════════════════════════════════════════════════════════════
+PART 8: SAFETY MECHANISMS (Preventing Disasters)
+═══════════════════════════════════════════════════════════════════════════════
+
+## Safety Layer 1: Concurrency Control
+
+ISSUE: Multiple processes modifying Git index simultaneously
+SOLUTION: Single Writer Pattern
+
+`python
+class RepoLock:
+    def __init__(self, lock_path: Path):
+        self.lock_path = lock_path
+        self.lock_file = None
+    
+    def acquire(self, timeout=30):
+        start = time.time()
+        while time.time() - start < timeout:
+            try:
+                # Atomic lock file creation
+                self.lock_file = open(self.lock_path, 'x')
+                return True
+            except FileExistsError:
+                time.sleep(0.1)
+        raise LockTimeoutError("Could not acquire repo lock")
+    
+    def release(self):
+        if self.lock_file:
+            self.lock_file.close()
+            os.remove(self.lock_path)
+`
+
+## Safety Layer 2: Precondition Assertions
+
+ISSUE: Git commands fail when working tree dirty
+SOLUTION: Explicit checks before operations
+
+`python
+def safe_operation(func):
+    def wrapper(self, *args, **kwargs):
+        # Assert expected branch
+        current = self.get_current_branch()
+        if current != self.expected_branch:
+            raise BranchMismatchError(f"Expected {self.expected_branch}, on {current}")
+        
+        # Assert clean tree (if required)
+        if self.requires_clean_tree(func):
+            if not self.is_tree_clean():
+                raise DirtyTreeError("Working tree has uncommitted changes")
+        
+        # Create snapshot tag
+        snapshot_tag = f"autobot/pre-{func.__name__}/{int(time.time())}"
+        self.create_tag(snapshot_tag)
+        
+        try:
+            return func(self, *args, **kwargs)
+        except Exception as e:
+            logger.error(f"Operation failed, rollback tag: {snapshot_tag}")
+            raise
+    return wrapper
+`
+
+## Safety Layer 3: Blast Radius Control
+
+ISSUE: Runaway automation commits hundreds of files
+SOLUTION: Per-cycle and per-hour limits
+
+`python
+class BlastRadiusLimiter:
+    def __init__(self, config):
+        self.max_actions_per_cycle = config.max_actions_per_cycle
+        self.max_commits_per_hour = config.max_commits_per_hour
+        self.commits_this_hour = []
+    
+    def check_commit_allowed(self) -> bool:
+        now = datetime.now()
+        # Prune old commits
+        self.commits_this_hour = [
+            t for t in self.commits_this_hour 
+            if (now - t).seconds < 3600
+        ]
+        
+        if len(self.commits_this_hour) >= self.max_commits_per_hour:
+            logger.warning("Max commits per hour reached, throttling")
+            return False
+        
+        return True
+    
+    def record_commit(self):
+        self.commits_this_hour.append(datetime.now())
+`
+
+## Safety Layer 4: Dry-Run Mode
+
+ISSUE: Don't trust automation until tested
+SOLUTION: Log-only mode, requires explicit enable
+
+`python
+class GitAdapter:
+    def __init__(self, dry_run=True):
+        self.dry_run = dry_run
+    
+    def _execute(self, cmd: List[str]) -> Result:
+        if self.dry_run:
+            logger.info(f"DRY-RUN: Would execute: {' '.join(cmd)}")
+            return Result(success=True, output="[dry-run]")
+        else:
+            return subprocess.run(cmd, capture_output=True)
+`
+
+## Safety Layer 5: Quarantine (Not Deletion)
+
+ISSUE: Automation deletes important files
+SOLUTION: Move to quarantine, never delete
+
+`python
+def quarantine_file(path: Path, reason: str):
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    quarantine_path = Path("_quarantine") / timestamp / path.name
+    quarantine_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    # Move, don't delete
+    shutil.move(str(path), str(quarantine_path))
+    
+    # Record reason
+    metadata = {
+        "original_path": str(path),
+        "reason": reason,
+        "timestamp": datetime.now().isoformat(),
+        "quarantine_path": str(quarantine_path)
+    }
+    write_jsonl("_quarantine/log.jsonl", metadata)
+`
+
+═══════════════════════════════════════════════════════════════════════════════
+END OF ARCHITECTURE DOCUMENT
+═══════════════════════════════════════════════════════════════════════════════

@@ -1,0 +1,408 @@
+# Process↔Module and File↔Step Mapping Reference (AI-Only)
+
+## 0) Purpose
+
+Define a deterministic, non-drifting way to:
+
+1. Map **process steps → modules** (primary ownership + contract boundaries).
+2. Map **files → process steps** (only where it adds execution traceability), while keeping **files → modules** as the canonical ownership model.
+
+This document is a reference for automated enforcement (scans, CI validation, refactors) and for AI planning/analysis.
+
+---
+
+## 1) Canonical Sources of Truth
+
+### 1.1 Module Registry (canonical)
+
+**Primary truth for:**
+
+* `module_id`
+* module scope (`owns`)
+* **contract boundaries** (`in_types`, `out_types`)
+* module file ownership boundary (`required_files`)
+* acceptance tests
+
+**Implication:** A file “belongs” to a module by satisfying module ownership rules (typically path + responsibility).
+
+### 1.2 Process Document (canonical for step sequence)
+
+**Primary truth for:**
+
+* step order
+* step intent
+* step input/output contracts
+* step `module_id` (owner)
+
+### 1.3 File Registry (canonical for concrete files)
+
+**Primary truth for:**
+
+* each file instance identity (doc_id, path)
+* `module_id` ownership
+* file `role` (entrypoint/library/schema/config/test/etc.)
+* optional `step_refs` (restricted; derived rule set below)
+
+---
+
+## 2) Core Concepts and Definitions
+
+### 2.1 Contract Boundary
+
+A **contract boundary** exists whenever a step’s **primary output** is one of the module registry `out_types`, and the next step consumes it as `in_types`.
+
+### 2.2 Step Ownership
+
+Every process step has **exactly one owner module** (`module_id`) responsible for:
+
+* producing the step’s declared primary output contract
+* enforcing validation rules for that output
+* deterministic behavior at that boundary (idempotency/ordering/time policy as applicable)
+
+### 2.3 File Ownership
+
+Every file has **exactly one owner module** (canonical), except explicitly-declared shared libraries (rare; must be intentional and versioned).
+
+### 2.4 File→Step Mapping Scope
+
+File→step mapping exists only to answer:
+
+* “What file executes this step?”
+* “Where is the entrypoint for this module boundary?”
+
+It is **not** intended to map all helpers, submodules, or library files to steps.
+
+---
+
+## 3) Mapping Process Steps → Modules
+
+### 3.1 Required Step Fields
+
+Each step must declare, at minimum:
+
+* `number` (unique integer)
+* `name`
+* `module_id` (must exist in module registry)
+* `input` (contract(s))
+* `output` (contract(s))
+* `validation` (boundary-level checks)
+* `failure` (boundary-level policy)
+
+Recommended:
+
+* `responsible` (entrypoint label; file or component name)
+* `implementation_note` (encoding details; must not rename contracts)
+
+### 3.2 Ownership Rule (deterministic)
+
+**Primary module owner = the module that produces the step’s primary output contract.**
+
+Algorithm:
+
+1. Extract step’s declared `output`.
+2. Select the module whose `out_types` contains that contract.
+3. Set `step.module_id = that module_id`.
+
+If multiple contracts are listed as output:
+
+* choose the module that produces the **primary** contract (the one that drives downstream progression)
+* treat others as **secondary** outputs (often cross-cutting logs/health)
+
+### 3.3 Cross-Cutting Outputs (secondary modules)
+
+If a step also causes:
+
+* event logging
+* metrics
+* audit export
+* health heartbeat
+
+Do **not** reassign ownership away from the primary module.
+Instead:
+
+* keep one `module_id` owner
+* optionally add `side_effects:` to record additional outputs owned by cross-cutting modules (log/health/audit)
+
+Example pattern:
+
+```yaml
+- number: 4
+  name: Normalize raw calendar entries
+  module_id: D3_CALENDAR_NORMALIZER
+  output: CalendarEvent
+  side_effects:
+    - module_id: F2_EVENT_LOG
+      output: EventStream
+      note: "CalendarEvent appended as calendar.* events"
+```
+
+### 3.4 The Canonical Chain Constraint
+
+Your process doc should align to the module registry chain:
+
+`FeatureFrame → Signal → TradeIntent → RiskDecision → OrderIntent → RoutedOrderIntent → Transport → EA → BrokerExecEvent → (ExecutionReport, PositionSnapshot) → OMS → TradeClosedRaw → TradeClosed → OutcomeBucket → (EventProximity + MatrixDecision) → Reentry TradeIntent`
+
+**Enforcement rule:** If a step outputs something outside module registry contract types, it must be:
+
+* either an `implementation_note` encoding (e.g., CSV encoding of BrokerOrderEnvelope)
+* or introduced as a new contract + module registry update
+
+### 3.5 Step Granularity Rule (avoid drift)
+
+Keep steps **module-boundary atomic**, not “implementation-line atomic”.
+
+Allowed:
+
+* one step per boundary (recommended)
+* internal sub-steps under `internal_steps:` if needed
+
+Disallowed:
+
+* splitting a single module boundary into multiple “steps” that still output the same contract (creates ambiguous ownership)
+
+---
+
+## 4) Mapping Files → Modules (canonical)
+
+### 4.1 Canonical Rule
+
+**Every file is assigned to exactly one `module_id`.**
+
+The module registry `required_files` provides the authoritative boundary for which files a module owns (path patterns, required docs/tests, etc.).
+
+### 4.2 File Role (required)
+
+Each file must have a `role` that controls how it may be mapped to steps.
+
+Recommended finite enum:
+
+* `entrypoint` (runs a boundary)
+* `library` (imported code, helpers)
+* `schema` (contract schemas, JSON schema, etc.)
+* `config` (defaults, templates)
+* `fixture` (test data)
+* `test` (unit/integration tests)
+* `doc` (module specs, process docs)
+* `data` (matrix profiles, static data)
+* `tooling` (linters, generators, dev utilities)
+
+**Critical constraint:** Only `entrypoint` files are eligible for file→step mapping by default.
+
+---
+
+## 5) Mapping Files → Process Steps (restricted, derived)
+
+### 5.1 Why this mapping exists
+
+Use file→step mapping only to provide:
+
+* execution traceability (“what runs Step 16?”)
+* automated linking for AI navigation (step → entrypoint → module → contracts/tests)
+
+### 5.2 Canonical Rule (anti-drift)
+
+**Files map to steps only through their module ownership and role constraints.**
+
+That means:
+
+* module ownership stays canonical
+* step ownership stays canonical
+* file→step links are *derived annotations*, not a second truth system
+
+### 5.3 Allowed File→Step Mapping
+
+A file may reference one or more steps **only if**:
+
+1. `file.module_id == step.module_id`
+2. `file.role == entrypoint`
+3. The file is a plausible executor for that step boundary (runs, schedules, or is the named responsible artifact)
+
+### 5.4 Disallowed File→Step Mapping (common failure modes)
+
+Do **not** map these to steps:
+
+* libraries/helpers (`role: library`)
+* schemas (`role: schema`)
+* configs (`role: config`)
+* tests/fixtures/docs
+
+Rationale: libraries and schemas are *supporting assets*, not step executors, and mapping them to steps creates noisy many-to-many relationships that become unmaintainable.
+
+### 5.5 Two-Layer Link Model (recommended)
+
+Use two distinct fields:
+
+#### A) In the process doc (step → entrypoints)
+
+```yaml
+- number: 16
+  module_id: B1_MT4_ADAPTER_TRANSPORT
+  entrypoint_files:
+    - src/B1_MT4_ADAPTER_TRANSPORT/transport_service.py
+```
+
+#### B) In the file registry (file → step refs; only entrypoints)
+
+```yaml
+module_id: B1_MT4_ADAPTER_TRANSPORT
+role: entrypoint
+step_refs: [16]
+```
+
+**Preference:** Keep the authoritative mapping in the process doc (`entrypoint_files`) and treat the file registry `step_refs` as optional or fully derived.
+
+---
+
+## 6) Deterministic Derivation Algorithms
+
+### 6.1 Derive Step → Entrypoint Candidates
+
+Inputs:
+
+* process step `module_id`
+* module registry `required_files` patterns
+* file registry entries (paths + role)
+
+Algorithm:
+
+1. Filter files where `file.module_id == step.module_id`.
+2. Filter to `role == entrypoint`.
+3. Rank by:
+
+   * path match closeness to module’s known entrypoint conventions (`src/<module_id>/`, `ea/<module_id>/`)
+   * filename similarity with `responsible` label (if present)
+4. Output `entrypoint_files` list (1–N).
+
+### 6.2 Validate Step → Entrypoint Files
+
+For each `entrypoint_file` in a step:
+
+* must exist
+* must belong to the step module (`file.module_id == step.module_id`)
+* must satisfy module `required_files` boundary (path/pattern compliance)
+
+### 6.3 Prevent Many-to-Many Explosion
+
+Hard limits (recommended):
+
+* each step: `entrypoint_files` ≤ 5
+* each entrypoint file: `step_refs` ≤ 10
+* else: require an explicit justification field `mapping_exception_reason`
+
+---
+
+## 7) Special Cases and How to Handle Them
+
+### 7.1 Orchestrator / Loop Steps
+
+If a step is a “loop” or orchestrator step that conceptually repeats the chain:
+
+* use `module_id: "(loop)"` or a real orchestrator module **only if such a module exists in the registry**
+* do not attach entrypoint files unless there is a real orchestrator implementation
+
+### 7.2 Cross-Cutting Modules
+
+Cross-cutting modules (event log, health, audit) should generally:
+
+* appear as their own steps if they produce primary outputs in the process
+* or appear as `side_effects:` on steps they observe
+
+Avoid mapping cross-cutting files as entrypoints for unrelated boundary steps.
+
+### 7.3 Shared Libraries
+
+If you genuinely need shared libraries:
+
+* define a dedicated shared module (e.g., `X_SHARED_LIBS`)
+* make it explicit in the module registry
+* do not map shared library files to steps (they are not executors)
+
+### 7.4 Multi-Entrypoint Modules
+
+Some modules may have multiple entrypoints (CLI + daemon + scheduler).
+Allowed pattern:
+
+* list them all in `entrypoint_files`
+* add an `entrypoint_roles:` annotation per file (optional)
+
+---
+
+## 8) Required Validation Rules (CI/Scanner)
+
+### 8.1 Step Validation
+
+* `step.module_id` must exist in module registry
+* `step.output` must be in `module.out_types` for that module (primary output must match)
+* `step.input` should be a subset of `module.in_types` (allowing configuration and cross-cutting inputs as declared)
+
+### 8.2 File Validation
+
+* every file has exactly one `module_id`
+* every file has `role` in the allowed enum
+* if `role == entrypoint` and `step_refs` exists:
+
+  * referenced steps must exist
+  * step.module_id must equal file.module_id
+
+### 8.3 Mapping Consistency (anti-drift)
+
+If both are present:
+
+* process doc `entrypoint_files` and file registry `step_refs` must be consistent (bidirectional check)
+
+---
+
+## 9) Implementation Guidance (practical, minimal, scalable)
+
+### 9.1 Minimum viable mapping that scales
+
+* process steps each have `module_id`
+* file registry each file has `module_id` + `role`
+* only add `entrypoint_files` for steps where you need fast traceability (initially: all boundary steps in the chain)
+
+### 9.2 What not to do
+
+* do not attempt “complete” mapping of every file to steps
+* do not allow step ownership ambiguity (two modules “own” the step)
+* do not put implementation encodings (CSV row formats) in the contract chain as new pseudo-contracts
+
+---
+
+## 10) Recommended Data Fields Summary
+
+### 10.1 Process Step fields (recommended)
+
+* `number`
+* `name`
+* `module_id`
+* `input`
+* `output`
+* `validation`
+* `failure`
+* `responsible` (optional label)
+* `entrypoint_files` (recommended)
+* `side_effects` (optional)
+* `implementation_note` (optional)
+
+### 10.2 File Registry fields (recommended)
+
+* `doc_id`
+* `path` / `relative_path`
+* `module_id`
+* `role`
+* `step_refs` (optional; only if role=entrypoint)
+* `contracts_produced` (optional; for discovery)
+* `contracts_consumed` (optional; for discovery)
+
+---
+
+## 11) Operational Payoff
+
+If enforced, this mapping yields:
+
+* deterministic traceability: **step → module → entrypoint → contracts → tests**
+* fast AI navigation without noise
+* minimal risk of drift (single ownership truths; derived links only)
+* scalable governance for large repos (modules are the partition; steps are contract boundaries)
+
+---
