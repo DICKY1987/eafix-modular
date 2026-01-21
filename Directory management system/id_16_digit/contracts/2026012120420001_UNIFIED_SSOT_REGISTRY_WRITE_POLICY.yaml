@@ -1,0 +1,490 @@
+# doc_id: 2026012120420001
+# Unified SSOT Registry - Write Policy
+# Defines per-column ownership and update rules for deterministic operations
+
+schema_version: "1.0"
+policy_version: "1.0"
+doc_id: "2026012120420001"
+last_updated: "2026-01-21T20:42:00Z"
+description: "Column ownership and write policies for unified SSOT registry"
+
+# Policy enum definitions
+enums:
+  writable_by: [tool_only, user_only, both, never]
+  update_policy: 
+    - immutable
+    - recompute_on_scan
+    - recompute_on_build
+    - manual_patch_only
+    - manual_or_automated
+    - normalize_on_ingest
+
+# Column policies (80 columns from unified schema)
+columns:
+  # Core columns (9)
+  record_kind:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "Discriminator field, set once at creation"
+  
+  record_id:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "Primary key, set once at creation"
+  
+  status:
+    writable_by: both
+    update_policy: manual_or_automated
+    allowed_transitions:
+      active: [deprecated, quarantined, archived]
+      deprecated: [archived, deleted]
+      quarantined: [active, deleted]
+      closed: [archived, deleted]
+      running: [closed, failed]
+      pending: [running, failed, closed]
+      failed: [pending, archived]
+    reason: "Lifecycle managed by tools and users"
+  
+  notes:
+    writable_by: user_only
+    update_policy: manual_patch_only
+    reason: "User-provided context and documentation"
+  
+  tags:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Tools can suggest, users can curate"
+  
+  created_utc:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "Timestamp of record creation, never changes"
+  
+  updated_utc:
+    writable_by: tool_only
+    update_policy: recompute_on_scan
+    reason: "Automatically updated on any modification"
+  
+  created_by:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "Actor who created record, never changes"
+  
+  updated_by:
+    writable_by: tool_only
+    update_policy: recompute_on_scan
+    reason: "Actor who last modified record"
+
+  # Entity columns (41)
+  entity_id:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "Entity primary key, set once"
+  
+  entity_kind:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "Entity type discriminator, set once"
+  
+  doc_id:
+    writable_by: tool_only
+    update_policy: immutable
+    derived_from: [filename]
+    formula_ref: "EXTRACT_16_DIGIT_PREFIX"
+    reason: "Extracted from filename, immutable identifier"
+  
+  filename:
+    writable_by: tool_only
+    update_policy: recompute_on_scan
+    derived_from: [relative_path]
+    formula_ref: "BASENAME"
+    reason: "Derived from path, recomputed on scan"
+  
+  extension:
+    writable_by: tool_only
+    update_policy: recompute_on_scan
+    derived_from: [filename]
+    formula_ref: "EXTENSION"
+    reason: "File type indicator, derived from filename"
+  
+  relative_path:
+    writable_by: tool_only
+    update_policy: recompute_on_scan
+    reason: "Scanned file location, reflects filesystem state"
+  
+  absolute_path:
+    writable_by: tool_only
+    update_policy: recompute_on_scan
+    reason: "Full path, platform-dependent, recomputed"
+  
+  directory_path:
+    writable_by: tool_only
+    update_policy: recompute_on_scan
+    derived_from: [relative_path]
+    formula_ref: "DIRNAME"
+    reason: "Parent directory for grouping queries"
+  
+  size_bytes:
+    writable_by: tool_only
+    update_policy: recompute_on_scan
+    reason: "File size from filesystem metadata"
+  
+  mtime_utc:
+    writable_by: tool_only
+    update_policy: recompute_on_scan
+    reason: "File modification timestamp from filesystem"
+  
+  sha256:
+    writable_by: tool_only
+    update_policy: recompute_on_scan
+    reason: "Content hash must match file bytes exactly"
+  
+  content_type:
+    writable_by: tool_only
+    update_policy: recompute_on_scan
+    reason: "MIME type derived from extension and magic bytes"
+  
+  asset_id:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "Asset identifier, set once for entity_kind=asset"
+  
+  asset_family:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Asset classification, tools suggest, users refine"
+  
+  asset_version:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Version tracking, tools detect, users override"
+  
+  canonical_path:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Logical path when physical path differs (symlinks)"
+  
+  transient_id:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "Transient entity identifier, set once"
+  
+  transient_type:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "Type of transient entity (temp file, cache, etc)"
+  
+  ttl_seconds:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Time-to-live for transient entities, configurable"
+  
+  expires_utc:
+    writable_by: tool_only
+    update_policy: recompute_on_build
+    derived_from: [created_utc, ttl_seconds]
+    formula_ref: "ADD_SECONDS"
+    reason: "Computed expiration timestamp"
+  
+  external_ref:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "External system reference (URL, ID, etc)"
+  
+  external_system:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Name of external system (GitHub, JIRA, etc)"
+  
+  resolver_hint:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "How to resolve external reference"
+  
+  module_id:
+    writable_by: tool_only
+    update_policy: recompute_on_scan
+    override_field: module_id_override
+    precedence: "override > manifest > path_rule"
+    reason: "Derived module assignment with user override support"
+  
+  module_id_source:
+    writable_by: tool_only
+    update_policy: recompute_on_scan
+    reason: "Provenance of module_id (override/manifest/path_rule/unassigned)"
+  
+  module_id_override:
+    writable_by: user_only
+    update_policy: manual_patch_only
+    reason: "User override for module assignment"
+  
+  process_id:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Process identifier (manual curation or tool-assigned)"
+  
+  process_step_id:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Process step identifier within process"
+  
+  process_step_role:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Role in process step (input/output/tool/etc)"
+  
+  role_code:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Functional role classification"
+  
+  type_code:
+    writable_by: tool_only
+    update_policy: recompute_on_scan
+    derived_from: [extension]
+    formula_ref: "LOOKUP_CONFIG(type_code_by_extension)"
+    reason: "Two-digit type classification from config map"
+  
+  function_code_1:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Primary function classification"
+  
+  function_code_2:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Secondary function classification"
+  
+  function_code_3:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Tertiary function classification"
+  
+  entrypoint_flag:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Marks file as application entrypoint"
+  
+  short_description:
+    writable_by: user_only
+    update_policy: manual_patch_only
+    reason: "Human-readable summary of entity purpose"
+  
+  first_seen_utc:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "First detection timestamp, never changes"
+  
+  last_seen_utc:
+    writable_by: tool_only
+    update_policy: recompute_on_scan
+    reason: "Most recent detection timestamp"
+  
+  scan_id:
+    writable_by: tool_only
+    update_policy: recompute_on_scan
+    reason: "Identifier of scan that last updated this entity"
+  
+  source_entity_id:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Reference to source entity (generated files)"
+  
+  supersedes_entity_id:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Reference to entity this replaces (versioning)"
+
+  # Edge columns (12)
+  edge_id:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "Edge primary key, set once"
+  
+  source_entity_id:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "Source node in relationship, set once"
+  
+  target_entity_id:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "Target node in relationship, set once"
+  
+  rel_type:
+    writable_by: tool_only
+    update_policy: normalize_on_ingest
+    derived_from: [rel_type_raw]
+    formula_ref: "UPPER"
+    reason: "Relationship type, normalized to uppercase"
+  
+  directionality:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "Edge direction (directed/bidirectional/undirected)"
+  
+  confidence:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Confidence score, tools set default, users adjust"
+  
+  evidence_method:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "How edge was detected (static_parse/dynamic_trace/etc)"
+  
+  evidence_locator:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "Where evidence was found (file:line or trace_id)"
+  
+  evidence_snippet:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "Code fragment or trace excerpt as proof"
+  
+  observed_utc:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "When edge was first observed"
+  
+  tool_version:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "Version of tool that detected edge"
+  
+  edge_flags:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Edge metadata flags (heuristic, requires_review, etc)"
+
+  # Generator columns (17)
+  generator_id:
+    writable_by: tool_only
+    update_policy: immutable
+    reason: "Generator primary key, set once"
+  
+  generator_name:
+    writable_by: user_only
+    update_policy: manual_patch_only
+    reason: "Human-readable generator name"
+  
+  generator_version:
+    writable_by: both
+    update_policy: manual_or_automated
+    reason: "Generator version, updated on changes"
+  
+  output_kind:
+    writable_by: user_only
+    update_policy: manual_patch_only
+    reason: "Type of output (index/report/derived_data/etc)"
+  
+  output_path:
+    writable_by: user_only
+    update_policy: manual_patch_only
+    reason: "Fixed output path (if not pattern-based)"
+  
+  output_path_pattern:
+    writable_by: user_only
+    update_policy: manual_patch_only
+    reason: "Pattern for output path (if dynamic)"
+  
+  declared_dependencies:
+    writable_by: user_only
+    update_policy: manual_patch_only
+    reason: "List of registry columns this generator depends on"
+  
+  input_filters:
+    writable_by: user_only
+    update_policy: manual_patch_only
+    reason: "Query filters to select input rows"
+  
+  sort_rule_id:
+    writable_by: user_only
+    update_policy: manual_patch_only
+    reason: "Reference to sort configuration"
+  
+  sort_keys:
+    writable_by: user_only
+    update_policy: manual_patch_only
+    reason: "Inline sort keys (alternative to sort_rule_id)"
+  
+  template_ref_entity_id:
+    writable_by: user_only
+    update_policy: manual_patch_only
+    reason: "Reference to template file entity"
+  
+  validator_id:
+    writable_by: user_only
+    update_policy: manual_patch_only
+    reason: "Reference to validator for output"
+  
+  validation_rules:
+    writable_by: user_only
+    update_policy: manual_patch_only
+    reason: "Inline validation rules"
+  
+  last_build_utc:
+    writable_by: tool_only
+    update_policy: recompute_on_build
+    reason: "Timestamp of last generator execution"
+  
+  source_registry_hash:
+    writable_by: tool_only
+    update_policy: recompute_on_build
+    reason: "Hash of registry state at build time (traceability)"
+  
+  source_registry_scan_id:
+    writable_by: tool_only
+    update_policy: recompute_on_build
+    reason: "Scan ID that produced input data"
+  
+  output_hash:
+    writable_by: tool_only
+    update_policy: recompute_on_build
+    reason: "Hash of generated output file"
+  
+  build_report_entity_id:
+    writable_by: tool_only
+    update_policy: recompute_on_build
+    reason: "Reference to build report entity"
+
+# Validation rules
+validation_rules:
+  - name: "tool_only_enforcement"
+    description: "tool_only fields MUST NOT be written by user operations"
+    check: "reject user writes to tool_only columns"
+  
+  - name: "immutable_enforcement"
+    description: "immutable fields MUST NOT change after initial creation"
+    check: "reject any modification to immutable fields"
+  
+  - name: "recompute_on_scan_enforcement"
+    description: "recompute_on_scan fields MUST be refreshed by scanner"
+    check: "scanner must update these fields on every scan"
+  
+  - name: "override_precedence"
+    description: "override_field takes precedence when present"
+    check: "if module_id_override is set, module_id must match it"
+  
+  - name: "derived_consistency"
+    description: "derived fields must match their formulas"
+    check: "recompute derived fields and compare to stored values"
+  
+  - name: "status_transition_validation"
+    description: "status changes must follow allowed_transitions"
+    check: "reject invalid status transitions"
+
+# Usage notes
+usage:
+  validator: "Load this policy at init, enforce before any write operation"
+  scanner: "Load to determine which fields to update on scan"
+  cli: "Respect policy when accepting user input"
+  documentation: "Mark fields as tool-only or user-editable in column dictionary"
+
+# Governance
+governance:
+  policy_owner: "System Architect"
+  review_cycle: "Quarterly"
+  change_process: "Update requires schema version bump if breaking"
+  approval_required: true

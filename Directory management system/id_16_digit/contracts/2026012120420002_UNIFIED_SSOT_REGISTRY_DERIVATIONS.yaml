@@ -1,0 +1,363 @@
+# doc_id: 2026012120420002
+# Unified SSOT Registry - Derivations Catalog
+# Machine-readable formula contracts for computed fields
+
+schema_version: "1.0"
+derivations_version: "1.0"
+doc_id: "2026012120420002"
+last_updated: "2026-01-21T20:42:00Z"
+description: "Formula catalog for all computed registry fields using safe DSL"
+
+# Safe DSL function catalog (no eval, no arbitrary code execution)
+allowed_functions:
+  BASENAME:
+    signature: "BASENAME(path: str) -> str"
+    description: "Extract filename from path"
+    implementation: "os.path.basename or Path.name"
+    example: "BASENAME('src/module/file.py') -> 'file.py'"
+  
+  DIRNAME:
+    signature: "DIRNAME(path: str) -> str"
+    description: "Extract directory from path, root returns '.'"
+    implementation: "os.path.dirname with root='.' normalization"
+    example: "DIRNAME('src/module/file.py') -> 'src/module', DIRNAME('file.py') -> '.'"
+  
+  EXTENSION:
+    signature: "EXTENSION(filename: str) -> str"
+    description: "Extract file extension without dot, lowercase"
+    implementation: "Path.suffix[1:].lower()"
+    example: "EXTENSION('file.PY') -> 'py', EXTENSION('README') -> ''"
+  
+  UPPER:
+    signature: "UPPER(text: str) -> str"
+    description: "Convert to uppercase"
+    implementation: "str.upper()"
+    example: "UPPER('imports') -> 'IMPORTS'"
+  
+  LOWER:
+    signature: "LOWER(text: str) -> str"
+    description: "Convert to lowercase"
+    implementation: "str.lower()"
+    example: "LOWER('FILE.PY') -> 'file.py'"
+  
+  ADD_SECONDS:
+    signature: "ADD_SECONDS(utc_ts: str, seconds: int) -> str"
+    description: "Add seconds to ISO 8601 timestamp"
+    implementation: "datetime.fromisoformat + timedelta"
+    example: "ADD_SECONDS('2026-01-21T20:00:00Z', 3600) -> '2026-01-21T21:00:00Z'"
+  
+  SHA256_BYTES:
+    signature: "SHA256_BYTES(bytes_data: bytes) -> str"
+    description: "Compute SHA256 hash of bytes"
+    implementation: "hashlib.sha256(data).hexdigest()"
+    example: "SHA256_BYTES(b'hello') -> '2cf24dba...'"
+  
+  NOW_UTC:
+    signature: "NOW_UTC() -> str"
+    description: "Current UTC timestamp in ISO 8601 format"
+    implementation: "datetime.now(timezone.utc).isoformat()"
+    example: "NOW_UTC() -> '2026-01-21T20:42:00.123456Z'"
+  
+  EXTRACT_16_DIGIT_PREFIX:
+    signature: "EXTRACT_16_DIGIT_PREFIX(filename: str) -> str | None"
+    description: "Extract 16-digit doc_id from filename prefix"
+    implementation: "regex match ^(\\d{16})_ then return group(1)"
+    example: "EXTRACT_16_DIGIT_PREFIX('2026012120420001_file.py') -> '2026012120420001'"
+  
+  LOOKUP_CONFIG:
+    signature: "LOOKUP_CONFIG(map_name: str, key: str, default: str) -> str"
+    description: "Lookup value in configuration map with default"
+    implementation: "config[map_name].get(key, default)"
+    example: "LOOKUP_CONFIG('type_code_by_extension', 'py', '00') -> '20'"
+  
+  NORMALIZE_PATH:
+    signature: "NORMALIZE_PATH(path: str) -> str"
+    description: "Normalize path: forward slashes, no leading ./, no trailing slash"
+    implementation: "path.replace('\\\\', '/').lstrip('./').rstrip('/')"
+    example: "NORMALIZE_PATH('.\\\\src\\\\file.py') -> 'src/file.py'"
+
+# Derivation rules (ordered by dependency chain)
+derivations:
+  # Level 1: Direct from scan
+  - column_name: filename
+    applies_when:
+      record_kind: entity
+      entity_kind: [file, asset]
+    owner: tool
+    inputs: [relative_path]
+    formula: "BASENAME(relative_path)"
+    update_policy: recompute_on_scan
+    validation_constraints:
+      - filename_not_empty
+      - no_path_separators
+    reason: "Extract filename from path for human readability"
+    examples:
+      - input: {relative_path: "src/core/registry.py"}
+        output: {filename: "registry.py"}
+      - input: {relative_path: "README.md"}
+        output: {filename: "README.md"}
+  
+  - column_name: directory_path
+    applies_when:
+      record_kind: entity
+      entity_kind: [file, asset]
+    owner: tool
+    inputs: [relative_path]
+    formula: "DIRNAME(relative_path) OR '.'"
+    update_policy: recompute_on_scan
+    validation_constraints:
+      - forward_slashes_only
+      - no_leading_slash
+      - no_trailing_slash
+      - root_is_dot
+    reason: "Extract parent directory for grouping and queries"
+    examples:
+      - input: {relative_path: "src/core/registry.py"}
+        output: {directory_path: "src/core"}
+      - input: {relative_path: "README.md"}
+        output: {directory_path: "."}
+  
+  # Level 2: From filename
+  - column_name: extension
+    applies_when:
+      record_kind: entity
+      entity_kind: [file, asset]
+    owner: tool
+    inputs: [filename]
+    formula: "EXTENSION(filename)"
+    update_policy: recompute_on_scan
+    validation_constraints:
+      - extension_lowercase
+      - no_dot_prefix
+    reason: "File type classification from extension"
+    examples:
+      - input: {filename: "script.PY"}
+        output: {extension: "py"}
+      - input: {filename: "README"}
+        output: {extension: ""}
+  
+  - column_name: doc_id
+    applies_when:
+      record_kind: entity
+      entity_kind: [file, asset]
+    owner: tool
+    inputs: [filename]
+    formula: "EXTRACT_16_DIGIT_PREFIX(filename)"
+    update_policy: immutable
+    validation_constraints:
+      - exactly_16_digits_or_null
+    reason: "Identity extraction from filename, immutable once set"
+    examples:
+      - input: {filename: "2026012120420001_policy.yaml"}
+        output: {doc_id: "2026012120420001"}
+      - input: {filename: "README.md"}
+        output: {doc_id: null}
+  
+  # Level 3: From extension + config
+  - column_name: type_code
+    applies_when:
+      record_kind: entity
+      entity_kind: [file, asset]
+    owner: tool
+    inputs: [extension]
+    formula: "LOOKUP_CONFIG('type_code_by_extension', extension, '00')"
+    update_policy: recompute_on_scan
+    validation_constraints:
+      - two_digit_numeric
+    reason: "Two-digit type classification from config map"
+    config_map_name: type_code_by_extension
+    config_map_example:
+      py: "20"
+      yaml: "01"
+      md: "02"
+      json: "01"
+      txt: "02"
+      "": "00"
+    examples:
+      - input: {extension: "py"}
+        output: {type_code: "20"}
+      - input: {extension: "yaml"}
+        output: {type_code: "01"}
+  
+  # Transient entity derivations
+  - column_name: expires_utc
+    applies_when:
+      record_kind: entity
+      entity_kind: transient
+      ttl_seconds: present
+    owner: tool
+    inputs: [created_utc, ttl_seconds]
+    formula: "ADD_SECONDS(created_utc, ttl_seconds)"
+    update_policy: recompute_on_build
+    validation_constraints:
+      - expires_after_created
+      - iso8601_format
+    reason: "Compute expiration timestamp for transient entities"
+    examples:
+      - input: {created_utc: "2026-01-21T20:00:00Z", ttl_seconds: 3600}
+        output: {expires_utc: "2026-01-21T21:00:00Z"}
+  
+  # Edge normalization
+  - column_name: rel_type
+    applies_when:
+      record_kind: edge
+    owner: tool
+    inputs: [rel_type_raw]
+    formula: "UPPER(rel_type_raw)"
+    update_policy: normalize_on_ingest
+    validation_constraints:
+      - uppercase_only
+      - in_allowed_enum
+    reason: "Normalize relationship type to uppercase for consistency"
+    allowed_enum_examples: [IMPORTS, DEPENDS_ON, CALLS, EXTENDS, IMPLEMENTS]
+    examples:
+      - input: {rel_type_raw: "imports"}
+        output: {rel_type: "IMPORTS"}
+      - input: {rel_type_raw: "Depends_On"}
+        output: {rel_type: "DEPENDS_ON"}
+  
+  # Path normalization (applied to all path fields)
+  - column_name: relative_path
+    applies_when:
+      record_kind: entity
+      entity_kind: [file, asset]
+    owner: tool
+    inputs: [relative_path_raw]
+    formula: "NORMALIZE_PATH(relative_path_raw)"
+    update_policy: normalize_on_ingest
+    validation_constraints:
+      - forward_slashes_only
+      - no_leading_slash
+      - no_leading_dot_slash
+      - no_trailing_slash
+    reason: "Standardize path format for cross-platform consistency"
+    examples:
+      - input: {relative_path_raw: ".\\src\\file.py"}
+        output: {relative_path: "src/file.py"}
+      - input: {relative_path_raw: "./docs/README.md"}
+        output: {relative_path: "docs/README.md"}
+  
+  # Content hash (special: from file bytes)
+  - column_name: sha256
+    applies_when:
+      record_kind: entity
+      entity_kind: [file, asset]
+    owner: tool
+    inputs: [file_bytes]
+    formula: "SHA256_BYTES(file_bytes)"
+    update_policy: recompute_on_scan
+    validation_constraints:
+      - hex_64_chars
+    reason: "Content hash for integrity and change detection"
+    note: "file_bytes not a registry column, read from filesystem"
+    examples:
+      - input: {file_bytes: "<actual file contents>"}
+        output: {sha256: "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"}
+  
+  # Timestamps (system-managed)
+  - column_name: updated_utc
+    applies_when:
+      record_kind: [entity, edge, generator]
+    owner: tool
+    inputs: []
+    formula: "NOW_UTC()"
+    update_policy: recompute_on_scan
+    validation_constraints:
+      - iso8601_format
+      - updated_gte_created
+    reason: "Track last modification time"
+    examples:
+      - input: {}
+        output: {updated_utc: "2026-01-21T20:42:00.123456Z"}
+
+# Validation constraint definitions
+validation_constraints:
+  filename_not_empty:
+    rule: "len(filename) > 0"
+    error_message: "Filename cannot be empty"
+  
+  no_path_separators:
+    rule: "'/' not in filename AND '\\\\' not in filename"
+    error_message: "Filename must not contain path separators"
+  
+  extension_lowercase:
+    rule: "extension == extension.lower()"
+    error_message: "Extension must be lowercase"
+  
+  no_dot_prefix:
+    rule: "not extension.startswith('.')"
+    error_message: "Extension must not include leading dot"
+  
+  exactly_16_digits_or_null:
+    rule: "doc_id is None OR (len(doc_id) == 16 AND doc_id.isdigit())"
+    error_message: "doc_id must be exactly 16 digits or null"
+  
+  two_digit_numeric:
+    rule: "len(type_code) == 2 AND type_code.isdigit()"
+    error_message: "type_code must be exactly 2 digits"
+  
+  forward_slashes_only:
+    rule: "'\\\\' not in path"
+    error_message: "Path must use forward slashes only"
+  
+  no_leading_slash:
+    rule: "not path.startswith('/')"
+    error_message: "Path must not start with slash"
+  
+  no_leading_dot_slash:
+    rule: "not path.startswith('./')"
+    error_message: "Path must not start with ./"
+  
+  no_trailing_slash:
+    rule: "not path.endswith('/')"
+    error_message: "Path must not end with slash"
+  
+  root_is_dot:
+    rule: "directory_path == '.' when relative_path has no directory"
+    error_message: "Root directory must be represented as '.'"
+  
+  expires_after_created:
+    rule: "expires_utc > created_utc"
+    error_message: "Expiration must be after creation time"
+  
+  iso8601_format:
+    rule: "datetime.fromisoformat(timestamp.rstrip('Z'))"
+    error_message: "Timestamp must be ISO 8601 format"
+  
+  updated_gte_created:
+    rule: "updated_utc >= created_utc"
+    error_message: "Updated timestamp must be >= created timestamp"
+  
+  uppercase_only:
+    rule: "rel_type == rel_type.upper()"
+    error_message: "rel_type must be uppercase"
+  
+  in_allowed_enum:
+    rule: "rel_type in allowed_values"
+    error_message: "rel_type must be in allowed enum"
+  
+  hex_64_chars:
+    rule: "len(sha256) == 64 AND all(c in '0123456789abcdef' for c in sha256)"
+    error_message: "SHA256 must be 64 hexadecimal characters"
+
+# Dependency graph (for change impact analysis)
+dependency_graph:
+  relative_path: [filename, directory_path]
+  filename: [extension, doc_id]
+  extension: [type_code]
+  created_utc: [expires_utc, updated_utc]
+  ttl_seconds: [expires_utc]
+
+# Usage
+usage:
+  validator: "Load derivations, recompute all derived fields, compare to stored values"
+  scanner: "Use formulas as single source of truth for computed fields"
+  cli_derive: "Execute formulas and update registry with --apply flag"
+  impact_analysis: "Use dependency_graph to find affected fields when inputs change"
+
+# Governance
+governance:
+  policy_owner: "System Architect"
+  review_cycle: "Quarterly"
+  change_process: "Adding derivation requires schema version bump"
+  formula_testing: "All formulas must have unit tests with examples"
