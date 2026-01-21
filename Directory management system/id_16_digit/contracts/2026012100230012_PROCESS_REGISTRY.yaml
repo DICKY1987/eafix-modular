@@ -1,0 +1,417 @@
+# doc_id: 2026012100230012
+# title: Process Registry
+# version: 1.0
+# date: 2026-01-21T00:23:14Z
+# status: AUTHORITATIVE
+# purpose: Valid process IDs, steps, and roles for manual process mapping
+
+schema_version: "1.0"
+registry_version: "1.0"
+last_updated: "2026-01-21T00:23:14Z"
+doc_id: "2026012100230012"
+
+# =============================================================================
+# PROCESSES
+# =============================================================================
+
+processes:
+  - process_id: PROC-BUILD
+    process_name: "Build and Compilation"
+    process_owner: "build-team"
+    process_description: "Software build and compilation pipeline"
+    process_status: active
+    
+    steps:
+      - process_step_id: STEP-COMPILE
+        process_step_name: "Source Compilation"
+        process_step_description: "Compile source code to executables"
+        allowed_roles:
+          - input
+          - output
+          - tool
+          - config
+        
+      - process_step_id: STEP-BUNDLE
+        process_step_name: "Asset Bundling"
+        process_step_description: "Bundle and optimize assets"
+        allowed_roles:
+          - input
+          - output
+          - tool
+          - config
+      
+      - process_step_id: STEP-PACKAGE
+        process_step_name: "Package Creation"
+        process_step_description: "Create deployment packages"
+        allowed_roles:
+          - input
+          - output
+          - tool
+  
+  - process_id: PROC-TEST
+    process_name: "Testing and Validation"
+    process_owner: "qa-team"
+    process_description: "Automated testing pipeline"
+    process_status: active
+    
+    steps:
+      - process_step_id: STEP-UNIT-TEST
+        process_step_name: "Unit Testing"
+        process_step_description: "Execute unit tests"
+        allowed_roles:
+          - test
+          - subject
+          - fixture
+          - tool
+          - log
+        
+      - process_step_id: STEP-INTEGRATION-TEST
+        process_step_name: "Integration Testing"
+        process_step_description: "Execute integration tests"
+        allowed_roles:
+          - test
+          - subject
+          - fixture
+          - tool
+          - log
+        
+      - process_step_id: STEP-E2E-TEST
+        process_step_name: "End-to-End Testing"
+        process_step_description: "Execute end-to-end tests"
+        allowed_roles:
+          - test
+          - subject
+          - fixture
+          - tool
+          - log
+  
+  - process_id: PROC-DEPLOY
+    process_name: "Deployment Pipeline"
+    process_owner: "devops-team"
+    process_description: "Application deployment process"
+    process_status: active
+    
+    steps:
+      - process_step_id: STEP-STAGE
+        process_step_name: "Stage Artifacts"
+        process_step_description: "Stage artifacts for deployment"
+        allowed_roles:
+          - input
+          - output
+          - tool
+          - config
+        
+      - process_step_id: STEP-PUBLISH
+        process_step_name: "Publish to Registry"
+        process_step_description: "Publish to artifact registry"
+        allowed_roles:
+          - input
+          - tool
+          - config
+        
+      - process_step_id: STEP-RELEASE
+        process_step_name: "Release to Production"
+        process_step_description: "Deploy to production environment"
+        allowed_roles:
+          - input
+          - tool
+          - config
+          - log
+  
+  - process_id: PROC-SCAN
+    process_name: "Code and Asset Scanning"
+    process_owner: "platform-team"
+    process_description: "Automated scanning and analysis"
+    process_status: active
+    
+    steps:
+      - process_step_id: STEP-DISCOVER
+        process_step_name: "File Discovery"
+        process_step_description: "Discover files in repository"
+        allowed_roles:
+          - subject
+          - tool
+          - config
+          - log
+        
+      - process_step_id: STEP-ANALYZE
+        process_step_name: "Static Analysis"
+        process_step_description: "Perform static code analysis"
+        allowed_roles:
+          - input
+          - tool
+          - output
+          - log
+        
+      - process_step_id: STEP-REGISTER
+        process_step_name: "Registry Update"
+        process_step_description: "Update central registry"
+        allowed_roles:
+          - input
+          - tool
+          - output
+  
+  - process_id: PROC-VALIDATE
+    process_name: "Registry Validation"
+    process_owner: "platform-team"
+    process_description: "Registry integrity validation"
+    process_status: active
+    
+    steps:
+      - process_step_id: STEP-SCHEMA-CHECK
+        process_step_name: "Schema Validation"
+        process_step_description: "Validate against JSON schema"
+        allowed_roles:
+          - subject
+          - tool
+          - log
+        
+      - process_step_id: STEP-POLICY-CHECK
+        process_step_name: "Policy Validation"
+        process_step_description: "Check write policy compliance"
+        allowed_roles:
+          - subject
+          - tool
+          - log
+        
+      - process_step_id: STEP-DERIVATION-CHECK
+        process_step_name: "Derivation Validation"
+        process_step_description: "Verify computed fields"
+        allowed_roles:
+          - subject
+          - tool
+          - log
+
+# =============================================================================
+# GLOBAL ROLES (allowed in any process/step)
+# =============================================================================
+
+global_roles:
+  - input
+  - output
+  - tool
+  - test
+  - subject
+  - fixture
+  - config
+  - log
+
+global_role_descriptions:
+  input:
+    description: "Input to the process step"
+    examples:
+      - "Source files for compilation"
+      - "Test fixtures for test execution"
+  
+  output:
+    description: "Output produced by the process step"
+    examples:
+      - "Compiled binaries"
+      - "Test reports"
+  
+  tool:
+    description: "Tool or script that executes the step"
+    examples:
+      - "Compiler executable"
+      - "Test runner"
+  
+  test:
+    description: "Test file or test suite"
+    examples:
+      - "Unit test file"
+      - "Integration test suite"
+  
+  subject:
+    description: "Subject being tested or analyzed"
+    examples:
+      - "Module under test"
+      - "File being scanned"
+  
+  fixture:
+    description: "Test fixture or test data"
+    examples:
+      - "Mock data"
+      - "Golden files"
+  
+  config:
+    description: "Configuration file for the process"
+    examples:
+      - "Build config"
+      - "Deployment config"
+  
+  log:
+    description: "Log file produced by the process"
+    examples:
+      - "Build log"
+      - "Test execution log"
+
+# =============================================================================
+# VALIDATION RULES
+# =============================================================================
+
+validation_rules:
+  process_id_exists:
+    rule: "process_id MUST exist in processes list"
+    enforcement: reject
+    reason: "Only registered processes are allowed"
+  
+  process_step_id_exists:
+    rule: "process_step_id MUST exist under specified process_id"
+    enforcement: reject
+    reason: "Only registered steps are allowed"
+  
+  process_step_role_allowed:
+    rule: "process_step_role MUST be in allowed_roles for step OR global_roles"
+    enforcement: reject
+    reason: "Only allowed roles per step"
+  
+  all_three_or_none:
+    rule: "All three fields (process_id, process_step_id, process_step_role) must be set together or all null"
+    enforcement: reject
+    reason: "Partial process mapping is invalid"
+  
+  process_status_active:
+    rule: "process_id must reference active process"
+    enforcement: warning
+    reason: "Using deprecated process"
+
+# =============================================================================
+# GOVERNANCE
+# =============================================================================
+
+governance:
+  adding_new_process:
+    requirements:
+      - "Design document describing process"
+      - "Process owner identified"
+      - "List of steps with descriptions"
+    
+    approval: "Architecture team + process owner"
+    
+    workflow:
+      - "Submit process definition YAML"
+      - "Review by architecture team"
+      - "Approval by process owner"
+      - "Merge to PROCESS_REGISTRY.yaml"
+      - "Validator updated to enforce new process"
+  
+  adding_new_step:
+    requirements:
+      - "Step description"
+      - "Allowed roles list"
+    
+    approval: "Process owner"
+    
+    workflow:
+      - "Update process entry in PROCESS_REGISTRY.yaml"
+      - "Submit PR"
+      - "Review by process owner"
+      - "Merge"
+  
+  adding_new_role:
+    requirements:
+      - "Role description"
+      - "Usage examples"
+      - "Rationale for new role (why existing roles insufficient)"
+    
+    approval: "Architecture team"
+    
+    workflow:
+      - "Add to global_roles list OR step-specific allowed_roles"
+      - "Submit PR with rationale"
+      - "Architecture team review"
+      - "Merge"
+  
+  deprecating_process:
+    workflow:
+      - "Set process_status to 'deprecated'"
+      - "Add deprecation_reason and deprecation_date"
+      - "Notify all users of deprecated process"
+      - "Grace period: 90 days"
+      - "After grace period, set status to 'archived'"
+
+# =============================================================================
+# USAGE EXAMPLES
+# =============================================================================
+
+usage_examples:
+  - description: "Assign file to build process compile step"
+    assignment:
+      process_id: PROC-BUILD
+      process_step_id: STEP-COMPILE
+      process_step_role: input
+    example_file: "src/main.py"
+    reasoning: "Source file compiled during build"
+  
+  - description: "Assign test file to test process"
+    assignment:
+      process_id: PROC-TEST
+      process_step_id: STEP-UNIT-TEST
+      process_step_role: test
+    example_file: "tests/test_registry.py"
+    reasoning: "Unit test file"
+  
+  - description: "Assign config file to deployment"
+    assignment:
+      process_id: PROC-DEPLOY
+      process_step_id: STEP-RELEASE
+      process_step_role: config
+    example_file: "config/production.yaml"
+    reasoning: "Production deployment configuration"
+
+# =============================================================================
+# PROCESS STATUS VALUES
+# =============================================================================
+
+process_status_values:
+  active:
+    description: "Process is currently in use"
+    allowed_operations: "all"
+  
+  deprecated:
+    description: "Process is deprecated, will be removed"
+    allowed_operations: "read-only, assignments discouraged"
+    migration_required: true
+  
+  archived:
+    description: "Process no longer in use"
+    allowed_operations: "read-only for historical records"
+    new_assignments: false
+
+# =============================================================================
+# MIGRATION SUPPORT
+# =============================================================================
+
+migration:
+  from_no_process_mapping:
+    description: "Initial process assignment for existing files"
+    recommendation: "Manual assignment based on file purpose"
+    workflow:
+      - "Identify files by purpose (test, source, config)"
+      - "Bulk assign via script"
+      - "Review and adjust manually"
+  
+  automated_assignment:
+    description: "Future: derive process from file location"
+    status: "planned"
+    approach: "Create MODULE_PROCESS_MAP.yaml to derive process from module_id"
+
+# =============================================================================
+# REPORTING
+# =============================================================================
+
+reporting:
+  process_coverage:
+    description: "Report on process mapping coverage"
+    metrics:
+      - "% of files with process assignment"
+      - "Files per process"
+      - "Files per step"
+      - "Files per role"
+  
+  process_health:
+    description: "Report on process health"
+    metrics:
+      - "Deprecated process usage"
+      - "Orphaned process references (invalid process_id)"
+      - "Unbalanced roles (e.g., outputs with no inputs)"

@@ -1,0 +1,380 @@
+# doc_id: 2026012100230011
+# title: Module Assignment Policy
+# version: 1.0
+# date: 2026-01-21T00:23:14Z
+# status: AUTHORITATIVE
+# purpose: Deterministic module derivation with precedence chain
+
+schema_version: "1.0"
+policy_version: "1.0"
+last_updated: "2026-01-21T00:23:14Z"
+doc_id: "2026012100230011"
+
+# =============================================================================
+# PRECEDENCE CHAIN (evaluated in order, first match wins)
+# =============================================================================
+
+precedence_chain:
+  1:
+    source: override
+    description: "User-specified override takes absolute precedence"
+    field: module_id_override
+    condition: "module_id_override is not null and module_id_override != ''"
+    module_id_source: "override"
+    reason: "User explicitly assigned module"
+    
+  2:
+    source: manifest
+    description: "Module manifest file in directory or parent"
+    method: lookup_module_manifest
+    search_paths:
+      - "{directory_path}/.module.yaml"
+      - "{directory_path}/module.yaml"
+      - "{directory_path}/../.module.yaml"
+      - "{directory_path}/../../.module.yaml"
+    manifest_field: module_id
+    condition: "manifest file exists AND module_id field present"
+    module_id_source: "manifest"
+    reason: "Declared in module manifest"
+    
+  3:
+    source: path_rule
+    description: "Deterministic path-to-module regex mapping"
+    method: regex_match
+    rules:
+      - pattern: "^core/.*"
+        module_id: "MOD-CORE"
+        description: "Core registry and ID system"
+        
+      - pattern: "^validation/.*"
+        module_id: "MOD-VALIDATION"
+        description: "Validation and integrity checking"
+        
+      - pattern: "^registry/.*"
+        module_id: "MOD-REGISTRY"
+        description: "Registry specifications and documentation"
+        
+      - pattern: "^automation/.*"
+        module_id: "MOD-AUTOMATION"
+        description: "Automation and generator scripts"
+        
+      - pattern: "^tests/.*"
+        module_id: "MOD-TESTS"
+        description: "Test suites"
+        
+      - pattern: "^docs/.*"
+        module_id: "MOD-DOCS"
+        description: "Documentation"
+        
+      - pattern: "^contracts/.*"
+        module_id: "MOD-CONTRACTS"
+        description: "Contracts and policies"
+        
+      - pattern: "^hooks/.*"
+        module_id: "MOD-HOOKS"
+        description: "Git hooks and integrations"
+        
+      - pattern: "^monitoring/.*"
+        module_id: "MOD-MONITORING"
+        description: "Monitoring and observability"
+        
+    condition: "relative_path matches pattern"
+    module_id_source: "path_rule"
+    reason: "Derived from directory structure"
+    
+  4:
+    source: default
+    description: "No module assignment (unassigned)"
+    module_id: null
+    module_id_source: "unassigned"
+    condition: "always (fallback)"
+    reason: "No module mapping found"
+
+# =============================================================================
+# MODULE MANIFEST SCHEMA
+# =============================================================================
+
+module_manifest_schema:
+  filename: ".module.yaml or module.yaml"
+  format: YAML
+  
+  required_fields:
+    - module_id
+  
+  optional_fields:
+    - module_name
+    - module_version
+    - module_owner
+    - module_description
+    - module_dependencies
+    - module_tags
+  
+  example: |
+    # .module.yaml
+    module_id: MOD-IDENTITY-CORE
+    module_name: "Identity System Core"
+    module_version: "2.1.0"
+    module_owner: "platform-team"
+    module_description: "Core identity allocation and registry"
+    module_dependencies:
+      - MOD-VALIDATION
+      - MOD-CONTRACTS
+    module_tags:
+      - identity
+      - core
+  
+  validation:
+    - module_id format: "MOD-[A-Z0-9_-]+"
+    - module_version: semantic versioning (x.y.z)
+    - module_dependencies: list of valid module IDs
+
+# =============================================================================
+# PATH RULE ALGORITHM
+# =============================================================================
+
+path_rule_algorithm:
+  description: "How path-to-module mapping works"
+  
+  steps:
+    1: "Normalize relative_path (forward slashes, no leading ./)"
+    2: "Extract top-level directory from relative_path"
+    3: "Match against regex patterns in order (first match wins)"
+    4: "If pattern matches, assign module_id from rule"
+    5: "If no match, module_id = null (unassigned)"
+  
+  normalization_rules:
+    - "Replace backslashes with forward slashes"
+    - "Remove leading ./"
+    - "Collapse repeated slashes"
+  
+  matching_rules:
+    - "Patterns are tested in order defined in policy"
+    - "First match wins (short-circuit evaluation)"
+    - "Use Python re.match() semantics (anchored at start)"
+  
+  examples:
+    - input: "core/registry.py"
+      pattern_matched: "^core/.*"
+      module_id: "MOD-CORE"
+      module_id_source: "path_rule"
+    
+    - input: "validation/validate_identity.py"
+      pattern_matched: "^validation/.*"
+      module_id: "MOD-VALIDATION"
+      module_id_source: "path_rule"
+    
+    - input: "README.md"
+      pattern_matched: null
+      module_id: null
+      module_id_source: "unassigned"
+
+# =============================================================================
+# OVERRIDE BEHAVIOR
+# =============================================================================
+
+override_behavior:
+  description: "How module_id_override affects module assignment"
+  
+  rules:
+    - "module_id_override takes absolute precedence over all other sources"
+    - "Scanner MUST NOT overwrite module_id when override is set"
+    - "Validator MUST check override references valid module (if module registry exists)"
+    - "Override can be cleared by setting to null or empty string explicitly"
+    - "Override must be set manually by user (tool_only = false for override field)"
+  
+  use_cases:
+    - "Temporarily assign file to different module for testing"
+    - "Override incorrect path-based assignment"
+    - "Assign root-level files to specific modules"
+  
+  example:
+    before:
+      relative_path: "utils/helper.py"
+      module_id: null  # No path rule matches "utils/"
+      module_id_source: "unassigned"
+      module_id_override: null
+    
+    after_override:
+      relative_path: "utils/helper.py"
+      module_id: "MOD-CORE"  # Derived from override
+      module_id_source: "override"
+      module_id_override: "MOD-CORE"
+
+# =============================================================================
+# VALIDATION RULES
+# =============================================================================
+
+validation_rules:
+  module_id_format:
+    rule: "module_id matches '^MOD-[A-Z0-9_-]+$' OR is null"
+    enforcement: reject
+    reason: "Ensure consistent module ID format"
+  
+  module_id_source_enum:
+    rule: "module_id_source in ['override', 'manifest', 'path_rule', 'unassigned']"
+    enforcement: reject
+    reason: "Track how module was assigned"
+  
+  override_consistency:
+    rule: "If module_id_source='override', module_id_override MUST be non-null"
+    enforcement: reject
+    reason: "Source must match actual override state"
+  
+  manifest_consistency:
+    rule: "If module_id_source='manifest', manifest file MUST exist at scan time"
+    enforcement: warning
+    reason: "Manifest may have been deleted since last scan"
+  
+  module_id_not_empty_when_sourced:
+    rule: "If module_id_source != 'unassigned', module_id MUST be non-null"
+    enforcement: reject
+    reason: "Source implies module was assigned"
+
+# =============================================================================
+# CONFLICT RESOLUTION
+# =============================================================================
+
+conflict_resolution:
+  multiple_files_same_directory:
+    rule: "All files in same directory get same module (from manifest or path rule)"
+    reason: "Directories are module boundaries"
+  
+  conflicting_manifests_in_tree:
+    rule: "Use closest ancestor manifest (shortest path)"
+    reason: "Child modules override parent modules"
+    example:
+      - "core/.module.yaml defines MOD-CORE"
+      - "core/sub/.module.yaml defines MOD-CORE-SUB"
+      - "core/sub/file.py → MOD-CORE-SUB (closer manifest wins)"
+  
+  invalid_manifest:
+    rule: "Skip to next precedence level (log warning)"
+    reason: "Don't block assignment on malformed manifest"
+    actions:
+      - "Log warning: 'Invalid manifest at {path}: {error}'"
+      - "Continue to path_rule evaluation"
+      - "Do NOT use partial manifest data"
+
+# =============================================================================
+# MODULE REGISTRY (optional but recommended)
+# =============================================================================
+
+module_registry:
+  description: "Optional centralized module registry for validation"
+  
+  format: YAML or JSON
+  
+  schema:
+    - module_id: string (unique)
+    - module_name: string
+    - module_description: string
+    - module_owner: string
+    - module_status: enum(active, deprecated, archived)
+    - module_path_pattern: string (regex)
+  
+  usage:
+    - "Validator can check module_id references are valid"
+    - "Reports can show module metadata"
+    - "Deprecation tracking"
+  
+  example: |
+    # MODULE_REGISTRY.yaml
+    modules:
+      - module_id: MOD-CORE
+        module_name: "Core System"
+        module_description: "Registry and ID allocation"
+        module_owner: "platform-team"
+        module_status: active
+        module_path_pattern: "^core/.*"
+      
+      - module_id: MOD-VALIDATION
+        module_name: "Validation Framework"
+        module_description: "Validators and integrity checks"
+        module_owner: "qa-team"
+        module_status: active
+        module_path_pattern: "^validation/.*"
+
+# =============================================================================
+# IMPLEMENTATION NOTES
+# =============================================================================
+
+implementation:
+  scanner_behavior:
+    - "Load MODULE_ASSIGNMENT_POLICY.yaml at startup"
+    - "For each file, evaluate precedence chain"
+    - "Set module_id and module_id_source"
+    - "Respect existing module_id_override (don't overwrite)"
+    - "Log module assignment decisions (debug mode)"
+  
+  validator_behavior:
+    - "Load MODULE_ASSIGNMENT_POLICY.yaml"
+    - "Check module_id format"
+    - "Check module_id_source consistency"
+    - "Warn on invalid manifest references"
+    - "Optionally validate against MODULE_REGISTRY.yaml"
+  
+  performance:
+    - "Cache compiled regex patterns"
+    - "Cache manifest file locations"
+    - "Manifest lookup should be fast (< 1ms per file)"
+
+# =============================================================================
+# MIGRATION SUPPORT
+# =============================================================================
+
+migration:
+  from_no_modules:
+    description: "Initial module assignment for existing files"
+    steps:
+      - "Run scanner with MODULE_ASSIGNMENT_POLICY"
+      - "All files get module assigned via path rules"
+      - "Review unassigned files"
+      - "Create manifests for complex structures"
+      - "Add overrides as needed"
+  
+  changing_path_rules:
+    description: "What happens when path rules change"
+    behavior: "Next scan will reassign modules based on new rules"
+    recommendation: "Version the policy file, migrate gradually"
+
+# =============================================================================
+# EXAMPLES
+# =============================================================================
+
+examples:
+  - description: "File with override"
+    file:
+      relative_path: "scripts/utility.py"
+      module_id_override: "MOD-CORE"
+    result:
+      module_id: "MOD-CORE"
+      module_id_source: "override"
+      reason: "Override takes precedence"
+  
+  - description: "File with manifest"
+    file:
+      relative_path: "services/api/handler.py"
+      directory_path: "services/api"
+    manifest:
+      path: "services/api/.module.yaml"
+      content: "module_id: MOD-API-SERVICE"
+    result:
+      module_id: "MOD-API-SERVICE"
+      module_id_source: "manifest"
+      reason: "Manifest found and valid"
+  
+  - description: "File with path rule match"
+    file:
+      relative_path: "core/registry.py"
+    result:
+      module_id: "MOD-CORE"
+      module_id_source: "path_rule"
+      reason: "Matches pattern '^core/.*'"
+  
+  - description: "File unassigned"
+    file:
+      relative_path: "README.md"
+    result:
+      module_id: null
+      module_id_source: "unassigned"
+      reason: "No rule matches"
