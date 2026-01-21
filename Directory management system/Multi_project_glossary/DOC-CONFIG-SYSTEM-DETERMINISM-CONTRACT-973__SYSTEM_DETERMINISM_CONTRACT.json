@@ -1,0 +1,80 @@
+{
+  "branch_isolation": {
+    "enforce_worktrees": false,
+    "require_clean_state": true
+  },
+  "config_priority": {
+    "allowed_sources": [
+      "CLI args via argparse/click",
+      "Config files: config.yaml, .env",
+      "Environment variables with explicit prefix (UET_*)"
+    ],
+    "no_implicit_config": true,
+    "precedence_order": [
+      "CLI Arguments (highest)",
+      "Configuration Files (YAML/JSON/TOML)",
+      "Environment Variables (lowest)"
+    ]
+  },
+  "determinism_rules": {
+    "canonical_json": {
+      "enforce": true,
+      "ensure_ascii": false,
+      "separators": [
+        ",",
+        ":"
+      ],
+      "sort_keys": true
+    },
+    "no_unseeded_random": {
+      "allowed_libraries": [
+        "random.Random(seed=fixed)",
+        "numpy.random.Generator(seed=fixed)"
+      ],
+      "enforce": true,
+      "gate_check": "scripts/gate_check.sh checks for 'import random' without seed"
+    },
+    "no_volatile_timestamps": {
+      "allowed_patterns": [
+        "datetime.datetime.fromisoformat(injected_timestamp)",
+        "time.time() only in performance measurement contexts with explicit disclaimer"
+      ],
+      "enforce": true,
+      "require_clock_injection": true
+    },
+    "stable_sorting": {
+      "enforce": true,
+      "rules": [
+        "Deterministic ordering for output lists and indexes"
+      ]
+    }
+  },
+  "module_name": "SUB_GLOSSARY",
+  "output_containment": {
+    "allowed_output_dirs": [
+      ".runs/<run_id>/",
+      "logs/",
+      "reports/"
+    ],
+    "enforce": true,
+    "violations_fail_ci": true
+  },
+  "protected_paths": [],
+  "resource_limits": {
+    "max_disk_usage_mb": 10240,
+    "max_execution_time_seconds": 3600,
+    "max_memory_mb": 4096
+  },
+  "run_directory_standard": {
+    "canonical_pattern": ".runs/<run_id>/",
+    "deprecated_patterns": [],
+    "enforcement": {
+      "ci_gate": true,
+      "validator": "scripts/validate_determinism_contract.py"
+    },
+    "rationale": "Module follows the repository-wide run directory standard."
+  },
+  "updated_utc": "2025-12-27T21:10:04.246368Z",
+  "version": "1.0.0",
+  "doc_id": "DOC-CONFIG-SYSTEM-DETERMINISM-CONTRACT-973"
+}

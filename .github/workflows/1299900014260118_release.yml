@@ -1,0 +1,540 @@
+---
+doc_id: DOC-INFRA-0014
+---
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v0.1.0)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Mark as pre-release'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      release_id: ${{ steps.create_release.outputs.id }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Node.js for conventional-changelog
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install conventional-changelog
+      run: |
+        npm install -g conventional-changelog-cli conventional-recommended-bump
+
+    - name: Determine version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          VERSION="${{ github.event.inputs.version }}"
+        else
+          VERSION=${GITHUB_REF#refs/tags/}
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "version_without_v=${VERSION#v}" >> $GITHUB_OUTPUT
+
+    - name: Get previous tag
+      id: prev_tag
+      run: |
+        PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+        if [ -z "$PREV_TAG" ]; then
+          PREV_TAG=$(git rev-list --max-parents=0 HEAD)
+          echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
+          echo "is_first_release=true" >> $GITHUB_OUTPUT
+        else
+          echo "prev_tag=$PREV_TAG" >> $GITHUB_OUTPUT
+          echo "is_first_release=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Generate changelog
+      id: changelog
+      run: |
+        if [ "${{ steps.prev_tag.outputs.is_first_release }}" = "true" ]; then
+          echo "## 🎉 Initial Release" > CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "This is the first release of the EAFIX Trading System with the following features:" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "### ✨ Features" >> CHANGELOG.md
+          echo "- **Microservices Architecture**: 17 containerized services with event-driven communication" >> CHANGELOG.md
+          echo "- **Contract Registry**: Centralized schema validation and cross-language compatibility" >> CHANGELOG.md
+          echo "- **Trading Pipeline**: Complete data ingestion → signals → risk → execution flow" >> CHANGELOG.md
+          echo "- **Security**: Signed container images with SBOM and vulnerability scanning" >> CHANGELOG.md
+          echo "- **Observability**: Structured logging, metrics, and health checks" >> CHANGELOG.md
+          echo "- **Production Ready**: Kubernetes manifests, CI/CD pipelines, and monitoring" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "### 🏗️ Architecture" >> CHANGELOG.md
+          echo "- **data-ingestor** (8081): Price feed normalization from MT4/DDE" >> CHANGELOG.md
+          echo "- **indicator-engine** (8082): Technical indicator computations" >> CHANGELOG.md
+          echo "- **signal-generator** (8083): Trading rule applications" >> CHANGELOG.md  
+          echo "- **risk-manager** (8084): Position sizing and risk validation" >> CHANGELOG.md
+          echo "- **execution-engine** (8085): Broker order execution" >> CHANGELOG.md
+          echo "- **gui-gateway** (8080): Operator UI and API gateway" >> CHANGELOG.md
+          echo "- **reporter** (8088): Metrics and P&L analysis" >> CHANGELOG.md
+          echo "- Plus 10 additional supporting services for complete functionality" >> CHANGELOG.md
+        else
+          conventional-changelog -p angular -r 2 > CHANGELOG.md
+        fi
+
+        # Escape newlines and special characters for GitHub Actions output
+        CHANGELOG_CONTENT=$(cat CHANGELOG.md | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g')
+        echo "content=$CHANGELOG_CONTENT" >> $GITHUB_OUTPUT
+
+    - name: Update version in files
+      run: |
+        VERSION="${{ steps.version.outputs.version_without_v }}"
+        
+        # Update pyproject.toml if it exists
+        if [ -f "pyproject.toml" ]; then
+          sed -i "s/^version = .*/version = \"$VERSION\"/" pyproject.toml
+        fi
+        
+        # Create/update VERSION file
+        echo "$VERSION" > VERSION
+        
+        # Update any package.json files
+        find . -name "package.json" -exec sed -i "s/\"version\": \".*\"/\"version\": \"$VERSION\"/" {} \;
+
+    - name: Generate release notes
+      id: release_notes
+      run: |
+        cat > release_notes.md << 'EOF'
+        ## 🚀 EAFIX Trading System ${{ steps.version.outputs.version }}
+
+        ### 📦 Container Images
+
+        All container images are available at `ghcr.io/${{ github.repository }}`:
+
+        | Service | Image | Port |
+        |---------|-------|------|
+        | GUI Gateway | `gui-gateway:${{ steps.version.outputs.version }}` | 8080 |
+        | Data Ingestor | `data-ingestor:${{ steps.version.outputs.version }}` | 8081 |
+        | Indicator Engine | `indicator-engine:${{ steps.version.outputs.version }}` | 8082 |
+        | Signal Generator | `signal-generator:${{ steps.version.outputs.version }}` | 8083 |
+        | Risk Manager | `risk-manager:${{ steps.version.outputs.version }}` | 8084 |
+        | Execution Engine | `execution-engine:${{ steps.version.outputs.version }}` | 8085 |
+        | Calendar Ingestor | `calendar-ingestor:${{ steps.version.outputs.version }}` | 8086 |
+        | Reentry Matrix | `reentry-matrix-svc:${{ steps.version.outputs.version }}` | 8087 |
+        | Reporter | `reporter:${{ steps.version.outputs.version }}` | 8088 |
+
+        ### 🔐 Security & Verification
+
+        All container images in this release have been:
+        - ✅ **Digitally signed** with Cosign keyless signing
+        - ✅ **SBOM generated** in SPDX format using Syft  
+        - ✅ **Vulnerability scanned** with Grype
+        - ✅ **Build attestations** created and attached
+
+        **Verify signatures:**
+        ```bash
+        cosign verify --certificate-identity-regexp=".*" \
+          --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
+          ghcr.io/${{ github.repository }}/gui-gateway:${{ steps.version.outputs.version }}
+        ```
+
+        ### 🚀 Quick Start
+
+        **Using Docker Compose:**
+        ```bash
+        curl -O https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/docker-compose.yml
+        docker compose up -d
+        ```
+
+        **Using Kubernetes:**
+        ```bash
+        curl -O https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/k8s-manifests.tar.gz
+        tar -xzf k8s-manifests.tar.gz
+        kubectl apply -f k8s-manifests/
+        ```
+
+        ### 📊 System Health
+
+        After deployment, verify system health:
+        ```bash
+        # Check GUI Gateway
+        curl http://localhost:8080/healthz
+
+        # Check all services  
+        curl http://localhost:8080/api/v1/system/status
+        ```
+
+        EOF
+
+        # Add changelog content
+        echo "" >> release_notes.md
+        cat CHANGELOG.md >> release_notes.md
+
+        # Add footer
+        cat >> release_notes.md << 'EOF'
+
+        ### 📚 Documentation
+
+        - [Architecture Overview](https://github.com/${{ github.repository }}/blob/${{ steps.version.outputs.version }}/README.md)
+        - [Service Catalog](https://github.com/${{ github.repository }}/blob/${{ steps.version.outputs.version }}/docs/modernization/01_service_catalog.md)
+        - [Contract System](https://github.com/${{ github.repository }}/blob/${{ steps.version.outputs.version }}/docs/modernization/02_contracts_codegen.md)
+        - [Deployment Guide](https://github.com/${{ github.repository }}/blob/${{ steps.version.outputs.version }}/deploy/README.md)
+
+        ### 🐛 Bug Reports & 💡 Feature Requests
+
+        Please use the [GitHub Issues](https://github.com/${{ github.repository }}/issues) to report bugs or request features.
+
+        ### 🔧 System Requirements
+
+        - **Docker**: 24.0.0+
+        - **Docker Compose**: 2.0.0+  
+        - **Kubernetes**: 1.25+ (optional)
+        - **Memory**: 4GB minimum, 8GB recommended
+        - **CPU**: 2 cores minimum, 4+ cores recommended
+        - **Storage**: 10GB for logs and data
+
+        ---
+
+        **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ steps.prev_tag.outputs.prev_tag }}...${{ steps.version.outputs.version }}
+        EOF
+
+        # Escape for GitHub Actions output
+        RELEASE_NOTES=$(cat release_notes.md | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g')
+        echo "content=$RELEASE_NOTES" >> $GITHUB_OUTPUT
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.version.outputs.version }}
+        release_name: 'EAFIX Trading System ${{ steps.version.outputs.version }}'
+        body: ${{ steps.release_notes.outputs.content }}
+        draft: false
+        prerelease: ${{ github.event.inputs.prerelease || false }}
+
+  upload-assets:
+    runs-on: ubuntu-latest
+    needs: create-release
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          VERSION="${{ github.event.inputs.version }}"
+        else
+          VERSION=${GITHUB_REF#refs/tags/}
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Create deployment artifacts
+      run: |
+        mkdir -p release-assets
+
+        # Create docker-compose.yml for easy deployment
+        cat > release-assets/docker-compose.yml << 'EOF'
+        version: '3.8'
+
+        services:
+          gui-gateway:
+            image: ghcr.io/${{ github.repository }}/gui-gateway:${{ steps.version.outputs.version }}
+            ports:
+              - "8080:8080"
+            environment:
+              - REDIS_URL=redis://redis:6379
+              - DATABASE_URL=postgresql://postgres:password@postgres:5432/eafix
+            depends_on:
+              - redis
+              - postgres
+            healthcheck:
+              test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+              interval: 30s
+              timeout: 10s
+              retries: 3
+
+          data-ingestor:
+            image: ghcr.io/${{ github.repository }}/data-ingestor:${{ steps.version.outputs.version }}
+            ports:
+              - "8081:8080"
+            environment:
+              - REDIS_URL=redis://redis:6379
+            depends_on:
+              - redis
+
+          indicator-engine:
+            image: ghcr.io/${{ github.repository }}/indicator-engine:${{ steps.version.outputs.version }}
+            ports:
+              - "8082:8080"
+            environment:
+              - REDIS_URL=redis://redis:6379
+            depends_on:
+              - redis
+
+          signal-generator:
+            image: ghcr.io/${{ github.repository }}/signal-generator:${{ steps.version.outputs.version }}
+            ports:
+              - "8083:8080"
+            environment:
+              - REDIS_URL=redis://redis:6379
+            depends_on:
+              - redis
+
+          risk-manager:
+            image: ghcr.io/${{ github.repository }}/risk-manager:${{ steps.version.outputs.version }}
+            ports:
+              - "8084:8080"
+            environment:
+              - REDIS_URL=redis://redis:6379
+            depends_on:
+              - redis
+
+          execution-engine:
+            image: ghcr.io/${{ github.repository }}/execution-engine:${{ steps.version.outputs.version }}
+            ports:
+              - "8085:8080"
+            environment:
+              - REDIS_URL=redis://redis:6379
+            depends_on:
+              - redis
+
+          reporter:
+            image: ghcr.io/${{ github.repository }}/reporter:${{ steps.version.outputs.version }}
+            ports:
+              - "8088:8080"
+            environment:
+              - REDIS_URL=redis://redis:6379
+              - DATABASE_URL=postgresql://postgres:password@postgres:5432/eafix
+            depends_on:
+              - redis
+              - postgres
+
+          redis:
+            image: redis:7-alpine
+            ports:
+              - "6379:6379"
+            command: redis-server --appendonly yes
+            volumes:
+              - redis-data:/data
+
+          postgres:
+            image: postgres:15-alpine
+            ports:
+              - "5432:5432"
+            environment:
+              - POSTGRES_DB=eafix
+              - POSTGRES_USER=postgres
+              - POSTGRES_PASSWORD=password
+            volumes:
+              - postgres-data:/var/lib/postgresql/data
+
+        volumes:
+          redis-data:
+          postgres-data:
+
+        networks:
+          default:
+            name: eafix-network
+        EOF
+
+        # Create Kubernetes manifests
+        mkdir -p release-assets/k8s-manifests
+        
+        # Generate basic Kubernetes deployment manifests
+        for service in gui-gateway data-ingestor indicator-engine signal-generator risk-manager execution-engine reporter; do
+          port=$(case $service in
+            "gui-gateway") echo 8080;;
+            "data-ingestor") echo 8081;;
+            "indicator-engine") echo 8082;;
+            "signal-generator") echo 8083;;
+            "risk-manager") echo 8084;;
+            "execution-engine") echo 8085;;
+            "reporter") echo 8088;;
+          esac)
+          
+          cat > release-assets/k8s-manifests/${service}-deployment.yaml << EOF
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: ${service}
+          labels:
+            app: ${service}
+            version: ${{ steps.version.outputs.version }}
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app: ${service}
+          template:
+            metadata:
+              labels:
+                app: ${service}
+            spec:
+              containers:
+              - name: ${service}
+                image: ghcr.io/${{ github.repository }}/${service}:${{ steps.version.outputs.version }}
+                ports:
+                - containerPort: 8080
+                env:
+                - name: REDIS_URL
+                  value: "redis://redis:6379"
+                - name: DATABASE_URL
+                  value: "postgresql://postgres:password@postgres:5432/eafix"
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8080
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8080
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  requests:
+                    memory: "128Mi"
+                    cpu: "100m"
+                  limits:
+                    memory: "512Mi"
+                    cpu: "500m"
+        ---
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: ${service}
+        spec:
+          selector:
+            app: ${service}
+          ports:
+          - port: ${port}
+            targetPort: 8080
+          type: ClusterIP
+        EOF
+        done
+
+        # Create archive of k8s manifests
+        tar -czf release-assets/k8s-manifests.tar.gz -C release-assets k8s-manifests/
+
+        # Create installation script
+        cat > release-assets/install.sh << 'EOF'
+        #!/bin/bash
+        set -e
+
+        VERSION="${{ steps.version.outputs.version }}"
+        echo "Installing EAFIX Trading System $VERSION"
+
+        # Check dependencies
+        command -v docker >/dev/null 2>&1 || { echo "Docker is required but not installed. Aborting." >&2; exit 1; }
+        command -v docker-compose >/dev/null 2>&1 || { echo "Docker Compose is required but not installed. Aborting." >&2; exit 1; }
+
+        # Download and start
+        echo "Downloading docker-compose.yml..."
+        curl -L -o docker-compose.yml https://github.com/${{ github.repository }}/releases/download/$VERSION/docker-compose.yml
+
+        echo "Starting EAFIX Trading System..."
+        docker-compose up -d
+
+        echo "Waiting for services to be ready..."
+        sleep 30
+
+        # Health check
+        if curl -f http://localhost:8080/healthz > /dev/null 2>&1; then
+          echo "✅ EAFIX Trading System is running!"
+          echo "📊 Dashboard: http://localhost:8080"
+          echo "🔍 API Status: http://localhost:8080/api/v1/system/status"
+        else
+          echo "❌ Health check failed. Check logs with: docker-compose logs"
+          exit 1
+        fi
+        EOF
+        chmod +x release-assets/install.sh
+
+        # Create README
+        cat > release-assets/README.txt << 'EOF'
+        EAFIX Trading System ${{ steps.version.outputs.version }}
+        ================================================
+
+        This release contains:
+
+        📁 Files:
+        - docker-compose.yml     - Docker Compose deployment
+        - k8s-manifests.tar.gz  - Kubernetes deployment manifests  
+        - install.sh            - Quick installation script
+        - README.txt            - This file
+
+        🚀 Quick Start:
+        1. Run: ./install.sh
+        2. Open: http://localhost:8080
+
+        📚 Documentation:
+        https://github.com/${{ github.repository }}/blob/${{ steps.version.outputs.version }}/README.md
+
+        🔐 Security:
+        All container images are signed and include SBOMs.
+        Verify with: cosign verify --certificate-identity-regexp=".*" --certificate-oidc-issuer="https://token.actions.githubusercontent.com" [image]
+
+        🐛 Issues:  
+        https://github.com/${{ github.repository }}/issues
+        EOF
+
+    - name: Upload docker-compose.yml
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: ./release-assets/docker-compose.yml
+        asset_name: docker-compose.yml
+        asset_content_type: text/yaml
+
+    - name: Upload k8s manifests
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: ./release-assets/k8s-manifests.tar.gz
+        asset_name: k8s-manifests.tar.gz
+        asset_content_type: application/gzip
+
+    - name: Upload install script
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: ./release-assets/install.sh
+        asset_name: install.sh
+        asset_content_type: application/x-sh
+
+    - name: Upload README
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: ./release-assets/README.txt
+        asset_name: README.txt
+        asset_content_type: text/plain

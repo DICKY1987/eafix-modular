@@ -1,0 +1,44 @@
+{
+  "_doc_id": "DOC-CONFIG-0131",
+
+  "doc_id": "DOC-CONTRACT-0014",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PriceTick",
+  "version": "1.0",
+  "description": "Market price tick data from broker feeds",
+  "type": "object",
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC timestamp of the tick"
+    },
+    "symbol": {
+      "type": "string",
+      "pattern": "^[A-Z]{6}$",
+      "description": "Currency pair symbol (e.g., EURUSD)"
+    },
+    "bid": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Bid price"
+    },
+    "ask": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Ask price"
+    },
+    "volume": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Optional tick volume"
+    }
+  },
+  "required": [
+    "timestamp",
+    "symbol",
+    "bid",
+    "ask"
+  ],
+  "additionalProperties": false
+}

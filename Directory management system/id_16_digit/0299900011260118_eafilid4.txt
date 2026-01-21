@@ -1,0 +1,691 @@
+## FILE_SCAN_CSV_REGISTRY — Technical Documentation (Registry Contract)
+
+```yaml
+document_id: DOC-REG-FILE-SCAN-CSV-001
+title: File Scan CSV Registry Contract (Snapshot Inventory)
+version: 1.0.0
+status: active
+source_generator: Enhanced File Scanner v2.py
+source_path: /mnt/data/Enhanced File Scanner v2.py
+output_filename_pattern: file_scan_YYYYMMDD_HHMMSS.csv[.gz]
+schema_version: REG-SCAN-CSV-1.0
+row_granularity: one row per scanned item (file OR directory)
+scope: filesystem snapshot inventory + ID-planning inputs
+```
+
+### What this registry is
+
+A **snapshot CSV registry** produced by a scan run. Each row represents **one filesystem item** (file or directory) observed under a scan root at scan time. The registry is designed to be:
+
+* **Machine-parsable** (fixed headers, deterministic derivations)
+* **Audit-friendly** (error fields, per-run identifiers)
+* **Planning-friendly** for your 16-digit filename ID enforcement (needs_id, placeholder filename, type/ns/scope derivations)
+
+### What this registry is not
+
+* It is **not** a mutating database.
+* It does **not** allocate IDs or rename files.
+* It is **not** guaranteed to include every possible file on disk (filters/exclusions apply).
+
+---
+
+## Output files and run identity
+
+### Output file naming
+
+The generator writes CSV as:
+
+* `file_scan_YYYYMMDD_HHMMSS.csv` (optionally `...csv.gz` when compression is enabled)
+
+This filename timestamp is **not the primary run identifier**.
+
+### Run identity fields
+
+Each row includes these per-run invariants:
+
+* `scan_id`: unique run identifier (timestamp + UUID suffix)
+* `scan_root`: absolute path of the root scanned
+* `first_seen_utc`: snapshot timestamp (UTC) set once per run
+
+These three values allow correlation of all rows to a single snapshot run even if the CSV file is moved/renamed.
+
+---
+
+## Record semantics (row behavior)
+
+### Row types
+
+* `is_directory = True` ⇒ directory row
+* `is_directory = False` ⇒ file row
+
+The scanner emits directory rows and file rows. Directory rows have:
+
+* `extension = ''`
+* `content_hash = ''`
+* `mime_type` often blank/unused
+
+### Path semantics
+
+* `relative_path` is **portable** and should be treated as the **primary locator within the scan root**.
+* `path` is the **absolute path at scan time** (useful for debugging, not portable across machines).
+
+Normalization:
+
+* `relative_path` uses forward slashes (`/`) regardless of platform.
+
+---
+
+## Canonical CSV header list (in exact order)
+
+Fixed headers always present:
+
+1. `scan_id`
+2. `scan_root`
+3. `first_seen_utc`
+4. `relative_path`
+5. `path`
+6. `name`
+7. `extension`
+8. `size_bytes`
+9. `mtime_utc`
+10. `created_time`
+11. `is_directory`
+12. `mime_type`
+13. `permissions`
+14. `content_hash`
+15. `doc_id`
+16. `has_id_prefix`
+17. `current_id_prefix`
+18. `needs_id`
+19. `0000000000000000_filename`
+20. `type_code`
+21. `ns_code`
+22. `scope`
+23. `planned_id`
+24. `planned_rel_path`
+25. `error`
+26. `error_kind`
+
+Optional headers (appear only when extra hashing is enabled):
+
+* `hash_sha256`, `hash_md5`, `hash_sha1`, `hash_sha512`, etc. (one per enabled algorithm)
+
+---
+
+## Column definitions (types, derivations, constraints)
+
+### Per-run columns
+
+| Column           |                  Type | Required | Meaning / Derivation                                                |
+| ---------------- | --------------------: | :------: | ------------------------------------------------------------------- |
+| `scan_id`        |                string |    yes   | Unique ID for the scan run. Same for every row in the same CSV.     |
+| `scan_root`      |                string |    yes   | Absolute scan root path. Same for every row in the same CSV.        |
+| `first_seen_utc` | string (UTC ISO-8601) |    yes   | Snapshot timestamp set once per run (e.g., `2026-01-18T17:33:12Z`). |
+
+### Identity / natural-key columns (portable item identity within a snapshot)
+
+| Column          |                  Type | Required | Meaning / Derivation                                                                                        |
+| --------------- | --------------------: | :------: | ----------------------------------------------------------------------------------------------------------- |
+| `relative_path` |                string |    yes   | Path relative to `scan_root` using `/`. Primary portable locator.                                           |
+| `size_bytes`    |                   int |    yes   | File size in bytes. For directories: `0`. On stat failure: may be `0`.                                      |
+| `mtime_utc`     | string (UTC ISO-8601) |   yes*   | Modified time in UTC. Empty if stat failed. (*required by contract; may be empty on error rows)             |
+| `content_hash`  |                string |   yes*   | Primary content hash used by natural keys (SHA-256 hex). Empty for directories, symlinks, or hash failures. |
+
+### Trace / debug columns
+
+| Column         |                  Type | Required | Meaning / Derivation                                                                              |
+| -------------- | --------------------: | :------: | ------------------------------------------------------------------------------------------------- |
+| `path`         |                string |    yes   | Absolute path at scan time. Not portable.                                                         |
+| `name`         |                string |    yes   | Basename at scan time.                                                                            |
+| `extension`    |                string |    yes   | Lowercase suffix without dot. Empty if none (and for directories).                                |
+| `created_time` | string (UTC ISO-8601) |    no    | Filesystem `ctime` rendered in UTC. **Not guaranteed to be true creation time on all platforms**. |
+| `mime_type`    |                string |    no    | Guessed MIME type from filename extension (`mimetypes.guess_type`).                               |
+| `permissions`  |                string |    no    | Last 3 octal digits of mode (e.g., `644`). Empty if unavailable.                                  |
+| `is_directory` |                  bool |    yes   | `True` for directory rows, `False` for file rows.                                                 |
+
+### Filename-ID detection and planning columns
+
+These columns exist to support your enforced naming rule `^\d{16}_<basename>` and Phase 1 planning.
+
+| Column                      |   Type | Required | Meaning / Derivation                                                                                                                                                     |
+| --------------------------- | -----: | :------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `doc_id`                    | string |    yes   | Extracted 16-digit prefix from `name` if present; else empty.                                                                                                            |
+| `has_id_prefix`             |   bool |    yes   | Whether `name` matches the project `id_regex` (default `^\d{16}_`).                                                                                                      |
+| `current_id_prefix`         | string |    yes   | Same as `doc_id` (explicit prefix field).                                                                                                                                |
+| `needs_id`                  |   bool |    yes   | `not has_id_prefix`. (True means filename does not comply.)                                                                                                              |
+| `0000000000000000_filename` | string |    yes   | Target-basename placeholder. If already prefixed, equals `name`; else `0000000000000000_<name>`.                                                                         |
+| `type_code`                 | string |    yes   | Derived “TYPE” code from extension/path rules. Defaults: `DIR` for directories, `NOEXT` if no extension, otherwise extension uppercased unless overridden by config map. |
+| `ns_code`                   | string |    yes   | Namespace code derived **from directory only** (top-level folder). Defaults: `ROOT` for top-level items, else top directory uppercased unless overridden by config map.  |
+| `scope`                     | string |    yes   | Collision domain / scope derived from `ns_code` via config map; defaults to `GLOBAL`.                                                                                    |
+| `planned_id`                | string |    yes   | Blank during scan (Phase 0). To be populated by a planner/allocator later.                                                                                               |
+| `planned_rel_path`          | string |    yes   | Blank during scan (Phase 0). To be populated later as the planned post-rename relative path.                                                                             |
+
+### Error/audit columns
+
+| Column       |   Type | Required | Meaning / Derivation                                           |
+| ------------ | -----: | :------: | -------------------------------------------------------------- |
+| `error`      | string |    yes   | Error message if any step failed; empty on success.            |
+| `error_kind` | string |    yes   | Normalized error class for triage/filtering; empty on success. |
+
+`error_kind` values emitted by the generator include:
+
+* `permission_denied`
+* `stat_failed`
+* `hash_failed`
+* `unexpected`
+
+Interpretation rule:
+
+* If `error_kind` is non-empty, treat the row as **partial**: some fields may be missing/zero/blank.
+
+---
+
+## Optional dynamic hash columns
+
+If optional hashing is enabled, additional columns appear as `hash_<algo>` (one per algorithm), e.g.:
+
+* `hash_sha256`
+* `hash_md5`
+* `hash_sha1`
+
+These are **separate from** `content_hash`:
+
+* `content_hash` is the **primary** natural-key hash (SHA-256) and exists in the fixed header set.
+* `hash_*` are optional extras for comparison or legacy uses.
+
+---
+
+## Natural key and snapshot model
+
+### Snapshot model
+
+Each CSV is one snapshot run. Within a run:
+
+* `scan_id` + `relative_path` identifies a single observed item row.
+
+Across runs:
+
+* The same `relative_path` may appear under a different `scan_id` (normal).
+
+### Natural key for item identity (migration-spec oriented)
+
+This registry is designed so that a planner/migrator can use a natural key shaped like:
+
+```text
+(first_seen_utc, relative_path, size_bytes, mtime_utc, content_hash)
+```
+
+Notes:
+
+* Directories will not have `content_hash`; treat them separately or use directory-specific rules.
+* Error rows may lack required fields; these should be flagged and handled explicitly.
+
+---
+
+## How AI should use this registry
+
+### Primary uses
+
+1. **Inventory**: enumerate all files and directories under the scan root.
+2. **Compliance detection**: filter `needs_id = True` to find non-compliant filenames.
+3. **Planning inputs**:
+
+   * group by `type_code/ns_code/scope` to build allocation batches
+   * generate `planned_id` and `planned_rel_path` without mutating the filesystem
+4. **Deduplication / equivalence**:
+
+   * compare by `content_hash` to identify identical contents across different paths
+5. **Audit / triage**:
+
+   * filter by `error_kind != ''` to isolate failed scans/hashes/stats
+
+### Rules for interpreting `needs_id`
+
+* `needs_id = True` means the current basename does not match the `id_regex`.
+* It does **not** mean the file must be renamed immediately; it’s an input to your planner.
+* For directories: `needs_id` may still be True, but filename-ID enforcement typically applies to **files**; treat directory behavior as a separate policy decision.
+
+### Rules for interpreting `doc_id/current_id_prefix`
+
+* If a name is `1234567890123456_somefile.py`:
+
+  * `doc_id = 1234567890123456`
+  * `current_id_prefix = 1234567890123456`
+  * `has_id_prefix = True`
+  * `needs_id = False`
+
+If no prefix exists:
+
+* `doc_id = ''`
+* `current_id_prefix = ''`
+* `has_id_prefix = False`
+* `needs_id = True`
+
+---
+
+## Coverage and exclusions (important for correctness)
+
+The scan may omit content due to:
+
+* excluded directory names (e.g., `.git`, `node_modules`, `__pycache__`, `venv`)
+* exclude/include filename patterns
+* skipping the output directory if it lives under the scan root
+* permission failures (captured as error rows)
+
+AI must not assume “missing from CSV means deleted.”
+
+---
+
+## Validation rules (AI-consumable)
+
+### Header contract
+
+* The first row must contain headers.
+* Fixed headers must appear exactly as specified above and in the same order.
+* Optional `hash_*` headers may appear after `error_kind`.
+
+### Type/format rules
+
+* `first_seen_utc`, `mtime_utc`, `created_time` are UTC ISO-8601 strings (with `Z`).
+* `is_directory` is boolean-like (CSV text `True/False`).
+* `size_bytes` is integer-like (may be `0` for directories or error rows).
+* `content_hash` is lowercase hex SHA-256 when present; blank otherwise.
+
+### Consistency rules
+
+Within a single `scan_id`:
+
+* `scan_root` must be identical for all rows.
+* `first_seen_utc` must be identical for all rows.
+
+---
+
+## Example interpretation patterns (for AI)
+
+### Find files that need IDs
+
+Filter:
+
+* `is_directory == False` AND `needs_id == True` AND `error_kind == ''`
+
+### Detect duplicates by content
+
+Group file rows where:
+
+* `is_directory == False` AND `content_hash != ''`
+  Group key:
+* `content_hash`
+
+### Prepare Phase 1 planned rename
+
+For each file where `needs_id == True`:
+
+* planned basename: `<planned_id>_<original_basename>`
+* planned relative path: same directory as `relative_path`, but with planned basename
+
+---
+
+## Change management
+
+If you evolve this registry:
+
+* Add columns only at the end (append-only schema evolution) to avoid breaking parsers.
+* Bump `schema_version` in the documentation when:
+
+  * columns are renamed/removed
+  * semantics of existing columns change
+  * optional columns become mandatory
+
+---
+
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.example.local/REG-SCAN-CSV-1.0.json",
+  "title": "FILE_SCAN_CSV_REGISTRY (REG-SCAN-CSV-1.0) — JSON validation envelope for CSV contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "headers", "rows"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "REG-SCAN-CSV-1.0",
+      "description": "Schema identifier for the CSV registry contract."
+    },
+    "headers": {
+      "type": "array",
+      "description": "CSV header row in exact order. Used to validate presence + order of fixed headers. Any extra headers must be hash_* dynamic hash columns.",
+      "minItems": 26,
+      "prefixItems": [
+        { "const": "scan_id" },
+        { "const": "scan_root" },
+        { "const": "first_seen_utc" },
+        { "const": "relative_path" },
+        { "const": "path" },
+        { "const": "name" },
+        { "const": "extension" },
+        { "const": "size_bytes" },
+        { "const": "mtime_utc" },
+        { "const": "created_time" },
+        { "const": "is_directory" },
+        { "const": "mime_type" },
+        { "const": "permissions" },
+        { "const": "content_hash" },
+        { "const": "doc_id" },
+        { "const": "has_id_prefix" },
+        { "const": "current_id_prefix" },
+        { "const": "needs_id" },
+        { "const": "0000000000000000_filename" },
+        { "const": "type_code" },
+        { "const": "ns_code" },
+        { "const": "scope" },
+        { "const": "planned_id" },
+        { "const": "planned_rel_path" },
+        { "const": "error" },
+        { "const": "error_kind" }
+      ],
+      "items": {
+        "type": "string",
+        "pattern": "^hash_[a-z0-9]+$",
+        "description": "Optional dynamic hash column (only allowed extras). Example: hash_sha256, hash_md5."
+      }
+    },
+    "rows": {
+      "type": "array",
+      "description": "CSV rows converted to JSON objects (one object per CSV row).",
+      "items": { "$ref": "#/$defs/ScanRow" }
+    }
+  },
+  "$defs": {
+    "EmptyOrDateTimeUtc": {
+      "description": "UTC ISO-8601 date-time string (recommended with trailing 'Z') or empty string when unavailable due to errors.",
+      "anyOf": [
+        { "type": "string", "format": "date-time" },
+        { "type": "string", "const": "" }
+      ]
+    },
+    "EmptyOrSha256": {
+      "description": "Lowercase/uppercase hex SHA-256 (64 hex chars) or empty string when not applicable/failed.",
+      "anyOf": [
+        { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" },
+        { "type": "string", "const": "" }
+      ]
+    },
+    "EmptyOr16Digits": {
+      "description": "16-digit numeric ID or empty string.",
+      "anyOf": [
+        { "type": "string", "pattern": "^\\d{16}$" },
+        { "type": "string", "const": "" }
+      ]
+    },
+    "EmptyOrMimeType": {
+      "description": "MIME type guess or empty string.",
+      "anyOf": [
+        { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]*/[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]*$" },
+        { "type": "string", "const": "" }
+      ]
+    },
+    "EmptyOrPermissions": {
+      "description": "Last three octal digits of mode (e.g., 644) or empty string.",
+      "anyOf": [
+        { "type": "string", "pattern": "^[0-7]{3}$" },
+        { "type": "string", "const": "" }
+      ]
+    },
+    "Extension": {
+      "description": "Lowercased extension with no dot; empty string if none (and for directories).",
+      "anyOf": [
+        { "type": "string", "pattern": "^[a-z0-9]+$" },
+        { "type": "string", "const": "" }
+      ]
+    },
+    "RelativePath": {
+      "type": "string",
+      "description": "Repo-root-relative path using forward slashes; must not be an absolute path.",
+      "pattern": "^(\\.|[^/].*)$",
+      "not": { "pattern": "^[A-Za-z]:\\\\|^\\\\\\\\|^/" },
+      "x_derivation": "Computed from scan_root + filesystem traversal. Normalized to '/'."
+    },
+    "ScanId": {
+      "type": "string",
+      "description": "Unique scan run ID (timestamp+suffix or UUID).",
+      "pattern": "^([0-9]{8}_[0-9]{6}_[A-Fa-f0-9]{12}|[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[1-5][A-Fa-f0-9]{3}-[89ABab][A-Fa-f0-9]{3}-[A-Fa-f0-9]{12})$",
+      "x_derivation": "Per-run invariant. Same for all rows in one CSV."
+    },
+    "CodeToken": {
+      "type": "string",
+      "description": "Uppercase token code (TYPE/NS/SCOPE).",
+      "pattern": "^[A-Z0-9_]+$"
+    },
+    "ScanRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "One scanned filesystem item (file or directory). All fixed headers are required; many allow empty strings when not applicable.",
+      "required": [
+        "scan_id",
+        "scan_root",
+        "first_seen_utc",
+        "relative_path",
+        "path",
+        "name",
+        "extension",
+        "size_bytes",
+        "mtime_utc",
+        "created_time",
+        "is_directory",
+        "mime_type",
+        "permissions",
+        "content_hash",
+        "doc_id",
+        "has_id_prefix",
+        "current_id_prefix",
+        "needs_id",
+        "0000000000000000_filename",
+        "type_code",
+        "ns_code",
+        "scope",
+        "planned_id",
+        "planned_rel_path",
+        "error",
+        "error_kind"
+      ],
+      "properties": {
+        "scan_id": {
+          "$ref": "#/$defs/ScanId",
+          "x_derivation": "Set once per run; copied into every row."
+        },
+        "scan_root": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Absolute scan root path at scan time.",
+          "x_derivation": "Input argument to scanner; normalized to absolute."
+        },
+        "first_seen_utc": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Snapshot timestamp (UTC) set once per run.",
+          "x_derivation": "Set once per run; copied into every row."
+        },
+        "relative_path": { "$ref": "#/$defs/RelativePath" },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Absolute path at scan time (debug/trace; not portable)."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Basename at scan time."
+        },
+        "extension": { "$ref": "#/$defs/Extension" },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "File size in bytes; for directories typically 0.",
+          "x_derivation": "Filesystem stat.st_size when available; 0 on directories or stat failure."
+        },
+        "mtime_utc": {
+          "$ref": "#/$defs/EmptyOrDateTimeUtc",
+          "x_derivation": "Filesystem mtime in UTC ISO-8601; empty when stat_failed."
+        },
+        "created_time": {
+          "$ref": "#/$defs/EmptyOrDateTimeUtc",
+          "description": "Filesystem ctime rendered in UTC; not true creation time on all platforms.",
+          "x_derivation": "Filesystem ctime when available; empty when stat_failed."
+        },
+        "is_directory": {
+          "type": "boolean",
+          "description": "True for directory rows, False for file rows."
+        },
+        "mime_type": {
+          "$ref": "#/$defs/EmptyOrMimeType",
+          "x_derivation": "Guess from extension (mimetypes.guess_type) or empty if unknown."
+        },
+        "permissions": {
+          "$ref": "#/$defs/EmptyOrPermissions",
+          "x_derivation": "Mode bits formatted as last three octal digits when available."
+        },
+        "content_hash": {
+          "$ref": "#/$defs/EmptyOrSha256",
+          "description": "Primary natural-key content hash (SHA-256). Blank for directories or on hash failure.",
+          "x_derivation": "SHA-256 of file bytes when readable (regular files)."
+        },
+        "doc_id": {
+          "$ref": "#/$defs/EmptyOr16Digits",
+          "description": "16-digit prefix extracted from filename if present; else empty.",
+          "x_derivation": "Extracted from name when name matches id_regex (default ^\\d{16}_)."
+        },
+        "has_id_prefix": {
+          "type": "boolean",
+          "description": "Does name match project id_regex (default ^\\d{16}_).",
+          "x_derivation": "Regex test against name."
+        },
+        "current_id_prefix": {
+          "$ref": "#/$defs/EmptyOr16Digits",
+          "description": "Explicit extracted 16-digit prefix if present; else empty.",
+          "x_derivation": "Same extraction as doc_id."
+        },
+        "needs_id": {
+          "type": "boolean",
+          "description": "True if not has_id_prefix; drives ID enforcement planning.",
+          "x_derivation": "needs_id = !has_id_prefix"
+        },
+        "0000000000000000_filename": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Target-basename placeholder for enforced naming rule.",
+          "x_derivation": "If has_id_prefix then equals name; else '0000000000000000_' + name."
+        },
+        "type_code": {
+          "$ref": "#/$defs/CodeToken",
+          "description": "Derived TYPE code (extension/path rules; config-overridable).",
+          "x_derivation": "Default: DIR for directories; NOEXT if no extension; else extension uppercased unless mapped."
+        },
+        "ns_code": {
+          "$ref": "#/$defs/CodeToken",
+          "description": "Derived namespace code by directory rules only (config-overridable).",
+          "x_derivation": "Default: ROOT for top-level items; else top directory uppercased unless mapped."
+        },
+        "scope": {
+          "$ref": "#/$defs/CodeToken",
+          "description": "Collision domain / scope segment value (config-overridable).",
+          "x_derivation": "Derived from ns_code via config map; default GLOBAL."
+        },
+        "planned_id": {
+          "$ref": "#/$defs/EmptyOr16Digits",
+          "description": "Blank during scan (Phase 0); populated later during planning/allocation."
+        },
+        "planned_rel_path": {
+          "type": "string",
+          "description": "Blank during scan (Phase 0); populated later as planned post-rename relative path.",
+          "x_derivation": "During planning: directory(relative_path) + '/' + planned_id + '_' + original_basename."
+        },
+        "error": {
+          "type": "string",
+          "description": "Per-row error message; empty on success."
+        },
+        "error_kind": {
+          "type": "string",
+          "description": "Normalized error class for triage; empty on success.",
+          "enum": ["", "permission_denied", "stat_failed", "hash_failed", "unexpected"]
+        }
+      },
+      "patternProperties": {
+        "^hash_[a-z0-9]+$": {
+          "description": "Optional dynamic hash column when extra hashing is enabled (CSV will include the column for every row; value may be empty if not applicable).",
+          "anyOf": [
+            { "type": "string", "pattern": "^[A-Fa-f0-9]{32,128}$" },
+            { "type": "string", "const": "" }
+          ],
+          "x_derivation": "Computed from file bytes using the named algorithm; empty for directories or failures."
+        }
+      },
+      "allOf": [
+        {
+          "description": "Directory-specific constraints.",
+          "if": { "properties": { "is_directory": { "const": true } }, "required": ["is_directory"] },
+          "then": {
+            "properties": {
+              "extension": { "const": "" },
+              "content_hash": { "const": "" },
+              "type_code": { "const": "DIR" }
+            }
+          }
+        },
+        {
+          "description": "ID-prefix consistency: when has_id_prefix is true, doc_id/current_id_prefix must be set; when false, they must be empty.",
+          "if": { "properties": { "has_id_prefix": { "const": true } }, "required": ["has_id_prefix"] },
+          "then": {
+            "properties": {
+              "doc_id": { "type": "string", "pattern": "^\\d{16}$" },
+              "current_id_prefix": { "type": "string", "pattern": "^\\d{16}$" },
+              "needs_id": { "const": false },
+              "0000000000000000_filename": { "type": "string", "pattern": "^\\d{16}_.+" }
+            }
+          },
+          "else": {
+            "properties": {
+              "doc_id": { "const": "" },
+              "current_id_prefix": { "const": "" },
+              "needs_id": { "const": true },
+              "0000000000000000_filename": { "type": "string", "pattern": "^0000000000000000_.+" }
+            }
+          }
+        },
+        {
+          "description": "Success vs error: on success (error_kind empty), error must be empty. On error (error_kind non-empty), error must be non-empty.",
+          "oneOf": [
+            {
+              "properties": { "error_kind": { "const": "" }, "error": { "const": "" } },
+              "required": ["error_kind", "error"]
+            },
+            {
+              "properties": {
+                "error_kind": { "enum": ["permission_denied", "stat_failed", "hash_failed", "unexpected"] },
+                "error": { "type": "string", "minLength": 1 }
+              },
+              "required": ["error_kind", "error"]
+            }
+          ]
+        },
+        {
+          "description": "When row is a file and there is no error_kind, content_hash should be present (SHA-256).",
+          "if": {
+            "properties": {
+              "is_directory": { "const": false },
+              "error_kind": { "const": "" }
+            },
+            "required": ["is_directory", "error_kind"]
+          },
+          "then": {
+            "properties": {
+              "content_hash": { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+```

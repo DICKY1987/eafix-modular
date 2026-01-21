@@ -1,0 +1,838 @@
+# Enhanced Calendar System Configuration
+# File: enhanced_config.yaml
+
+# =============================================================================
+# CORE SYSTEM CONFIGURATION
+# =============================================================================
+
+# Calendar Import Settings
+calendar_auto_import: true
+import_day: 6  # Sunday (0=Monday, 6=Sunday)
+import_hour: 12  # 12 PM CST
+retry_interval_hours: 1
+max_retry_attempts: 24
+import_timeout_seconds: 30
+
+# File Processing Settings
+chunk_size: 1000
+memory_limit_mb: 100
+max_workers: 10
+max_connections: 10
+
+# Event Processing Settings
+anticipation_hours: [1, 2, 4]
+anticipation_enabled: true
+minimum_gap_minutes: 30
+
+# Trigger Configuration
+trigger_offsets:
+  EMO-E: -3      # High impact: -3 minutes
+  EMO-A: -2      # Medium impact: -2 minutes
+  EQT-OPEN: -5   # Equity markets: -5 minutes
+  ANTICIPATION: -1  # Anticipation events: -1 minute
+
+# Parameter Sets (4 rotation sets)
+parameter_sets:
+  1:
+    lot_size: 0.01
+    buy_distance: 20
+    sell_distance: 20
+    stop_loss: 40
+    take_profit: 80
+    risk_level: "low"
+  2:
+    lot_size: 0.02
+    buy_distance: 20
+    sell_distance: 20
+    stop_loss: 40
+    take_profit: 80
+    risk_level: "medium"
+  3:
+    lot_size: 0.03
+    buy_distance: 20
+    sell_distance: 20
+    stop_loss: 40
+    take_profit: 80
+    risk_level: "medium"
+  4:
+    lot_size: 0.04
+    buy_distance: 20
+    sell_distance: 20
+    stop_loss: 40
+    take_profit: 80
+    risk_level: "high"
+
+# =============================================================================
+# DATABASE CONFIGURATION
+# =============================================================================
+
+database_path: "data/enhanced_calendar.db"
+backup_retention_days: 30
+auto_vacuum: true
+wal_mode: true
+
+# =============================================================================
+# NOTIFICATION SYSTEM CONFIGURATION
+# =============================================================================
+
+notification_settings:
+  email_enabled: true
+  sms_enabled: true
+  webhook_enabled: true
+  
+  # SMTP Configuration for Email
+  smtp_settings:
+    host: "smtp.gmail.com"
+    port: 587
+    username: "your-email@gmail.com"
+    password: "your-app-password"  # Use app-specific password
+    use_tls: true
+    
+  # Twilio Configuration for SMS
+  twilio_settings:
+    account_sid: "your-twilio-account-sid"
+    auth_token: "your-twilio-auth-token"
+    from_number: "+1234567890"
+    
+  # Webhook Configuration
+  webhook_settings:
+    endpoints:
+      - url: "https://your-webhook-endpoint.com/alerts"
+        secret: "your-webhook-secret"
+        
+  # Alert Recipients
+  alert_recipients:
+    - "admin@yourdomain.com"
+    - "+1234567890"  # SMS number
+    
+  # Notification Priorities
+  critical_events:
+    - "system_startup"
+    - "system_shutdown" 
+    - "database_error"
+    - "memory_overflow"
+    - "circuit_breaker_open"
+    
+  high_priority_events:
+    - "signal_generation_error"
+    - "file_processing_error"
+    - "network_timeout"
+    
+  medium_priority_events:
+    - "configuration_change"
+    - "backtest_completion"
+    - "compliance_violation"
+
+# =============================================================================
+# RISK MANAGEMENT CONFIGURATION
+# =============================================================================
+
+risk_management:
+  # Global Risk Limits
+  max_daily_risk_pct: 5.0  # Maximum 5% of account per day
+  max_portfolio_risk_pct: 10.0  # Maximum 10% of account total
+  max_trades_per_day: 10
+  max_trades_per_hour: 3
+  
+  # Position Sizing
+  default_risk_per_trade_pct: 2.0  # 2% risk per trade
+  min_lot_size: 0.01
+  max_lot_size: 1.0
+  
+  # Correlation Limits
+  max_correlation_exposure: 0.7  # Maximum 70% correlation between positions
+  correlation_window_days: 30
+  
+  # Drawdown Protection
+  max_drawdown_pct: 15.0  # Stop trading at 15% drawdown
+  daily_loss_limit_pct: 3.0  # Stop trading at 3% daily loss
+  
+  # Currency Exposure Limits
+  currency_limits:
+    USD: 50.0  # Maximum 50% exposure to USD pairs
+    EUR: 30.0
+    GBP: 20.0
+    JPY: 20.0
+    AUD: 15.0
+    CAD: 15.0
+    CHF: 10.0
+    NZD: 10.0
+
+# =============================================================================
+# PORTFOLIO MANAGEMENT CONFIGURATION
+# =============================================================================
+
+portfolio_management:
+  # Account Configuration
+  accounts:
+    account_1:
+      account_id: "live_account_1"
+      account_type: "live"
+      currency: "USD"
+      initial_balance: 10000
+      risk_profile: "conservative"
+      active: true
+      max_lot_size: 0.5
+      allowed_symbols: ["EURUSD", "GBPUSD", "USDJPY", "USDCAD"]
+      
+    account_2:
+      account_id: "demo_account_1"
+      account_type: "demo"
+      currency: "EUR"
+      initial_balance: 5000
+      risk_profile: "aggressive"
+      active: true
+      max_lot_size: 1.0
+      allowed_symbols: ["EURUSD", "GBPUSD", "EURGBP", "EURJPY"]
+      
+  # Risk Profile Settings
+  risk_profiles:
+    conservative:
+      risk_multiplier: 0.5
+      max_daily_trades: 5
+      allowed_risk_levels: ["low"]
+      
+    moderate:
+      risk_multiplier: 1.0
+      max_daily_trades: 8
+      allowed_risk_levels: ["low", "medium"]
+      
+    aggressive:
+      risk_multiplier: 1.5
+      max_daily_trades: 12
+      allowed_risk_levels: ["low", "medium", "high"]
+
+# =============================================================================
+# BACKTESTING CONFIGURATION
+# =============================================================================
+
+backtesting:
+  # Default Backtest Settings
+  initial_balance: 10000
+  commission_per_lot: 7.0  # $7 per lot round trip
+  spread_pips: 1.5  # Average spread in pips
+  slippage_pips: 0.5  # Average slippage in pips
+  
+  # Data Sources
+  historical_data_path: "data/historical/"
+  supported_symbols: ["EURUSD", "GBPUSD", "USDJPY", "USDCAD", "AUDUSD", "NZDUSD", "USDCHF"]
+  
+  # Analysis Settings
+  calculate_sharpe: true
+  calculate_sortino: true
+  calculate_calmar: true
+  benchmark_symbol: "EURUSD"
+  
+  # Report Generation
+  generate_charts: true
+  chart_output_path: "reports/charts/"
+  pdf_reports: true
+  pdf_output_path: "reports/pdf/"
+
+# =============================================================================
+# COMPLIANCE CONFIGURATION
+# =============================================================================
+
+compliance:
+  # Regulatory Settings
+  jurisdiction: "US"  # US, EU, UK, etc.
+  mifid_ii_compliance: false
+  dodd_frank_compliance: true
+  
+  # Audit Trail Settings
+  log_all_trades: true
+  log_all_signals: true
+  log_configuration_changes: true
+  audit_retention_days: 2555  # 7 years
+  
+  # Reporting Settings
+  daily_reports: true
+  weekly_reports: true
+  monthly_reports: true
+  quarterly_reports: true
+  
+  # Report Recipients
+  compliance_recipients:
+    - "compliance@yourdomain.com"
+    - "risk@yourdomain.com"
+    
+  # Violation Thresholds
+  position_size_limit: 1.0  # Maximum 1.0 lots per position
+  daily_loss_threshold: 500  # $500 daily loss threshold
+  weekly_loss_threshold: 1500  # $1500 weekly loss threshold
+  
+  # Required Reports
+  required_monthly_metrics:
+    - "total_trades"
+    - "win_rate"
+    - "profit_factor"
+    - "max_drawdown"
+    - "sharpe_ratio"
+    - "var_95"  # Value at Risk 95%
+    - "position_concentration"
+
+# =============================================================================
+# MONITORING & PERFORMANCE CONFIGURATION
+# =============================================================================
+
+monitoring:
+  # Health Check Settings
+  health_check_interval: 30  # seconds
+  performance_monitoring: true
+  memory_monitoring: true
+  disk_monitoring: true
+  
+  # Performance Thresholds
+  max_memory_usage_pct: 80
+  max_cpu_usage_pct: 85
+  max_disk_usage_pct: 90
+  max_database_response_ms: 1000
+  
+  # Metrics Collection
+  collect_system_metrics: true
+  collect_trading_metrics: true
+  collect_error_metrics: true
+  metrics_retention_days: 90
+  
+  # Alerting Thresholds
+  critical_thresholds:
+    memory_usage_pct: 90
+    cpu_usage_pct: 95
+    disk_usage_pct: 95
+    database_response_ms: 5000
+    error_rate_per_hour: 10
+    
+  warning_thresholds:
+    memory_usage_pct: 80
+    cpu_usage_pct: 85
+    disk_usage_pct: 85
+    database_response_ms: 1000
+    error_rate_per_hour: 5
+
+# =============================================================================
+# INTEGRATION CONFIGURATION
+# =============================================================================
+
+integration:
+  # MT4/MT5 Integration
+  mt4_enabled: true
+  mt4_signal_path: "signals/mt4_signals.csv"
+  mt4_status_path: "status/mt4_status.csv"
+  mt4_response_path: "responses/mt4_responses.csv"
+  
+  # Redis Integration (for distributed systems)
+  redis_enabled: false
+  redis_host: "localhost"
+  redis_port: 6379
+  redis_db: 0
+  redis_password: ""
+  
+  # MQTT Integration (for real-time messaging)
+  mqtt_enabled: false
+  mqtt_broker: "localhost"
+  mqtt_port: 1883
+  mqtt_topics:
+    signals: "trading/signals"
+    status: "trading/status"
+    alerts: "trading/alerts"
+  
+  # External APIs
+  external_apis:
+    calendar_providers:
+      forexfactory:
+        enabled: true
+        url: "https://www.forexfactory.com/calendar"
+        backup_enabled: true
+        
+      investing_com:
+        enabled: false
+        api_key: ""
+        
+    market_data:
+      alpha_vantage:
+        enabled: false
+        api_key: ""
+        
+      yahoo_finance:
+        enabled: true
+        
+# =============================================================================
+# SECURITY CONFIGURATION
+# =============================================================================
+
+security:
+  # Encryption Settings
+  encrypt_sensitive_data: true
+  encryption_key_path: "keys/encryption.key"
+  
+  # Access Control
+  require_authentication: false
+  session_timeout_minutes: 60
+  
+  # API Security
+  api_rate_limiting: true
+  max_requests_per_minute: 100
+  
+  # File Security
+  secure_file_permissions: true
+  backup_encryption: true
+  
+  # Logging Security
+  log_sensitive_data: false
+  anonymize_personal_data: true
+
+# =============================================================================
+# PATHS CONFIGURATION
+# =============================================================================
+
+paths:
+  # Data Directories
+  data_dir: "data/"
+  calendar_import_path: "downloads/"
+  signals_export_path: "signals/"
+  status_export_path: "status/"
+  backup_path: "backups/"
+  logs_path: "logs/"
+  reports_path: "reports/"
+  
+  # File Patterns
+  calendar_file_patterns:
+    - "ff_calendar*.csv"
+    - "*thisweek*.csv"
+    - "calendar*.csv"
+    - "*forex*.csv"
+    
+  # Archive Settings
+  archive_processed_files: true
+  archive_path: "archive/"
+  archive_retention_days: 90
+
+# =============================================================================
+# DEVELOPMENT & TESTING CONFIGURATION
+# =============================================================================
+
+development:
+  # Debug Settings
+  debug_mode: false
+  verbose_logging: false
+  log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  
+  # Testing Settings
+  test_mode: false
+  mock_trading: false
+  simulation_speed: 1.0  # 1.0 = real-time, 10.0 = 10x speed
+  
+  # Development Tools
+  auto_reload: true
+  profiling_enabled: false
+  memory_profiling: false
+  
+  # Test Data
+  test_data_path: "tests/data/"
+  generate_test_signals: false
+  test_notification_recipient: "test@yourdomain.com"
+
+---
+# Deployment Configuration
+# File: docker-compose.yml
+
+version: '3.8'
+
+services:
+  enhanced-calendar:
+    build: .
+    container_name: enhanced-calendar-system
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config:/app/config
+      - ./downloads:/app/downloads
+      - ./signals:/app/signals
+      - ./backups:/app/backups
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=INFO
+    ports:
+      - "8000:8000"  # API port
+    depends_on:
+      - redis
+      - mosquitto
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      
+  redis:
+    image: redis:7-alpine
+    container_name: calendar-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: calendar-mqtt
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_logs:/mosquitto/log
+
+volumes:
+  redis_data:
+  mosquitto_data:
+  mosquitto_logs:
+
+---
+# Requirements File
+# File: requirements.txt
+
+# Core Dependencies
+asyncio-mqtt==0.13.0
+aiofiles==23.2.1
+aiohttp==3.9.1
+aiosqlite==0.19.0
+pydantic==2.5.0
+structlog==23.2.0
+watchdog==3.0.0
+pyyaml==6.0.1
+
+# Database & Performance
+redis==5.0.1
+lz4==4.3.2
+psutil==5.9.6
+
+# Notifications
+twilio==8.10.0
+jinja2==3.1.2
+
+# Data Processing & Analysis
+pandas==2.1.4
+numpy==1.25.2
+scipy==1.11.4
+
+# Visualization & Reporting
+plotly==5.17.0
+matplotlib==3.8.2
+
+# Backtesting & Statistics
+ta-lib==0.4.28
+statsmodels==0.14.0
+
+# Web Framework (for API/dashboard)
+fastapi==0.104.1
+uvicorn==0.24.0
+
+# Configuration & Validation
+jsonschema==4.20.0
+python-dotenv==1.0.0
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+
+# Security & Encryption
+cryptography==41.0.8
+passlib==1.7.4
+
+# Monitoring & Logging
+prometheus-client==0.19.0
+grafana-api==1.0.3
+
+---
+# Dockerfile
+# File: Dockerfile
+
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    make \
+    libc-dev \
+    libffi-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY . .
+
+# Create necessary directories
+RUN mkdir -p data logs config downloads signals backups reports
+
+# Set permissions
+RUN chmod +x *.py
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import requests; requests.get('http://localhost:8000/health')" || exit 1
+
+# Expose port
+EXPOSE 8000
+
+# Run the application
+CMD ["python", "enhanced_calendar_system.py"]
+
+---
+# Installation & Deployment Guide
+# File: DEPLOYMENT.md
+
+# Enhanced Economic Calendar System - Deployment Guide
+
+## Prerequisites
+
+1. **Python 3.11+**
+2. **Docker & Docker Compose** (for containerized deployment)
+3. **Redis** (for distributed caching)
+4. **MQTT Broker** (for real-time messaging)
+
+## Quick Start (Docker)
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd enhanced-calendar-system
+   ```
+
+2. **Configure the system:**
+   ```bash
+   cp enhanced_config.yaml.example enhanced_config.yaml
+   # Edit enhanced_config.yaml with your settings
+   ```
+
+3. **Start the system:**
+   ```bash
+   docker-compose up -d
+   ```
+
+4. **Verify deployment:**
+   ```bash
+   curl http://localhost:8000/health
+   ```
+
+## Manual Installation
+
+1. **Install Python dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Initialize the database:**
+   ```bash
+   python -c "
+   import asyncio
+   from enhanced_calendar_system import OptimizedDatabaseManager
+   async def init():
+       db = OptimizedDatabaseManager('data/enhanced_calendar.db')
+       await db.initialize()
+   asyncio.run(init())
+   "
+   ```
+
+3. **Start the system:**
+   ```bash
+   python enhanced_calendar_system.py
+   ```
+
+## Configuration
+
+### Essential Configuration Items
+
+1. **Database Path:**
+   ```yaml
+   database_path: "data/enhanced_calendar.db"
+   ```
+
+2. **Notification Settings:**
+   ```yaml
+   notification_settings:
+     smtp_settings:
+       host: "your-smtp-host"
+       username: "your-email@domain.com"
+       password: "your-password"
+   ```
+
+3. **Risk Management:**
+   ```yaml
+   risk_management:
+     max_daily_risk_pct: 5.0
+     default_risk_per_trade_pct: 2.0
+   ```
+
+### Environment Variables
+
+Set these environment variables for enhanced security:
+
+```bash
+export SMTP_PASSWORD="your-smtp-password"
+export TWILIO_AUTH_TOKEN="your-twilio-token"
+export ENCRYPTION_KEY="your-encryption-key"
+export DATABASE_PATH="/secure/path/to/database.db"
+```
+
+## Performance Tuning
+
+### Database Optimization
+
+1. **Increase cache size for better performance:**
+   ```yaml
+   database_settings:
+     cache_size: 10000
+     mmap_size: 268435456  # 256MB
+   ```
+
+2. **Enable WAL mode for better concurrency:**
+   ```yaml
+   database_settings:
+     wal_mode: true
+     synchronous: NORMAL
+   ```
+
+### Memory Management
+
+1. **Adjust chunk size for large files:**
+   ```yaml
+   chunk_size: 1000  # Increase for more memory, decrease for less
+   memory_limit_mb: 100  # Set based on available RAM
+   ```
+
+2. **Configure worker threads:**
+   ```yaml
+   max_workers: 10  # Set based on CPU cores
+   max_connections: 10  # Database connection pool size
+   ```
+
+## Monitoring & Maintenance
+
+### Health Monitoring
+
+The system provides several health endpoints:
+
+- `/health` - Basic health check
+- `/metrics` - Prometheus metrics
+- `/status` - Detailed system status
+
+### Log Management
+
+Logs are structured in JSON format and include:
+- Component identification
+- Error tracking with UUIDs
+- Performance metrics
+- Audit trails
+
+### Backup Strategy
+
+1. **Automated database backups:**
+   ```yaml
+   backup_retention_days: 30
+   auto_backup_interval: "daily"
+   ```
+
+2. **Configuration backups:**
+   - Automatic backups before config changes
+   - Timestamped backup files
+   - Restore capabilities
+
+## Security Considerations
+
+1. **File Permissions:**
+   ```bash
+   chmod 600 enhanced_config.yaml
+   chmod 700 data/
+   chmod 700 logs/
+   ```
+
+2. **Network Security:**
+   - Use TLS for all external communications
+   - Implement API rate limiting
+   - Regular security updates
+
+3. **Data Encryption:**
+   - Enable encryption for sensitive configuration data
+   - Encrypt database backups
+   - Secure key management
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Database Lock Errors:**
+   - Check for zombie processes
+   - Verify WAL mode is enabled
+   - Increase connection pool size
+
+2. **Memory Issues:**
+   - Reduce chunk_size
+   - Lower memory_limit_mb
+   - Enable streaming processing
+
+3. **Notification Failures:**
+   - Verify SMTP/SMS credentials
+   - Check network connectivity
+   - Review notification logs
+
+### Debug Mode
+
+Enable debug mode for troubleshooting:
+
+```yaml
+development:
+  debug_mode: true
+  verbose_logging: true
+  log_level: "DEBUG"
+```
+
+## Performance Benchmarks
+
+### Expected Performance
+
+- **File Processing:** 100+ events/second
+- **Database Operations:** <10ms response time
+- **Memory Usage:** <100MB for normal operation
+- **Signal Generation:** <1 second latency
+
+### Optimization Tips
+
+1. Use SSD storage for database
+2. Allocate sufficient RAM for caching
+3. Monitor system resources regularly
+4. Regular database maintenance
+
+## Support & Maintenance
+
+### Regular Maintenance Tasks
+
+1. **Weekly:**
+   - Review error logs
+   - Check disk space
+   - Verify backup integrity
+
+2. **Monthly:**
+   - Analyze performance metrics
+   - Review compliance reports
+   - Update dependencies
+
+3. **Quarterly:**
+   - Security audit
+   - Performance tuning
+   - Capacity planning
+
+For additional support, check the documentation or contact the development team.

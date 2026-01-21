@@ -1,0 +1,261 @@
+Below is a **brainstormed, generic instruction framework** specifically for **directory operations and directory-driven AI work**, designed so it can be:
+
+1. **Loaded verbatim into an AI tool** as a baseline operating constitution
+2. **Mechanically specialized per project** (like EAFIX / DIR-OPT) without rewriting the core logic
+3. **Complete enough to prevent drift, omissions, and partial solutions**
+
+This is intentionally **AI-instruction-oriented**, not human prose.
+
+---
+
+## 1. Mental Model First (Non-Negotiable)
+
+Before defining instructions, lock the model the AI must operate under:
+
+**Directories are not containers. They are contracts.**
+
+That implies:
+
+* A directory has **purpose**
+* A directory has **inputs**
+* A directory has **outputs**
+* A directory has **allowed operations**
+* A directory has **completion criteria**
+* A directory has **forbidden content**
+
+Your instruction framework should force the AI to reason this way.
+
+---
+
+## 2. Generic Instruction Template — High-Level Sections
+
+This is the **stable skeleton** you reuse everywhere.
+
+### SECTION A — Authority & Scope
+
+Defines *what the AI is allowed to touch*.
+
+**Instruction Concepts**
+
+* Define **project root**
+* Define **managed vs unmanaged directories**
+* Define **read-only zones**
+* Define **generated vs source zones**
+
+Example concepts (generic, not project-specific):
+
+* “All paths are interpreted relative to `<PROJECT_ROOT>`”
+* “AI may not invent new top-level directories”
+* “Generated artifacts must never be co-located with source artifacts”
+
+---
+
+### SECTION B — Directory Classification Rules
+
+Force the AI to classify every directory before acting.
+
+**Required classification per directory**
+
+* `directory_kind` (module, global, infra, archive, state, generated, temp)
+* `ownership` (module-owned vs system-owned)
+* `mutability` (immutable / append-only / mutable)
+* `audience` (AI-only / human-facing / mixed)
+
+**Hard rule**
+
+> If a directory cannot be classified, the AI must stop and ask.
+
+This prevents silent entropy.
+
+---
+
+### SECTION C — Directory Depth & Nesting Constraints
+
+This directly connects to your earlier **root / root-1 / root-2** discussion.
+
+Generic rule pattern:
+
+* Define **maximum depth per directory_kind**
+* Define **semantic meaning of depth levels**
+
+Example (generic form):
+
+* Depth 0: system scope
+* Depth 1: ownership boundary
+* Depth 2: implementation detail
+* Depth >2: forbidden unless explicitly justified
+
+This gives the AI a **mechanical stopping rule**.
+
+---
+
+### SECTION D — Allowed Operations Matrix
+
+This is critical and often missing.
+
+For each directory kind, define:
+
+| Operation      | Allowed?           |
+| -------------- | ------------------ |
+| Create file    | Yes / No           |
+| Rename file    | Yes / No           |
+| Move file in   | Yes / No           |
+| Move file out  | Yes / No           |
+| Delete file    | Yes / Archive-only |
+| Generate files | Yes / No           |
+
+**Rule**
+
+> The AI must validate the operation against the directory’s operation matrix before acting.
+
+This prevents “helpful but destructive” behavior.
+
+---
+
+### SECTION E — File Placement Determinism
+
+This section removes guesswork.
+
+Generic rules:
+
+* A file belongs to **exactly one directory owner**
+* Ownership is determined by **purpose**, not extension
+* Files that serve multiple purposes must be **split or wrapped**, not duplicated
+
+You already use this thinking with:
+
+* module ownership
+* registry ownership
+* process ownership
+
+This instruction layer makes that thinking reusable.
+
+---
+
+### SECTION F — Completeness & Definition of Done (DoD)
+
+This is where most AI systems fail.
+
+For any directory-level task, the AI must answer:
+
+1. What files **must exist** when complete?
+2. What files **must not exist**?
+3. What validations prove correctness?
+4. What evidence artifacts are produced?
+
+Generic DoD rule:
+
+> If “done” cannot be verified by inspecting the directory tree, the task is incomplete.
+
+---
+
+### SECTION G — Change Safety Rules
+
+Applies to **all** directory operations.
+
+Mandatory concepts:
+
+* No delete without archive or snapshot
+* No move without traceability
+* No rename without registry update (if registry exists)
+* No bulk operation without dry-run reasoning
+
+This aligns perfectly with your existing safe-merge and watcher work.
+
+---
+
+### SECTION H — AI Failure Modes (Explicit)
+
+You should explicitly tell the AI what *not* to do.
+
+Examples:
+
+* Do not infer intent from filenames alone
+* Do not collapse directories “for cleanliness”
+* Do not optimize structure without explicit instruction
+* Do not merge directories with different ownership
+
+This dramatically reduces hallucinated refactors.
+
+---
+
+## 3. Parameterization Layer (How You Specialize Per Project)
+
+The generic template becomes powerful when **parameterized**, not rewritten.
+
+### Project-Specific Inputs
+
+You swap in:
+
+* `<PROJECT_ROOT>`
+* Allowed directory kinds
+* Depth limits
+* Registry presence (yes/no)
+* Module system present (yes/no)
+* Archive strategy
+
+Everything else stays identical.
+
+This allows:
+
+* EAFIX
+* File Alchemist
+* Future projects
+  to all run under the same mental law.
+
+---
+
+## 4. How This Leverages CIO / Copilot-Style Instruction Slots
+
+This framework is ideal for:
+
+* `copilot-instructions.md`
+* “System Prompt” fields
+* Workspace-level AI configs
+* Repo-level AI governance
+
+Because:
+
+* It is **procedural**, not narrative
+* It is **constraint-driven**
+* It scales across tools and vendors
+* It aligns with deterministic automation
+
+---
+
+## 5. What You Should Do Next (Concrete)
+
+1. **Freeze the generic template** (no project terms)
+2. Create a **Project Overlay File** that only defines parameters
+3. Load **both** into the AI tool:
+
+   * Generic = law
+   * Overlay = environment
+4. Add a rule:
+
+   > If generic and project instructions conflict, project wins
+
+This gives you **maximum reuse with zero ambiguity**.
+
+---
+
+## Bottom Line
+
+What you’re designing is not “instructions”.
+
+It’s a **Directory Governance Constitution for AI**.
+
+Once you formalize it this way:
+
+* Completeness becomes enforceable
+* Drift becomes detectable
+* AI behavior becomes predictable
+* New projects become cheap to onboard
+
+If you want, next step can be:
+
+* A **strict YAML instruction schema**
+* A **copilot-ready instruction file**
+* Or a **validation checklist that tests an AI’s output against this framework**
+
+Just say which.

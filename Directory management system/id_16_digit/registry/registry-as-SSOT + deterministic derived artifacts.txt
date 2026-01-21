@@ -1,0 +1,157 @@
+This is a strong idea. You’re describing “registry-as-SSOT + deterministic derived artifacts,” i.e., a build system where the registry is the only editable source and everything else is computed.
+
+If you do it right, you get four wins:
+
+* **No drift:** indexes can’t lie because they’re regenerated from the registry.
+* **No manual bookkeeping:** people stop editing derived files.
+* **Auditable changes:** a single cell/field change has a clear blast radius.
+* **Composable automation:** once you have one derived artifact, you can stack more.
+
+Where this succeeds or fails is almost entirely about **contracts and enforcement**.
+
+## The core pattern (spreadsheet equivalent)
+
+### SSOT inputs (cells)
+
+Your registry rows/columns, plus a few small configuration tables (segment tables, ignore rules, etc.).
+
+### Pure formulas
+
+Deterministic functions like:
+
+* `files_for_module(module_id) = registry.filter(module_id == X and status in active)`
+* `module_index_md = render(template, files_for_module)`
+* `dir_manifest = groupby(directory_id)`
+* `dependency_graph = edges(from imports/metadata + registry links)`
+
+### Derived artifacts (answers)
+
+* `modules/<module>/INDEX.md`
+* `modules/<module>/MANIFEST.json`
+* `repo/FILE_CATALOG.json`
+* `docs/REGISTRY_REPORT.md`
+* `relationships/GRAPH.json`
+
+### Recalc trigger
+
+* file watcher, pre-commit hook, CI job, or explicit `build.py`.
+
+## Hard rules you need (or it turns into a mess)
+
+1. **Registry is the only editable truth**
+
+   * Treat derived artifacts as **read-only outputs**.
+   * If someone edits `modules/X/INDEX.md` manually, it gets overwritten next build.
+
+2. **Every derived artifact has a declared input contract**
+
+   * Example: “Module index is derived ONLY from `FILE_ID_REGISTRY.module_id` + `status` + `relative_path` + `name`.”
+   * If a field isn’t in the declared dependency list, the generator must not read it.
+
+3. **Generators must be pure and deterministic**
+
+   * No “look around the filesystem and guess” except via declared, controlled inputs.
+   * Stable ordering rules (sort keys) so output diffs are predictable.
+
+4. **Change detection is explicit**
+
+   * For each derived artifact, store:
+
+     * `source_registry_scan_id`
+     * `source_registry_hash`
+     * `generator_version`
+   * Then you can answer: “What registry state produced this file?”
+
+5. **Idempotency and safety gates**
+
+   * Generate to temp → validate → atomic replace.
+   * If validation fails, do not touch the previous output.
+
+## Your example: module directory indexes
+
+This is exactly the kind of thing that should be derived.
+
+### Inputs required (minimum)
+
+From registry:
+
+* `doc_id`
+* `relative_path`
+* `filename`
+* `module_id` (or module tag)
+* `status` (active/deprecated/quarantined)
+  Optionally:
+* `role_code` / `type_code`
+* `description` (short)
+* `entrypoint` flag
+* `depends_on` links (if you store them)
+
+### Output
+
+`modules/<module_id>/INDEX.md` (and/or JSON)
+
+### Deterministic ordering
+
+Pick one and never change it without bumping generator version:
+
+* Primary: `role_code`, then `type_code`, then `filename`
+* Or primary: `relative_path` lexicographic
+
+## The big trap: “module tag” integrity
+
+If “module_id” is a manually edited registry cell, you need enforcement or it will rot.
+
+Two workable approaches:
+
+### A) Module tag is authoritative and manually set
+
+* Great when humans know module membership.
+* Needs validation rules:
+
+  * module_id must exist in `MODULE_REGISTRY`
+  * file path must be within module root (or explicitly allowed)
+
+### B) Module membership is derived
+
+* module_id computed from directory location or pattern rules
+* humans don’t set it at all
+* best when directory structure is stable
+
+You can mix them: **default derived, allow override** with an `module_id_override` field that is rare and audited.
+
+## Recommended artifact taxonomy (so the “spreadsheet” stays clean)
+
+**Tier 0 (inputs / SSOT)**
+
+* FILE_ID_REGISTRY.csv (or sqlite)
+* MODULE_REGISTRY.csv
+* GENERATOR_REGISTRY.csv (what outputs exist, their formulas, versioning)
+* CONFIG tables (segment tables, ignore patterns)
+
+**Tier 1 (derived, critical)**
+
+* module indexes
+* directory manifests
+* repo catalog
+* “what changed” reports
+
+**Tier 2 (derived, convenience)**
+
+* docs, diagrams, dashboards, search indexes, relationship graphs
+
+## Minimal implementation that works
+
+You can implement this with “simple programming” if you keep it disciplined:
+
+* One command: `build_artifacts.py`
+* It:
+
+  1. loads registry snapshot
+  2. runs generators (each generator declares dependencies)
+  3. writes outputs atomically
+  4. writes `BUILD_REPORT.json` with hashes + versions
+* Optional watcher calls `build_artifacts.py --changed <path>` but still uses registry as the source-of-truth.
+
+## Bottom line
+
+Your spreadsheet analogy is correct and scalable, and “module index derived from module tags” is an ideal first derived artifact. The only requirement: enforce SSOT/derived separation, declare dependencies, and make generation deterministic with versioned outputs and atomic writes. If you do those, you’ll get the “instant recalc” behavior you want without drift or manual maintenance.

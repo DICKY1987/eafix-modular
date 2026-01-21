@@ -1,0 +1,314 @@
+# Runtime File Clutter vs Performance and Auditability
+
+## Directory Cleanliness + Evidence Preservation Policy (AI Review Document)
+
+### Status
+
+* **Intent:** Canonical policy proposal
+* **Scope:** Any repo/module tree that produces runtime artifacts (Python/PowerShell/MQL4/etc.)
+* **Primary outcome:** Reduce directory clutter **without** sacrificing speed (caches) or auditability (evidence)
+
+---
+
+## 1. Problem Statement
+
+Development and execution workflows generate large volumes of runtime artifacts inside working directories (module folders, repo root, tool default locations). This creates:
+
+### 1.1 Operational Problems
+
+* **Directory clutter**: important source artifacts become hard to find; navigation indexes drift.
+* **Non-deterministic “where outputs go”**: tools write in defaults that vary by user/machine.
+* **Increased error rate**: users delete “clutter” and accidentally remove a downstream input.
+
+### 1.2 Governance Problems
+
+* **Audits become unreliable** if evidence is mixed with working files and deleted during cleanup.
+* **Performance regressions** occur when caches are deleted to reduce clutter.
+
+---
+
+## 2. Core Requirement
+
+Achieve all three simultaneously:
+
+1. **Clean working directories** (module folders remain mostly source + canonical artifacts)
+2. **No performance loss** (retain caches; do not force recomputation unless desired)
+3. **No audit loss** (retain or archive evidence deterministically)
+
+---
+
+## 3. Key Insight: Extensions Are Not Enough
+
+File extensions alone cannot reliably classify artifacts. Example: `*.json` may be:
+
+* CACHE metadata
+* EVIDENCE run receipts
+* PRODUCT runtime config (input to next stage)
+
+Therefore classification must be driven by:
+
+* **Producer** (which tool created it)
+* **Path contract** (where it’s allowed to be written)
+* **Consumer references** (is it used as input later)
+
+---
+
+## 4. Artifact Classification Contract
+
+Every generated artifact must fall into exactly one bucket:
+
+### 4.1 CACHE (Speedup Artifacts)
+
+* Purpose: reduce recomputation time
+* Safe to delete (functionally) after run, but impacts performance
+* Must be consolidated into a dedicated cache sink
+
+Examples:
+
+* Python bytecode caches, test/type/lint caches, build intermediates
+
+### 4.2 EVIDENCE (Audit Artifacts)
+
+* Purpose: prove what happened during a run; support debugging and acceptance verification
+* Deleting reduces auditability; execution typically still works
+* Must be isolated under per-run evidence directories + indexed
+
+Examples:
+
+* logs, coverage reports, test reports, validation receipts, run summaries
+
+### 4.3 EPHEMERAL (Scratch/Temp)
+
+* Purpose: transient intermediate data that is not reused and not needed for audits
+* Safe to delete immediately after the generating step completes
+* Must be consolidated into a temp sink
+
+Examples:
+
+* `*.tmp`, swap files, short-lived scratch outputs
+
+### 4.4 PRODUCT (Downstream Inputs / Deliverables)
+
+* Purpose: outputs consumed by later steps or delivered externally
+* Must NOT be auto-deleted
+* Must be stored in a dedicated products/output sink and referenced explicitly
+
+Examples:
+
+* exported CSV consumed by an EA, generated configs that runtime loads
+
+---
+
+## 5. Solution Overview (The “Write Sinks” Model)
+
+### 5.1 Define Dedicated Write Sinks
+
+Only these directories may receive generated files:
+
+* `run/<run_id>/...` → **EVIDENCE**
+* `.cache/...` → **CACHE**
+* `.tmp/...` → **EPHEMERAL**
+* `out/...` (or `products/...`) → **PRODUCT**
+
+### 5.2 Enforce the Hard Rule
+
+**No tool or script is allowed to write generated output outside the sinks.**
+
+This rule alone eliminates module-directory clutter while preserving performance and audit trails.
+
+---
+
+## 6. Run Identity and Evidence Layout
+
+### 6.1 Run ID
+
+A run must have a unique, deterministic identifier.
+
+Example format:
+
+* `run_id = YYYYMMDD_HHMMSS_<seq-or-rand>`
+  (seq recommended if you maintain a state file)
+
+### 6.2 Evidence Directory Layout
+
+Recommended layout:
+
+* `run/<run_id>/logs/`
+* `run/<run_id>/reports/`
+* `run/<run_id>/receipts/`
+* `run/<run_id>/inputs_snapshot/` (optional but strong for audits)
+* `run/<run_id>/manifest.json` (**required**)
+
+### 6.3 Evidence Manifest (Required)
+
+At run end, generate:
+
+* `run/<run_id>/manifest.json` containing:
+
+  * file list and relative paths
+  * sha256 hashes
+  * tool versions / config snapshot
+  * pass/fail summary
+  * start/end timestamps
+  * exit codes
+
+This makes audits robust even if evidence is later compressed or moved.
+
+---
+
+## 7. Retention Policy (Avoid Evidence Bloat Without Losing Audits)
+
+### 7.1 Policy
+
+* Keep last **N** runs uncompressed (example: N=10)
+* Compress older runs (zip/tar) but keep:
+
+  * manifest
+  * high-level receipts/index
+* Keep failure runs longer than success runs
+* Support “pinning” runs (release, incident, legal hold)
+
+### 7.2 Deletion Rules
+
+* EPHEMERAL: delete at end-of-step or end-of-run
+* CACHE: keep; optional rotation by size/time
+* EVIDENCE: rotate by policy; never delete pinned
+* PRODUCT: never delete automatically unless explicitly governed (versioning policy required)
+
+---
+
+## 8. Tooling Strategy: Redirect Instead of Delete
+
+Primary method to reduce clutter without performance loss:
+
+* **redirect cache outputs** to `.cache/` (or machine-local cache dir)
+* **redirect logs/reports** to `run/<run_id>/...`
+
+### 8.1 Implementation Pattern
+
+* Environment variables and CLI flags define output/cache directories
+* Scripts pass these locations into tool invocations
+* Wrapper scripts enforce defaults
+
+### 8.2 Examples (Conceptual)
+
+* Python bytecode cache → redirect away from module dirs
+* Pytest cache directory → redirect to `.cache/pytest/`
+* Type/lint caches → redirect to `.cache/mypy/`, `.cache/ruff/`
+* Coverage outputs → redirect to `run/<run_id>/reports/`
+
+(Exact flags/env vars are tool-specific; the policy remains stable.)
+
+---
+
+## 9. Enforcement Mechanism (Deterministic and Checkable)
+
+### 9.1 Post-Run “Stray File Gate” (Required)
+
+At end of run:
+
+1. scan repo/module tree
+2. collect any new/modified files outside allowed sinks:
+
+   * `run/`, `.cache/`, `.tmp/`, `out/`
+3. if any are found:
+
+   * **FAIL** the run (strict mode), or
+   * **AUTO-MOVE** to the correct sink (migration mode), and emit a receipt
+
+### 9.2 Pre-Commit Gate (Recommended)
+
+Prevent accidental commits of generated artifacts by blocking:
+
+* cache directories
+* run directories (or only allow receipts)
+* temp directories
+
+### 9.3 Allowlist / Denylist
+
+Maintain a machine-readable policy file (example):
+
+* `DIR_OUTPUT_POLICY.yaml`
+
+  * allowed sink roots
+  * known cache patterns
+  * evidence patterns
+  * ephemeral patterns
+  * product patterns
+
+---
+
+## 10. Failure Modes and Mitigations
+
+### 10.1 Misclassifying PRODUCT as Clutter
+
+**Risk:** deleting breaks pipeline or runtime
+**Mitigation:** PRODUCT is defined by **consumer references**. If a later step reads it, it is PRODUCT.
+
+### 10.2 Evidence Loss Through Cleanup
+
+**Risk:** audits/debugging fail
+**Mitigation:** manifest required; retention policy prevents premature deletion; pinning supported.
+
+### 10.3 Performance Loss Through Cache Deletion
+
+**Risk:** repeated recomputation
+**Mitigation:** caches are redirected, not deleted; rotation is optional and size-based.
+
+### 10.4 Tools That Ignore Output Directives
+
+**Risk:** tools still write in working dirs
+**Mitigation:** stray-file gate catches violations; wrapper scripts standardize invocations.
+
+---
+
+## 11. Adoption Plan
+
+### Phase 0 — Baseline
+
+* Add sinks: `.cache/`, `.tmp/`, `run/`, `out/`
+* Add ignore rules (git hygiene)
+
+### Phase 1 — Redirect
+
+* Update scripts/tool invocations to write into sinks
+* Begin generating run manifests
+
+### Phase 2 — Enforce
+
+* Enable stray-file gate (fail on violations)
+* Add pre-commit/CI checks
+
+### Phase 3 — Retain
+
+* Implement retention/archival policy
+* Add pinning support and run index
+
+---
+
+## 12. Acceptance Tests (Definition of Done)
+
+A run is “clean and compliant” if:
+
+1. **No generated files** exist outside the sink roots
+2. `run/<run_id>/manifest.json` exists and hashes match files
+3. Evidence outputs are placed under `run/<run_id>/...`
+4. Caches are placed under `.cache/...`
+5. Ephemeral outputs are placed under `.tmp/...` and are removed per policy
+6. Products are placed under `out/...` and referenced explicitly (manifest/registry)
+
+---
+
+## 13. Non-Goals
+
+* Eliminating all generated files (only relocating and governing them)
+* Relying on file extension alone for classification
+* Manual cleanup as a primary mechanism
+
+---
+
+## 14. Summary
+
+This policy reduces clutter by enforcing **where generated files are allowed to be written**, not by deleting everything. Performance is preserved by **redirecting caches**, and audits are preserved by **isolating evidence per run** and requiring a **hash manifest** plus retention rules.
+
+If you want this tightened into a machine-enforceable spec next: I can convert this into a strict `DIR_OUTPUT_POLICY.yaml` contract + a minimal acceptance-test checklist that a validator can enforce.

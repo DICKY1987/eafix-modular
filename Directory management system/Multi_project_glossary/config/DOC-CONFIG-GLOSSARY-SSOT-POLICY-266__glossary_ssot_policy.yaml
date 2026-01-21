@@ -1,0 +1,56 @@
+# DOC_LINK: DOC-CONFIG-GLOSSARY-SSOT-POLICY-266
+doc_id: DOC-CONFIG-GLOSSARY-SSOT-POLICY-266
+ssot_policy:
+  # Categories that indicate SSOT-related glossary terms
+  term_categories:
+    - Specifications
+    - Framework
+    - GlobalService
+    - Contract
+    - CoreConcept
+
+  # Front-matter fields to check
+  ssot_frontmatter_field: "ssot"
+  ssot_scope_field: "ssot_scope"
+  doc_id_field: "doc_id"
+
+  # Where to find glossary metadata
+  glossary_metadata_file: "DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml"
+
+  # CI enforcement levels
+  ci:
+    fail_on_missing_term_for_ssot_doc: true
+    fail_on_missing_doc_for_ssot_term: true
+    fail_on_ssot_doc_missing_doc_id: true
+    warn_on_wrong_category: true
+
+  # File pattern exclusions (don't scan these)
+  exclude_patterns:
+    - "_ARCHIVE/**"
+    - "legacy/**"
+    - ".venv/**"
+    - "__pycache__/**"
+    - "*.pyc"
+    - ".git/**"
+
+  # Error message templates
+  messages:
+    ssot_doc_no_term: |
+      SSOT document without glossary term: {path}
+      doc_id: {doc_id}
+
+      Fix: Add a glossary term in DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml under 'terms:' section
+
+    term_missing_file: |
+      Glossary term references missing file: {term_id}
+      File: {file_path}
+
+      Fix: Either:
+      1. Restore the file, OR
+      2. Remove the file from term's implementation.files, OR
+      3. Update the path if file was moved
+
+    ssot_no_doc_id: |
+      SSOT document missing required doc_id: {path}
+
+      Fix: Add doc_id to front-matter (format: DOC-CATEGORY-NAME-NNN)

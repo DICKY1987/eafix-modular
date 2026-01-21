@@ -1,0 +1,395 @@
+document:
+  title: REGISTRY_GLOSSARY_TERMS
+  purpose: Definitions for all material terms used as column headers (and key values) in the Unified SSOT Registry.
+  scope: Unified registry supporting record_kind = entity | edge | generator
+  version: 1.0
+  status: draft
+  notes:
+    - This glossary is intended to be authoritative for validation, generators, and AI usage.
+    - If a term has allowed_values, treat them as enums unless later revised.
+
+categories:
+
+  CORE_FIELDS_ALL_ROWS:
+    record_kind:
+      definition: Discriminator that declares the logical schema for the row.
+      type: enum
+      allowed_values: ["entity", "edge", "generator"]
+      constraints: ["required", "controls which other columns are meaningful"]
+    record_id:
+      definition: Unique primary key for the row, regardless of record_kind.
+      type: string
+      constraints: ["required", "unique"]
+      notes: ["May equal entity_id/edge_id/generator_id, but does not have to."]
+    status:
+      definition: Lifecycle state indicating whether the row is considered active and eligible for derivations.
+      type: enum
+      allowed_values: ["active", "deprecated", "quarantined", "archived", "deleted"]
+      constraints: ["required"]
+    notes:
+      definition: Free-text human annotation. Not used by deterministic generators unless explicitly declared.
+      type: string
+      constraints: ["optional"]
+    tags:
+      definition: Machine-readable labels for grouping/filtering.
+      type: list_string
+      constraints: ["optional"]
+      notes: ["Store as JSON array or delimited string; choose one encoding and enforce."]
+    created_utc:
+      definition: UTC timestamp when this row was first created.
+      type: datetime_utc
+      constraints: ["required", "immutable after creation"]
+    updated_utc:
+      definition: UTC timestamp of last modification to this row.
+      type: datetime_utc
+      constraints: ["required"]
+    created_by:
+      definition: Actor identifier that created the row (user, tool, automation).
+      type: string
+      constraints: ["optional"]
+    updated_by:
+      definition: Actor identifier that last updated the row (user, tool, automation).
+      type: string
+      constraints: ["optional"]
+
+  ENTITY_FIELDS:
+    entity_id:
+      definition: Stable unique identifier for an entity (the thing being described).
+      type: string
+      constraints: ["required when record_kind=entity", "unique across entity rows"]
+    entity_kind:
+      definition: Class of entity the row describes.
+      type: enum
+      allowed_values: ["file", "asset", "transient", "external", "module", "directory", "process", "other"]
+      constraints: ["required when record_kind=entity"]
+
+  FILE_ENTITY_FIELDS:
+    doc_id:
+      definition: Fixed-width 16-digit identifier embedded in filenames or registry, identifying a concrete file instance.
+      type: string
+      constraints: ["optional unless your system mandates it", "if present must match ^\\d{16}$"]
+    filename:
+      definition: Basename of the file (including doc_id prefix if your naming convention includes it).
+      type: string
+      constraints: ["required for entity_kind=file"]
+    extension:
+      definition: Normalized file extension (without dot), lowercased.
+      type: string
+      constraints: ["required for entity_kind=file"]
+    relative_path:
+      definition: Repository-root-relative path to the file using canonical separators.
+      type: string
+      constraints: ["required for entity_kind=file", "portable identifier"]
+    absolute_path:
+      definition: Absolute filesystem path at scan time (debug/trace only; not portable).
+      type: string
+      constraints: ["optional"]
+    size_bytes:
+      definition: File size in bytes at scan time.
+      type: integer
+      constraints: ["optional", "non-negative"]
+    mtime_utc:
+      definition: File last-modified time in UTC at scan time.
+      type: datetime_utc
+      constraints: ["optional"]
+    sha256:
+      definition: SHA-256 hash of file contents for integrity and change detection.
+      type: string
+      constraints: ["optional", "if present must be 64 hex chars"]
+    content_type:
+      definition: Content classification (often MIME-like) derived by inspection or heuristic.
+      type: string
+      constraints: ["optional"]
+
+  ASSET_ENTITY_FIELDS:
+    asset_id:
+      definition: Stable identifier for a canonical reusable asset (template, schema, reference artifact).
+      type: string
+      constraints: ["required for entity_kind=asset"]
+    asset_family:
+      definition: Grouping label for related assets (e.g., schema family, template family).
+      type: string
+      constraints: ["optional"]
+    asset_version:
+      definition: Version label for the asset (semantic or integer).
+      type: string
+      constraints: ["optional"]
+    canonical_path:
+      definition: Canonical location of the reusable asset within the repository.
+      type: string
+      constraints: ["optional"]
+
+  TRANSIENT_ENTITY_FIELDS:
+    transient_id:
+      definition: Identifier for a non-file or runtime-scoped concept (run, task, scan, build, session).
+      type: string
+      constraints: ["required for entity_kind=transient"]
+    transient_type:
+      definition: Subtype for transient IDs.
+      type: enum
+      allowed_values: ["task_id", "run_id", "scan_id", "build_id", "session_id", "other"]
+      constraints: ["optional but recommended"]
+    ttl_seconds:
+      definition: Time-to-live in seconds; after this, the transient may be considered expired.
+      type: integer
+      constraints: ["optional", "non-negative"]
+    expires_utc:
+      definition: UTC timestamp after which the transient should be treated as expired.
+      type: datetime_utc
+      constraints: ["optional"]
+
+  EXTERNAL_ENTITY_FIELDS:
+    external_ref:
+      definition: External identifier or locator (ticket key, URL, commit hash, etc.).
+      type: string
+      constraints: ["required for entity_kind=external"]
+    external_system:
+      definition: System/type of the external reference.
+      type: enum
+      allowed_values: ["github", "jira", "url", "other"]
+      constraints: ["optional but recommended"]
+    resolver_hint:
+      definition: Optional hint for how to resolve the external_ref (API name, base URL, parsing rule).
+      type: string
+      constraints: ["optional"]
+
+  MODULE_PROCESS_DIRECTORY_MAPPING:
+    module_id:
+      definition: Identifier of the module the entity belongs to (ownership/membership).
+      type: string
+      constraints: ["optional unless module tagging is mandatory"]
+    module_id_source:
+      definition: Declares how module_id was determined.
+      type: enum
+      allowed_values: ["manual", "derived", "override"]
+      constraints: ["optional but recommended"]
+    module_id_override:
+      definition: Explicit override value used when default derivation would assign a different module_id.
+      type: string
+      constraints: ["optional"]
+    process_id:
+      definition: Identifier for a process definition or workflow this entity participates in.
+      type: string
+      constraints: ["optional"]
+    process_step_id:
+      definition: Identifier for a specific step within a process.
+      type: string
+      constraints: ["optional"]
+    process_step_role:
+      definition: Declares the entity’s role relative to a process step.
+      type: enum
+      allowed_values: ["entrypoint", "supporting", "output", "other"]
+      constraints: ["optional"]
+
+  CLASSIFICATION_INDEXING_HELPERS:
+    role_code:
+      definition: Code used to classify an entity’s role within the system for ordering/filtering (project-defined).
+      type: string
+      constraints: ["optional"]
+    type_code:
+      definition: Code used to classify an entity’s type/category within the system for ordering/filtering (project-defined).
+      type: string
+      constraints: ["optional"]
+    function_code_1:
+      definition: Primary function classification code (e.g., transforms, extracts) if you use multi-function encoding.
+      type: string
+      constraints: ["optional"]
+    function_code_2:
+      definition: Secondary function classification code.
+      type: string
+      constraints: ["optional"]
+    function_code_3:
+      definition: Tertiary function classification code.
+      type: string
+      constraints: ["optional"]
+    entrypoint_flag:
+      definition: Boolean marker indicating the entity is an entrypoint (starts execution or defines a module interface).
+      type: boolean
+      constraints: ["optional"]
+    short_description:
+      definition: One-line description intended for human-readable indexes and reports.
+      type: string
+      constraints: ["optional"]
+
+  LIFECYCLE_PROVENANCE_FIELDS:
+    first_seen_utc:
+      definition: UTC timestamp when the entity was first observed by scanning/inventory.
+      type: datetime_utc
+      constraints: ["optional"]
+    last_seen_utc:
+      definition: UTC timestamp when the entity was most recently observed by scanning/inventory.
+      type: datetime_utc
+      constraints: ["optional"]
+    scan_id:
+      definition: Identifier of the scan/inventory run that most recently confirmed this entity.
+      type: string
+      constraints: ["optional"]
+    source_entity_id:
+      definition: Provenance link to the entity this one was derived/copied/generated from.
+      type: string
+      constraints: ["optional", "should reference an existing entity_id when present"]
+    supersedes_entity_id:
+      definition: Provenance link to an older entity that this one replaces.
+      type: string
+      constraints: ["optional", "should reference an existing entity_id when present"]
+
+  EDGE_FIELDS:
+    edge_id:
+      definition: Stable unique identifier for an edge (relationship record).
+      type: string
+      constraints: ["required when record_kind=edge", "unique across edge rows"]
+    source_entity_id:
+      definition: The origin node of the relationship.
+      type: string
+      constraints: ["required when record_kind=edge", "must reference existing entity_id"]
+    target_entity_id:
+      definition: The destination node of the relationship.
+      type: string
+      constraints: ["required when record_kind=edge", "must reference existing entity_id"]
+    rel_type:
+      definition: Relationship type describing how source relates to target.
+      type: enum
+      allowed_values:
+        ["documents", "depends_on", "produces", "consumes", "contains", "implements", "tests", "references", "duplicates", "conflicts_with", "other"]
+      constraints: ["required when record_kind=edge"]
+    directionality:
+      definition: Declares whether rel_type should be interpreted as directed or undirected.
+      type: enum
+      allowed_values: ["directed", "undirected"]
+      constraints: ["optional but recommended"]
+
+  EDGE_EVIDENCE_CONFIDENCE:
+    confidence:
+      definition: Numeric confidence score for the edge truthfulness.
+      type: float
+      constraints: ["required when record_kind=edge", "range 0.0..1.0"]
+    evidence_method:
+      definition: Method used to establish the relationship.
+      type: enum
+      allowed_values: ["static_parse", "registry_link", "user_asserted", "runtime_observed", "heuristic", "other"]
+      constraints: ["required when record_kind=edge"]
+    evidence_locator:
+      definition: Pointer to where the evidence can be found (file:line, AST path, log reference, URL).
+      type: string
+      constraints: ["required when record_kind=edge"]
+    evidence_snippet:
+      definition: Short excerpt or summary of the evidence (non-authoritative convenience).
+      type: string
+      constraints: ["optional"]
+    observed_utc:
+      definition: UTC timestamp when the evidence was observed or last verified.
+      type: datetime_utc
+      constraints: ["required when record_kind=edge"]
+    tool_version:
+      definition: Version of the tool/generator/parser that produced the edge record.
+      type: string
+      constraints: ["optional but recommended"]
+    edge_flags:
+      definition: Machine-readable flags that qualify the edge (e.g., stale, ambiguous, circular).
+      type: list_string
+      constraints: ["optional"]
+
+  GENERATOR_FIELDS:
+    generator_id:
+      definition: Stable unique identifier for a generator definition.
+      type: string
+      constraints: ["required when record_kind=generator", "unique across generator rows"]
+    generator_name:
+      definition: Human-friendly name of the generator.
+      type: string
+      constraints: ["optional but recommended"]
+    generator_version:
+      definition: Version of generator logic used to produce outputs (bump when ordering or rendering rules change).
+      type: string
+      constraints: ["required when record_kind=generator"]
+    output_kind:
+      definition: Category of derived artifact produced by the generator.
+      type: enum
+      allowed_values: ["module_index", "dir_manifest", "repo_catalog", "graph", "report", "other"]
+      constraints: ["required when record_kind=generator"]
+    output_path:
+      definition: Concrete output path for a derived artifact.
+      type: string
+      constraints: ["optional if output_path_pattern is used"]
+    output_path_pattern:
+      definition: Template/pattern that resolves to output paths (e.g., modules/{module_id}/INDEX.md).
+      type: string
+      constraints: ["optional"]
+    declared_dependencies:
+      definition: Explicit allow-list of registry columns the generator is permitted to read.
+      type: list_string
+      constraints: ["required for deterministic enforcement"]
+    input_filters:
+      definition: Declarative filter defining which registry rows are eligible inputs.
+      type: string_or_json
+      constraints: ["optional but recommended"]
+    sort_rule_id:
+      definition: Identifier for a stable, versioned sorting rule used by the generator.
+      type: string
+      constraints: ["optional but recommended"]
+    sort_keys:
+      definition: Ordered list of keys used to sort inputs deterministically before rendering.
+      type: list_string
+      constraints: ["optional but recommended"]
+    template_ref_entity_id:
+      definition: Entity reference to a template file/asset used to render the output.
+      type: string
+      constraints: ["optional", "should reference existing entity_id"]
+    validator_id:
+      definition: Identifier for an output validator (contract checker) used to accept/reject generated output.
+      type: string
+      constraints: ["optional"]
+    validation_rules:
+      definition: Inline validation rules used when no validator_id is referenced.
+      type: string_or_json
+      constraints: ["optional"]
+
+  BUILD_TRACEABILITY_FIELDS:
+    last_build_utc:
+      definition: UTC timestamp when the generator last successfully produced its outputs.
+      type: datetime_utc
+      constraints: ["optional"]
+    source_registry_hash:
+      definition: Hash of the registry state (or snapshot subset) used as input to generation.
+      type: string
+      constraints: ["optional but recommended for audit"]
+    source_registry_scan_id:
+      definition: Scan/snapshot identifier of the registry state used as input.
+      type: string
+      constraints: ["optional but recommended for audit"]
+    output_hash:
+      definition: Hash of the generated output contents for change detection.
+      type: string
+      constraints: ["optional"]
+    build_report_entity_id:
+      definition: Entity reference to the build report artifact produced by the build system.
+      type: string
+      constraints: ["optional", "should reference existing entity_id"]
+
+value_terms_used_by_registry:
+  active:
+    definition: Status meaning eligible for normal derivations and considered current.
+  deprecated:
+    definition: Status meaning retained but no longer preferred; may remain in indexes depending on policy.
+  quarantined:
+    definition: Status meaning excluded from normal derivations pending review due to policy violations or uncertainty.
+  archived:
+    definition: Status meaning retained for history/audit but excluded from active operation.
+  deleted:
+    definition: Status meaning logically removed; retained only for traceability if policy allows.
+
+types_reference:
+  string:
+    definition: Text value.
+  integer:
+    definition: Whole number.
+  float:
+    definition: Decimal number.
+  boolean:
+    definition: true or false.
+  datetime_utc:
+    definition: Timestamp normalized to UTC in a single enforced format (e.g., ISO 8601 with Z).
+  list_string:
+    definition: List of strings stored in a single cell using a single enforced encoding (JSON array recommended).
+  string_or_json:
+    definition: Either a string encoding or structured JSON; pick one canonical encoding and enforce.

@@ -1,0 +1,91 @@
+---
+doc_id: DOC-INFRA-0013
+---
+name: Performance Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: "HTTP target URL for k6 test"
+        default: "http://localhost:8080/healthz"
+        required: true
+      vus:
+        description: "k6 VUs"
+        default: "5"
+        required: true
+      duration:
+        description: "k6 duration"
+        default: "30s"
+        required: true
+      locust_host:
+        description: "Locust host"
+        default: "http://localhost:8080"
+        required: true
+      users:
+        description: "Locust users"
+        default: "10"
+        required: true
+      spawn:
+        description: "Locust spawn rate"
+        default: "5"
+        required: true
+      locust_duration:
+        description: "Locust duration"
+        default: "1m"
+        required: true
+
+jobs:
+  k6:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run k6 via Docker (non-blocking)
+        continue-on-error: true
+        run: |
+          mkdir -p scripts/perf/k6
+          docker run --rm \
+            -e TARGET_URL='${{ inputs.target_url }}' \
+            -e VUS='${{ inputs.vus }}' \
+            -e DURATION='${{ inputs.duration }}' \
+            -v "$PWD/scripts/perf/k6:/work" -w /work \
+            grafana/k6 run /work/script.js --summary-export /work/summary.json || true
+      - name: Upload k6 summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-summary
+          path: scripts/perf/k6/summary.json
+          if-no-files-found: ignore
+
+  locust:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Locust
+        run: pip install --upgrade pip locust
+      - name: Run Locust (non-blocking)
+        continue-on-error: true
+        run: |
+          mkdir -p scripts/perf/locust
+          locust -f scripts/perf/locust/locustfile.py \
+            --headless \
+            -u '${{ inputs.users }}' \
+            -r '${{ inputs.spawn }}' \
+            -t '${{ inputs.locust_duration }}' \
+            --host '${{ inputs.locust_host }}' \
+            --csv scripts/perf/locust/results || true
+      - name: Upload Locust results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: locust-results
+          path: scripts/perf/locust/results*.*
+          if-no-files-found: ignore
+

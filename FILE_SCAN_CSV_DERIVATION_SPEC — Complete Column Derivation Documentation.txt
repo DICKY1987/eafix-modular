@@ -1,0 +1,522 @@
+## FILE_SCAN_CSV_DERIVATION_SPEC — Complete Column Derivation Documentation
+
+```yaml
+document_id: DOC-REG-FILE-SCAN-CSV-DERIV-001
+title: File Scan CSV Registry — Complete Column Derivation Specification
+version: 1.0.0
+status: target_contract
+applies_to_registry: REG-SCAN-CSV-1.0
+generator_intent: Any scanner that claims to produce REG-SCAN-CSV-1.0 MUST implement these derivations exactly.
+note: This document defines derivation logic. Validation rules belong in the JSON Schema.
+```
+
+---
+
+# 1) Inputs (authoritative sources for derivation)
+
+## 1.1 Runtime inputs
+
+* **scan_root (root directory)**: the directory being scanned.
+* **scan_timestamp_utc**: captured once per run, used as `first_seen_utc`.
+* **scan_id**: captured once per run, used as `scan_id`.
+
+## 1.2 Configuration inputs (identity + scan behavior)
+
+### Identity configuration (optional)
+
+Identity config may be absent. If present, it MUST be treated as authoritative overrides where specified.
+
+**identity_config fields**
+
+* `id_regex` (string regex). Default: `^\d{16}_`
+* `placeholder_id` (string). Default: `0000000000000000`
+* `default_scope` (string). Default: `GLOBAL`
+* `type_code_by_extension` (map ext -> code). Default: empty
+* `ns_code_by_top_dir` (map top_dir -> code). Default: empty
+* `scope_by_ns_code` (map ns_code -> scope). Default: empty
+
+### Scan configuration
+
+* Excluded directory names (case-insensitive)
+* Exclude filename patterns (case-insensitive substring match)
+* Include filename patterns (if non-empty, only matching files are included)
+* Whether to include directories as rows (this contract assumes **yes**)
+* Output directory exclusion (if output dir is under scan_root, exclude it)
+
+---
+
+# 2) Execution model (run-level algorithm)
+
+## 2.1 Run initialization (exact rules)
+
+1. `scan_root` is normalized to an **absolute path**.
+2. `first_seen_utc` is set once:
+
+   * `first_seen_utc = now_utc_iso8601_z()`
+3. `scan_id` is set once:
+
+   * MUST be unique per run.
+   * Recommended formats:
+
+     * `YYYYMMDD_HHMMSS_<12hex>` OR UUIDv4.
+4. Determine effective identity settings:
+
+   * `ID_REGEX = identity_config.id_regex OR '^\d{16}_'`
+   * `PLACEHOLDER_ID = identity_config.placeholder_id OR '0000000000000000'`
+   * `DEFAULT_SCOPE = identity_config.default_scope OR 'GLOBAL'`
+   * `TYPE_MAP = identity_config.type_code_by_extension OR {}`
+   * `NS_MAP = identity_config.ns_code_by_top_dir OR {}`
+   * `SCOPE_MAP = identity_config.scope_by_ns_code OR {}`
+
+## 2.2 Traversal (exact rules)
+
+Traverse recursively under `scan_root`:
+
+For each filesystem entry encountered (directory or file):
+
+1. Build `path` = absolute filesystem path.
+2. Apply exclusions:
+
+   * If any ancestor directory name is in excluded dir list (case-insensitive) ⇒ skip subtree.
+   * If `path` is under output directory (and output dir is under scan_root) ⇒ skip.
+3. For files, apply filename include/exclude patterns:
+
+   * If `include_patterns` non-empty: file MUST match at least one include pattern.
+   * If file matches any exclude pattern ⇒ skip.
+4. For each included item, emit exactly one row (even if errors occur; populate error fields).
+
+---
+
+# 3) Column derivation catalog (complete and deterministic)
+
+## 3.0 Shared helper rules (used by multiple columns)
+
+### H1 — `now_utc_iso8601_z()`
+
+* `dt = datetime.now(timezone.utc)`
+* Return ISO-8601 with trailing `Z`
+
+  * Example: `2026-01-18T17:33:12Z`
+
+### H2 — `to_utc_iso8601_z(epoch_seconds)`
+
+* `dt = datetime.fromtimestamp(epoch_seconds, timezone.utc)`
+* Return ISO-8601 with trailing `Z`
+
+### H3 — `sanitize_code_token(s)`
+
+Convert any string to a valid code token:
+
+1. Uppercase
+2. Replace any character not `[A-Z0-9]` with `_`
+3. Collapse multiple `_` to single `_`
+4. Trim leading/trailing `_`
+5. If empty after sanitize, return `UNKNOWN`
+
+### H4 — `relative_path_from(scan_root, path)`
+
+1. `rel = os.path.relpath(path, scan_root)`
+2. Normalize separators:
+
+   * Replace `\` with `/`
+3. If `rel == '.'`, keep `.` (only if root itself is emitted; otherwise unused)
+4. Return `rel`
+
+### H5 — `extension_from_name(name)`
+
+* `ext = Path(name).suffix` (last suffix only)
+* If `ext == ''` return `''`
+* Else return `ext[1:].lower()`
+
+### H6 — `match_id_prefix(name)`
+
+* `has_id_prefix = regex(ID_REGEX).match(name) is not None`
+
+### H7 — `extract_16_digit_prefix(name)`
+
+* If `name` matches `^(\d{16})_` return the 16 digits.
+* Else return `''`
+* Note: extraction is always based on the fixed 16-digit pattern, even if `ID_REGEX` is broader. (Keeps doc_id stable.)
+
+### H8 — `guess_mime_type(name)`
+
+* `mime = mimetypes.guess_type(name)[0]`
+* If `mime is None` return `''`
+* Else return `mime`
+
+### H9 — `permissions_from_stat(st_mode)`
+
+* `perms = st_mode & 0o777`
+* Return `f"{perms:03o}"`
+
+### H10 — `sha256_file(path)`
+
+Compute SHA-256 of file bytes:
+
+* Open `path` in binary mode, stream in chunks (e.g., 1–8MB).
+* Return lowercase hex digest (64 hex chars).
+
+Failure handling:
+
+* Permission/read errors ⇒ raise `PermissionError` or `OSError` and caller sets error fields.
+
+---
+
+## 3.1 Per-run columns
+
+### `scan_id`
+
+* **Source**: run initialization
+* **Rule**: same value for all rows in the run
+* **Error behavior**: never blank
+
+### `scan_root`
+
+* **Source**: run initialization
+* **Rule**: absolute path of scan root (as used for traversal)
+* **Error behavior**: never blank
+
+### `first_seen_utc`
+
+* **Source**: run initialization
+* **Rule**: same value for all rows in the run (`now_utc_iso8601_z()`)
+* **Error behavior**: never blank
+
+---
+
+## 3.2 Path and name columns
+
+### `path`
+
+* **Source**: traversal
+* **Rule**: absolute filesystem path at scan time
+* **Error behavior**: if path exists but later ops fail, still emit path
+
+### `relative_path`
+
+* **Source**: `relative_path_from(scan_root, path)`
+* **Rule**: portable locator under scan root using `/`
+* **Error behavior**: if relpath computation fails, set `relative_path=''` and set error
+
+### `name`
+
+* **Source**: `os.path.basename(path)`
+* **Rule**: current basename at scan time
+* **Error behavior**: if basename fails (rare), set name='' and set error
+
+---
+
+## 3.3 File type, size, times
+
+### `is_directory`
+
+* **Source**: filesystem
+* **Rule**:
+
+  * `True` if entry is a directory
+  * `False` otherwise
+* **Error behavior**:
+
+  * If stat/type detection fails: set `is_directory=False` and set `error_kind=stat_failed`
+
+### `extension`
+
+* **Source**: `extension_from_name(name)`
+* **Rule**:
+
+  * For directories: MUST be `''`
+  * For files: last suffix lowercased without dot; else `''`
+* **Error behavior**: if name is empty due to earlier failure, extension=''
+
+### `size_bytes`
+
+* **Source**: filesystem stat
+* **Rule**:
+
+  * For directories: `0`
+  * For files: `st_size`
+* **Error behavior**:
+
+  * If stat fails: `0` and set `error_kind=stat_failed`
+
+### `mtime_utc`
+
+* **Source**: filesystem stat
+* **Rule**:
+
+  * For files/dirs: `to_utc_iso8601_z(st_mtime)`
+* **Error behavior**:
+
+  * If stat fails: `''` and set `error_kind=stat_failed`
+
+### `created_time`
+
+* **Source**: filesystem stat (ctime semantics)
+* **Rule**:
+
+  * `to_utc_iso8601_z(st_ctime)`
+* **Important note**:
+
+  * On some platforms this is metadata-change time, not true creation time.
+* **Error behavior**:
+
+  * If stat fails: `''` and set `error_kind=stat_failed`
+
+---
+
+## 3.4 MIME and permissions
+
+### `mime_type`
+
+* **Source**: `guess_mime_type(name)`
+* **Rule**:
+
+  * If unknown: `''`
+* **Error behavior**:
+
+  * Never an error by itself; can be blank on success
+
+### `permissions`
+
+* **Source**: filesystem stat
+* **Rule**:
+
+  * If permissions are included: `permissions_from_stat(st_mode)`
+  * Else `''`
+* **Error behavior**:
+
+  * If stat fails: `''` and set `error_kind=stat_failed`
+
+---
+
+## 3.5 Content hashing (natural key)
+
+### `content_hash`
+
+* **Purpose**: primary natural-key hash; required for file identity across runs
+* **Rule**:
+
+  * If `is_directory=True`: `''`
+  * If file:
+
+    * `content_hash = sha256_file(path)` (64 hex)
+* **Error behavior**:
+
+  * If hashing fails due to permissions/IO:
+
+    * `content_hash=''`
+    * `error_kind='hash_failed'`
+    * `error` populated with exception string
+* **Non-error skipping is NOT allowed** under this contract (do not blank content_hash just because file is large). If you need that, add explicit skip policy fields.
+
+---
+
+## 3.6 ID prefix detection and planning placeholders
+
+### `has_id_prefix`
+
+* **Rule**: `match_id_prefix(name)` using `ID_REGEX`
+* **Error behavior**:
+
+  * If name is missing, treat as False and set `error_kind=unexpected`
+
+### `doc_id`
+
+* **Rule**:
+
+  * If filename matches `^(\d{16})_`:
+
+    * `doc_id = extracted 16 digits`
+  * Else `''`
+* **Error behavior**: if name missing, `''`
+
+### `current_id_prefix`
+
+* **Rule**: same as `doc_id` (explicit duplicate for clarity)
+* **Error behavior**: if name missing, `''`
+
+### `needs_id`
+
+* **Rule**: `needs_id = not has_id_prefix`
+* **Error behavior**: if has_id_prefix missing, default True and set error
+
+### `0000000000000000_filename`
+
+* **Rule**:
+
+  * If `has_id_prefix=True`:
+
+    * `0000000000000000_filename = name`
+  * Else:
+
+    * `0000000000000000_filename = PLACEHOLDER_ID + '_' + name`
+* **Error behavior**:
+
+  * If `name==''`, then value is `PLACEHOLDER_ID + '_'`
+
+### `planned_id`
+
+* **Rule**:
+
+  * Phase 0 scan output MUST leave blank: `''`
+* **Populated later**:
+
+  * A planner allocates a 16-digit ID; scan never mutates.
+
+### `planned_rel_path`
+
+* **Rule**:
+
+  * Phase 0 scan output MUST leave blank: `''`
+* **Populated later**:
+
+  * If planned:
+
+    * `planned_rel_path = dirname(relative_path) + '/' + planned_id + '_' + original_basename`
+    * Where `original_basename` is the non-prefixed basename (the scan-time `name`).
+
+---
+
+## 3.7 Type / namespace / scope derivations
+
+These MUST be derived deterministically and must be config-overridable.
+
+### `type_code`
+
+* **Rule order (highest precedence first)**:
+
+  1. If `is_directory=True` ⇒ `type_code = 'DIR'`
+  2. Else compute `ext = extension`
+
+     * If `ext==''` ⇒ `type_code = 'NOEXT'`
+     * Else if `ext in TYPE_MAP` ⇒ `type_code = TYPE_MAP[ext]`
+     * Else ⇒ `type_code = ext.upper()`
+  3. Finally sanitize: `type_code = sanitize_code_token(type_code)`
+
+### `ns_code`
+
+* **Inputs**: `relative_path`
+* **Rule**:
+
+  1. Determine top directory:
+
+     * If `relative_path` contains `/`:
+
+       * `top = relative_path.split('/')[0]`
+     * Else:
+
+       * `top = ''` (top-level file)
+  2. If `top==''` or `top=='.'` ⇒ `ns_code='ROOT'`
+  3. Else if `top in NS_MAP` ⇒ `ns_code = NS_MAP[top]`
+  4. Else ⇒ `ns_code = top.upper()`
+  5. Sanitize: `ns_code = sanitize_code_token(ns_code)`
+
+### `scope`
+
+* **Inputs**: `ns_code`
+* **Rule**:
+
+  1. If `ns_code in SCOPE_MAP` ⇒ `scope = SCOPE_MAP[ns_code]`
+  2. Else ⇒ `scope = DEFAULT_SCOPE`
+  3. Sanitize: `scope = sanitize_code_token(scope)`
+
+---
+
+## 3.8 Error fields (audit-perfect run behavior)
+
+### `error_kind`
+
+* **Rule**:
+
+  * `''` if no error occurred for the row
+  * One of:
+
+    * `permission_denied`
+    * `stat_failed`
+    * `hash_failed`
+    * `unexpected`
+
+### `error`
+
+* **Rule**:
+
+  * `''` if `error_kind==''`
+  * Otherwise a human-readable error message (exception string)
+
+### Error precedence (when multiple failures could occur)
+
+For each row, operations are attempted in this order, and the first failure determines the primary error_kind:
+
+1. Determine entry type + stat (`stat_failed` on failure)
+2. Derive permissions/times/size (`stat_failed` already covers)
+3. Hash content for files (`hash_failed` or `permission_denied` if clearly permission-related)
+4. Any other unexpected exception ⇒ `unexpected`
+
+If a failure happens early:
+
+* still emit row with best-effort fields
+* set `error_kind` and `error`
+* leave dependent fields blank/zero as specified above
+
+---
+
+# 4) Optional dynamic hash columns (`hash_*`)
+
+These columns are **optional** and appear only if the scanner is configured to output them.
+
+### Header rule
+
+* For each enabled algorithm `algo`, add header: `hash_<algo>` (e.g., `hash_md5`, `hash_sha1`).
+
+### Value rule per row
+
+* If `is_directory=True` ⇒ `''`
+* If file and hashing succeeds ⇒ hex digest for that algorithm
+* If hashing fails ⇒ `''` and (if not already set) error_kind becomes `hash_failed`
+
+**Important**: `content_hash` is still required and remains the primary hash. Dynamic hashes are secondary.
+
+---
+
+# 5) Worked examples (canonical)
+
+### Example A: non-prefixed Python file under `src/`
+
+Input:
+
+* `relative_path = src/app/main.py`
+* `name = main.py`
+  Derived:
+* `extension = py`
+* `has_id_prefix = False`
+* `doc_id = ''`
+* `needs_id = True`
+* `0000000000000000_filename = 0000000000000000_main.py`
+* `type_code = PY` (unless TYPE_MAP overrides)
+* `ns_code = SRC` (unless NS_MAP overrides)
+* `scope = GLOBAL` (unless SCOPE_MAP overrides)
+* `planned_id = ''`, `planned_rel_path = ''`
+
+### Example B: already prefixed markdown doc
+
+`name = 1234567890123456_README.md`
+Derived:
+
+* `has_id_prefix = True`
+* `doc_id = 1234567890123456`
+* `needs_id = False`
+* `0000000000000000_filename = 1234567890123456_README.md`
+
+---
+
+# 6) What this document guarantees to AI
+
+If a CSV claims to be **REG-SCAN-CSV-1.0 compliant**, AI can assume:
+
+* Every column is derived exactly as specified here.
+* Blank fields have defined meanings (not “unknown” ambiguity).
+* `needs_id`, placeholder filename, and `type_code/ns_code/scope` are consistent and deterministic.
+* Errors are represented explicitly and do not silently drop rows.
+
+---
+

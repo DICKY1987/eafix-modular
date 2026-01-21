@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eafix.io/schemas/registry_store.json",
+  "title": "Central ID Registry",
+  "description": "Schema for EAFIX 16-digit identity registry store",
+  "type": "object",
+  "required": ["schema_version", "scope", "counters", "allocations", "metadata"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Schema version for compatibility"
+    },
+    "scope": {
+      "type": "string",
+      "pattern": "^\\d{6}$",
+      "description": "6-digit scope (YYMMDD)"
+    },
+    "counters": {
+      "type": "object",
+      "description": "Counter state per NS_TYPE_SCOPE tuple",
+      "propertyNames": {
+        "pattern": "^\\d{3}_\\d{2}_\\d{6}$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": ["current", "allocated"],
+        "properties": {
+          "current": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 99999,
+            "description": "Current sequence number"
+          },
+          "allocated": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total IDs allocated from this counter"
+          },
+          "reserved": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 99999
+            },
+            "description": "Reserved sequence numbers"
+          }
+        }
+      }
+    },
+    "allocations": {
+      "type": "array",
+      "description": "History of all ID allocations",
+      "items": {
+        "type": "object",
+        "required": ["id", "file_path", "allocated_at", "status"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^\\d{16}$",
+            "description": "16-digit ID"
+          },
+          "file_path": {
+            "type": "string",
+            "description": "Relative path to file"
+          },
+          "allocated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp"
+          },
+          "allocated_by": {
+            "type": "string",
+            "description": "User or system that allocated"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "deprecated", "superseded"],
+            "description": "Current status of allocation"
+          },
+          "superseded_by": {
+            "type": "string",
+            "pattern": "^\\d{16}$",
+            "description": "ID that supersedes this one"
+          },
+          "deprecated_reason": {
+            "type": "string",
+            "description": "Reason for deprecation"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata"
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["created_at", "last_updated", "version"],
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "total_allocations": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,258 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "module.manifest.schema.json",
+  "title": "Module Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "module_id",
+    "module_type",
+    "status",
+    "owner",
+    "purpose",
+    "contract_version",
+    "contract_tier",
+    "migration_state",
+    "evidence_policy",
+    "primary_output",
+    "inputs",
+    "outputs",
+    "required_files",
+    "validators",
+    "acceptance_tests",
+    "dependency_rules",
+    "side_effects"
+  ],
+  "properties": {
+    "module_id": {
+      "type": "string",
+      "pattern": "^[A-Z0-9][A-Z0-9_\\-]{2,63}$"
+    },
+    "module_type": {
+      "type": "string",
+      "enum": ["system", "library", "service", "data", "tool"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "deprecated"]
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 2000
+    },
+    "contract_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "contract_tier": {
+      "type": "string",
+      "enum": ["tier1", "tier2", "tier3"]
+    },
+    "migration_state": {
+      "type": "string",
+      "enum": ["none", "partial", "legacy"]
+    },
+    "evidence_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["root_dir", "layout_version", "required_subtrees"],
+      "properties": {
+        "root_dir": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "layout_version": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "required_subtrees": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1, "maxLength": 128 }
+        }
+      }
+    },
+    "primary_output": { "$ref": "#/$defs/artifact_ref" },
+    "inputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/io_item" }
+    },
+    "outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/io_item" }
+    },
+    "required_files": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/required_file" }
+    },
+    "validators": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/executable_check" }
+    },
+    "acceptance_tests": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/executable_check" }
+    },
+    "dependency_rules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed_modules", "disallowed"],
+      "properties": {
+        "allowed_modules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["module_id"],
+            "properties": {
+              "module_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+              "contract_version_range": { "type": "string", "minLength": 1, "maxLength": 64 },
+              "dependency_type": { "type": "string", "minLength": 1, "maxLength": 64 }
+            }
+          }
+        },
+        "disallowed": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/disallowed_rule" }
+        }
+      }
+    },
+    "side_effects": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/side_effect" }
+    }
+  },
+  "$defs": {
+    "artifact_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "path"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["file", "dataset", "registry", "schema", "dag", "index", "report", "other"]
+        },
+        "path": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "id_ref": { "type": "string", "maxLength": 128 }
+      }
+    },
+    "io_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "direction", "artifact"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "direction": { "type": "string", "enum": ["in", "out"] },
+        "artifact": { "$ref": "#/$defs/artifact_ref" },
+        "required": { "type": "boolean", "default": true },
+        "freshness": {
+          "type": "string",
+          "enum": ["static", "run_generated", "time_sensitive"],
+          "default": "static"
+        },
+        "derivation": { "type": "string", "maxLength": 4000 }
+      }
+    },
+    "required_file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "path"],
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": [
+            "entrypoint",
+            "library",
+            "config",
+            "config_schema",
+            "io_schema",
+            "validator",
+            "tests",
+            "fixtures",
+            "docs",
+            "readme",
+            "scripts",
+            "other"
+          ]
+        },
+        "path": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "optional": { "type": "boolean", "default": false },
+        "description": { "type": "string", "maxLength": 2000 }
+      }
+    },
+    "executable_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["check_id", "type", "command", "expected"],
+      "properties": {
+        "check_id": { "type": "string", "pattern": "^[A-Z0-9][A-Z0-9_\\-]{2,63}$" },
+        "type": {
+          "type": "string",
+          "enum": ["structure", "schema", "static", "runtime", "smoke", "integration"]
+        },
+        "command": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "cwd": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "timeout_seconds": { "type": "integer", "minimum": 1, "maximum": 36000 },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cpu_seconds": { "type": "integer", "minimum": 1, "maximum": 36000 },
+            "memory_mb": { "type": "integer", "minimum": 1, "maximum": 1048576 },
+            "disk_mb": { "type": "integer", "minimum": 1, "maximum": 1048576 }
+          }
+        },
+        "expected": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["exit_code"],
+          "properties": {
+            "exit_code": { "type": "integer", "minimum": 0, "maximum": 255 },
+            "produces": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/artifact_ref" }
+            },
+            "no_changes": { "type": "boolean", "default": false }
+          }
+        }
+      }
+    },
+    "disallowed_rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "pattern", "reason"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["import", "path_access", "network", "exec", "env_var", "other"]
+        },
+        "pattern": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "reason": { "type": "string", "minLength": 5, "maxLength": 2000 }
+      }
+    },
+    "side_effect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "scope", "invariants"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["filesystem_mutation", "git_staging", "network_access", "env_write", "process_spawn", "other"]
+        },
+        "scope": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "invariants": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 3, "maxLength": 256 }
+        }
+      }
+    }
+  }
+}

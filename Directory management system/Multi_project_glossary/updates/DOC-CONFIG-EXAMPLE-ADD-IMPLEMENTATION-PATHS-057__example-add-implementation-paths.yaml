@@ -1,0 +1,50 @@
+# DOC_LINK: DOC-CONFIG-EXAMPLE-ADD-IMPLEMENTATION-PATHS-057
+doc_id: DOC-CONFIG-EXAMPLE-ADD-IMPLEMENTATION-PATHS-057
+# Example: Add Implementation Paths to Core Engine Terms
+# Location: glossary/updates/add-implementation-paths.yaml
+
+patch_id: "01J4AC8E1W3D0C8QK7F3HA2XYZ"
+description: "Add implementation paths to all Core Engine terms"
+date: "2025-11-25"
+author: "architecture-team"
+
+terms:
+  - term_id: TERM-ENGINE-001
+    action: update
+    field: implementation.files
+    value:
+      - "core/engine/orchestrator.py"
+      - "engine/orchestrator/orchestrator.py"
+
+  - term_id: TERM-ENGINE-001
+    action: add
+    field: implementation.entry_points
+    value:
+      - "Orchestrator.run_workstream()"
+      - "Orchestrator.execute_bundle()"
+
+  - term_id: TERM-ENGINE-002
+    action: update
+    field: implementation.files
+    value:
+      - "core/engine/executor.py"
+
+  - term_id: TERM-ENGINE-002
+    action: add
+    field: implementation.entry_points
+    value:
+      - "Executor.execute_step()"
+      - "Executor.handle_timeout()"
+
+  - term_id: TERM-ENGINE-015
+    action: update
+    field: implementation.files
+    value:
+      - "core/engine/scheduler.py"
+
+  - term_id: TERM-ENGINE-015
+    action: add
+    field: implementation.entry_points
+    value:
+      - "Scheduler.schedule_tasks()"
+      - "Scheduler.build_dag()"

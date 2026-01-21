@@ -1,0 +1,199 @@
+# DOC_LINK: DOC-CONFIG-GLOSSARY-METADATA-032
+doc_id: DOC-CONFIG-GLOSSARY-METADATA-032
+# Glossary Metadata
+# This file tracks term lifecycle and machine-readable data
+# PREFER using scripts/DOC-SCRIPT-SCRIPTS-UPDATE-TERM-264__update_term.py over manual edits
+
+schema_version: "1.0.0"
+last_updated: "2025-11-27T14:13:51Z"
+total_terms: 83
+
+# Category definitions
+categories:
+  "Architecture":
+    code: "ARCH"
+    description: "Module-centric architecture and organization"
+    term_count: 8
+  "Core Engine":
+    code: "ENGINE"
+    description: "Execution orchestration components"
+    term_count: 23
+  "Patch Management":
+    code: "PATCH"
+    description: "Patch lifecycle and validation"
+    term_count: 8
+  "Error Detection":
+    code: "ERROR"
+    description: "Error detection and recovery"
+    term_count: 10
+  "Specifications":
+    code: "SPEC"
+    description: "Spec management and tooling"
+    term_count: 10
+  "State Management":
+    code: "STATE"
+    description: "Database and state tracking"
+    term_count: 8
+  "Integrations":
+    code: "INTEG"
+    description: "External tool integrations"
+    term_count: 10
+  "Framework":
+    code: "FRAME"
+    description: "UET and foundational concepts"
+    term_count: 3
+  "Project Management":
+    code: "PM"
+    description: "CCPM and planning"
+    term_count: 4
+
+# Term registry
+# NOTE: This file is the SSOT. Glossary output is generated in:
+#   docs/DOC-GUIDE-GLOSSARY-665__glossary.md
+terms:
+
+  TERM-GLOSS-SSOT-POLICY:
+    name: "Glossary SSOT Policy"
+    category: "Framework"
+    status: "active"
+    added_date: "2025-12-04"
+    added_by: "system-automation"
+    last_modified: "2025-12-04T00:24:00Z"
+    modified_by: "automation"
+    aliases:
+      - "SSOT Policy Spec"
+      - "Single Source of Truth Enforcement"
+    implementation:
+      files:
+        - "glossary/specs/GLOSSARY_SSOT_POLICY_SPEC.md"
+        - "scripts/glossary_ssot_policy.py"
+        - "glossary/config/glossary_ssot_policy.yaml"
+      entry_points:
+        - "python scripts/glossary_ssot_policy.py"
+    config_refs:
+      - "glossary/config/glossary_ssot_policy.yaml"
+    related_terms:
+      - term_id: "TERM-FRAME-001"
+        relationship: "extends"
+    patch_history:
+      - patch_id: "ssot-policy-001"
+        action: "added"
+        date: "2025-12-04T00:24:00Z"
+        description: "Initial SSOT policy system creation"
+
+  TERM-ENGINE-001:
+    name: "Orchestrator"
+    category: "Core Engine"
+    status: "active"
+    added_date: "2025-11-20"
+    added_by: "architecture-team"
+    last_modified: "2025-11-23T14:30:00Z"
+    modified_by: "automation"
+    aliases:
+      - "Workstream Orchestrator"
+      - "Job Orchestrator"
+    implementation:
+      files:
+        - "core/engine/orchestrator.py"
+        - "engine/orchestrator/orchestrator.py"
+      entry_points:
+        - "Orchestrator.run_workstream()"
+        - "Orchestrator.execute_bundle()"
+    schema_refs:
+      - "schema/workstream.schema.json"
+      - "schema/uet/execution_request.v1.json"
+    config_refs:
+      - "config/orchestrator.yaml"
+    related_terms:
+      - term_id: "TERM-ENGINE-002"
+        relationship: "uses"
+      - term_id: "TERM-ENGINE-015"
+        relationship: "uses"
+      - term_id: "TERM-STATE-003"
+        relationship: "depends_on"
+    patch_history:
+      - patch_id: "initial"
+        action: "added"
+        date: "2025-11-20T10:00:00Z"
+        description: "Initial term creation"
+
+  TERM-SPEC-TEST-DEMO:
+    name: "Test Demonstration Specification"
+    category: "Specifications"
+    status: "active"
+    added_date: "2025-12-04"
+    added_by: "automated-test"
+    implementation:
+      files:
+        - "specs/TEST_DEMO_SPEC.md"
+    related_terms:
+      - term_id: "TERM-GLOSS-SSOT-POLICY"
+        relationship: "demonstrates"
+
+  TERM-ENGINE-002:
+    name: "Executor"
+    category: "Core Engine"
+    status: "active"
+    added_date: "2025-11-20"
+    added_by: "architecture-team"
+    last_modified: "2025-11-20T00:00:00Z"
+    implementation:
+      files:
+        - "core/engine/executor.py"
+      entry_points:
+        - "Executor.execute_step()"
+    related_terms:
+      - term_id: "TERM-ENGINE-001"
+        relationship: "used_by"
+    patch_history:
+      - patch_id: "initial"
+        action: "added"
+        date: "2025-11-20T00:00:00Z"
+
+  TERM-PATCH-001:
+    name: "Patch Artifact"
+    category: "Patch Management"
+    status: "active"
+    added_date: "2025-11-20"
+    added_by: "architecture-team"
+    last_modified: "2025-11-23T00:00:00Z"
+    implementation:
+      files:
+        - "core/patches/patch_artifact.py"
+    schema_refs:
+      - "schema/uet/patch_artifact.v1.json"
+    related_terms:
+      - term_id: "TERM-PATCH-002"
+        relationship: "used_by"
+      - term_id: "TERM-PATCH-003"
+        relationship: "tracked_by"
+    patch_history:
+      - patch_id: "initial"
+        action: "added"
+        date: "2025-11-20T00:00:00Z"
+
+  TERM-STATE-003:
+    name: "Pipeline Database"
+    category: "State Management"
+    status: "active"
+    added_date: "2025-11-15"
+    added_by: "architecture-team"
+    last_modified: "2025-11-23T00:00:00Z"
+    implementation:
+      files:
+        - "core/state/db.py"
+    schema_refs:
+      - "schema/schema.sql"
+    related_terms:
+      - term_id: "TERM-STATE-001"
+        relationship: "implements"
+      - term_id: "TERM-ENGINE-001"
+        relationship: "required_by"
+    patch_history:
+      - patch_id: "initial"
+        action: "added"
+        date: "2025-11-15T00:00:00Z"
+
+  # ... Additional terms would be populated here via update tooling
+  # Generate glossary output with:
+  #   python scripts/generate_glossary.py --ssot DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml

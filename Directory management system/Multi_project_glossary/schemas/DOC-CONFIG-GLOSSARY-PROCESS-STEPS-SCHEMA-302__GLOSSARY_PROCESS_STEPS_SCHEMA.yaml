@@ -1,0 +1,952 @@
+# DOC_LINK: DOC-CONFIG-GLOSSARY-PROCESS-STEPS-SCHEMA-302
+doc_id: DOC-CONFIG-GLOSSARY-PROCESS-STEPS-SCHEMA-302
+# ================================================================================
+# GLOSSARY SYSTEM PROCESS STEPS - SCHEMA-BASED REFERENCE
+# ================================================================================
+# Version: 1.0
+# Last Updated: 2025-12-09
+# System: Glossary Governance & Term Management System
+# Format: YAML with standardized schema per step
+# Alignment: Glossary term lifecycle and SSOT enforcement requirements
+# ================================================================================
+
+meta:
+  doc_id: "GLOSSARY_PROCESS_STEPS_SCHEMA"
+  version: "1.0.0"
+  last_updated: "2025-12-09"
+  source_documents:
+    - "GLOSSARY_SYSTEM_OVERVIEW.md"
+    - "DOC-GUIDE-DOC-GLOSSARY-GOVERNANCE-872__DOC_GLOSSARY_GOVERNANCE.md"
+    - "DOC-GUIDE-DOC-GLOSSARY-SCHEMA-873__DOC_GLOSSARY_SCHEMA.md"
+    - "DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml"
+    - "DOC-GUIDE-DOC-GLOSSARY-CHANGELOG-871__DOC_GLOSSARY_CHANGELOG.md"
+
+  description: |
+    Comprehensive schema-based documentation of Glossary System processes.
+    This system provides term lifecycle management, SSOT enforcement, automated
+    validation, and quality tracking for 83+ terms across 9 categories.
+
+    Each step follows standardized schema:
+    - Required fields: step_id, phase, name, responsible_component, operation_kind,
+      description, inputs, expected_outputs, requires_human_confirmation
+
+    This enables:
+    - Term lifecycle management (proposed → draft → active → deprecated → archived)
+    - SSOT policy enforcement across documentation
+    - Automated term extraction from code and markdown
+    - Quality metrics tracking (92% validation score)
+    - Patch-based update workflows
+    - Cross-reference validation
+
+  state_machine:
+    phases:
+      - INIT
+      - PROPOSAL
+      - DRAFT
+      - VALIDATION
+      - ACTIVATION
+      - MAINTENANCE
+      - DEPRECATION
+      - ARCHIVAL
+      - DONE
+
+    valid_transitions:
+      INIT: [PROPOSAL]
+      PROPOSAL: [DRAFT, REJECTED]
+      DRAFT: [VALIDATION, REJECTED]
+      VALIDATION: [ACTIVATION, DRAFT]       # Back to DRAFT if validation fails
+      ACTIVATION: [MAINTENANCE]
+      MAINTENANCE: [DEPRECATION, VALIDATION]  # Re-validation or deprecation
+      DEPRECATION: [ARCHIVAL]
+      ARCHIVAL: [DONE]
+      "*": [FAILED]                         # Any state can fail
+
+    terminal_states: [DONE, FAILED, REJECTED]
+
+    ssot_enforcement: true                  # SSOT policy active
+
+  lenses:
+    governance:
+      description: "Term lifecycle, approval workflows, quality standards"
+    validation:
+      description: "Schema validation, cross-reference checking, orphan detection"
+    automation:
+      description: "Term extraction, automated updates, CI integration"
+    quality:
+      description: "Metrics tracking, refinement, continuous improvement"
+
+  automation_levels:
+    semi_automatic:
+      description: "Automated extraction and validation with human approval gates"
+      validation_score: "92%"
+      total_terms: 83
+
+# ================================================================================
+# OPERATION KIND TAXONOMY
+# ================================================================================
+
+operation_kinds:
+  term_proposal:
+    description: "Submit new term proposal with definition and metadata"
+  term_validation:
+    description: "Schema validation, cross-reference checks, quality review"
+  term_activation:
+    description: "Approve and activate term in glossary"
+  term_update:
+    description: "Patch-based or manual term updates"
+  term_deprecation:
+    description: "Mark term as deprecated, provide migration path"
+  term_archival:
+    description: "Archive deprecated term for historical reference"
+  term_extraction:
+    description: "Extract terms from code, markdown, documentation"
+  ssot_enforcement:
+    description: "Enforce Single Source of Truth policy across docs"
+  cross_reference_validation:
+    description: "Validate term references, detect orphans"
+  quality_analysis:
+    description: "Calculate validation score, track metrics"
+  patch_application:
+    description: "Apply systematic patches to glossary"
+  initialization:
+    description: "Bootstrap glossary system, load metadata"
+  persistence:
+    description: "Save term data, update changelog, metadata sync"
+
+# ================================================================================
+# GLOBAL COMPONENT REGISTRY
+# ================================================================================
+
+components:
+  glossary_metadata:
+    file: "DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml"
+    role: "Machine-readable term registry and lifecycle tracker"
+    responsibilities:
+      - "Store 83+ terms with TERM-XXX-NNN identifiers"
+      - "Track term lifecycle status (proposed → archived)"
+      - "Maintain category definitions (9 categories)"
+      - "Record implementation paths and config refs"
+      - "Track relationship graph between terms"
+      - "Maintain patch history per term"
+      - "Skip quality statistics (not tracked in SSOT)"
+    data_structures:
+      - "Term: {term_id, name, category, status, implementation, related_terms, patch_history}"
+      - "Categories: {code, description, term_count}"
+      - "Statistics: {by_status, by_category, orphaned_terms}"
+      - "Quality: {validation_score: 92%, issues, trends}"
+
+  glossary_governance:
+    file: "DOC-GUIDE-DOC-GLOSSARY-GOVERNANCE-872__DOC_GLOSSARY_GOVERNANCE.md"
+    role: "Governance framework and lifecycle policies"
+    responsibilities:
+      - "Define term lifecycle states and transitions"
+      - "Specify update mechanisms (manual, patch, automated)"
+      - "Set quality standards and refinement processes"
+      - "Define review schedules and approval workflows"
+    data_structures:
+      - "Lifecycle: proposed → draft → active → deprecated → archived"
+      - "UpdateMechanisms: {manual, patch_based, automated}"
+
+  glossary_schema:
+    file: "DOC-GUIDE-DOC-GLOSSARY-SCHEMA-873__DOC_GLOSSARY_SCHEMA.md"
+    role: "JSON Schema definition for term structure"
+    responsibilities:
+      - "Define term schema with required fields"
+      - "Specify metadata format (term_id, category, status)"
+      - "Define validation rules and constraints"
+      - "Provide templates for term types"
+    data_structures:
+      - "TermSchema: {term_id (pattern: TERM-XXX-NNN), name, category, definition, status}"
+      - "Categories: [Core Engine, Patch Management, Error Detection, Specifications, etc.]"
+      - "Status enum: [proposed, draft, active, deprecated, archived]"
+
+  glossary_changelog:
+    file: "DOC-GUIDE-DOC-GLOSSARY-CHANGELOG-871__DOC_GLOSSARY_CHANGELOG.md"
+    role: "Version history and change tracking"
+    responsibilities:
+      - "Track patch-based changes"
+      - "Maintain version history"
+      - "Log quality check outcomes"
+      - "Document upcoming changes roadmap"
+    data_structures:
+      - "ChangeEntry: {patch_id, action, date, description}"
+
+  validate_glossary:
+    file: "scripts/DOC-SCRIPT-SCRIPTS-VALIDATE-GLOSSARY-265__validate_glossary.py"
+    role: "Full glossary validation tool"
+    responsibilities:
+      - "Structure validation against JSON schema"
+      - "Content quality checks (definition length, etc.)"
+      - "Cross-reference validation"
+      - "Orphan term detection"
+      - "Implementation path verification"
+    interfaces:
+      - "CLI: python scripts/DOC-SCRIPT-SCRIPTS-VALIDATE-GLOSSARY-265__validate_glossary.py"
+    data_structures:
+      - "ValidationResult: {valid, errors[], warnings[], quality_score}"
+
+  generate_glossary:
+    file: "scripts/generate_glossary.py"
+    role: "Automated term extraction from sources"
+    responsibilities:
+      - "Extract terms from markdown files"
+      - "Extract terms from Python code"
+      - "Generate term proposals"
+      - "Update glossary metadata"
+    interfaces:
+      - "CLI: python scripts/generate_glossary.py --ssot DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml"
+
+  update_term:
+    file: "scripts/DOC-SCRIPT-SCRIPTS-UPDATE-TERM-264__update_term.py"
+    role: "Programmatic term updates"
+    responsibilities:
+      - "Update term definitions"
+      - "Add/remove aliases"
+      - "Update implementation refs"
+      - "Record patch history"
+    interfaces:
+      - "CLI: python scripts/DOC-SCRIPT-SCRIPTS-UPDATE-TERM-264__update_term.py --term-id TERM-XXX-NNN"
+
+  glossary_ssot_policy:
+    file: "scripts/glossary_ssot_policy.py"
+    role: "SSOT policy enforcement"
+    responsibilities:
+      - "Detect glossary term usage in documentation"
+      - "Validate references point to glossary"
+      - "Flag undefined terms"
+      - "Suggest glossary links"
+    interfaces:
+      - "CLI: python scripts/glossary_ssot_policy.py"
+    data_structures:
+      - "PolicyViolation: {file, line, term, issue_type}"
+
+# ================================================================================
+# ARTIFACT REGISTRY
+# ================================================================================
+
+artifact_registry:
+  glossary_docs:
+    - path: "glossary/*.md"
+      format: "Markdown"
+      description: "Glossary documentation and governance guides"
+
+  glossary_metadata:
+    - path: "DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml"
+      format: "YAML"
+      description: "Machine-readable term registry with 83+ terms"
+
+  term_specs:
+    - path: "glossary/specs/*.md"
+      format: "Markdown"
+      description: "Individual term specification documents"
+
+  glossary_config:
+    - path: "glossary/config/*.yaml"
+      format: "YAML"
+      description: "Glossary system configuration (SSOT policy, categories)"
+
+  glossary_scripts:
+    - path: "scripts/*.py"
+      format: "Python"
+      description: "Glossary automation tools (validation, extraction, updates)"
+
+  changelog:
+    - path: "DOC-GUIDE-DOC-GLOSSARY-CHANGELOG-871__DOC_GLOSSARY_CHANGELOG.md"
+      format: "Markdown"
+      description: "Version history and change tracking"
+
+  updates:
+    - path: "glossary/updates/*.yaml"
+      format: "YAML"
+      description: "Pending update patches"
+
+# ================================================================================
+# PROCESS STEPS - INIT PHASE
+# ================================================================================
+
+phases:
+  INIT:
+    description: "Initialize glossary system, load metadata, validate structure"
+
+    steps:
+      - step_id: "GLOSS-INIT-001"
+        phase: "INIT"
+        name: "Load Glossary Metadata"
+        responsible_component: "glossary_metadata"
+        operation_kind: "initialization"
+        description: |
+          Load DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml file.
+          Parse term registry (83+ terms).
+          Load category definitions (9 categories).
+          Initialize metadata fields (no statistics tracked).
+        pattern_ids: []
+        inputs:
+          - "File: DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml"
+        expected_outputs:
+          - "Terms loaded: 83 terms"
+          - "Categories: {Core Engine: 23, Patch Management: 8, Error Detection: 10, etc.}"
+          - "Quality score: 92%"
+        requires_human_confirmation: false
+        guardrail_checkpoint: false
+        artifact_registry_refs:
+          - "DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml"
+
+      - step_id: "GLOSS-INIT-002"
+        phase: "INIT"
+        name: "Validate Directory Structure"
+        responsible_component: "validate_glossary"
+        operation_kind: "initialization"
+        description: |
+          Check required directories exist:
+          - glossary/ (documentation)
+          - glossary/specs/ (term specifications)
+          - glossary/config/ (configuration)
+          - glossary/updates/ (pending patches)
+          - scripts/ (automation tools)
+        pattern_ids: []
+        inputs:
+          - "glossary_root: glossary/"
+        expected_outputs:
+          - "All required directories validated"
+        requires_human_confirmation: false
+        guardrail_checkpoint: false
+        artifact_registry_refs:
+          - "glossary/"
+
+      - step_id: "GLOSS-INIT-003"
+        phase: "INIT"
+        name: "Load Governance Policies"
+        responsible_component: "glossary_governance"
+        operation_kind: "initialization"
+        description: |
+          Load governance framework from DOC-GUIDE-DOC-GLOSSARY-GOVERNANCE-872__DOC_GLOSSARY_GOVERNANCE.md.
+          Parse lifecycle state machine.
+          Load update mechanisms and quality standards.
+          Parse review schedules.
+        pattern_ids: []
+        inputs:
+          - "File: DOC-GUIDE-DOC-GLOSSARY-GOVERNANCE-872__DOC_GLOSSARY_GOVERNANCE.md"
+        expected_outputs:
+          - "Lifecycle states: [proposed, draft, active, deprecated, archived]"
+          - "Update mechanisms: {manual, patch_based, automated}"
+          - "Quality standards loaded"
+        requires_human_confirmation: false
+        guardrail_checkpoint: true
+        artifact_registry_refs:
+          - "DOC-GUIDE-DOC-GLOSSARY-GOVERNANCE-872__DOC_GLOSSARY_GOVERNANCE.md"
+
+# ================================================================================
+# PROCESS STEPS - PROPOSAL PHASE
+# ================================================================================
+
+  PROPOSAL:
+    description: "Submit new term proposal with definition and metadata"
+
+    steps:
+      - step_id: "GLOSS-PROP-001"
+        phase: "PROPOSAL"
+        name: "Create Term Proposal"
+        responsible_component: "update_term"
+        operation_kind: "term_proposal"
+        description: |
+          Create new term proposal with:
+          - Unique term ID (TERM-<CATEGORY>-<SEQ>)
+          - Name and category
+          - Definition (20-1000 chars)
+          - Aliases (optional)
+          - Implementation refs (optional)
+          - Related terms (optional)
+        pattern_ids: []
+        inputs:
+          - "name: string"
+          - "category: one of 9 categories"
+          - "definition: string (20-1000 chars)"
+        expected_outputs:
+          - "Term proposal: {term_id: TERM-XXX-NNN, status: proposed}"
+        requires_human_confirmation: false
+        guardrail_checkpoint: false
+        artifact_registry_refs: []
+
+      - step_id: "GLOSS-PROP-002"
+        phase: "PROPOSAL"
+        name: "Check for Duplicates"
+        responsible_component: "validate_glossary"
+        operation_kind: "cross_reference_validation"
+        description: |
+          Check if similar term already exists.
+          Search by name and aliases.
+          Calculate similarity scores.
+          Flag potential duplicates.
+        pattern_ids: []
+        inputs:
+          - "Term proposal from PROP-001"
+          - "Existing terms from metadata"
+        expected_outputs:
+          - "Duplicate check: {is_duplicate: bool, similar_terms: []}"
+        requires_human_confirmation: false
+        guardrail_checkpoint: true
+        artifact_registry_refs:
+          - "DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml"
+
+# ================================================================================
+# PROCESS STEPS - DRAFT PHASE
+# ================================================================================
+
+  DRAFT:
+    description: "Develop term with full metadata, implementation refs, examples"
+
+    steps:
+      - step_id: "GLOSS-DRAFT-001"
+        phase: "DRAFT"
+        name: "Enrich Term Metadata"
+        responsible_component: "update_term"
+        operation_kind: "term_update"
+        description: |
+          Add comprehensive metadata:
+          - Implementation files and entry points
+          - Schema and config references
+          - Related terms and relationships
+          - Aliases and types (if applicable)
+        pattern_ids: []
+        inputs:
+          - "Term proposal (status: proposed)"
+        expected_outputs:
+          - "Enriched term (status: draft)"
+          - "Implementation refs added"
+          - "Related terms linked"
+        requires_human_confirmation: false
+        guardrail_checkpoint: false
+        artifact_registry_refs: []
+
+      - step_id: "GLOSS-DRAFT-002"
+        phase: "DRAFT"
+        name: "Verify Implementation Paths"
+        responsible_component: "validate_glossary"
+        operation_kind: "cross_reference_validation"
+        description: |
+          Verify all implementation file paths exist.
+          Check entry points are valid.
+          Validate schema and config references.
+        pattern_ids: []
+        inputs:
+          - "Draft term with implementation refs"
+        expected_outputs:
+          - "Path validation: {all_exist: bool, missing: []}"
+        requires_human_confirmation: false
+        guardrail_checkpoint: true
+        artifact_registry_refs: []
+
+# ================================================================================
+# PROCESS STEPS - VALIDATION PHASE
+# ================================================================================
+
+  VALIDATION:
+    description: "Validate term against schema, check quality, verify references"
+
+    steps:
+      - step_id: "GLOSS-VAL-001"
+        phase: "VALIDATION"
+        name: "Schema Validation"
+        responsible_component: "validate_glossary"
+        operation_kind: "term_validation"
+        description: |
+          Validate term structure against JSON schema:
+          - Required fields present (term_id, name, category, definition, status)
+          - term_id matches pattern: ^TERM-[A-Z]+-[0-9]{3}$
+          - Category is valid enum value
+          - Definition length: 20-1000 chars
+          - Status is valid lifecycle state
+        pattern_ids: []
+        inputs:
+          - "Draft term"
+          - "Schema from DOC-GUIDE-DOC-GLOSSARY-SCHEMA-873__DOC_GLOSSARY_SCHEMA.md"
+        expected_outputs:
+          - "Validation result: {valid: bool, errors: [], warnings: []}"
+        requires_human_confirmation: false
+        guardrail_checkpoint: true
+        artifact_registry_refs:
+          - "DOC-GUIDE-DOC-GLOSSARY-SCHEMA-873__DOC_GLOSSARY_SCHEMA.md"
+
+      - step_id: "GLOSS-VAL-002"
+        phase: "VALIDATION"
+        name: "Quality Check"
+        responsible_component: "validate_glossary"
+        operation_kind: "quality_analysis"
+        description: |
+          Check term quality:
+          - Definition clarity and completeness
+          - Has implementation references
+          - Has examples (if applicable)
+          - Has related terms
+          - No orphaned references
+        pattern_ids: []
+        inputs:
+          - "Draft term"
+        expected_outputs:
+          - "Quality score: 0-100"
+          - "Quality issues: {missing_examples: bool, missing_implementation: bool}"
+        requires_human_confirmation: false
+        guardrail_checkpoint: false
+        artifact_registry_refs: []
+
+      - step_id: "GLOSS-VAL-003"
+        phase: "VALIDATION"
+        name: "Cross-Reference Validation"
+        responsible_component: "validate_glossary"
+        operation_kind: "cross_reference_validation"
+        description: |
+          Validate all related_terms references:
+          - All term_ids exist in registry
+          - Relationship types are valid
+          - No circular references
+          - Bidirectional relationships consistent
+        pattern_ids: []
+        inputs:
+          - "Draft term"
+          - "Term registry from metadata"
+        expected_outputs:
+          - "Cross-ref validation: {valid: bool, orphaned: [], circular: []}"
+        requires_human_confirmation: false
+        guardrail_checkpoint: true
+        artifact_registry_refs:
+          - "DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml"
+
+# ================================================================================
+# PROCESS STEPS - ACTIVATION PHASE
+# ================================================================================
+
+  ACTIVATION:
+    description: "Approve and activate term in glossary"
+
+    steps:
+      - step_id: "GLOSS-ACT-001"
+        phase: "ACTIVATION"
+        name: "Update Term Status to Active"
+        responsible_component: "update_term"
+        operation_kind: "term_activation"
+        description: |
+          Change term status from 'draft' to 'active'.
+          Record activation date and approver.
+          Skip statistics updates (not tracked).
+        pattern_ids: []
+        inputs:
+          - "Validated term (status: draft)"
+        expected_outputs:
+          - "Active term (status: active)"
+          - "Activation metadata: {date, approved_by}"
+        requires_human_confirmation: true
+        guardrail_checkpoint: false
+        artifact_registry_refs:
+          - "DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml"
+
+      - step_id: "GLOSS-ACT-002"
+        phase: "ACTIVATION"
+        name: "Update Glossary Index"
+        responsible_component: "glossary_metadata"
+        operation_kind: "persistence"
+        description: |
+          Add term to active glossary index.
+          Update category term counts.
+          Regenerate glossary documentation.
+          Run quality checks.
+        pattern_ids: []
+        inputs:
+          - "Active term from ACT-001"
+        expected_outputs:
+          - "Updated DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml"
+          - "Category metadata updated"
+          - "Quality score recalculated"
+        requires_human_confirmation: false
+        guardrail_checkpoint: false
+        artifact_registry_refs:
+          - "DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml"
+
+      - step_id: "GLOSS-ACT-003"
+        phase: "ACTIVATION"
+        name: "Create Changelog Entry"
+        responsible_component: "glossary_changelog"
+        operation_kind: "persistence"
+        description: |
+          Create changelog entry for term activation:
+          - Patch ID (if patch-based)
+          - Action: "added"
+          - Date and description
+          - Version increment
+        pattern_ids: []
+        inputs:
+          - "Active term with metadata"
+        expected_outputs:
+          - "Changelog entry added to DOC-GUIDE-DOC-GLOSSARY-CHANGELOG-871__DOC_GLOSSARY_CHANGELOG.md"
+        requires_human_confirmation: false
+        guardrail_checkpoint: false
+        artifact_registry_refs:
+          - "DOC-GUIDE-DOC-GLOSSARY-CHANGELOG-871__DOC_GLOSSARY_CHANGELOG.md"
+
+# ================================================================================
+# PROCESS STEPS - MAINTENANCE PHASE
+# ================================================================================
+
+  MAINTENANCE:
+    description: "Update active terms, apply patches, maintain quality"
+
+    steps:
+      - step_id: "GLOSS-MAINT-001"
+        phase: "MAINTENANCE"
+        name: "Apply Term Update Patch"
+        responsible_component: "update_term"
+        operation_kind: "patch_application"
+        description: |
+          Apply systematic patch to term:
+          - Update definition or metadata
+          - Add/remove aliases
+          - Update implementation refs
+          - Record in patch_history
+        pattern_ids: []
+        inputs:
+          - "Active term"
+          - "Update patch: {field, old_value, new_value}"
+        expected_outputs:
+          - "Updated term with new patch_history entry"
+        requires_human_confirmation: false
+        guardrail_checkpoint: false
+        artifact_registry_refs: []
+
+      - step_id: "GLOSS-MAINT-002"
+        phase: "MAINTENANCE"
+        name: "Extract Terms from Code"
+        responsible_component: "generate_glossary"
+        operation_kind: "term_extraction"
+        description: |
+          Automated term extraction from codebase:
+          - Scan Python files for term definitions
+          - Scan markdown for term usage
+          - Generate term proposals
+          - Flag undefined terms
+        pattern_ids: []
+        inputs:
+          - "Source files: *.py, *.md"
+        expected_outputs:
+          - "Extracted terms: List[TermProposal]"
+          - "Undefined term usage: List[{file, line, term}]"
+        requires_human_confirmation: false
+        guardrail_checkpoint: false
+        artifact_registry_refs: []
+
+      - step_id: "GLOSS-MAINT-003"
+        phase: "MAINTENANCE"
+        name: "Enforce SSOT Policy"
+        responsible_component: "glossary_ssot_policy"
+        operation_kind: "ssot_enforcement"
+        description: |
+          Enforce Single Source of Truth policy:
+          - Detect term usage in documentation
+          - Validate references point to glossary
+          - Flag duplicate definitions
+          - Suggest glossary links
+        pattern_ids: []
+        inputs:
+          - "Documentation files"
+          - "Glossary terms from metadata"
+        expected_outputs:
+          - "SSOT violations: List[{file, line, term, issue}]"
+          - "Suggested fixes"
+        requires_human_confirmation: false
+        guardrail_checkpoint: true
+        artifact_registry_refs:
+          - "scripts/glossary_ssot_policy.py"
+
+      - step_id: "GLOSS-MAINT-004"
+        phase: "MAINTENANCE"
+        name: "Calculate Quality Metrics"
+        responsible_component: "validate_glossary"
+        operation_kind: "quality_analysis"
+        description: |
+          Run glossary quality checks:
+          - Validation score (current: 92%)
+          - Terms without implementation: 5
+          - Terms without examples: 11
+          - Orphaned terms: 0
+          - Average related terms: 3.2
+          - Trends over time
+        pattern_ids: []
+        inputs:
+          - "All terms from metadata"
+        expected_outputs:
+          - "Quality metrics: {validation_score: 92, issues: [], trends: []}"
+        requires_human_confirmation: false
+        guardrail_checkpoint: false
+        artifact_registry_refs:
+          - "DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml"
+
+# ================================================================================
+# PROCESS STEPS - DEPRECATION PHASE
+# ================================================================================
+
+  DEPRECATION:
+    description: "Mark term as deprecated, provide migration path"
+
+    steps:
+      - step_id: "GLOSS-DEPR-001"
+        phase: "DEPRECATION"
+        name: "Update Term Status to Deprecated"
+        responsible_component: "update_term"
+        operation_kind: "term_deprecation"
+        description: |
+          Change term status from 'active' to 'deprecated'.
+          Add deprecation metadata:
+          - Deprecation date
+          - Reason for deprecation
+          - Migration path (replacement term_id)
+          - Sunset date (when to archive)
+        pattern_ids: []
+        inputs:
+          - "Active term"
+          - "Deprecation reason and replacement term"
+        expected_outputs:
+          - "Deprecated term (status: deprecated)"
+          - "Deprecation metadata added"
+        requires_human_confirmation: true
+        guardrail_checkpoint: false
+        artifact_registry_refs: []
+
+      - step_id: "GLOSS-DEPR-002"
+        phase: "DEPRECATION"
+        name: "Update References to Use Replacement"
+        responsible_component: "glossary_ssot_policy"
+        operation_kind: "ssot_enforcement"
+        description: |
+          Find all references to deprecated term.
+          Update to use replacement term.
+          Flag references that need manual review.
+        pattern_ids: []
+        inputs:
+          - "Deprecated term with replacement"
+          - "All documentation files"
+        expected_outputs:
+          - "Updated references: List[{file, line, old_term, new_term}]"
+          - "Manual review needed: List[{file, reason}]"
+        requires_human_confirmation: false
+        guardrail_checkpoint: false
+        artifact_registry_refs: []
+
+# ================================================================================
+# PROCESS STEPS - ARCHIVAL PHASE
+# ================================================================================
+
+  ARCHIVAL:
+    description: "Archive deprecated term for historical reference"
+
+    steps:
+      - step_id: "GLOSS-ARCH-001"
+        phase: "ARCHIVAL"
+        name: "Update Term Status to Archived"
+        responsible_component: "update_term"
+        operation_kind: "term_archival"
+        description: |
+          Change term status from 'deprecated' to 'archived'.
+          Add archival metadata:
+          - Archival date
+          - Historical reference note
+        pattern_ids: []
+        inputs:
+          - "Deprecated term (past sunset date)"
+        expected_outputs:
+          - "Archived term (status: archived)"
+          - "Archival metadata added"
+        requires_human_confirmation: false
+        guardrail_checkpoint: false
+        artifact_registry_refs: []
+
+      - step_id: "GLOSS-ARCH-002"
+        phase: "ARCHIVAL"
+        name: "Update Statistics"
+        responsible_component: "glossary_metadata"
+        operation_kind: "persistence"
+        description: |
+          Skip statistics updates in metadata:
+          - Decrement active term count
+          - Increment archived term count
+          - Update category metadata (optional)
+          - Re-run quality checks
+        pattern_ids: []
+        inputs:
+          - "Archived term"
+        expected_outputs:
+          - "Updated DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml"
+        requires_human_confirmation: false
+        guardrail_checkpoint: false
+        artifact_registry_refs:
+          - "DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml"
+
+# ================================================================================
+# PROCESS STEPS - DONE PHASE
+# ================================================================================
+
+  DONE:
+    description: "Term lifecycle complete, generate reports"
+
+    steps:
+      - step_id: "GLOSS-DONE-001"
+        phase: "DONE"
+        name: "Generate Quality Report"
+        responsible_component: "validate_glossary"
+        operation_kind: "quality_analysis"
+        description: |
+          Generate comprehensive quality report:
+          - Total terms: 83
+          - By status: {active: 72, deprecated: 3, archived: 8}
+          - By category: {Core Engine: 23, Patch Management: 8, etc.}
+          - Validation score: 92%
+          - Quality issues and trends
+        pattern_ids: []
+        inputs:
+          - "Glossary metadata"
+        expected_outputs:
+          - "Quality report with metrics and recommendations"
+        requires_human_confirmation: false
+        guardrail_checkpoint: false
+        artifact_registry_refs:
+          - "DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml"
+
+# ================================================================================
+# GUARDRAIL CHECKPOINTS
+# ================================================================================
+
+guardrail_checkpoints:
+  - checkpoint_id: "GC-GLOSS-GOVERNANCE"
+    phase: "INIT"
+    step_id: "GLOSS-INIT-003"
+    description: "Validate governance policies loaded correctly"
+    validation_logic: "Lifecycle states and update mechanisms defined"
+    on_fail: "Abort initialization, cannot proceed without governance"
+
+  - checkpoint_id: "GC-GLOSS-DUPLICATE"
+    phase: "PROPOSAL"
+    step_id: "GLOSS-PROP-002"
+    description: "Prevent duplicate term registration"
+    validation_logic: "No existing term with same name or high similarity"
+    on_fail: "Reject proposal, suggest using existing term"
+
+  - checkpoint_id: "GC-GLOSS-PATHS"
+    phase: "DRAFT"
+    step_id: "GLOSS-DRAFT-002"
+    description: "Verify implementation paths exist"
+    validation_logic: "All implementation files and entry points valid"
+    on_fail: "Flag missing paths, require correction before activation"
+
+  - checkpoint_id: "GC-GLOSS-SCHEMA"
+    phase: "VALIDATION"
+    step_id: "GLOSS-VAL-001"
+    description: "Validate term against JSON schema"
+    validation_logic: "Term conforms to schema in DOC-GUIDE-DOC-GLOSSARY-SCHEMA-873__DOC_GLOSSARY_SCHEMA.md"
+    on_fail: "Return to DRAFT phase with validation errors"
+
+  - checkpoint_id: "GC-GLOSS-REFS"
+    phase: "VALIDATION"
+    step_id: "GLOSS-VAL-003"
+    description: "Validate all cross-references"
+    validation_logic: "All related_terms exist, no circular refs, no orphans"
+    on_fail: "Return to DRAFT phase with reference errors"
+
+  - checkpoint_id: "GC-GLOSS-SSOT"
+    phase: "MAINTENANCE"
+    step_id: "GLOSS-MAINT-003"
+    description: "Enforce SSOT policy compliance"
+    validation_logic: "No duplicate definitions, all refs point to glossary"
+    on_fail: "Flag SSOT violations, require remediation"
+
+# ================================================================================
+# ANTI-PATTERNS BLOCKED
+# ================================================================================
+
+anti_patterns:
+  - id: "ANTI-GLOSS-DUPLICATE-TERM"
+    description: "Duplicate term with same or similar name"
+    detection: "Name similarity check during proposal"
+    enforcement: "Reject proposal, suggest existing term or merge request"
+
+  - id: "ANTI-GLOSS-UNDEFINED-REFS"
+    description: "Term references non-existent related term"
+    detection: "Cross-reference validation checks term_id exists"
+    enforcement: "Flag error, require valid term_id or remove reference"
+
+  - id: "ANTI-GLOSS-ORPHAN-TERM"
+    description: "Term with no relationships to other terms"
+    detection: "Check related_terms array is non-empty"
+    enforcement: "Flag warning, suggest related terms"
+
+  - id: "ANTI-GLOSS-MISSING-IMPL"
+    description: "Term lacks implementation references"
+    detection: "Check implementation.files is non-empty"
+    enforcement: "Flag quality issue, reduce validation score"
+
+  - id: "ANTI-GLOSS-SSOT-VIOLATION"
+    description: "Documentation contains duplicate term definition"
+    detection: "SSOT policy scanner finds definition outside glossary"
+    enforcement: "Flag violation, require removal and glossary link"
+
+  - id: "ANTI-GLOSS-BAD-ID"
+    description: "Term ID doesn't match pattern TERM-XXX-NNN"
+    detection: "Regex validation: ^TERM-[A-Z]+-[0-9]{3}$"
+    enforcement: "Reject term, require valid term_id"
+
+# ================================================================================
+# EXECUTION MODES
+# ================================================================================
+
+execution_modes:
+  validate_all:
+    description: "Validate entire glossary structure and quality"
+    command: "python scripts/DOC-SCRIPT-SCRIPTS-VALIDATE-GLOSSARY-265__validate_glossary.py"
+    phases: "INIT → VALIDATION → DONE"
+    automation: "Fully automatic"
+
+  generate_glossary:
+    description: "Extract terms from code and markdown"
+    command: "python scripts/generate_glossary.py --ssot DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml"
+    phases: "INIT → MAINTENANCE (extraction) → DONE"
+    automation: "Fully automatic with review"
+
+  update_term:
+    description: "Update specific term metadata"
+    command: "python scripts/DOC-SCRIPT-SCRIPTS-UPDATE-TERM-264__update_term.py --term-id TERM-XXX-NNN"
+    phases: "INIT → MAINTENANCE (update) → DONE"
+    automation: "Semi-automatic (requires confirmation)"
+
+  enforce_ssot:
+    description: "Enforce SSOT policy across documentation"
+    command: "python scripts/glossary_ssot_policy.py"
+    phases: "INIT → MAINTENANCE (SSOT enforcement) → DONE"
+    automation: "Fully automatic"
+
+  add_term:
+    description: "Add new term to glossary"
+    phases: "INIT → PROPOSAL → DRAFT → VALIDATION → ACTIVATION → DONE"
+    automation: "Semi-automatic (requires approval)"
+
+# ================================================================================
+# COMPLETION CRITERIA
+# ================================================================================
+
+completion_criteria:
+  GLOSSARY_SYSTEM_COMPLETE:
+    description: "Glossary system operational with high quality"
+    conditions:
+      - "83+ terms registered and active"
+      - "Validation score ≥90% (current: 92%)"
+      - "All terms have valid schema"
+      - "No orphaned terms"
+      - "SSOT policy enforced"
+      - "Governance framework active"
+    artifacts_required:
+      - "DOC-CONFIG-GLOSSARY-METADATA-032__.glossary-metadata.yaml with 83+ terms"
+      - "DOC-GUIDE-DOC-GLOSSARY-GOVERNANCE-872__DOC_GLOSSARY_GOVERNANCE.md"
+      - "DOC-GUIDE-DOC-GLOSSARY-SCHEMA-873__DOC_GLOSSARY_SCHEMA.md"
+      - "DOC-GUIDE-DOC-GLOSSARY-CHANGELOG-871__DOC_GLOSSARY_CHANGELOG.md"
+      - "scripts/DOC-SCRIPT-SCRIPTS-VALIDATE-GLOSSARY-265__validate_glossary.py"
+    next_steps:
+      - "Maintain quality score ≥90%"
+      - "Add missing implementation refs (5 terms)"
+      - "Add missing examples (11 terms)"
+      - "Continue automated term extraction"
+      - "Enforce SSOT policy in CI/CD"

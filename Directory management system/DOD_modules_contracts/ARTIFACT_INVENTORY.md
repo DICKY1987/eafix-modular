@@ -1,0 +1,72 @@
+# Contract Artifact Inventory
+
+Source:
+C:\Users\richg\eafix-modular\Directory management system\ChatGPT-Contracts for Checkable !Done!.md
+
+Below is a comprehensive inventory of the artifacts that make up a module contract in this system. For each item I indicate whether it is required by the operating model (R) or optional but strongly recommended (O), and describe its purpose.
+
+### 1. Contract File and Metadata
+
+| Artifact | Required? | Purpose / Notes | Evidence |
+| --- | --- | --- | --- |
+| module.manifest.yaml | R | The central contract document for the module. A manifest file declares a package as a module and specifies metadata such as its name, version and dependencies. In our model it also defines the module ID, type, status, owner, purpose and boundaries. It is machine-enforceable and defines "done" for the module. | https://www.odoo.com/documentation/19.0/developer/reference/backend/module.html |
+| module identity fields (module_id, module_type, status, owner) | R | Unique identifiers and lifecycle status in the manifest. They let tooling reason about scope, classification and ownership. | |
+| purpose | R | A short statement in the manifest explaining why the module exists. Helps humans and AI understand its role. | |
+| tags | O | Free-form labels in the manifest for grouping or filtering modules. | |
+
+### 2. Boundary and Interface Declarations
+
+| Artifact | Required? | Purpose / Notes | Evidence |
+| --- | --- | --- | --- |
+| primary_output declaration | R | Declares the single primary artifact produced by the module (e.g. a file, dataset or report). Forces boundary clarity by making clear what others can depend on. | |
+| exposed_interfaces | O | Lists the supported ways other modules can interact with this module (e.g. CLI, API). Optional for simple modules. | |
+| disallowed_access / dependency rules | R | Specifies allowed and forbidden module dependencies and file paths. Equivalent to the depends list in Odoo manifests, which lists modules that must be loaded before this one. Prevents cross-boundary coupling. | https://www.odoo.com/documentation/19.0/developer/reference/backend/module.html |
+| side_effects and invariants (for system modules) | R for system modules | System modules often rename files, update registries or stage Git changes. These side effects must be declared so automation can validate idempotence and safety (e.g. no deletions, atomic renames). | |
+
+### 3. Input/Output and Schema Artifacts
+
+| Artifact | Required? | Purpose / Notes | Evidence |
+| --- | --- | --- | --- |
+| inputs list | R | In the manifest: a list of all input artifacts (files, schemas, configuration) that the module depends on. | |
+| outputs list | R | In the manifest: a list of all output artifacts the module produces or mutates. Defines what downstream modules consume. | |
+| configuration file (e.g. config.yaml) | O | Parameterizes the module. Using a configuration file with a $schema property enables schema validation of its contents. | https://learn.microsoft.com/en-us/azure/data-api-builder/configuration/ |
+| configuration schema (e.g. config_schema.json) | O | A JSON Schema describing the structure of the configuration file. Schema validation checks data types, required fields and formats. | https://dev.to/marciorc_/schema-validation-vs-contract-testing-understanding-the-differences-58ji |
+| I/O schema (e.g. io_schema.json) | R | Defines the structure and allowed values of input and output data. Schema validation is part of contract testing. | https://dev.to/marciorc_/schema-validation-vs-contract-testing-understanding-the-differences-58ji |
+| fixtures / sample inputs | O | Example input files used in tests. Help validate that the module behaves correctly with real data. | |
+
+### 4. Required Code Files
+
+| Artifact | Required? | Purpose / Notes |
+| --- | --- | --- |
+| entrypoint script (e.g. module_entrypoint.py) | R | A single script or binary that represents the canonical way to run the module. It ties configuration, libraries and primary output together. |
+| library code (one or more files) | R | The implementation of the module's business logic. Organized within the module's directory. |
+| validator script(s) (e.g. validate.py) | R | Executable checks defined in the manifest. These validate structural invariants, schema correctness and runtime behavior. Schema validation focuses on data structure while contract testing covers behavior and business rules. | https://dev.to/marciorc_/schema-validation-vs-contract-testing-understanding-the-differences-58ji |
+
+### 5. Tests and Evidence
+
+| Artifact | Required? | Purpose / Notes | Evidence |
+| --- | --- | --- | --- |
+| acceptance tests | R | Automated tests that determine whether the module satisfies its contract. Acceptance testing is formal testing conducted to determine if the requirements of a specification or contract are met. They should be deterministic and part of CI. | https://en.wikipedia.org/wiki/Acceptance_testing |
+| structure validators / static checks | R | Validators that ensure required files exist and code passes linting/type checks. | |
+| runtime validators | R | Smoke-tests that run the module end-to-end using fixtures and verify that outputs match schemas and expected behavior. | |
+| evidence directory (e.g. evidence/validation/, evidence/acceptance/) | R | Stores logs and reports produced by validators and tests. Evidence is important for audit trails and debugging. | |
+| coverage reports | O | Code coverage or test coverage reports. Helpful for governance but not strictly required. | |
+
+### 6. Documentation and Support Files
+
+| Artifact | Required? | Purpose / Notes |
+| --- | --- | --- |
+| README / docs | O | Human-readable documentation explaining the module's purpose, how to run it and how to interpret its outputs. Recommended for maintainability. |
+| scripts (e.g. helper scripts, CLI wrappers) | O | Convenience scripts for running tasks or generating derived artifacts. |
+| CHANGELOG / notes | O | Tracks changes to the module contract (contract_version) and helps consumers know when breaking changes occur. |
+
+### 7. Optional Integrations
+
+| Artifact | Required? | Purpose / Notes |
+| --- | --- | --- |
+| file-ID registrations | O | If you use a file-ID registry, outputs and key files can include id_ref entries in the manifest to ensure they are registered and traceable. |
+| versioning and migration state | O | Fields in the manifest describing the contract version, compatibility policy and migration state. Useful when evolving modules and managing partial migrations. |
+
+### Summary
+
+To develop a module contract, start by creating a module.manifest.yaml with identity, purpose, boundaries, I/O declarations, validators and acceptance tests. Write the entrypoint, library code and schemas to satisfy this contract. Add validators, acceptance tests and an evidence directory so automation can verify structural correctness, schema compliance and behavior. Optional artifacts like configuration files, schemas, fixtures and documentation improve usability and safety but are not strictly required.

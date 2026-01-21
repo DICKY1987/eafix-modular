@@ -1,0 +1,217 @@
+# DOC_LINK: DOC-CONFIG-GLOSSARY-POLICY-055
+doc_id: DOC-CONFIG-GLOSSARY-POLICY-055
+# Glossary Policy and Validation Rules
+# Used by scripts/validate_glossary.py
+
+schema_version: "1.0.0"
+
+# Validation rules
+validation:
+
+  # Definition quality
+  definition:
+    min_length: 20
+    max_length: 1000
+
+    # Patterns that should appear (at least one)
+    required_patterns:
+      - "\\b(Component|Process|Pattern|System|Tool|Mechanism|Method|Strategy)\\b"
+
+    # Patterns that should NOT appear
+    forbidden_patterns:
+      - "^It is\\b"           # Weak starts
+      - "^This is\\b"
+      - "^A thing that\\b"
+      - "\\bTODO\\b"          # No incomplete definitions
+      - "\\bFIXME\\b"
+
+  # Related terms
+  related_terms:
+    min_count: 1              # At least 1 related term
+    max_count: 10             # No more than 10
+    require_bidirectional: true  # If A→B, then B should→A
+
+  # Implementation references
+  implementation:
+    verify_files_exist: true  # Check that referenced files exist
+    verify_entry_points_exist: false  # Don't check entry points (expensive)
+    warn_if_missing: true     # Warn if code-based term has no impl
+
+  # Cross-references
+  cross_references:
+    max_orphaned_terms: 0     # Target: zero orphaned terms
+    max_dead_links: 0         # Target: zero broken links
+    warn_orphans: true        # Warn about orphans
+
+  # Naming conventions
+  naming:
+    max_length: 100           # Term name max length
+    forbidden_chars: ["#", "$", "%", "&", "*"]
+    case_style: "title"       # Title Case expected
+
+# Quality targets
+quality_targets:
+  terms_with_implementation_pct: 90   # 90% should have impl paths
+  terms_with_examples_pct: 85         # 85% should have examples
+  terms_with_schema_refs_pct: 60      # 60% should have schema refs
+  avg_related_terms: 3.0              # Average 3 related terms per term
+  min_definition_quality_score: 80    # Definition clarity score
+
+# Category definitions
+categories:
+  "Core Engine":
+    code: "ENGINE"
+    description: "Execution orchestration components"
+    requires_implementation: true
+    requires_examples: true
+
+  "Patch Management":
+    code: "PATCH"
+    description: "Patch lifecycle and validation"
+    requires_implementation: true
+    requires_schema_refs: true
+
+  "Error Detection":
+    code: "ERROR"
+    description: "Error detection and recovery"
+    requires_implementation: true
+    requires_examples: true
+
+  "Specifications":
+    code: "SPEC"
+    description: "Spec management and tooling"
+    requires_implementation: true
+    requires_schema_refs: false
+
+  "State Management":
+    code: "STATE"
+    description: "Database and state tracking"
+    requires_implementation: true
+    requires_schema_refs: true
+
+  "Integrations":
+    code: "INTEG"
+    description: "External tool integrations"
+    requires_implementation: true
+    requires_examples: false
+
+  "Framework":
+    code: "FRAME"
+    description: "UET and foundational concepts"
+    requires_implementation: false
+    requires_schema_refs: true
+
+  "Project Management":
+    code: "PM"
+    description: "CCPM and planning"
+    requires_implementation: false
+    requires_examples: false
+
+# Lifecycle rules
+lifecycle:
+
+  # Status values
+  valid_statuses:
+    - proposed
+    - draft
+    - active
+    - deprecated
+    - archived
+
+  # Deprecation rules
+  deprecation:
+    min_active_period_days: 30        # Must be active 30+ days before deprecation
+    keep_deprecated_releases: 2       # Keep for 2 releases before archival
+    require_replacement: true         # Must specify replacement term
+    require_migration_guide: true     # Must provide migration guide
+
+  # Approval requirements
+  approval:
+    new_terms:
+      min_reviewers: 2
+      required_role: "architecture-team"
+
+    updates:
+      min_reviewers: 1
+      required_role: "contributor"
+
+    deprecation:
+      min_reviewers: 2
+      required_role: "architecture-team"
+
+# Automation settings
+automation:
+
+  # Auto-extraction from code
+  extraction:
+    enabled: false                    # Disable until tool ready
+    scan_paths:
+      - "core/"
+      - "engine/"
+      - "error/"
+      - "aim/"
+      - "pm/"
+    min_confidence: 0.80              # Only propose if 80%+ confidence
+
+  # CI integration
+  ci:
+    validate_on_pr: true              # Validate on PR
+    fail_on_errors: true              # Fail PR if errors
+    fail_on_warnings: false           # Don't fail on warnings
+    update_changelog: false           # Manual changelog for now
+
+  # Metrics reporting
+  metrics:
+    generate_report: true
+    report_path: "../docs/glossary_metrics.md"
+    update_frequency: "weekly"
+
+# Relationship types
+relationships:
+  valid_types:
+    - uses
+    - used_by
+    - depends_on
+    - required_by
+    - implements
+    - implemented_by
+    - extends
+    - extended_by
+    - replaces
+    - replaced_by
+    - related
+
+  # Bidirectional pairs (if A→B with type X, expect B→A with type Y)
+  bidirectional_pairs:
+    uses: used_by
+    depends_on: required_by
+    implements: implemented_by
+    extends: extended_by
+    replaces: replaced_by
+
+# Review schedule
+review:
+  frequency:
+    proposals: "weekly"               # Review proposals weekly
+    quality: "monthly"                # Quality audit monthly
+    comprehensive: "quarterly"        # Full audit quarterly
+
+  notifications:
+    enabled: false                    # Disable until notification system ready
+    channels: []
+
+# Deprecation warnings
+deprecation_warnings:
+  enabled: true
+  warn_at_age_days: 730               # Warn if active term is 2+ years old
+  suggest_review: true
+
+---
+
+# Usage Examples
+
+# Validate with this policy:
+#   python scripts/validate_glossary.py
+#
+# Custom validation:
+#   python scripts/validate_glossary.py --policy config/custom_policy.yaml

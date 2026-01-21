@@ -1,0 +1,63 @@
+{
+  "_doc_id": "DOC-CONFIG-0136",
+
+  "doc_id": "DOC-CONTRACT-0019",
+  "$id": "https://example.com/reentry/orders_in.schema.json",
+  "title": "Orders In CSV Schema",
+  "description": "Schema for orders_in.csv rows produced by EA and consumed by Python",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ts_utc",
+    "reentry_key",
+    "ticket",
+    "status",
+    "fill_price",
+    "sl_hit",
+    "tp_hit",
+    "close_reason"
+  ],
+  "properties": {
+    "ts_utc": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "reentry_key": {
+      "type": "string",
+      "pattern": "^[A-Z0-9_]+~[A-Z0-9_]+~[A-Z0-9_]+~[A-Z0-9_]+~[1-9][0-9]*$"
+    },
+    "ticket": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "SUBMITTED",
+        "FILLED",
+        "CLOSED",
+        "REJECTED"
+      ]
+    },
+    "fill_price": {
+      "type": "number",
+      "minimum": 0
+    },
+    "sl_hit": {
+      "type": "boolean"
+    },
+    "tp_hit": {
+      "type": "boolean"
+    },
+    "close_reason": {
+      "type": "string",
+      "enum": [
+        "SL",
+        "TP",
+        "MANUAL",
+        "TIMEOUT",
+        "UNKNOWN"
+      ]
+    }
+  }
+}

@@ -1,0 +1,182 @@
+module_id: DOD_MODULES_CONTRACTS
+module_type: system
+status: draft
+owner: richg
+purpose: Define and validate module contracts so done is checkable.
+contract_version: "0.1.0"
+contract_tier: tier1
+migration_state: none
+
+evidence_policy:
+  root_dir: evidence
+  layout_version: 1
+  required_subtrees:
+    - validation
+    - acceptance
+    - runs
+
+primary_output:
+  kind: schema
+  path: schemas/module.manifest.schema.json
+  description: JSON Schema for module.manifest.yaml.
+
+inputs:
+  - name: source_contracts_doc
+    direction: in
+    artifact:
+      kind: file
+      path: "ChatGPT-Contracts for Checkable !Done!.md"
+    required: true
+    freshness: static
+  - name: inventory_source
+    direction: in
+    artifact:
+      kind: file
+      path: "comprehensive inventory of a module.txt"
+    required: false
+    freshness: static
+
+outputs:
+  - name: manifest_schema
+    direction: out
+    artifact:
+      kind: schema
+      path: schemas/module.manifest.schema.json
+    required: true
+    freshness: static
+  - name: structure_validation_report
+    direction: out
+    artifact:
+      kind: report
+      path: evidence/validation/structure_validation.json
+    required: true
+    freshness: run_generated
+  - name: structure_acceptance_report
+    direction: out
+    artifact:
+      kind: report
+      path: evidence/acceptance/structure_acceptance.json
+    required: true
+    freshness: run_generated
+  - name: manifest_schema_validation_report
+    direction: out
+    artifact:
+      kind: report
+      path: evidence/validation/manifest_schema_validation.json
+    required: true
+    freshness: run_generated
+  - name: contract_acceptance_report
+    direction: out
+    artifact:
+      kind: report
+      path: evidence/acceptance/contract_acceptance.json
+    required: true
+    freshness: run_generated
+
+required_files:
+  - role: other
+    path: module.manifest.yaml
+    description: Module contract for this module.
+  - role: validator
+    path: scripts/validate_structure.ps1
+    description: Validates required structure and emits evidence.
+  - role: validator
+    path: scripts/validate_manifest_schema.ps1
+    description: Validates module.manifest.yaml against schema.
+  - role: scripts
+    path: scripts/run_acceptance.ps1
+    description: Runs acceptance checks and emits evidence.
+  - role: scripts
+    path: scripts/run_validators.ps1
+    description: Orchestrates full validation suite.
+  - role: io_schema
+    path: schemas/module.manifest.schema.json
+    description: Schema for module.manifest.yaml.
+  - role: readme
+    path: README.md
+  - role: docs
+    path: SYSTEM_ARTIFACTS.md
+  - role: docs
+    path: ARTIFACTS.md
+  - role: docs
+    path: FILE_TREE.txt
+  - role: docs
+    path: DEEP_DIVE.md
+  - role: docs
+    path: WORKFLOW.md
+  - role: docs
+    path: SCHEMA_ADDITIONS.md
+  - role: docs
+    path: ARTIFACT_INVENTORY.md
+  - role: docs
+    path: CHANGELOG.md
+    description: Contract version history.
+  - role: tests
+    path: tests/acceptance
+    description: Acceptance test suite.
+  - role: fixtures
+    path: tests/fixtures
+    description: Test fixtures.
+  - role: library
+    path: src
+    description: Shared implementation code.
+  - role: config
+    path: config/config.yaml
+    description: Validator configuration.
+  - role: config_schema
+    path: config/config_schema.json
+    description: Schema for config.yaml.
+
+validators:
+  - check_id: STRUCTURE_VALIDATION
+    type: structure
+    command: powershell -ExecutionPolicy Bypass -File scripts/validate_structure.ps1 -Mode validation
+    cwd: .
+    timeout_seconds: 60
+    expected:
+      exit_code: 0
+      produces:
+        - kind: report
+          path: evidence/validation/structure_validation.json
+  - check_id: MANIFEST_SCHEMA_VALIDATION
+    type: schema
+    command: powershell -ExecutionPolicy Bypass -File scripts/validate_manifest_schema.ps1
+    cwd: .
+    timeout_seconds: 60
+    expected:
+      exit_code: 0
+      produces:
+        - kind: report
+          path: evidence/validation/manifest_schema_validation.json
+
+acceptance_tests:
+  - check_id: STRUCTURE_ACCEPTANCE
+    type: smoke
+    command: powershell -ExecutionPolicy Bypass -File scripts/validate_structure.ps1 -Mode acceptance
+    cwd: .
+    timeout_seconds: 60
+    expected:
+      exit_code: 0
+      produces:
+        - kind: report
+          path: evidence/acceptance/structure_acceptance.json
+  - check_id: CONTRACT_ACCEPTANCE
+    type: integration
+    command: powershell -ExecutionPolicy Bypass -File scripts/run_acceptance.ps1
+    cwd: .
+    timeout_seconds: 300
+    expected:
+      exit_code: 0
+      produces:
+        - kind: report
+          path: evidence/acceptance/contract_acceptance.json
+
+dependency_rules:
+  allowed_modules: []
+  disallowed: []
+
+side_effects:
+  - kind: filesystem_mutation
+    scope: evidence
+    invariants:
+      - only_writes_under_evidence

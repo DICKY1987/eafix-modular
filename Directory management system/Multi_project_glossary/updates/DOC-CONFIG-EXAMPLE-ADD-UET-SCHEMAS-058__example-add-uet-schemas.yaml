@@ -1,0 +1,46 @@
+# DOC_LINK: DOC-CONFIG-EXAMPLE-ADD-UET-SCHEMAS-058
+doc_id: DOC-CONFIG-EXAMPLE-ADD-UET-SCHEMAS-058
+# Example: Add UET Schema References to Terms
+# Location: glossary/updates/add-uet-schemas.yaml
+# Usage: python scripts/update_term.py --spec updates/add-uet-schemas.yaml --dry-run
+
+patch_id: "01J5XY9F2X4E1D9RL8G4JB3CDE"
+description: "Add UET schema references to all relevant terms"
+date: "2025-11-25"
+author: "architecture-team"
+
+terms:
+  # Core Engine
+  - term_id: TERM-ENGINE-001
+    action: add
+    field: schema_refs
+    value:
+      - "schema/uet/execution_request.v1.json"
+      - "schema/workstream.schema.json"
+
+  # Patch Management
+  - term_id: TERM-PATCH-001
+    action: add
+    field: schema_refs
+    value:
+      - "schema/uet/patch_artifact.v1.json"
+
+  - term_id: TERM-PATCH-003
+    action: add
+    field: schema_refs
+    value:
+      - "schema/uet/patch_ledger_entry.v1.json"
+
+  - term_id: TERM-PATCH-004
+    action: add
+    field: schema_refs
+    value:
+      - "schema/uet/patch_policy.v1.json"
+
+  # State Management
+  - term_id: TERM-STATE-003
+    action: add
+    field: schema_refs
+    value:
+      - "schema/schema.sql"
+      - "schema/uet/run_execution.v1.json"

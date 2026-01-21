@@ -1,0 +1,101 @@
+profile:
+  profile_id: NUM16_TYPE_NS_SEQ_SCOPE
+  id_width: 16
+  alphabet: numeric
+  # Segment layout: TYPE (file type), NS (namespace), SEQ (monotonic counter), SCOPE (collision domain)
+  segments:
+    - name: TYPE
+      width: 2
+      source: derived
+      meaning: file type code
+      derivation_rule: extension
+    - name: NS
+      width: 3
+      source: config
+      meaning: registry namespace code
+    - name: SEQ
+      width: 5
+      source: allocated
+      meaning: monotonic sequence counter
+    - name: SCOPE
+      width: 6
+      source: config
+      meaning: collision domain (repo_id/project_id)
+  # Counter key defines the allocation namespace.  Sequence counters are keyed by (NS, TYPE, SCOPE).
+  counter_key: [NS, TYPE, SCOPE]
+  delimiter_after_id: "_"
+  id_regex: '^\\d{16}_.+'
+
+# Fixed collision domain value for this project.  This six‑digit constant must never change once IDs are issued.
+scope: "260118"
+
+# File type classification rules.  Each extension maps to a two‑digit TYPE code.  Unknown types fall back to 00.
+type_classification:
+  method: extension
+  table:
+    # Documentation / specs
+    - { match: ".md",    type_code: "01" }
+    - { match: ".txt",   type_code: "02" }
+    # Data interchange / artifacts
+    - { match: ".csv",   type_code: "10" }
+    - { match: ".json",  type_code: "11" }
+    - { match: ".yaml",  type_code: "12" }
+    - { match: ".yml",   type_code: "12" }
+    - { match: ".jsonl", type_code: "13" }
+    # Code / automation
+    - { match: ".py",    type_code: "20" }
+    - { match: ".ps1",   type_code: "21" }
+    - { match: ".mq4",   type_code: "22" }
+    # Storage / runtime
+    - { match: ".db",    type_code: "30" }
+    # Diagrams / generated web output
+    - { match: ".xml",   type_code: "40" }
+    - { match: ".png",   type_code: "41" }
+    - { match: ".log",   type_code: "42" }
+    - { match: ".html",  type_code: "43" }
+    # Native/runtime binaries
+    - { match: ".exe",   type_code: "50" }
+    - { match: ".dll",   type_code: "51" }
+    # Fallback catch‑all rule
+    - { match: "*",      type_code: "00" }
+
+# Directory‑based namespace routing.  Each path_glob maps files to a three‑digit NS code.  Patterns should be updated to reflect the project's actual layout.
+namespace_routing:
+  method: directory_rules_only
+  rules:
+    - { path_glob: "docs/**/*",             ns_code: "100" }   # documentation and specifications
+    - { path_glob: "data/**/*",             ns_code: "110" }   # datasets, CSV, JSON, YAML, registries
+    - { path_glob: "scripts/python/**/*",    ns_code: "200" }   # Python services, pipelines, tooling
+    - { path_glob: "scripts/powershell/**/*", ns_code: "201" }   # PowerShell automation scripts
+    - { path_glob: "scripts/mq4/**/*",       ns_code: "202" }   # MetaTrader (MQ4) scripts
+    - { path_glob: "storage/**/*",          ns_code: "300" }   # SQLite databases and persistent storage
+    - { path_glob: "assets/**/*",           ns_code: "400" }   # diagrams, images, XML assets
+    - { path_glob: "logs/**/*",             ns_code: "410" }   # service logs and evidence artifacts
+    - { path_glob: "reports/**/*",          ns_code: "420" }   # generated reports (HTML)
+    - { path_glob: "bin/**/*",              ns_code: "500" }   # executables, DLLs, other binaries
+    - { path_glob: "**/*",                 ns_code: "999" }   # fallback for uncategorized paths
+
+# Allocation configuration.  The watcher will acquire a filesystem lock and allocate IDs from the counter namespace defined above.
+allocation:
+  counter_key: [NS, TYPE, SCOPE]
+  lock:
+    mode: filesystem
+    lock_path: ".identity_allocation.lock"
+
+# Collision policy defines behavior when conflicts occur during ID assignment
+collision_policy:
+  on_id_exists: abort_run
+  on_path_exists: abort_run
+  on_hash_duplicate: unique_ids
+
+# Hashing specification for content-based identity checks.
+hashing:
+  content_hash_algorithm: "sha256"
+  include_hashes: false
+  hash_algorithms: ["sha256"]
+  max_file_size_for_hash: 104857600
+
+# Storage configuration.  These files persist registry state and rename history.
+storage:
+  master_registry_path: "MASTER_ID_REGISTRY.json"
+  file_id_map_path: "FILE_ID_MAP.jsonl"

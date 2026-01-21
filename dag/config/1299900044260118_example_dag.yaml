@@ -1,0 +1,108 @@
+doc_id: DOC-CONFIG-0142
+# Example DAG Configuration
+# A simple example DAG demonstrating the structure and patterns
+
+version: "1.0"
+dag_id: "example-processing-dag"
+description: "Example DAG for data processing workflow"
+
+# ============================================================================
+# EXAMPLE WORKFLOW: Data Ingestion -> Processing -> Output
+# ============================================================================
+nodes:
+  - id: "start_workflow"
+    name: "Workflow Initialization"
+    phase: "1.000"
+    kind: "system_initialization"
+    owner: "PY"
+    sla_ms: 500
+    children:
+      - "load_configuration"
+    
+  - id: "load_configuration"
+    name: "Load Processing Configuration"
+    phase: "1.001"
+    kind: "config_loading"
+    owner: "PY"
+    sla_ms: 300
+    children:
+      - "verify_config"
+    
+  - id: "verify_config"
+    name: "Verify Configuration Integrity"
+    phase: "1.002"
+    kind: "VERIFY_BOUNDARY_COVERAGE"
+    owner: "PY"
+    sla_ms: 200
+    injected: true
+    verification_type: "config_validation"
+    children:
+      - "fetch_data"
+
+  - id: "fetch_data"
+    name: "Fetch Input Data"
+    phase: "2.000"
+    kind: "data_ingestion"
+    owner: "PY"
+    sla_ms: 2000
+    children:
+      - "validate_data"
+    
+  - id: "validate_data"
+    name: "Validate Input Data"
+    phase: "2.001"
+    kind: "VERIFY_STATE_TRANSITIONS"
+    owner: "PY"
+    sla_ms: 500
+    injected: true
+    verification_type: "data_validation"
+    children:
+      - "process_data"
+    
+  - id: "process_data"
+    name: "Process Data"
+    phase: "3.000"
+    kind: "data_processing"
+    owner: "PY"
+    sla_ms: 5000
+    children:
+      - "verify_processing"
+    
+  - id: "verify_processing"
+    name: "Verify Processing Results"
+    phase: "3.001"
+    kind: "VERIFY_INVARIANT_ASSERTIONS"
+    owner: "PY"
+    sla_ms: 300
+    injected: true
+    verification_type: "result_validation"
+    children:
+      - "write_output"
+    
+  - id: "write_output"
+    name: "Write Output Data"
+    phase: "4.000"
+    kind: "data_output"
+    owner: "PY"
+    sla_ms: 1000
+    children:
+      - "verify_output"
+    
+  - id: "verify_output"
+    name: "Verify Output Integrity"
+    phase: "4.001"
+    kind: "VERIFY_ERROR_HANDLING"
+    owner: "PY"
+    sla_ms: 200
+    injected: true
+    verification_type: "output_validation"
+    children:
+      - "complete_workflow"
+    
+  - id: "complete_workflow"
+    name: "Workflow Completion"
+    phase: "5.000"
+    kind: "system_completion"
+    owner: "PY"
+    sla_ms: 100
+    children: []

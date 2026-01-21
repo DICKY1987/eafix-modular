@@ -1,0 +1,97 @@
+{
+  "_doc_id": "DOC-CONFIG-0139",
+
+  "doc_id": "DOC-CONFIG-0047",
+  "duration_buckets": [
+    {
+      "token": "FLASH",
+      "max_minutes": 5,
+      "iso_limit": "PT5M",
+      "desc": "Very short burst; spike handling; <= 5 minutes"
+    },
+    {
+      "token": "QUICK",
+      "max_minutes": 30,
+      "iso_limit": "PT30M",
+      "desc": "Short move; <= 30 minutes"
+    },
+    {
+      "token": "LONG",
+      "max_minutes": 240,
+      "iso_limit": "PT4H",
+      "desc": "Sustained move; <= 4 hours"
+    },
+    {
+      "token": "EXTENDED",
+      "max_minutes": null,
+      "iso_limit": null,
+      "desc": "Prolonged; > 4 hours"
+    }
+  ],
+  "proximity_buckets": [
+    {
+      "token": "PRE_1H",
+      "window_minutes": [
+        -60,
+        0
+      ],
+      "desc": "In anticipation window before scheduled event time (exclusive of T0)"
+    },
+    {
+      "token": "AT_EVENT",
+      "window_minutes": [
+        0,
+        5
+      ],
+      "desc": "At the event print and immediate aftershock window (0-5m)"
+    },
+    {
+      "token": "POST_30M",
+      "window_minutes": [
+        1,
+        30
+      ],
+      "desc": "Post-event stabilization window (1-30m after T0)"
+    }
+  ],
+  "outcome_buckets": [
+    {
+      "token": "W2",
+      "rank": 2,
+      "desc": "Strong win / exceeded high threshold"
+    },
+    {
+      "token": "W1",
+      "rank": 1,
+      "desc": "Win / hit target"
+    },
+    {
+      "token": "BE",
+      "rank": 0,
+      "desc": "Break-even"
+    },
+    {
+      "token": "L1",
+      "rank": -1,
+      "desc": "Loss / small adverse move"
+    },
+    {
+      "token": "L2",
+      "rank": -2,
+      "desc": "Strong loss / large adverse move"
+    }
+  ],
+  "direction_enum": [
+    "LONG",
+    "SHORT",
+    "ANY"
+  ],
+  "generation_range": {
+    "min": 1,
+    "max": 3
+  },
+  "strength_range": {
+    "min": 0.0,
+    "max": 1.0
+  }
+}

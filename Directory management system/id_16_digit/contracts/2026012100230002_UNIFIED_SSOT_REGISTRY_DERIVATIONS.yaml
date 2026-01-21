@@ -1,0 +1,379 @@
+# doc_id: 2026012100230002
+# title: Unified SSOT Registry - Derivation Formulas
+# version: 1.0
+# date: 2026-01-21T00:23:14Z
+# status: AUTHORITATIVE
+# purpose: Machine-readable formula contracts for all computed fields
+
+schema_version: "1.0"
+derivations_version: "1.0"
+last_updated: "2026-01-21T00:23:14Z"
+doc_id: "2026012100230002"
+
+# =============================================================================
+# ALLOWED FORMULA DSL (Safe built-ins only, no eval)
+# =============================================================================
+
+allowed_functions:
+  BASENAME:
+    signature: "BASENAME(path: str) -> str"
+    description: "Extract filename from path"
+    example: "BASENAME('core/registry.py') -> 'registry.py'"
+    
+  DIRNAME:
+    signature: "DIRNAME(path: str) -> str"
+    description: "Extract directory from path, root = '.'"
+    example: "DIRNAME('core/registry.py') -> 'core'"
+    
+  EXTENSION:
+    signature: "EXTENSION(filename: str) -> str"
+    description: "Extract lowercase extension without dot"
+    example: "EXTENSION('file.PY') -> 'py'"
+    
+  UPPER:
+    signature: "UPPER(text: str) -> str"
+    description: "Convert to uppercase"
+    example: "UPPER('imports') -> 'IMPORTS'"
+    
+  LOWER:
+    signature: "LOWER(text: str) -> str"
+    description: "Convert to lowercase"
+    example: "LOWER('README') -> 'readme'"
+    
+  ADD_SECONDS:
+    signature: "ADD_SECONDS(utc_ts: str, seconds: int) -> str"
+    description: "Add seconds to ISO 8601 timestamp"
+    example: "ADD_SECONDS('2026-01-21T00:00:00Z', 3600) -> '2026-01-21T01:00:00Z'"
+    
+  SHA256_BYTES:
+    signature: "SHA256_BYTES(file_bytes: bytes) -> str"
+    description: "Compute SHA256 hash (tool-only)"
+    example: "SHA256_BYTES(content) -> 'a3b2c1...'"
+    tool_only: true
+    
+  NOW_UTC:
+    signature: "NOW_UTC() -> str"
+    description: "Current UTC timestamp (tool-only)"
+    example: "NOW_UTC() -> '2026-01-21T00:23:14Z'"
+    tool_only: true
+    
+  EXTRACT_16_DIGIT_PREFIX:
+    signature: "EXTRACT_16_DIGIT_PREFIX(filename: str) -> str"
+    description: "Extract 16-digit prefix from filename"
+    example: "EXTRACT_16_DIGIT_PREFIX('0199900001260118_file.py') -> '0199900001260118'"
+    
+  LOOKUP_CONFIG:
+    signature: "LOOKUP_CONFIG(map_name: str, key: str, default: str) -> str"
+    description: "Lookup value in config map"
+    example: "LOOKUP_CONFIG('type_code_by_extension', 'py', '00') -> '20'"
+
+# =============================================================================
+# DERIVATION CATALOG
+# =============================================================================
+
+derivations:
+  # FILE ENTITY DERIVATIONS
+  
+  - column_name: filename
+    applies_when:
+      record_kind: entity
+      entity_kind: file
+    owner: tool
+    inputs:
+      - relative_path
+    formula: "BASENAME(relative_path)"
+    update_policy: recompute_on_scan
+    validation:
+      - filename_not_empty
+      - no_path_separators
+    reason: "Base name extraction from relative path"
+    examples:
+      - input: {relative_path: "core/registry.py"}
+        output: {filename: "registry.py"}
+      - input: {relative_path: "README.md"}
+        output: {filename: "README.md"}
+  
+  - column_name: extension
+    applies_when:
+      record_kind: entity
+      entity_kind: file
+    owner: tool
+    inputs:
+      - filename
+    formula: "EXTENSION(filename)"
+    update_policy: recompute_on_scan
+    validation:
+      - extension_lowercase
+      - no_dot_prefix
+    reason: "File type extraction from filename"
+    examples:
+      - input: {filename: "script.PY"}
+        output: {extension: "py"}
+      - input: {filename: "README"}
+        output: {extension: ""}
+  
+  - column_name: directory_path
+    applies_when:
+      record_kind: entity
+      entity_kind: file
+    owner: tool
+    inputs:
+      - relative_path
+    formula: "DIRNAME(relative_path) OR '.'"
+    update_policy: recompute_on_scan
+    validation:
+      - forward_slashes_only
+      - no_leading_slash
+      - no_trailing_slash
+    reason: "Parent directory for grouping and queries"
+    examples:
+      - input: {relative_path: "core/registry.py"}
+        output: {directory_path: "core"}
+      - input: {relative_path: "README.md"}
+        output: {directory_path: "."}
+      - input: {relative_path: "core/sub/file.py"}
+        output: {directory_path: "core/sub"}
+  
+  - column_name: doc_id
+    applies_when:
+      record_kind: entity
+      entity_kind: file
+    owner: tool
+    inputs:
+      - filename
+    formula: "EXTRACT_16_DIGIT_PREFIX(filename)"
+    update_policy: immutable
+    validation:
+      - exactly_16_digits
+    reason: "Identity extraction from filename prefix"
+    examples:
+      - input: {filename: "0199900001260118_file.py"}
+        output: {doc_id: "0199900001260118"}
+      - input: {filename: "README.md"}
+        output: {doc_id: ""}
+  
+  - column_name: type_code
+    applies_when:
+      record_kind: entity
+      entity_kind: file
+    owner: tool
+    inputs:
+      - extension
+    formula: "LOOKUP_CONFIG('type_code_by_extension', extension, '00')"
+    update_policy: recompute_on_scan
+    validation:
+      - two_digit_numeric
+    reason: "File type classification from extension"
+    examples:
+      - input: {extension: "py"}
+        output: {type_code: "20"}
+      - input: {extension: "md"}
+        output: {type_code: "01"}
+      - input: {extension: "unknown"}
+        output: {type_code: "00"}
+  
+  - column_name: content_type
+    applies_when:
+      record_kind: entity
+      entity_kind: file
+    owner: tool
+    inputs:
+      - filename
+    formula: "MIME_TYPE(filename)"
+    update_policy: recompute_on_scan
+    validation: []
+    reason: "MIME type from extension"
+    examples:
+      - input: {filename: "script.py"}
+        output: {content_type: "text/x-python"}
+      - input: {filename: "data.json"}
+        output: {content_type: "application/json"}
+  
+  - column_name: sha256
+    applies_when:
+      record_kind: entity
+      entity_kind: file
+    owner: tool
+    inputs:
+      - file_bytes
+    formula: "SHA256_BYTES(file_bytes)"
+    update_policy: recompute_on_scan
+    validation:
+      - hex_64_chars
+    reason: "Content hash for integrity checking"
+    tool_only: true
+  
+  # TRANSIENT ENTITY DERIVATIONS
+  
+  - column_name: expires_utc
+    applies_when:
+      record_kind: entity
+      entity_kind: transient
+      ttl_seconds: present
+    owner: tool
+    inputs:
+      - created_utc
+      - ttl_seconds
+    formula: "ADD_SECONDS(created_utc, ttl_seconds)"
+    update_policy: recompute_on_build
+    validation:
+      - expires_after_created
+    reason: "Expiration time for transient entities"
+    examples:
+      - input: {created_utc: "2026-01-21T00:00:00Z", ttl_seconds: 3600}
+        output: {expires_utc: "2026-01-21T01:00:00Z"}
+  
+  # EDGE DERIVATIONS
+  
+  - column_name: rel_type
+    applies_when:
+      record_kind: edge
+    owner: tool
+    inputs:
+      - rel_type_raw
+    formula: "UPPER(rel_type_raw)"
+    update_policy: normalize_on_ingest
+    validation:
+      - uppercase_only
+    reason: "Relationship type normalization"
+    examples:
+      - input: {rel_type_raw: "imports"}
+        output: {rel_type: "IMPORTS"}
+      - input: {rel_type_raw: "CALLS"}
+        output: {rel_type: "CALLS"}
+  
+  # UNIVERSAL TIME CONSTRAINT DERIVATIONS
+  
+  - column_name: updated_utc
+    applies_when:
+      record_kind: [entity, edge, generator]
+    owner: tool
+    inputs: []
+    formula: "NOW_UTC()"
+    update_policy: recompute_on_scan
+    validation:
+      - updated_gte_created
+    reason: "Modification timestamp"
+    tool_only: true
+
+# =============================================================================
+# VALIDATION CONSTRAINTS
+# =============================================================================
+
+validation_constraints:
+  filename_not_empty:
+    rule: "len(filename) > 0"
+    message: "Filename cannot be empty"
+    
+  no_path_separators:
+    rule: "'/' not in filename AND '\\\\' not in filename"
+    message: "Filename cannot contain path separators"
+    
+  extension_lowercase:
+    rule: "extension == extension.lower()"
+    message: "Extension must be lowercase"
+    
+  no_dot_prefix:
+    rule: "not extension.startswith('.')"
+    message: "Extension must not include leading dot"
+    
+  exactly_16_digits:
+    rule: "len(doc_id) == 16 AND doc_id.isdigit()"
+    message: "doc_id must be exactly 16 digits"
+    allow_empty: true
+    
+  two_digit_numeric:
+    rule: "len(type_code) == 2 AND type_code.isdigit()"
+    message: "type_code must be exactly 2 digits"
+    
+  expires_after_created:
+    rule: "expires_utc > created_utc"
+    message: "Expiration must be after creation"
+    
+  uppercase_only:
+    rule: "rel_type == rel_type.upper()"
+    message: "rel_type must be uppercase"
+    
+  hex_64_chars:
+    rule: "len(sha256) == 64 AND all(c in '0123456789abcdef' for c in sha256)"
+    message: "SHA256 must be 64 hex characters"
+    
+  forward_slashes_only:
+    rule: "'\\\\' not in directory_path"
+    message: "directory_path must use forward slashes"
+    
+  no_leading_slash:
+    rule: "not directory_path.startswith('/')"
+    message: "directory_path must not have leading slash"
+    
+  no_trailing_slash:
+    rule: "not directory_path.endswith('/')"
+    message: "directory_path must not have trailing slash"
+    
+  updated_gte_created:
+    rule: "updated_utc >= created_utc"
+    message: "updated_utc must be >= created_utc"
+
+# =============================================================================
+# DERIVATION ENGINE POLICY
+# =============================================================================
+
+engine_policy:
+  mode: strict
+  recompute_on_mismatch: true
+  quarantine_on_validation_failure: false
+  log_all_derivations: false
+  log_mismatches: true
+  
+  lazy_population:
+    enabled: true
+    description: "Allow null-to-value population on first scan"
+    
+  idempotency:
+    required: true
+    description: "Same inputs must always produce same outputs"
+    
+  dependency_tracking:
+    enabled: true
+    description: "Track which fields depend on which inputs"
+
+# =============================================================================
+# USAGE EXAMPLES
+# =============================================================================
+
+usage_examples:
+  - description: "Validate computed field matches formula"
+    code: |
+      derivation = get_derivation('filename')
+      actual = record['filename']
+      expected = BASENAME(record['relative_path'])
+      assert actual == expected, f"Mismatch: {actual} != {expected}"
+  
+  - description: "Recompute all derived fields for entity"
+    code: |
+      for derivation in get_derivations(record_kind='entity', entity_kind='file'):
+          if derivation.applies_to(record):
+              inputs = {col: record[col] for col in derivation.inputs}
+              record[derivation.column_name] = derivation.compute(inputs)
+  
+  - description: "Check if field is computed"
+    code: |
+      is_computed = has_derivation('directory_path')
+      # Returns True
+
+# =============================================================================
+# MIGRATION NOTES
+# =============================================================================
+
+migration:
+  from_prose_spec: "FILE_SCAN_CSV_DERIVATION_SPEC.txt"
+  changes:
+    - "Formalized all prose derivations as machine-readable YAML"
+    - "Added validation constraints for each derivation"
+    - "Added examples with input/output pairs"
+    - "Defined safe DSL with no eval() risk"
+  
+  backward_compatibility:
+    - "All existing derivations preserved"
+    - "No formula logic changes"
+    - "Only formalization of existing behavior"

@@ -1,0 +1,67 @@
+{
+  "_doc_id": "DOC-CONFIG-0134",
+
+  "doc_id": "DOC-CONTRACT-0017",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/reentry/hybrid_id.schema.json",
+  "title": "Reentry Hybrid Identifier",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "signal_id",
+    "time_bucket",
+    "outcome_bucket",
+    "proximity_bucket",
+    "generation",
+    "reentry_key",
+    "comment_suffix"
+  ],
+  "properties": {
+    "signal_id": {
+      "type": "string",
+      "pattern": "^[A-Z0-9_]{3,64}$"
+    },
+    "time_bucket": {
+      "type": "string",
+      "enum": [
+        "FLASH",
+        "QUICK",
+        "LONG",
+        "EXTENDED"
+      ]
+    },
+    "outcome_bucket": {
+      "type": "string",
+      "enum": [
+        "W2",
+        "W1",
+        "BE",
+        "L1",
+        "L2"
+      ]
+    },
+    "proximity_bucket": {
+      "type": "string",
+      "enum": [
+        "PRE_1H",
+        "AT_EVENT",
+        "POST_30M"
+      ]
+    },
+    "generation": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+    },
+    "reentry_key": {
+      "type": "string",
+      "pattern": "^[A-Z0-9_]+~[A-Z0-9_]+~[A-Z0-9_]+~[A-Z0-9_]+~[1-9][0-9]*$"
+    },
+    "comment_suffix": {
+      "type": "string",
+      "pattern": "^[A-Z2-7]{4,10}$",
+      "description": "Short base32 hash for EA comment"
+    }
+  },
+  "description": "Serialized as SIG~TB~OB~PB~G; EA comment uses a prefix + comment_suffix to respect MT4 comment length limits."
+}

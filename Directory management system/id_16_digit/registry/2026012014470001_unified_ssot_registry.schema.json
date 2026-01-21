@@ -1,0 +1,261 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eafix.io/schemas/unified_ssot_registry.json",
+  "title": "Unified SSOT Registry",
+  "description": "Schema for single unified SSOT registry - Version 2.1 (2026-01-20)",
+  "type": "object",
+  "required": ["meta", "counters", "records"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["document_id", "registry_name", "version", "status", "last_updated_utc"],
+      "properties": {
+        "document_id": {
+          "type": "string",
+          "description": "Unique registry document ID"
+        },
+        "registry_name": {
+          "type": "string",
+          "const": "UNIFIED_SSOT_REGISTRY",
+          "description": "Registry name constant"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Semantic version"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "deprecated", "archived"],
+          "description": "Registry meta status"
+        },
+        "last_updated_utc": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last update timestamp"
+        },
+        "authoritative": {
+          "type": "boolean",
+          "description": "Whether this is the authoritative registry"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "counters": {
+      "type": "object",
+      "description": "Counter state for ID allocation",
+      "additionalProperties": true
+    },
+    "records": {
+      "type": "array",
+      "description": "All registry records (entities, edges, generators)",
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/entityRecord" },
+          { "$ref": "#/$defs/edgeRecord" },
+          { "$ref": "#/$defs/generatorRecord" }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "coreFields": {
+      "type": "object",
+      "required": ["record_kind", "record_id", "status", "created_utc", "updated_utc", "created_by", "updated_by"],
+      "properties": {
+        "record_kind": {
+          "type": "string",
+          "enum": ["entity", "edge", "generator"],
+          "description": "Record discriminator"
+        },
+        "record_id": {
+          "type": "string",
+          "description": "Globally unique record ID"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "deprecated", "quarantined", "archived", "deleted", "closed", "running", "pending", "failed"],
+          "description": "Record status (expanded in v2.1 for transient lifecycle)"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional notes"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Optional tags"
+        },
+        "created_utc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_utc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "created_by": {
+          "type": "string"
+        },
+        "updated_by": {
+          "type": "string"
+        }
+      }
+    },
+    "entityRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/coreFields" },
+        {
+          "type": "object",
+          "required": ["entity_id", "entity_kind"],
+          "properties": {
+            "record_kind": { "const": "entity" },
+            "entity_id": {
+              "type": "string",
+              "description": "Unique entity identifier"
+            },
+            "entity_kind": {
+              "type": "string",
+              "enum": ["file", "asset", "transient", "external", "module", "directory", "process", "other"],
+              "description": "Entity type discriminator (expanded in v2.1 to include 'other')"
+            },
+            "doc_id": { "type": ["string", "null"] },
+            "filename": { "type": ["string", "null"] },
+            "extension": { "type": ["string", "null"] },
+            "relative_path": { "type": ["string", "null"] },
+            "absolute_path": { "type": ["string", "null"] },
+            "directory_path": {
+              "type": ["string", "null"],
+              "description": "Directory portion of relative_path (dirname)"
+            },
+            "size_bytes": { "type": ["integer", "null"] },
+            "mtime_utc": { "type": ["string", "null"], "format": "date-time" },
+            "sha256": { "type": ["string", "null"] },
+            "content_type": { "type": ["string", "null"] },
+            "asset_id": { "type": ["string", "null"] },
+            "asset_family": { "type": ["string", "null"] },
+            "asset_version": { "type": ["string", "null"] },
+            "canonical_path": { "type": ["string", "null"] },
+            "transient_id": { "type": ["string", "null"] },
+            "transient_type": { "type": ["string", "null"] },
+            "ttl_seconds": { "type": ["integer", "null"] },
+            "expires_utc": { "type": ["string", "null"], "format": "date-time" },
+            "external_ref": { "type": ["string", "null"] },
+            "external_system": { "type": ["string", "null"] },
+            "resolver_hint": { "type": ["string", "null"] },
+            "module_id": { "type": ["string", "null"] },
+            "module_id_source": { "type": ["string", "null"] },
+            "module_id_override": { "type": ["string", "null"] },
+            "process_id": { "type": ["string", "null"] },
+            "process_step_id": { "type": ["string", "null"] },
+            "process_step_role": { "type": ["string", "null"] },
+            "role_code": { "type": ["string", "null"] },
+            "type_code": { "type": ["string", "null"] },
+            "function_code_1": { "type": ["string", "null"] },
+            "function_code_2": { "type": ["string", "null"] },
+            "function_code_3": { "type": ["string", "null"] },
+            "entrypoint_flag": { "type": ["boolean", "null"] },
+            "short_description": { "type": ["string", "null"] },
+            "first_seen_utc": { "type": ["string", "null"], "format": "date-time" },
+            "last_seen_utc": { "type": ["string", "null"], "format": "date-time" },
+            "scan_id": { "type": ["string", "null"] },
+            "source_entity_id": { "type": ["string", "null"] },
+            "supersedes_entity_id": { "type": ["string", "null"] }
+          }
+        }
+      ]
+    },
+    "edgeRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/coreFields" },
+        {
+          "type": "object",
+          "required": ["edge_id", "source_entity_id", "target_entity_id", "rel_type"],
+          "properties": {
+            "record_kind": { "const": "edge" },
+            "edge_id": {
+              "type": "string",
+              "description": "Unique edge identifier"
+            },
+            "source_entity_id": {
+              "type": "string",
+              "description": "Source entity ID"
+            },
+            "target_entity_id": {
+              "type": "string",
+              "description": "Target entity ID"
+            },
+            "rel_type": {
+              "type": "string",
+              "enum": ["IMPORTS", "CALLS", "TESTS", "DOCUMENTS", "USES_SCHEMA", "USES_TEMPLATE", "GENERATED_FROM", "PRODUCES", "DEPENDS_ON", "DUPLICATES", "PARALLEL_IMPL", "IMPLEMENTS_ASSET", "REFERENCES_FILE", "REFERENCES_ASSET", "CONTAINS", "CONFLICTS_WITH"],
+              "description": "Relationship type (MUST be uppercase - normalization rule enforced in v2.1)"
+            },
+            "directionality": {
+              "type": "string",
+              "enum": ["directed", "undirected"]
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            },
+            "evidence_method": { "type": ["string", "null"] },
+            "evidence_locator": { "type": ["string", "null"] },
+            "evidence_snippet": { "type": ["string", "null"] },
+            "observed_utc": { "type": ["string", "null"], "format": "date-time" },
+            "tool_version": { "type": ["string", "null"] },
+            "edge_flags": {
+              "type": ["array", "null"],
+              "items": { "type": "string" }
+            }
+          }
+        }
+      ]
+    },
+    "generatorRecord": {
+      "allOf": [
+        { "$ref": "#/$defs/coreFields" },
+        {
+          "type": "object",
+          "required": ["generator_id", "generator_name", "generator_version"],
+          "properties": {
+            "record_kind": { "const": "generator" },
+            "generator_id": {
+              "type": "string",
+              "description": "Unique generator identifier"
+            },
+            "generator_name": { "type": "string" },
+            "generator_version": { "type": "string" },
+            "output_kind": { "type": ["string", "null"] },
+            "output_path": { "type": ["string", "null"] },
+            "output_path_pattern": { "type": ["string", "null"] },
+            "declared_dependencies": {
+              "type": ["array", "null"],
+              "items": { "type": "string" }
+            },
+            "input_filters": {
+              "type": ["object", "null"]
+            },
+            "sort_rule_id": { "type": ["string", "null"] },
+            "sort_keys": {
+              "type": ["array", "null"],
+              "items": { "type": "string" }
+            },
+            "template_ref_entity_id": { "type": ["string", "null"] },
+            "validator_id": { "type": ["string", "null"] },
+            "validation_rules": {
+              "type": ["object", "null"]
+            },
+            "last_build_utc": { "type": ["string", "null"], "format": "date-time" },
+            "source_registry_hash": { "type": ["string", "null"] },
+            "source_registry_scan_id": { "type": ["string", "null"] },
+            "output_hash": { "type": ["string", "null"] },
+            "build_report_entity_id": { "type": ["string", "null"] }
+          }
+        }
+      ]
+    }
+  }
+}

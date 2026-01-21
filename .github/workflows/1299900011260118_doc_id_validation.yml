@@ -1,0 +1,24 @@
+name: Doc ID Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  validate-doc-ids:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate Doc IDs
+        run: |
+          cd doc_id_subsystem/validation
+          python validate_doc_id_coverage.py --baseline 0.95
+          python validate_doc_id_uniqueness.py

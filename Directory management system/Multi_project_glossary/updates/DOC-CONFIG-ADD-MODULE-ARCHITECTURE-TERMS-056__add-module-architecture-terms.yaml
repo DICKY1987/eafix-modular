@@ -1,0 +1,329 @@
+# DOC_LINK: DOC-CONFIG-ADD-MODULE-ARCHITECTURE-TERMS-056
+doc_id: DOC-CONFIG-ADD-MODULE-ARCHITECTURE-TERMS-056
+# Add Module Architecture Terms
+# Location: glossary/updates/add-module-architecture-terms.yaml
+# Usage: python scripts/update_term.py --spec updates/add-module-architecture-terms.yaml
+# Created: 2025-11-27
+
+patch_id: "01JDZX2A3B4C5D6E7F8G9H0J1K"
+description: "Add module-centric architecture terminology"
+date: "2025-11-27"
+author: "architecture-team"
+
+terms:
+  # Term 1: Module
+  - term_id: TERM-ARCH-001
+    action: create
+    content:
+      name: "Module"
+      category: "Architecture"
+      definition: "Self-contained functional unit with ULID-prefixed artifacts, clear boundaries, and layer assignment. All related code, tests, schemas, and docs colocated in one directory."
+      status: "active"
+      aliases:
+        - "Module Package"
+        - "Module Unit"
+      implementation:
+        files:
+          - "modules/*/module.manifest.yaml"
+          - "schema/module.schema.json"
+        entry_points:
+          - "Module manifest defines boundaries"
+      schema_refs:
+        - "schema/module.schema.json"
+      examples:
+        - name: "Core State Module"
+          code: |
+            modules/core-state/
+              010003_db.py              # Code with ULID prefix
+              010003_db.test.py         # Test oracle
+              010003_db.schema.json     # Contract
+              010003_module.manifest.yaml  # Module identity
+              .state/current.json       # Module state
+      related_terms:
+        - "ULID Prefix"
+        - "Module Manifest"
+        - "Layer"
+      usage: |
+        Module boundaries determined by:
+        - Functional cohesion (related capabilities)
+        - Layer rules (depends only on same/lower layers)
+        - Import independence (clear contracts)
+        - AI context size (optimized for tool loading)
+
+  # Term 2: Module-Centric Architecture
+  - term_id: TERM-ARCH-002
+    action: create
+    content:
+      name: "Module-Centric Architecture"
+      category: "Architecture"
+      definition: "Code organization pattern where all module artifacts (code, tests, schemas, docs) are colocated in a single directory, enabling deterministic AI context loading and atomic SafePatch operations."
+      status: "active"
+      aliases:
+        - "Module-First Organization"
+      implementation:
+        files:
+          - "modules/"
+          - "MODULES_INVENTORY.yaml"
+          - "docs/MODULE_CENTRIC_MIGRATION_GUIDE.md"
+      benefits:
+        - "Deterministic context loading: load_module('modules/core-state/')"
+        - "Atomic SafePatch: clone just one directory"
+        - "ULID-based identity: machine-verifiable relationships"
+        - "Parallel AI execution: no shared bottlenecks"
+      vs_artifact_type:
+        artifact_type:
+          structure: "core/state/db.py, tests/state/test_db.py, docs/STATE_GUIDE.md, schema/state.schema.json"
+          problems:
+            - "AI must load context from 4 different locations"
+            - "SafePatch worktrees need complex file tracking"
+            - "No atomic module boundaries"
+        module_centric:
+          structure: "modules/core-state/010003_db.py, 010003_db.test.py, 010003_db.md, 010003_db.schema.json"
+          benefits:
+            - "Single directory contains everything"
+            - "ULID prefix links all artifacts"
+            - "Atomic clone/load operations"
+      related_terms:
+        - "Module"
+        - "Artifact-Type Organization"
+        - "ULID Prefix"
+      references:
+        - "docs/MODULE_CENTRIC_MIGRATION_GUIDE.md"
+        - "Module-Centric/architecture/WHY_MODULE_CENTRIC_WORKS.md"
+
+  # Term 3: Submodule
+  - term_id: TERM-ARCH-003
+    action: create
+    content:
+      name: "Submodule"
+      category: "Architecture"
+      definition: "Hierarchical organization within a complex module. Each submodule has its own manifest and is controlled by parent module. Used for internal structure, not external dependencies."
+      status: "active"
+      implementation:
+        files:
+          - "schema/module.schema.json (lines 331-346)"
+      schema_refs:
+        - "schema/module.schema.json"
+      examples:
+        - name: "Submodule Structure"
+          code: |
+            modules/error-engine/
+              010004_module.manifest.yaml
+              submodules/
+                state-machine/
+                  manifest.yaml
+                  010004_state_machine.py
+                plugin-manager/
+                  manifest.yaml
+                  010004_plugin_manager.py
+      vs_shared_module:
+        submodule:
+          - "Internal organization"
+          - "Parent module controls lifecycle"
+          - "No external dependencies"
+          - "Example: error-engine/submodules/state-machine"
+        shared_module:
+          - "External dependency"
+          - "Independent lifecycle"
+          - "Listed in dependencies.modules"
+          - "Example: error-shared (used by many plugins)"
+      related_terms:
+        - "Module"
+        - "Shared Module"
+        - "Module Manifest"
+
+  # Term 4: ULID Prefix (expand existing)
+  - term_id: TERM-FRAME-002
+    action: update
+    field: definition
+    value: "Universally Unique Lexicographically Sortable Identifier. 26-character ID with 6-char prefix used for module identity. All artifacts in a module share the same 6-char prefix (e.g., 010003 for core-state)."
+
+  - term_id: TERM-FRAME-002
+    action: add
+    field: module_usage
+    value:
+      prefix_assignment: "First 6 chars identify module (e.g., 010003)"
+      full_ulid: "26 chars identify individual artifacts"
+      examples:
+        - "010003 = core-state module prefix"
+        - "010003_db.py = database code file"
+        - "010003_db.test.py = database test file"
+        - "01000300000000000000000001 = specific artifact ULID"
+      benefits:
+        - "Machine-verifiable relationships (same prefix = same module)"
+        - "Lexicographic sorting (chronological order)"
+        - "Globally unique (no collisions)"
+
+  # Term 5: Layer
+  - term_id: TERM-ARCH-005
+    action: create
+    content:
+      name: "Layer"
+      category: "Architecture"
+      definition: "Architectural layer assignment (infra, domain, api, ui) that enforces dependency rules. Modules can only depend on same or lower layers."
+      status: "active"
+      layers:
+        infra:
+          name: "Infrastructure"
+          description: "Database, state, schemas, configuration"
+          dependencies: []
+          modules: ["core.state", "schema", "config"]
+        domain:
+          name: "Domain Logic"
+          description: "Core business logic and orchestration"
+          dependencies: ["infra"]
+          modules: ["core.engine", "core.planning", "error.engine", "specifications.tools"]
+        api:
+          name: "API & Integrations"
+          description: "External tool integrations and bridges"
+          dependencies: ["infra", "domain"]
+          modules: ["aim", "pm", "specifications.bridge"]
+        ui:
+          name: "User Interface"
+          description: "CLI, GUI, user-facing tools"
+          dependencies: ["infra", "domain", "api"]
+          modules: ["engine", "error.plugins", "scripts", "gui"]
+      dependency_rules:
+        - "No circular dependencies between modules"
+        - "Modules can only depend on same or lower layer"
+        - "Infrastructure layer has no dependencies"
+        - "UI layer can depend on all lower layers"
+      implementation:
+        files:
+          - "docs/CODEBASE_INDEX.yaml"
+          - "schema/module.schema.json"
+      schema_refs:
+        - "schema/module.schema.json"
+      related_terms:
+        - "Module"
+        - "Dependency Graph"
+      references:
+        - "docs/CODEBASE_INDEX.yaml"
+
+  # Term 6: Module Manifest
+  - term_id: TERM-ARCH-006
+    action: create
+    content:
+      name: "Module Manifest"
+      category: "Architecture"
+      definition: "YAML file (module.manifest.yaml) defining module identity, dependencies, artifacts, contracts, and AI metadata. Machine-readable module specification."
+      status: "active"
+      aliases:
+        - "Module Specification"
+        - "Module Manifest File"
+      implementation:
+        files:
+          - "modules/*/module.manifest.yaml"
+          - "schema/module.schema.json"
+        template: "templates/module.manifest.template.yaml"
+      schema_refs:
+        - "schema/module.schema.json"
+      required_fields:
+        - "module_id (kebab-case, e.g., core-state)"
+        - "ulid_prefix (6 chars, e.g., 010003)"
+        - "purpose (concise statement)"
+        - "layer (infra/domain/api/ui)"
+      examples:
+        - name: "Core State Manifest"
+          code: |
+            module_id: "core-state"
+            ulid_prefix: "010003"
+            purpose: "Database operations and state management"
+            layer: "infra"
+            artifacts:
+              code:
+                - path: "010003_db.py"
+                  ulid: "01000300000000000000000001"
+              tests:
+                - path: "010003_db.test.py"
+                  ulid: "01000300000000000000000002"
+            dependencies:
+              modules: []
+              external:
+                - name: "sqlite3"
+      related_terms:
+        - "Module"
+        - "ULID Prefix"
+        - "Layer"
+      references:
+        - "schema/module.schema.json"
+        - "templates/module.manifest.template.yaml"
+
+  # Term 7: Artifact-Type Organization
+  - term_id: TERM-ARCH-007
+    action: create
+    content:
+      name: "Artifact-Type Organization"
+      category: "Architecture"
+      definition: "Legacy code organization pattern where artifacts are grouped by type (code/, tests/, docs/, schema/) rather than by module. Being migrated to module-centric architecture."
+      status: "deprecated"
+      aliases:
+        - "Type-Based Organization"
+        - "Artifact-First Organization"
+      deprecated_reason: "Causes scattered context loading, complex SafePatch operations, no atomic module boundaries"
+      replacement: "Module-Centric Architecture"
+      structure:
+        legacy:
+          - "core/state/db.py"
+          - "tests/state/test_db.py"
+          - "docs/STATE_GUIDE.md"
+          - "schema/state.schema.json"
+      problems:
+        - "AI must load context from 4+ directories"
+        - "SafePatch worktrees need complex file tracking"
+        - "No atomic module boundaries"
+        - "Cross-directory coordination required"
+      migration_status: "In progress - see MIGRATION_STATUS_SUMMARY.md"
+      related_terms:
+        - "Module-Centric Architecture"
+        - "Module"
+      references:
+        - "docs/MODULE_CENTRIC_MIGRATION_GUIDE.md"
+        - "MIGRATION_STATUS_SUMMARY.md"
+
+  # Term 8: Shared Module
+  - term_id: TERM-ARCH-008
+    action: create
+    content:
+      name: "Shared Module"
+      category: "Architecture"
+      definition: "Standalone module providing common utilities/types to other modules. Listed explicitly in dependencies.modules of consuming modules. Has independent lifecycle."
+      status: "active"
+      aliases:
+        - "Utility Module"
+        - "Common Module"
+      examples:
+        - name: "error-shared Module"
+          code: |
+            modules/error-shared/
+              010021_types.py
+              010021_time.py
+              010021_hashing.py
+              010021_jsonl_manager.py
+              010021_security.py
+              010021_module.manifest.yaml
+
+            # Used by error plugins
+            dependencies:
+              modules: ["error-shared"]
+      vs_submodule:
+        shared_module:
+          ownership: "Independent module"
+          dependency: "Explicit in manifest"
+          lifecycle: "Independent versioning"
+          example: "error-shared (ULID 010021)"
+        submodule:
+          ownership: "Parent module controls"
+          dependency: "Implicit (internal)"
+          lifecycle: "Follows parent"
+          example: "error-engine/submodules/state-machine"
+      implementation:
+        files:
+          - "modules/error-shared/"
+      related_terms:
+        - "Module"
+        - "Submodule"
+        - "Module Dependencies"
+      references:
+        - "AGENT_3_COMPLETION_REPORT.md"
+        - "MODULES_INVENTORY.yaml"

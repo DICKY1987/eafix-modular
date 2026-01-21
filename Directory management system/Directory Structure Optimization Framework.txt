@@ -1,0 +1,212 @@
+# Directory Structure Optimization
+
+**User:** bill reed (richgwilks@gmail.com)  
+**Created:** 1/19/2026 8:02:51  
+**Updated:** 1/19/2026 19:13:00  
+**Exported:** 1/20/2026 0:40:28  
+**Link:** [https://chatgpt.com/g/g-p-696e341154508191ba4eb1f9eac07bfe-dir-opt/c/696e3910-3304-832e-9a8e-c0fa41548ebb](https://chatgpt.com/g/g-p-696e341154508191ba4eb1f9eac07bfe-dir-opt/c/696e3910-3304-832e-9a8e-c0fa41548ebb)  
+
+## Response:
+1) Make the directory “self-describing” and enforceable
+-------------------------------------------------------
+
+*   **Directory contract per folder**: each directory has a small `DIR_CONTRACT.yaml` that defines:
+    *   allowed file kinds (by extension and/or registry `kind`)
+    *   whether the folder is _canonical_ vs _generated_ vs _evidence_ vs _archive_
+    *   max file count / max total size
+    *   retention rules (TTL, keep-last-N)
+*   **Automated contract enforcement** (watcher + scheduled validator):
+    *   anything that violates the contract is **moved**, not deleted (to a quarantine bucket)
+    *   violations emit a machine-readable report (JSONL)
+
+This is the root of “zero-touch”: the folder itself declares what is allowed, and automation enforces it.
+
+* * *
+
+2) Hard-separate canonical vs generated vs evidence vs trash
+------------------------------------------------------------
+
+A lot of “confusion” is just mixing lifecycles.
+
+*   `core/` (canonical, human-reviewed, versioned)
+*   `generated/` (derived artifacts; always reproducible)
+*   `runs/<run_id>/` (execution outputs, logs, reports, summaries)
+*   `archive/` (immutable frozen snapshots)
+*   `quarantine/` (unknown/messy/unclassified files)
+*   `scratch/` (developer-local; ignored by automation and git)
+
+Key rule: **tools never write into `core/`**, only into `generated/` or `runs/`.
+
+* * *
+
+3) Treat “reports/CLI summaries” as _run artifacts_ with retention
+------------------------------------------------------------------
+
+Your clutter set (execution summaries, reports, logs, intermediate outputs) should be forced into run-scoped folders:
+
+*   Every execution gets a `run_id` and writes only to `runs/<run_id>/...`
+*   Maintain a **single pointer**:
+    *   `runs/_latest/` (junction/symlink or a small file that stores latest run\_id)
+*   Retention policy:
+    *   keep last N runs (e.g., 20), or last X days
+    *   keep “pinned” runs indefinitely (`runs/<run_id>/PINNED`)
+
+This prevents “random report files” from polluting the working tree.
+
+* * *
+
+4) Use a quarantine workflow instead of guessing
+------------------------------------------------
+
+When automation can’t confidently classify a file:
+
+*   move it to `quarantine/`
+*   attach a machine tag:
+    *   `quarantine/<file>.__meta.json` with why it was quarantined (unknown type, violates contract, duplicate, etc.)
+*   optionally attempt auto-classification via heuristics, but **never** let it land in canonical paths without passing validation
+
+This avoids silent wrong moves.
+
+* * *
+
+5) Deprecation as a first-class lifecycle (no loose “old stuff”)
+----------------------------------------------------------------
+
+Define a standard deprecation mechanism:
+
+*   A file can be active or deprecated via **registry fields**, not vibes:
+    *   `status: active|deprecated|replaced|archived`
+    *   `replaced_by_doc_id`
+    *   `deprecated_utc`, `deprecation_reason`
+*   Deprecation automation:
+    *   when `status=deprecated`, file is automatically moved to `archive/deprecated/<year>/...`
+    *   canonical location gets either nothing (preferred) or a tiny stub pointer file (if humans need a breadcrumb)
+
+Result: old plans stop coexisting next to current ones.
+
+* * *
+
+6) “Single source of truth” indexes that are always derived
+-----------------------------------------------------------
+
+Your Excel-formula analogy is exactly right. Apply it aggressively:
+
+*   Folder `INDEX.md` / `INDEX.json` are **never manually edited**
+*   They are generated from:
+    *   FILE\_ID\_REGISTRY fields (`module_id`, `process_step_id`, `kind`, `status`)
+    *   directory contracts
+*   Add a build step: `render_indexes` that rewrites all indexes deterministically
+
+This kills drift and stops “stale documentation” from lingering.
+
+* * *
+
+7) Orphan + duplicate detectors (automatic cleanup signals)
+-----------------------------------------------------------
+
+Add automated detectors that run on every scan:
+
+*   **Orphan detector**: files present on disk but missing in registry
+*   **Dangling registry entries**: registry row points to missing file
+*   **Duplicate logical artifacts**: same `module_id` + same “role” producing multiple competing docs/plans
+*   **Deprecated-in-active-path**: deprecated files still sitting in active folders
+*   **Unreferenced generated artifacts**: generated files not referenced by any current index/run manifest
+
+Each detector produces:
+
+*   a JSON report
+*   a proposed patch/move plan (machine-executable)
+
+* * *
+
+8) Require every file to have an “owner” (module/process) or be rejected
+------------------------------------------------------------------------
+
+Enforce a rule:
+
+*   any file in canonical directories must have:
+    *   `module_id`
+    *   and optionally `process_step_id`
+    *   and `role` (spec, plan, schema, script, test, evidence, etc.)
+
+If not, it goes to quarantine. This single rule prevents most mess.
+
+* * *
+
+9) “Active set” vs “everything else” via baselines
+--------------------------------------------------
+
+Maintain an explicit **ACTIVE\_BASELINE.json**:
+
+*   list of the canonical doc\_ids that constitute “current system”
+*   everything else is either generated, archived, deprecated, or quarantine
+
+This gives AI and users a clean “what matters” slice instantly.
+
+* * *
+
+10) Minimal-touch doc freshness guarantees
+------------------------------------------
+
+Stop stale docs with enforcement:
+
+*   docs have `declared_inputs` (doc\_ids or registry queries)
+*   doc build computes `content_hash` of inputs and stores in doc metadata
+*   if inputs changed and doc wasn’t rebuilt, it is flagged as **stale** and optionally moved out of active indexes
+
+This is the deterministic equivalent of “this doc is out of date.”
+
+* * *
+
+11) Safe auto-delete is rare; prefer reversible moves
+-----------------------------------------------------
+
+Adopt a two-step garbage collector:
+
+1.  Move candidates to `trash_staging/` (timestamped)
+2.  Delete only after:
+    *   TTL elapsed (e.g., 14 days)
+    *   no references remain (registry + indexes + manifests)
+    *   not pinned
+
+This reduces catastrophic mistakes while still keeping things clean.
+
+* * *
+
+12) Enforce boundaries in git and tooling
+-----------------------------------------
+
+*   `.gitignore` should aggressively ignore `runs/`, `scratch/`, `trash_staging/`
+*   pre-commit / CI checks:
+    *   fail if generated artifacts are committed
+    *   fail if canonical paths contain unregistered files
+    *   fail if deprecated files exist in active folders
+    *   fail if indexes were manually edited (hash-based)
+
+* * *
+
+13) “One-way doors” for canonical changes
+-----------------------------------------
+
+To prevent random edits and partial migrations:
+
+*   Only allow canonical file moves/renames via one tool (your watcher/renamer)
+*   Tool emits:
+    *   registry patch
+    *   move plan
+    *   evidence log
+
+This ensures history is coherent and avoids human ad-hoc cleanup.
+
+* * *
+
+### If you implement only 3 things first
+
+1.  **run-scoped outputs** (`runs/<run_id>/` + retention + `_latest`)
+2.  **directory contracts + quarantine** (enforce what belongs where)
+3.  **registry-derived indexes** (docs and navigation always generated)
+
+Those three eliminate most directory chaos without needing “perfect AI classification.”
+
+## Response:
+Thought for 2m 55s
