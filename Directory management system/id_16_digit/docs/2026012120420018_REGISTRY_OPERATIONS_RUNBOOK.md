@@ -592,7 +592,332 @@ Include:
 
 ---
 
-## 10. Changelog
+## 10. Hardening Features (v1.1)
+
+### 10.1 Derive --Apply (Atomic Registry Updates)
+
+**Purpose**: Apply derivation formulas to registry with atomic write + backup.
+
+**Safety Guarantees**:
+- Backup created before any modification
+- Atomic write via temp file + os.replace()
+- fsync ensures data persistence
+- Idempotent (running twice = no changes second time)
+- Respects write policy (only updates tool-owned fields)
+
+**Basic Usage**:
+```bash
+# Dry-run: check what would change
+python automation/2026012120420011_registry_cli.py derive --dry-run
+
+# Apply changes with backup
+python automation/2026012120420011_registry_cli.py derive --apply
+
+# Timestamped backup (keeps history)
+python automation/2026012120420011_registry_cli.py derive --apply --timestamped-backup
+
+# Save detailed change report
+python automation/2026012120420011_registry_cli.py derive --apply --report changes.json
+```
+
+**Output**:
+```
+Applying derivations to registry...
+→ ENT-001: 2 field(s) updated
+    extension: PY → py
+    type_code: None → 00
+
+✓ Backup created: ID_REGISTRY.json.backup
+✓ Registry updated atomically: ID_REGISTRY.json
+
+Results:
+  Total records: 150
+  Records updated: 12
+  
+  Fields updated:
+    extension: 12
+    type_code: 8
+```
+
+**Implementation Notes**:
+1. **Backup Strategy**: Creates `.backup` file (or timestamped) before ANY writes
+2. **Atomic Write**: Writes to `.tmp_registry_*.json`, fsyncs, then `os.replace()`
+3. **Determinism**: Same inputs → same outputs (no timestamp fields recomputed)
+4. **Idempotency**: Second run finds 0 changes if first succeeded
+
+**Error Handling**:
+- Backup failure → abort, exit code 2
+- Write failure → temp file cleaned up, original untouched
+- Validation failure → continue (but log warnings)
+
+**When to Use**:
+- After scan updates scanner-provided fields
+- To fix inconsistent derived fields
+- Before critical operations (atomic = safe)
+
+**When NOT to Use**:
+- Don't use to fix user-only fields (use manual edit)
+- Don't use if registry format changed (migrate first)
+
+---
+
+### 10.2 Export to CSV/SQLite
+
+**Purpose**: Export registry to CSV or SQLite for analysis/reporting.
+
+#### CSV Export
+
+**Deterministic Output**:
+- Column order: priority columns first (record_id, doc_id, entity_kind...), then alphabetical
+- Row order: sorted by (record_kind, record_id)
+- Complex fields: serialized as JSON strings
+- All columns present in every row (blank for null)
+
+**Usage**:
+```bash
+# Export all records
+python automation/2026012120420011_registry_cli.py export --format csv --output registry.csv
+
+# Filter by entity kind
+python automation/2026012120420011_registry_cli.py export --format csv --output files.csv --entity-kind file
+
+# Filter by record kind
+python automation/2026012120420011_registry_cli.py export --format csv --output edges.csv --record-kind edge
+```
+
+**Example CSV**:
+```csv
+record_id,record_kind,doc_id,entity_kind,filename,extension,semantic_tags
+ENT-001,entity,1234567890123456,file,test.py,py,"[""policy"", ""validator""]"
+EDGE-001,edge,,,,,
+```
+
+#### SQLite Export
+
+**Schema**:
+- `meta` table: key-value pairs from registry metadata
+- `entity_records` table: all entity fields + indexes on (doc_id, entity_kind, module_id, status)
+- `edge_records` table: all edge fields + indexes on (source_doc_id, target_doc_id, rel_type)
+- `generator_records` table: all generator fields + indexes on (output_doc_id)
+
+**Usage**:
+```bash
+# Export to SQLite
+python automation/2026012120420011_registry_cli.py export --format sqlite --output registry.sqlite
+
+# Query with SQL
+sqlite3 registry.sqlite "SELECT filename, extension FROM entity_records WHERE module_id='MOD-CORE'"
+
+# Check table structure
+sqlite3 registry.sqlite ".schema entity_records"
+```
+
+**Queryable Examples**:
+```sql
+-- Find all Python files
+SELECT doc_id, filename FROM entity_records WHERE extension='py';
+
+-- Find high-confidence edges
+SELECT * FROM edge_records WHERE confidence_score > 0.9;
+
+-- Count by module
+SELECT module_id, COUNT(*) FROM entity_records GROUP BY module_id;
+```
+
+**Implementation Notes**:
+1. **Full Rebuild**: Drops existing DB, recreates tables (deterministic)
+2. **Indexes**: Created for common query patterns
+3. **Serialization**: Lists/dicts stored as JSON text
+4. **Determinism**: Same registry → identical DB (row order stable)
+
+---
+
+### 10.3 Module Assignment Validator
+
+**Purpose**: Enforce MODULE_ASSIGNMENT_POLICY precedence chain.
+
+**Precedence Chain** (highest to lowest):
+1. **Override** (`module_id_override` field) - manual override
+2. **Manifest** (`.module.yaml` file in directory tree) - explicit declaration
+3. **Path Rule** (regex match on `relative_path`) - automatic inference
+4. **Default** (null) - unassigned
+
+**Validation Rules**:
+- Actual `module_id` must match expected from precedence
+- Conflicts detected if multiple path rules match with different modules
+- Override always wins (no validation against other rules)
+
+**Usage**:
+```bash
+# Standalone validator
+python validation/2026012120460001_validate_module_assignment.py --registry ID_REGISTRY.json --verbose
+
+# Integrated in CLI
+python automation/2026012120420011_registry_cli.py validate --include-module
+```
+
+**Example Output**:
+```
+Results:
+  Total records: 150
+  Entity records: 120
+  Valid: 115
+  Invalid: 5
+  
+  Module source distribution:
+    override: 3
+    manifest: 12
+    path_rule: 95
+    unassigned: 10
+
+❌ Module assignment validation FAILED
+  ENT-042: Module mismatch: actual='MOD-TESTS' != expected='MOD-CORE' (source: path_rule, reason: Matched pattern: ^core/.*)
+```
+
+**Path Rules** (from policy):
+- `^core/.*` → MOD-CORE
+- `^validation/.*` → MOD-VALIDATION
+- `^registry/.*` → MOD-REGISTRY
+- `^automation/.*` → MOD-AUTOMATION
+- `^tests/.*` → MOD-TESTS
+- `^docs/.*` → MOD-DOCS
+- `^contracts/.*` → MOD-CONTRACTS
+- `^hooks/.*` → MOD-HOOKS
+- `^monitoring/.*` → MOD-MONITORING
+
+**When to Enable**:
+- When module features are used (module-based reports, etc.)
+- To enforce architectural boundaries
+- For modular codebases with clear ownership
+
+**Gating**: Use `--include-module` flag (opt-in)
+
+---
+
+### 10.4 Process Validation Validator
+
+**Purpose**: Enforce PROCESS_REGISTRY rules for workflow mapping.
+
+**Validation Rules**:
+1. `process_step_id` requires `process_id` (can't have step without process)
+2. `process_step_role` requires both `process_id` and `process_step_id`
+3. `process_id` must exist in registry (PROC-BUILD, PROC-TEST, PROC-DEPLOY, PROC-SCAN, PROC-VALIDATE)
+4. `process_step_id` must belong to its `process_id`
+5. `process_step_role` must be allowed for that step
+
+**Usage**:
+```bash
+# Standalone validator
+python validation/2026012120460002_validate_process.py --registry ID_REGISTRY.json --verbose
+
+# Integrated in CLI
+python automation/2026012120420011_registry_cli.py validate --include-process
+```
+
+**Example Output**:
+```
+Results:
+  Total records: 150
+  Records with process fields: 25
+  Valid: 23
+  Invalid: 2
+  
+  Records by process:
+    PROC-BUILD: 12
+    PROC-TEST: 10
+    PROC-SCAN: 3
+
+❌ Process validation FAILED
+  ENT-099: process_step_id 'STEP-COMPILE' present but process_id is missing
+  ENT-100: process_step_role 'fixture' not allowed for process 'PROC-BUILD' step 'STEP-COMPILE'. Allowed roles: ['input', 'output', 'tool', 'config']
+```
+
+**Valid Processes**:
+- `PROC-BUILD` (steps: STEP-COMPILE, STEP-BUNDLE, STEP-LINT)
+- `PROC-TEST` (steps: STEP-UNIT-TEST, STEP-INTEGRATION-TEST, STEP-E2E-TEST)
+- `PROC-DEPLOY` (steps: STEP-PACKAGE, STEP-PUBLISH, STEP-PROVISION, STEP-RELEASE)
+- `PROC-SCAN` (steps: STEP-DISCOVERY, STEP-ANALYSIS, STEP-SYNC)
+- `PROC-VALIDATE` (steps: STEP-POLICY-CHECK, STEP-DERIVATION-CHECK, STEP-QUALITY-CHECK)
+
+**When to Enable**:
+- When process mapping features are used
+- To ensure workflow integrity
+- For process-aware tooling
+
+**Gating**: Use `--include-process` flag (opt-in)
+
+---
+
+## 11. Implementation Notes
+
+### 11.1 Atomic Write + Backup Strategy
+
+**Flow**:
+1. Read `ID_REGISTRY.json`
+2. Compute changes (in memory)
+3. If changes > 0:
+   - `shutil.copy2(registry_file, backup_path)`  # Preserve metadata
+   - `tempfile.mkstemp()` in same directory  # Atomic on same filesystem
+   - `json.dump()` to temp file
+   - `f.flush()` + `os.fsync()`  # Force write to disk
+   - `os.replace(temp, registry)`  # Atomic on POSIX/Windows
+4. If changes == 0: exit (no backup needed)
+
+**Why Atomic**:
+- `os.replace()` is atomic on both Windows and POSIX
+- Prevents partial writes visible to readers
+- Power loss during write → either old or new, never corrupt
+- Same-filesystem requirement ensures atomicity
+
+### 11.2 Export Determinism Rules
+
+**CSV**:
+- Column order from `priority_columns` list + sorted remainder
+- Row order: `sorted(records, key=lambda r: (r.get("record_kind"), r.get("record_id")))`
+- Complex field serialization: `json.dumps(value, ensure_ascii=False)`
+
+**SQLite**:
+- Full rebuild (drop + recreate) for determinism
+- Indexes created in fixed order
+- No timestamps in schema (would break reproducibility)
+- INSERT order: records sorted before insertion
+
+### 11.3 Validator Gating (Opt-In)
+
+**Why Opt-In**:
+- Module/process validators depend on features that may not be used
+- Avoids false positives in projects not using those features
+- Explicit intent (user knows what's being validated)
+
+**How to Enable**:
+```bash
+# Enable module validator
+registry_cli.py validate --include-module
+
+# Enable process validator
+registry_cli.py validate --include-process
+
+# Enable both
+registry_cli.py validate --include-module --include-process
+```
+
+**Default Behavior** (no flags):
+- Runs: write_policy, derivations, conditional_enums, edge_evidence
+- Skips: module_assignment, process_validation
+
+---
+
+## 12. Changelog
+
+### v1.1 (2026-01-21) - Hardening Release
+- **NEW**: derive --apply with atomic writes and backup
+- **NEW**: CSV export with deterministic column/row ordering
+- **NEW**: SQLite export with queryable schema + indexes
+- **NEW**: Module assignment validator with precedence chain
+- **NEW**: Process validation validator with workflow rules
+- **IMPROVED**: Derivation engine skips timestamp fields (idempotency fix)
+- **DOCS**: Implementation notes section added
+- **TESTS**: 100% pass rate (5 derive, 5 export, 10 validator tests)
 
 ### v1.0 (2026-01-21)
 - Initial runbook
@@ -602,5 +927,5 @@ Include:
 
 ---
 
-**Last Updated**: 2026-01-21T20:42:00Z  
+**Last Updated**: 2026-01-21T22:45:00Z  
 **Next Review**: 2026-04-21 (Quarterly)

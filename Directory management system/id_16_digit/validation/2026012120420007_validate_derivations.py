@@ -335,6 +335,149 @@ class DerivationsValidator:
                         print(f"    {error}")
         
         return len(all_errors) == 0, all_errors, stats
+    
+    def apply_derivations(
+        self,
+        registry_path: str,
+        backup_suffix: str = ".backup",
+        create_timestamped_backup: bool = False,
+        verbose: bool = False
+    ) -> Dict[str, Any]:
+        """
+        Apply derivations to registry with atomic write and backup.
+        
+        Args:
+            registry_path: Path to ID_REGISTRY.json
+            backup_suffix: Backup file suffix (default: .backup)
+            create_timestamped_backup: If True, add timestamp to backup
+            verbose: Print detailed results
+        
+        Returns:
+            Stats dict with changes made
+        """
+        import tempfile
+        import shutil
+        from datetime import datetime, timezone
+        
+        # Read registry
+        registry_file = Path(registry_path)
+        if not registry_file.exists():
+            raise FileNotFoundError(f"Registry not found: {registry_path}")
+        
+        with open(registry_file, 'r', encoding='utf-8') as f:
+            registry = json.load(f)
+        
+        records = registry.get("records", [])
+        
+        # Track changes
+        stats = {
+            "total_records": len(records),
+            "records_updated": 0,
+            "fields_updated": {},
+            "changes": []
+        }
+        
+        # Apply derivations to each record
+        for idx, record in enumerate(records):
+            record_id = record.get("record_id", f"record_{idx}")
+            record_changes = []
+            
+            for derivation in self.derivations:
+                column = derivation.get("column_name")
+                
+                # Skip timestamp fields during recomputation (they should be set by the system, not derived)
+                if column in ["created_utc", "updated_utc", "last_scanned_at"]:
+                    continue
+                
+                if not self._applies_to_record(derivation, record):
+                    continue
+                
+                stored_value = record.get(column)
+                computed_value = self.recompute_field(column, record)
+                
+                if computed_value is None:
+                    continue
+                
+                # Check if update needed
+                if stored_value != computed_value:
+                    old_val = stored_value
+                    record[column] = computed_value
+                    record_changes.append({
+                        "field": column,
+                        "old": old_val,
+                        "new": computed_value
+                    })
+                    
+                    # Track in stats
+                    if column not in stats["fields_updated"]:
+                        stats["fields_updated"][column] = 0
+                    stats["fields_updated"][column] += 1
+            
+            if record_changes:
+                stats["records_updated"] += 1
+                stats["changes"].append({
+                    "record_id": record_id,
+                    "changes": record_changes
+                })
+                
+                # Only update updated_utc if other fields changed
+                record["updated_utc"] = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
+                
+                if verbose:
+                    print(f"→ {record_id}: {len(record_changes)} field(s) updated")
+                    for change in record_changes:
+                        print(f"    {change['field']}: {change['old']} → {change['new']}")
+        
+        # If no changes, exit early
+        if stats["records_updated"] == 0:
+            if verbose:
+                print("✓ No changes needed (all derived fields consistent)")
+            return stats
+        
+        # Create backup
+        if create_timestamped_backup:
+            timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+            backup_path = registry_file.with_suffix(f".{timestamp}.backup")
+        else:
+            backup_path = Path(str(registry_file) + backup_suffix)
+        
+        shutil.copy2(registry_file, backup_path)
+        if verbose:
+            print(f"\n✓ Backup created: {backup_path}")
+        
+        # Update registry metadata
+        if "meta" not in registry:
+            registry["meta"] = {}
+        registry["meta"]["last_updated"] = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
+        registry["meta"]["last_derivation_update"] = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
+        
+        # Write to temp file first (atomic operation)
+        temp_fd, temp_path = tempfile.mkstemp(
+            dir=registry_file.parent,
+            prefix=".tmp_registry_",
+            suffix=".json",
+            text=True
+        )
+        
+        try:
+            with os.fdopen(temp_fd, 'w', encoding='utf-8') as f:
+                json.dump(registry, f, indent=2, ensure_ascii=False)
+                f.flush()
+                os.fsync(f.fileno())
+            
+            # Atomic replace
+            os.replace(temp_path, registry_file)
+            
+            if verbose:
+                print(f"✓ Registry updated atomically: {registry_file}")
+        
+        except Exception as e:
+            # Clean up temp file on error
+            if os.path.exists(temp_path):
+                os.unlink(temp_path)
+            raise RuntimeError(f"Failed to write registry: {e}")
+        
+        return stats
 
 
 def main():

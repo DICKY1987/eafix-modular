@@ -55,7 +55,7 @@ class RegistryCLI:
         Validate registry against all policies.
         
         Usage:
-            registry validate [--strict] [--report FILE]
+            registry validate [--strict] [--report FILE] [--include-module] [--include-process]
         """
         print("Running registry validation...")
         print()
@@ -155,6 +155,56 @@ class RegistryCLI:
                 print(f"⚠ Edge evidence validation ERROR: {e}")
                 all_passed = False
         
+        # Run module assignment validation (if enabled)
+        if args.include_module:
+            ModuleAssignmentValidator = import_validator("validate_module_assignment", "ModuleAssignmentValidator")
+            if ModuleAssignmentValidator:
+                try:
+                    validator = ModuleAssignmentValidator()
+                    base_dir = str(self.registry_path.parent)
+                    is_valid, errors, stats = validator.validate_registry_file(
+                        registry_path=str(self.registry_path),
+                        base_dir=base_dir,
+                        verbose=args.verbose
+                    )
+                    results["module_assignment"] = {"passed": is_valid, "errors": errors, "stats": stats}
+                    
+                    if is_valid:
+                        print("✅ Module assignment validation PASSED")
+                    else:
+                        print("❌ Module assignment validation FAILED")
+                        all_passed = False
+                        if args.strict:
+                            for error in errors[:5]:
+                                print(f"  {error}")
+                except Exception as e:
+                    print(f"⚠ Module assignment validation ERROR: {e}")
+                    all_passed = False
+        
+        # Run process validation (if enabled)
+        if args.include_process:
+            ProcessValidator = import_validator("validate_process", "ProcessValidator")
+            if ProcessValidator:
+                try:
+                    validator = ProcessValidator()
+                    is_valid, errors, stats = validator.validate_registry_file(
+                        registry_path=str(self.registry_path),
+                        verbose=args.verbose
+                    )
+                    results["process_validation"] = {"passed": is_valid, "errors": errors, "stats": stats}
+                    
+                    if is_valid:
+                        print("✅ Process validation PASSED")
+                    else:
+                        print("❌ Process validation FAILED")
+                        all_passed = False
+                        if args.strict:
+                            for error in errors[:5]:
+                                print(f"  {error}")
+                except Exception as e:
+                    print(f"⚠ Process validation ERROR: {e}")
+                    all_passed = False
+        
         # Save report if requested
         if args.report:
             with open(args.report, 'w', encoding='utf-8') as f:
@@ -174,7 +224,7 @@ class RegistryCLI:
         Recompute derived fields.
         
         Usage:
-            registry derive [--dry-run] [--apply]
+            registry derive [--dry-run] [--apply] [--timestamped-backup] [--report FILE]
         """
         DerivationsValidator = import_validator("validate_derivations", "DerivationsValidator")
         if not DerivationsValidator:
@@ -195,16 +245,52 @@ class RegistryCLI:
                     print("✅ All derived fields consistent (no changes needed)")
                     return 0
                 else:
-                    print(f"⚠ {len(errors)} fields would be updated:")
+                    print(f"⚠ {len(errors)} field(s) would be updated:")
                     for error in errors[:10]:
                         print(f"  {error}")
-                    return 1
+                    if len(errors) > 10:
+                        print(f"  ... and {len(errors) - 10} more")
+                    return 0
+            
+            elif args.apply:
+                print("Applying derivations to registry...")
+                apply_stats = validator.apply_derivations(
+                    registry_path=str(self.registry_path),
+                    backup_suffix=".backup",
+                    create_timestamped_backup=args.timestamped_backup,
+                    verbose=args.verbose
+                )
+                
+                print(f"\nResults:")
+                print(f"  Total records: {apply_stats['total_records']}")
+                print(f"  Records updated: {apply_stats['records_updated']}")
+                
+                if apply_stats['fields_updated']:
+                    print(f"\n  Fields updated:")
+                    for field, count in sorted(apply_stats['fields_updated'].items()):
+                        print(f"    {field}: {count}")
+                
+                # Save report if requested
+                if args.report:
+                    with open(args.report, 'w', encoding='utf-8') as f:
+                        json.dump(apply_stats, f, indent=2, ensure_ascii=False)
+                    print(f"\n📄 Report saved to: {args.report}")
+                
+                if apply_stats['records_updated'] > 0:
+                    print(f"\n✅ Registry updated successfully")
+                else:
+                    print(f"\n✅ No changes needed (already consistent)")
+                
+                return 0
             else:
-                print("❌ --apply not implemented yet (requires registry rewrite logic)")
+                print("❌ Error: must specify --dry-run or --apply", file=sys.stderr)
                 return 1
         
         except Exception as e:
             print(f"❌ Error: {e}", file=sys.stderr)
+            import traceback
+            if args.verbose:
+                traceback.print_exc()
             return 2
     
     def cmd_normalize(self, args) -> int:
@@ -330,10 +416,303 @@ class RegistryCLI:
         Export registry to different format.
         
         Usage:
-            registry export --format [csv|sqlite] --output FILE
+            registry export --format [csv|sqlite] --output FILE [--entity-kind KIND]
         """
-        print(f"❌ Export to {args.format} not implemented yet", file=sys.stderr)
-        return 1
+        try:
+            with open(self.registry_path, 'r', encoding='utf-8') as f:
+                registry = json.load(f)
+            
+            records = registry.get("records", [])
+            
+            # Apply filters
+            if args.entity_kind:
+                records = [r for r in records if r.get("entity_kind") == args.entity_kind]
+            
+            if args.record_kind:
+                records = [r for r in records if r.get("record_kind") == args.record_kind]
+            
+            if args.format == "csv":
+                return self._export_csv(records, args.output, args.verbose)
+            elif args.format == "sqlite":
+                return self._export_sqlite(records, registry, args.output, args.verbose)
+            else:
+                print(f"❌ Unknown format: {args.format}", file=sys.stderr)
+                return 1
+        
+        except Exception as e:
+            print(f"❌ Error: {e}", file=sys.stderr)
+            import traceback
+            if args.verbose:
+                traceback.print_exc()
+            return 2
+    
+    def _export_csv(self, records: List[Dict[str, Any]], output_path: str, verbose: bool = False) -> int:
+        """Export records to CSV format."""
+        import csv
+        
+        if not records:
+            print("⚠ No records to export", file=sys.stderr)
+            return 1
+        
+        # Determine authoritative column order
+        # Get all unique columns across records (deterministic order)
+        all_columns = set()
+        for record in records:
+            all_columns.update(record.keys())
+        
+        # Define canonical ordering (priority columns first, rest alphabetical)
+        priority_columns = [
+            "record_id", "record_kind", "doc_id", "entity_kind", 
+            "filename", "relative_path", "extension", "type_code",
+            "module_id", "status", "source_doc_id", "target_doc_id", 
+            "edge_kind", "rel_type"
+        ]
+        
+        # Build ordered column list
+        columns = []
+        for col in priority_columns:
+            if col in all_columns:
+                columns.append(col)
+                all_columns.remove(col)
+        
+        # Add remaining columns alphabetically
+        columns.extend(sorted(all_columns))
+        
+        if verbose:
+            print(f"Exporting {len(records)} records to CSV...")
+            print(f"Columns: {len(columns)}")
+        
+        # Write CSV with deterministic ordering
+        with open(output_path, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=columns, extrasaction='ignore')
+            writer.writeheader()
+            
+            # Sort records for deterministic output (by record_kind, then record_id)
+            sorted_records = sorted(records, key=lambda r: (r.get("record_kind", ""), r.get("record_id", "")))
+            
+            for record in sorted_records:
+                # Serialize complex fields as JSON strings
+                row = {}
+                for col in columns:
+                    value = record.get(col)
+                    if value is None:
+                        row[col] = ""
+                    elif isinstance(value, (list, dict)):
+                        row[col] = json.dumps(value, ensure_ascii=False)
+                    else:
+                        row[col] = str(value)
+                
+                writer.writerow(row)
+        
+        print(f"✅ Exported {len(sorted_records)} records to: {output_path}")
+        return 0
+    
+    def _export_sqlite(
+        self, 
+        records: List[Dict[str, Any]], 
+        registry: Dict[str, Any],
+        output_path: str, 
+        verbose: bool = False
+    ) -> int:
+        """Export records to SQLite database."""
+        import sqlite3
+        
+        if verbose:
+            print(f"Exporting {len(records)} records to SQLite...")
+        
+        # Remove existing DB if present (full rebuild)
+        if os.path.exists(output_path):
+            os.unlink(output_path)
+        
+        conn = sqlite3.connect(output_path)
+        cursor = conn.cursor()
+        
+        try:
+            # Create meta table
+            cursor.execute("""
+                CREATE TABLE meta (
+                    key TEXT PRIMARY KEY,
+                    value TEXT
+                )
+            """)
+            
+            meta = registry.get("meta", {})
+            for key, value in meta.items():
+                cursor.execute("INSERT INTO meta (key, value) VALUES (?, ?)", 
+                             (key, json.dumps(value) if isinstance(value, (dict, list)) else str(value)))
+            
+            # Create entity_records table
+            cursor.execute("""
+                CREATE TABLE entity_records (
+                    record_id TEXT PRIMARY KEY,
+                    doc_id TEXT,
+                    entity_kind TEXT,
+                    filename TEXT,
+                    relative_path TEXT,
+                    extension TEXT,
+                    type_code TEXT,
+                    module_id TEXT,
+                    status TEXT,
+                    business_criticality TEXT,
+                    file_size_bytes INTEGER,
+                    line_count INTEGER,
+                    sha256_checksum TEXT,
+                    created_utc TEXT,
+                    updated_utc TEXT,
+                    primary_purpose TEXT,
+                    notes TEXT,
+                    semantic_tags TEXT,
+                    quarantine_reason TEXT
+                )
+            """)
+            
+            # Create indexes for entity_records
+            cursor.execute("CREATE INDEX idx_entity_doc_id ON entity_records(doc_id)")
+            cursor.execute("CREATE INDEX idx_entity_kind ON entity_records(entity_kind)")
+            cursor.execute("CREATE INDEX idx_entity_module ON entity_records(module_id)")
+            cursor.execute("CREATE INDEX idx_entity_status ON entity_records(status)")
+            
+            # Create edge_records table
+            cursor.execute("""
+                CREATE TABLE edge_records (
+                    record_id TEXT PRIMARY KEY,
+                    source_doc_id TEXT,
+                    target_doc_id TEXT,
+                    edge_kind TEXT,
+                    rel_type TEXT,
+                    evidence_method TEXT,
+                    evidence_locator TEXT,
+                    confidence_score REAL,
+                    status TEXT,
+                    created_utc TEXT,
+                    updated_utc TEXT,
+                    notes TEXT
+                )
+            """)
+            
+            # Create indexes for edge_records
+            cursor.execute("CREATE INDEX idx_edge_source ON edge_records(source_doc_id)")
+            cursor.execute("CREATE INDEX idx_edge_target ON edge_records(target_doc_id)")
+            cursor.execute("CREATE INDEX idx_edge_rel_type ON edge_records(rel_type)")
+            cursor.execute("CREATE INDEX idx_edge_kind ON edge_records(edge_kind)")
+            
+            # Create generator_records table
+            cursor.execute("""
+                CREATE TABLE generator_records (
+                    record_id TEXT PRIMARY KEY,
+                    generator_kind TEXT,
+                    output_doc_id TEXT,
+                    input_doc_ids TEXT,
+                    tool TEXT,
+                    command TEXT,
+                    status TEXT,
+                    created_utc TEXT,
+                    updated_utc TEXT,
+                    notes TEXT
+                )
+            """)
+            
+            cursor.execute("CREATE INDEX idx_gen_output ON generator_records(output_doc_id)")
+            
+            # Insert records
+            entity_count = 0
+            edge_count = 0
+            generator_count = 0
+            
+            for record in records:
+                record_kind = record.get("record_kind")
+                
+                if record_kind == "entity":
+                    cursor.execute("""
+                        INSERT INTO entity_records VALUES (
+                            :record_id, :doc_id, :entity_kind, :filename, :relative_path,
+                            :extension, :type_code, :module_id, :status, :business_criticality,
+                            :file_size_bytes, :line_count, :sha256_checksum, :created_utc, :updated_utc,
+                            :primary_purpose, :notes, :semantic_tags, :quarantine_reason
+                        )
+                    """, {
+                        "record_id": record.get("record_id"),
+                        "doc_id": record.get("doc_id"),
+                        "entity_kind": record.get("entity_kind"),
+                        "filename": record.get("filename"),
+                        "relative_path": record.get("relative_path"),
+                        "extension": record.get("extension"),
+                        "type_code": record.get("type_code"),
+                        "module_id": record.get("module_id"),
+                        "status": record.get("status"),
+                        "business_criticality": record.get("business_criticality"),
+                        "file_size_bytes": record.get("file_size_bytes"),
+                        "line_count": record.get("line_count"),
+                        "sha256_checksum": record.get("sha256_checksum"),
+                        "created_utc": record.get("created_utc"),
+                        "updated_utc": record.get("updated_utc"),
+                        "primary_purpose": record.get("primary_purpose"),
+                        "notes": record.get("notes"),
+                        "semantic_tags": json.dumps(record.get("semantic_tags")) if record.get("semantic_tags") else None,
+                        "quarantine_reason": record.get("quarantine_reason")
+                    })
+                    entity_count += 1
+                
+                elif record_kind == "edge":
+                    cursor.execute("""
+                        INSERT INTO edge_records VALUES (
+                            :record_id, :source_doc_id, :target_doc_id, :edge_kind, :rel_type,
+                            :evidence_method, :evidence_locator, :confidence_score, :status,
+                            :created_utc, :updated_utc, :notes
+                        )
+                    """, {
+                        "record_id": record.get("record_id"),
+                        "source_doc_id": record.get("source_doc_id"),
+                        "target_doc_id": record.get("target_doc_id"),
+                        "edge_kind": record.get("edge_kind"),
+                        "rel_type": record.get("rel_type"),
+                        "evidence_method": record.get("evidence_method"),
+                        "evidence_locator": record.get("evidence_locator"),
+                        "confidence_score": record.get("confidence_score"),
+                        "status": record.get("status"),
+                        "created_utc": record.get("created_utc"),
+                        "updated_utc": record.get("updated_utc"),
+                        "notes": record.get("notes")
+                    })
+                    edge_count += 1
+                
+                elif record_kind == "generator":
+                    cursor.execute("""
+                        INSERT INTO generator_records VALUES (
+                            :record_id, :generator_kind, :output_doc_id, :input_doc_ids,
+                            :tool, :command, :status, :created_utc, :updated_utc, :notes
+                        )
+                    """, {
+                        "record_id": record.get("record_id"),
+                        "generator_kind": record.get("generator_kind"),
+                        "output_doc_id": record.get("output_doc_id"),
+                        "input_doc_ids": json.dumps(record.get("input_doc_ids")) if record.get("input_doc_ids") else None,
+                        "tool": record.get("tool"),
+                        "command": record.get("command"),
+                        "status": record.get("status"),
+                        "created_utc": record.get("created_utc"),
+                        "updated_utc": record.get("updated_utc"),
+                        "notes": record.get("notes")
+                    })
+                    generator_count += 1
+            
+            conn.commit()
+            
+            if verbose:
+                print(f"  Entity records: {entity_count}")
+                print(f"  Edge records: {edge_count}")
+                print(f"  Generator records: {generator_count}")
+            
+            print(f"✅ Exported to SQLite: {output_path}")
+            print(f"   Entities: {entity_count}, Edges: {edge_count}, Generators: {generator_count}")
+            return 0
+        
+        except Exception as e:
+            conn.rollback()
+            raise
+        
+        finally:
+            conn.close()
 
 
 def main():
@@ -358,12 +737,16 @@ Examples:
     validate_parser = subparsers.add_parser("validate", help="Validate registry against all policies")
     validate_parser.add_argument("--strict", action="store_true", help="Exit on first error")
     validate_parser.add_argument("--report", help="Save detailed report to JSON file")
+    validate_parser.add_argument("--include-module", action="store_true", help="Include module assignment validation")
+    validate_parser.add_argument("--include-process", action="store_true", help="Include process validation")
     validate_parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
     
     # Derive command
     derive_parser = subparsers.add_parser("derive", help="Recompute derived fields")
     derive_parser.add_argument("--dry-run", "-n", action="store_true", help="Show what would change")
-    derive_parser.add_argument("--apply", action="store_true", help="Apply changes")
+    derive_parser.add_argument("--apply", action="store_true", help="Apply changes to registry")
+    derive_parser.add_argument("--timestamped-backup", action="store_true", help="Create timestamped backup file")
+    derive_parser.add_argument("--report", help="Save detailed change report to JSON file")
     derive_parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
     
     # Normalize command
@@ -389,7 +772,9 @@ Examples:
     export_parser = subparsers.add_parser("export", help="Export registry")
     export_parser.add_argument("--format", choices=["csv", "sqlite"], required=True, help="Export format")
     export_parser.add_argument("--output", "-o", required=True, help="Output file")
+    export_parser.add_argument("--record-kind", choices=["entity", "edge", "generator"], help="Filter by record kind")
     export_parser.add_argument("--entity-kind", help="Filter by entity kind")
+    export_parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
     
     args = parser.parse_args()
     
