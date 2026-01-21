@@ -1,0 +1,293 @@
+# doc_id: 2026012120420005
+# Unified SSOT Registry - Process Registry
+# Defines valid process IDs, steps, and roles for workflow mapping
+
+schema_version: "1.0"
+registry_version: "1.0"
+doc_id: "2026012120420005"
+last_updated: "2026-01-21T20:42:00Z"
+description: "Catalog of valid processes, steps, and roles for entity workflow mapping"
+
+# Process catalog
+processes:
+  - process_id: PROC-BUILD
+    process_name: "Build and Compilation"
+    process_owner: "build-team"
+    process_description: "Compile source code and generate build artifacts"
+    steps:
+      - process_step_id: STEP-COMPILE
+        process_step_name: "Source Compilation"
+        process_step_description: "Compile source files to bytecode/binary"
+        allowed_roles: [input, output, tool, config]
+      
+      - process_step_id: STEP-BUNDLE
+        process_step_name: "Asset Bundling"
+        process_step_description: "Package compiled assets into distributable bundles"
+        allowed_roles: [input, output, tool, config]
+      
+      - process_step_id: STEP-LINT
+        process_step_name: "Code Linting"
+        process_step_description: "Static analysis for code quality"
+        allowed_roles: [subject, tool, config, log]
+  
+  - process_id: PROC-TEST
+    process_name: "Testing and Validation"
+    process_owner: "qa-team"
+    process_description: "Execute test suites and validate correctness"
+    steps:
+      - process_step_id: STEP-UNIT-TEST
+        process_step_name: "Unit Testing"
+        process_step_description: "Test individual functions and methods"
+        allowed_roles: [test, subject, fixture, tool, log]
+      
+      - process_step_id: STEP-INTEGRATION-TEST
+        process_step_name: "Integration Testing"
+        process_step_description: "Test component interactions"
+        allowed_roles: [test, subject, fixture, tool, log, config]
+      
+      - process_step_id: STEP-E2E-TEST
+        process_step_name: "End-to-End Testing"
+        process_step_description: "Test full user workflows"
+        allowed_roles: [test, subject, fixture, tool, log, config]
+  
+  - process_id: PROC-DEPLOY
+    process_name: "Deployment Pipeline"
+    process_owner: "devops-team"
+    process_description: "Deploy artifacts to target environments"
+    steps:
+      - process_step_id: STEP-PACKAGE
+        process_step_name: "Package Artifacts"
+        process_step_description: "Create deployment packages"
+        allowed_roles: [input, output, tool, config]
+      
+      - process_step_id: STEP-PUBLISH
+        process_step_name: "Publish to Registry"
+        process_step_description: "Upload packages to artifact registry"
+        allowed_roles: [input, output, tool, config, log]
+      
+      - process_step_id: STEP-PROVISION
+        process_step_name: "Provision Infrastructure"
+        process_step_description: "Create/update cloud resources"
+        allowed_roles: [config, tool, log]
+      
+      - process_step_id: STEP-RELEASE
+        process_step_name: "Release to Production"
+        process_step_description: "Deploy to production environment"
+        allowed_roles: [input, tool, config, log]
+  
+  - process_id: PROC-SCAN
+    process_name: "Registry Scanning"
+    process_owner: "platform-team"
+    process_description: "Scan filesystem and populate registry"
+    steps:
+      - process_step_id: STEP-DISCOVERY
+        process_step_name: "File Discovery"
+        process_step_description: "Traverse filesystem and discover entities"
+        allowed_roles: [output, tool, config]
+      
+      - process_step_id: STEP-ANALYSIS
+        process_step_name: "Static Analysis"
+        process_step_description: "Extract metadata and relationships"
+        allowed_roles: [input, output, tool, log]
+      
+      - process_step_id: STEP-SYNC
+        process_step_name: "Registry Sync"
+        process_step_description: "Update registry with scan results"
+        allowed_roles: [input, output, tool, log]
+  
+  - process_id: PROC-VALIDATE
+    process_name: "Registry Validation"
+    process_owner: "platform-team"
+    process_description: "Validate registry against policies and constraints"
+    steps:
+      - process_step_id: STEP-POLICY-CHECK
+        process_step_name: "Policy Enforcement"
+        process_step_description: "Check write policies and derivations"
+        allowed_roles: [subject, tool, config, log]
+      
+      - process_step_id: STEP-CONSTRAINT-CHECK
+        process_step_name: "Constraint Validation"
+        process_step_description: "Validate uniqueness, references, formats"
+        allowed_roles: [subject, tool, config, log]
+
+# Global roles (allowed in any step unless overridden)
+global_roles:
+  - input
+  - output
+  - tool
+  - log
+
+# Role definitions
+role_definitions:
+  input:
+    description: "File consumed as input by process step"
+    examples: ["Source code for compilation", "Test data for test execution"]
+  
+  output:
+    description: "File produced as output by process step"
+    examples: ["Compiled binary", "Test report", "Deployment package"]
+  
+  tool:
+    description: "Tool or script that executes the process step"
+    examples: ["Compiler executable", "Test runner", "Deploy script"]
+  
+  config:
+    description: "Configuration file that controls process step behavior"
+    examples: ["Build config", "Test config", "Deployment manifest"]
+  
+  log:
+    description: "Log file generated during process step execution"
+    examples: ["Build log", "Test output", "Deployment log"]
+  
+  test:
+    description: "Test file or suite (for testing processes)"
+    examples: ["Unit test file", "Integration test suite"]
+  
+  subject:
+    description: "File under test or analysis"
+    examples: ["Module being tested", "Code being linted"]
+  
+  fixture:
+    description: "Test fixture or mock data"
+    examples: ["Test database dump", "Mock API responses"]
+
+# Validation rules
+validation_rules:
+  - name: "process_id_exists"
+    description: "process_id MUST exist in processes list"
+    check: "process_id in [p['process_id'] for p in processes]"
+    enforcement: "reject"
+  
+  - name: "process_step_id_exists"
+    description: "process_step_id MUST exist under specified process"
+    check: "process_step_id in steps for given process_id"
+    enforcement: "reject"
+  
+  - name: "role_allowed_for_step"
+    description: "process_step_role MUST be in allowed_roles for step OR global_roles"
+    check: "role in step['allowed_roles'] OR role in global_roles"
+    enforcement: "reject"
+  
+  - name: "all_or_none"
+    description: "All three fields (process_id, process_step_id, process_step_role) must be set together or all null"
+    check: "(all three set) OR (all three null)"
+    enforcement: "reject"
+  
+  - name: "process_owner_contact"
+    description: "process_owner should be a valid team/person identifier"
+    check: "process_owner not empty"
+    enforcement: "warn"
+
+# Usage guidelines
+usage_guidelines:
+  when_to_use:
+    - "Tracking which files participate in build/test/deploy workflows"
+    - "Understanding artifact lineage (input → tool → output chains)"
+    - "Auditing which configurations control critical processes"
+    - "Mapping test coverage (which tests exercise which subjects)"
+  
+  when_not_to_use:
+    - "Fine-grained execution traces (use dynamic edges for runtime relationships)"
+    - "Temporary process state (use transient entities)"
+    - "Process monitoring/observability (use dedicated monitoring systems)"
+  
+  assignment_strategy:
+    - "Manual curation: User assigns process mappings based on domain knowledge"
+    - "Tool inference: Scanner detects files in build/test directories and suggests roles"
+    - "Hybrid: Scanner suggests, user confirms/overrides"
+
+# Examples
+examples:
+  build_process:
+    - entity_id: ENT-000123
+      filename: "src/main.py"
+      process_id: PROC-BUILD
+      process_step_id: STEP-COMPILE
+      process_step_role: input
+      rationale: "Source file compiled to bytecode"
+    
+    - entity_id: ENT-000124
+      filename: "dist/main.pyc"
+      process_id: PROC-BUILD
+      process_step_id: STEP-COMPILE
+      process_step_role: output
+      rationale: "Compiled bytecode output"
+    
+    - entity_id: ENT-000125
+      filename: "build.yaml"
+      process_id: PROC-BUILD
+      process_step_id: STEP-COMPILE
+      process_step_role: config
+      rationale: "Build configuration"
+  
+  test_process:
+    - entity_id: ENT-000456
+      filename: "tests/test_main.py"
+      process_id: PROC-TEST
+      process_step_id: STEP-UNIT-TEST
+      process_step_role: test
+      rationale: "Unit test suite"
+    
+    - entity_id: ENT-000123
+      filename: "src/main.py"
+      process_id: PROC-TEST
+      process_step_id: STEP-UNIT-TEST
+      process_step_role: subject
+      rationale: "Module under test"
+    
+    - entity_id: ENT-000457
+      filename: "tests/fixtures/sample_data.json"
+      process_id: PROC-TEST
+      process_step_id: STEP-UNIT-TEST
+      process_step_role: fixture
+      rationale: "Test data fixture"
+
+# Governance
+governance:
+  policy_owner: "System Architect"
+  review_cycle: "Quarterly"
+  change_process: "Adding new process requires design doc + registry update"
+  approval_required: true
+  
+  adding_new_process:
+    process:
+      - "Document process purpose and owner"
+      - "Define steps and allowed roles"
+      - "Update this registry file"
+      - "Update validator to recognize new process"
+      - "Test on sample entities"
+    approval: "System Architect + Process Owner"
+  
+  adding_new_step:
+    process:
+      - "Update process entry with new step"
+      - "Define allowed roles"
+      - "Document step purpose"
+    approval: "Process Owner"
+  
+  adding_new_role:
+    process:
+      - "Update global_roles OR step allowed_roles"
+      - "Document role definition and examples"
+      - "Update role_definitions section"
+    approval: "System Architect"
+
+# Migration from free-text
+migration_guide:
+  previous_state: "process_id, process_step_id, process_step_role were free-text fields"
+  current_state: "Must reference valid entries in this registry"
+  
+  migration_steps:
+    - "Export existing unique process IDs from registry"
+    - "Map to standardized process_id values (PROC-*)"
+    - "Create process entries in this registry"
+    - "Update entity records with new process_id values"
+    - "Validate all references after migration"
+  
+  backward_compatibility: "Validator warns on unknown process_id (doesn't fail) for grace period"
+
+# References
+references:
+  write_policy: "contracts/2026012120420001_UNIFIED_SSOT_REGISTRY_WRITE_POLICY.yaml"
+  registry_schema: "registry/2026012014470001_unified_ssot_registry.schema.json"
+  implementation_plan: "docs/2026012102510001_UNIFIED_SSOT_REGISTRY_IMPLEMENTATION_PLAN.md"

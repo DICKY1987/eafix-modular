@@ -1,0 +1,280 @@
+# doc_id: 2026012120420004
+# Unified SSOT Registry - Module Assignment Policy
+# Defines deterministic module derivation with precedence chain
+
+schema_version: "1.0"
+policy_version: "1.0"
+doc_id: "2026012120420004"
+last_updated: "2026-01-21T20:42:00Z"
+description: "Module assignment rules with override > manifest > path_rule precedence"
+
+# Precedence chain (evaluated in order, first match wins)
+precedence_chain:
+  - level: 1
+    source: override
+    field: module_id_override
+    condition: "module_id_override is not null"
+    module_id_source: "override"
+    description: "User override takes absolute precedence"
+    behavior: "Use module_id_override value directly"
+  
+  - level: 2
+    source: manifest
+    method: lookup_module_manifest
+    search_paths:
+      - "{directory_path}/.module.yaml"
+      - "{directory_path}/module.yaml"
+      - "{parent_directory}/.module.yaml"
+      - "{parent_directory}/module.yaml"
+      - "{parent_parent_directory}/.module.yaml"
+    manifest_field: module_id
+    condition: "manifest file exists AND module_id field present"
+    module_id_source: "manifest"
+    description: "Explicit module declaration in manifest file"
+    behavior: "Read module_id from closest ancestor manifest"
+  
+  - level: 3
+    source: path_rule
+    method: regex_match
+    rules:
+      - pattern: "^core/.*"
+        module_id: "MOD-CORE"
+        description: "Core system libraries and utilities"
+      
+      - pattern: "^validation/.*"
+        module_id: "MOD-VALIDATION"
+        description: "Registry validation and policy enforcement"
+      
+      - pattern: "^registry/.*"
+        module_id: "MOD-REGISTRY"
+        description: "Registry storage and schemas"
+      
+      - pattern: "^automation/.*"
+        module_id: "MOD-AUTOMATION"
+        description: "CLI tools and automation scripts"
+      
+      - pattern: "^tests/.*"
+        module_id: "MOD-TESTS"
+        description: "Test suites and fixtures"
+      
+      - pattern: "^docs/.*"
+        module_id: "MOD-DOCS"
+        description: "Documentation and specifications"
+      
+      - pattern: "^contracts/.*"
+        module_id: "MOD-CONTRACTS"
+        description: "Policy contracts and schemas"
+      
+      - pattern: "^hooks/.*"
+        module_id: "MOD-HOOKS"
+        description: "Git hooks and pre-commit scripts"
+      
+      - pattern: "^monitoring/.*"
+        module_id: "MOD-MONITORING"
+        description: "Monitoring and observability"
+    condition: "relative_path matches pattern"
+    module_id_source: "path_rule"
+    description: "Path-based module inference from directory structure"
+    behavior: "Match relative_path against regex patterns in order"
+  
+  - level: 4
+    source: default
+    module_id: null
+    module_id_source: "unassigned"
+    condition: "always (fallback)"
+    description: "No module assignment rule matched"
+    behavior: "Leave module_id as null"
+
+# Module manifest schema (.module.yaml format)
+module_manifest_schema:
+  required_fields:
+    - module_id
+  
+  optional_fields:
+    - module_name
+    - module_version
+    - module_owner
+    - module_description
+    - module_dependencies
+  
+  example: |
+    # .module.yaml
+    module_id: MOD-IDENTITY-CORE
+    module_name: "Identity System Core"
+    module_version: "2.1.0"
+    module_owner: "platform-team"
+    module_description: "Core identity allocation and registry management"
+    module_dependencies:
+      - MOD-CORE
+      - MOD-REGISTRY
+  
+  validation:
+    module_id_format: "MOD-[A-Z0-9_-]+"
+    module_id_length: [4, 64]
+    manifest_file_name: ".module.yaml OR module.yaml"
+    encoding: "UTF-8"
+
+# Path rule algorithm details
+path_rule_algorithm:
+  steps:
+    - description: "Normalize relative_path"
+      actions:
+        - "Convert backslashes to forward slashes"
+        - "Remove leading ./ prefix"
+        - "Remove trailing slash"
+    
+    - description: "Extract top-level directory"
+      actions:
+        - "Split path by /"
+        - "Take first component"
+    
+    - description: "Match against regex patterns"
+      actions:
+        - "Iterate patterns in order"
+        - "Use re.match(pattern, relative_path)"
+        - "Return module_id from first match"
+    
+    - description: "Fallback to unassigned"
+      actions:
+        - "If no match, module_id = null"
+        - "module_id_source = 'unassigned'"
+  
+  case_sensitivity: "Case-sensitive on Unix, case-insensitive on Windows"
+  pattern_order: "First match wins (order matters)"
+
+# Override behavior
+override_behavior:
+  precedence: "module_id_override takes absolute precedence over manifest and path rules"
+  scanner_behavior: "Scanner MUST NOT overwrite module_id when module_id_override is set"
+  validation: "Validator MUST check that override references a valid module (if module registry exists)"
+  clear_override: "Set module_id_override to null explicitly to remove override"
+  use_cases:
+    - "Temporary exception to module structure"
+    - "File in wrong directory but conceptually belongs to different module"
+    - "Testing module reassignment without moving files"
+
+# Manifest behavior
+manifest_behavior:
+  search_order: "Check current directory first, then parent, then grandparent"
+  closest_wins: "Use manifest from closest ancestor directory"
+  caching: "Manifest content should be cached per scan to avoid repeated reads"
+  invalid_manifest: "If manifest file exists but is invalid YAML or missing module_id, skip to next precedence level"
+  conflict_resolution: "Multiple files in same directory inherit same module_id from shared manifest"
+
+# Validation rules
+validation_rules:
+  - name: "module_id_format"
+    rule: "module_id matches pattern ^MOD-[A-Z0-9_-]+$ (if not null)"
+    enforcement: "reject"
+  
+  - name: "module_id_source_enum"
+    rule: "module_id_source in [override, manifest, path_rule, unassigned]"
+    enforcement: "reject"
+  
+  - name: "override_requires_value"
+    rule: "if module_id_source == 'override', module_id_override MUST be present"
+    enforcement: "reject"
+  
+  - name: "manifest_file_exists"
+    rule: "if module_id_source == 'manifest', manifest file MUST have existed at scan time"
+    enforcement: "warn (manifest may have been deleted after scan)"
+  
+  - name: "module_id_matches_override"
+    rule: "if module_id_override is not null, module_id MUST equal module_id_override"
+    enforcement: "reject"
+
+# Conflict resolution scenarios
+conflict_resolution:
+  - scenario: "Multiple files in same directory"
+    resolution: "All files get same module_id (from manifest or path rule)"
+    rationale: "Directory structure implies cohesive module"
+  
+  - scenario: "Conflicting manifests in directory tree"
+    resolution: "Use closest ancestor manifest"
+    rationale: "More specific overrides more general"
+  
+  - scenario: "Invalid manifest file"
+    resolution: "Skip to next precedence level, log warning"
+    rationale: "Don't fail scan due to malformed manifest"
+  
+  - scenario: "Path matches multiple regex patterns"
+    resolution: "Use first match (pattern order matters)"
+    rationale: "Deterministic precedence, no ambiguity"
+
+# Module registry (optional future enhancement)
+module_registry:
+  description: "Optional centralized module catalog for validation"
+  use_case: "Validate that module_id references exist, enforce module constraints"
+  format: "YAML or JSON file with module definitions"
+  location: "contracts/MODULE_REGISTRY.yaml"
+  current_status: "Not implemented (validation skipped if registry doesn't exist)"
+
+# Usage examples
+usage_examples:
+  override_example:
+    relative_path: "docs/legacy_doc.md"
+    module_id_override: "MOD-LEGACY"
+    effective_module_id: "MOD-LEGACY"
+    module_id_source: "override"
+    rationale: "File physically in docs/ but conceptually part of legacy module"
+  
+  manifest_example:
+    relative_path: "core/identity/allocator.py"
+    manifest_path: "core/.module.yaml"
+    manifest_content: "module_id: MOD-IDENTITY-CORE"
+    effective_module_id: "MOD-IDENTITY-CORE"
+    module_id_source: "manifest"
+    rationale: "Explicit declaration in core module manifest"
+  
+  path_rule_example:
+    relative_path: "validation/validate_write_policy.py"
+    matching_pattern: "^validation/.*"
+    effective_module_id: "MOD-VALIDATION"
+    module_id_source: "path_rule"
+    rationale: "Path-based inference from directory structure"
+  
+  unassigned_example:
+    relative_path: "scratch/temp_file.txt"
+    effective_module_id: null
+    module_id_source: "unassigned"
+    rationale: "No rule matched, file not part of any module"
+
+# Governance
+governance:
+  policy_owner: "System Architect"
+  review_cycle: "Quarterly"
+  change_process: "Adding path rules requires pattern testing and conflict analysis"
+  approval_required: true
+  
+  path_rule_additions:
+    process: "Propose new pattern with module_id, test against existing paths for conflicts"
+    approval: "System Architect review"
+    testing: "Run scanner with new rule on full codebase, verify no unintended changes"
+  
+  manifest_schema_changes:
+    process: "Update schema, provide migration guide for existing manifests"
+    approval: "System Architect + Module owners"
+    versioning: "Manifests include schema_version field for forward compatibility"
+
+# Performance considerations
+performance:
+  manifest_caching:
+    description: "Cache manifest file content per scan to avoid repeated file I/O"
+    implementation: "Dictionary keyed by directory path"
+    invalidation: "Clear cache between scans"
+  
+  regex_compilation:
+    description: "Compile path rule patterns once at scan initialization"
+    implementation: "Use re.compile() and store compiled patterns"
+    benefit: "Avoid recompiling patterns for every file"
+  
+  search_path_optimization:
+    description: "Stop searching at first found manifest"
+    implementation: "Iterate search paths in order, return immediately on first match"
+    benefit: "Minimize filesystem operations"
+
+# References
+references:
+  write_policy: "contracts/2026012120420001_UNIFIED_SSOT_REGISTRY_WRITE_POLICY.yaml"
+  registry_schema: "registry/2026012014470001_unified_ssot_registry.schema.json"
+  implementation_plan: "docs/2026012102510001_UNIFIED_SSOT_REGISTRY_IMPLEMENTATION_PLAN.md"
