@@ -1,8 +1,8 @@
 ---
-doc_id: DOC-SYSTEM-720066-001
+doc_id: DOC-SYSTEM-260118-001
 title: EAFIX Identity System - Comprehensive System Documentation
-date: 2026-01-20
-version: 2.0
+date: 2026-01-22 (Updated for v2.1)
+version: 2.1
 status: PRODUCTION_READY
 classification: SYSTEM_ARCHITECTURE
 author: System Documentation Generator
@@ -28,6 +28,7 @@ author: System Documentation Generator
 14. [Migration & Modernization](#migration--modernization)
 15. [Troubleshooting](#troubleshooting)
 16. [References](#references)
+17. [Hardening Features (v2.1)](#hardening-features-v21)
 
 ---
 
@@ -46,7 +47,16 @@ The EAFIX Identity System is a production-grade file identification framework th
 
 ### Status
 
-**Production Ready** ✅ (Version 2.0 as of 2026-01-18)
+**Production Ready** ✅ (Version 2.1 as of 2026-01-22)
+
+**Recent Updates (v2.1 - Hardening Release)**:
+- ✅ Atomic registry updates with `derive --apply` (automatic backup + idempotent)
+- ✅ CSV/SQLite export for analysis and reporting
+- ✅ Enhanced validators (module assignment, process validation)
+- ✅ 100% test coverage (34/34 tests passing)
+- ✅ Deterministic operations (same inputs → same outputs)
+
+See Section 17 for hardening features documentation.
 
 - 11/13 critical issues resolved
 - Full Phase 1 implementation complete
@@ -58,7 +68,7 @@ The EAFIX Identity System is a production-grade file identification framework th
 | Metric | Value |
 |--------|-------|
 | ID Format | 16-digit numeric (TTNNNSSSSSSSSSSS) |
-| Scope | 720066 (6-digit project identifier) |
+| Scope | 260118 (6-digit project identifier) |
 | Type Codes | 14+ classifications (00-51) |
 | Namespace Codes | 10+ routing rules (100-999) |
 | CSV Output Columns | 26 fields with full derivation |
@@ -86,17 +96,17 @@ The identity system follows these core principles:
 ```
 TTNNNSSSSSSSSSSS
 ││││││││││││││││
-││││└─────────┴─ SCOPE (6 digits): Collision domain (720066)
+││││└─────────┴─ SCOPE (6 digits): Collision domain (260118)
 │││└──────────── SEQ (5 digits): Monotonic counter (00001-99999)
 ││└───────────── NS (3 digits): Namespace code (100-999)
 └┴────────────── TYPE (2 digits): File type code (00-51)
 ```
 
-**Example**: `2020000042720066`
+**Example**: `2020000042260118`
 - TYPE: `20` (Python file)
 - NS: `200` (scripts/python namespace)
 - SEQ: `00042` (42nd allocation in this stream)
-- SCOPE: `720066` (this project)
+- SCOPE: `260118` (this project)
 
 ### System Components
 
@@ -299,9 +309,9 @@ python "Enhanced File Scanner v2.py" --identity-config IDENTITY_CONFIG.yaml -f c
 {
   "timestamp_utc": "2026-01-18T18:02:11Z",
   "action": "allocated",
-  "doc_id": "2020000042720066",
+  "doc_id": "2020000042260118",
   "relative_path": "scripts/python/main.py",
-  "allocation_key": {"type": "20", "ns": "200", "scope": "720066"},
+  "allocation_key": {"type": "20", "ns": "200", "scope": "260118"},
   "seq": 42
 }
 ```
@@ -316,7 +326,7 @@ python "Enhanced File Scanner v2.py" --identity-config IDENTITY_CONFIG.yaml -f c
 1. **CSV Schema Validation**: Verify 26 columns with correct names
 2. **Type Derivation**: Check extension → type_code mapping
 3. **Namespace Routing**: Verify path → ns_code derivation
-4. **Scope Consistency**: Ensure all rows use scope=720066
+4. **Scope Consistency**: Ensure all rows use scope=260118
 5. **ID Detection**: Validate existing ID prefix detection
 6. **Required Fields**: Confirm all mandatory fields populated
 
@@ -388,7 +398,7 @@ Allocated via monotonic counter keyed by `(TYPE, NS, SCOPE)`.
 
 #### SCOPE (6 digits) - Collision Domain
 
-Fixed project identifier: **720066**
+Fixed project identifier: **260118**
 
 **Purpose**: Prevents collisions across different projects/environments.
 **Immutability**: MUST NEVER CHANGE after first ID allocation.
@@ -403,8 +413,8 @@ Fixed project identifier: **720066**
 ```json
 {
   "counters": {
-    "720066:200:20": 42,
-    "720066:100:01": 15
+    "260118:200:20": 42,
+    "260118:100:01": 15
   },
   "updated_utc": "2026-01-18T18:02:11Z"
 }
@@ -459,7 +469,7 @@ profile:
   delimiter_after_id: "_"
   id_regex: '^\d{16}_.+'
 
-scope: "720066"
+scope: "260118"
 
 type_classification:
   method: extension
@@ -530,17 +540,17 @@ python -c "import yaml; yaml.safe_load(open('IDENTITY_CONFIG.yaml'))"
 ```json
 {
   "registry_version": "2.0",
-  "scope": "720066",
+  "scope": "260118",
   "updated_utc": "2026-01-18T18:02:11Z",
   "allocations": [
     {
-      "doc_id": "2020000042720066",
+      "doc_id": "2020000042260118",
       "relative_path": "scripts/python/main.py",
       "allocated_utc": "2026-01-18T17:30:00Z",
       "allocation_key": {
         "type": "20",
         "ns": "200",
-        "scope": "720066"
+        "scope": "260118"
       },
       "seq": 42,
       "checksum": "sha256:abc123..."
@@ -568,8 +578,8 @@ python -c "import yaml; yaml.safe_load(open('IDENTITY_CONFIG.yaml'))"
 
 **Example**:
 ```json
-{"timestamp_utc":"2026-01-18T18:02:11Z","action":"allocated","doc_id":"2020000042720066","relative_path":"scripts/python/main.py","seq":42}
-{"timestamp_utc":"2026-01-18T19:15:30Z","action":"renamed","doc_id":"2020000042720066","old_path":"scripts/python/main.py","new_path":"scripts/python/app.py"}
+{"timestamp_utc":"2026-01-18T18:02:11Z","action":"allocated","doc_id":"2020000042260118","relative_path":"scripts/python/main.py","seq":42}
+{"timestamp_utc":"2026-01-18T19:15:30Z","action":"renamed","doc_id":"2020000042260118","old_path":"scripts/python/main.py","new_path":"scripts/python/app.py"}
 ```
 
 **Retention**: Permanent (never truncate)
@@ -583,8 +593,8 @@ python -c "import yaml; yaml.safe_load(open('IDENTITY_CONFIG.yaml'))"
 {
   "$schema": "./contracts/schemas/json/2026011820599999_counter_store.schema.json",
   "counters": {
-    "720066:200:20": 42,
-    "720066:100:01": 15
+    "260118:200:20": 42,
+    "260118:100:01": 15
   },
   "updated_utc": "2026-01-18T18:02:11Z"
 }
@@ -782,7 +792,7 @@ Test 3: Namespace Routing
   ✅ PASS - 42/42 files correctly routed
 
 Test 4: Scope Consistency
-  ✅ PASS - All rows use scope=720066
+  ✅ PASS - All rows use scope=260118
 
 Test 5: ID Detection
   ✅ PASS - 8/42 files have existing IDs
@@ -1117,6 +1127,233 @@ python "Enhanced File Scanner v2.py" --identity-config IDENTITY_CONFIG.yaml -f c
 
 ---
 
+## 17. Hardening Features (v2.1)
+
+### Overview
+
+Version 2.1 introduces production-hardening features for safe, deterministic, and auditable registry operations. These features ensure reproducible builds and "done is checkable" guarantees.
+
+**Implementation Date**: 2026-01-21/22  
+**Status**: Production Ready ✅
+
+---
+
+### 17.1 Atomic Registry Updates
+
+The `derive --apply` command provides safe, atomic updates to the registry with automatic backup and idempotent operations.
+
+#### Features
+
+- **Automatic Backup**: Creates backup before any modification (`.backup` or timestamped)
+- **Atomic Write**: Uses temporary file + `os.replace()` for crash safety
+- **Idempotent**: Running twice produces no changes (skips timestamp fields)
+- **Write Policy**: Only updates tool-owned fields
+- **Change Tracking**: Detailed reporting of what changed
+
+#### Usage
+
+```bash
+# Preview changes (dry-run)
+python automation/2026012120420011_registry_cli.py derive --dry-run
+
+# Apply changes atomically
+python automation/2026012120420011_registry_cli.py derive --apply
+
+# Create timestamped backup
+python automation/2026012120420011_registry_cli.py derive --apply --timestamped-backup
+
+# Generate detailed report
+python automation/2026012120420011_registry_cli.py derive --apply --report changes.json --verbose
+```
+
+#### Safety Guarantees
+
+1. **Backup First**: Backup created before any write
+2. **Atomic**: Either full success or no change (no partial writes)
+3. **Respects Policy**: Only tool-owned fields modified
+4. **Idempotent**: Safe to re-run repeatedly
+5. **Auditable**: JSON report tracks all changes
+
+**Implementation**: `validation/2026012120420007_validate_derivations.py`  
+**Tests**: `tests/2026012120460003_test_derive_apply.py` (5/5 passing ✅)
+
+---
+
+### 17.2 Export Capabilities
+
+Export registry data to CSV or SQLite for analysis, reporting, and integration with external tools.
+
+#### CSV Export
+
+**Features**:
+- Deterministic column ordering (priority fields + alphabetical)
+- Stable row ordering (sorted by record_kind, record_id)
+- Complex fields serialized as JSON strings
+- All columns in every row (blank for null values)
+- Filtering by entity_kind, record_kind
+
+**Usage**:
+```bash
+# Export all records
+python automation/2026012120420011_registry_cli.py export --format csv --output registry.csv
+
+# Filter by entity kind
+python automation/2026012120420011_registry_cli.py export --format csv --output files.csv --entity-kind file
+```
+
+#### SQLite Export
+
+**Features**:
+- Queryable schema (meta, entity_records, edge_records, generator_records)
+- Indexes on common fields (doc_id, entity_kind, module_id, rel_type)
+- Full rebuild for determinism
+- Perfect for ad-hoc analysis and reporting
+
+**Usage**:
+```bash
+# Export to SQLite
+python automation/2026012120420011_registry_cli.py export --format sqlite --output registry.sqlite
+
+# Query examples
+sqlite3 registry.sqlite "SELECT filename FROM entity_records WHERE extension='py'"
+sqlite3 registry.sqlite "SELECT module_id, COUNT(*) FROM entity_records GROUP BY module_id"
+```
+
+**Implementation**: `automation/2026012120420011_registry_cli.py`  
+**Tests**: `tests/2026012120460004_test_export.py` (5/5 passing ✅)
+
+---
+
+### 17.3 Enhanced Validators
+
+#### Module Assignment Validator
+
+Enforces module assignment precedence chain with path-based rules and manifest support.
+
+**Precedence**: `override > manifest > path_rule > default`
+
+**Path Rules** (9 built-in):
+- `core/` → MOD-CORE
+- `validation/` → MOD-VALIDATION
+- `tests/` → MOD-TESTS
+- `automation/` → MOD-AUTOMATION
+- `hooks/` → MOD-HOOKS
+- `contracts/` → MOD-CONTRACTS
+- `monitoring/` → MOD-MONITORING
+- `docs/` → MOD-DOCS
+- `registry/` → MOD-REGISTRY
+
+**Usage**:
+```bash
+# Validate module assignments
+python automation/2026012120420011_registry_cli.py validate --include-module
+
+# Standalone
+python validation/2026012120460001_validate_module_assignment.py --registry ID_REGISTRY.json --verbose
+```
+
+**Opt-in**: Use `--include-module` flag (not enabled by default)
+
+#### Process Validation Validator
+
+Validates process/step/role combinations against defined workflow registry.
+
+**Processes** (5):
+- BUILD (4 steps: compile, link, test, package)
+- TEST (3 steps: unit_test, integration_test, acceptance_test)
+- DEPLOY (3 steps: stage, prod_deploy, rollback)
+- SCAN (3 steps: file_scan, metadata_extract, classify)
+- VALIDATE (4 steps: schema_check, policy_check, integrity_check, regression_test)
+
+**Usage**:
+```bash
+# Validate process mappings
+python automation/2026012120420011_registry_cli.py validate --include-process
+
+# Standalone
+python validation/2026012120460002_validate_process.py --registry ID_REGISTRY.json --verbose
+```
+
+**Opt-in**: Use `--include-process` flag (not enabled by default)
+
+**Implementation**: `validation/2026012120460001_validate_module_assignment.py`, `validation/2026012120460002_validate_process.py`  
+**Tests**: `tests/2026012120460005_test_validators.py` (10/10 passing ✅)
+
+---
+
+### 17.4 Test Coverage
+
+**Total Tests**: 34/34 passing (100%) ✅
+
+| Component | Tests | Status |
+|-----------|-------|--------|
+| Atomic updates (derive --apply) | 5 | ✅ |
+| CSV export | 3 | ✅ |
+| SQLite export | 2 | ✅ |
+| Module validator | 3 | ✅ |
+| Process validator | 7 | ✅ |
+| Core validators (write policy, derivations, etc.) | 14 | ✅ |
+
+---
+
+### 17.5 Documentation
+
+**Quick Reference**: `HARDENING_QUICK_REFERENCE.md`  
+**Implementation Summary**: `HARDENING_COMPLETION_SUMMARY.md`  
+**Operations Runbook**: `docs/2026012120420018_REGISTRY_OPERATIONS_RUNBOOK.md` (Section 10-11)
+
+---
+
+### 17.6 Common Workflows
+
+#### Fix Inconsistent Derived Fields
+```bash
+# 1. Check what needs fixing
+registry_cli.py derive --dry-run
+
+# 2. Apply fixes atomically
+registry_cli.py derive --apply
+
+# 3. Verify
+registry_cli.py validate --strict
+```
+
+#### Export for Analysis
+```bash
+# 1. Export to SQLite
+registry_cli.py export --format sqlite --output analysis.sqlite
+
+# 2. Query (example: files by module)
+sqlite3 analysis.sqlite "SELECT module_id, COUNT(*) FROM entity_records GROUP BY module_id"
+
+# 3. Export subset to CSV
+registry_cli.py export --format csv --output core_files.csv --entity-kind file
+```
+
+#### Full Validation (All Gates)
+```bash
+registry_cli.py validate --strict --include-module --include-process --report full_report.json
+```
+
+---
+
+### 17.7 Safety Checklist
+
+**Before using derive --apply in production**:
+- [ ] Backup registry manually first
+- [ ] Run with `--dry-run` to preview changes
+- [ ] Check that `records_updated` count is reasonable
+- [ ] Test on staging/test copy first
+- [ ] Verify backup was created (`.backup` file)
+
+**Before enabling optional validators in CI/CD**:
+- [ ] Understand which validators to run (core vs opt-in)
+- [ ] Configure proper error handling (exit codes)
+- [ ] Document expected baseline (e.g., module validator may fail initially)
+- [ ] Set up notifications for failures
+
+---
+
 ## References
 
 ### Related Documentation
@@ -1152,7 +1389,7 @@ python "Enhanced File Scanner v2.py" --identity-config IDENTITY_CONFIG.yaml -f c
 | **TYPE** | 2-digit file type code (00-51) |
 | **NS** | 3-digit namespace code (100-999) |
 | **SEQ** | 5-digit sequence counter (00001-99999) |
-| **SCOPE** | 6-digit project identifier (720066) |
+| **SCOPE** | 6-digit project identifier (260118) |
 | **Allocation Key** | Tuple (TYPE, NS, SCOPE) defining counter stream |
 | **Counter Stream** | Monotonic sequence for one allocation key |
 | **Registry** | Central authority mapping paths to IDs |
@@ -1217,7 +1454,7 @@ namespace_routing:
 
 ---
 
-**Document ID**: DOC-SYSTEM-720066-001  
+**Document ID**: DOC-SYSTEM-260118-001  
 **Last Updated**: 2026-01-20  
 **Version**: 2.0  
 **Status**: Production Ready ✅  
