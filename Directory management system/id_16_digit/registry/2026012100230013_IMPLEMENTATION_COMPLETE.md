@@ -466,9 +466,179 @@ python automation/2026012100230010_generator_runner.py registry/ID_REGISTRY.json
 
 ---
 
+## Phase 5: Hardening Features (COMPLETE ✅)
+
+**Implementation Date**: 2026-01-21T20:00 - 22:50  
+**Git Commits**: 10bf509, 39ef561, 371cb0c
+
+### Artifacts Created
+
+1. **validation/2026012120460001_validate_module_assignment.py**
+   - Location: `validation/`
+   - Purpose: Enforce module assignment precedence chain
+   - Size: 11,950 bytes
+   - Features: Override > manifest > path_rule > default precedence
+   - Path Patterns: 9 built-in rules (core/, validation/, tests/, automation/, etc.)
+
+2. **validation/2026012120460002_validate_process.py**
+   - Location: `validation/`
+   - Purpose: Validate process/step/role combinations
+   - Size: 10,235 bytes
+   - Features: 5 processes (BUILD, TEST, DEPLOY, SCAN, VALIDATE)
+   - Steps: 17 process steps with allowed roles
+   - Validation: Required field checks, combination rules
+
+3. **tests/2026012120460003_test_derive_apply.py**
+   - Location: `tests/`
+   - Purpose: Test atomic registry updates
+   - Size: 9,647 bytes
+   - Tests: 5 (backup creation, idempotency, derivations, write policy, reporting)
+   - Result: ✅ 5/5 passing
+
+4. **tests/2026012120460004_test_export.py**
+   - Location: `tests/`
+   - Purpose: Test CSV/SQLite export functionality
+   - Size: 12,658 bytes
+   - Tests: 5 (columns, ordering, serialization, filtering, schema)
+   - Result: ✅ 5/5 passing
+
+5. **tests/2026012120460005_test_validators.py**
+   - Location: `tests/`
+   - Purpose: Test module/process validators
+   - Size: 11,734 bytes
+   - Tests: 10 (precedence, path rules, conflicts, process validation, integration)
+   - Result: ✅ 10/10 passing
+
+### Updated Files
+
+1. **automation/2026012120420011_registry_cli.py** (+350 lines)
+   - Added `derive --apply` command implementation
+   - Added CSV export method (`_export_csv`)
+   - Added SQLite export method (`_export_sqlite`)
+   - Integrated module/process validators (`--include-module`, `--include-process`)
+   - Added JSON report generation (`--report` flag)
+   - Enhanced error handling and verbose output
+
+2. **validation/2026012120420007_validate_derivations.py** (+160 lines)
+   - Added `apply_derivations()` method for atomic updates
+   - Implemented backup creation (`.backup` or timestamped)
+   - Atomic write via temp file + `os.replace()`
+   - Idempotency fix (skip timestamp fields: created_utc, updated_utc, etc.)
+   - Change tracking and reporting
+   - Respects write policy (only tool-owned fields)
+
+3. **docs/2026012120420018_REGISTRY_OPERATIONS_RUNBOOK.md** (+380 lines)
+   - Section 10: Hardening Features
+     - 10.1: derive --apply with atomic writes
+     - 10.2: CSV/SQLite export
+     - 10.3: Module assignment validator
+     - 10.4: Process validation validator
+   - Section 11: Implementation Notes
+     - Atomic write + backup strategy
+     - Export determinism rules
+     - Validator gating (opt-in flags)
+   - Updated changelog (v1.1 entry)
+
+### Features Implemented
+
+#### A) Atomic Registry Updates
+**Command**: `registry_cli.py derive --apply`
+
+- ✅ Backup created before any modification (`.backup` or `--timestamped-backup`)
+- ✅ Atomic write via temporary file + `os.replace()`
+- ✅ Idempotent (running twice produces no changes)
+- ✅ Respects write policy (only tool-owned fields)
+- ✅ Change tracking and reporting (`--report changes.json`)
+- ✅ Dry-run mode for safety (`--dry-run`)
+
+#### B) Export Capabilities
+
+**CSV Export**:
+- ✅ Deterministic column order (priority + alphabetical)
+- ✅ Stable row ordering (sorted by record_kind, record_id)
+- ✅ Complex fields as JSON strings
+- ✅ Filtering by entity_kind, record_kind
+
+**SQLite Export**:
+- ✅ Queryable schema (meta, entity_records, edge_records, generator_records)
+- ✅ Indexes on common fields (doc_id, entity_kind, module_id, rel_type)
+- ✅ Full rebuild for determinism
+- ✅ Perfect for ad-hoc analysis
+
+#### C) Enhanced Validation
+
+**Module Assignment Validator**:
+- ✅ Precedence chain: override > manifest > path_rule > default
+- ✅ 9 built-in path patterns
+- ✅ Conflict detection
+- ✅ Opt-in via `--include-module` flag
+
+**Process Validation Validator**:
+- ✅ 5 processes, 17 steps
+- ✅ Role validation per step
+- ✅ Required field checks
+- ✅ Opt-in via `--include-process` flag
+
+### Test Coverage
+
+**Phase 5 Tests (20 new)**:
+- derive --apply: 5/5 passing ✅
+- CSV/SQLite export: 5/5 passing ✅
+- Module/process validators: 10/10 passing ✅
+
+**Total Tests**: 34/34 passing (100%) ✅
+- Phase 1-4 tests: 14/14 passing
+- Phase 5 tests: 20/20 passing
+
+### Documentation Created
+
+1. **HARDENING_COMPLETION_SUMMARY.md** (8.7 KB)
+   - Detailed implementation summary
+   - Feature descriptions
+   - Test results
+   - Git commits
+
+2. **HARDENING_QUICK_REFERENCE.md** (5.6 KB)
+   - Quick command reference
+   - Common workflows
+   - Troubleshooting tips
+   - Safety checklist
+
+3. **Documentation Consolidation** (3 files, 34.4 KB)
+   - DOCUMENTATION_CONSOLIDATION_RECOMMENDATIONS.md
+   - DOCUMENTATION_CONSOLIDATION_REVIEW.md
+   - DOCUMENTATION_CONSOLIDATION_EXECUTION_SUMMARY.md
+
+**Total New Documentation**: +48.7 KB
+
+### Success Criteria - All Met ✅
+
+| Criterion | Status |
+|-----------|--------|
+| derive --apply atomic + backup | ✅ |
+| CSV export deterministic | ✅ |
+| SQLite export queryable | ✅ |
+| Module validator enforces policy | ✅ |
+| Process validator enforces policy | ✅ |
+| Running twice = identical output | ✅ |
+| All tests passing (34/34) | ✅ |
+| Documentation complete | ✅ |
+
+### Git Commits
+
+- `10bf509`: Main hardening implementation (5 files + 3 updates)
+- `39ef561`: Completion summary document
+- `371cb0c`: Quick reference card
+- `e823166`: Documentation consolidation (4 files archived)
+- `ab2bca9`: Consolidation execution summary
+
+✅ **Phase 5 Complete**: 2026-01-21T22:50:00Z
+
+---
+
 ## Conclusion
 
-**Status**: ✅ COMPLETE
+**Status**: ✅ COMPLETE (Phases 1-5)
 
 The Unified SSOT Registry system is now fully operational with:
 
@@ -476,6 +646,7 @@ The Unified SSOT Registry system is now fully operational with:
 - **Quality gates**: Edge evidence ensures auditability
 - **Formula engine**: Generators enable reproducible builds
 - **Module/process mapping**: Optional features support advanced workflows
+- **Hardening features**: Atomic updates, exports, enhanced validation (Phase 5)
 
 **"Done is checkable"** has been achieved:
 - Every change is validated against policies
