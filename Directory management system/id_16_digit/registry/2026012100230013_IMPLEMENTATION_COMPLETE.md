@@ -43,11 +43,12 @@ Successfully implemented complete deterministic SSOT registry system across all 
    - Size: 11,985 bytes
    - Derivations defined: 10 with validation constraints
 
-3. **2026012100230003_SCHEMA_AUTHORITY_POLICY.md**
+3. **2026012120420017_SCHEMA_AUTHORITY_POLICY.md** (supersedes 2026012100230003)
    - Location: `docs/`
    - Purpose: Governance for schema changes
-   - Size: 11,574 bytes
+   - Size: 10,640 bytes (updated version)
    - Defines: Enum management, versioning, change workflow
+   - Note: Initial version (2026012100230003) archived to `archive/superseded/`
 
 4. **2026012100230004_validate_write_policy.py**
    - Location: `validation/`
@@ -261,7 +262,8 @@ contracts/
 └── 2026012100230012_PROCESS_REGISTRY.yaml
 
 docs/
-└── 2026012100230003_SCHEMA_AUTHORITY_POLICY.md
+└── 2026012120420017_SCHEMA_AUTHORITY_POLICY.md (current version)
+    [2026012100230003 archived - see archive/superseded/]
 
 validation/
 ├── 2026012100230004_validate_write_policy.py

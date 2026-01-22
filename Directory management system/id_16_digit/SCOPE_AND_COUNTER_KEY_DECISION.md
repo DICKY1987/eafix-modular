@@ -2,7 +2,8 @@
 doc_id: DECISION-2026-01-21-001
 title: SCOPE Value and Counter Key Format - Authoritative Decision
 date: 2026-01-21T18:59:32Z
-status: REQUIRES_DECISION
+decision_date: 2026-01-21T19:30:00Z
+status: DECIDED
 classification: CRITICAL_SYSTEM_DECISION
 ---
 
@@ -10,9 +11,17 @@ classification: CRITICAL_SYSTEM_DECISION
 
 ## Executive Summary
 
-**Critical Issue**: The identity system has **two different SCOPE values** and **two different counter key formats** in active use, creating inconsistency across specifications and implementations.
+**Status**: ✅ DECIDED
 
-**This document requires immediate decision** to establish the authoritative standard.
+**Decisions Made (2026-01-21)**:
+1. **SCOPE Value**: `260118` - Represents project start date (Jan 18, 2026)
+2. **Counter Key Format**: `{SCOPE}:{NS}:{TYPE}` - Colon-separated, SCOPE-first
+
+**Rationale**:
+- **260118**: Already used by majority of files (23+), clear semantic meaning (project start date), minimal migration required
+- **SCOPE:NS:TYPE**: Matches SEQ_ALLOCATOR_SPEC.md (authoritative), aligns with ID segment order
+
+**Migration Completed**: All configs, registries, and affected files updated.
 
 ---
 
@@ -105,7 +114,8 @@ def _get_counter_key(self, ns_code: str, type_code: str, scope: str) -> str:
 **Found in**:
 - `registry/ID_REGISTRY.json` (actual keys: `"999_01_260119"`, `"999_20_260119"`)
 - `2026011822020001_3_PHASE_MODERNIZATION_ROADMAP.md` line 149: "Key format: NS_TYPE_SCOPE"
-- `registry/2026012012110001_UNIFIED_SSOT_REGISTRY_ANALYSIS.md`: `"NS_TYPE_SCOPE"`
+- `archive/design-decisions/2026012012110001_UNIFIED_SSOT_REGISTRY_ANALYSIS.md`: `"NS_TYPE_SCOPE"`  
+  (Historical analysis that led to single unified registry design)
 
 ### Comparison
 
@@ -292,8 +302,35 @@ SCOPE-first keeps all counters for one project together, which is semantically c
 
 ---
 
-**Status**: AWAITING DECISION  
-**Decision Maker**: Project Lead / Technical Architect  
-**Deadline**: Before documentation consolidation begins  
-**Document Version**: 1.0  
-**Last Updated**: 2026-01-21T18:59:32Z
+## Decision Record
+
+**Decision Date**: 2026-01-21T19:30:00Z
+
+### Final Decisions
+
+| Decision | Value | Rationale |
+|----------|-------|-----------|
+| SCOPE Value | `260118` | Majority usage (23+ files), semantic meaning (project start date 2026-01-18), minimal migration |
+| Counter Key Format | `SCOPE:NS:TYPE` | Matches SEQ_ALLOCATOR_SPEC.md, aligns with ID segment order, standard hierarchical key format |
+
+### Changes Implemented
+
+1. **IDENTITY_CONFIG.yaml**: scope `720066` → `260118`
+2. **registry_store.py**: Counter key format updated to `f"{scope}:{ns_code}:{type_code}"`
+3. **counter_store.schema.json**: Pattern updated to `^[0-9]{6}:[0-9]{3}:[0-9]{2}$`
+4. **ID_REGISTRY.json**: scope and counter keys migrated
+5. **Files renamed**: 4 files with `260119` renamed to `260118`
+
+### Questions Answered
+
+1. **SCOPE Selection**: `260118` = Date 2026-01-18 (project start date)
+2. **File Migration**: Files with 260119 migrated to 260118; legacy 260118 files preserved
+3. **Backward Compatibility**: System maintains single SCOPE for new allocations; legacy files documented in registry
+
+---
+
+**Status**: ✅ DECIDED AND IMPLEMENTED
+**Decision Maker**: Project Lead
+**Decision Date**: 2026-01-21
+**Document Version**: 2.0
+**Last Updated**: 2026-01-21T19:30:00Z
