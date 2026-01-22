@@ -1,0 +1,625 @@
+registry_version: 1.0.0
+generated_at: '2026-01-22T01:16:49.916675Z'
+source: Derived from updated_trading_process_aligned.yaml
+doc_id: '2026012201111006'
+modules:
+- module_id: B1_MT4_ADAPTER_TRANSPORT
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 16
+  contract_boundaries:
+    in_types:
+    - ResolvedConfig
+    - RoutedOrderIntent
+    out_types: &id001
+    - AdapterAck
+    - BrokerOrderEnvelope
+  required_files:
+  - role: entrypoint
+    pattern: src/B1_MT4_ADAPTER_TRANSPORT/**/*.py
+    description: B1_MT4_ADAPTER_TRANSPORT implementation files
+  - role: test
+    pattern: tests/B1_MT4_ADAPTER_TRANSPORT/**/*.py
+    description: B1_MT4_ADAPTER_TRANSPORT test suite
+  - role: schema
+    pattern: schemas/B1_MT4_ADAPTER_TRANSPORT/**/*.json
+    description: B1_MT4_ADAPTER_TRANSPORT contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id001
+- module_id: B2_MT4_EA_EXECUTOR
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 17
+  contract_boundaries:
+    in_types:
+    - BrokerOrderEnvelope
+    out_types: &id002
+    - BrokerExecEvent (accept/fill/reject/close)
+    - EAHealth
+  required_files:
+  - role: entrypoint
+    pattern: src/B2_MT4_EA_EXECUTOR/**/*.py
+    description: B2_MT4_EA_EXECUTOR implementation files
+  - role: test
+    pattern: tests/B2_MT4_EA_EXECUTOR/**/*.py
+    description: B2_MT4_EA_EXECUTOR test suite
+  - role: schema
+    pattern: schemas/B2_MT4_EA_EXECUTOR/**/*.json
+    description: B2_MT4_EA_EXECUTOR contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id002
+- module_id: B3_EXEC_EVENT_NORMALIZER
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 18
+  contract_boundaries:
+    in_types:
+    - BrokerExecEvent
+    - ResolvedConfig
+    out_types: &id003
+    - ExecutionReport
+    - PositionSnapshot
+  required_files:
+  - role: entrypoint
+    pattern: src/B3_EXEC_EVENT_NORMALIZER/**/*.py
+    description: B3_EXEC_EVENT_NORMALIZER implementation files
+  - role: test
+    pattern: tests/B3_EXEC_EVENT_NORMALIZER/**/*.py
+    description: B3_EXEC_EVENT_NORMALIZER test suite
+  - role: schema
+    pattern: schemas/B3_EXEC_EVENT_NORMALIZER/**/*.json
+    description: B3_EXEC_EVENT_NORMALIZER contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id003
+- module_id: C1_BAR_BUILDER
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 8
+  contract_boundaries:
+    in_types:
+    - MarketTick
+    - ResolvedConfig
+    out_types: &id004
+    - Bar
+  required_files:
+  - role: entrypoint
+    pattern: src/C1_BAR_BUILDER/**/*.py
+    description: C1_BAR_BUILDER implementation files
+  - role: test
+    pattern: tests/C1_BAR_BUILDER/**/*.py
+    description: C1_BAR_BUILDER test suite
+  - role: schema
+    pattern: schemas/C1_BAR_BUILDER/**/*.json
+    description: C1_BAR_BUILDER contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id004
+- module_id: C2_INDICATOR_ENGINE
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 9
+  contract_boundaries:
+    in_types:
+    - Bar
+    - ResolvedConfig
+    out_types: &id005
+    - IndicatorSnapshot
+  required_files:
+  - role: entrypoint
+    pattern: src/C2_INDICATOR_ENGINE/**/*.py
+    description: C2_INDICATOR_ENGINE implementation files
+  - role: test
+    pattern: tests/C2_INDICATOR_ENGINE/**/*.py
+    description: C2_INDICATOR_ENGINE test suite
+  - role: schema
+    pattern: schemas/C2_INDICATOR_ENGINE/**/*.json
+    description: C2_INDICATOR_ENGINE contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id005
+- module_id: C3_FEATURE_PACKAGER
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 10
+  contract_boundaries:
+    in_types:
+    - CalendarTrigger
+    - IndicatorSnapshot
+    - ResolvedConfig
+    out_types: &id006
+    - FeatureFrame
+  required_files:
+  - role: entrypoint
+    pattern: src/C3_FEATURE_PACKAGER/**/*.py
+    description: C3_FEATURE_PACKAGER implementation files
+  - role: test
+    pattern: tests/C3_FEATURE_PACKAGER/**/*.py
+    description: C3_FEATURE_PACKAGER test suite
+  - role: schema
+    pattern: schemas/C3_FEATURE_PACKAGER/**/*.json
+    description: C3_FEATURE_PACKAGER contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id006
+- module_id: D1_MARKET_FEED_ADAPTER
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 7
+  contract_boundaries:
+    in_types:
+    - RawTick
+    - ResolvedConfig
+    out_types: &id007
+    - MarketTick
+  required_files:
+  - role: entrypoint
+    pattern: src/D1_MARKET_FEED_ADAPTER/**/*.py
+    description: D1_MARKET_FEED_ADAPTER implementation files
+  - role: test
+    pattern: tests/D1_MARKET_FEED_ADAPTER/**/*.py
+    description: D1_MARKET_FEED_ADAPTER test suite
+  - role: schema
+    pattern: schemas/D1_MARKET_FEED_ADAPTER/**/*.json
+    description: D1_MARKET_FEED_ADAPTER contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id007
+- module_id: D2_CALENDAR_SOURCE_ADAPTER
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 3
+  contract_boundaries:
+    in_types:
+    - CalendarSourceConfig
+    - ScheduleTick
+    out_types: &id008
+    - CalendarRaw
+  required_files:
+  - role: entrypoint
+    pattern: src/D2_CALENDAR_SOURCE_ADAPTER/**/*.py
+    description: D2_CALENDAR_SOURCE_ADAPTER implementation files
+  - role: test
+    pattern: tests/D2_CALENDAR_SOURCE_ADAPTER/**/*.py
+    description: D2_CALENDAR_SOURCE_ADAPTER test suite
+  - role: schema
+    pattern: schemas/D2_CALENDAR_SOURCE_ADAPTER/**/*.json
+    description: D2_CALENDAR_SOURCE_ADAPTER contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id008
+- module_id: D3_CALENDAR_NORMALIZER
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 4
+  contract_boundaries:
+    in_types:
+    - CalendarRaw
+    - ResolvedConfig
+    out_types: &id009
+    - CalendarEvent (UTC timestamps, standardized impact, dedup keys)
+  required_files:
+  - role: entrypoint
+    pattern: src/D3_CALENDAR_NORMALIZER/**/*.py
+    description: D3_CALENDAR_NORMALIZER implementation files
+  - role: test
+    pattern: tests/D3_CALENDAR_NORMALIZER/**/*.py
+    description: D3_CALENDAR_NORMALIZER test suite
+  - role: schema
+    pattern: schemas/D3_CALENDAR_NORMALIZER/**/*.json
+    description: D3_CALENDAR_NORMALIZER contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id009
+- module_id: D4_CALENDAR_TRIGGER_BUILDER
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 6
+  contract_boundaries:
+    in_types:
+    - CalendarEvent
+    - ResolvedConfig
+    - ScheduleTick
+    out_types: &id010
+    - CalendarTrigger (symbol set
+    - suppression metadata)
+    - window
+  required_files:
+  - role: entrypoint
+    pattern: src/D4_CALENDAR_TRIGGER_BUILDER/**/*.py
+    description: D4_CALENDAR_TRIGGER_BUILDER implementation files
+  - role: test
+    pattern: tests/D4_CALENDAR_TRIGGER_BUILDER/**/*.py
+    description: D4_CALENDAR_TRIGGER_BUILDER test suite
+  - role: schema
+    pattern: schemas/D4_CALENDAR_TRIGGER_BUILDER/**/*.json
+    description: D4_CALENDAR_TRIGGER_BUILDER contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id010
+- module_id: E1_OUTCOME_BUCKETIZER
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 21
+  contract_boundaries:
+    in_types:
+    - ResolvedConfig
+    - TradeClosed
+    out_types: &id011
+    - OutcomeBucket
+  required_files:
+  - role: entrypoint
+    pattern: src/E1_OUTCOME_BUCKETIZER/**/*.py
+    description: E1_OUTCOME_BUCKETIZER implementation files
+  - role: test
+    pattern: tests/E1_OUTCOME_BUCKETIZER/**/*.py
+    description: E1_OUTCOME_BUCKETIZER test suite
+  - role: schema
+    pattern: schemas/E1_OUTCOME_BUCKETIZER/**/*.json
+    description: E1_OUTCOME_BUCKETIZER contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id011
+- module_id: E2_PROXIMITY_EVALUATOR
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 22
+  contract_boundaries:
+    in_types:
+    - CalendarEvent
+    - ClockTick
+    - ResolvedConfig
+    out_types: &id012
+    - EventProximity
+  required_files:
+  - role: entrypoint
+    pattern: src/E2_PROXIMITY_EVALUATOR/**/*.py
+    description: E2_PROXIMITY_EVALUATOR implementation files
+  - role: test
+    pattern: tests/E2_PROXIMITY_EVALUATOR/**/*.py
+    description: E2_PROXIMITY_EVALUATOR test suite
+  - role: schema
+    pattern: schemas/E2_PROXIMITY_EVALUATOR/**/*.json
+    description: E2_PROXIMITY_EVALUATOR contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id012
+- module_id: E3_MATRIX_LOOKUP
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 23
+  contract_boundaries:
+    in_types:
+    - EventProximity
+    - MatrixProfile
+    - OutcomeBucket
+    - ResolvedConfig
+    - SignalContext
+    out_types: &id013
+    - MatrixDecision (or MatrixFallbackUsed)
+  required_files:
+  - role: entrypoint
+    pattern: src/E3_MATRIX_LOOKUP/**/*.py
+    description: E3_MATRIX_LOOKUP implementation files
+  - role: test
+    pattern: tests/E3_MATRIX_LOOKUP/**/*.py
+    description: E3_MATRIX_LOOKUP test suite
+  - role: schema
+    pattern: schemas/E3_MATRIX_LOOKUP/**/*.json
+    description: E3_MATRIX_LOOKUP contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id013
+- module_id: E4_REENTRY_INTENT_BUILDER
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 24
+  contract_boundaries:
+    in_types:
+    - MatrixDecision
+    - ReentryChainState
+    - ResolvedConfig
+    out_types: &id014
+    - TradeIntent OR ReentrySuppressed
+  required_files:
+  - role: entrypoint
+    pattern: src/E4_REENTRY_INTENT_BUILDER/**/*.py
+    description: E4_REENTRY_INTENT_BUILDER implementation files
+  - role: test
+    pattern: tests/E4_REENTRY_INTENT_BUILDER/**/*.py
+    description: E4_REENTRY_INTENT_BUILDER test suite
+  - role: schema
+    pattern: schemas/E4_REENTRY_INTENT_BUILDER/**/*.json
+    description: E4_REENTRY_INTENT_BUILDER contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id014
+- module_id: F1_CONFIG_PREFERENCES
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 1
+  contract_boundaries:
+    in_types:
+    - ConfigSource (defaults
+    - overrides)
+    out_types: &id015
+    - ResolvedConfig (immutable snapshot)
+  required_files:
+  - role: entrypoint
+    pattern: src/F1_CONFIG_PREFERENCES/**/*.py
+    description: F1_CONFIG_PREFERENCES implementation files
+  - role: test
+    pattern: tests/F1_CONFIG_PREFERENCES/**/*.py
+    description: F1_CONFIG_PREFERENCES test suite
+  - role: schema
+    pattern: schemas/F1_CONFIG_PREFERENCES/**/*.json
+    description: F1_CONFIG_PREFERENCES contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id015
+- module_id: F2_EVENT_LOG
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 5
+  contract_boundaries:
+    in_types:
+    - CalendarEvent
+    out_types: &id016
+    - EventStream (calendar.* events)
+  required_files:
+  - role: entrypoint
+    pattern: src/F2_EVENT_LOG/**/*.py
+    description: F2_EVENT_LOG implementation files
+  - role: test
+    pattern: tests/F2_EVENT_LOG/**/*.py
+    description: F2_EVENT_LOG test suite
+  - role: schema
+    pattern: schemas/F2_EVENT_LOG/**/*.json
+    description: F2_EVENT_LOG contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id016
+- module_id: F3_CLOCK_SCHEDULER
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 2
+  contract_boundaries:
+    in_types:
+    - ResolvedConfig
+    out_types: &id017
+    - ScheduleTick
+  required_files:
+  - role: entrypoint
+    pattern: src/F3_CLOCK_SCHEDULER/**/*.py
+    description: F3_CLOCK_SCHEDULER implementation files
+  - role: test
+    pattern: tests/F3_CLOCK_SCHEDULER/**/*.py
+    description: F3_CLOCK_SCHEDULER test suite
+  - role: schema
+    pattern: schemas/F3_CLOCK_SCHEDULER/**/*.json
+    description: F3_CLOCK_SCHEDULER contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id017
+- module_id: O1_ORDER_ROUTER
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 15
+  contract_boundaries:
+    in_types:
+    - BrokerPolicy
+    - OrderIntent
+    - ResolvedConfig
+    out_types: &id018
+    - RoutedOrderIntent
+  required_files:
+  - role: entrypoint
+    pattern: src/O1_ORDER_ROUTER/**/*.py
+    description: O1_ORDER_ROUTER implementation files
+  - role: test
+    pattern: tests/O1_ORDER_ROUTER/**/*.py
+    description: O1_ORDER_ROUTER test suite
+  - role: schema
+    pattern: schemas/O1_ORDER_ROUTER/**/*.json
+    description: O1_ORDER_ROUTER contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id018
+- module_id: O2_OMS_STATE_MACHINE
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 19
+  contract_boundaries:
+    in_types:
+    - ExecutionReport
+    - PositionSnapshot
+    - ResolvedConfig
+    - RoutedOrderIntent
+    out_types: &id019
+    - OrderStateChanged
+    - PositionStateChanged
+    - TradeClosedRaw
+  required_files:
+  - role: entrypoint
+    pattern: src/O2_OMS_STATE_MACHINE/**/*.py
+    description: O2_OMS_STATE_MACHINE implementation files
+  - role: test
+    pattern: tests/O2_OMS_STATE_MACHINE/**/*.py
+    description: O2_OMS_STATE_MACHINE test suite
+  - role: schema
+    pattern: schemas/O2_OMS_STATE_MACHINE/**/*.json
+    description: O2_OMS_STATE_MACHINE contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id019
+- module_id: O3_TRADE_CLOSE_CLASSIFIER
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 20
+  contract_boundaries:
+    in_types:
+    - ResolvedConfig
+    - TradeClosedRaw
+    out_types: &id020
+    - TradeClosed
+  required_files:
+  - role: entrypoint
+    pattern: src/O3_TRADE_CLOSE_CLASSIFIER/**/*.py
+    description: O3_TRADE_CLOSE_CLASSIFIER implementation files
+  - role: test
+    pattern: tests/O3_TRADE_CLOSE_CLASSIFIER/**/*.py
+    description: O3_TRADE_CLOSE_CLASSIFIER test suite
+  - role: schema
+    pattern: schemas/O3_TRADE_CLOSE_CLASSIFIER/**/*.json
+    description: O3_TRADE_CLOSE_CLASSIFIER contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id020
+- module_id: P1_HEALTH_AGGREGATOR
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 26
+  contract_boundaries:
+    in_types:
+    - AdapterHealth
+    - ModuleHealth
+    - ResolvedConfig
+    out_types: &id021
+    - HealthReport
+  required_files:
+  - role: entrypoint
+    pattern: src/P1_HEALTH_AGGREGATOR/**/*.py
+    description: P1_HEALTH_AGGREGATOR implementation files
+  - role: test
+    pattern: tests/P1_HEALTH_AGGREGATOR/**/*.py
+    description: P1_HEALTH_AGGREGATOR test suite
+  - role: schema
+    pattern: schemas/P1_HEALTH_AGGREGATOR/**/*.json
+    description: P1_HEALTH_AGGREGATOR contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id021
+- module_id: R1_RISK_EVALUATOR
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 13
+  contract_boundaries:
+    in_types:
+    - PortfolioState
+    - ResolvedConfig
+    - RiskPolicy
+    - TradeIntent
+    out_types: &id022
+    - RiskDecision (APPROVE/REJECT
+    - reason codes
+    - sized params)
+  required_files:
+  - role: entrypoint
+    pattern: src/R1_RISK_EVALUATOR/**/*.py
+    description: R1_RISK_EVALUATOR implementation files
+  - role: test
+    pattern: tests/R1_RISK_EVALUATOR/**/*.py
+    description: R1_RISK_EVALUATOR test suite
+  - role: schema
+    pattern: schemas/R1_RISK_EVALUATOR/**/*.json
+    description: R1_RISK_EVALUATOR contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id022
+- module_id: R2_ORDER_INTENT_COMPILER
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 14
+  contract_boundaries:
+    in_types:
+    - ResolvedConfig
+    - RiskDecision
+    out_types: &id023
+    - OrderIntent
+  required_files:
+  - role: entrypoint
+    pattern: src/R2_ORDER_INTENT_COMPILER/**/*.py
+    description: R2_ORDER_INTENT_COMPILER implementation files
+  - role: test
+    pattern: tests/R2_ORDER_INTENT_COMPILER/**/*.py
+    description: R2_ORDER_INTENT_COMPILER test suite
+  - role: schema
+    pattern: schemas/R2_ORDER_INTENT_COMPILER/**/*.json
+    description: R2_ORDER_INTENT_COMPILER contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id023
+- module_id: S1_SIGNAL_ENGINE
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 11
+  contract_boundaries:
+    in_types:
+    - FeatureFrame
+    - PositionSummary
+    - ResolvedConfig
+    out_types: &id024
+    - Signal OR SignalSuppressed
+  required_files:
+  - role: entrypoint
+    pattern: src/S1_SIGNAL_ENGINE/**/*.py
+    description: S1_SIGNAL_ENGINE implementation files
+  - role: test
+    pattern: tests/S1_SIGNAL_ENGINE/**/*.py
+    description: S1_SIGNAL_ENGINE test suite
+  - role: schema
+    pattern: schemas/S1_SIGNAL_ENGINE/**/*.json
+    description: S1_SIGNAL_ENGINE contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id024
+- module_id: S2_INTENT_BUILDER
+  module_type: other
+  status: active
+  owner: system
+  purpose: Implements steps 12
+  contract_boundaries:
+    in_types:
+    - ResolvedConfig
+    - Signal
+    out_types: &id025
+    - TradeIntent
+  required_files:
+  - role: entrypoint
+    pattern: src/S2_INTENT_BUILDER/**/*.py
+    description: S2_INTENT_BUILDER implementation files
+  - role: test
+    pattern: tests/S2_INTENT_BUILDER/**/*.py
+    description: S2_INTENT_BUILDER test suite
+  - role: schema
+    pattern: schemas/S2_INTENT_BUILDER/**/*.json
+    description: S2_INTENT_BUILDER contract schemas
+  validation_rules:
+  - check: output_contracts_implemented
+    contracts: *id025
