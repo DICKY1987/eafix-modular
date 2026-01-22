@@ -1,0 +1,27 @@
+Step,Step Name,Module,Module Type,Inputs,Outputs,Entrypoint File,Has Implementation
+1,Resolve configuration snapshot,F1_CONFIG_PREFERENCES,other,ConfigSource (defaults + overrides),ResolvedConfig (immutable snapshot),,No
+2,Emit schedule tick (calendar polling cadence),F3_CLOCK_SCHEDULER,other,ResolvedConfig,ScheduleTick,services/calendar-ingestor/src/2099900093260118_main.py,Yes
+3,Poll calendar source(s),D2_CALENDAR_SOURCE_ADAPTER,other,CalendarSourceConfig + ScheduleTick,CalendarRaw,services/calendar-ingestor/src/2099900093260118_main.py,Yes
+4,Normalize raw calendar entries,D3_CALENDAR_NORMALIZER,other,CalendarRaw + ResolvedConfig,"CalendarEvent (UTC timestamps, standardized impact, dedup keys)",services/calendar-ingestor/src/2099900093260118_main.py,Yes
+5,Persist calendar events (append-only),F2_EVENT_LOG,other,CalendarEvent,EventStream (calendar.* events),services/calendar-ingestor/src/2099900093260118_main.py,Yes
+6,Build anticipation triggers from calendar,D4_CALENDAR_TRIGGER_BUILDER,other,CalendarEvent + ScheduleTick + ResolvedConfig,CalendarTrigger (symbol set + window + suppression metadata),services/calendar-ingestor/src/2099900093260118_main.py,Yes
+7,Ingest market ticks,D1_MARKET_FEED_ADAPTER,other,RawTick + ResolvedConfig,MarketTick,services/data-ingestor/src/2099900112260118_main.py,Yes
+8,Aggregate ticks into bars,C1_BAR_BUILDER,other,MarketTick + ResolvedConfig,Bar,,No
+9,Compute indicators,C2_INDICATOR_ENGINE,other,Bar + ResolvedConfig,IndicatorSnapshot,services/desktop-ui/2099900128260118_expiry_indicator_service.py,Yes
+10,Assemble strategy feature frame,C3_FEATURE_PACKAGER,other,IndicatorSnapshot + CalendarTrigger + ResolvedConfig,FeatureFrame,,No
+11,Generate signal (or suppression),S1_SIGNAL_ENGINE,other,FeatureFrame + PositionSummary + ResolvedConfig,Signal OR SignalSuppressed,compliance/auto-remediation/2099900012260118_remediation-engine.py,Yes
+12,Convert signal to trade intent,S2_INTENT_BUILDER,other,Signal + ResolvedConfig,TradeIntent,,No
+13,Evaluate risk and size,R1_RISK_EVALUATOR,other,TradeIntent + PortfolioState + RiskPolicy + ResolvedConfig,RiskDecision (APPROVE/REJECT + reason codes + sized params),,No
+14,Compile order intent,R2_ORDER_INTENT_COMPILER,other,RiskDecision + ResolvedConfig,OrderIntent,services/transport-router/src/2099900199260118_main.py,Yes
+15,Route order to broker,O1_ORDER_ROUTER,other,OrderIntent + BrokerPolicy + ResolvedConfig,RoutedOrderIntent,services/transport-router/src/2099900199260118_main.py,Yes
+16,Serialize and send to MT4 adapter,B1_MT4_ADAPTER_TRANSPORT,other,RoutedOrderIntent + ResolvedConfig,BrokerOrderEnvelope + AdapterAck,services/transport-router/src/2099900199260118_main.py,Yes
+17,EA executes broker order,B2_MT4_EA_EXECUTOR,other,BrokerOrderEnvelope,BrokerExecEvent (accept/fill/reject/close) + EAHealth,services/transport-router/src/2099900199260118_main.py,Yes
+18,Normalize broker events to canonical reports,B3_EXEC_EVENT_NORMALIZER,other,BrokerExecEvent + ResolvedConfig,ExecutionReport + PositionSnapshot,services/event-gateway/src/2099900141260118_main.py,Yes
+19,Apply execution reports to OMS state,O2_OMS_STATE_MACHINE,other,RoutedOrderIntent + ExecutionReport + PositionSnapshot + ResolvedConfig,OrderStateChanged + PositionStateChanged + TradeClosedRaw,,No
+20,Classify trade close and compute canonical PnL,O3_TRADE_CLOSE_CLASSIFIER,other,TradeClosedRaw + ResolvedConfig,TradeClosed,,No
+21,Bucketize outcome,E1_OUTCOME_BUCKETIZER,other,TradeClosed + ResolvedConfig,OutcomeBucket,,No
+22,Compute event proximity,E2_PROXIMITY_EVALUATOR,other,CalendarEvent + ClockTick + ResolvedConfig,EventProximity,services/event-gateway/src/2099900141260118_main.py,Yes
+23,Lookup matrix decision,E3_MATRIX_LOOKUP,other,OutcomeBucket + EventProximity + SignalContext + MatrixProfile + ResolvedConfig,MatrixDecision (or MatrixFallbackUsed),services/reentry-matrix-svc/src/2099900174260118_main.py,Yes
+24,Build reentry trade intent (or suppress),E4_REENTRY_INTENT_BUILDER,other,MatrixDecision + ReentryChainState + ResolvedConfig,TradeIntent OR ReentrySuppressed,services/reentry-engine/src/2099900166260118_main.py,Yes
+25,Loop: reentry intent follows same risk->order->route->transport->execute chain,(loop),unknown,TradeIntent from Step 24,"Either (a) new RoutedOrderIntent executed, producing new OutcomeBucket, or (b) suppression/cooldown state update",services/transport-router/src/2099900199260118_main.py,Yes
+26,Health aggregation + SLO evaluation,P1_HEALTH_AGGREGATOR,other,AdapterHealth + ModuleHealth + ResolvedConfig,HealthReport,services/telemetry-daemon/src/2099900192260118_main.py,Yes

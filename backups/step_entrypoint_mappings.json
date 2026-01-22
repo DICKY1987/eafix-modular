@@ -1,0 +1,392 @@
+{
+  "1": {
+    "step_name": "Resolve configuration snapshot",
+    "module_id": "F1_CONFIG_PREFERENCES",
+    "responsible": "configuration_service.py",
+    "candidates": [],
+    "recommended": null
+  },
+  "2": {
+    "step_name": "Emit schedule tick (calendar polling cadence)",
+    "module_id": "F3_CLOCK_SCHEDULER",
+    "responsible": "scheduler.py",
+    "candidates": [
+      {
+        "file": "services/calendar-ingestor/src/2099900093260118_main.py",
+        "filename": "2099900093260118_main.py",
+        "score": 20
+      },
+      {
+        "file": "services/data-ingestor/src/2099900112260118_main.py",
+        "filename": "2099900112260118_main.py",
+        "score": 10
+      },
+      {
+        "file": "services/data-ingestor/src/2099900113260118_main_enterprise.py",
+        "filename": "2099900113260118_main_enterprise.py",
+        "score": 10
+      }
+    ],
+    "recommended": "services/calendar-ingestor/src/2099900093260118_main.py"
+  },
+  "3": {
+    "step_name": "Poll calendar source(s)",
+    "module_id": "D2_CALENDAR_SOURCE_ADAPTER",
+    "responsible": "calendar_service.py::poll_scheduler",
+    "candidates": [
+      {
+        "file": "services/calendar-ingestor/src/2099900093260118_main.py",
+        "filename": "2099900093260118_main.py",
+        "score": 33
+      },
+      {
+        "file": "services/data-ingestor/src/2099900112260118_main.py",
+        "filename": "2099900112260118_main.py",
+        "score": 10
+      },
+      {
+        "file": "services/data-ingestor/src/2099900113260118_main_enterprise.py",
+        "filename": "2099900113260118_main_enterprise.py",
+        "score": 10
+      }
+    ],
+    "recommended": "services/calendar-ingestor/src/2099900093260118_main.py"
+  },
+  "4": {
+    "step_name": "Normalize raw calendar entries",
+    "module_id": "D3_CALENDAR_NORMALIZER",
+    "responsible": "calendar_service.py::normalize_events",
+    "candidates": [
+      {
+        "file": "services/calendar-ingestor/src/2099900093260118_main.py",
+        "filename": "2099900093260118_main.py",
+        "score": 33
+      },
+      {
+        "file": "services/data-ingestor/src/2099900112260118_main.py",
+        "filename": "2099900112260118_main.py",
+        "score": 10
+      },
+      {
+        "file": "services/data-ingestor/src/2099900113260118_main_enterprise.py",
+        "filename": "2099900113260118_main_enterprise.py",
+        "score": 10
+      }
+    ],
+    "recommended": "services/calendar-ingestor/src/2099900093260118_main.py"
+  },
+  "5": {
+    "step_name": "Persist calendar events (append-only)",
+    "module_id": "F2_EVENT_LOG",
+    "responsible": "event_log.py",
+    "candidates": [
+      {
+        "file": "services/calendar-ingestor/src/2099900093260118_main.py",
+        "filename": "2099900093260118_main.py",
+        "score": 28
+      },
+      {
+        "file": "services/event-gateway/src/2099900141260118_main.py",
+        "filename": "2099900141260118_main.py",
+        "score": 25
+      },
+      {
+        "file": "services/data-ingestor/src/2099900112260118_main.py",
+        "filename": "2099900112260118_main.py",
+        "score": 10
+      }
+    ],
+    "recommended": "services/calendar-ingestor/src/2099900093260118_main.py"
+  },
+  "6": {
+    "step_name": "Build anticipation triggers from calendar",
+    "module_id": "D4_CALENDAR_TRIGGER_BUILDER",
+    "responsible": "calendar_anticipator.py",
+    "candidates": [
+      {
+        "file": "services/calendar-ingestor/src/2099900093260118_main.py",
+        "filename": "2099900093260118_main.py",
+        "score": 33
+      },
+      {
+        "file": "services/data-ingestor/src/2099900112260118_main.py",
+        "filename": "2099900112260118_main.py",
+        "score": 10
+      },
+      {
+        "file": "services/data-ingestor/src/2099900113260118_main_enterprise.py",
+        "filename": "2099900113260118_main_enterprise.py",
+        "score": 10
+      }
+    ],
+    "recommended": "services/calendar-ingestor/src/2099900093260118_main.py"
+  },
+  "7": {
+    "step_name": "Ingest market ticks",
+    "module_id": "D1_MARKET_FEED_ADAPTER",
+    "responsible": "market_feed_adapter.py",
+    "candidates": [
+      {
+        "file": "services/data-ingestor/src/2099900112260118_main.py",
+        "filename": "2099900112260118_main.py",
+        "score": 18
+      },
+      {
+        "file": "services/data-ingestor/src/2099900113260118_main_enterprise.py",
+        "filename": "2099900113260118_main_enterprise.py",
+        "score": 18
+      },
+      {
+        "file": "services/data-validator/src/2099900123260118_main.py",
+        "filename": "2099900123260118_main.py",
+        "score": 10
+      }
+    ],
+    "recommended": "services/data-ingestor/src/2099900112260118_main.py"
+  },
+  "8": {
+    "step_name": "Aggregate ticks into bars",
+    "module_id": "C1_BAR_BUILDER",
+    "responsible": "bar_builder.py",
+    "candidates": [],
+    "recommended": null
+  },
+  "9": {
+    "step_name": "Compute indicators",
+    "module_id": "C2_INDICATOR_ENGINE",
+    "responsible": "indicator_engine.py",
+    "candidates": [
+      {
+        "file": "services/desktop-ui/2099900128260118_expiry_indicator_service.py",
+        "filename": "2099900128260118_expiry_indicator_service.py",
+        "score": 15
+      },
+      {
+        "file": "compliance/auto-remediation/2099900012260118_remediation-engine.py",
+        "filename": "2099900012260118_remediation-engine.py",
+        "score": 5
+      },
+      {
+        "file": "services/reentry-engine/src/2099900166260118_main.py",
+        "filename": "2099900166260118_main.py",
+        "score": 5
+      }
+    ],
+    "recommended": "services/desktop-ui/2099900128260118_expiry_indicator_service.py"
+  },
+  "10": {
+    "step_name": "Assemble strategy feature frame",
+    "module_id": "C3_FEATURE_PACKAGER",
+    "responsible": "feature_packager.py",
+    "candidates": [],
+    "recommended": null
+  },
+  "11": {
+    "step_name": "Generate signal (or suppression)",
+    "module_id": "S1_SIGNAL_ENGINE",
+    "responsible": "signal_generator.py",
+    "candidates": [
+      {
+        "file": "compliance/auto-remediation/2099900012260118_remediation-engine.py",
+        "filename": "2099900012260118_remediation-engine.py",
+        "score": 5
+      },
+      {
+        "file": "services/reentry-engine/src/2099900166260118_main.py",
+        "filename": "2099900166260118_main.py",
+        "score": 5
+      }
+    ],
+    "recommended": "compliance/auto-remediation/2099900012260118_remediation-engine.py"
+  },
+  "12": {
+    "step_name": "Convert signal to trade intent",
+    "module_id": "S2_INTENT_BUILDER",
+    "responsible": "intent_builder.py",
+    "candidates": [],
+    "recommended": null
+  },
+  "13": {
+    "step_name": "Evaluate risk and size",
+    "module_id": "R1_RISK_EVALUATOR",
+    "responsible": "risk_manager.py",
+    "candidates": [],
+    "recommended": null
+  },
+  "14": {
+    "step_name": "Compile order intent",
+    "module_id": "R2_ORDER_INTENT_COMPILER",
+    "responsible": "order_intent_compiler.py",
+    "candidates": [
+      {
+        "file": "services/transport-router/src/2099900199260118_main.py",
+        "filename": "2099900199260118_main.py",
+        "score": 10
+      }
+    ],
+    "recommended": "services/transport-router/src/2099900199260118_main.py"
+  },
+  "15": {
+    "step_name": "Route order to broker",
+    "module_id": "O1_ORDER_ROUTER",
+    "responsible": "order_router.py",
+    "candidates": [
+      {
+        "file": "services/transport-router/src/2099900199260118_main.py",
+        "filename": "2099900199260118_main.py",
+        "score": 23
+      }
+    ],
+    "recommended": "services/transport-router/src/2099900199260118_main.py"
+  },
+  "16": {
+    "step_name": "Serialize and send to MT4 adapter",
+    "module_id": "B1_MT4_ADAPTER_TRANSPORT",
+    "responsible": "transport_service.py",
+    "candidates": [
+      {
+        "file": "services/transport-router/src/2099900199260118_main.py",
+        "filename": "2099900199260118_main.py",
+        "score": 5
+      }
+    ],
+    "recommended": "services/transport-router/src/2099900199260118_main.py"
+  },
+  "17": {
+    "step_name": "EA executes broker order",
+    "module_id": "B2_MT4_EA_EXECUTOR",
+    "responsible": "EAFIX.mq4",
+    "candidates": [
+      {
+        "file": "services/transport-router/src/2099900199260118_main.py",
+        "filename": "2099900199260118_main.py",
+        "score": 10
+      }
+    ],
+    "recommended": "services/transport-router/src/2099900199260118_main.py"
+  },
+  "18": {
+    "step_name": "Normalize broker events to canonical reports",
+    "module_id": "B3_EXEC_EVENT_NORMALIZER",
+    "responsible": "result_processor.py",
+    "candidates": [
+      {
+        "file": "services/event-gateway/src/2099900141260118_main.py",
+        "filename": "2099900141260118_main.py",
+        "score": 25
+      },
+      {
+        "file": "services/gui-gateway/src/2099900156260118_main.py",
+        "filename": "2099900156260118_main.py",
+        "score": 10
+      }
+    ],
+    "recommended": "services/event-gateway/src/2099900141260118_main.py"
+  },
+  "19": {
+    "step_name": "Apply execution reports to OMS state",
+    "module_id": "O2_OMS_STATE_MACHINE",
+    "responsible": "oms.py",
+    "candidates": [],
+    "recommended": null
+  },
+  "20": {
+    "step_name": "Classify trade close and compute canonical PnL",
+    "module_id": "O3_TRADE_CLOSE_CLASSIFIER",
+    "responsible": "trade_close_classifier.py",
+    "candidates": [],
+    "recommended": null
+  },
+  "21": {
+    "step_name": "Bucketize outcome",
+    "module_id": "E1_OUTCOME_BUCKETIZER",
+    "responsible": "outcome_bucketizer.py",
+    "candidates": [],
+    "recommended": null
+  },
+  "22": {
+    "step_name": "Compute event proximity",
+    "module_id": "E2_PROXIMITY_EVALUATOR",
+    "responsible": "proximity_evaluator.py",
+    "candidates": [
+      {
+        "file": "services/event-gateway/src/2099900141260118_main.py",
+        "filename": "2099900141260118_main.py",
+        "score": 28
+      },
+      {
+        "file": "services/gui-gateway/src/2099900156260118_main.py",
+        "filename": "2099900156260118_main.py",
+        "score": 10
+      }
+    ],
+    "recommended": "services/event-gateway/src/2099900141260118_main.py"
+  },
+  "23": {
+    "step_name": "Lookup matrix decision",
+    "module_id": "E3_MATRIX_LOOKUP",
+    "responsible": "matrix_lookup.py",
+    "candidates": [
+      {
+        "file": "services/reentry-matrix-svc/src/2099900174260118_main.py",
+        "filename": "2099900174260118_main.py",
+        "score": 23
+      }
+    ],
+    "recommended": "services/reentry-matrix-svc/src/2099900174260118_main.py"
+  },
+  "24": {
+    "step_name": "Build reentry trade intent (or suppress)",
+    "module_id": "E4_REENTRY_INTENT_BUILDER",
+    "responsible": "reentry_intent_builder.py",
+    "candidates": [
+      {
+        "file": "services/reentry-engine/src/2099900166260118_main.py",
+        "filename": "2099900166260118_main.py",
+        "score": 23
+      },
+      {
+        "file": "services/reentry-matrix-svc/src/2099900174260118_main.py",
+        "filename": "2099900174260118_main.py",
+        "score": 23
+      }
+    ],
+    "recommended": "services/reentry-engine/src/2099900166260118_main.py"
+  },
+  "25": {
+    "step_name": "Loop: reentry intent follows same risk->order->route->transport->execute chain",
+    "module_id": "(loop)",
+    "responsible": "orchestrator",
+    "candidates": [
+      {
+        "file": "services/transport-router/src/2099900199260118_main.py",
+        "filename": "2099900199260118_main.py",
+        "score": 30
+      },
+      {
+        "file": "services/reentry-engine/src/2099900166260118_main.py",
+        "filename": "2099900166260118_main.py",
+        "score": 18
+      },
+      {
+        "file": "services/reentry-matrix-svc/src/2099900174260118_main.py",
+        "filename": "2099900174260118_main.py",
+        "score": 18
+      }
+    ],
+    "recommended": "services/transport-router/src/2099900199260118_main.py"
+  },
+  "26": {
+    "step_name": "Health aggregation + SLO evaluation",
+    "module_id": "P1_HEALTH_AGGREGATOR",
+    "responsible": "health_service.py",
+    "candidates": [
+      {
+        "file": "services/telemetry-daemon/src/2099900192260118_main.py",
+        "filename": "2099900192260118_main.py",
+        "score": 10
+      }
+    ],
+    "recommended": "services/telemetry-daemon/src/2099900192260118_main.py"
+  }
+}

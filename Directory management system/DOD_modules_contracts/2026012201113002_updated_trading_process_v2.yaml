@@ -1,0 +1,277 @@
+process_id: HUEY_P_EAFIX_END_TO_END
+process_version: 2.0.0
+alignment:
+  aligned_to_chain: true
+  chain_reference: FeatureFrame -> Signal -> TradeIntent -> RiskDecision -> OrderIntent
+    -> RoutedOrderIntent -> Transport -> EA -> BrokerExecEvent -> (ExecutionReport,
+    PositionSnapshot) -> OMS -> TradeClosedRaw -> TradeClosed -> OutcomeBucket ->
+    (EventProximity + MatrixDecision) -> Reentry TradeIntent
+  module_registry:
+    file: MODULE_REGISTRY_version 1.0.0.txt
+    registry_version: 1.0.0
+notes:
+- This document keeps the original intent (calendar-driven trade + MT4 execution +
+  result-driven reentry) but rewrites step outputs to match the canonical contract
+  chain in MODULE_REGISTRY.
+- Where the existing implementation is CSV/file-IPC, the contract names remain canonical;
+  the transport step specifies the on-disk representation as an implementation detail.
+steps:
+- number: 1
+  name: Resolve configuration snapshot
+  module_id: F1_CONFIG_PREFERENCES
+  responsible: configuration_service.py
+  input: ConfigSource (defaults + overrides)
+  output: ResolvedConfig (immutable snapshot)
+  validation: Schema validate; stable ordering; hash snapshot
+  failure: Reject invalid config; continue using last known good snapshot
+  entrypoint_files: []
+- number: 2
+  name: Emit schedule tick (calendar polling cadence)
+  module_id: F3_CLOCK_SCHEDULER
+  responsible: scheduler.py
+  input: ResolvedConfig
+  output: ScheduleTick
+  validation: Frozen-time mode supported for tests
+  failure: If scheduler stalls, emit HealthReport alert and pause polling
+  entrypoint_files:
+  - services/calendar-ingestor/src/2099900093260118_main.py
+- number: 3
+  name: Poll calendar source(s)
+  module_id: D2_CALENDAR_SOURCE_ADAPTER
+  responsible: calendar_service.py::poll_scheduler
+  input: CalendarSourceConfig + ScheduleTick
+  output: CalendarRaw
+  validation: HTTP 200; payload parsable; source_event_id present
+  failure: Retry w/ deterministic backoff; on persistent failure emit IngestError
+    and skip cycle
+  entrypoint_files:
+  - services/calendar-ingestor/src/2099900093260118_main.py
+- number: 4
+  name: Normalize raw calendar entries
+  module_id: D3_CALENDAR_NORMALIZER
+  responsible: calendar_service.py::normalize_events
+  input: CalendarRaw + ResolvedConfig
+  output: CalendarEvent (UTC timestamps, standardized impact, dedup keys)
+  validation: UTC conversion success; impact in enum; dedup policy applied
+  failure: Emit NormalizationError for malformed rows; continue with valid CalendarEvent
+  entrypoint_files:
+  - services/calendar-ingestor/src/2099900093260118_main.py
+- number: 5
+  name: Persist calendar events (append-only)
+  module_id: F2_EVENT_LOG
+  responsible: event_log.py
+  input: CalendarEvent
+  output: EventStream (calendar.* events)
+  validation: Idempotent by message_id; ordered by created_utc + tie-breaker
+  failure: Rollback and retry once; on persistent failure halt calendar pipeline
+  entrypoint_files:
+  - services/calendar-ingestor/src/2099900093260118_main.py
+- number: 6
+  name: Build anticipation triggers from calendar
+  module_id: D4_CALENDAR_TRIGGER_BUILDER
+  responsible: calendar_anticipator.py
+  input: CalendarEvent + ScheduleTick + ResolvedConfig
+  output: CalendarTrigger (symbol set + window + suppression metadata)
+  validation: No duplicate trigger for event+offset; TTL rules applied
+  failure: Default to conservative suppression metadata; emit error event
+  entrypoint_files:
+  - services/calendar-ingestor/src/2099900093260118_main.py
+- number: 7
+  name: Ingest market ticks
+  module_id: D1_MARKET_FEED_ADAPTER
+  responsible: market_feed_adapter.py
+  input: RawTick + ResolvedConfig
+  output: MarketTick
+  validation: Timestamp freshness; symbol normalization; reject malformed
+  failure: Emit IngestError; skip malformed ticks
+  entrypoint_files:
+  - services/data-ingestor/src/2099900112260118_main.py
+- number: 8
+  name: Aggregate ticks into bars
+  module_id: C1_BAR_BUILDER
+  responsible: bar_builder.py
+  input: MarketTick + ResolvedConfig
+  output: Bar
+  validation: Deterministic bar boundaries; tie-breaker rules
+  failure: Drop out-of-order ticks per policy; emit error event
+  entrypoint_files: []
+- number: 9
+  name: Compute indicators
+  module_id: C2_INDICATOR_ENGINE
+  responsible: indicator_engine.py
+  input: Bar + ResolvedConfig
+  output: IndicatorSnapshot
+  validation: Deterministic rounding; indicator params pinned by config snapshot
+  failure: Emit indicator error; do not output partial snapshots unless flagged
+  entrypoint_files:
+  - services/desktop-ui/2099900128260118_expiry_indicator_service.py
+- number: 10
+  name: Assemble strategy feature frame
+  module_id: C3_FEATURE_PACKAGER
+  responsible: feature_packager.py
+  input: IndicatorSnapshot + CalendarTrigger + ResolvedConfig
+  output: FeatureFrame
+  validation: Exact declared feature set; stable ordering
+  failure: Emit packaging error; do not emit FeatureFrame
+  entrypoint_files: []
+- number: 11
+  name: Generate signal (or suppression)
+  module_id: S1_SIGNAL_ENGINE
+  responsible: signal_generator.py
+  input: FeatureFrame + PositionSummary + ResolvedConfig
+  output: Signal OR SignalSuppressed
+  validation: Suppression reasons enumerated; no sizing/broker specifics
+  failure: On internal error, emit SignalSuppressed with deterministic reason code
+  entrypoint_files:
+  - compliance/auto-remediation/2099900012260118_remediation-engine.py
+- number: 12
+  name: Convert signal to trade intent
+  module_id: S2_INTENT_BUILDER
+  responsible: intent_builder.py
+  input: Signal + ResolvedConfig
+  output: TradeIntent
+  validation: Stable correlation_id from Signal; constraints + rationale attached
+  failure: Reject intent; emit error event
+  entrypoint_files: []
+- number: 13
+  name: Evaluate risk and size
+  module_id: R1_RISK_EVALUATOR
+  responsible: risk_manager.py
+  input: TradeIntent + PortfolioState + RiskPolicy + ResolvedConfig
+  output: RiskDecision (APPROVE/REJECT + reason codes + sized params)
+  validation: Idempotent for same inputs; deterministic sizing + rounding
+  failure: On rule engine failure default to REJECT with SAFETY_FAIL reason
+  entrypoint_files: []
+- number: 14
+  name: Compile order intent
+  module_id: R2_ORDER_INTENT_COMPILER
+  responsible: order_intent_compiler.py
+  input: RiskDecision + ResolvedConfig
+  output: OrderIntent
+  validation: client_order_id + idempotency_key assigned per policy
+  failure: If compilation fails, emit error; do not proceed to routing
+  entrypoint_files:
+  - services/transport-router/src/2099900199260118_main.py
+- number: 15
+  name: Route order to broker
+  module_id: O1_ORDER_ROUTER
+  responsible: order_router.py
+  input: OrderIntent + BrokerPolicy + ResolvedConfig
+  output: RoutedOrderIntent
+  validation: Routing deterministic; preserves OrderIntent hash
+  failure: If routing fails, emit error and reject
+  entrypoint_files:
+  - services/transport-router/src/2099900199260118_main.py
+- number: 16
+  name: Serialize and send to MT4 adapter
+  module_id: B1_MT4_ADAPTER_TRANSPORT
+  responsible: transport_service.py
+  input: RoutedOrderIntent + ResolvedConfig
+  output: BrokerOrderEnvelope + AdapterAck
+  validation: Atomic write+rename (no partial reads); sequence + hash; idempotent
+    resend
+  failure: Deterministic retry schedule; on persistent failure emit TransportError
+    and stop
+  implementation_note: If using CSV, treat CSV row as the on-disk encoding of BrokerOrderEnvelope;
+    envelope hash == file hash.
+  entrypoint_files:
+  - services/transport-router/src/2099900199260118_main.py
+- number: 17
+  name: EA executes broker order
+  module_id: B2_MT4_EA_EXECUTOR
+  responsible: EAFIX.mq4
+  input: BrokerOrderEnvelope
+  output: BrokerExecEvent (accept/fill/reject/close) + EAHealth
+  validation: EA contains no strategy/risk logic; only execution
+  failure: Classify and emit error events; retries per deterministic policy
+  entrypoint_files:
+  - services/transport-router/src/2099900199260118_main.py
+- number: 18
+  name: Normalize broker events to canonical reports
+  module_id: B3_EXEC_EVENT_NORMALIZER
+  responsible: result_processor.py
+  input: BrokerExecEvent + ResolvedConfig
+  output: ExecutionReport + PositionSnapshot
+  validation: Dedup + ordering policy; canonical rounding
+  failure: Emit NormalizationError; quarantine malformed broker events
+  entrypoint_files:
+  - services/event-gateway/src/2099900141260118_main.py
+- number: 19
+  name: Apply execution reports to OMS state
+  module_id: O2_OMS_STATE_MACHINE
+  responsible: oms.py
+  input: RoutedOrderIntent + ExecutionReport + PositionSnapshot + ResolvedConfig
+  output: OrderStateChanged + PositionStateChanged + TradeClosedRaw
+  validation: Idempotent fills; out-of-order handling per policy; stable final state
+  failure: On OMS inconsistency, quarantine stream and halt new orders
+  entrypoint_files: []
+- number: 20
+  name: Classify trade close and compute canonical PnL
+  module_id: O3_TRADE_CLOSE_CLASSIFIER
+  responsible: trade_close_classifier.py
+  input: TradeClosedRaw + ResolvedConfig
+  output: TradeClosed
+  validation: Close reason enum; deterministic PnL rounding rules
+  failure: If PnL cannot be computed, emit TradeClosed with COMPUTATION_ERROR flag
+  entrypoint_files: []
+- number: 21
+  name: Bucketize outcome
+  module_id: E1_OUTCOME_BUCKETIZER
+  responsible: outcome_bucketizer.py
+  input: TradeClosed + ResolvedConfig
+  output: OutcomeBucket
+  validation: Only enumerated buckets; stable bucket mapping
+  failure: If mapping fails, emit UNKNOWN bucket and quarantine for review
+  entrypoint_files: []
+- number: 22
+  name: Compute event proximity
+  module_id: E2_PROXIMITY_EVALUATOR
+  responsible: proximity_evaluator.py
+  input: CalendarEvent + ClockTick + ResolvedConfig
+  output: EventProximity
+  validation: Frozen-time supported; thresholds validated (no overlaps/gaps)
+  failure: Emit proximity error; default to MOST_CONSERVATIVE proximity bucket
+  entrypoint_files:
+  - services/event-gateway/src/2099900141260118_main.py
+- number: 23
+  name: Lookup matrix decision
+  module_id: E3_MATRIX_LOOKUP
+  responsible: matrix_lookup.py
+  input: OutcomeBucket + EventProximity + SignalContext + MatrixProfile + ResolvedConfig
+  output: MatrixDecision (or MatrixFallbackUsed)
+  validation: Deterministic fallback hierarchy; matrix version pinned
+  failure: If matrix missing, emit MatrixFallbackUsed + safest MatrixDecision
+  entrypoint_files:
+  - services/reentry-matrix-svc/src/2099900174260118_main.py
+- number: 24
+  name: Build reentry trade intent (or suppress)
+  module_id: E4_REENTRY_INTENT_BUILDER
+  responsible: reentry_intent_builder.py
+  input: MatrixDecision + ReentryChainState + ResolvedConfig
+  output: TradeIntent OR ReentrySuppressed
+  validation: 'Hard cap: no reentry beyond R2; no circular chains'
+  failure: Emit ReentrySuppressed with deterministic reason
+  entrypoint_files:
+  - services/reentry-engine/src/2099900166260118_main.py
+- number: 25
+  name: 'Loop: reentry intent follows same risk->order->route->transport->execute
+    chain'
+  module_id: (loop)
+  responsible: orchestrator
+  input: TradeIntent from Step 24
+  output: Either (a) new RoutedOrderIntent executed, producing new OutcomeBucket,
+    or (b) suppression/cooldown state update
+  validation: Chain depth < configured max; velocity limits; idempotency keys enforced
+  failure: On loop prevention trigger, enforce terminal cooldown and stop
+  entrypoint_files:
+  - services/transport-router/src/2099900199260118_main.py
+- number: 26
+  name: Health aggregation + SLO evaluation
+  module_id: P1_HEALTH_AGGREGATOR
+  responsible: health_service.py
+  input: AdapterHealth + ModuleHealth + ResolvedConfig
+  output: HealthReport
+  validation: Deterministic thresholds; stable report format
+  failure: If health is unknown, default to risk-off posture (suppress new intents)
+  entrypoint_files:
+  - services/telemetry-daemon/src/2099900192260118_main.py

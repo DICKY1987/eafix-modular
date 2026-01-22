@@ -1,0 +1,414 @@
+[
+  {
+    "step_number": 1,
+    "step_name": "Resolve configuration snapshot",
+    "module_id": "F1_CONFIG_PREFERENCES",
+    "module_type": "other",
+    "input_contracts": "ConfigSource (defaults + overrides)",
+    "output_contracts": "ResolvedConfig (immutable snapshot)",
+    "entrypoint_count": 0,
+    "entrypoints": [],
+    "has_implementation": false
+  },
+  {
+    "step_number": 2,
+    "step_name": "Emit schedule tick (calendar polling cadence)",
+    "module_id": "F3_CLOCK_SCHEDULER",
+    "module_type": "other",
+    "input_contracts": "ResolvedConfig",
+    "output_contracts": "ScheduleTick",
+    "entrypoint_count": 1,
+    "entrypoints": [
+      {
+        "file": "services/calendar-ingestor/src/2099900093260118_main.py",
+        "doc_id": "2099900093260118",
+        "role": "entrypoint",
+        "filename": "2099900093260118_main.py"
+      }
+    ],
+    "has_implementation": true
+  },
+  {
+    "step_number": 3,
+    "step_name": "Poll calendar source(s)",
+    "module_id": "D2_CALENDAR_SOURCE_ADAPTER",
+    "module_type": "other",
+    "input_contracts": "CalendarSourceConfig + ScheduleTick",
+    "output_contracts": "CalendarRaw",
+    "entrypoint_count": 1,
+    "entrypoints": [
+      {
+        "file": "services/calendar-ingestor/src/2099900093260118_main.py",
+        "doc_id": "2099900093260118",
+        "role": "entrypoint",
+        "filename": "2099900093260118_main.py"
+      }
+    ],
+    "has_implementation": true
+  },
+  {
+    "step_number": 4,
+    "step_name": "Normalize raw calendar entries",
+    "module_id": "D3_CALENDAR_NORMALIZER",
+    "module_type": "other",
+    "input_contracts": "CalendarRaw + ResolvedConfig",
+    "output_contracts": "CalendarEvent (UTC timestamps, standardized impact, dedup keys)",
+    "entrypoint_count": 1,
+    "entrypoints": [
+      {
+        "file": "services/calendar-ingestor/src/2099900093260118_main.py",
+        "doc_id": "2099900093260118",
+        "role": "entrypoint",
+        "filename": "2099900093260118_main.py"
+      }
+    ],
+    "has_implementation": true
+  },
+  {
+    "step_number": 5,
+    "step_name": "Persist calendar events (append-only)",
+    "module_id": "F2_EVENT_LOG",
+    "module_type": "other",
+    "input_contracts": "CalendarEvent",
+    "output_contracts": "EventStream (calendar.* events)",
+    "entrypoint_count": 1,
+    "entrypoints": [
+      {
+        "file": "services/calendar-ingestor/src/2099900093260118_main.py",
+        "doc_id": "2099900093260118",
+        "role": "entrypoint",
+        "filename": "2099900093260118_main.py"
+      }
+    ],
+    "has_implementation": true
+  },
+  {
+    "step_number": 6,
+    "step_name": "Build anticipation triggers from calendar",
+    "module_id": "D4_CALENDAR_TRIGGER_BUILDER",
+    "module_type": "other",
+    "input_contracts": "CalendarEvent + ScheduleTick + ResolvedConfig",
+    "output_contracts": "CalendarTrigger (symbol set + window + suppression metadata)",
+    "entrypoint_count": 1,
+    "entrypoints": [
+      {
+        "file": "services/calendar-ingestor/src/2099900093260118_main.py",
+        "doc_id": "2099900093260118",
+        "role": "entrypoint",
+        "filename": "2099900093260118_main.py"
+      }
+    ],
+    "has_implementation": true
+  },
+  {
+    "step_number": 7,
+    "step_name": "Ingest market ticks",
+    "module_id": "D1_MARKET_FEED_ADAPTER",
+    "module_type": "other",
+    "input_contracts": "RawTick + ResolvedConfig",
+    "output_contracts": "MarketTick",
+    "entrypoint_count": 1,
+    "entrypoints": [
+      {
+        "file": "services/data-ingestor/src/2099900112260118_main.py",
+        "doc_id": "2099900112260118",
+        "role": "entrypoint",
+        "filename": "2099900112260118_main.py"
+      }
+    ],
+    "has_implementation": true
+  },
+  {
+    "step_number": 8,
+    "step_name": "Aggregate ticks into bars",
+    "module_id": "C1_BAR_BUILDER",
+    "module_type": "other",
+    "input_contracts": "MarketTick + ResolvedConfig",
+    "output_contracts": "Bar",
+    "entrypoint_count": 0,
+    "entrypoints": [],
+    "has_implementation": false
+  },
+  {
+    "step_number": 9,
+    "step_name": "Compute indicators",
+    "module_id": "C2_INDICATOR_ENGINE",
+    "module_type": "other",
+    "input_contracts": "Bar + ResolvedConfig",
+    "output_contracts": "IndicatorSnapshot",
+    "entrypoint_count": 1,
+    "entrypoints": [
+      {
+        "file": "services/desktop-ui/2099900128260118_expiry_indicator_service.py",
+        "doc_id": "2099900128260118",
+        "role": "entrypoint",
+        "filename": "2099900128260118_expiry_indicator_service.py"
+      }
+    ],
+    "has_implementation": true
+  },
+  {
+    "step_number": 10,
+    "step_name": "Assemble strategy feature frame",
+    "module_id": "C3_FEATURE_PACKAGER",
+    "module_type": "other",
+    "input_contracts": "IndicatorSnapshot + CalendarTrigger + ResolvedConfig",
+    "output_contracts": "FeatureFrame",
+    "entrypoint_count": 0,
+    "entrypoints": [],
+    "has_implementation": false
+  },
+  {
+    "step_number": 11,
+    "step_name": "Generate signal (or suppression)",
+    "module_id": "S1_SIGNAL_ENGINE",
+    "module_type": "other",
+    "input_contracts": "FeatureFrame + PositionSummary + ResolvedConfig",
+    "output_contracts": "Signal OR SignalSuppressed",
+    "entrypoint_count": 1,
+    "entrypoints": [
+      {
+        "file": "compliance/auto-remediation/2099900012260118_remediation-engine.py",
+        "doc_id": "2099900012260118",
+        "role": "entrypoint",
+        "filename": "2099900012260118_remediation-engine.py"
+      }
+    ],
+    "has_implementation": true
+  },
+  {
+    "step_number": 12,
+    "step_name": "Convert signal to trade intent",
+    "module_id": "S2_INTENT_BUILDER",
+    "module_type": "other",
+    "input_contracts": "Signal + ResolvedConfig",
+    "output_contracts": "TradeIntent",
+    "entrypoint_count": 0,
+    "entrypoints": [],
+    "has_implementation": false
+  },
+  {
+    "step_number": 13,
+    "step_name": "Evaluate risk and size",
+    "module_id": "R1_RISK_EVALUATOR",
+    "module_type": "other",
+    "input_contracts": "TradeIntent + PortfolioState + RiskPolicy + ResolvedConfig",
+    "output_contracts": "RiskDecision (APPROVE/REJECT + reason codes + sized params)",
+    "entrypoint_count": 0,
+    "entrypoints": [],
+    "has_implementation": false
+  },
+  {
+    "step_number": 14,
+    "step_name": "Compile order intent",
+    "module_id": "R2_ORDER_INTENT_COMPILER",
+    "module_type": "other",
+    "input_contracts": "RiskDecision + ResolvedConfig",
+    "output_contracts": "OrderIntent",
+    "entrypoint_count": 1,
+    "entrypoints": [
+      {
+        "file": "services/transport-router/src/2099900199260118_main.py",
+        "doc_id": "2099900199260118",
+        "role": "entrypoint",
+        "filename": "2099900199260118_main.py"
+      }
+    ],
+    "has_implementation": true
+  },
+  {
+    "step_number": 15,
+    "step_name": "Route order to broker",
+    "module_id": "O1_ORDER_ROUTER",
+    "module_type": "other",
+    "input_contracts": "OrderIntent + BrokerPolicy + ResolvedConfig",
+    "output_contracts": "RoutedOrderIntent",
+    "entrypoint_count": 1,
+    "entrypoints": [
+      {
+        "file": "services/transport-router/src/2099900199260118_main.py",
+        "doc_id": "2099900199260118",
+        "role": "entrypoint",
+        "filename": "2099900199260118_main.py"
+      }
+    ],
+    "has_implementation": true
+  },
+  {
+    "step_number": 16,
+    "step_name": "Serialize and send to MT4 adapter",
+    "module_id": "B1_MT4_ADAPTER_TRANSPORT",
+    "module_type": "other",
+    "input_contracts": "RoutedOrderIntent + ResolvedConfig",
+    "output_contracts": "BrokerOrderEnvelope + AdapterAck",
+    "entrypoint_count": 1,
+    "entrypoints": [
+      {
+        "file": "services/transport-router/src/2099900199260118_main.py",
+        "doc_id": "2099900199260118",
+        "role": "entrypoint",
+        "filename": "2099900199260118_main.py"
+      }
+    ],
+    "has_implementation": true
+  },
+  {
+    "step_number": 17,
+    "step_name": "EA executes broker order",
+    "module_id": "B2_MT4_EA_EXECUTOR",
+    "module_type": "other",
+    "input_contracts": "BrokerOrderEnvelope",
+    "output_contracts": "BrokerExecEvent (accept/fill/reject/close) + EAHealth",
+    "entrypoint_count": 1,
+    "entrypoints": [
+      {
+        "file": "services/transport-router/src/2099900199260118_main.py",
+        "doc_id": "2099900199260118",
+        "role": "entrypoint",
+        "filename": "2099900199260118_main.py"
+      }
+    ],
+    "has_implementation": true
+  },
+  {
+    "step_number": 18,
+    "step_name": "Normalize broker events to canonical reports",
+    "module_id": "B3_EXEC_EVENT_NORMALIZER",
+    "module_type": "other",
+    "input_contracts": "BrokerExecEvent + ResolvedConfig",
+    "output_contracts": "ExecutionReport + PositionSnapshot",
+    "entrypoint_count": 1,
+    "entrypoints": [
+      {
+        "file": "services/event-gateway/src/2099900141260118_main.py",
+        "doc_id": "2099900141260118",
+        "role": "entrypoint",
+        "filename": "2099900141260118_main.py"
+      }
+    ],
+    "has_implementation": true
+  },
+  {
+    "step_number": 19,
+    "step_name": "Apply execution reports to OMS state",
+    "module_id": "O2_OMS_STATE_MACHINE",
+    "module_type": "other",
+    "input_contracts": "RoutedOrderIntent + ExecutionReport + PositionSnapshot + ResolvedConfig",
+    "output_contracts": "OrderStateChanged + PositionStateChanged + TradeClosedRaw",
+    "entrypoint_count": 0,
+    "entrypoints": [],
+    "has_implementation": false
+  },
+  {
+    "step_number": 20,
+    "step_name": "Classify trade close and compute canonical PnL",
+    "module_id": "O3_TRADE_CLOSE_CLASSIFIER",
+    "module_type": "other",
+    "input_contracts": "TradeClosedRaw + ResolvedConfig",
+    "output_contracts": "TradeClosed",
+    "entrypoint_count": 0,
+    "entrypoints": [],
+    "has_implementation": false
+  },
+  {
+    "step_number": 21,
+    "step_name": "Bucketize outcome",
+    "module_id": "E1_OUTCOME_BUCKETIZER",
+    "module_type": "other",
+    "input_contracts": "TradeClosed + ResolvedConfig",
+    "output_contracts": "OutcomeBucket",
+    "entrypoint_count": 0,
+    "entrypoints": [],
+    "has_implementation": false
+  },
+  {
+    "step_number": 22,
+    "step_name": "Compute event proximity",
+    "module_id": "E2_PROXIMITY_EVALUATOR",
+    "module_type": "other",
+    "input_contracts": "CalendarEvent + ClockTick + ResolvedConfig",
+    "output_contracts": "EventProximity",
+    "entrypoint_count": 1,
+    "entrypoints": [
+      {
+        "file": "services/event-gateway/src/2099900141260118_main.py",
+        "doc_id": "2099900141260118",
+        "role": "entrypoint",
+        "filename": "2099900141260118_main.py"
+      }
+    ],
+    "has_implementation": true
+  },
+  {
+    "step_number": 23,
+    "step_name": "Lookup matrix decision",
+    "module_id": "E3_MATRIX_LOOKUP",
+    "module_type": "other",
+    "input_contracts": "OutcomeBucket + EventProximity + SignalContext + MatrixProfile + ResolvedConfig",
+    "output_contracts": "MatrixDecision (or MatrixFallbackUsed)",
+    "entrypoint_count": 1,
+    "entrypoints": [
+      {
+        "file": "services/reentry-matrix-svc/src/2099900174260118_main.py",
+        "doc_id": "2099900174260118",
+        "role": "entrypoint",
+        "filename": "2099900174260118_main.py"
+      }
+    ],
+    "has_implementation": true
+  },
+  {
+    "step_number": 24,
+    "step_name": "Build reentry trade intent (or suppress)",
+    "module_id": "E4_REENTRY_INTENT_BUILDER",
+    "module_type": "other",
+    "input_contracts": "MatrixDecision + ReentryChainState + ResolvedConfig",
+    "output_contracts": "TradeIntent OR ReentrySuppressed",
+    "entrypoint_count": 1,
+    "entrypoints": [
+      {
+        "file": "services/reentry-engine/src/2099900166260118_main.py",
+        "doc_id": "2099900166260118",
+        "role": "entrypoint",
+        "filename": "2099900166260118_main.py"
+      }
+    ],
+    "has_implementation": true
+  },
+  {
+    "step_number": 25,
+    "step_name": "Loop: reentry intent follows same risk->order->route->transport->execute chain",
+    "module_id": "(loop)",
+    "module_type": "unknown",
+    "input_contracts": "TradeIntent from Step 24",
+    "output_contracts": "Either (a) new RoutedOrderIntent executed, producing new OutcomeBucket, or (b) suppression/cooldown state update",
+    "entrypoint_count": 1,
+    "entrypoints": [
+      {
+        "file": "services/transport-router/src/2099900199260118_main.py",
+        "doc_id": "2099900199260118",
+        "role": "entrypoint",
+        "filename": "2099900199260118_main.py"
+      }
+    ],
+    "has_implementation": true
+  },
+  {
+    "step_number": 26,
+    "step_name": "Health aggregation + SLO evaluation",
+    "module_id": "P1_HEALTH_AGGREGATOR",
+    "module_type": "other",
+    "input_contracts": "AdapterHealth + ModuleHealth + ResolvedConfig",
+    "output_contracts": "HealthReport",
+    "entrypoint_count": 1,
+    "entrypoints": [
+      {
+        "file": "services/telemetry-daemon/src/2099900192260118_main.py",
+        "doc_id": "2099900192260118",
+        "role": "entrypoint",
+        "filename": "2099900192260118_main.py"
+      }
+    ],
+    "has_implementation": true
+  }
+]
