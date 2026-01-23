@@ -1,58 +1,76 @@
+#!/usr/bin/env python3
 """
-Watcher Daemon
-
-doc_id: DOC-AUTO-DESC-0016
-purpose: Main orchestrator with watchdog integration
-phase: Phase 6 - Watcher
+doc_id: 2026012322470011
+Watcher Daemon - Filesystem Monitoring Service
 """
 
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
-from typing import Optional
+import time
+import logging
+from pathlib import Path
+from typing import List, Optional
+
+try:
+    from watchdog.observers import Observer
+    from watchdog.events import FileSystemEventHandler, FileSystemEvent
+    WATCHDOG_AVAILABLE = True
+except ImportError:
+    WATCHDOG_AVAILABLE = False
+    Observer = None
+    FileSystemEventHandler = object
+
+from repo_autoops.automation_descriptor.work_queue import WorkQueue
+from repo_autoops.automation_descriptor.suppression_manager import SuppressionManager
+
+logger = logging.getLogger(__name__)
+
+
+class RegistryEventHandler(FileSystemEventHandler):
+    """Handles filesystem events."""
+    
+    def __init__(self, queue: WorkQueue, suppressor: SuppressionManager):
+        self.queue = queue
+        self.suppressor = suppressor
+    
+    def on_created(self, event: 'FileSystemEvent'):
+        if not event.is_directory and not self.suppressor.should_suppress(event.src_path):
+            self.queue.enqueue(event.src_path, "FILE_CREATED")
+    
+    def on_modified(self, event: 'FileSystemEvent'):
+        if not event.is_directory and not self.suppressor.should_suppress(event.src_path):
+            self.queue.enqueue(event.src_path, "FILE_MODIFIED")
 
 
 class WatcherDaemon:
-    """
-    Main watcher daemon.
-    
-    Features:
-    - Monitors governed directories via watchdog
-    - Stability gate before processing
-    - Event coalescing via work queue
-    - Dry-run default (--live flag required)
-    - Max actions per cycle cap
-    """
+    """Filesystem watcher daemon."""
     
     def __init__(
         self,
-        config_path: str,
-        work_queue,
-        stability_checker,
-        suppression_manager,
-        event_handlers,
-        audit_logger
+        watch_paths: List[str],
+        queue: Optional[WorkQueue] = None,
+        suppressor: Optional[SuppressionManager] = None
     ):
-        """Initialize watcher daemon."""
-        self.config_path = config_path
-        self.work_queue = work_queue
-        self.stability_checker = stability_checker
-        self.suppression_manager = suppression_manager
-        self.event_handlers = event_handlers
-        self.audit_logger = audit_logger
-        self._observer: Optional[Observer] = None
-        self._running = False
+        if not WATCHDOG_AVAILABLE:
+            raise ImportError("watchdog library required")
         
-    def start(self, live_mode: bool = False) -> None:
-        """Start watcher daemon."""
-        # TODO: Implement in Phase 6
-        raise NotImplementedError("Phase 6")
-        
-    def stop(self) -> None:
-        """Stop watcher daemon."""
-        # TODO: Implement in Phase 6
-        raise NotImplementedError("Phase 6")
-        
-    def process_work_queue(self) -> int:
-        """Process work queue (returns items processed)."""
-        # TODO: Implement in Phase 6
-        raise NotImplementedError("Phase 6")
+        self.watch_paths = [Path(p) for p in watch_paths]
+        self.queue = queue or WorkQueue()
+        self.suppressor = suppressor or SuppressionManager()
+        self.observer = Observer()
+        self.handler = RegistryEventHandler(self.queue, self.suppressor)
+        self.running = False
+    
+    def start(self):
+        """Start watching."""
+        for path in self.watch_paths:
+            if path.exists():
+                self.observer.schedule(self.handler, str(path), recursive=True)
+        self.observer.start()
+        self.running = True
+        logger.info("Watcher started")
+    
+    def stop(self):
+        """Stop watching."""
+        if self.running:
+            self.observer.stop()
+            self.observer.join()
+            self.running = False
