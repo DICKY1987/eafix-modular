@@ -1,0 +1,181 @@
+{
+  "checks": [
+    {
+      "check_id": "edge_exists_assign_prefix_method_to_validator_gate",
+      "evidence": {
+        "edge_type": "calls",
+        "from_exists": true,
+        "from_node": "assign_prefix_method",
+        "note": "Simplified edge verification - assumes edge exists if both nodes exist",
+        "to_exists": true,
+        "to_node": "validator_gate"
+      },
+      "passed": true,
+      "reason": null
+    },
+    {
+      "check_id": "edge_exists_identity_handler_to_assign_prefix_method",
+      "evidence": {
+        "edge_type": "calls",
+        "from_exists": true,
+        "from_node": "identity_handler",
+        "note": "Simplified edge verification - assumes edge exists if both nodes exist",
+        "to_exists": true,
+        "to_node": "assign_prefix_method"
+      },
+      "passed": true,
+      "reason": null
+    },
+    {
+      "check_id": "edge_exists_identity_handler_to_has_prefix_check",
+      "evidence": {
+        "edge_type": "calls",
+        "from_exists": true,
+        "from_node": "identity_handler",
+        "note": "Simplified edge verification - assumes edge exists if both nodes exist",
+        "to_exists": true,
+        "to_node": "has_prefix_check"
+      },
+      "passed": true,
+      "reason": null
+    },
+    {
+      "check_id": "edge_exists_orchestrator_dispatch_to_identity_handler",
+      "evidence": {
+        "edge_type": "calls",
+        "from_exists": true,
+        "from_node": "orchestrator_dispatch",
+        "note": "Simplified edge verification - assumes edge exists if both nodes exist",
+        "to_exists": true,
+        "to_node": "identity_handler"
+      },
+      "passed": true,
+      "reason": null
+    },
+    {
+      "check_id": "edge_exists_queue_enqueue_to_orchestrator_dispatch",
+      "evidence": {
+        "edge_type": "triggers",
+        "from_exists": true,
+        "from_node": "queue_enqueue",
+        "note": "Simplified edge verification - assumes edge exists if both nodes exist",
+        "to_exists": true,
+        "to_node": "orchestrator_dispatch"
+      },
+      "passed": true,
+      "reason": null
+    },
+    {
+      "check_id": "edge_exists_watcher_entrypoint_to_queue_enqueue",
+      "evidence": {
+        "edge_type": "calls",
+        "from_exists": true,
+        "from_node": "watcher_entrypoint",
+        "note": "Simplified edge verification - assumes edge exists if both nodes exist",
+        "to_exists": true,
+        "to_node": "queue_enqueue"
+      },
+      "passed": true,
+      "reason": null
+    },
+    {
+      "check_id": "no_orphaned_nodes",
+      "evidence": {
+        "entrypoint": "watcher_entrypoint",
+        "note": "Simplified reachability check - assumes nodes are reachable if they exist"
+      },
+      "passed": true,
+      "reason": null
+    },
+    {
+      "check_id": "node_exists_assign_prefix_method",
+      "evidence": {
+        "exists": true,
+        "location": "repo_autoops/identity_pipeline.py::IdentityPipeline::assign_prefix",
+        "node_id": "assign_prefix_method",
+        "node_type": "method"
+      },
+      "passed": true,
+      "reason": null
+    },
+    {
+      "check_id": "node_exists_has_prefix_check",
+      "evidence": {
+        "exists": true,
+        "location": "repo_autoops/identity_pipeline.py::IdentityPipeline::has_prefix",
+        "node_id": "has_prefix_check",
+        "node_type": "method"
+      },
+      "passed": true,
+      "reason": null
+    },
+    {
+      "check_id": "node_exists_identity_handler",
+      "evidence": {
+        "exists": true,
+        "location": "repo_autoops/identity_pipeline.py::IdentityPipeline",
+        "node_id": "identity_handler",
+        "node_type": "class"
+      },
+      "passed": true,
+      "reason": null
+    },
+    {
+      "check_id": "node_exists_orchestrator_dispatch",
+      "evidence": {
+        "exists": true,
+        "location": "repo_autoops/orchestrator.py::Orchestrator::handle_event",
+        "node_id": "orchestrator_dispatch",
+        "node_type": "method"
+      },
+      "passed": true,
+      "reason": null
+    },
+    {
+      "check_id": "node_exists_queue_enqueue",
+      "evidence": {
+        "exists": true,
+        "location": "repo_autoops/queue.py::EventQueue::enqueue",
+        "node_id": "queue_enqueue",
+        "node_type": "method"
+      },
+      "passed": true,
+      "reason": null
+    },
+    {
+      "check_id": "node_exists_validator_gate",
+      "evidence": {
+        "exists": true,
+        "location": "repo_autoops/validators.py::validate_file_path",
+        "node_id": "validator_gate",
+        "node_type": "function"
+      },
+      "passed": true,
+      "reason": null
+    },
+    {
+      "check_id": "node_exists_watcher_entrypoint",
+      "evidence": {
+        "exists": true,
+        "location": "repo_autoops/watcher.py::FileWatcher",
+        "node_id": "watcher_entrypoint",
+        "node_type": "class"
+      },
+      "passed": true,
+      "reason": null
+    }
+  ],
+  "graph_discovery": {
+    "edges_discovered": 77,
+    "nodes_discovered": 68
+  },
+  "status": "PASS",
+  "summary": {
+    "failed": 0,
+    "passed": 14,
+    "total_checks": 14
+  },
+  "timestamp_utc": "2026-01-23T19:02:53.890112+00:00",
+  "trigger_id": "FILE_IDENTITY_CREATE",
+  "verification_layer": "layer1"
+}
