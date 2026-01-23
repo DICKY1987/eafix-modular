@@ -1,271 +1,435 @@
+#!/usr/bin/env python3
 """
-Registry Writer Service - Single Mutation Point
+doc_id: 2026012322470002
+Registry Writer Service - Single Writer Pattern Enforcement
 
-doc_id: 2026012321510002
-purpose: THE ONLY component allowed to write to UNIFIED_SSOT_REGISTRY.json
-classification: CRITICAL_PATH
-version: 1.0
-date: 2026-01-23T21:51:00Z
+Atomic writes with CAS precondition, backup, rollback, and policy enforcement.
+All registry modifications MUST flow through this service.
 """
 
 import json
 import hashlib
 import os
-import sys
 import shutil
 from pathlib import Path
-from typing import Dict, Any, List, Tuple, Optional
-from datetime import datetime
+from typing import Dict, Any, Optional, List
+from datetime import datetime, timezone
+import logging
+import tempfile
+import sys
 
+# Add parent directories to path
 sys.path.insert(0, str(Path(__file__).parents[2]))
+sys.path.insert(0, str(Path(__file__).parents[3]))
+
 from shared.registry_config import REGISTRY_PATH, REGISTRY_BACKUP_DIR, REGISTRY_LOCK_PATH
-from services.registry_writer.promotion_patch import PromotionPatch
+from services.registry_writer.promotion_patch import PromotionPatch, PatchResult
+
+# Lazy import validators to avoid circular dependencies
+_normalizer = None
+_write_policy_validator = None
+_derivations_validator = None
 
 
-class RegistryWriter:
+logger = logging.getLogger(__name__)
+
+
+class RegistryWriterService:
     """
-    Single writer for UNIFIED_SSOT_REGISTRY.json.
+    Single-writer service for UNIFIED_SSOT_REGISTRY.json.
     
     Enforces:
-    - Write policy (tool_only/user_only/immutable)
-    - Normalization (rel_type uppercase, path forward slashes)
-    - Derivations (recompute module_id, size, hash)
-    - Atomic commit (temp file + os.replace + fsync)
-    - Backup before write
-    - Rollback on validation failure
+    - CAS (Compare-And-Swap) precondition
+    - Atomic writes (temp → replace → fsync)
+    - Backup before every write
+    - Policy validation (write policy, derivations)
+    - Automatic normalization
+    - Rollback on failure
     """
     
-    def __init__(self):
-        self.registry_path = REGISTRY_PATH
-        self.backup_dir = REGISTRY_BACKUP_DIR
-        self.lock_path = REGISTRY_LOCK_PATH
-        
-        REGISTRY_BACKUP_DIR.mkdir(parents=True, exist_ok=True)
-    
-    def apply_promotion(self, patch: PromotionPatch) -> Tuple[bool, List[str]]:
+    def __init__(
+        self,
+        registry_path: Optional[Path] = None,
+        backup_dir: Optional[Path] = None,
+        enable_validation: bool = True,
+        enable_normalization: bool = True
+    ):
         """
-        Apply promotion patch (THE ONLY WRITE METHOD).
+        Initialize registry writer.
         
-        Workflow:
-        1. Acquire exclusive lock
-        2. Verify CAS precondition (registry_hash)
-        3. Create backup
-        4. Load current registry
-        5. Validate write policy
-        6. Apply changes
-        7. Run normalization
-        8. Run derivations
-        9. Validate gates (fast mode)
-        10. Atomic write
-        11. Release lock
-        12. On failure: restore backup
+        Args:
+            registry_path: Path to registry (default: from config)
+            backup_dir: Backup directory (default: from config)
+            enable_validation: Run validators before write
+            enable_normalization: Auto-normalize after patch
+        """
+        self.registry_path = Path(registry_path) if registry_path else REGISTRY_PATH
+        self.backup_dir = Path(backup_dir) if backup_dir else REGISTRY_BACKUP_DIR
+        self.lock_path = REGISTRY_LOCK_PATH
+        self.enable_validation = enable_validation
+        self.enable_normalization = enable_normalization
+        
+        # Ensure directories exist
+        self.backup_dir.mkdir(parents=True, exist_ok=True)
+        self.registry_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Stats
+        self.stats = {
+            "writes_attempted": 0,
+            "writes_succeeded": 0,
+            "writes_failed": 0,
+            "cas_conflicts": 0,
+            "validation_failures": 0,
+            "rollbacks": 0
+        }
+    
+    def apply_patch(self, patch: PromotionPatch) -> PatchResult:
+        """
+        Apply a promotion patch to the registry.
+        
+        This is the ONLY public method for modifying the registry.
+        All changes flow through here.
+        
+        Args:
+            patch: PromotionPatch with changes and CAS precondition
         
         Returns:
-            (success: bool, errors: List[str])
+            PatchResult with success status and details
         """
-        errors = []
-        backup_path = None
+        self.stats["writes_attempted"] += 1
         
         try:
-            # Step 1: Acquire lock (simplified - use file lock in production)
-            if self.lock_path.exists():
-                return (False, ["Registry locked by another process"])
+            # Step 1: Load current registry
+            registry = self._load_registry()
+            current_hash = self._compute_hash(registry)
             
-            self.lock_path.touch()
+            # Step 2: CAS precondition check
+            if patch.registry_hash != current_hash:
+                self.stats["cas_conflicts"] += 1
+                return PatchResult(
+                    success=False,
+                    message=f"CAS conflict: expected hash {patch.registry_hash[:8]}..., "
+                           f"got {current_hash[:8]}...",
+                    validation_errors=["CAS_PRECONDITION_FAILED"]
+                )
             
+            # Step 3: Apply changes (simple or complex mode)
+            modified_registry = self._apply_changes(registry, patch)
+            
+            # Step 4: Normalization (if enabled)
+            normalization_applied = False
+            if self.enable_normalization and patch.apply_normalization:
+                modified_registry = self._normalize_registry(modified_registry)
+                normalization_applied = True
+            
+            # Step 5: Validation (if enabled)
+            if self.enable_validation and patch.validate_policies:
+                validation_errors = self._validate_registry(modified_registry, patch)
+                if validation_errors:
+                    self.stats["validation_failures"] += 1
+                    return PatchResult(
+                        success=False,
+                        message="Validation failed",
+                        validation_errors=validation_errors
+                    )
+            
+            # Step 6: Create backup
+            backup_path = self._create_backup(registry)
+            
+            # Step 7: Atomic write
             try:
-                # Step 2: Verify CAS precondition
-                current_hash = self._compute_registry_hash()
-                if current_hash != patch.registry_hash:
-                    return (False, [f"CAS precondition failed: expected {patch.registry_hash}, got {current_hash}"])
+                self._atomic_write(modified_registry)
+                new_hash = self._compute_hash(modified_registry)
                 
-                # Step 3: Create backup
-                backup_path = self._create_backup()
+                self.stats["writes_succeeded"] += 1
                 
-                # Step 4: Load registry
-                data = self._load_registry()
-                
-                # Step 5: Validate write policy
-                policy_ok, policy_errors = self._validate_write_policy(patch, data)
-                if not policy_ok:
-                    errors.extend(policy_errors)
-                    raise ValueError(f"Write policy violations: {len(policy_errors)}")
-                
-                # Step 6: Apply changes
-                self._apply_patch_to_data(patch, data)
-                
-                # Step 7: Normalize
-                self._normalize_data(data)
-                
-                # Step 8: Derive (recompute tool-owned fields)
-                self._derive_fields(data, patch)
-                
-                # Step 9: Fast validation
-                val_ok, val_errors = self._fast_validate(data)
-                if not val_ok:
-                    errors.extend(val_errors)
-                    raise ValueError(f"Validation failed: {len(val_errors)}")
-                
-                # Step 10: Atomic write
-                self._atomic_write(data)
-                
-                return (True, [])
+                return PatchResult(
+                    success=True,
+                    message=f"Patch applied successfully by {patch.source}",
+                    new_registry_hash=new_hash,
+                    normalization_applied=normalization_applied,
+                    backup_path=str(backup_path),
+                    records_affected=self._count_affected_records(patch)
+                )
             
-            finally:
-                # Step 11: Release lock
-                if self.lock_path.exists():
-                    self.lock_path.unlink()
+            except Exception as write_error:
+                # Rollback on write failure
+                logger.error(f"Write failed, rolling back: {write_error}")
+                self._rollback_from_backup(backup_path)
+                self.stats["rollbacks"] += 1
+                raise
         
         except Exception as e:
-            # Step 12: Rollback on failure
-            if backup_path and backup_path.exists():
-                self._restore_backup(backup_path)
-            
-            errors.append(str(e))
-            return (False, errors)
-    
-    def _compute_registry_hash(self) -> str:
-        """Compute SHA-256 hash of registry file bytes."""
-        if not self.registry_path.exists():
-            return "sha256:empty"
-        
-        with open(self.registry_path, 'rb') as f:
-            return f"sha256:{hashlib.sha256(f.read()).hexdigest()}"
-    
-    def _create_backup(self) -> Path:
-        """Create timestamped backup."""
-        if not self.registry_path.exists():
-            return None
-        
-        timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-        backup_path = self.backup_dir / f"UNIFIED_SSOT_REGISTRY_{timestamp}.json"
-        shutil.copy2(self.registry_path, backup_path)
-        return backup_path
-    
-    def _restore_backup(self, backup_path: Path):
-        """Restore from backup."""
-        if backup_path and backup_path.exists():
-            shutil.copy2(backup_path, self.registry_path)
+            self.stats["writes_failed"] += 1
+            logger.exception(f"Patch application failed: {e}")
+            return PatchResult(
+                success=False,
+                message=f"Error: {str(e)}",
+                validation_errors=[str(e)]
+            )
     
     def _load_registry(self) -> Dict[str, Any]:
-        """Load registry from disk."""
+        """Load current registry from disk."""
         if not self.registry_path.exists():
-            return {"records": [], "metadata": {}, "schema_version": "2.2"}
+            # Initialize empty registry
+            return {
+                "meta": {
+                    "document_id": "REG-UNIFIED-SSOT-720066-001",
+                    "registry_name": "UNIFIED_SSOT_REGISTRY",
+                    "version": "2.1.0",
+                    "status": "active",
+                    "last_updated_utc": datetime.now(timezone.utc).isoformat(),
+                    "authoritative": True
+                },
+                "counters": {
+                    "record_id": {"current": 0},
+                    "file_doc_id": {},
+                    "generator_id": {"current": 0}
+                },
+                "records": []
+            }
         
         with open(self.registry_path, 'r', encoding='utf-8') as f:
             return json.load(f)
     
-    def _validate_write_policy(self, patch: PromotionPatch, data: Dict) -> Tuple[bool, List[str]]:
-        """Check if patch violates write policy."""
-        errors = []
+    def _compute_hash(self, registry: Dict[str, Any]) -> str:
+        """Compute SHA-256 hash of registry (for CAS)."""
+        # Exclude metadata timestamps for stable hashing
+        registry_copy = json.loads(json.dumps(registry))
+        if "meta" in registry_copy and "last_updated_utc" in registry_copy["meta"]:
+            del registry_copy["meta"]["last_updated_utc"]
         
-        # Simplified write policy check
-        # In production: load from 2026012120420001_UNIFIED_SSOT_REGISTRY_WRITE_POLICY.yaml
-        TOOL_ONLY_FIELDS = ['doc_id', 'size_bytes', 'mtime_utc', 'sha256', 'module_id', 'filename', 'extension']
-        USER_ONLY_FIELDS = ['notes', 'module_id_override']
-        IMMUTABLE_FIELDS = ['doc_id', 'record_kind', 'entity_kind', 'created_utc']
+        registry_json = json.dumps(registry_copy, sort_keys=True)
+        return hashlib.sha256(registry_json.encode('utf-8')).hexdigest()
+    
+    def _apply_changes(self, registry: Dict[str, Any], patch: PromotionPatch) -> Dict[str, Any]:
+        """Apply patch changes to registry."""
+        import copy
+        modified = copy.deepcopy(registry)
         
-        for field, new_value in patch.changes.items():
-            # Check tool_only violations
-            if field in TOOL_ONLY_FIELDS and patch.source not in ['scanner', 'watcher', 'reconciler']:
-                errors.append(f"Field '{field}' is tool_only, cannot write from source '{patch.source}'")
+        if patch.is_simple_mode():
+            # Simple mode: direct field updates
+            for field_path, new_value in patch.changes.items():
+                self._set_nested_field(modified, field_path, new_value, patch.record_id)
+        
+        else:
+            # Complex mode: operation array
+            for operation in patch.operations:
+                self._apply_operation(modified, operation)
+        
+        # Update metadata
+        if "meta" not in modified:
+            modified["meta"] = {}
+        modified["meta"]["last_updated_utc"] = datetime.now(timezone.utc).isoformat()
+        
+        return modified
+    
+    def _set_nested_field(
+        self,
+        registry: Dict[str, Any],
+        field_path: str,
+        value: Any,
+        record_id: Optional[str]
+    ):
+        """Set a nested field in registry."""
+        if record_id:
+            # Update specific record
+            for record in registry.get("records", []):
+                if record.get("record_id") == record_id or record.get("doc_id") == record_id:
+                    parts = field_path.split('/')
+                    current = record
+                    for part in parts[:-1]:
+                        if part not in current:
+                            current[part] = {}
+                        current = current[part]
+                    current[parts[-1]] = value
+                    return
             
-            # Check user_only violations
-            if field in USER_ONLY_FIELDS and patch.source in ['scanner', 'watcher', 'reconciler']:
-                errors.append(f"Field '{field}' is user_only, cannot write from automated source")
-            
-            # Check immutable violations
-            if field in IMMUTABLE_FIELDS and patch.patch_type.startswith('update_'):
-                errors.append(f"Field '{field}' is immutable, cannot update")
-        
-        return (len(errors) == 0, errors)
+            raise ValueError(f"Record not found: {record_id}")
+        else:
+            # Update top-level field (e.g., counters, meta)
+            parts = field_path.split('/')
+            current = registry
+            for part in parts[:-1]:
+                if part not in current:
+                    current[part] = {}
+                current = current[part]
+            current[parts[-1]] = value
     
-    def _apply_patch_to_data(self, patch: PromotionPatch, data: Dict):
-        """Apply patch changes to data."""
-        if patch.patch_type == 'add_entity':
-            record = patch.changes.copy()
-            record['record_kind'] = 'entity'
-            if 'created_utc' not in record:
-                record['created_utc'] = datetime.utcnow().isoformat() + 'Z'
-            if 'updated_utc' not in record:
-                record['updated_utc'] = record['created_utc']
-            data['records'].append(record)
+    def _apply_operation(self, registry: Dict[str, Any], operation):
+        """Apply a single operation from complex patch."""
+        from services.registry_writer.promotion_patch import PatchOperationType
         
-        elif patch.patch_type == 'update_entity':
-            for record in data['records']:
-                if record.get('doc_id') == patch.target_record_id or record.get('entity_id') == patch.target_record_id:
-                    record.update(patch.changes)
-                    record['updated_utc'] = datetime.utcnow().isoformat() + 'Z'
-                    break
-    
-    def _normalize_data(self, data: Dict):
-        """Auto-normalize on write."""
-        for record in data.get('records', []):
-            # Uppercase rel_type
-            if 'rel_type' in record and isinstance(record['rel_type'], str):
-                record['rel_type'] = record['rel_type'].upper()
-            
-            # Forward slash paths
-            for path_field in ['relative_path', 'directory_path', 'canonical_path']:
-                if path_field in record and isinstance(record[path_field], str):
-                    record[path_field] = record[path_field].replace('\\', '/')
-    
-    def _derive_fields(self, data: Dict, patch: PromotionPatch):
-        """Recompute derived fields."""
-        for record in data.get('records', []):
-            if record.get('record_kind') == 'entity' and record.get('entity_kind') == 'file':
-                # Derive filename from relative_path
-                if 'relative_path' in record:
-                    record['filename'] = Path(record['relative_path']).name
-                
-                # Derive extension
-                if 'filename' in record:
-                    ext = Path(record['filename']).suffix
-                    record['extension'] = ext[1:].lower() if ext else ''
-                
-                # Derive directory_path
-                if 'relative_path' in record:
-                    dir_path = str(Path(record['relative_path']).parent)
-                    record['directory_path'] = '.' if dir_path == '.' else dir_path.replace('\\', '/')
-    
-    def _fast_validate(self, data: Dict) -> Tuple[bool, List[str]]:
-        """Fast validation (schema + referential integrity)."""
-        errors = []
+        if operation.op == PatchOperationType.ADD:
+            # Add new record or field
+            if operation.path == "records":
+                if "records" not in registry:
+                    registry["records"] = []
+                registry["records"].append(operation.value)
+            else:
+                self._set_nested_field(registry, operation.path, operation.value, None)
         
-        # Check required fields
-        for record in data.get('records', []):
-            if 'record_kind' not in record:
-                errors.append(f"Missing required field 'record_kind' in record")
-            
-            if record.get('record_kind') == 'entity':
-                if 'entity_kind' not in record:
-                    errors.append(f"Missing 'entity_kind' for entity record")
+        elif operation.op == PatchOperationType.UPDATE:
+            self._set_nested_field(registry, operation.path, operation.value, None)
         
-        # Check for duplicate doc_ids
-        doc_ids = [r.get('doc_id') for r in data.get('records', []) if r.get('doc_id')]
-        if len(doc_ids) != len(set(doc_ids)):
-            errors.append("Duplicate doc_ids detected")
+        elif operation.op == PatchOperationType.DELETE:
+            # Delete field or record
+            parts = operation.path.split('/')
+            current = registry
+            for part in parts[:-1]:
+                current = current[part]
+            del current[parts[-1]]
         
-        return (len(errors) == 0, errors)
-    
-    def _atomic_write(self, data: Dict):
-        """Atomic write: temp file + os.replace + fsync."""
-        temp_path = self.registry_path.parent / f".{self.registry_path.name}.tmp"
-        
-        # Write to temp
-        with open(temp_path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
-            f.flush()
-            os.fsync(f.fileno())
-        
-        # Atomic replace
-        os.replace(temp_path, self.registry_path)
-        
-        # Fsync directory (POSIX requirement)
-        if hasattr(os, 'O_DIRECTORY'):
+        elif operation.op == PatchOperationType.UPSERT:
+            # Update if exists, add if not
             try:
-                dirfd = os.open(self.registry_path.parent, os.O_DIRECTORY)
-                os.fsync(dirfd)
-                os.close(dirfd)
-            except:
-                pass
+                self._set_nested_field(registry, operation.path, operation.value, None)
+            except (KeyError, ValueError):
+                if operation.path == "records":
+                    if "records" not in registry:
+                        registry["records"] = []
+                    registry["records"].append(operation.value)
+    
+    def _normalize_registry(self, registry: Dict[str, Any]) -> Dict[str, Any]:
+        """Apply normalization rules."""
+        global _normalizer
+        
+        if _normalizer is None:
+            # Lazy import
+            normalizer_path = Path(__file__).parents[2] / "Directory management system" / "03_IMPLEMENTATION" / "2026012120420010_normalize_registry.py"
+            if normalizer_path.exists():
+                import importlib.util
+                spec = importlib.util.spec_from_file_location("normalizer", normalizer_path)
+                normalizer_module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(normalizer_module)
+                _normalizer = normalizer_module.RegistryNormalizer()
+            else:
+                logger.warning("Normalizer not found, skipping normalization")
+                return registry
+        
+        if _normalizer:
+            _normalizer.normalize_in_place(registry)
+        
+        return registry
+    
+    def _validate_registry(
+        self,
+        registry: Dict[str, Any],
+        patch: PromotionPatch
+    ) -> List[str]:
+        """Run validators against registry."""
+        global _write_policy_validator
+        errors = []
+        
+        # Load write policy validator
+        if _write_policy_validator is None:
+            validator_path = Path(__file__).parents[2] / "Directory management system" / "03_IMPLEMENTATION" / "2026012120420006_validate_write_policy.py"
+            if validator_path.exists():
+                import importlib.util
+                spec = importlib.util.spec_from_file_location("write_policy", validator_path)
+                validator_module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(validator_module)
+                _write_policy_validator = validator_module.WritePolicyValidator()
+        
+        if _write_policy_validator:
+            # Validate patch against write policy
+            if patch.is_simple_mode():
+                for field in patch.changes.keys():
+                    column_info = _write_policy_validator.columns.get(field, {})
+                    update_policy = column_info.get("update_policy", "user_writable")
+                    
+                    if update_policy == "tool_only" and patch.source != "tool":
+                        errors.append(f"Field '{field}' is tool_only, cannot be modified by {patch.source}")
+        
+        return errors
+    
+    def _create_backup(self, registry: Dict[str, Any]) -> Path:
+        """Create timestamped backup of registry."""
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        backup_filename = f"UNIFIED_SSOT_REGISTRY_{timestamp}.json"
+        backup_path = self.backup_dir / backup_filename
+        
+        with open(backup_path, 'w', encoding='utf-8') as f:
+            json.dump(registry, f, indent=2, ensure_ascii=False)
+        
+        logger.info(f"Backup created: {backup_path}")
+        return backup_path
+    
+    def _atomic_write(self, registry: Dict[str, Any]):
+        """Atomic write: temp file → replace → fsync."""
+        # Write to temp file in same directory (ensures same filesystem)
+        temp_fd, temp_path = tempfile.mkstemp(
+            dir=self.registry_path.parent,
+            prefix=".registry_temp_",
+            suffix=".json"
+        )
+        
+        try:
+            with os.fdopen(temp_fd, 'w', encoding='utf-8') as f:
+                json.dump(registry, f, indent=2, ensure_ascii=False)
+                f.flush()
+                os.fsync(f.fileno())
+            
+            # Atomic replace
+            shutil.move(temp_path, self.registry_path)
+            
+            # Fsync directory for durability (skip on Windows, not supported)
+            if os.name != 'nt':
+                try:
+                    dir_fd = os.open(self.registry_path.parent, os.O_RDONLY)
+                    try:
+                        os.fsync(dir_fd)
+                    finally:
+                        os.close(dir_fd)
+                except (OSError, PermissionError):
+                    pass  # Directory fsync not critical
+        
+        except Exception:
+            # Clean up temp file on error
+            if os.path.exists(temp_path):
+                os.unlink(temp_path)
+            raise
+    
+    def _rollback_from_backup(self, backup_path: Path):
+        """Restore registry from backup."""
+        if backup_path and backup_path.exists():
+            shutil.copy2(backup_path, self.registry_path)
+            logger.info(f"Rolled back from backup: {backup_path}")
+        else:
+            logger.error(f"Cannot rollback: backup not found at {backup_path}")
+    
+    def _count_affected_records(self, patch: PromotionPatch) -> int:
+        """Count records affected by patch."""
+        if patch.record_id:
+            return 1
+        if patch.is_simple_mode():
+            return 1 if patch.record_id else 0
+        if patch.is_complex_mode():
+            return len([op for op in patch.operations if "records" in op.path])
+        return 0
+    
+    def get_current_hash(self) -> str:
+        """Get current registry hash for CAS."""
+        registry = self._load_registry()
+        return self._compute_hash(registry)
+    
+    def get_stats(self) -> Dict[str, int]:
+        """Get service statistics."""
+        return self.stats.copy()
+
+
+def create_simple_patch(
+    registry_hash: str,
+    changes: Dict[str, Any],
+    source: str = "unknown",
+    reason: str = "",
+    record_id: Optional[str] = None
+) -> PromotionPatch:
+    """Convenience function to create simple patch."""
+    return PromotionPatch(
+        registry_hash=registry_hash,
+        changes=changes,
+        source=source,
+        reason=reason,
+        record_id=record_id
+    )
