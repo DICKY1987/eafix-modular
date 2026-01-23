@@ -1,93 +1,60 @@
+#!/usr/bin/env python3
 """
-Suppression Manager
+doc_id: 2026012322470008
+Suppression Manager - Loop Prevention for Self-Induced Events
 
-doc_id: DOC-AUTO-DESC-0004
-purpose: Self-induced event suppression (loop prevention)
-phase: Phase 2 - Infrastructure
+Tracks operations performed by the system to suppress resulting filesystem events.
 """
 
-from typing import Set, Dict
-from datetime import datetime, timedelta
+import time
+import threading
+from typing import Dict
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class SuppressionManager:
-    """
-    Tracks self-induced events to prevent infinite loops.
+    """Tracks self-induced operations to suppress resulting events."""
     
-    When the watcher renames a file or updates the registry, it registers
-    those actions here so it doesn't re-process its own changes.
-    """
+    def __init__(self, suppression_window_seconds: float = 2.0):
+        """Initialize suppression manager."""
+        self.suppression_window = suppression_window_seconds
+        self._suppressions: Dict[str, float] = {}
+        self._lock = threading.RLock()
     
-    def __init__(self, suppression_window: int = 5):
-        """
-        Initialize suppression manager.
+    def register_operation(self, path: str):
+        """Register a self-induced operation."""
+        expiry = time.time() + self.suppression_window
         
-        Args:
-            suppression_window: How long to suppress events (seconds, default: 5)
-        """
-        self.suppression_window = suppression_window
-        self._suppressed: Dict[str, datetime] = {}
+        with self._lock:
+            self._suppressions[path] = expiry
         
-    def register_rename(self, old_path: str, new_path: str) -> None:
-        """
-        Register a file rename performed by this system.
+        logger.debug(f"Registered suppression: {path}")
+    
+    def should_suppress(self, path: str) -> bool:
+        """Check if event should be suppressed."""
+        current_time = time.time()
         
-        Args:
-            old_path: Original file path
-            new_path: New file path (with doc_id)
+        with self._lock:
+            # Clean expired
+            expired = [p for p, exp in self._suppressions.items() if exp < current_time]
+            for p in expired:
+                del self._suppressions[p]
             
-        Effect:
-        - Suppresses FILE_MOVED events for these paths for suppression_window
-        """
-        # TODO: Implement in Phase 2
-        raise NotImplementedError("Phase 2")
+            if path in self._suppressions:
+                logger.debug(f"Suppressing event: {path}")
+                return True
         
-    def register_write(self, path: str) -> None:
-        """
-        Register a file write performed by this system.
+        return False
+    
+    def get_stats(self) -> dict:
+        """Get suppression statistics."""
+        current_time = time.time()
         
-        Args:
-            path: File path that was written
-            
-        Effect:
-        - Suppresses FILE_MODIFIED events for this path for suppression_window
-        """
-        # TODO: Implement in Phase 2
-        raise NotImplementedError("Phase 2")
-        
-    def register_registry_update(self) -> None:
-        """
-        Register that registry was updated.
-        
-        Effect:
-        - Suppresses FILE_MODIFIED events for registry file for suppression_window
-        """
-        # TODO: Implement in Phase 2
-        raise NotImplementedError("Phase 2")
-        
-    def is_suppressed(self, path: str) -> bool:
-        """
-        Check if events for this path should be suppressed.
-        
-        Args:
-            path: File path to check
-            
-        Returns:
-            True if this path is currently suppressed, False otherwise
-        """
-        # TODO: Implement in Phase 2
-        raise NotImplementedError("Phase 2")
-        
-    def cleanup_expired(self) -> int:
-        """
-        Remove expired suppression entries.
-        
-        Returns:
-            Number of entries cleaned up
-        """
-        # TODO: Implement in Phase 2
-        raise NotImplementedError("Phase 2")
-        
-    def clear_all(self) -> None:
-        """Clear all suppression entries (for testing)."""
-        self._suppressed.clear()
+        with self._lock:
+            active = sum(1 for exp in self._suppressions.values() if exp >= current_time)
+            return {
+                "total_tracked": len(self._suppressions),
+                "active_suppressions": active
+            }
