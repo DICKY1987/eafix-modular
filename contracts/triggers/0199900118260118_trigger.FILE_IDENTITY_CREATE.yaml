@@ -1,0 +1,209 @@
+# Trigger Lifecycle Contract: FILE_IDENTITY_CREATE
+# doc_id: 0199900118260118
+# version: 1.0
+# purpose: Contract for file identity allocation automation trigger
+
+metadata:
+  trigger_id: "FILE_IDENTITY_CREATE"
+  version: "1.0"
+  description: "Automates assignment of 16-digit ID prefix and doc_id to new files"
+  created_utc: "2026-01-23T18:56:00Z"
+  owner: "repo-autoops"
+  doc_id: "0199900118260118"
+
+# Files that must exist for this trigger to be complete
+required_files:
+  - path: "repo_autoops/identity_pipeline.py"
+    role: "handler"
+    description: "Core identity assignment logic (IdentityPipeline class)"
+    
+  - path: "repo_autoops/orchestrator.py"
+    role: "dispatcher"
+    description: "Orchestrates trigger handling and routing"
+    
+  - path: "repo_autoops/watcher.py"
+    role: "entrypoint"
+    description: "File system watcher that detects new files and emits trigger"
+    
+  - path: "repo_autoops/queue.py"
+    role: "dispatcher"
+    description: "Queue management for trigger events"
+    
+  - path: "repo_autoops/validators.py"
+    role: "gate"
+    description: "Validation gates for file identity assignment"
+    
+  - path: "repo_autoops/config.py"
+    role: "config"
+    description: "Configuration loading and management"
+
+# Configuration keys that must exist
+required_config:
+  - key: "identity.mode"
+    expected_type: "string"
+    description: "Identity assignment mode (draft or auto-commit)"
+    
+  - key: "identity.dry_run"
+    expected_type: "boolean"
+    description: "Whether to perform actual file operations"
+    
+  - key: "watcher.enabled"
+    expected_type: "boolean"
+    description: "Enable/disable file watching"
+    
+  - key: "watcher.paths"
+    expected_type: "list"
+    description: "Paths to watch for new files"
+
+# Graph nodes that must exist (for Layer 1 verification)
+required_nodes:
+  - node_id: "watcher_entrypoint"
+    node_type: "class"
+    location: "repo_autoops/watcher.py::FileWatcher"
+    description: "Watches file system and emits FILE_CREATED events"
+    
+  - node_id: "orchestrator_dispatch"
+    node_type: "method"
+    location: "repo_autoops/orchestrator.py::Orchestrator::handle_event"
+    description: "Routes trigger events to appropriate handlers"
+    
+  - node_id: "queue_enqueue"
+    node_type: "method"
+    location: "repo_autoops/queue.py::EventQueue::enqueue"
+    description: "Enqueues trigger event for processing"
+    
+  - node_id: "identity_handler"
+    node_type: "class"
+    location: "repo_autoops/identity_pipeline.py::IdentityPipeline"
+    description: "Handles identity assignment"
+    
+  - node_id: "assign_prefix_method"
+    node_type: "method"
+    location: "repo_autoops/identity_pipeline.py::IdentityPipeline::assign_prefix"
+    description: "Assigns 16-digit prefix to filename"
+    
+  - node_id: "has_prefix_check"
+    node_type: "method"
+    location: "repo_autoops/identity_pipeline.py::IdentityPipeline::has_prefix"
+    description: "Gate: Checks if file already has prefix"
+    
+  - node_id: "validator_gate"
+    node_type: "function"
+    location: "repo_autoops/validators.py::validate_file_path"
+    description: "Gate: Validates file path before assignment"
+
+# Graph edges that must exist (wiring verification)
+required_edges:
+  - from_node: "watcher_entrypoint"
+    to_node: "queue_enqueue"
+    edge_type: "calls"
+    description: "Watcher enqueues detected file events"
+    
+  - from_node: "queue_enqueue"
+    to_node: "orchestrator_dispatch"
+    edge_type: "triggers"
+    description: "Queue triggers orchestrator event handling"
+    
+  - from_node: "orchestrator_dispatch"
+    to_node: "identity_handler"
+    edge_type: "calls"
+    description: "Orchestrator routes to identity handler"
+    
+  - from_node: "identity_handler"
+    to_node: "has_prefix_check"
+    edge_type: "calls"
+    description: "Handler checks if prefix already exists (gate)"
+    
+  - from_node: "identity_handler"
+    to_node: "assign_prefix_method"
+    edge_type: "calls"
+    description: "Handler assigns prefix if check passes"
+    
+  - from_node: "assign_prefix_method"
+    to_node: "validator_gate"
+    edge_type: "calls"
+    description: "Assignment validates file path before operation"
+
+# Patterns that must NOT exist in required files (forbidden markers)
+forbidden_patterns:
+  - pattern: "TODO"
+    reason: "No TODO markers allowed in required automation paths"
+    scope: "required_files"
+    
+  - pattern: "FIXME"
+    reason: "No FIXME markers allowed in required automation paths"
+    scope: "required_files"
+    
+  - pattern: "raise NotImplementedError"
+    reason: "No stub implementations in required paths"
+    scope: "required_files"
+    
+  - pattern: "pass\\s*#\\s*stub"
+    reason: "No stub placeholders in required paths"
+    scope: "required_files"
+
+# Completion gates (what must be true for this contract to be satisfied)
+completion_gates:
+  - gate_id: "all_files_exist"
+    description: "All required_files are present at specified paths"
+    verification: "layer0_static"
+    
+  - gate_id: "all_config_exists"
+    description: "All required_config keys are accessible"
+    verification: "layer0_static"
+    
+  - gate_id: "no_forbidden_patterns"
+    description: "No forbidden patterns found in required files"
+    verification: "layer0_static"
+    
+  - gate_id: "all_nodes_exist"
+    description: "All required_nodes are found in codebase"
+    verification: "layer1_graph"
+    
+  - gate_id: "all_edges_exist"
+    description: "All required_edges are present in call graph"
+    verification: "layer1_graph"
+    
+  - gate_id: "no_orphaned_nodes"
+    description: "All nodes are reachable from watcher entrypoint"
+    verification: "layer1_graph"
+
+# Evidence requirements (what must be recorded when trigger executes)
+evidence_requirements:
+  - evidence_type: "execution_log"
+    description: "Log entry for identity assignment"
+    required_fields: ["trigger_id", "run_id", "timestamp", "status", "file_path"]
+    
+  - evidence_type: "artifact_modified"
+    description: "Record of file rename operation"
+    required_fields: ["old_path", "new_path", "prefix_assigned"]
+
+# Idempotency policy (Layer 5 - deferred)
+idempotency:
+  policy: "safe-rerun"
+  description: "has_prefix check prevents duplicate assignments"
+  verification_method: "layer5_idempotency"
+
+# Rollback policy (Layer 4 - deferred)
+rollback:
+  supported: true
+  rollback_handler: "repo_autoops/identity_pipeline.py::IdentityPipeline::rollback_rename"
+  description: "Revert file rename by restoring original filename"
+
+# Dependencies (other triggers or services this depends on)
+dependencies:
+  - dependency_id: "file_system"
+    dependency_type: "service"
+    description: "Requires file system access for rename operations"
+    required: true
+    
+  - dependency_id: "git"
+    dependency_type: "tool"
+    description: "Optionally integrates with git for staging renamed files"
+    required: false
+
+# Validation metadata
+validation:
+  schema_version: "1.0"
+  last_validated_utc: "2026-01-23T18:56:00Z"
+  validator_version: "1.0"

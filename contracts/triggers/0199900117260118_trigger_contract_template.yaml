@@ -1,0 +1,168 @@
+# Trigger Lifecycle Contract Template
+# doc_id: 0199900117260118
+# version: 1.0
+# purpose: Template for defining automation trigger wiring and completeness requirements
+
+metadata:
+  trigger_id: "TRIGGER_NAME_HERE"  # Required: Unique trigger identifier (e.g., FILE_IDENTITY_CREATE)
+  version: "1.0"  # Required: Contract version
+  description: "Brief description of what this trigger automates"  # Required
+  created_utc: "2026-01-23T00:00:00Z"  # Required: ISO8601 timestamp
+  owner: "module-name or team-name"  # Required: Responsible party
+  doc_id: "DOC-XXXX"  # Required: Document registry ID
+
+# Files that must exist for this trigger to be complete
+required_files:
+  - path: "path/to/entrypoint.py"  # Required: Absolute or repo-relative path
+    role: "entrypoint"  # Required: One of [entrypoint, dispatcher, handler, gate, evidence, config]
+    description: "What this file does in the automation flow"  # Optional
+    
+  - path: "path/to/dispatcher.py"
+    role: "dispatcher"
+    description: "Routes trigger to appropriate handler"
+    
+  - path: "path/to/handler.py"
+    role: "handler"
+    description: "Performs the core automation action"
+    
+  - path: "config/trigger_config.yaml"
+    role: "config"
+    description: "Configuration for this trigger"
+
+# Configuration keys that must exist
+required_config:
+  - key: "triggers.TRIGGER_NAME_HERE.enabled"  # Required: Config key path (dot notation)
+    expected_type: "boolean"  # Optional: Type constraint
+    description: "Enable/disable trigger"  # Optional
+    
+  - key: "triggers.TRIGGER_NAME_HERE.handler"
+    expected_type: "string"
+    description: "Handler module path"
+
+# Graph nodes that must exist (for Layer 1 verification)
+required_nodes:
+  - node_id: "entrypoint"  # Required: Unique node identifier
+    node_type: "function"  # Required: One of [function, class, method, module]
+    location: "path/to/entrypoint.py::function_name"  # Required: File path + function/class name
+    description: "Entry point that receives trigger event"  # Optional
+    
+  - node_id: "dispatcher"
+    node_type: "function"
+    location: "path/to/dispatcher.py::dispatch_function"
+    description: "Routes to handler"
+    
+  - node_id: "handler"
+    node_type: "function"
+    location: "path/to/handler.py::handle_function"
+    description: "Core automation logic"
+    
+  - node_id: "gate_check"
+    node_type: "function"
+    location: "path/to/gates.py::validate_preconditions"
+    description: "Pre-execution validation"
+    
+  - node_id: "evidence_write"
+    node_type: "function"
+    location: "path/to/evidence.py::record_execution"
+    description: "Evidence recording"
+
+# Graph edges that must exist (wiring verification)
+required_edges:
+  - from_node: "entrypoint"  # Required: Must reference a required_nodes.node_id
+    to_node: "dispatcher"  # Required: Must reference a required_nodes.node_id
+    edge_type: "calls"  # Required: One of [calls, imports, triggers, emits]
+    description: "Entrypoint calls dispatcher"  # Optional
+    
+  - from_node: "dispatcher"
+    to_node: "handler"
+    edge_type: "calls"
+    description: "Dispatcher calls handler"
+    
+  - from_node: "handler"
+    to_node: "gate_check"
+    edge_type: "calls"
+    description: "Handler validates preconditions"
+    
+  - from_node: "handler"
+    to_node: "evidence_write"
+    edge_type: "calls"
+    description: "Handler records evidence"
+
+# Patterns that must NOT exist in required files (forbidden markers)
+forbidden_patterns:
+  - pattern: "TODO"  # Required: Regex pattern or literal string
+    reason: "No TODO markers allowed in required automation paths"  # Optional
+    scope: "required_files"  # Optional: Where to check [required_files, all]
+    
+  - pattern: "FIXME"
+    reason: "No FIXME markers allowed in required automation paths"
+    scope: "required_files"
+    
+  - pattern: "raise NotImplementedError"
+    reason: "No stub implementations in required paths"
+    scope: "required_files"
+    
+  - pattern: "pass\\s*#\\s*stub"
+    reason: "No stub placeholders in required paths"
+    scope: "required_files"
+
+# Completion gates (what must be true for this contract to be satisfied)
+completion_gates:
+  - gate_id: "all_files_exist"  # Required: Unique gate identifier
+    description: "All required_files are present at specified paths"  # Required
+    verification: "layer0_static"  # Required: Which ALVT layer verifies this
+    
+  - gate_id: "all_config_exists"
+    description: "All required_config keys are accessible"
+    verification: "layer0_static"
+    
+  - gate_id: "no_forbidden_patterns"
+    description: "No forbidden patterns found in required files"
+    verification: "layer0_static"
+    
+  - gate_id: "all_nodes_exist"
+    description: "All required_nodes are found in codebase"
+    verification: "layer1_graph"
+    
+  - gate_id: "all_edges_exist"
+    description: "All required_edges are present in call graph"
+    verification: "layer1_graph"
+    
+  - gate_id: "no_orphaned_nodes"
+    description: "All nodes are reachable from entrypoint"
+    verification: "layer1_graph"
+
+# Optional: Evidence requirements (what must be recorded when trigger executes)
+evidence_requirements:
+  - evidence_type: "execution_log"  # Optional: Type identifier
+    description: "Log entry for trigger execution"  # Optional
+    required_fields: ["trigger_id", "run_id", "timestamp", "status"]  # Optional
+    
+  - evidence_type: "artifact_created"
+    description: "Record of artifacts created"
+    required_fields: ["artifact_id", "artifact_path", "artifact_type"]
+
+# Optional: Idempotency policy (Layer 5 - deferred)
+idempotency:
+  policy: "safe-rerun"  # Optional: One of [run-once, safe-rerun, conditional]
+  description: "Trigger can safely execute multiple times with same inputs"  # Optional
+  verification_method: "layer5_idempotency"  # Optional: How to verify
+
+# Optional: Rollback policy (Layer 4 - deferred)
+rollback:
+  supported: true  # Optional: Boolean
+  rollback_handler: "path/to/rollback.py::rollback_function"  # Optional: Path to rollback logic
+  description: "How to undo this trigger's effects"  # Optional
+
+# Optional: Dependencies (other triggers or services this depends on)
+dependencies:
+  - dependency_id: "OTHER_TRIGGER_ID"  # Optional: ID of dependency
+    dependency_type: "trigger"  # Optional: One of [trigger, service, tool]
+    description: "Why this dependency exists"  # Optional
+    required: true  # Optional: Boolean
+
+# Validation metadata (for contract validator tool)
+validation:
+  schema_version: "1.0"  # Required: Contract schema version
+  last_validated_utc: "2026-01-23T00:00:00Z"  # Optional: Last validation timestamp
+  validator_version: "1.0"  # Optional: ALVT validator version used
