@@ -55,6 +55,31 @@ def cmd_queue_status(args):
     return 0
 
 
+def cmd_reconcile(args):
+    """Run reconciliation scan."""
+    from repo_autoops.automation_descriptor.reconciler import Reconciler
+    from shared.registry_config import REGISTRY_PATH
+    
+    queue = WorkQueue()
+    reconciler = Reconciler(
+        watch_paths=args.paths or ["repo_autoops"],
+        registry_path=REGISTRY_PATH,
+        queue=queue
+    )
+    
+    print("Running reconciliation scan...")
+    stats = reconciler.reconcile()
+    
+    print("\nReconciliation Results:")
+    print(f"  Files scanned:             {stats['files_scanned']}")
+    print(f"  Registry records:          {stats['registry_records']}")
+    print(f"  Missing from registry:     {stats['missing_from_registry']}")
+    print(f"  Missing from filesystem:   {stats['missing_from_filesystem']}")
+    print(f"  Repairs enqueued:          {stats['repairs_enqueued']}")
+    
+    return 0
+
+
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description="Registry Automation CLI")
@@ -70,6 +95,10 @@ def main():
     queue_p = subparsers.add_parser('queue-status')
     queue_p.set_defaults(func=cmd_queue_status)
     
+    reconcile_p = subparsers.add_parser('reconcile')
+    reconcile_p.add_argument('--paths', nargs='+')
+    reconcile_p.set_defaults(func=cmd_reconcile)
+    
     args = parser.parse_args()
     
     if not args.command:
@@ -81,3 +110,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
