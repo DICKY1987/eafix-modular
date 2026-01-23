@@ -1,0 +1,977 @@
+# ALVT System Documentation - Complete Reference
+# doc_id: 0199900131260118
+
+version: "1.0.0"
+created: "2026-01-23T19:25:00Z"
+status: "PRODUCTION"
+project: "ALVT - Automation Lifecycle Verification Tooling"
+baseline_tag: "alvt-pilot-baseline-v1.0"
+
+# ==============================================================================
+# SYSTEM OVERVIEW
+# ==============================================================================
+
+system:
+  name: "ALVT"
+  full_name: "Automation Lifecycle Verification Tooling"
+  purpose: |
+    Provides objective, repeatable verification that automation triggers are
+    correctly wired and complete before runtime execution through contract-based
+    static analysis and graph connectivity verification.
+  
+  core_principle: |
+    Automation completeness must be provable through static analysis and graph
+    connectivity verification before any runtime execution.
+  
+  implementation_status:
+    phase_0_scope_lock: "COMPLETE"
+    phase_1_architecture: "COMPLETE"
+    phase_2_contracts: "COMPLETE"
+    phase_3_implementation: "COMPLETE"
+    phase_4_validation: "COMPLETE"
+    phase_5_packaging: "COMPLETE"
+    phase_6_baseline_freeze: "COMPLETE"
+    layer_0_static_integrity: "IMPLEMENTED"
+    layer_1_graph_connectivity: "IMPLEMENTED"
+    layer_2_plan_determinism: "PLANNED"
+    layer_3_sandbox_execution: "PLANNED"
+    layer_4_negative_paths: "PLANNED"
+    layer_5_idempotency: "PLANNED"
+
+# ==============================================================================
+# VERIFICATION LAYERS
+# ==============================================================================
+
+verification_layers:
+  layer_0:
+    name: "Static Integrity"
+    status: "IMPLEMENTED"
+    purpose: "Verify fundamental requirements without execution"
+    
+    checks:
+      - check_type: "file_existence"
+        description: "All required files exist at specified paths"
+        implementation: "Path resolution from contract required_files"
+        
+      - check_type: "config_accessibility"
+        description: "All required config keys are accessible"
+        implementation: "Placeholder (config validation deferred)"
+        status: "PLACEHOLDER"
+        
+      - check_type: "forbidden_patterns"
+        description: "No stub/TODO markers in required-path code"
+        patterns:
+          - "TODO"
+          - "FIXME"
+          - "raise NotImplementedError"
+          - "pass\\s*#\\s*stub"
+    
+    tool:
+      path: "tools/alvt/2099900121260118_layer0_static.py"
+      entry_point: "Layer0Verifier"
+      report_format: "JSON"
+      report_location: "reports/alvt/static.<trigger>.json"
+    
+    success_criteria:
+      - "All required files exist"
+      - "All config keys validated (or documented as placeholder)"
+      - "No forbidden patterns in required files"
+      - "status field in report = PASS"
+
+  layer_1:
+    name: "Graph Connectivity"
+    status: "IMPLEMENTED"
+    purpose: "Verify automation wiring through graph analysis"
+    
+    checks:
+      - check_type: "node_existence"
+        description: "Required nodes exist in codebase"
+        node_types:
+          - "entrypoint"
+          - "dispatcher"
+          - "handler"
+          - "gate"
+          - "evidence"
+        discovery_method: "AST parsing of Python files"
+        
+      - check_type: "edge_verification"
+        description: "Required edges exist between nodes"
+        implementation: "Simplified (assumes edge if both nodes exist)"
+        status: "SIMPLIFIED"
+        edge_types:
+          - "calls"
+          - "imports"
+          - "triggers"
+          - "emits"
+        
+      - check_type: "reachability"
+        description: "No orphaned nodes (all reachable from entrypoint)"
+        implementation: "Simplified (assumes reachable if node exists)"
+    
+    tool:
+      path: "tools/alvt/2099900122260118_layer1_graph.py"
+      entry_point: "Layer1Verifier"
+      report_format: "JSON"
+      report_location: "reports/alvt/graph.<trigger>.json"
+    
+    success_criteria:
+      - "All required nodes discovered"
+      - "All required edges verified (or both endpoints exist)"
+      - "No orphaned nodes"
+      - "status field in report = PASS"
+
+  layer_2:
+    name: "Plan Determinism"
+    status: "PLANNED"
+    purpose: "Verify execution plans are deterministic and reproducible"
+    priority: "HIGH"
+    planned_features:
+      - "Plan generation stability (same inputs → same plan)"
+      - "Plan hash stability across multiple runs"
+      - "Plan structure validation"
+      - "Tool availability verification"
+
+  layer_3:
+    name: "Sandbox Execution"
+    status: "PLANNED"
+    purpose: "Verify automation executes correctly in isolated environment"
+    priority: "HIGH"
+    planned_features:
+      - "Workspace isolation"
+      - "End-to-end execution"
+      - "Artifact validation"
+      - "Evidence recording verification"
+
+  layer_4:
+    name: "Negative Path Validation"
+    status: "PLANNED"
+    purpose: "Verify error handling and rollback correctness"
+    priority: "MEDIUM"
+    planned_features:
+      - "Error detection"
+      - "Rollback correctness"
+      - "Edge case handling"
+
+  layer_5:
+    name: "Idempotency Verification"
+    status: "PLANNED"
+    purpose: "Verify safe re-execution with same inputs"
+    priority: "MEDIUM"
+    planned_features:
+      - "Safe re-execution"
+      - "Policy compliance (run-once, safe-rerun, conditional)"
+      - "Evidence consistency"
+
+# ==============================================================================
+# CONTRACT SYSTEM
+# ==============================================================================
+
+contract_system:
+  purpose: "Machine-readable specifications of automation trigger requirements"
+  format: "YAML"
+  schema_version: "1.0"
+  
+  template:
+    path: "contracts/triggers/0199900117260118_trigger_contract_template.yaml"
+    doc_id: "0199900117260118"
+    
+  required_sections:
+    metadata:
+      required_fields:
+        - trigger_id
+        - version
+        - description
+        - created_utc
+        - owner
+        - doc_id
+      
+    required_files:
+      description: "Files that must exist for trigger to be complete"
+      fields:
+        - path
+        - role
+        - description
+      valid_roles:
+        - entrypoint
+        - dispatcher
+        - handler
+        - gate
+        - evidence
+        - config
+    
+    required_config:
+      description: "Config keys that must exist"
+      fields:
+        - key
+        - expected_type
+        - description
+    
+    required_nodes:
+      description: "Graph nodes that must exist"
+      fields:
+        - node_id
+        - node_type
+        - location
+        - description
+      valid_node_types:
+        - function
+        - class
+        - method
+        - module
+    
+    required_edges:
+      description: "Graph edges that must exist"
+      fields:
+        - from_node
+        - to_node
+        - edge_type
+        - description
+      valid_edge_types:
+        - calls
+        - imports
+        - triggers
+        - emits
+    
+    forbidden_patterns:
+      description: "Patterns that must NOT exist in required files"
+      fields:
+        - pattern
+        - reason
+        - scope
+    
+    completion_gates:
+      description: "What must be true for contract satisfaction"
+      fields:
+        - gate_id
+        - description
+        - verification
+  
+  validation:
+    tool: "tools/alvt/2099900119260118_validate_contract.py"
+    checks:
+      - "Schema structure validation"
+      - "Required sections present"
+      - "Path resolvability"
+      - "Graph consistency (edges reference declared nodes)"
+
+# ==============================================================================
+# PILOT BASELINE - FILE_IDENTITY_CREATE
+# ==============================================================================
+
+pilot_baseline:
+  trigger_id: "FILE_IDENTITY_CREATE"
+  contract_doc_id: "0199900118260118"
+  contract_path: "contracts/triggers/0199900118260118_trigger.FILE_IDENTITY_CREATE.yaml"
+  status: "FROZEN"
+  frozen_date: "2026-01-23T19:08:00Z"
+  baseline_version: "1.0"
+  git_tag: "alvt-pilot-baseline-v1.0"
+  
+  purpose: "Automates assignment of 16-digit ID prefix and doc_id to new files"
+  owner: "repo-autoops"
+  
+  verification_results:
+    layer_0:
+      status: "PASS"
+      checks_total: 14
+      checks_passed: 14
+      checks_failed: 0
+      report_path: "reports/alvt/static.FILE_IDENTITY_CREATE.json"
+      breakdown:
+        file_existence: "6/6 PASS"
+        config_keys: "4/4 PASS (placeholder)"
+        forbidden_patterns: "4/4 PASS"
+    
+    layer_1:
+      status: "PASS"
+      checks_total: 14
+      checks_passed: 14
+      checks_failed: 0
+      report_path: "reports/alvt/graph.FILE_IDENTITY_CREATE.json"
+      breakdown:
+        node_existence: "7/7 PASS"
+        edge_verification: "6/6 PASS (simplified)"
+        reachability: "1/1 PASS"
+    
+    test_suite:
+      total_tests: 15
+      passed: 15
+      failed: 0
+      duration_seconds: 0.46
+      test_files:
+        - "tests/2099900123260118_test_alvt_layer0.py"
+        - "tests/2099900124260118_test_alvt_layer1.py"
+    
+    stability:
+      consecutive_runs: 2
+      run_1_result: "PASS (14/14 Layer 0, 14/14 Layer 1)"
+      run_2_result: "PASS (14/14 Layer 0, 14/14 Layer 1)"
+      determinism: "CONFIRMED"
+  
+  contract_structure:
+    required_files_count: 6
+    required_files:
+      - path: "repo_autoops/identity_pipeline.py"
+        role: "handler"
+      - path: "repo_autoops/orchestrator.py"
+        role: "dispatcher"
+      - path: "repo_autoops/watcher.py"
+        role: "entrypoint"
+      - path: "repo_autoops/queue.py"
+        role: "dispatcher"
+      - path: "repo_autoops/validators.py"
+        role: "gate"
+      - path: "repo_autoops/config.py"
+        role: "config"
+    
+    required_config_count: 4
+    required_config:
+      - "identity.mode"
+      - "identity.dry_run"
+      - "watcher.enabled"
+      - "watcher.paths"
+    
+    required_nodes_count: 7
+    required_nodes:
+      - node_id: "watcher_entrypoint"
+        location: "repo_autoops/watcher.py::FileWatcher"
+      - node_id: "orchestrator_dispatch"
+        location: "repo_autoops/orchestrator.py::Orchestrator::handle_event"
+      - node_id: "queue_enqueue"
+        location: "repo_autoops/queue.py::EventQueue::enqueue"
+      - node_id: "identity_handler"
+        location: "repo_autoops/identity_pipeline.py::IdentityPipeline"
+      - node_id: "assign_prefix_method"
+        location: "repo_autoops/identity_pipeline.py::IdentityPipeline::assign_prefix"
+      - node_id: "has_prefix_check"
+        location: "repo_autoops/identity_pipeline.py::IdentityPipeline::has_prefix"
+      - node_id: "validator_gate"
+        location: "repo_autoops/validators.py::validate_file_path"
+    
+    required_edges_count: 6
+    required_edges:
+      - from: "watcher_entrypoint"
+        to: "queue_enqueue"
+      - from: "queue_enqueue"
+        to: "orchestrator_dispatch"
+      - from: "orchestrator_dispatch"
+        to: "identity_handler"
+      - from: "identity_handler"
+        to: "has_prefix_check"
+      - from: "identity_handler"
+        to: "assign_prefix_method"
+      - from: "assign_prefix_method"
+        to: "validator_gate"
+  
+  known_limitations:
+    - limitation_id: "config_validation_placeholder"
+      status: "DOCUMENTED"
+      impact: "Config key checks pass with placeholder note"
+      acceptable: true
+      reason: "Full config system integration deferred to post-pilot"
+      future_work: "Integrate with repo_autoops.config module"
+      
+    - limitation_id: "simplified_edge_verification"
+      status: "DOCUMENTED"
+      impact: "Edges assumed to exist if both endpoint nodes exist"
+      acceptable: true
+      reason: "Full call-graph analysis requires additional tooling"
+      future_work: "Implement AST-based call graph traversal"
+
+# ==============================================================================
+# TOOLS AND CLI
+# ==============================================================================
+
+tools:
+  contract_validator:
+    doc_id: "2099900119260118"
+    path: "tools/alvt/2099900119260118_validate_contract.py"
+    entry_point: "ContractValidator"
+    purpose: "Validates trigger contracts against schema"
+    usage: "python validate_contract.py --trigger <TRIGGER_ID>"
+    exit_codes:
+      0: "Contract valid"
+      1: "Contract invalid or not found"
+  
+  layer0_verifier:
+    doc_id: "2099900121260118"
+    path: "tools/alvt/2099900121260118_layer0_static.py"
+    entry_point: "Layer0Verifier"
+    purpose: "Static integrity verification"
+    usage: "python layer0_static.py --trigger <TRIGGER_ID>"
+    outputs:
+      - "reports/alvt/static.<trigger>.json"
+    exit_codes:
+      0: "All checks passed"
+      1: "One or more checks failed"
+  
+  layer1_verifier:
+    doc_id: "2099900122260118"
+    path: "tools/alvt/2099900122260118_layer1_graph.py"
+    entry_point: "Layer1Verifier"
+    purpose: "Graph connectivity verification"
+    usage: "python layer1_graph.py --trigger <TRIGGER_ID>"
+    outputs:
+      - "reports/alvt/graph.<trigger>.json"
+    exit_codes:
+      0: "All checks passed"
+      1: "One or more checks failed"
+  
+  unified_cli:
+    doc_id: "2099900126260118"
+    path: "tools/alvt/2099900126260118_alvt_cli.py"
+    entry_point: "main"
+    purpose: "Unified interface for all ALVT tools"
+    
+    commands:
+      validate:
+        description: "Validate trigger contract"
+        usage: "python alvt_cli.py validate --trigger <TRIGGER_ID>"
+        
+      layer0:
+        description: "Run Layer 0 static verification"
+        usage: "python alvt_cli.py layer0 --trigger <TRIGGER_ID>"
+        
+      layer1:
+        description: "Run Layer 1 graph verification"
+        usage: "python alvt_cli.py layer1 --trigger <TRIGGER_ID>"
+        
+      verify:
+        description: "Run all verification steps (contract, layer0, layer1)"
+        usage: "python alvt_cli.py verify --trigger <TRIGGER_ID>"
+        steps:
+          - "Step 1: Contract Validation"
+          - "Step 2: Layer 0 (Static Integrity)"
+          - "Step 3: Layer 1 (Graph Connectivity)"
+
+# ==============================================================================
+# TEST SUITE
+# ==============================================================================
+
+test_suite:
+  framework: "pytest"
+  total_files: 2
+  total_tests: 15
+  status: "ALL PASSING"
+  
+  test_files:
+    layer0_tests:
+      doc_id: "2099900123260118"
+      path: "tests/2099900123260118_test_alvt_layer0.py"
+      test_count: 8
+      coverage:
+        - "File existence detection (pass/fail)"
+        - "Forbidden pattern detection"
+        - "Config validation (placeholder)"
+        - "Report structure validation"
+        - "Deterministic output verification"
+    
+    layer1_tests:
+      doc_id: "2099900124260118"
+      path: "tests/2099900124260118_test_alvt_layer1.py"
+      test_count: 7
+      coverage:
+        - "Node discovery (classes, functions, methods)"
+        - "Edge verification"
+        - "Reachability checking"
+        - "Report structure validation"
+        - "Non-Python file handling"
+        - "Deterministic output verification"
+  
+  execution:
+    command: "pytest tests/2099900123260118_test_alvt_layer0.py tests/2099900124260118_test_alvt_layer1.py -q"
+    expected_duration_seconds: 0.5
+    expected_output: "15 passed"
+
+# ==============================================================================
+# DOCUMENTATION
+# ==============================================================================
+
+documentation:
+  architecture:
+    doc_id: "0199900116260118"
+    path: "contracts/triggers/0199900116260118_automation_verification_architecture.md"
+    purpose: "Complete ALVT architecture specification"
+    sections:
+      - "Core principle"
+      - "Architecture layers (0-7)"
+      - "Artifact flow"
+      - "Workspace-safe testing rules"
+      - "Contract-to-implementation binding"
+      - "Validation gates"
+      - "Fix-validate-repeat discipline"
+  
+  pilot_runbook:
+    doc_id: "0199900127260118"
+    path: "contracts/triggers/0199900127260118_run_alvt_pilot.md"
+    purpose: "Operational runbook for FILE_IDENTITY_CREATE verification"
+    sections:
+      - "Prerequisites"
+      - "Step-by-step verification workflow"
+      - "Expected outputs"
+      - "Troubleshooting"
+      - "Success criteria"
+  
+  new_trigger_checklist:
+    doc_id: "0199900128260118"
+    path: "contracts/triggers/0199900128260118_new_trigger_checklist.md"
+    purpose: "Template for adding new triggers after pilot"
+    steps: 10
+    substeps: 40
+    
+  baseline_document:
+    doc_id: "0199900129260118"
+    path: "contracts/triggers/0199900129260118_pilot_baseline_locked.md"
+    purpose: "Frozen reference baseline for FILE_IDENTITY_CREATE"
+    status: "LOCKED"
+    
+  layer2_plus_backlog:
+    doc_id: "0199900130260118"
+    path: "contracts/triggers/0199900130260118_layer2_plus_backlog.md"
+    purpose: "Roadmap for Layer 2+ verification capabilities"
+    planned_layers:
+      - "Layer 2: Plan Determinism (HIGH priority)"
+      - "Layer 3: Sandbox Execution (HIGH priority)"
+      - "Layer 4: Negative Paths (MEDIUM priority)"
+      - "Layer 5: Idempotency (MEDIUM priority)"
+      - "Layer 6: Performance (FUTURE)"
+      - "Layer 7: Security (FUTURE)"
+  
+  findings_log:
+    doc_id: "0199900125260118"
+    path: "reports/alvt/0199900125260118_alvt_pilot_findings.md"
+    purpose: "Complete issue log for pilot execution"
+    findings_count: 6
+    issues_resolved: 4
+    limitations_documented: 2
+
+# ==============================================================================
+# FILE INVENTORY
+# ==============================================================================
+
+file_inventory:
+  total_files: 21
+  total_commits: 8
+  
+  by_category:
+    documentation: 11
+    tools: 5
+    tests: 2
+    reports: 3
+  
+  by_doc_id_prefix:
+    "01999": 9  # Documentation files
+    "20999": 7  # Code files (tools/tests)
+    "10999": 0  # Data files
+    "none": 5   # Reports and misc
+  
+  complete_list:
+    - doc_id: null
+      path: "contracts/triggers/pilot_trigger_selection.md"
+      type: "documentation"
+      phase: "0"
+      
+    - doc_id: "0199900116260118"
+      path: "contracts/triggers/0199900116260118_automation_verification_architecture.md"
+      type: "documentation"
+      phase: "1"
+      
+    - doc_id: "0199900117260118"
+      path: "contracts/triggers/0199900117260118_trigger_contract_template.yaml"
+      type: "template"
+      phase: "2"
+      
+    - doc_id: "0199900118260118"
+      path: "contracts/triggers/0199900118260118_trigger.FILE_IDENTITY_CREATE.yaml"
+      type: "contract"
+      phase: "2"
+      
+    - doc_id: "2099900119260118"
+      path: "tools/alvt/2099900119260118_validate_contract.py"
+      type: "tool"
+      phase: "2"
+      
+    - doc_id: "2099900120260118"
+      path: "tools/alvt/__init__.py"
+      type: "tool"
+      phase: "2"
+      
+    - doc_id: "2099900121260118"
+      path: "tools/alvt/2099900121260118_layer0_static.py"
+      type: "tool"
+      phase: "3"
+      
+    - doc_id: "2099900122260118"
+      path: "tools/alvt/2099900122260118_layer1_graph.py"
+      type: "tool"
+      phase: "3"
+      
+    - doc_id: "2099900123260118"
+      path: "tests/2099900123260118_test_alvt_layer0.py"
+      type: "test"
+      phase: "3"
+      
+    - doc_id: "2099900124260118"
+      path: "tests/2099900124260118_test_alvt_layer1.py"
+      type: "test"
+      phase: "3"
+      
+    - doc_id: null
+      path: "reports/alvt/static.FILE_IDENTITY_CREATE.json"
+      type: "report"
+      phase: "4"
+      
+    - doc_id: null
+      path: "reports/alvt/graph.FILE_IDENTITY_CREATE.json"
+      type: "report"
+      phase: "4"
+      
+    - doc_id: "0199900125260118"
+      path: "reports/alvt/0199900125260118_alvt_pilot_findings.md"
+      type: "documentation"
+      phase: "4"
+      
+    - doc_id: "2099900126260118"
+      path: "tools/alvt/2099900126260118_alvt_cli.py"
+      type: "tool"
+      phase: "5"
+      
+    - doc_id: "0199900127260118"
+      path: "contracts/triggers/0199900127260118_run_alvt_pilot.md"
+      type: "documentation"
+      phase: "5"
+      
+    - doc_id: "0199900128260118"
+      path: "contracts/triggers/0199900128260118_new_trigger_checklist.md"
+      type: "documentation"
+      phase: "5"
+      
+    - doc_id: "0199900129260118"
+      path: "contracts/triggers/0199900129260118_pilot_baseline_locked.md"
+      type: "documentation"
+      phase: "6"
+      
+    - doc_id: "0199900130260118"
+      path: "contracts/triggers/0199900130260118_layer2_plus_backlog.md"
+      type: "documentation"
+      phase: "6"
+      
+    - doc_id: null
+      path: "ALVT_IMPLEMENTATION_COMPLETE.md"
+      type: "documentation"
+      phase: "6"
+      
+    - doc_id: "0199900131260118"
+      path: "ALVT_SYSTEM_DOCUMENTATION.yaml"
+      type: "documentation"
+      phase: "6"
+      current_file: true
+
+# ==============================================================================
+# WORKFLOW AND PROCESSES
+# ==============================================================================
+
+workflows:
+  add_new_trigger:
+    description: "Process for adding a new automation trigger to ALVT"
+    reference: "contracts/triggers/0199900128260118_new_trigger_checklist.md"
+    
+    steps:
+      - step: 1
+        name: "Trigger Identification"
+        substeps:
+          - "Define trigger identity (ID, purpose, owner)"
+          - "Define scope (inputs, outputs, side effects)"
+      
+      - step: 2
+        name: "Contract Creation"
+        substeps:
+          - "Copy contract template"
+          - "Assign doc_id to new contract"
+          - "Populate all required sections"
+      
+      - step: 3
+        name: "Contract Validation"
+        command: "python validate_contract.py --trigger <TRIGGER_ID>"
+        expected: "Exit 0, output VALID"
+      
+      - step: 4
+        name: "Layer 0 Verification"
+        command: "python layer0_static.py --trigger <TRIGGER_ID>"
+        expected: "Report status=PASS"
+        fix_if_fail: "Fix missing files, config keys, or forbidden patterns"
+      
+      - step: 5
+        name: "Layer 1 Verification"
+        command: "python layer1_graph.py --trigger <TRIGGER_ID>"
+        expected: "Report status=PASS"
+        fix_if_fail: "Implement missing nodes or edges"
+      
+      - step: 6
+        name: "Stability Verification"
+        action: "Run Layer 0 and Layer 1 twice consecutively"
+        expected: "Both runs produce identical results"
+      
+      - step: 7
+        name: "Documentation"
+        substeps:
+          - "Create findings log"
+          - "Document known limitations"
+          - "Update relevant documentation"
+      
+      - step: 8
+        name: "Commit and Push"
+        commands:
+          - "git add contracts/triggers/ reports/alvt/"
+          - "git commit -m 'Add ALVT contract for <TRIGGER_ID>'"
+          - "git push origin HEAD"
+  
+  run_verification:
+    description: "Execute ALVT verification for existing trigger"
+    
+    quick_check:
+      command: "python tools/alvt/2099900126260118_alvt_cli.py verify --trigger <TRIGGER_ID>"
+      duration: "5-10 seconds"
+      output: "PASS/FAIL for all steps"
+    
+    detailed_check:
+      steps:
+        - command: "python tools/alvt/2099900119260118_validate_contract.py --trigger <TRIGGER_ID>"
+          purpose: "Validate contract"
+        - command: "python tools/alvt/2099900121260118_layer0_static.py --trigger <TRIGGER_ID>"
+          purpose: "Run Layer 0"
+        - command: "python tools/alvt/2099900122260118_layer1_graph.py --trigger <TRIGGER_ID>"
+          purpose: "Run Layer 1"
+        - command: "cat reports/alvt/static.<TRIGGER_ID>.json | python -m json.tool"
+          purpose: "View Layer 0 report"
+        - command: "cat reports/alvt/graph.<TRIGGER_ID>.json | python -m json.tool"
+          purpose: "View Layer 1 report"
+
+# ==============================================================================
+# INTEGRATION POINTS
+# ==============================================================================
+
+integration:
+  ci_cd:
+    status: "READY FOR INTEGRATION"
+    recommended_pipeline:
+      - stage: "pre-commit"
+        action: "Run ALVT Layer 0 for changed contracts"
+        exit_on_fail: true
+      
+      - stage: "pull-request"
+        action: "Run ALVT Layer 0+1 for all active triggers"
+        exit_on_fail: true
+      
+      - stage: "pre-deploy"
+        action: "Run full ALVT verification suite"
+        exit_on_fail: true
+        include_stability_check: true
+  
+  registry_system:
+    integration_type: "OPTIONAL"
+    description: "ALVT reports can be stored as evidence artifacts"
+    benefits:
+      - "Queryable via EvidenceOps helpers"
+      - "Linked to trigger execution history"
+      - "Audit trail for automation changes"
+  
+  development_workflow:
+    pre_commit_hook:
+      recommended: true
+      action: "Run ALVT Layer 0 on modified contracts"
+      
+    ide_integration:
+      recommended: true
+      action: "Lint contract YAML against schema"
+      
+    code_review:
+      recommended: true
+      requirement: "ALVT verification PASS before merge"
+
+# ==============================================================================
+# MAINTENANCE AND OPERATIONS
+# ==============================================================================
+
+maintenance:
+  baseline_protection:
+    FILE_IDENTITY_CREATE:
+      status: "FROZEN"
+      allowed_changes:
+        - "Bug fixes in ALVT tools (maintain or improve verification)"
+        - "Documentation improvements"
+        - "Additional test coverage"
+      
+      prohibited_changes:
+        - "Modifications to contract (without formal review)"
+        - "Changes to automation wiring that break verification"
+        - "Removal of required files, nodes, or edges"
+        - "Addition of forbidden patterns"
+      
+      change_process:
+        - "Document reason in new findings log"
+        - "Re-run full verification (all phases)"
+        - "Update baseline document"
+        - "Increment version number"
+        - "Create new git tag"
+  
+  regression_testing:
+    frequency: "On every ALVT tool change"
+    baseline_trigger: "FILE_IDENTITY_CREATE"
+    expected_result: "All PASS (same as frozen baseline)"
+    failure_action: "Revert tool changes or document intentional behavior change"
+  
+  monitoring:
+    metrics:
+      - metric: "trigger_coverage"
+        description: "% of triggers with ALVT contracts"
+        target: "100%"
+      
+      - metric: "layer0_pass_rate"
+        description: "% of triggers passing Layer 0"
+        target: "100%"
+      
+      - metric: "layer1_pass_rate"
+        description: "% of triggers passing Layer 1"
+        target: "100%"
+      
+      - metric: "verification_time"
+        description: "Average time to run full verification"
+        target: "<10 seconds"
+
+# ==============================================================================
+# TROUBLESHOOTING
+# ==============================================================================
+
+troubleshooting:
+  common_issues:
+    - issue: "Contract file not found"
+      symptom: "ERROR: Contract file not found for trigger"
+      solution: |
+        Verify contract file exists with correct naming:
+        ls -la contracts/triggers/*<TRIGGER_ID>*
+        Expected: <doc_id>_trigger.<TRIGGER_ID>.yaml
+    
+    - issue: "Layer 0 reports missing files"
+      symptom: "Check failed: File not found"
+      solutions:
+        - "Verify file path is correct in contract (repo-relative)"
+        - "Create missing file"
+        - "Update contract if path has changed"
+    
+    - issue: "Layer 1 reports missing nodes"
+      symptom: "Check failed: Node not found"
+      solutions:
+        - "Verify node location format: path/to/file.py::Class::method"
+        - "Implement missing class/function"
+        - "Update contract if location has changed"
+    
+    - issue: "Config validation shows placeholder"
+      symptom: "Config check passes with note 'not yet implemented'"
+      solution: "This is expected - config validation is documented placeholder"
+      
+    - issue: "Edge verification simplified"
+      symptom: "Edge check passes with note 'simplified edge verification'"
+      solution: "This is expected - full call-graph analysis is deferred"
+    
+    - issue: "Tests fail on import"
+      symptom: "ModuleNotFoundError in test files"
+      solution: |
+        Tests use importlib.util for dynamic imports.
+        Verify alvt_path is correct and tools exist.
+
+# ==============================================================================
+# REFERENCES
+# ==============================================================================
+
+references:
+  planning_documents:
+    - name: "Original ALVT Plan"
+      path: "Directory management system/autoplan.txt"
+      
+    - name: "Automation Production Pattern"
+      path: "Directory management system/automation minimal production-pattern.md"
+      
+    - name: "Debug Prompts and Automation"
+      path: "Directory management system/ChatGPT-Debug Prompts and Automation.md"
+  
+  implementation_documents:
+    - name: "Architecture"
+      doc_id: "0199900116260118"
+      path: "contracts/triggers/0199900116260118_automation_verification_architecture.md"
+      
+    - name: "Baseline"
+      doc_id: "0199900129260118"
+      path: "contracts/triggers/0199900129260118_pilot_baseline_locked.md"
+      
+    - name: "Runbook"
+      doc_id: "0199900127260118"
+      path: "contracts/triggers/0199900127260118_run_alvt_pilot.md"
+      
+    - name: "Layer 2+ Backlog"
+      doc_id: "0199900130260118"
+      path: "contracts/triggers/0199900130260118_layer2_plus_backlog.md"
+  
+  git_references:
+    repository: "https://github.com/DICKY1987/eafix-modular"
+    baseline_tag: "alvt-pilot-baseline-v1.0"
+    final_commit: "8c8d43e"
+    
+  external_dependencies:
+    - name: "Python"
+      version: "3.8+"
+      purpose: "Runtime for ALVT tools"
+      
+    - name: "pytest"
+      version: "latest"
+      purpose: "Test framework"
+      install: "pip install pytest"
+      
+    - name: "PyYAML"
+      version: "latest"
+      purpose: "YAML parsing for contracts"
+      install: "pip install pyyaml"
+
+# ==============================================================================
+# METADATA
+# ==============================================================================
+
+metadata:
+  document_version: "1.0.0"
+  last_updated: "2026-01-23T19:25:00Z"
+  author: "ALVT Implementation Team"
+  format: "YAML"
+  encoding: "UTF-8"
+  
+  changelog:
+    - version: "1.0.0"
+      date: "2026-01-23"
+      changes:
+        - "Initial comprehensive documentation"
+        - "Complete system overview"
+        - "All 6 phases documented"
+        - "FILE_IDENTITY_CREATE baseline reference"
+        - "Tools and workflows documented"
+        - "Troubleshooting guide included"
+  
+  document_status:
+    phase_0: "DOCUMENTED"
+    phase_1: "DOCUMENTED"
+    phase_2: "DOCUMENTED"
+    phase_3: "DOCUMENTED"
+    phase_4: "DOCUMENTED"
+    phase_5: "DOCUMENTED"
+    phase_6: "DOCUMENTED"
+    completeness: "100%"
+    production_ready: true
+  
+  future_updates:
+    - "Add Layer 2 implementation when available"
+    - "Add Layer 3 implementation when available"
+    - "Update metrics with actual usage data"
+    - "Add CI/CD integration examples"
+    - "Document additional trigger baselines"
+
+# ==============================================================================
+# END OF DOCUMENTATION
+# ==============================================================================
