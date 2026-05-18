@@ -40,6 +40,16 @@ class Settings(BaseSettings):
         default="./data/calendar",
         description="Directory to write active calendar signals CSV files"
     )
+
+    calendar_source_path: Optional[str] = Field(
+        default=None,
+        description="Optional CSV file containing raw or normalized economic calendar events",
+    )
+
+    source_timezone: str = Field(
+        default="America/New_York",
+        description="Timezone for raw source date/time fields before UTC normalization",
+    )
     
     # Calendar event sources
     calendar_sources: List[str] = Field(
@@ -55,6 +65,16 @@ class Settings(BaseSettings):
     data_source: str = Field(
         default="investing.com",
         description="Primary calendar data source"
+    )
+
+    calendar_events_topic: str = Field(
+        default="eafix.calendar.events",
+        description="Redis topic for normalized CalendarEvent payloads",
+    )
+
+    calendar_signals_topic: str = Field(
+        default="eafix.calendar.signals",
+        description="Redis topic for ActiveCalendarSignal payloads",
     )
     
     # Signal generation parameters

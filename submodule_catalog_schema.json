@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "submodule_catalog_schema.json",
+  "title": "EAFIX Submodule Context Catalog Schema",
+  "type": "object",
+  "required": [
+    "catalog_metadata",
+    "context_artifacts",
+    "work_cells"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "catalog_metadata": {
+      "type": "object",
+      "required": [
+        "catalog_id",
+        "version",
+        "generated_at_utc",
+        "source_plan",
+        "parent_document",
+        "authority_model"
+      ],
+      "additionalProperties": true
+    },
+    "context_artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "context_artifact_id",
+          "authority_level",
+          "path",
+          "sha256",
+          "must_not_be_modified"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "work_cells": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "work_cell_id",
+          "parent_module",
+          "parent_module_symbol",
+          "purpose",
+          "input_contracts",
+          "output_contracts",
+          "source_files",
+          "test_files",
+          "allowed_dependencies",
+          "forbidden_dependencies",
+          "required_reference_documents",
+          "context_artifact_refs",
+          "validation_gates",
+          "acceptance_gates"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "work_cell_id": {
+            "type": "string",
+            "minLength": 3
+          },
+          "work_cell_type": {
+            "type": "string"
+          },
+          "parent_module": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_module_symbol": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_module_name": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 10
+          },
+          "process_step_codes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "input_contracts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "output_contracts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "test_files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "allowed_dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "forbidden_dependencies": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "required_reference_documents": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "context_artifact_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "validation_gates": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "acceptance_gates": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "ui_bindings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "derivation_notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "file_scope_resolution": {
+            "type": "string",
+            "enum": [
+              "canonical_module_mapping",
+              "service_scope"
+            ],
+            "description": "How source_files and allowed_files are resolved for this work cell."
+          },
+          "service_scope": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Service names used when file_scope_resolution is service_scope."
+          },
+          "candidate_file_classification": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "source_files": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "test_files": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "service_scope_files": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "filtered_from_source_files": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "requires_agent_capability": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            },
+            "description": "Capability tags the consuming agent must have, such as python, mql4, or ui."
+          },
+          "dependency_scope_override_note": {
+            "type": "string",
+            "description": "When present, use the work cell dependency and file-scope metadata instead of inferring from parent_module alone."
+          }
+        }
+      }
+    }
+  }
+}

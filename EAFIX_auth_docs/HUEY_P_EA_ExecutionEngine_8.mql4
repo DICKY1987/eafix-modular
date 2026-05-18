@@ -1,0 +1,164 @@
+/*
+   HUEY_P_EA_ExecutionEngine_8.mql4
+
+   This Expert Advisor is a simple moving‑average crossover strategy.  It was
+   created as a clean and compilable example for MetaTrader 4 and follows
+   the recommended structure for MQL4 programs using the OnInit(), OnTick()
+   and OnDeinit() event handlers.  According to the MQL4 documentation an
+   Expert Advisor should declare its event handler functions with specific
+   signatures.  The OnInit() function may return an integer value to
+   indicate success or failure【269448600939606†L69-L101】, the OnDeinit() handler
+   must be declared as void with a single `const int` parameter【269448600939606†L124-L132】,
+   and the OnTick() handler must be a void function with no parameters
+   that is called each time a new price tick arrives【269448600939606†L140-L154】.
+
+   The trading logic implemented here uses two simple moving averages.  When
+   the fast moving average crosses above the slow moving average, the EA
+   opens a long (buy) position if one isn’t already open.  When the fast
+   moving average crosses below the slow moving average, it opens a short
+   (sell) position if none exists.  Existing positions of the opposite type
+   are closed before opening a new trade.  Stop‑loss and take‑profit levels
+   can be configured through input parameters.
+
+   NOTE:
+   The original file `HUEY_P_EA_ExecutionEngine_8.mq4` referenced in the
+   assignment was not available in the project sources.  Consequently this
+   implementation serves as a functional replacement that compiles under
+   modern MetaTrader 4 (build 600+) and demonstrates proper use of the
+   event handler functions as described in the official documentation.
+*/
+
+#property strict
+#property version   "1.00"
+#property description "Simple Moving‑Average Crossover EA"
+#property author     "AutoConverted"
+#property link       "https://docs.mql4.com/"
+
+//---- input parameters ------------------------------------------------------
+extern double LotSize   = 0.10;   // Volume of a single trade in lots
+extern int    Slippage  = 3;      // Maximum slippage permitted
+extern int    FastMA    = 10;     // Period of the fast moving average
+extern int    SlowMA    = 20;     // Period of the slow moving average
+extern double StopLoss  = 50.0;   // Stop‑loss in points (0 = no SL)
+extern double TakeProfit= 100.0;  // Take‑profit in points (0 = no TP)
+
+//---------------------------------------------------------------------------
+//  OnInit() – Initialization logic
+//  The return value indicates whether initialization succeeded.  A zero
+//  return code or the ENUM_INIT_RETCODE value INIT_SUCCEEDED means the EA
+//  can continue【269448600939606†L69-L101】.
+int OnInit()
+  {
+   // Perform any one‑time setup here.  Since this EA has no special
+   // initialization requirements, return INIT_SUCCEEDED.
+   return(INIT_SUCCEEDED);
+  }
+
+//---------------------------------------------------------------------------
+//  OnDeinit() – Deinitialization logic
+//  This function is called when the EA is removed or reinitialised.  It
+//  must have the void return type and accept a single constant int
+//  parameter identifying the deinitialization reason【269448600939606†L124-L132】.
+void OnDeinit(const int reason)
+  {
+   // At this point you can perform cleanup such as closing charts or
+   // releasing resources.  There is nothing to clean up in this example.
+  }
+
+//---------------------------------------------------------------------------
+//  Helper function to close all open positions of a given type for the
+//  current symbol.  This function iterates through open orders and closes
+//  those matching the specified order type (OP_BUY or OP_SELL).
+void ClosePositions(int orderType)
+  {
+   // Loop backwards through open orders because OrderClose() can change
+   // the order indexing.
+   for(int i=OrdersTotal()-1; i>=0; i--)
+     {
+      if(OrderSelect(i,SELECT_BY_POS,MODE_TRADES))
+        {
+         if(OrderSymbol()==Symbol() && OrderType()==orderType)
+           {
+            double closePrice = (orderType==OP_BUY) ? Bid : Ask;
+            if(!OrderClose(OrderTicket(),OrderLots(),closePrice,Slippage,clrYellow))
+              {
+               Print("OrderClose failed on ticket ",OrderTicket()," with error ",GetLastError());
+              }
+           }
+        }
+     }
+  }
+
+//---------------------------------------------------------------------------
+//  OnTick() – Main event handler
+//  This function is executed on every tick【269448600939606†L140-L154】.  It implements
+//  the moving‑average crossover strategy described above.
+void OnTick()
+  {
+   // Calculate current and previous values for both moving averages.
+   double fastMA_Current  = iMA(Symbol(),0,FastMA,0,MODE_SMA,PRICE_CLOSE,0);
+   double fastMA_Previous = iMA(Symbol(),0,FastMA,0,MODE_SMA,PRICE_CLOSE,1);
+   double slowMA_Current  = iMA(Symbol(),0,SlowMA,0,MODE_SMA,PRICE_CLOSE,0);
+   double slowMA_Previous = iMA(Symbol(),0,SlowMA,0,MODE_SMA,PRICE_CLOSE,1);
+
+   // Flags to indicate whether we currently have open buy or sell positions.
+   bool hasOpenBuy  = false;
+   bool hasOpenSell = false;
+
+   int totalOrders = OrdersTotal();
+   for(int i=0; i<totalOrders; i++)
+     {
+      if(OrderSelect(i,SELECT_BY_POS,MODE_TRADES))
+        {
+         if(OrderSymbol()==Symbol())
+           {
+            if(OrderType()==OP_BUY)  hasOpenBuy  = true;
+            if(OrderType()==OP_SELL) hasOpenSell = true;
+           }
+        }
+     }
+
+   // Detect crossover signals
+   bool bullishCrossover = (fastMA_Previous <= slowMA_Previous) && (fastMA_Current > slowMA_Current);
+   bool bearishCrossover = (fastMA_Previous >= slowMA_Previous) && (fastMA_Current < slowMA_Current);
+
+   // Handle bullish crossover (Buy)
+   if(bullishCrossover && !hasOpenBuy)
+     {
+      // Close opposite positions
+      if(hasOpenSell)
+         ClosePositions(OP_SELL);
+
+      // Prepare order parameters
+      double openPrice  = NormalizeDouble(Ask,Digits);
+      double stopLoss   = StopLoss>0 ? openPrice - StopLoss*Point : 0;
+      double takeProfit = TakeProfit>0 ? openPrice + TakeProfit*Point : 0;
+
+      int ticket = OrderSend(Symbol(),OP_BUY,LotSize,openPrice,Slippage,stopLoss,takeProfit,
+                             "SMA Crossover Buy",0,0,clrGreen);
+      if(ticket<0)
+        {
+         Print("OrderSend (Buy) failed: ",GetLastError());
+        }
+     }
+
+   // Handle bearish crossover (Sell)
+   if(bearishCrossover && !hasOpenSell)
+     {
+      // Close opposite positions
+      if(hasOpenBuy)
+         ClosePositions(OP_BUY);
+
+      // Prepare order parameters
+      double openPrice  = NormalizeDouble(Bid,Digits);
+      double stopLoss   = StopLoss>0 ? openPrice + StopLoss*Point : 0;
+      double takeProfit = TakeProfit>0 ? openPrice - TakeProfit*Point : 0;
+
+      int ticket = OrderSend(Symbol(),OP_SELL,LotSize,openPrice,Slippage,stopLoss,takeProfit,
+                             "SMA Crossover Sell",0,0,clrRed);
+      if(ticket<0)
+        {
+         Print("OrderSend (Sell) failed: ",GetLastError());
+        }
+     }
+  }

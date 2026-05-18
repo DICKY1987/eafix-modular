@@ -1,0 +1,94 @@
+EAFIX-Modular — MT4 ↔ Python Communication Test
+================================================
+
+WHAT THIS TESTS
+───────────────
+  Test A  HTTP WebRequest      MT4  → Python   (MT4 calls Python's HTTP server)
+  Test B  Signal JSONL file    Python → MT4    (Python writes, MT4 reads)
+  Test C  Feedback CSV file    MT4  → Python   (MT4 writes, Python reads)
+
+Files
+-----
+  python_comms_test.py   Run on your PC (Python side)
+  MT4_CommTest.mq4       Compile and run in MetaTrader 4 (Script)
+
+
+STEP 1 — MT4: Allow WebRequest
+───────────────────────────────
+  In MetaTrader 4:
+    Tools → Options → Expert Advisors
+    ☑ Allow WebRequest for listed URL
+    Add:  http://127.0.0.1:5001
+    Click OK.
+
+
+STEP 2 — Python: Start the test
+────────────────────────────────
+  Open a Command Prompt in this folder:
+
+    cd C:\Users\richg\eafix-modular\tests\comms_test
+    python python_comms_test.py
+
+  The script will:
+    • Start an HTTP server on port 5001
+    • Write a test signal to MT4's Common\Files\eafix_test\signal.jsonl
+    • Wait up to 120 seconds for MT4 to respond
+
+
+STEP 3 — MT4: Compile and run the Script
+──────────────────────────────────────────
+  In MetaTrader 4:
+    1. Open MetaEditor (F4 or Tools → MetaEditor)
+    2. File → Open → navigate to MT4_CommTest.mq4 → Open
+    3. Press F7 to compile (no errors expected)
+    4. Back in MT4, open Navigator (Ctrl+N)
+    5. Expand Scripts → find MT4_CommTest
+    6. Drag it onto any chart (e.g., EURUSD M1)
+    7. Leave inputs at defaults → OK
+
+  Results appear immediately in:
+    • MetaTrader 4 → Experts tab (at the bottom)
+    • The chart comment (shown on chart for 5 seconds)
+
+
+STEP 4 — Read results
+──────────────────────
+  Python console will show:
+    ✅  Test A — HTTP WebRequest  (MT4 → Python)
+    ✅  Test B — Signal file      (Python → MT4)
+    ✅  Test C — Feedback file    (MT4 → Python)
+
+  MT4 Experts tab will show:
+    ✅ PASS  Test A — HTTP WebRequest
+    ✅ PASS  Test B — Signal file read
+    ✅ PASS  Test C — Feedback file write
+    🎉  ALL TESTS PASSED
+
+
+TROUBLESHOOTING
+───────────────
+  "WebRequest returned -1"
+    → WebRequest is not enabled for the URL.
+      Repeat Step 1 — add http://127.0.0.1:5001 to the allowed list.
+
+  "Port 5001 is already in use"
+    → Another process (e.g., the expiry_service.py) is on that port.
+      Stop it, or set HTTP_PORT=5002 before running:
+        set HTTP_PORT=5002 && python python_comms_test.py
+      Then update PythonBaseURL input in MT4_CommTest to match.
+
+  "Cannot open signal.jsonl"
+    → Python hasn't written the file yet, or MT4 common dir path differs.
+      Find your correct path:
+        In MT4: File → Open Data Folder → navigate up two levels →
+        Common → Files → eafix_test
+      Then set the env var:
+        set MT4_COMMON_DIR=C:\path\to\Common\Files
+        python python_comms_test.py
+
+  "No feedback file received within timeout"
+    → MT4 Script didn't run within 120s, or Test C failed on the MT4 side.
+      Check the MT4 Experts tab for the Test C result.
+
+  Common files directory (default):
+    C:\Users\<YourName>\AppData\Roaming\MetaQuotes\Terminal\Common\Files\

@@ -1,200 +1,156 @@
 #!/usr/bin/env python3
 # doc_id: DOC-TEST-0073
-# DOC_ID: DOC-SERVICE-0120
 """
-Manual Economic Calendar Event Simulator
-Creates synthetic calendar events to test the complete signal flow
+Manual Economic Calendar Signal Simulator.
+
+Creates current-shape ActiveCalendarSignal CSV files for signal-flow tests.
 """
 
-import json
 import csv
 import hashlib
-import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
+
+
+ACTIVE_SIGNAL_FIELDS = [
+    "file_seq",
+    "checksum_sha256",
+    "timestamp",
+    "calendar_id",
+    "symbol",
+    "impact_level",
+    "proximity_state",
+    "anticipation_event",
+    "direction_bias",
+    "confidence_score",
+]
 
 
 class CalendarEventSimulator:
-    """Simulates economic calendar events for testing"""
-    
+    """Simulates current-shape active calendar signals for testing."""
+
     def __init__(self, csv_dir: str = None):
         self.csv_dir = Path(csv_dir) if csv_dir else Path.cwd() / "test_data"
         self.csv_dir.mkdir(exist_ok=True)
         self.file_seq = 1
-        
-    def generate_cal8_id(self, region: str, country: str, impact: str, 
-                        event_type: str, version: str = "1", revision: str = "0") -> str:
-        """Generate CAL8 identifier: R1C2I1E2V1F1"""
-        return f"{region}{country}{impact}{event_type}{version}{revision}"
-    
-    def generate_hybrid_id(self, cal8: str, generation: str = "O", 
-                          signal: str = "ECO_HIGH_USD", duration: str = "FL",
-                          outcome: str = "O1", proximity: str = "IM", 
-                          symbol: str = "EURUSD") -> str:
-        """Generate Hybrid ID"""
-        return f"{cal8}-{generation}-{signal}-{duration}-{outcome}-{proximity}-{symbol}"
-    
+
     def create_test_event(self, event_config: Dict) -> Dict:
-        """Create a single test calendar event"""
-        now = datetime.utcnow()
-        event_time = now + timedelta(minutes=event_config.get('minutes_from_now', 30))
-        
-        # Generate CAL8 ID
-        cal8 = self.generate_cal8_id(
-            region=event_config.get('region', 'A'),
-            country=event_config.get('country', 'US'),
-            impact=event_config.get('impact', 'H'),
-            event_type=event_config.get('event_type', 'NF')
-        )
-        
-        # Generate CAL5 (legacy alias)
-        cal5 = cal8[:5]
-        
-        event = {
-            'symbol': event_config.get('symbol', 'EURUSD'),
-            'cal8': cal8,
-            'cal5': cal5,
-            'signal_type': event_config.get('signal_type', 'ECO_HIGH_USD'),
-            'proximity': event_config.get('proximity', 'SH'),  # SH = Short-term
-            'event_time_utc': event_time.isoformat() + 'Z',
-            'state': event_config.get('state', 'SCHEDULED'),
-            'priority_weight': event_config.get('priority_weight', 1.0),
-            'file_seq': self.file_seq,
-            'created_at_utc': now.isoformat() + 'Z',
+        """Create a single ActiveCalendarSignal row."""
+        now = datetime.now(timezone.utc)
+        minutes_from_now = int(event_config.get("minutes_from_now", 30))
+        event_time = now + timedelta(minutes=minutes_from_now)
+
+        proximity_state = event_config.get("proximity_state")
+        if not proximity_state:
+            if minutes_from_now > 5:
+                proximity_state = "PRE_1H"
+            elif minutes_from_now >= -5:
+                proximity_state = "AT_EVENT"
+            else:
+                proximity_state = "POST_30M"
+
+        impact_level = event_config.get("impact_level")
+        if not impact_level:
+            raw_impact = str(event_config.get("impact", "HIGH")).upper()
+            impact_level = "HIGH" if raw_impact in {"H", "HIGH"} else "MEDIUM"
+
+        currency = event_config.get("currency") or event_config.get("country", "US")
+        currency = "USD" if currency == "US" else str(currency).upper()[:3]
+        event_code = event_config.get("event_code") or event_config.get("event_type", "NFP")
+        calendar_id = event_config.get("calendar_id") or f"CAL8_{currency}_{event_code}_H"
+
+        signal = {
+            "file_seq": self.file_seq,
+            "timestamp": event_time.isoformat().replace("+00:00", "Z"),
+            "calendar_id": calendar_id,
+            "symbol": event_config.get("symbol", "EURUSD"),
+            "impact_level": impact_level,
+            "proximity_state": proximity_state,
+            "anticipation_event": proximity_state == "PRE_1H",
+            "direction_bias": event_config.get("direction_bias", "BULLISH"),
+            "confidence_score": float(event_config.get("confidence_score", 0.85)),
         }
-        
-        # Add checksum
-        event_str = json.dumps(event, sort_keys=True)
-        event['checksum_sha256'] = hashlib.sha256(event_str.encode()).hexdigest()
-        
-        return event
-    
+        signal["checksum_sha256"] = self._compute_row_checksum(signal)
+        return signal
+
     def write_active_calendar_signals(self, events: List[Dict]) -> str:
-        """Write events to active_calendar_signals.csv with atomic write"""
+        """Write ActiveCalendarSignal rows with an atomic temp-file rename."""
         temp_file = self.csv_dir / "active_calendar_signals.csv.tmp"
         final_file = self.csv_dir / "active_calendar_signals.csv"
-        
-        # CSV headers as per spec
-        headers = [
-            'symbol', 'cal8', 'cal5', 'signal_type', 'proximity', 
-            'event_time_utc', 'state', 'priority_weight', 'file_seq',
-            'created_at_utc', 'checksum_sha256'
-        ]
-        
-        with open(temp_file, 'w', newline='') as f:
-            writer = csv.DictWriter(f, fieldnames=headers)
+
+        with temp_file.open("w", newline="", encoding="utf-8") as handle:
+            writer = csv.DictWriter(handle, fieldnames=ACTIVE_SIGNAL_FIELDS)
             writer.writeheader()
-            writer.writerows(events)
-        
-        # Atomic rename
+            writer.writerows(
+                {field: event.get(field) for field in ACTIVE_SIGNAL_FIELDS}
+                for event in events
+            )
+
         temp_file.rename(final_file)
         self.file_seq += 1
-        
         return str(final_file)
 
-    def simulate_event_lifecycle(self, symbol: str = "EURUSD", 
-                                minutes_ahead: int = 30) -> List[str]:
-        """Simulate complete event lifecycle: SCHEDULED -> ANTICIPATION -> ACTIVE -> COOLDOWN -> EXPIRED"""
-        
-        states = [
-            ('SCHEDULED', 'LG', minutes_ahead),      # Long-term proximity
-            ('ANTICIPATION', 'SH', 15),              # Short-term proximity  
-            ('ACTIVE', 'IM', 0),                     # Immediate proximity
-            ('COOLDOWN', 'CD', -5),                  # Cooldown phase
-            ('EXPIRED', 'EX', -30)                   # Expired
+    def simulate_event_lifecycle(
+        self,
+        symbol: str = "EURUSD",
+        minutes_ahead: int = 30,
+    ) -> List[str]:
+        """Simulate PRE_1H -> AT_EVENT -> POST_30M signal lifecycle."""
+        stages = [
+            ("PRE_1H", minutes_ahead),
+            ("AT_EVENT", 0),
+            ("POST_30M", -10),
         ]
-        
+
         created_files = []
-        
-        for state, proximity, time_offset in states:
-            event_config = {
-                'symbol': symbol,
-                'region': 'A',
-                'country': 'US', 
-                'impact': 'H',
-                'event_type': 'NF',  # Non-farm payrolls
-                'signal_type': 'ECO_HIGH_USD',
-                'state': state,
-                'proximity': proximity,
-                'minutes_from_now': time_offset,
-                'priority_weight': 1.0 if state == 'ACTIVE' else 0.8
-            }
-            
-            event = self.create_test_event(event_config)
-            file_path = self.write_active_calendar_signals([event])
-            created_files.append(file_path)
-            
-            print(f"Created {state} event: {file_path}")
-            
+        for proximity_state, minutes_from_now in stages:
+            event = self.create_test_event({
+                "symbol": symbol,
+                "currency": "USD",
+                "impact_level": "HIGH",
+                "event_code": "NFP",
+                "proximity_state": proximity_state,
+                "minutes_from_now": minutes_from_now,
+                "confidence_score": 0.9 if proximity_state == "AT_EVENT" else 0.8,
+            })
+            created_files.append(self.write_active_calendar_signals([event]))
         return created_files
 
     def create_multiple_events(self, event_configs: List[Dict]) -> str:
-        """Create multiple events in single CSV file"""
-        events = []
-        for config in event_configs:
-            events.append(self.create_test_event(config))
-        
-        return self.write_active_calendar_signals(events)
+        """Create multiple ActiveCalendarSignal rows in a single CSV file."""
+        return self.write_active_calendar_signals([
+            self.create_test_event(config) for config in event_configs
+        ])
+
+    def _compute_row_checksum(self, row_data: Dict) -> str:
+        values = [
+            str(row_data[key])
+            for key in sorted(row_data.keys())
+            if key != "checksum_sha256"
+        ]
+        return hashlib.sha256("|".join(values).encode("utf-8")).hexdigest()
 
 
-def main():
-    """Demo script showing different test scenarios"""
+def main() -> None:
     simulator = CalendarEventSimulator()
-    
-    print("=== Economic Calendar Event Simulator ===\n")
-    
-    # Scenario 1: Single high-impact USD event
-    print("1. Creating single high-impact USD Non-Farm Payrolls event...")
-    single_event = simulator.create_test_event({
-        'symbol': 'EURUSD',
-        'region': 'A',
-        'country': 'US',
-        'impact': 'H',
-        'event_type': 'NF',
-        'signal_type': 'ECO_HIGH_USD',
-        'state': 'SCHEDULED',
-        'proximity': 'SH',
-        'minutes_from_now': 30
-    })
-    file1 = simulator.write_active_calendar_signals([single_event])
-    print(f"   Created: {file1}\n")
-    
-    # Scenario 2: Multiple currency events  
-    print("2. Creating multiple currency events...")
-    multi_events = [
+    file_path = simulator.create_multiple_events([
         {
-            'symbol': 'EURUSD',
-            'region': 'E', 'country': 'EU', 'impact': 'H', 'event_type': 'CP',
-            'signal_type': 'ECO_HIGH_EUR', 'minutes_from_now': 45
+            "symbol": "EURUSD",
+            "currency": "USD",
+            "event_code": "NFP",
+            "proximity_state": "PRE_1H",
         },
         {
-            'symbol': 'GBPUSD', 
-            'region': 'E', 'country': 'GB', 'impact': 'M', 'event_type': 'PM',
-            'signal_type': 'ECO_MED_GBP', 'minutes_from_now': 60
+            "symbol": "GBPUSD",
+            "currency": "GBP",
+            "event_code": "BOE",
+            "proximity_state": "AT_EVENT",
         },
-        {
-            'symbol': 'USDJPY',
-            'region': 'P', 'country': 'JP', 'impact': 'H', 'event_type': 'RD', 
-            'signal_type': 'ECO_HIGH_JPY', 'minutes_from_now': 90
-        }
-    ]
-    file2 = simulator.create_multiple_events(multi_events)
-    print(f"   Created: {file2}\n")
-    
-    # Scenario 3: Complete lifecycle simulation
-    print("3. Simulating complete event lifecycle...")
-    lifecycle_files = simulator.simulate_event_lifecycle('EURUSD', 120)
-    print(f"   Created {len(lifecycle_files)} lifecycle files\n")
-    
-    print("=== Test Files Created ===")
-    print("You can now:")
-    print("1. Monitor the system's response to these events")
-    print("2. Check if signals appear in the Signals Tab")
-    print("3. Verify Economic Calendar Tab shows the events")
-    print("4. Confirm decisions flow to reentry_decisions.csv")
-    print("5. Watch for MT4 execution")
+    ])
+    print(f"Created current-shape active calendar signals: {file_path}")
 
 
 if __name__ == "__main__":
     main()
+

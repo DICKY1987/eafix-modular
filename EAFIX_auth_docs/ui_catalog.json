@@ -1,0 +1,1977 @@
+{
+  "catalog_id": "UI-CATALOG-EAFIX-OPERATOR",
+  "catalog_name": "EAFIX Operator UI Catalog",
+  "document_type": "canonical_ui_catalog",
+  "status": "canonical",
+  "version": "1.0.0",
+  "created_at_utc": "2026-05-05T00:00:00Z",
+  "updated_at_utc": "2026-05-05T00:00:00Z",
+  "process_context": {
+    "process_id": "HUEY_P_EAFIX_END_TO_END",
+    "process_version": "2.0.0",
+    "related_process_contract": "updated_trading_process_aligned.json",
+    "ui_role": "Operator-facing monitoring, configuration, diagnostic, and intervention surface for the EAFIX trading system."
+  },
+  "authority_model": {
+    "purpose": "This file is the single source of truth for the intended UI structure, behavior, data dependencies, controls, safety rules, and implementation bindings.",
+    "scope_in": [
+      "Desktop operator UI products",
+      "Dashboard REST and WebSocket gateway contracts",
+      "Tabs, panels, controls, filters, and actions",
+      "UI-visible data contracts and source services",
+      "Operator safety controls and disabled-state rules",
+      "Acceptance criteria and implementation file bindings"
+    ],
+    "scope_out": [
+      "Pixel-perfect visual layout",
+      "Brand artwork",
+      "Broker-specific credentials",
+      "Trading strategy calculations outside UI display and operator control",
+      "Generated Grafana dashboard internals except monitoring dashboard references"
+    ],
+    "source_priority": [
+      {
+        "rank": 1,
+        "path": "services\\desktop-ui\\0199900104260118_GUI_Spec_Controls_Sections.md",
+        "role": "primary_ui_behavior_and_controls_spec"
+      },
+      {
+        "rank": 2,
+        "path": "docs\\0199900079260118_SYSTEM_DESCRIPTION_COMPREHENSIVE.md",
+        "role": "ui_layer_architecture_api_and_websocket_reference"
+      },
+      {
+        "rank": 3,
+        "path": "EAFIX-Modular \u2014 End-to-End Module Map.txt",
+        "role": "human_readable_ui_and_gateway_layer_map"
+      },
+      {
+        "rank": 4,
+        "path": "services\\dashboard-backend\\frontend\\0099900037260118_trading_dashboard.tsx",
+        "role": "react_dashboard_implementation_reference"
+      },
+      {
+        "rank": 5,
+        "path": "services\\desktop-ui\\2099900135260118_tkinter_dashboard_gui.py",
+        "role": "tkinter_dashboard_implementation_reference"
+      },
+      {
+        "rank": 6,
+        "path": "services\\dashboard-backend\\src\\2099900106260118_main.py",
+        "role": "dashboard_backend_runtime_reference"
+      },
+      {
+        "rank": 7,
+        "path": "services\\gui-gateway\\src\\2099900156260118_main.py",
+        "role": "gui_gateway_runtime_reference"
+      }
+    ],
+    "conflict_resolution": [
+      "If this catalog conflicts with legacy Markdown, this catalog wins after version 1.0.0.",
+      "If this catalog conflicts with live source behavior, treat source behavior as implementation drift unless the source file has a newer explicit UI catalog reference.",
+      "If service ports differ between docs and running deployment config, deployment config wins for runtime, but this catalog must be updated in the same change."
+    ]
+  },
+  "catalog_shape": {
+    "required_top_level_sections": [
+      "ui_products",
+      "navigation",
+      "screens",
+      "shared_components",
+      "data_contracts",
+      "rest_apis",
+      "websocket_contracts",
+      "safety_model",
+      "implementation_bindings",
+      "acceptance_criteria"
+    ],
+    "id_conventions": {
+      "screen_id": "UI-SCREEN-<AREA>",
+      "panel_id": "UI-PANEL-<AREA>-<NAME>",
+      "control_id": "UI-CTRL-<AREA>-<ACTION>",
+      "data_contract_id": "UI-DATA-<CONTRACT>",
+      "api_id": "UI-API-<SERVICE>-<RESOURCE>",
+      "websocket_channel_id": "UI-WS-<CHANNEL>"
+    }
+  },
+  "ui_products": [
+    {
+      "product_id": "UI-PRODUCT-DESKTOP-OPERATOR",
+      "name": "Desktop Operator UI",
+      "kind": "desktop_application",
+      "declared_stack": [
+        "Electron",
+        "React",
+        "TypeScript",
+        "TailwindCSS",
+        "Embedded Python backend",
+        "WebSocket client"
+      ],
+      "observed_implementation_paths": [
+        "services\\dashboard-backend\\frontend\\0099900037260118_trading_dashboard.tsx",
+        "services\\desktop-ui\\2099900135260118_tkinter_dashboard_gui.py",
+        "services\\desktop-ui\\dashboard\\2099900136260118_tkinter_dashboard_gui.py",
+        "services\\dashboard-backend\\src\\2099900108260118_tkinter_dashboard_gui.py"
+      ],
+      "primary_user": "Trading system operator",
+      "purpose": "Provide live trading visibility, signal review, configuration, safety intervention, history, analytics, diagnostics, and reentry controls."
+    },
+    {
+      "product_id": "UI-PRODUCT-DASHBOARD-BACKEND",
+      "name": "Dashboard Backend",
+      "kind": "backend_for_frontend",
+      "service_name": "dashboard-backend",
+      "declared_port": 8092,
+      "observed_implementation_paths": [
+        "services\\dashboard-backend\\src\\2099900106260118_main.py",
+        "services\\dashboard-backend\\src\\2099900105260118_dashboard_backend.py",
+        "services\\dashboard-backend\\src\\2099900104260118_advanced_indicators.py"
+      ],
+      "purpose": "Aggregate trading, market, signal, position, calendar, metric, and audit data into UI-friendly REST and streaming responses."
+    },
+    {
+      "product_id": "UI-PRODUCT-GUI-GATEWAY",
+      "name": "GUI Gateway",
+      "kind": "api_gateway",
+      "service_name": "gui-gateway",
+      "declared_port": 8091,
+      "observed_implementation_paths": [
+        "services\\gui-gateway\\src\\2099900156260118_main.py",
+        "services\\gui-gateway\\src\\2099900155260118_config.py",
+        "services\\gui-gateway\\src\\2099900157260118_models.py",
+        "services\\gui-gateway\\src\\2099900158260118_plugin.py"
+      ],
+      "purpose": "Expose operator API and real-time UI subscriptions for system status, dashboard summaries, positions, signals, orders, calendar events, and alerts."
+    },
+    {
+      "product_id": "UI-PRODUCT-MT4-OVERLAY",
+      "name": "MT4 Expiry Zones Overlay",
+      "kind": "mt4_indicator_overlay",
+      "observed_implementation_paths": [
+        "services\\desktop-ui\\2299900003260118_ExpiryZones.mq4",
+        "services\\desktop-ui\\2099900129260118_expiry_service.py",
+        "services\\desktop-ui\\2099900128260118_expiry_indicator_service.py"
+      ],
+      "purpose": "Display expiry zones, indicator summaries, spot data, and MT4-facing UI data served over local HTTP."
+    },
+    {
+      "product_id": "UI-PRODUCT-GRAFANA-OPS",
+      "name": "Trading System Overview Dashboard",
+      "kind": "observability_dashboard",
+      "observed_implementation_paths": [
+        "observability\\dashboards\\1199900029260118_trading-system-overview.json"
+      ],
+      "purpose": "Provide operations-oriented monitoring distinct from the operator trading UI."
+    }
+  ],
+  "navigation": {
+    "primary_tabs": [
+      "live_trading",
+      "signals_history",
+      "configuration",
+      "system_status",
+      "trade_history",
+      "history_analytics",
+      "dde_price_feed",
+      "economic_calendar",
+      "reentry_matrix",
+      "reentry_parameter_sets",
+      "alerts",
+      "equity_risk"
+    ],
+    "navigation_rules": [
+      "Tabs must preserve filters when the operator navigates away and back.",
+      "Deep links must restore tab, panel, selected entity, and active filters when possible.",
+      "Controls that emit decisions or broker-affecting commands must show disabled reason text when unavailable."
+    ]
+  },
+  "screens": [
+    {
+      "screen_id": "UI-SCREEN-LIVE-TRADING",
+      "name": "Live Trading",
+      "route_key": "live_trading",
+      "purpose": "Show real-time trading state and allow low-risk live workflow actions.",
+      "data_inputs": [
+        "Signal",
+        "PositionSnapshot",
+        "MarketData",
+        "HealthReport",
+        "SystemMetrics"
+      ],
+      "panels": [
+        {
+          "panel_id": "UI-PANEL-LIVE-STATUS-CARDS",
+          "name": "Status Cards",
+          "required_fields": [
+            "connectivity",
+            "latency",
+            "data_health",
+            "risk_posture",
+            "open_positions_summary"
+          ]
+        },
+        {
+          "panel_id": "UI-PANEL-LIVE-SIGNAL-TICKER",
+          "name": "Signal Ticker",
+          "required_fields": [
+            "signal_id",
+            "symbol",
+            "side",
+            "strength",
+            "confidence",
+            "probability",
+            "sample_size",
+            "ack_state",
+            "trace_id"
+          ],
+          "behavior": [
+            "Deduplicate identical signals within configured TTL.",
+            "Support compact and detailed row density.",
+            "Support pause and resume auto-scroll."
+          ]
+        },
+        {
+          "panel_id": "UI-PANEL-LIVE-QUICK-ACTIONS",
+          "name": "Quick Actions",
+          "required_actions": [
+            "acknowledge_alert",
+            "pin_signal",
+            "open_in_config",
+            "copy_trace_id",
+            "refresh_snapshot"
+          ]
+        }
+      ],
+      "filters": [
+        "symbol",
+        "timeframe",
+        "signal_status",
+        "row_density"
+      ],
+      "controls": [
+        {
+          "control_id": "UI-CTRL-LIVE-ACKNOWLEDGE-ALERT",
+          "label": "Acknowledge alert",
+          "control_type": "button",
+          "event": "alerts.acknowledge",
+          "payload_required": [
+            "alert_id"
+          ],
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-LIVE-PIN-SIGNAL",
+          "label": "Pin signal",
+          "control_type": "button",
+          "event": "signal.pin",
+          "payload_required": [
+            "signal_id"
+          ],
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-LIVE-AUTOSCROLL-TOGGLE",
+          "label": "Pause/Resume auto-scroll",
+          "control_type": "toggle",
+          "event": "ui.ticker_autoscroll_toggle",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-LIVE-OPEN-IN-CONFIG",
+          "label": "Open in Config",
+          "control_type": "button",
+          "event": "ui.navigate",
+          "payload_required": [
+            "target",
+            "anchor"
+          ],
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-LIVE-COPY-TRACE-ID",
+          "label": "Copy trace id",
+          "control_type": "button",
+          "event": "ui.copy_trace_id",
+          "payload_required": [
+            "trace_id"
+          ],
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-LIVE-REFRESH-SNAPSHOT",
+          "label": "Refresh snapshot",
+          "control_type": "button",
+          "event": "ui.refresh_live",
+          "cooldown_seconds": 3,
+          "safety_level": "low"
+        }
+      ],
+      "acceptance_criteria": [
+        "Live cards update within 1 second under expected load.",
+        "Signal ticker deduplicates identical signals within TTL and displays acknowledgement state.",
+        "Quick actions emit corresponding events and persist to history."
+      ]
+    },
+    {
+      "screen_id": "UI-SCREEN-CONFIGURATION",
+      "name": "Configuration",
+      "route_key": "configuration",
+      "purpose": "Manage global communication settings, indicator parameters, strategy settings, and dependency guardrails.",
+      "data_inputs": [
+        "ResolvedConfig",
+        "IndicatorConfig",
+        "RiskPolicy",
+        "CalendarPreferences"
+      ],
+      "panels": [
+        {
+          "panel_id": "UI-PANEL-CONFIG-COMMUNICATIONS",
+          "name": "Communications Bridge Settings",
+          "required_fields": [
+            "COMM_MODE",
+            "ListenPort",
+            "CommPollSeconds",
+            "EnableCSVSignals",
+            "EnableDLLSignals",
+            "DebugComm"
+          ],
+          "validation": [
+            "COMM_MODE must be one of Auto, CSV, Socket.",
+            "ListenPort must be inside configured safe port range.",
+            "DebugComm defaults to false."
+          ]
+        },
+        {
+          "panel_id": "UI-PANEL-CONFIG-INDICATOR-FORMS",
+          "name": "Indicator and Strategy Forms",
+          "behavior": [
+            "Forms are generated from parameter schemas.",
+            "Changes validate before save.",
+            "Hot reload requires successful validation and config snapshot update."
+          ]
+        },
+        {
+          "panel_id": "UI-PANEL-CONFIG-DEPENDENCY-GUARDRAILS",
+          "name": "Dependency Guardrails",
+          "behavior": [
+            "Show dependent services and contracts before applying config changes.",
+            "Block saves that would create invalid downstream configuration."
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "control_id": "UI-CTRL-CONFIG-SAVE",
+          "label": "Save",
+          "control_type": "button",
+          "event": "config.save",
+          "safety_level": "medium",
+          "requires_validation": true
+        },
+        {
+          "control_id": "UI-CTRL-CONFIG-VALIDATE",
+          "label": "Validate",
+          "control_type": "button",
+          "event": "config.validate",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-CONFIG-RESET-DEFAULTS",
+          "label": "Reset defaults",
+          "control_type": "button",
+          "event": "config.reset_defaults",
+          "safety_level": "medium",
+          "requires_confirmation": true
+        },
+        {
+          "control_id": "UI-CTRL-CONFIG-EXPORT",
+          "label": "Export",
+          "control_type": "button",
+          "event": "config.export",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-CONFIG-IMPORT",
+          "label": "Import",
+          "control_type": "button",
+          "event": "config.import",
+          "safety_level": "medium",
+          "requires_validation": true
+        }
+      ],
+      "acceptance_criteria": [
+        "Invalid settings cannot be saved.",
+        "Saved settings produce a new resolved configuration snapshot.",
+        "Import and reset actions require validation before activation."
+      ]
+    },
+    {
+      "screen_id": "UI-SCREEN-SIGNALS-HISTORY",
+      "name": "Signals History",
+      "route_key": "signals_history",
+      "purpose": "Review historical and current signals with filters, drill-down, and traceability.",
+      "data_inputs": [
+        "Signal",
+        "IndicatorVector",
+        "FeatureFrame",
+        "ExecutionReport"
+      ],
+      "panels": [
+        {
+          "panel_id": "UI-PANEL-SIGNALS-TABLE",
+          "name": "Signals Table",
+          "required_columns": [
+            "signal_id",
+            "timestamp",
+            "symbol",
+            "timeframe",
+            "side",
+            "confidence",
+            "source_indicators",
+            "status",
+            "hybrid_id",
+            "trace_id"
+          ]
+        },
+        {
+          "panel_id": "UI-PANEL-SIGNALS-DETAIL",
+          "name": "Signal Detail",
+          "behavior": [
+            "Shows full audit trail when hybrid_id is available.",
+            "Shows source indicators and normalized signal fields.",
+            "Links to execution and trade history when present."
+          ]
+        }
+      ],
+      "filters": [
+        "symbol",
+        "date_range",
+        "confidence",
+        "status",
+        "timeframe"
+      ],
+      "controls": [
+        {
+          "control_id": "UI-CTRL-SIGNALS-OPEN-AUDIT",
+          "label": "Open audit trail",
+          "control_type": "button",
+          "event": "signals.open_audit",
+          "payload_required": [
+            "hybrid_id"
+          ],
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-SIGNALS-EXPORT",
+          "label": "Export signals",
+          "control_type": "button",
+          "event": "signals.export",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-SIGNALS-PIN",
+          "label": "Pin signal",
+          "control_type": "button",
+          "event": "signal.pin",
+          "payload_required": [
+            "signal_id"
+          ],
+          "safety_level": "low"
+        }
+      ],
+      "acceptance_criteria": [
+        "Signal history is paginated and filterable.",
+        "Drill-down can resolve a complete audit trail by hybrid_id when available.",
+        "Exports include visible filters and selected columns."
+      ]
+    },
+    {
+      "screen_id": "UI-SCREEN-TRADE-HISTORY",
+      "name": "Trade History",
+      "route_key": "trade_history",
+      "purpose": "Inspect completed and in-flight trades, execution results, outcomes, and PnL reconciliation.",
+      "data_inputs": [
+        "ExecutionReport",
+        "PositionSnapshot",
+        "TradeClosed",
+        "OutcomeBucket",
+        "OrderHistory"
+      ],
+      "panels": [
+        {
+          "panel_id": "UI-PANEL-TRADES-TABLE",
+          "name": "Trade Table",
+          "required_columns": [
+            "order_id",
+            "signal_id",
+            "timestamp",
+            "symbol",
+            "side",
+            "quantity",
+            "entry_price",
+            "exit_price",
+            "status",
+            "pnl",
+            "duration_minutes",
+            "commission",
+            "outcome_bucket"
+          ]
+        },
+        {
+          "panel_id": "UI-PANEL-TRADES-KPIS",
+          "name": "Trade KPIs",
+          "required_fields": [
+            "total_trades",
+            "win_rate_percent",
+            "total_pnl",
+            "average_win",
+            "average_loss",
+            "profit_factor",
+            "max_drawdown_percent"
+          ]
+        }
+      ],
+      "filters": [
+        "symbol",
+        "date_range",
+        "status",
+        "outcome_bucket",
+        "strategy_tag"
+      ],
+      "controls": [
+        {
+          "control_id": "UI-CTRL-TRADES-EXPORT",
+          "label": "Export trades",
+          "control_type": "button",
+          "event": "trades.export",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-TRADES-OPEN-SIGNAL",
+          "label": "Open source signal",
+          "control_type": "button",
+          "event": "signals.open",
+          "payload_required": [
+            "signal_id"
+          ],
+          "safety_level": "low"
+        }
+      ],
+      "acceptance_criteria": [
+        "Trade KPIs reconcile with Equity and Risk dashboard metrics.",
+        "Trade rows link back to source signals and execution reports.",
+        "Exports include active filters."
+      ]
+    },
+    {
+      "screen_id": "UI-SCREEN-HISTORY-ANALYTICS",
+      "name": "History and Analytics",
+      "route_key": "history_analytics",
+      "purpose": "Provide logs, KPIs, analytics views, and operator review workflows.",
+      "data_inputs": [
+        "EventLogEntry",
+        "TradingStatistics",
+        "AuditTrail",
+        "SystemMetrics"
+      ],
+      "panels": [
+        {
+          "panel_id": "UI-PANEL-ANALYTICS-LOGS",
+          "name": "Logs",
+          "required_fields": [
+            "timestamp",
+            "severity",
+            "source",
+            "message",
+            "trace_id"
+          ]
+        },
+        {
+          "panel_id": "UI-PANEL-ANALYTICS-KPIS",
+          "name": "KPI Summary",
+          "required_fields": [
+            "win_rate",
+            "profit_factor",
+            "expectancy",
+            "fallback_rate",
+            "coverage_percent",
+            "latency_p95",
+            "latency_p99"
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "control_id": "UI-CTRL-ANALYTICS-EXPORT",
+          "label": "Export report",
+          "control_type": "button",
+          "event": "analytics.export_report",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-ANALYTICS-COPY-TRACE",
+          "label": "Copy trace id",
+          "control_type": "button",
+          "event": "ui.copy_trace_id",
+          "safety_level": "low"
+        }
+      ],
+      "acceptance_criteria": [
+        "Logs are filterable by severity, source, and trace_id.",
+        "KPI values cite their time window and data source.",
+        "Analytics exports are reproducible from visible filters."
+      ]
+    },
+    {
+      "screen_id": "UI-SCREEN-DDE-PRICE-FEED",
+      "name": "DDE Price Feed",
+      "route_key": "dde_price_feed",
+      "purpose": "Monitor and operate MT4 DDE price ingestion and subscriptions.",
+      "data_inputs": [
+        "PriceTick",
+        "AdapterHealth",
+        "MarketData"
+      ],
+      "panels": [
+        {
+          "panel_id": "UI-PANEL-DDE-CONNECTION",
+          "name": "Connection",
+          "required_fields": [
+            "connected",
+            "poll_interval_ms",
+            "last_tick_at",
+            "latency_ms",
+            "subscribed_symbols"
+          ]
+        },
+        {
+          "panel_id": "UI-PANEL-DDE-LIVE-TABLE",
+          "name": "Live Tick Table",
+          "required_columns": [
+            "symbol",
+            "bid",
+            "ask",
+            "spread",
+            "timestamp",
+            "source"
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "control_id": "UI-CTRL-DDE-CONNECT",
+          "label": "Connect",
+          "control_type": "button",
+          "event": "dde.connect",
+          "safety_level": "medium"
+        },
+        {
+          "control_id": "UI-CTRL-DDE-DISCONNECT",
+          "label": "Disconnect",
+          "control_type": "button",
+          "event": "dde.disconnect",
+          "safety_level": "medium",
+          "requires_confirmation": true
+        },
+        {
+          "control_id": "UI-CTRL-DDE-ADD-SYMBOL",
+          "label": "Add symbol",
+          "control_type": "button",
+          "event": "dde.symbol.add",
+          "payload_required": [
+            "symbol"
+          ],
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-DDE-SUBSCRIBE-ALL",
+          "label": "Subscribe all",
+          "control_type": "button",
+          "event": "dde.subscribe_all",
+          "safety_level": "medium"
+        },
+        {
+          "control_id": "UI-CTRL-DDE-RETRY-NOW",
+          "label": "Retry now",
+          "control_type": "button",
+          "event": "dde.retry_now",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-DDE-LATENCY-TEST",
+          "label": "Latency test",
+          "control_type": "button",
+          "event": "dde.latency_test",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-DDE-EXPORT-SNAPSHOT",
+          "label": "Export snapshot",
+          "control_type": "button",
+          "event": "dde.export_snapshot",
+          "safety_level": "low"
+        }
+      ],
+      "acceptance_criteria": [
+        "Connection state reflects DDE adapter state without manual refresh.",
+        "Retry and backoff behavior is visible to the operator.",
+        "Snapshot export includes subscribed symbols and latest tick state."
+      ]
+    },
+    {
+      "screen_id": "UI-SCREEN-ECONOMIC-CALENDAR",
+      "name": "Economic Calendar",
+      "route_key": "economic_calendar",
+      "purpose": "Monitor calendar ingestion, anticipation states, integrity checks, and calendar import safety controls.",
+      "data_inputs": [
+        "CalendarFrame",
+        "CalendarEvent",
+        "CalendarTriggers",
+        "EventProximity"
+      ],
+      "panels": [
+        {
+          "panel_id": "UI-PANEL-CALENDAR-ACTIVE-TABLE",
+          "name": "Active Calendar Table",
+          "required_columns": [
+            "symbol",
+            "cal8",
+            "cal5",
+            "signal_type",
+            "proximity",
+            "event_time_utc",
+            "state",
+            "priority_weight",
+            "file_seq",
+            "created_at_utc",
+            "checksum"
+          ],
+          "state_values": [
+            "SCHEDULED",
+            "ANTICIPATION",
+            "ACTIVE",
+            "COOLDOWN",
+            "EXPIRED",
+            "BLOCKED"
+          ]
+        },
+        {
+          "panel_id": "UI-PANEL-CALENDAR-INTEGRITY",
+          "name": "Integrity Tiles",
+          "required_fields": [
+            "sequence_gap_count",
+            "checksum_failure_count",
+            "last_import_at",
+            "blocked_rows_count"
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "control_id": "UI-CTRL-CALENDAR-IMPORT-CSV",
+          "label": "Import CSV",
+          "control_type": "button",
+          "event": "calendar.import_csv",
+          "safety_level": "medium",
+          "requires_validation": true
+        },
+        {
+          "control_id": "UI-CTRL-CALENDAR-SOCKET-TEST",
+          "label": "Socket test",
+          "control_type": "button",
+          "event": "calendar.socket_test",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-CALENDAR-INTEGRITY-CHECK",
+          "label": "CSV integrity check",
+          "control_type": "button",
+          "event": "calendar.integrity_check",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-CALENDAR-REFRESH-RESCAN",
+          "label": "Refresh/Rescan",
+          "control_type": "button",
+          "event": "calendar.refresh_rescan",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-CALENDAR-TOGGLE-LIVE",
+          "label": "Toggle live mode",
+          "control_type": "toggle",
+          "event": "calendar.live_mode_toggle",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-CALENDAR-STOP-IMPORTS",
+          "label": "STOP Imports",
+          "control_type": "button",
+          "event": "calendar.stop_imports",
+          "safety_level": "high",
+          "requires_confirmation": true,
+          "effect": "Pause scheduler and mark affected rows BLOCKED."
+        },
+        {
+          "control_id": "UI-CTRL-CALENDAR-RESUME-IMPORTS",
+          "label": "RESUME Imports",
+          "control_type": "button",
+          "event": "calendar.resume_imports",
+          "safety_level": "high",
+          "requires_confirmation": true,
+          "effect": "Resume scheduler after operator confirmation."
+        },
+        {
+          "control_id": "UI-CTRL-CALENDAR-EXPORT-SELECTION",
+          "label": "Export selection",
+          "control_type": "button",
+          "event": "calendar.export_selection",
+          "safety_level": "low"
+        }
+      ],
+      "acceptance_criteria": [
+        "STOP and RESUME reflect within one poll interval.",
+        "Badges and integrity tiles update without page refresh.",
+        "Exports include visible cal8, cal5, and priority fields."
+      ]
+    },
+    {
+      "screen_id": "UI-SCREEN-SYSTEM-STATUS",
+      "name": "System Status",
+      "route_key": "system_status",
+      "purpose": "Show health, incidents, resources, degraded states, and admin-gated operational tools.",
+      "data_inputs": [
+        "HealthReport",
+        "SystemMetrics",
+        "AdapterHealth",
+        "ModuleHealth",
+        "SLOReport"
+      ],
+      "panels": [
+        {
+          "panel_id": "UI-PANEL-STATUS-HEALTH-TILES",
+          "name": "Health Tiles",
+          "required_fields": [
+            "database_connected",
+            "ea_bridge_connected",
+            "last_heartbeat",
+            "cpu_usage",
+            "memory_usage",
+            "win_rate",
+            "max_drawdown",
+            "coverage_percent",
+            "fallback_rate",
+            "p95_latency",
+            "p99_latency",
+            "slippage_vs_expected",
+            "spread_vs_model",
+            "conflict_rate",
+            "calendar_revisions_processed",
+            "circuit_breaker_triggers",
+            "csv_integrity_counts"
+          ]
+        },
+        {
+          "panel_id": "UI-PANEL-STATUS-BROKER-CLOCK",
+          "name": "Broker Clock Skew",
+          "required_fields": [
+            "broker_offset_seconds",
+            "offset_last_updated_at",
+            "skew_state"
+          ],
+          "degraded_rule": "If absolute broker clock skew exceeds 120 seconds or offset is stale for more than 15 minutes, set DEGRADED, mark EA bridge disconnected, and disable decision emission until two consecutive healthy checks."
+        },
+        {
+          "panel_id": "UI-PANEL-STATUS-OPERATOR-TOOLS",
+          "name": "Operator Tools",
+          "admin_gated": true
+        }
+      ],
+      "controls": [
+        {
+          "control_id": "UI-CTRL-STATUS-PAUSE-DECISIONS",
+          "label": "Pause Decisions",
+          "control_type": "button",
+          "event": "operator.pause_decisions",
+          "safety_level": "high",
+          "requires_admin": true,
+          "requires_confirmation": true
+        },
+        {
+          "control_id": "UI-CTRL-STATUS-RESUME-DECISIONS",
+          "label": "Resume Decisions",
+          "control_type": "button",
+          "event": "operator.resume_decisions",
+          "safety_level": "high",
+          "requires_admin": true,
+          "requires_confirmation": true
+        },
+        {
+          "control_id": "UI-CTRL-STATUS-FLATTEN-ALL",
+          "label": "Flatten All",
+          "control_type": "button",
+          "event": "operator.flatten_all",
+          "safety_level": "critical",
+          "requires_admin": true,
+          "requires_confirmation": true
+        },
+        {
+          "control_id": "UI-CTRL-STATUS-CANCEL-ALL-ORDERS",
+          "label": "Cancel All Orders",
+          "control_type": "button",
+          "event": "operator.cancel_all_orders",
+          "safety_level": "critical",
+          "requires_admin": true,
+          "requires_confirmation": true
+        },
+        {
+          "control_id": "UI-CTRL-STATUS-RESYNC-BROKER-CLOCK",
+          "label": "Resync Broker Clock",
+          "control_type": "button",
+          "event": "operator.resync_broker_clock",
+          "safety_level": "high",
+          "requires_admin": true
+        },
+        {
+          "control_id": "UI-CTRL-STATUS-ESCALATE-PAGE",
+          "label": "Escalate/Page",
+          "control_type": "button",
+          "event": "operator.escalate_page",
+          "safety_level": "medium",
+          "requires_admin": true
+        }
+      ],
+      "acceptance_criteria": [
+        "In DEGRADED mode, decision-emitting controls are disabled and labeled with reason.",
+        "Alerts fire when configured health thresholds are breached.",
+        "Critical controls are admin-gated and require confirmation."
+      ]
+    },
+    {
+      "screen_id": "UI-SCREEN-REENTRY-MATRIX",
+      "name": "Reentry Matrix",
+      "route_key": "reentry_matrix",
+      "purpose": "Inspect and manage reentry decision matrix dimensions, cells, versions, overrides, and decision traceability.",
+      "data_inputs": [
+        "OutcomeBucket",
+        "EventProximity",
+        "MatrixDecision",
+        "ReentryChainState",
+        "MatrixProfile"
+      ],
+      "panels": [
+        {
+          "panel_id": "UI-PANEL-REENTRY-MATRIX-HEATMAP",
+          "name": "Matrix Heatmap",
+          "required_dimensions": [
+            "signal_context",
+            "timing_context",
+            "outcome_bucket",
+            "chain_position",
+            "generation"
+          ]
+        },
+        {
+          "panel_id": "UI-PANEL-REENTRY-MATRIX-OVERRIDES",
+          "name": "Manual Overrides",
+          "required_fields": [
+            "scope",
+            "ttl",
+            "reason",
+            "created_by",
+            "expires_at",
+            "affected_trades"
+          ],
+          "behavior": [
+            "Overrides auto-revert when TTL expires.",
+            "Trades affected by overrides are tagged for separate PnL and audit."
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "control_id": "UI-CTRL-REENTRY-EDIT-CELL",
+          "label": "Edit cell",
+          "control_type": "button",
+          "event": "reentry.matrix.edit_cell",
+          "safety_level": "high",
+          "requires_admin": true,
+          "requires_validation": true
+        },
+        {
+          "control_id": "UI-CTRL-REENTRY-BULK-COPY",
+          "label": "Bulk copy",
+          "control_type": "button",
+          "event": "reentry.matrix.bulk_copy",
+          "safety_level": "high",
+          "requires_admin": true,
+          "requires_validation": true
+        },
+        {
+          "control_id": "UI-CTRL-REENTRY-RESET-SLICE",
+          "label": "Reset slice",
+          "control_type": "button",
+          "event": "reentry.matrix.reset_slice",
+          "safety_level": "high",
+          "requires_admin": true,
+          "requires_confirmation": true
+        },
+        {
+          "control_id": "UI-CTRL-REENTRY-SAVE-VERSION",
+          "label": "Save version",
+          "control_type": "button",
+          "event": "reentry.matrix.save_version",
+          "safety_level": "high",
+          "requires_admin": true,
+          "requires_validation": true
+        },
+        {
+          "control_id": "UI-CTRL-REENTRY-COMPARE-VERSIONS",
+          "label": "Compare versions",
+          "control_type": "button",
+          "event": "reentry.matrix.compare_versions",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-REENTRY-ROLLBACK",
+          "label": "Rollback",
+          "control_type": "button",
+          "event": "reentry.matrix.rollback",
+          "safety_level": "high",
+          "requires_admin": true,
+          "requires_confirmation": true
+        },
+        {
+          "control_id": "UI-CTRL-REENTRY-OPEN-DECISIONS",
+          "label": "Open decisions",
+          "control_type": "button",
+          "event": "reentry.decisions.open",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-REENTRY-OPEN-LEDGER",
+          "label": "Open reentry ledger",
+          "control_type": "button",
+          "event": "reentry.ledger.open",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-REENTRY-NEW-OVERRIDE",
+          "label": "New Override",
+          "control_type": "button",
+          "event": "reentry.override.create",
+          "safety_level": "high",
+          "requires_admin": true,
+          "requires_confirmation": true,
+          "payload_required": [
+            "scope",
+            "ttl",
+            "reason"
+          ]
+        },
+        {
+          "control_id": "UI-CTRL-REENTRY-REVERT-OVERRIDE",
+          "label": "Revert Override",
+          "control_type": "button",
+          "event": "reentry.override.revert",
+          "safety_level": "high",
+          "requires_admin": true,
+          "requires_confirmation": true
+        }
+      ],
+      "acceptance_criteria": [
+        "Matrix edits validate before save.",
+        "Version comparison shows changed cells and affected decision dimensions.",
+        "Manual overrides require scope, TTL, and reason."
+      ]
+    },
+    {
+      "screen_id": "UI-SCREEN-REENTRY-PARAMETER-SETS",
+      "name": "Reentry Parameter Sets",
+      "route_key": "reentry_parameter_sets",
+      "purpose": "Manage typed parameter sets for reentry behavior and link active sets to matrix profiles.",
+      "data_inputs": [
+        "MatrixProfile",
+        "ReentryPolicy",
+        "ResolvedConfig"
+      ],
+      "panels": [
+        {
+          "panel_id": "UI-PANEL-REENTRY-PARAM-EDITOR",
+          "name": "Parameter Editor",
+          "required_sections": [
+            "risk_and_sizing",
+            "confidence_thresholds",
+            "generation_limits",
+            "spread_guard",
+            "bridge_and_storage",
+            "matrix_linkage"
+          ]
+        },
+        {
+          "panel_id": "UI-PANEL-REENTRY-PARAM-ACTIVE-OVERRIDES",
+          "name": "Active Overrides",
+          "behavior": [
+            "Read-only list of active overrides affecting this parameter set.",
+            "Each override links back to Reentry Matrix."
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "control_id": "UI-CTRL-REENTRY-PARAM-NEW-SET",
+          "label": "New set",
+          "control_type": "button",
+          "event": "reentry.parameters.new_set",
+          "safety_level": "medium"
+        },
+        {
+          "control_id": "UI-CTRL-REENTRY-PARAM-DUPLICATE",
+          "label": "Duplicate",
+          "control_type": "button",
+          "event": "reentry.parameters.duplicate",
+          "safety_level": "medium"
+        },
+        {
+          "control_id": "UI-CTRL-REENTRY-PARAM-SAVE",
+          "label": "Save",
+          "control_type": "button",
+          "event": "reentry.parameters.save",
+          "safety_level": "high",
+          "requires_validation": true
+        },
+        {
+          "control_id": "UI-CTRL-REENTRY-PARAM-IMPORT-JSON",
+          "label": "Import JSON",
+          "control_type": "button",
+          "event": "reentry.parameters.import_json",
+          "safety_level": "high",
+          "requires_validation": true
+        },
+        {
+          "control_id": "UI-CTRL-REENTRY-PARAM-EXPORT-JSON",
+          "label": "Export JSON",
+          "control_type": "button",
+          "event": "reentry.parameters.export_json",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-REENTRY-PARAM-SET-ACTIVE",
+          "label": "Set active",
+          "control_type": "button",
+          "event": "reentry.parameters.set_active",
+          "safety_level": "high",
+          "requires_admin": true,
+          "requires_confirmation": true
+        },
+        {
+          "control_id": "UI-CTRL-REENTRY-PARAM-DELETE",
+          "label": "Delete",
+          "control_type": "button",
+          "event": "reentry.parameters.delete",
+          "safety_level": "high",
+          "requires_admin": true,
+          "requires_confirmation": true
+        },
+        {
+          "control_id": "UI-CTRL-REENTRY-PARAM-LINK-MATRIX",
+          "label": "Link to matrix",
+          "control_type": "button",
+          "event": "reentry.parameters.link_matrix",
+          "safety_level": "medium",
+          "requires_validation": true
+        }
+      ],
+      "acceptance_criteria": [
+        "Required keys are present before save.",
+        "Parameter typing is enforced.",
+        "Active parameter sets link to a valid matrix profile."
+      ]
+    },
+    {
+      "screen_id": "UI-SCREEN-ALERTS",
+      "name": "Alerts and Notifications",
+      "route_key": "alerts",
+      "purpose": "Display and operate alert lifecycle for signal, risk, health, degraded mode, calendar emergency stop, and integrity events.",
+      "data_inputs": [
+        "AlertEvent",
+        "HealthReport",
+        "SLOReport",
+        "EventLogEntry"
+      ],
+      "panels": [
+        {
+          "panel_id": "UI-PANEL-ALERTS-LIST",
+          "name": "Alerts List",
+          "required_fields": [
+            "alert_id",
+            "severity",
+            "source",
+            "message",
+            "state",
+            "created_at",
+            "acknowledged_by",
+            "trace_id"
+          ]
+        },
+        {
+          "panel_id": "UI-PANEL-ALERTS-TRIGGERS",
+          "name": "Alert Triggers",
+          "trigger_categories": [
+            "probability_threshold",
+            "confidence_threshold",
+            "sample_size_floor",
+            "risk_posture_gate",
+            "coverage_threshold",
+            "fallback_spike",
+            "broker_clock_degraded",
+            "calendar_emergency_stop",
+            "checksum_failure",
+            "sequence_gap"
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "control_id": "UI-CTRL-ALERTS-ACKNOWLEDGE",
+          "label": "Acknowledge",
+          "control_type": "button",
+          "event": "alerts.acknowledge",
+          "payload_required": [
+            "alert_id"
+          ],
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-ALERTS-ESCALATE",
+          "label": "Escalate",
+          "control_type": "button",
+          "event": "alerts.escalate",
+          "payload_required": [
+            "alert_id"
+          ],
+          "safety_level": "medium"
+        }
+      ],
+      "acceptance_criteria": [
+        "Alerts deduplicate within configured TTL.",
+        "Acknowledged and escalated states are persisted.",
+        "Critical alerts remain visible until resolved or explicitly acknowledged."
+      ]
+    },
+    {
+      "screen_id": "UI-SCREEN-EQUITY-RISK",
+      "name": "Equity and Risk Dashboard",
+      "route_key": "equity_risk",
+      "purpose": "Visualize equity, drawdown, outcomes, risk cards, and recent closes for live risk review.",
+      "data_inputs": [
+        "TradeClosed",
+        "OutcomeBucket",
+        "RiskDecision",
+        "PortfolioState",
+        "TradingStatistics"
+      ],
+      "panels": [
+        {
+          "panel_id": "UI-PANEL-EQUITY-CURVE",
+          "name": "Equity Curve",
+          "required_fields": [
+            "timestamp",
+            "equity",
+            "cash_adjustment",
+            "account"
+          ]
+        },
+        {
+          "panel_id": "UI-PANEL-EQUITY-DRAWDOWN",
+          "name": "Drawdown Curve",
+          "required_fields": [
+            "drawdown",
+            "max_drawdown",
+            "time_underwater"
+          ]
+        },
+        {
+          "panel_id": "UI-PANEL-EQUITY-OUTCOMES",
+          "name": "Outcome Distribution",
+          "required_fields": [
+            "outcome_bucket",
+            "count",
+            "pnl"
+          ]
+        },
+        {
+          "panel_id": "UI-PANEL-EQUITY-RISK-CARDS",
+          "name": "Risk Cards",
+          "required_fields": [
+            "expectancy",
+            "profit_factor",
+            "geometric_growth",
+            "var_5_percent",
+            "risk_of_ruin_proximity"
+          ]
+        }
+      ],
+      "filters": [
+        "date",
+        "symbol",
+        "strategy_tag",
+        "parameter_set_id",
+        "account",
+        "gross_net",
+        "currency_normalization",
+        "smoothing",
+        "compare_a_b"
+      ],
+      "controls": [
+        {
+          "control_id": "UI-CTRL-EQUITY-TOGGLE-OVERLAYS",
+          "label": "Toggle overlays",
+          "control_type": "toggle",
+          "event": "equity.toggle_overlays",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-EQUITY-SAVE-VIEW-PRESET",
+          "label": "Save view preset",
+          "control_type": "button",
+          "event": "equity.save_view_preset",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-EQUITY-EXPORT-SERIES",
+          "label": "Export series",
+          "control_type": "button",
+          "event": "equity.export_series",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-EQUITY-SNAPSHOT",
+          "label": "Snapshot",
+          "control_type": "button",
+          "event": "equity.snapshot",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-EQUITY-COMPARE-MODE",
+          "label": "Compare mode",
+          "control_type": "toggle",
+          "event": "equity.compare_mode",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-EQUITY-NET-GROSS-TOGGLE",
+          "label": "Net/Gross toggle",
+          "control_type": "toggle",
+          "event": "equity.net_gross_toggle",
+          "safety_level": "low"
+        },
+        {
+          "control_id": "UI-CTRL-EQUITY-CURRENCY-NORMALIZE",
+          "label": "Currency normalize",
+          "control_type": "toggle",
+          "event": "equity.currency_normalize",
+          "safety_level": "low"
+        }
+      ],
+      "acceptance_criteria": [
+        "Equity and risk panels update within 1 second after close events.",
+        "At least 50000 trades remain interactive in supported views.",
+        "KPIs reconcile with Trade History."
+      ]
+    }
+  ],
+  "shared_components": [
+    {
+      "component_id": "UI-COMP-RISK-RIBBON",
+      "name": "Risk Ribbon",
+      "purpose": "Persistent summary of current risk posture, degraded mode, active circuit breakers, and decision emission state.",
+      "visible_on": [
+        "live_trading",
+        "configuration",
+        "system_status",
+        "reentry_matrix",
+        "equity_risk"
+      ],
+      "data_inputs": [
+        "RiskDecision",
+        "HealthReport",
+        "SLOReport"
+      ]
+    },
+    {
+      "component_id": "UI-COMP-TOAST-ALERT-MANAGER",
+      "name": "Toast and Alert Manager",
+      "purpose": "Display prioritized alerts and operator acknowledgement or escalation actions.",
+      "data_inputs": [
+        "AlertEvent"
+      ],
+      "controls": [
+        "UI-CTRL-ALERTS-ACKNOWLEDGE",
+        "UI-CTRL-ALERTS-ESCALATE"
+      ]
+    },
+    {
+      "component_id": "UI-COMP-FILTER-BAR",
+      "name": "Filter Bar",
+      "purpose": "Provide reusable symbol, timeframe, date, status, and confidence filters.",
+      "behavior": [
+        "Filter state is preserved across tab navigation.",
+        "Exports include active filter state."
+      ]
+    }
+  ],
+  "data_contracts": [
+    {
+      "data_contract_id": "UI-DATA-SIGNAL",
+      "contract_name": "Signal",
+      "required_ui_fields": [
+        "signal_id",
+        "timestamp",
+        "symbol",
+        "side",
+        "confidence",
+        "source_indicators",
+        "status",
+        "trace_id"
+      ],
+      "producer_process_steps": [
+        "S10"
+      ]
+    },
+    {
+      "data_contract_id": "UI-DATA-POSITION-SNAPSHOT",
+      "contract_name": "PositionSnapshot",
+      "required_ui_fields": [
+        "symbol",
+        "side",
+        "quantity",
+        "entry_price",
+        "current_price",
+        "unrealized_pnl",
+        "stop_loss",
+        "take_profit"
+      ],
+      "producer_process_steps": [
+        "S18"
+      ]
+    },
+    {
+      "data_contract_id": "UI-DATA-EXECUTION-REPORT",
+      "contract_name": "ExecutionReport",
+      "required_ui_fields": [
+        "order_id",
+        "signal_id",
+        "status",
+        "execution_price",
+        "timestamp",
+        "commission",
+        "trace_id"
+      ],
+      "producer_process_steps": [
+        "S18"
+      ]
+    },
+    {
+      "data_contract_id": "UI-DATA-CALENDAR-EVENT",
+      "contract_name": "CalendarEvent",
+      "required_ui_fields": [
+        "event_id",
+        "timestamp",
+        "currency",
+        "title",
+        "impact",
+        "actual",
+        "forecast",
+        "previous"
+      ],
+      "producer_process_steps": [
+        "S04",
+        "S06"
+      ]
+    },
+    {
+      "data_contract_id": "UI-DATA-HEALTH-REPORT",
+      "contract_name": "HealthReport",
+      "required_ui_fields": [
+        "overall_status",
+        "services",
+        "metrics",
+        "timestamp"
+      ],
+      "producer_process_steps": [
+        "S26"
+      ]
+    },
+    {
+      "data_contract_id": "UI-DATA-MATRIX-DECISION",
+      "contract_name": "MatrixDecision",
+      "required_ui_fields": [
+        "matrix_version",
+        "signal_context",
+        "timing_context",
+        "outcome_bucket",
+        "chain_position",
+        "action",
+        "reason"
+      ],
+      "producer_process_steps": [
+        "S23"
+      ]
+    },
+    {
+      "data_contract_id": "UI-DATA-ALERT-EVENT",
+      "contract_name": "AlertEvent",
+      "required_ui_fields": [
+        "alert_id",
+        "severity",
+        "source",
+        "message",
+        "state",
+        "created_at",
+        "acknowledged_by",
+        "trace_id"
+      ],
+      "producer_process_steps": [
+        "S25",
+        "S26"
+      ]
+    },
+    {
+      "data_contract_id": "UI-DATA-OUTCOME-BUCKET",
+      "contract_name": "OutcomeBucket",
+      "required_ui_fields": [
+        "bucket",
+        "trade_id",
+        "pnl",
+        "classification_reason"
+      ],
+      "producer_process_steps": [
+        "S21"
+      ]
+    }
+  ],
+  "rest_apis": [
+    {
+      "api_id": "UI-API-DASHBOARD-SIGNALS",
+      "service": "dashboard-backend",
+      "method": "GET",
+      "path": "/api/signals",
+      "purpose": "Recent signals for signal history and live panels.",
+      "consumed_by_screens": [
+        "UI-SCREEN-LIVE-TRADING",
+        "UI-SCREEN-SIGNALS-HISTORY"
+      ]
+    },
+    {
+      "api_id": "UI-API-DASHBOARD-SIGNAL-DETAIL",
+      "service": "dashboard-backend",
+      "method": "GET",
+      "path": "/api/signals/{id}",
+      "purpose": "Signal detail and drill-down.",
+      "consumed_by_screens": [
+        "UI-SCREEN-SIGNALS-HISTORY"
+      ]
+    },
+    {
+      "api_id": "UI-API-DASHBOARD-POSITIONS",
+      "service": "dashboard-backend",
+      "method": "GET",
+      "path": "/api/positions",
+      "purpose": "Open positions for live trading and risk views.",
+      "consumed_by_screens": [
+        "UI-SCREEN-LIVE-TRADING",
+        "UI-SCREEN-EQUITY-RISK"
+      ]
+    },
+    {
+      "api_id": "UI-API-DASHBOARD-TRADES",
+      "service": "dashboard-backend",
+      "method": "GET",
+      "path": "/api/trades",
+      "purpose": "Trade history and PnL views.",
+      "consumed_by_screens": [
+        "UI-SCREEN-TRADE-HISTORY",
+        "UI-SCREEN-EQUITY-RISK"
+      ]
+    },
+    {
+      "api_id": "UI-API-DASHBOARD-CALENDAR",
+      "service": "dashboard-backend",
+      "method": "GET",
+      "path": "/api/calendar",
+      "purpose": "Upcoming calendar events.",
+      "consumed_by_screens": [
+        "UI-SCREEN-ECONOMIC-CALENDAR",
+        "UI-SCREEN-LIVE-TRADING"
+      ]
+    },
+    {
+      "api_id": "UI-API-DASHBOARD-METRICS",
+      "service": "dashboard-backend",
+      "method": "GET",
+      "path": "/api/metrics",
+      "purpose": "System health metrics.",
+      "consumed_by_screens": [
+        "UI-SCREEN-SYSTEM-STATUS",
+        "UI-SCREEN-LIVE-TRADING"
+      ]
+    },
+    {
+      "api_id": "UI-API-DASHBOARD-INDICATOR-CONFIG",
+      "service": "dashboard-backend",
+      "method": "POST",
+      "path": "/api/config/indicators",
+      "purpose": "Update indicator configuration.",
+      "consumed_by_screens": [
+        "UI-SCREEN-CONFIGURATION"
+      ]
+    },
+    {
+      "api_id": "UI-API-DASHBOARD-AUDIT",
+      "service": "dashboard-backend",
+      "method": "GET",
+      "path": "/api/audit/{hybrid_id}",
+      "purpose": "Complete audit trail.",
+      "consumed_by_screens": [
+        "UI-SCREEN-SIGNALS-HISTORY",
+        "UI-SCREEN-HISTORY-ANALYTICS"
+      ]
+    },
+    {
+      "api_id": "UI-API-GUI-SYSTEM-STATUS",
+      "service": "gui-gateway",
+      "method": "GET",
+      "path": "/api/v1/system/status",
+      "purpose": "Overall system status and service health.",
+      "consumed_by_screens": [
+        "UI-SCREEN-SYSTEM-STATUS"
+      ],
+      "observed_in_source": "services\\gui-gateway\\src\\2099900156260118_main.py"
+    },
+    {
+      "api_id": "UI-API-GUI-DASHBOARD",
+      "service": "gui-gateway",
+      "method": "GET",
+      "path": "/api/v1/dashboard",
+      "purpose": "Comprehensive trading dashboard data.",
+      "consumed_by_screens": [
+        "UI-SCREEN-LIVE-TRADING",
+        "UI-SCREEN-EQUITY-RISK"
+      ],
+      "observed_in_source": "services\\gui-gateway\\src\\2099900156260118_main.py"
+    },
+    {
+      "api_id": "UI-API-GUI-POSITIONS",
+      "service": "gui-gateway",
+      "method": "GET",
+      "path": "/api/v1/positions",
+      "purpose": "Current position summary.",
+      "consumed_by_screens": [
+        "UI-SCREEN-LIVE-TRADING",
+        "UI-SCREEN-EQUITY-RISK"
+      ],
+      "observed_in_source": "services\\gui-gateway\\src\\2099900156260118_main.py"
+    },
+    {
+      "api_id": "UI-API-GUI-LIVE-SIGNALS",
+      "service": "gui-gateway",
+      "method": "GET",
+      "path": "/api/v1/signals/live",
+      "purpose": "Live trading signals feed.",
+      "consumed_by_screens": [
+        "UI-SCREEN-LIVE-TRADING",
+        "UI-SCREEN-SIGNALS-HISTORY"
+      ],
+      "observed_in_source": "services\\gui-gateway\\src\\2099900156260118_main.py"
+    },
+    {
+      "api_id": "UI-API-GUI-ORDER-HISTORY",
+      "service": "gui-gateway",
+      "method": "GET",
+      "path": "/api/v1/orders/history",
+      "purpose": "Order execution history.",
+      "consumed_by_screens": [
+        "UI-SCREEN-TRADE-HISTORY"
+      ],
+      "observed_in_source": "services\\gui-gateway\\src\\2099900156260118_main.py"
+    },
+    {
+      "api_id": "UI-API-GUI-CALENDAR-EVENTS",
+      "service": "gui-gateway",
+      "method": "GET",
+      "path": "/api/v1/calendar/events",
+      "purpose": "Upcoming economic calendar events.",
+      "consumed_by_screens": [
+        "UI-SCREEN-ECONOMIC-CALENDAR"
+      ],
+      "observed_in_source": "services\\gui-gateway\\src\\2099900156260118_main.py"
+    }
+  ],
+  "websocket_contracts": [
+    {
+      "websocket_id": "UI-WS-GUI-GATEWAY",
+      "service": "gui-gateway",
+      "url": "ws://localhost:8091/ws",
+      "subscription_message": {
+        "action": "subscribe",
+        "channels": [
+          "signals",
+          "positions",
+          "alerts"
+        ]
+      },
+      "message_envelope": {
+        "required_fields": [
+          "channel",
+          "event",
+          "payload",
+          "timestamp"
+        ]
+      }
+    },
+    {
+      "websocket_id": "UI-WS-DASHBOARD-BACKEND",
+      "service": "dashboard-backend",
+      "url": "service_defined",
+      "observed_message_types": [
+        "subscribe",
+        "unsubscribe",
+        "get_history",
+        "update",
+        "history"
+      ],
+      "observed_in_source": "services\\dashboard-backend\\src\\2099900106260118_main.py"
+    }
+  ],
+  "websocket_channels": [
+    {
+      "websocket_channel_id": "UI-WS-SIGNALS",
+      "channel": "signals",
+      "payload_contract": "Signal",
+      "consumed_by_screens": [
+        "UI-SCREEN-LIVE-TRADING",
+        "UI-SCREEN-SIGNALS-HISTORY"
+      ]
+    },
+    {
+      "websocket_channel_id": "UI-WS-POSITIONS",
+      "channel": "positions",
+      "payload_contract": "PositionSnapshot",
+      "consumed_by_screens": [
+        "UI-SCREEN-LIVE-TRADING",
+        "UI-SCREEN-EQUITY-RISK"
+      ]
+    },
+    {
+      "websocket_channel_id": "UI-WS-ALERTS",
+      "channel": "alerts",
+      "payload_contract": "AlertEvent",
+      "consumed_by_screens": [
+        "UI-SCREEN-LIVE-TRADING",
+        "UI-SCREEN-SYSTEM-STATUS",
+        "UI-SCREEN-ALERTS"
+      ]
+    }
+  ],
+  "safety_model": {
+    "safety_levels": [
+      {
+        "level": "low",
+        "meaning": "Display-only or local UI convenience action."
+      },
+      {
+        "level": "medium",
+        "meaning": "May alter UI-visible state, subscriptions, or non-trading configuration."
+      },
+      {
+        "level": "high",
+        "meaning": "May alter trading decisions, calendar intake, reentry behavior, or operational posture."
+      },
+      {
+        "level": "critical",
+        "meaning": "May cancel orders, flatten positions, or stop/resume decision emission."
+      }
+    ],
+    "global_disabled_state_rules": [
+      {
+        "rule_id": "UI-SAFETY-DEGRADED-DISABLE-DECISIONS",
+        "trigger": "System enters DEGRADED due to broker clock skew, stale offset, unknown health, or circuit breaker.",
+        "effect": "Disable decision-emitting controls and show the disabled reason."
+      },
+      {
+        "rule_id": "UI-SAFETY-ADMIN-GATE-CRITICAL",
+        "trigger": "Control safety_level is high or critical and requires_admin is true.",
+        "effect": "Require admin role before enabling the control."
+      },
+      {
+        "rule_id": "UI-SAFETY-CONFIRM-CRITICAL",
+        "trigger": "Control requires_confirmation is true.",
+        "effect": "Require explicit confirmation with action label, scope, and reason before emitting event."
+      },
+      {
+        "rule_id": "UI-SAFETY-VALIDATE-BEFORE-ACTIVATE",
+        "trigger": "Control requires_validation is true.",
+        "effect": "Run validation and block the action when validation fails."
+      }
+    ],
+    "operator_audit_requirements": [
+      "High and critical safety controls must record user, timestamp, reason, input payload, result, and trace_id.",
+      "Manual overrides must record scope, TTL, reason, author, expiration, and affected trades.",
+      "Emergency STOP/RESUME actions must persist state changes to history."
+    ]
+  },
+  "implementation_bindings": [
+    {
+      "binding_id": "UI-BIND-REACT-DASHBOARD",
+      "path": "services\\dashboard-backend\\frontend\\0099900037260118_trading_dashboard.tsx",
+      "binds_to": [
+        "UI-SCREEN-LIVE-TRADING",
+        "UI-SCREEN-SIGNALS-HISTORY"
+      ],
+      "notes": [
+        "Current implementation contains mock signal data and should be reconciled with catalog data contracts."
+      ]
+    },
+    {
+      "binding_id": "UI-BIND-TKINTER-DESKTOP",
+      "path": "services\\desktop-ui\\2099900135260118_tkinter_dashboard_gui.py",
+      "binds_to": [
+        "UI-PRODUCT-DESKTOP-OPERATOR"
+      ]
+    },
+    {
+      "binding_id": "UI-BIND-TKINTER-DASHBOARD-SUBDIR",
+      "path": "services\\desktop-ui\\dashboard\\2099900136260118_tkinter_dashboard_gui.py",
+      "binds_to": [
+        "UI-PRODUCT-DESKTOP-OPERATOR"
+      ]
+    },
+    {
+      "binding_id": "UI-BIND-DASHBOARD-BACKEND-MAIN",
+      "path": "services\\dashboard-backend\\src\\2099900106260118_main.py",
+      "binds_to": [
+        "UI-PRODUCT-DASHBOARD-BACKEND",
+        "UI-WS-DASHBOARD-BACKEND"
+      ]
+    },
+    {
+      "binding_id": "UI-BIND-DASHBOARD-DATA-MANAGER",
+      "path": "services\\dashboard-backend\\src\\2099900105260118_dashboard_backend.py",
+      "binds_to": [
+        "UI-DATA-SIGNAL",
+        "UI-SCREEN-LIVE-TRADING",
+        "UI-SCREEN-SIGNALS-HISTORY"
+      ]
+    },
+    {
+      "binding_id": "UI-BIND-GUI-GATEWAY-MAIN",
+      "path": "services\\gui-gateway\\src\\2099900156260118_main.py",
+      "binds_to": [
+        "UI-PRODUCT-GUI-GATEWAY",
+        "UI-API-GUI-SYSTEM-STATUS",
+        "UI-API-GUI-DASHBOARD",
+        "UI-API-GUI-POSITIONS",
+        "UI-API-GUI-LIVE-SIGNALS",
+        "UI-API-GUI-ORDER-HISTORY",
+        "UI-API-GUI-CALENDAR-EVENTS"
+      ]
+    },
+    {
+      "binding_id": "UI-BIND-GUI-GATEWAY-MODELS",
+      "path": "services\\gui-gateway\\src\\2099900157260118_models.py",
+      "binds_to": [
+        "UI-DATA-SIGNAL",
+        "UI-DATA-POSITION-SNAPSHOT",
+        "UI-DATA-CALENDAR-EVENT",
+        "UI-DATA-HEALTH-REPORT"
+      ]
+    },
+    {
+      "binding_id": "UI-BIND-MT4-EXPIRY-ZONES",
+      "path": "services\\desktop-ui\\2299900003260118_ExpiryZones.mq4",
+      "binds_to": [
+        "UI-PRODUCT-MT4-OVERLAY"
+      ]
+    },
+    {
+      "binding_id": "UI-BIND-CURRENCY-STRENGTH-MOCKUP",
+      "path": "services\\desktop-ui\\indicators\\currency_strength\\4399900001260118_currency_strength_mockup.html",
+      "binds_to": [
+        "UI-SCREEN-LIVE-TRADING",
+        "UI-SCREEN-HISTORY-ANALYTICS"
+      ],
+      "notes": [
+        "Mockup/reference only; not authoritative over this catalog."
+      ]
+    },
+    {
+      "binding_id": "UI-BIND-GRAFANA-OPS",
+      "path": "observability\\dashboards\\1199900029260118_trading-system-overview.json",
+      "binds_to": [
+        "UI-PRODUCT-GRAFANA-OPS"
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "criteria_id": "UI-ACCEPT-GLOBAL-LATENCY",
+      "applies_to": [
+        "UI-SCREEN-LIVE-TRADING",
+        "UI-SCREEN-SYSTEM-STATUS",
+        "UI-SCREEN-EQUITY-RISK"
+      ],
+      "rule": "Live status, signal, health, and risk views update within 1 second under expected load."
+    },
+    {
+      "criteria_id": "UI-ACCEPT-GLOBAL-SAFETY-DISABLED-REASON",
+      "applies_to": [
+        "safety_model"
+      ],
+      "rule": "Any disabled decision-emitting control must show a concrete disabled reason."
+    },
+    {
+      "criteria_id": "UI-ACCEPT-GLOBAL-AUDIT",
+      "applies_to": [
+        "safety_model"
+      ],
+      "rule": "High and critical controls must emit auditable events with user, reason, timestamp, payload, result, and trace_id."
+    },
+    {
+      "criteria_id": "UI-ACCEPT-GLOBAL-EXPORT-FILTERS",
+      "applies_to": [
+        "UI-SCREEN-SIGNALS-HISTORY",
+        "UI-SCREEN-TRADE-HISTORY",
+        "UI-SCREEN-HISTORY-ANALYTICS",
+        "UI-SCREEN-EQUITY-RISK"
+      ],
+      "rule": "Exports must include active filters and visible columns or series."
+    },
+    {
+      "criteria_id": "UI-ACCEPT-GLOBAL-CONTRACT-TRACEABILITY",
+      "applies_to": [
+        "data_contracts",
+        "rest_apis",
+        "websocket_contracts"
+      ],
+      "rule": "Every UI-visible data field must resolve to a named data contract or documented implementation binding."
+    }
+  ],
+  "known_gaps": [
+    {
+      "gap_id": "UI-GAP-ELECTRON-SCAFFOLD",
+      "description": "Architecture docs declare Electron + React + TypeScript, but the local implementation evidence is a standalone TSX component plus Tkinter GUI files. The packaging boundary is not fully represented in source.",
+      "resolution_rule": "Do not infer a complete Electron app until package and runtime files are present or added to implementation_bindings."
+    },
+    {
+      "gap_id": "UI-GAP-DASHBOARD-ENDPOINT-DRIFT",
+      "description": "Docs list dashboard-backend REST paths under /api, while gui-gateway source exposes /api/v1 paths. Both are cataloged as separate API sources until reconciled.",
+      "resolution_rule": "When implementation is standardized, deprecate the losing API entries in a catalog version bump."
+    },
+    {
+      "gap_id": "UI-GAP-SCHEMA-FILE",
+      "description": "This catalog is self-describing, but no separate JSON Schema file is created because the requirement was one authoritative JSON file.",
+      "resolution_rule": "If CI validation is needed later, generate schemas\\ui_catalog.schema.json from catalog_shape without changing this file's authority."
+    }
+  ]
+}

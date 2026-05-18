@@ -1,0 +1,38 @@
+{
+  "gate": "G-02",
+  "validated_at_utc": "2026-03-17T00:01:34Z",
+  "physical_status": "PASS",
+  "inputs": {
+    "config": "id_migration/config/physical_id_config.json",
+    "registry": "id_migration/output/physical_id_registry.csv"
+  },
+  "output": "id_migration/output/physical_validation_report.json",
+  "summary": {
+    "registry_rows": 1042,
+    "registry_file_rows": 792,
+    "registry_directory_rows": 250,
+    "non_excluded_rows": 1041,
+    "excluded_rows": 1,
+    "governed_directories_on_disk": 250,
+    "anchors_on_disk": 250,
+    "error_count": 0,
+    "warning_count": 1
+  },
+  "checks": {
+    "registry_has_exact_11_columns": true,
+    "non_excluded_rows_have_physical_ids": true,
+    "parent_linkage_valid": true,
+    "no_duplicate_ids": true,
+    "no_orphan_dir_anchors": true,
+    "registry_paths_match_filesystem": true
+  },
+  "errors": [],
+  "warnings": [
+    {
+      "code": "EXCLUDED_ROW_WITHOUT_ID",
+      "message": "excluded row carries no physical ID",
+      "line_number": 1003,
+      "relative_path": "tests/fixtures/test_data/0099900043260118_active_calendar_signals.csv.tmp"
+    }
+  ]
+}

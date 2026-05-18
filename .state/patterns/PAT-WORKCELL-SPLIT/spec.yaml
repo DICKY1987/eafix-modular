@@ -1,0 +1,11 @@
+pattern_id: PAT-WORKCELL-SPLIT
+version: 1.0.0
+purpose: "Split or bind dense service files to work-cell-scoped module structures."
+executor_id: EXEC-WORKCELL-SPLITTER
+output_contract_ref: OUT-WORKCELL-SPLIT
+determinism:
+  - stable_input_order
+  - schema_backed_defaults_only
+forbidden:
+  - modify_protected_path
+  - write_outside_declared_scope

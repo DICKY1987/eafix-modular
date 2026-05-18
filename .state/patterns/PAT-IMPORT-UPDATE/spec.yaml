@@ -1,0 +1,11 @@
+pattern_id: PAT-IMPORT-UPDATE
+version: 1.0.0
+purpose: "Update imports after work-cell module extraction without changing behavior."
+executor_id: EXEC-IMPORT-FIXER
+output_contract_ref: OUT-IMPORT-UPDATED
+determinism:
+  - stable_input_order
+  - schema_backed_defaults_only
+forbidden:
+  - modify_protected_path
+  - write_outside_declared_scope

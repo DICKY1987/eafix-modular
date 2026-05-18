@@ -1,0 +1,50 @@
+{
+  "manifest_type": "service_work_cell_binding",
+  "generated_at_utc": "2026-05-18T05:47:05Z",
+  "work_cell_id": "E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION",
+  "work_cell_type": "module_boundary",
+  "parent_module_symbol": "E4_REENTRY_INTENT_BUILDER",
+  "requires_agent_capability": [
+    "python"
+  ],
+  "context_packet_path": "context_packets/50000000000000000024/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION/work_cell_context.json",
+  "service": "reentry-engine",
+  "source_files": [
+    "services\\reentry-engine\\src\\2099900163260118_config.py",
+    "services\\reentry-engine\\src\\2099900164260118_decision_client.py",
+    "services\\reentry-engine\\src\\2099900165260118_health.py",
+    "services\\reentry-engine\\src\\2099900166260118_main.py",
+    "services\\reentry-engine\\src\\2099900167260118_metrics.py",
+    "services\\reentry-engine\\src\\2099900168260118_plugin.py",
+    "services\\reentry-engine\\src\\2099900169260118_processor.py",
+    "services\\reentry-engine\\src\\2099900170260118___init__.py"
+  ],
+  "test_files": [
+    "services\\reentry-engine\\tests\\2099900171260118_test_integration.py"
+  ],
+  "allowed_dependencies": [
+    "F1_CONFIG_PREFERENCES",
+    "E3_MATRIX_LOOKUP"
+  ],
+  "forbidden_dependencies": [
+    "B1_MT4_ADAPTER_TRANSPORT",
+    "B2_MT4_EA_EXECUTOR",
+    "B3_EXEC_EVENT_NORMALIZER",
+    "D2_CALENDAR_SOURCE_ADAPTER",
+    "D3_CALENDAR_NORMALIZER"
+  ],
+  "required_reference_documents": [
+    "DOC_MODULE_CATALOG",
+    "DOC_PROCESS_STEP_CATALOG",
+    "DOC_ALIGNED_PROCESS",
+    "DOC_ROUTING_INSTRUCTIONS",
+    "DOC_DECOMPOSITION_MODEL",
+    "DOC_CAL_DES_RULES",
+    "DOC_UI_CATALOG",
+    "DOC_ATOMIC_LIFECYCLE_MD"
+  ],
+  "notes": [
+    "Manifest-only Phase 3 binding; no runtime logic was moved by this completion pass.",
+    "Use this file as the source-scope contract for subsequent behavior-preserving extraction."
+  ]
+}

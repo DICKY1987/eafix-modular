@@ -1,0 +1,58 @@
+{
+  "manifest_type": "service_work_cell_binding",
+  "generated_at_utc": "2026-05-18T05:47:05Z",
+  "work_cell_id": "EA_SYSTEM_B_COMMUNICATION_BRIDGES__MQL4_TRANSPORTS",
+  "work_cell_type": "ea_side_mql4_system",
+  "parent_module_symbol": "B1_MT4_ADAPTER_TRANSPORT",
+  "requires_agent_capability": [
+    "mql4"
+  ],
+  "context_packet_path": "context_packets/50000000000000000016/EA_SYSTEM_B_COMMUNICATION_BRIDGES__MQL4_TRANSPORTS/work_cell_context.json",
+  "service": "transport-router",
+  "source_files": [
+    "services\\transport-router\\src\\2099900197260118_config.py",
+    "services\\transport-router\\src\\2099900198260118_health.py",
+    "services\\transport-router\\src\\2099900199260118_main.py",
+    "services\\transport-router\\src\\2099900200260118_metrics.py",
+    "services\\transport-router\\src\\2099900201260118_plugin.py",
+    "services\\transport-router\\src\\2099900202260118_router.py",
+    "services\\transport-router\\src\\2099900203260118_validator.py",
+    "services\\transport-router\\src\\2099900204260118_watcher.py",
+    "services\\transport-router\\src\\2099900205260118___init__.py"
+  ],
+  "test_files": [
+    "services\\transport-router\\tests\\2099900206260118_test_integration.py"
+  ],
+  "allowed_dependencies": [
+    "F1_CONFIG_PREFERENCES",
+    "O1_ORDER_ROUTER"
+  ],
+  "forbidden_dependencies": [
+    "C1_BAR_BUILDER",
+    "C2_INDICATOR_ENGINE",
+    "C3_FEATURE_PACKAGER",
+    "D2_CALENDAR_SOURCE_ADAPTER",
+    "D3_CALENDAR_NORMALIZER",
+    "D4_CALENDAR_TRIGGER_BUILDER",
+    "E1_OUTCOME_BUCKETIZER",
+    "E2_PROXIMITY_EVALUATOR",
+    "E3_MATRIX_LOOKUP",
+    "E4_REENTRY_INTENT_BUILDER"
+  ],
+  "required_reference_documents": [
+    "DOC_MODULE_CATALOG",
+    "DOC_PROCESS_STEP_CATALOG",
+    "DOC_ALIGNED_PROCESS",
+    "DOC_ROUTING_INSTRUCTIONS",
+    "DOC_DECOMPOSITION_MODEL",
+    "DOC_COMM_CHANNELS",
+    "DOC_MT4_AUTHORITATIVE_REF",
+    "DOC_MT4_PY_CHANNELS_TXT",
+    "DOC_FILE_MODULE_MAPPING",
+    "DOC_EA_EXECUTION_ENGINE_SAMPLE"
+  ],
+  "notes": [
+    "Manifest-only Phase 3 binding; no runtime logic was moved by this completion pass.",
+    "Use this file as the source-scope contract for subsequent behavior-preserving extraction."
+  ]
+}

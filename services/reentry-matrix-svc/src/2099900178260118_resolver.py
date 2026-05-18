@@ -54,6 +54,14 @@ class ParameterSet(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     active: bool = Field(True, description="Whether parameter set is active")
+
+    # Extended matrix parameters (GAP-33, GAP-34, GAP-35)
+    action_type: str = Field("SAME_TRADE", description="Reentry action type: NO_REENTRY | SAME_TRADE | REVERSE | INCREASE_SIZE")
+    delay_minutes: int = Field(0, ge=0, description="Delay before dispatching reentry (0=immediate)")
+    performance_tracking: dict = Field(
+        default_factory=lambda: {"execution_count": 0, "success_count": 0, "total_pnl_pips": 0.0},
+        description="Performance tracking counters"
+    )
     
     def matches_criteria(self, outcome: str, duration: str, proximity: str, 
                         calendar: str, symbol: str) -> Tuple[bool, float]:
@@ -354,7 +362,12 @@ class TieredParameterResolver:
             
             # Generation check
             "generation_allowed": generation <= best_match.max_generation,
-            "next_generation": generation + 1 if generation < best_match.max_generation else None
+            "next_generation": generation + 1 if generation < best_match.max_generation else None,
+
+            # Extended matrix fields (GAP-33, GAP-34, GAP-35)
+            "action_type": best_match.action_type,
+            "delay_minutes": best_match.delay_minutes,
+            "performance_tracking": best_match.performance_tracking,
         }
         
         logger.info(

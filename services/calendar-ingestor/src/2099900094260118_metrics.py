@@ -8,7 +8,27 @@ import time
 from typing import Dict, Any
 from collections import defaultdict, Counter
 import structlog
-from prometheus_client import Counter as PrometheusCounter, Histogram, Gauge
+
+try:
+    from prometheus_client import Counter as PrometheusCounter, Histogram, Gauge
+except ImportError:  # pragma: no cover - exercised only in minimal test envs
+    class _NoopMetric:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def labels(self, **kwargs):
+            return self
+
+        def inc(self, *args, **kwargs):
+            pass
+
+        def set(self, *args, **kwargs):
+            pass
+
+        def observe(self, *args, **kwargs):
+            pass
+
+    PrometheusCounter = Histogram = Gauge = _NoopMetric
 
 logger = structlog.get_logger(__name__)
 

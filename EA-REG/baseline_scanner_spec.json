@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft/2020-12/schema",
+  "title": "Baseline Repository Scanner Specification",
+  "description": "Specifies configuration and output schema for the baseline scanner that enumerates repository files and directories prior to ID assignment.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["scanner_config", "inventory_schema"],
+  "properties": {
+    "scanner_config": {
+      "type": "object",
+      "description": "Configuration directives that control the scope of scanning.",
+      "additionalProperties": false,
+      "required": [
+        "repository_root",
+        "excluded_directories",
+        "excluded_files",
+        "include_hidden_files",
+        "follow_symlinks",
+        "output_format"
+      ],
+      "properties": {
+        "repository_root": {
+          "type": "string",
+          "description": "Absolute path to the root directory that will be scanned."
+        },
+        "excluded_directories": {
+          "type": "array",
+          "description": "List of directory names or relative paths to exclude from scanning.",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "excluded_files": {
+          "type": "array",
+          "description": "List of file name patterns to exclude from scanning.",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "include_hidden_files": {
+          "type": "boolean",
+          "description": "Whether hidden files (names starting with a dot) should be included in the scan."
+        },
+        "follow_symlinks": {
+          "type": "boolean",
+          "description": "Whether the scanner should follow symbolic links."
+        },
+        "output_format": {
+          "type": "string",
+          "enum": ["csv", "json", "jsonl"],
+          "description": "Output format of the baseline inventory file."
+        }
+      }
+    },
+    "inventory_schema": {
+      "type": "object",
+      "description": "Schema of a single inventory record produced by the baseline scanner.",
+      "additionalProperties": false,
+      "required": [
+        "object_type",
+        "relative_path",
+        "name",
+        "parent_relative_path",
+        "extension",
+        "exists_on_disk",
+        "is_excluded"
+      ],
+      "properties": {
+        "object_type": {
+          "type": "string",
+          "enum": ["file", "directory"],
+          "description": "The kind of filesystem object ('file' or 'directory')."
+        },
+        "relative_path": {
+          "type": "string",
+          "description": "Path of the object relative to the repository root."
+        },
+        "name": {
+          "type": "string",
+          "description": "Base name of the file or directory."
+        },
+        "parent_relative_path": {
+          "type": "string",
+          "description": "Relative path of the parent directory."
+        },
+        "extension": {
+          "type": "string",
+          "description": "File extension including the leading dot for files; empty string for directories."
+        },
+        "exists_on_disk": {
+          "type": "boolean",
+          "description": "Indicates whether the object exists on disk at the time of scanning."
+        },
+        "is_excluded": {
+          "type": "boolean",
+          "description": "Indicates whether the object falls under an exclusion rule."
+        }
+      }
+    }
+  }
+}

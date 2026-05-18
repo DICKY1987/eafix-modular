@@ -13,7 +13,7 @@ import json
 import csv
 import tempfile
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Import our contract system
 import sys
@@ -269,6 +269,7 @@ class TestContractIntegration:
         assert len(mt4_comment) <= 31, "MT4 comment too long"
         
         # Step 3: Create trade result CSV data
+        open_time = datetime.utcnow()
         trade_result_data = {
             "file_seq": 1,
             "checksum_sha256": "b" * 64,
@@ -279,8 +280,8 @@ class TestContractIntegration:
             "lot_size": 0.01,
             "open_price": 1.10000,
             "close_price": 1.10500,
-            "open_time": datetime.utcnow(),
-            "close_time": datetime.utcnow(),
+            "open_time": open_time,
+            "close_time": open_time + timedelta(minutes=30),
             "duration_minutes": 30,
             "profit_loss": 50.0,
             "profit_loss_pips": 50.0,

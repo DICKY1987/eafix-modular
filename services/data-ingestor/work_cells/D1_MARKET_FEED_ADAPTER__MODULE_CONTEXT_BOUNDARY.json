@@ -1,0 +1,73 @@
+{
+  "manifest_type": "service_work_cell_binding",
+  "generated_at_utc": "2026-05-18T05:47:05Z",
+  "work_cell_id": "D1_MARKET_FEED_ADAPTER__MODULE_CONTEXT_BOUNDARY",
+  "work_cell_type": "module_boundary",
+  "parent_module_symbol": "D1_MARKET_FEED_ADAPTER",
+  "requires_agent_capability": [
+    "python"
+  ],
+  "context_packet_path": "context_packets/50000000000000000007/D1_MARKET_FEED_ADAPTER__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+  "service": "data-ingestor",
+  "source_files": [
+    "services\\data-ingestor\\src\\2099900109260118_config.py",
+    "services\\data-ingestor\\src\\2099900110260118_health.py",
+    "services\\data-ingestor\\src\\2099900111260118_ingestor.py",
+    "services\\data-ingestor\\src\\2099900112260118_main.py",
+    "services\\data-ingestor\\src\\2099900113260118_main_enterprise.py",
+    "services\\data-ingestor\\src\\2099900114260118_metrics.py",
+    "services\\data-ingestor\\src\\2099900115260118_models.py",
+    "services\\data-ingestor\\src\\2099900116260118_plugin.py"
+  ],
+  "test_files": [
+    "services\\data-ingestor\\tests\\integration\\2099900117260118___init__.py",
+    "services\\data-ingestor\\tests\\unit\\2099900118260118_test_data_ingestor_enterprise.py",
+    "services\\data-ingestor\\tests\\unit\\2099900119260118_test_data_ingestor_service.py",
+    "services\\data-ingestor\\tests\\unit\\2099900120260118___init__.py"
+  ],
+  "allowed_dependencies": [
+    "F1_CONFIG_PREFERENCES"
+  ],
+  "forbidden_dependencies": [
+    "B1_MT4_ADAPTER_TRANSPORT",
+    "B2_MT4_EA_EXECUTOR",
+    "B3_EXEC_EVENT_NORMALIZER",
+    "C1_BAR_BUILDER",
+    "C2_INDICATOR_ENGINE",
+    "C3_FEATURE_PACKAGER",
+    "D2_CALENDAR_SOURCE_ADAPTER",
+    "D3_CALENDAR_NORMALIZER",
+    "D4_CALENDAR_TRIGGER_BUILDER",
+    "E1_OUTCOME_BUCKETIZER",
+    "E2_PROXIMITY_EVALUATOR",
+    "E3_MATRIX_LOOKUP",
+    "E4_REENTRY_INTENT_BUILDER",
+    "F1_FLOW_ORCHESTRATOR",
+    "F2_EVENT_LOG",
+    "F3_CLOCK_SCHEDULER",
+    "O1_ORDER_ROUTER",
+    "O2_OMS_STATE_MACHINE",
+    "O3_TRADE_CLOSE_CLASSIFIER",
+    "P1_HEALTH_AGGREGATOR",
+    "R1_RISK_EVALUATOR",
+    "R2_ORDER_INTENT_COMPILER",
+    "S1_SIGNAL_ENGINE",
+    "S2_INTENT_BUILDER",
+    "SHARED_LIBS"
+  ],
+  "required_reference_documents": [
+    "DOC_MODULE_CATALOG",
+    "DOC_PROCESS_STEP_CATALOG",
+    "DOC_ALIGNED_PROCESS",
+    "DOC_ROUTING_INSTRUCTIONS",
+    "DOC_DECOMPOSITION_MODEL",
+    "DOC_COMM_CHANNELS",
+    "DOC_FILE_MODULE_MAPPING",
+    "DOC_MT4_AUTHORITATIVE_REF",
+    "DOC_MT4_PY_CHANNELS_TXT"
+  ],
+  "notes": [
+    "Manifest-only Phase 3 binding; no runtime logic was moved by this completion pass.",
+    "Use this file as the source-scope contract for subsequent behavior-preserving extraction."
+  ]
+}

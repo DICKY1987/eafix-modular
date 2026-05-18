@@ -15,7 +15,7 @@ from shared.plugin_interface import PluginContext
 
 
 def _load_plugin_class():
-    module = importlib.import_module("services.signal-generator.src.plugin")
+    module = importlib.import_module("services.signal_generator.src.plugin")
     return module.SignalGeneratorPlugin
 
 
@@ -32,9 +32,9 @@ async def test_signal_generator_initialization():
 
 def test_signal_generation():
     """Test signal generation logic."""
-    plugin_class = _load_plugin_class()
-    plugin = plugin_class()
-    plugin._thresholds = {"rsi_overbought": 70, "rsi_oversold": 30}
+    module = importlib.import_module("services.signal_generator.src.plugin")
+    settings = module.Settings()
+    processor = module.SignalProcessor(settings)
 
     indicators = {
         "symbol": "EURUSD",
@@ -43,8 +43,17 @@ def test_signal_generation():
         "ema_50": 1.2340,
         "timestamp": "2026-01-09T19:00:00Z",
     }
+    processor.on_calendar_signal({
+        "symbol": "EURUSD",
+        "calendar_id": "CAL8_USD_NFP_H",
+        "proximity_state": "AT_EVENT",
+        "confidence_score": 0.75,
+        "direction_bias": "BULLISH",
+    })
+    processor.on_indicator_vector(indicators)
 
-    signal = plugin._generate_signal(indicators)
+    signal = processor.evaluate("EURUSD")
     assert signal is not None
-    assert signal["action"] == "BUY"
+    assert signal["event_type"] == "Signal"
+    assert signal["direction"] == "LONG"
     assert signal["confidence"] > 0

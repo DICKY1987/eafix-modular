@@ -1,0 +1,1026 @@
+{
+  "process_id": "HUEY_P_EAFIX_END_TO_END",
+  "process_version": "2.0.0",
+  "source_file": "updated_trading_process_aligned.yaml",
+  "generated_at": "2026-05-04T00:00:00Z",
+  "generator_id": "reconciled-from-process-step-catalog/1.0",
+  "schema_id": "HUEY_P_EAFIX_PROCESS_SCHEMA_v2",
+  "generated_from_sha256": "d10364038048f7b4ae66a787ca8e88cc031d70102b2119a48b1c899be5491642",
+  "phases": [
+    {
+      "phase_id": "PHASE_A",
+      "phase_name": "CONFIG + SCHEDULING",
+      "step_numbers": [
+        1,
+        2
+      ],
+      "module_sequence": [
+        "F1_CONFIG_PREFERENCES",
+        "F3_CLOCK_SCHEDULER"
+      ]
+    },
+    {
+      "phase_id": "PHASE_B",
+      "phase_name": "ECONOMIC CALENDAR INTAKE -> TRIGGERS",
+      "step_numbers": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "module_sequence": [
+        "D2_CALENDAR_SOURCE_ADAPTER",
+        "D3_CALENDAR_NORMALIZER",
+        "F2_EVENT_LOG",
+        "D4_CALENDAR_TRIGGER_BUILDER"
+      ]
+    },
+    {
+      "phase_id": "PHASE_C",
+      "phase_name": "MARKET DATA -> BARS -> INDICATORS",
+      "step_numbers": [
+        7,
+        8,
+        9
+      ],
+      "module_sequence": [
+        "D1_MARKET_FEED_ADAPTER",
+        "C1_BAR_BUILDER",
+        "C2_INDICATOR_ENGINE"
+      ]
+    },
+    {
+      "phase_id": "PHASE_D",
+      "phase_name": "FEATURE FRAME ASSEMBLY",
+      "step_numbers": [
+        10
+      ],
+      "module_sequence": [
+        "C3_FEATURE_PACKAGER"
+      ]
+    },
+    {
+      "phase_id": "PHASE_E",
+      "phase_name": "SIGNAL -> INTENT -> RISK DECISION",
+      "step_numbers": [
+        11,
+        12,
+        13
+      ],
+      "module_sequence": [
+        "S1_SIGNAL_ENGINE",
+        "S2_INTENT_BUILDER",
+        "R1_RISK_EVALUATOR"
+      ]
+    },
+    {
+      "phase_id": "PHASE_F",
+      "phase_name": "ORDER INTENT COMPILATION",
+      "step_numbers": [
+        14
+      ],
+      "module_sequence": [
+        "R2_ORDER_INTENT_COMPILER"
+      ]
+    },
+    {
+      "phase_id": "PHASE_G",
+      "phase_name": "ORDER ROUTING -> TRANSPORT -> EA EXECUTION",
+      "step_numbers": [
+        15,
+        16,
+        17
+      ],
+      "module_sequence": [
+        "O1_ORDER_ROUTER",
+        "B1_MT4_ADAPTER_TRANSPORT",
+        "B2_MT4_EA_EXECUTOR"
+      ]
+    },
+    {
+      "phase_id": "PHASE_H",
+      "phase_name": "BROKER EVENT NORMALIZATION",
+      "step_numbers": [
+        18
+      ],
+      "module_sequence": [
+        "B3_EXEC_EVENT_NORMALIZER"
+      ]
+    },
+    {
+      "phase_id": "PHASE_I",
+      "phase_name": "OMS -> TRADE CLOSE -> REENTRY DECISION",
+      "step_numbers": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ],
+      "module_sequence": [
+        "O2_OMS_STATE_MACHINE",
+        "O3_TRADE_CLOSE_CLASSIFIER",
+        "E1_OUTCOME_BUCKETIZER",
+        "E2_PROXIMITY_EVALUATOR",
+        "E3_MATRIX_LOOKUP",
+        "E4_REENTRY_INTENT_BUILDER"
+      ]
+    },
+    {
+      "phase_id": "PHASE_J",
+      "phase_name": "ORCHESTRATION + HEALTH & SLO",
+      "step_numbers": [
+        25,
+        26
+      ],
+      "module_sequence": [
+        "F1_FLOW_ORCHESTRATOR",
+        "P1_HEALTH_AGGREGATOR"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "60000000000000000001",
+      "step_number": 1,
+      "step_code": "S01",
+      "phase_id": "PHASE_A",
+      "name": "Resolve configuration snapshot",
+      "module_id": "F1_CONFIG_PREFERENCES",
+      "responsible": "configuration_service.py",
+      "input_contracts": [
+        "ConfigSource"
+      ],
+      "output_contracts": [
+        "ResolvedConfig"
+      ],
+      "output_description": "ResolvedConfig (immutable snapshot)",
+      "dependency_step_ids": [],
+      "entrypoint_files": [],
+      "validation_contract": {
+        "validation_id": "VAL-S01-001",
+        "rule": "Schema validate; stable ordering; hash snapshot",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S01-CONFIG",
+        "rule": "Reject invalid config; continue using last known good snapshot",
+        "default_behavior": "REJECT"
+      }
+    },
+    {
+      "step_id": "60000000000000000002",
+      "step_number": 2,
+      "step_code": "S02",
+      "phase_id": "PHASE_A",
+      "name": "Emit schedule tick (calendar polling cadence)",
+      "module_id": "F3_CLOCK_SCHEDULER",
+      "responsible": "scheduler.py",
+      "input_contracts": [
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "ScheduleTick"
+      ],
+      "output_description": "ScheduleTick",
+      "dependency_step_ids": [
+        "60000000000000000001"
+      ],
+      "entrypoint_files": [
+        "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+      ],
+      "validation_contract": {
+        "validation_id": "VAL-S02-001",
+        "rule": "Frozen-time mode supported for tests",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S02-SCHEDULER",
+        "rule": "If scheduler stalls, emit HealthReport alert and pause polling",
+        "default_behavior": "CONTINUE"
+      }
+    },
+    {
+      "step_id": "60000000000000000003",
+      "step_number": 3,
+      "step_code": "S03",
+      "phase_id": "PHASE_B",
+      "name": "Poll calendar source(s)",
+      "module_id": "D2_CALENDAR_SOURCE_ADAPTER",
+      "responsible": "calendar_service.py::poll_scheduler",
+      "input_contracts": [
+        "CalendarSourceConfig",
+        "ScheduleTick"
+      ],
+      "output_contracts": [
+        "CalendarRaw"
+      ],
+      "output_description": "CalendarRaw",
+      "dependency_step_ids": [
+        "60000000000000000002"
+      ],
+      "entrypoint_files": [
+        "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+      ],
+      "validation_contract": {
+        "validation_id": "VAL-S03-001",
+        "rule": "HTTP 200; payload parsable; source_event_id present",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S03-CALENDAR",
+        "rule": "Retry w/ deterministic backoff; on persistent failure emit IngestError and skip cycle",
+        "default_behavior": "CONTINUE"
+      }
+    },
+    {
+      "step_id": "60000000000000000004",
+      "step_number": 4,
+      "step_code": "S04",
+      "phase_id": "PHASE_B",
+      "name": "Normalize raw calendar entries",
+      "module_id": "D3_CALENDAR_NORMALIZER",
+      "responsible": "calendar_service.py::normalize_events",
+      "input_contracts": [
+        "CalendarRaw",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "CalendarEvent"
+      ],
+      "output_description": "CalendarEvent (UTC timestamps, standardized impact, dedup keys)",
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000003"
+      ],
+      "entrypoint_files": [
+        "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+      ],
+      "validation_contract": {
+        "validation_id": "VAL-S04-001",
+        "rule": "UTC conversion success; impact in enum; dedup policy applied",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S04-NORMALIZE",
+        "rule": "Emit NormalizationError for malformed rows; continue with valid CalendarEvent",
+        "default_behavior": "CONTINUE"
+      }
+    },
+    {
+      "step_id": "60000000000000000005",
+      "step_number": 5,
+      "step_code": "S05",
+      "phase_id": "PHASE_B",
+      "name": "Persist calendar events (append-only)",
+      "module_id": "F2_EVENT_LOG",
+      "responsible": "event_log.py",
+      "input_contracts": [
+        "CalendarEvent"
+      ],
+      "output_contracts": [
+        "EventStream"
+      ],
+      "output_description": "EventStream (calendar.* events)",
+      "dependency_step_ids": [
+        "60000000000000000004"
+      ],
+      "entrypoint_files": [
+        "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+      ],
+      "validation_contract": {
+        "validation_id": "VAL-S05-001",
+        "rule": "Idempotent by message_id; ordered by created_utc + tie-breaker",
+        "evidence_required": false
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S05-LOG",
+        "rule": "Rollback and retry once; on persistent failure halt calendar pipeline",
+        "default_behavior": "REJECT"
+      }
+    },
+    {
+      "step_id": "60000000000000000006",
+      "step_number": 6,
+      "step_code": "S06",
+      "phase_id": "PHASE_B",
+      "name": "Build anticipation triggers from calendar",
+      "module_id": "D4_CALENDAR_TRIGGER_BUILDER",
+      "responsible": "calendar_anticipator.py",
+      "input_contracts": [
+        "CalendarEvent",
+        "ScheduleTick",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "CalendarTrigger"
+      ],
+      "output_description": "CalendarTrigger (symbol set + window + suppression metadata)",
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000002",
+        "60000000000000000004"
+      ],
+      "entrypoint_files": [
+        "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+      ],
+      "validation_contract": {
+        "validation_id": "VAL-S06-001",
+        "rule": "No duplicate trigger for event+offset; TTL rules applied",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S06-TRIGGERS",
+        "rule": "Default to conservative suppression metadata; emit error event",
+        "default_behavior": "CONTINUE"
+      }
+    },
+    {
+      "step_id": "60000000000000000007",
+      "step_number": 7,
+      "step_code": "S07",
+      "phase_id": "PHASE_C",
+      "name": "Ingest market ticks",
+      "module_id": "D1_MARKET_FEED_ADAPTER",
+      "responsible": "market_feed_adapter.py",
+      "input_contracts": [
+        "RawTick",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "MarketTick"
+      ],
+      "output_description": "MarketTick",
+      "dependency_step_ids": [
+        "60000000000000000001"
+      ],
+      "entrypoint_files": [
+        "services\\data-ingestor\\src\\2099900112260118_main.py"
+      ],
+      "validation_contract": {
+        "validation_id": "VAL-S07-001",
+        "rule": "Timestamp freshness; symbol normalization; reject malformed",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S07-MARKETDATA",
+        "rule": "Emit IngestError; skip malformed ticks",
+        "default_behavior": "CONTINUE"
+      }
+    },
+    {
+      "step_id": "60000000000000000008",
+      "step_number": 8,
+      "step_code": "S08",
+      "phase_id": "PHASE_C",
+      "name": "Aggregate ticks into bars",
+      "module_id": "C1_BAR_BUILDER",
+      "responsible": "bar_builder.py",
+      "input_contracts": [
+        "MarketTick",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "Bar"
+      ],
+      "output_description": "Bar",
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000007"
+      ],
+      "entrypoint_files": [],
+      "validation_contract": {
+        "validation_id": "VAL-S08-001",
+        "rule": "Deterministic bar boundaries; tie-breaker rules",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S08-FEATURE",
+        "rule": "Drop out-of-order ticks per policy; emit error event",
+        "default_behavior": "CONTINUE"
+      }
+    },
+    {
+      "step_id": "60000000000000000009",
+      "step_number": 9,
+      "step_code": "S09",
+      "phase_id": "PHASE_C",
+      "name": "Compute indicators",
+      "module_id": "C2_INDICATOR_ENGINE",
+      "responsible": "indicator_engine.py",
+      "input_contracts": [
+        "Bar",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "IndicatorSnapshot"
+      ],
+      "output_description": "IndicatorSnapshot",
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000008"
+      ],
+      "entrypoint_files": [
+        "services\\desktop-ui\\2099900128260118_expiry_indicator_service.py"
+      ],
+      "validation_contract": {
+        "validation_id": "VAL-S09-001",
+        "rule": "Deterministic rounding; indicator params pinned by config snapshot",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S09-INDICATOR",
+        "rule": "Emit indicator error; do not output partial snapshots unless flagged",
+        "default_behavior": "REJECT"
+      }
+    },
+    {
+      "step_id": "60000000000000000010",
+      "step_number": 10,
+      "step_code": "S10",
+      "phase_id": "PHASE_D",
+      "name": "Assemble strategy feature frame",
+      "module_id": "C3_FEATURE_PACKAGER",
+      "responsible": "feature_packager.py",
+      "input_contracts": [
+        "IndicatorSnapshot",
+        "CalendarTrigger",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "FeatureFrame"
+      ],
+      "output_description": "FeatureFrame",
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000006",
+        "60000000000000000009"
+      ],
+      "entrypoint_files": [],
+      "validation_contract": {
+        "validation_id": "VAL-S10-001",
+        "rule": "Exact declared feature set; stable ordering",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S10-SIGNAL",
+        "rule": "Emit packaging error; do not emit FeatureFrame",
+        "default_behavior": "REJECT"
+      }
+    },
+    {
+      "step_id": "60000000000000000011",
+      "step_number": 11,
+      "step_code": "S11",
+      "phase_id": "PHASE_E",
+      "name": "Generate signal (or suppression)",
+      "module_id": "S1_SIGNAL_ENGINE",
+      "responsible": "signal_generator.py",
+      "input_contracts": [
+        "FeatureFrame",
+        "PositionSummary",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "Signal",
+        "SignalSuppressed"
+      ],
+      "output_description": "Signal OR SignalSuppressed",
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000010"
+      ],
+      "entrypoint_files": [
+        "compliance\\auto-remediation\\2099900012260118_remediation-engine.py"
+      ],
+      "validation_contract": {
+        "validation_id": "VAL-S11-001",
+        "rule": "Suppression reasons enumerated; no sizing/broker specifics",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S11-INTENT",
+        "rule": "On internal error, emit SignalSuppressed with deterministic reason code",
+        "default_behavior": "CONTINUE"
+      }
+    },
+    {
+      "step_id": "60000000000000000012",
+      "step_number": 12,
+      "step_code": "S12",
+      "phase_id": "PHASE_E",
+      "name": "Convert signal to trade intent",
+      "module_id": "S2_INTENT_BUILDER",
+      "responsible": "intent_builder.py",
+      "input_contracts": [
+        "Signal",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "TradeIntent"
+      ],
+      "output_description": "TradeIntent",
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000011"
+      ],
+      "entrypoint_files": [],
+      "validation_contract": {
+        "validation_id": "VAL-S12-001",
+        "rule": "Stable correlation_id from Signal; constraints + rationale attached",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S12-RISK",
+        "rule": "Reject intent; emit error event",
+        "default_behavior": "REJECT"
+      }
+    },
+    {
+      "step_id": "60000000000000000013",
+      "step_number": 13,
+      "step_code": "S13",
+      "phase_id": "PHASE_E",
+      "name": "Evaluate risk and size",
+      "module_id": "R1_RISK_EVALUATOR",
+      "responsible": "risk_manager.py",
+      "input_contracts": [
+        "TradeIntent",
+        "PortfolioState",
+        "RiskPolicy",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "RiskDecision"
+      ],
+      "output_description": "RiskDecision (APPROVE/REJECT + reason codes + sized params)",
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000012"
+      ],
+      "entrypoint_files": [],
+      "validation_contract": {
+        "validation_id": "VAL-S13-001",
+        "rule": "Idempotent for same inputs; deterministic sizing + rounding",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S13-ORDERINTENT",
+        "rule": "On rule engine failure default to REJECT with SAFETY_FAIL reason",
+        "default_behavior": "REJECT"
+      }
+    },
+    {
+      "step_id": "60000000000000000014",
+      "step_number": 14,
+      "step_code": "S14",
+      "phase_id": "PHASE_F",
+      "name": "Compile order intent",
+      "module_id": "R2_ORDER_INTENT_COMPILER",
+      "responsible": "order_intent_compiler.py",
+      "input_contracts": [
+        "RiskDecision",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "OrderIntent"
+      ],
+      "output_description": "OrderIntent",
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000013"
+      ],
+      "entrypoint_files": [
+        "services\\transport-router\\src\\2099900199260118_main.py"
+      ],
+      "validation_contract": {
+        "validation_id": "VAL-S14-001",
+        "rule": "client_order_id + idempotency_key assigned per policy",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S14-ROUTING",
+        "rule": "If compilation fails, emit error; do not proceed to routing",
+        "default_behavior": "REJECT"
+      }
+    },
+    {
+      "step_id": "60000000000000000015",
+      "step_number": 15,
+      "step_code": "S15",
+      "phase_id": "PHASE_G",
+      "name": "Route order to broker",
+      "module_id": "O1_ORDER_ROUTER",
+      "responsible": "order_router.py",
+      "input_contracts": [
+        "OrderIntent",
+        "BrokerPolicy",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "RoutedOrderIntent"
+      ],
+      "output_description": "RoutedOrderIntent",
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000014"
+      ],
+      "entrypoint_files": [
+        "services\\transport-router\\src\\2099900199260118_main.py"
+      ],
+      "validation_contract": {
+        "validation_id": "VAL-S15-001",
+        "rule": "Routing deterministic; preserves OrderIntent hash",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S15-TRANSPORT",
+        "rule": "If routing fails, emit error and reject",
+        "default_behavior": "REJECT"
+      }
+    },
+    {
+      "step_id": "60000000000000000016",
+      "step_number": 16,
+      "step_code": "S16",
+      "phase_id": "PHASE_G",
+      "name": "Serialize and send to MT4 adapter",
+      "module_id": "B1_MT4_ADAPTER_TRANSPORT",
+      "responsible": "transport_service.py",
+      "input_contracts": [
+        "RoutedOrderIntent",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "BrokerOrderEnvelope",
+        "AdapterAck"
+      ],
+      "output_description": "BrokerOrderEnvelope + AdapterAck",
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000015"
+      ],
+      "entrypoint_files": [
+        "services\\transport-router\\src\\2099900199260118_main.py"
+      ],
+      "validation_contract": {
+        "validation_id": "VAL-S16-001",
+        "rule": "Atomic write+rename (no partial reads); sequence + hash; idempotent resend",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S16-EA",
+        "rule": "Deterministic retry schedule; on persistent failure emit TransportError and stop",
+        "default_behavior": "REJECT"
+      }
+    },
+    {
+      "step_id": "60000000000000000017",
+      "step_number": 17,
+      "step_code": "S17",
+      "phase_id": "PHASE_G",
+      "name": "EA executes broker order",
+      "module_id": "B2_MT4_EA_EXECUTOR",
+      "responsible": "EAFIX.mq4",
+      "input_contracts": [
+        "BrokerOrderEnvelope"
+      ],
+      "output_contracts": [
+        "BrokerExecEvent",
+        "EAHealth"
+      ],
+      "output_description": "BrokerExecEvent (accept/fill/reject/close) + EAHealth",
+      "dependency_step_ids": [
+        "60000000000000000016"
+      ],
+      "entrypoint_files": [
+        "services\\transport-router\\src\\2099900199260118_main.py"
+      ],
+      "validation_contract": {
+        "validation_id": "VAL-S17-001",
+        "rule": "EA contains no strategy/risk logic; only execution",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S17-NORMALIZE",
+        "rule": "Classify and emit error events; retries per deterministic policy",
+        "default_behavior": "CONTINUE"
+      }
+    },
+    {
+      "step_id": "60000000000000000018",
+      "step_number": 18,
+      "step_code": "S18",
+      "phase_id": "PHASE_H",
+      "name": "Normalize broker events to canonical reports",
+      "module_id": "B3_EXEC_EVENT_NORMALIZER",
+      "responsible": "result_processor.py",
+      "input_contracts": [
+        "BrokerExecEvent",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "ExecutionReport",
+        "PositionSnapshot"
+      ],
+      "output_description": "ExecutionReport + PositionSnapshot",
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000017"
+      ],
+      "entrypoint_files": [
+        "services\\event-gateway\\src\\2099900141260118_main.py"
+      ],
+      "validation_contract": {
+        "validation_id": "VAL-S18-001",
+        "rule": "Dedup + ordering policy; canonical rounding",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S18-OMS",
+        "rule": "Emit NormalizationError; quarantine malformed broker events",
+        "default_behavior": "REJECT"
+      }
+    },
+    {
+      "step_id": "60000000000000000019",
+      "step_number": 19,
+      "step_code": "S19",
+      "phase_id": "PHASE_I",
+      "name": "Apply execution reports to OMS state",
+      "module_id": "O2_OMS_STATE_MACHINE",
+      "responsible": "oms.py",
+      "input_contracts": [
+        "RoutedOrderIntent",
+        "ExecutionReport",
+        "PositionSnapshot",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "OrderStateChanged",
+        "PositionStateChanged",
+        "TradeClosedRaw"
+      ],
+      "output_description": "OrderStateChanged + PositionStateChanged + TradeClosedRaw",
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000015",
+        "60000000000000000018"
+      ],
+      "entrypoint_files": [],
+      "validation_contract": {
+        "validation_id": "VAL-S19-001",
+        "rule": "Idempotent fills; out-of-order handling per policy; stable final state",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S19-CLOSECLASS",
+        "rule": "On OMS inconsistency, quarantine stream and halt new orders",
+        "default_behavior": "REJECT"
+      }
+    },
+    {
+      "step_id": "60000000000000000020",
+      "step_number": 20,
+      "step_code": "S20",
+      "phase_id": "PHASE_I",
+      "name": "Classify trade close and compute canonical PnL",
+      "module_id": "O3_TRADE_CLOSE_CLASSIFIER",
+      "responsible": "trade_close_classifier.py",
+      "input_contracts": [
+        "TradeClosedRaw",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "TradeClosed"
+      ],
+      "output_description": "TradeClosed",
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000019"
+      ],
+      "entrypoint_files": [],
+      "validation_contract": {
+        "validation_id": "VAL-S20-001",
+        "rule": "Close reason enum; deterministic PnL rounding rules",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S20-CLOSENORM",
+        "rule": "If PnL cannot be computed, emit TradeClosed with COMPUTATION_ERROR flag",
+        "default_behavior": "CONTINUE"
+      }
+    },
+    {
+      "step_id": "60000000000000000021",
+      "step_number": 21,
+      "step_code": "S21",
+      "phase_id": "PHASE_I",
+      "name": "Bucketize outcome",
+      "module_id": "E1_OUTCOME_BUCKETIZER",
+      "responsible": "outcome_bucketizer.py",
+      "input_contracts": [
+        "TradeClosed",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "OutcomeBucket"
+      ],
+      "output_description": "OutcomeBucket",
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000020"
+      ],
+      "entrypoint_files": [],
+      "validation_contract": {
+        "validation_id": "VAL-S21-001",
+        "rule": "Only enumerated buckets; stable bucket mapping",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S21-BUCKET",
+        "rule": "If mapping fails, emit UNKNOWN bucket and quarantine for review",
+        "default_behavior": "REJECT"
+      }
+    },
+    {
+      "step_id": "60000000000000000022",
+      "step_number": 22,
+      "step_code": "S22",
+      "phase_id": "PHASE_I",
+      "name": "Compute event proximity",
+      "module_id": "E2_PROXIMITY_EVALUATOR",
+      "responsible": "proximity_evaluator.py",
+      "input_contracts": [
+        "CalendarEvent",
+        "ClockTick",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "EventProximity"
+      ],
+      "output_description": "EventProximity",
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000004"
+      ],
+      "entrypoint_files": [
+        "services\\event-gateway\\src\\2099900141260118_main.py"
+      ],
+      "validation_contract": {
+        "validation_id": "VAL-S22-001",
+        "rule": "Frozen-time supported; thresholds validated (no overlaps/gaps)",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S22-PROXIMITY",
+        "rule": "Emit proximity error; default to MOST_CONSERVATIVE proximity bucket",
+        "default_behavior": "CONTINUE"
+      }
+    },
+    {
+      "step_id": "60000000000000000023",
+      "step_number": 23,
+      "step_code": "S23",
+      "phase_id": "PHASE_I",
+      "name": "Lookup matrix decision",
+      "module_id": "E3_MATRIX_LOOKUP",
+      "responsible": "matrix_lookup.py",
+      "input_contracts": [
+        "OutcomeBucket",
+        "EventProximity",
+        "SignalContext",
+        "MatrixProfile",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "MatrixDecision"
+      ],
+      "output_description": "MatrixDecision (or MatrixFallbackUsed)",
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000021",
+        "60000000000000000022"
+      ],
+      "entrypoint_files": [
+        "services\\reentry-matrix-svc\\src\\2099900174260118_main.py"
+      ],
+      "validation_contract": {
+        "validation_id": "VAL-S23-001",
+        "rule": "Deterministic fallback hierarchy; matrix version pinned",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S23-MATRIX",
+        "rule": "If matrix missing, emit MatrixFallbackUsed + safest MatrixDecision",
+        "default_behavior": "CONTINUE"
+      }
+    },
+    {
+      "step_id": "60000000000000000024",
+      "step_number": 24,
+      "step_code": "S24",
+      "phase_id": "PHASE_I",
+      "name": "Build reentry trade intent (or suppress)",
+      "module_id": "E4_REENTRY_INTENT_BUILDER",
+      "responsible": "reentry_intent_builder.py",
+      "input_contracts": [
+        "MatrixDecision",
+        "ReentryChainState",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "TradeIntent",
+        "ReentrySuppressed"
+      ],
+      "output_description": "TradeIntent OR ReentrySuppressed",
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000023"
+      ],
+      "entrypoint_files": [
+        "services\\reentry-engine\\src\\2099900166260118_main.py"
+      ],
+      "validation_contract": {
+        "validation_id": "VAL-S24-001",
+        "rule": "Hard cap: no reentry beyond R2; no circular chains",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S24-REENTRY",
+        "rule": "Emit ReentrySuppressed with deterministic reason",
+        "default_behavior": "CONTINUE"
+      }
+    },
+    {
+      "step_id": "60000000000000000025",
+      "step_number": 25,
+      "step_code": "S25",
+      "phase_id": "PHASE_J",
+      "name": "Loop: reentry intent follows same risk->order->route->transport->execute chain",
+      "module_id": "F1_FLOW_ORCHESTRATOR",
+      "responsible": "orchestrator",
+      "input_contracts": [
+        "TradeIntent"
+      ],
+      "output_contracts": [
+        "Either",
+        "RoutedOrderIntent",
+        "OutcomeBucket"
+      ],
+      "output_description": "Either (a) new RoutedOrderIntent executed, producing new OutcomeBucket, or (b) suppression/cooldown state update",
+      "dependency_step_ids": [
+        "60000000000000000012",
+        "60000000000000000024"
+      ],
+      "entrypoint_files": [
+        "services\\transport-router\\src\\2099900199260118_main.py"
+      ],
+      "validation_contract": {
+        "validation_id": "VAL-S25-001",
+        "rule": "Chain depth < configured max; velocity limits; idempotency keys enforced",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S25-HEALTH",
+        "rule": "On loop prevention trigger, enforce terminal cooldown and stop",
+        "default_behavior": "REJECT"
+      }
+    },
+    {
+      "step_id": "60000000000000000026",
+      "step_number": 26,
+      "step_code": "S26",
+      "phase_id": "PHASE_J",
+      "name": "Health aggregation + SLO evaluation",
+      "module_id": "P1_HEALTH_AGGREGATOR",
+      "responsible": "health_service.py",
+      "input_contracts": [
+        "AdapterHealth",
+        "ModuleHealth",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "HealthReport"
+      ],
+      "output_description": "HealthReport",
+      "dependency_step_ids": [
+        "60000000000000000001"
+      ],
+      "entrypoint_files": [
+        "services\\telemetry-daemon\\src\\2099900192260118_main.py"
+      ],
+      "validation_contract": {
+        "validation_id": "VAL-S26-001",
+        "rule": "Deterministic thresholds; stable report format",
+        "evidence_required": true
+      },
+      "failure_contract": {
+        "failure_mode_id": "FAIL-S26-SLO",
+        "rule": "If health is unknown, default to risk-off posture (suppress new intents)",
+        "default_behavior": "CONTINUE"
+      }
+    }
+  ]
+}

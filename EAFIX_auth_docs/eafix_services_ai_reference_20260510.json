@@ -1,0 +1,2110 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "ai_session_reference",
+  "reference_id": "EAFIX-SERVICES-SESSION-REFERENCE-20260510",
+  "title": "EAFIX Modular Services and Techspec Session Reference for AI Agents",
+  "status": "generated_from_terminal_transcript",
+  "created_at_utc": "2026-05-10T00:00:00Z",
+  "purpose": "Give an AI agent enough context about the terminal session, downloaded authoritative documents, services directory layout, service inventory, and generated services file tree without requiring access to the original terminal chat.",
+  "source_material": {
+    "primary_transcript_file": "✳ Explore eafix modular services directory.txt",
+    "primary_transcript_sha256": "e7eabd45b3b8cafd57cccbf5e2443934b08cc6d7d4765a9c92548de05ff5a6cd",
+    "source_limitations": [
+      "This reference is derived from terminal transcript output, not a fresh filesystem scan performed by this assistant.",
+      "The services file count is preserved as reported in the transcript: approximately 250 source files, excluding __pycache__ and .pyc files.",
+      "The transport-router portion of the transcript contained duplicated lines; normalized_paths removes duplicate path entries while services_tree_raw preserves the original transcript tree.",
+      "Techspec download verification command returned no output in the transcript after the download step, but the transcript explicitly states all 19 Markdown files downloaded successfully.",
+      "The transcript visually truncates the download command output; exact downloaded filenames should be verified in C:\\Users\\richg\\eafix-modular\\EAFIX_auth_docs."
+    ]
+  },
+  "repository_context": {
+    "working_directory": "C:\\Users\\richg\\eafix-modular",
+    "github_techspec_url": "https://github.com/DICKY1987/eafix-modular/tree/master/docs/techspec",
+    "github_repository": "DICKY1987/eafix-modular",
+    "github_branch": "master",
+    "techspec_source_path": "docs/techspec",
+    "local_authoritative_docs_path": "C:\\Users\\richg\\eafix-modular\\EAFIX_auth_docs",
+    "services_path": "C:\\Users\\richg\\eafix-modular\\services"
+  },
+  "techspec_folder": {
+    "reported_item_count": 20,
+    "reported_markdown_file_count": 19,
+    "reported_directory_count": 1,
+    "download_status": "All 19 Markdown files reportedly downloaded successfully to local_authoritative_docs_path.",
+    "major_files": [
+      {
+        "name": "0110000080_HUEY_P Documentation SystemComplete Implementation Instructions.md",
+        "reported_size": "107 KB",
+        "role": "large implementation instructions reference"
+      },
+      {
+        "name": "0110000081_HUEY_P_UNIFIED_SPECIFICATION.md",
+        "reported_size": "83 KB",
+        "role": "large unified specification reference"
+      }
+    ],
+    "listed_items": [
+      {
+        "name": "0110000063_01_scope_overview.md",
+        "size": "2.2 KB",
+        "type": "file"
+      },
+      {
+        "name": "0110000064_01_scope_principles.md",
+        "size": "1.3 KB",
+        "type": "file"
+      },
+      {
+        "name": "0110000065_02_integration_comm.md",
+        "size": "1.3 KB",
+        "type": "file"
+      },
+      {
+        "name": "0110000066_02_runtime_architecture.md",
+        "size": "1.9 KB",
+        "type": "file"
+      },
+      {
+        "name": "0110000067_03_identifier_systems.md",
+        "size": "1.7 KB",
+        "type": "file"
+      },
+      {
+        "name": "0110000068_03_plugin_model.md",
+        "size": "1.6 KB",
+        "type": "file"
+      },
+      {
+        "name": "0110000069_04_layout_navigation.md",
+        "size": "0.9 KB",
+        "type": "file"
+      },
+      {
+        "name": "0110000070_04_signal_csv_contracts.md",
+        "size": "2.4 KB",
+        "type": "file"
+      },
+      {
+        "name": "0110000071_05_calendar_ingest_transform.md",
+        "size": "1.8 KB",
+        "type": "file"
+      },
+      {
+        "name": "0110000072_05_tabs_panels_controls.md",
+        "size": "2.1 KB",
+        "type": "file"
+      },
+      {
+        "name": "0110000073_06_reentry_subsystem.md",
+        "size": "1.3 KB",
+        "type": "file"
+      },
+      {
+        "name": "0110000074_06_signal_model_mapping.md",
+        "size": "1.1 KB",
+        "type": "file"
+      },
+      {
+        "name": "0110000075_07_risk_portfolio_controls.md",
+        "size": "1.1 KB",
+        "type": "file"
+      },
+      {
+        "name": "0110000076_07_transport_bridge_contracts.md",
+        "size": "1.3 KB",
+        "type": "file"
+      },
+      {
+        "name": "0110000077_08_monitoring_testing_gov.md",
+        "size": "1.2 KB",
+        "type": "file"
+      },
+      {
+        "name": "0110000078_08_qc_acceptance_telemetry.md",
+        "size": "1.6 KB",
+        "type": "file"
+      },
+      {
+        "name": "0110000079_econ_spec_standardized.md",
+        "size": "9.9 KB",
+        "type": "file"
+      },
+      {
+        "name": "0110000080_HUEY_P Documentation SystemComplete Implementation Instructions.md",
+        "size": "107 KB",
+        "type": "file"
+      },
+      {
+        "name": "0110000081_HUEY_P_UNIFIED_SPECIFICATION.md",
+        "size": "83 KB",
+        "type": "file"
+      },
+      {
+        "name": "archive/",
+        "size": "—",
+        "type": "dir"
+      }
+    ],
+    "filename_observation_note": "The GitHub table in the transcript displays 0110000063-style filenames, while the download output shows at least the first three files with longer 0110000063260118-style numeric prefixes. Use an actual directory listing of EAFIX_auth_docs before relying on exact local filenames.",
+    "downloaded_items_observed_partial": [
+      "0110000063260118_01_scope_overview.md",
+      "0110000064260118_01_scope_principles.md",
+      "0110000065260118_02_integration_comm.md"
+    ]
+  },
+  "services_directory": {
+    "reported_total_source_files": "~250",
+    "exclusions": [
+      "__pycache__",
+      "*.pyc"
+    ],
+    "architecture_patterns": [
+      {
+        "pattern": "dual_naming_convention",
+        "description": "Hyphenated service directories such as data-ingestor contain implementation files; underscore directories such as data_ingestor act as stable import wrappers."
+      },
+      {
+        "pattern": "numeric_id_prefixed_files",
+        "description": "Implementation files carry numeric ID prefixes, for example 2099900112260118_main.py, for traceability."
+      },
+      {
+        "pattern": "directory_identity_files",
+        "description": ".dir_id files are present for directory identity tracking."
+      },
+      {
+        "pattern": "plugin_architecture",
+        "description": "Every service is expected to expose plugin.py inheriting from BasePlugin or equivalent shared plugin base."
+      },
+      {
+        "pattern": "standard_service_structure",
+        "description": "Typical service structure includes config.py, health.py, metrics.py, main.py, and plugin.py, with FastAPI-style main entrypoints where applicable."
+      }
+    ],
+    "service_inventory": [
+      {
+        "service": "calendar-ingestor",
+        "status": "Active",
+        "purpose": "Calendar event ingestion"
+      },
+      {
+        "service": "common",
+        "status": "Active",
+        "purpose": "Shared base classes, startup_health_gate, BaseService"
+      },
+      {
+        "service": "compliance-monitor",
+        "status": "Stub",
+        "purpose": "Only a requirements.txt"
+      },
+      {
+        "service": "dashboard-backend",
+        "status": "Active",
+        "purpose": "FastAPI backend + React frontend dashboard"
+      },
+      {
+        "service": "data-ingestor",
+        "status": "Active",
+        "purpose": "Normalizes MT4/DDE broker feeds into PriceTick events"
+      },
+      {
+        "service": "data-validator",
+        "status": "Stub",
+        "purpose": "Minimal source files"
+      },
+      {
+        "service": "desktop-ui",
+        "status": "Active",
+        "purpose": "Tkinter GUI, MQ4 scripts, indicator overlays"
+      },
+      {
+        "service": "event-gateway",
+        "status": "Active",
+        "purpose": "Event broker/gateway"
+      },
+      {
+        "service": "execution-engine",
+        "status": "Active",
+        "purpose": "OMS, trade outcome classification"
+      },
+      {
+        "service": "flow-monitor",
+        "status": "Active",
+        "purpose": "Workflow monitoring"
+      },
+      {
+        "service": "flow-orchestrator",
+        "status": "Active",
+        "purpose": "Service workflow coordination"
+      },
+      {
+        "service": "gui-gateway",
+        "status": "Active",
+        "purpose": "GUI communication gateway"
+      },
+      {
+        "service": "indicator-engine",
+        "status": "Active",
+        "purpose": "Currency strength, advanced indicators"
+      },
+      {
+        "service": "reentry-engine",
+        "status": "Active",
+        "purpose": "Processes TradeResult into ReentryDecision events"
+      },
+      {
+        "service": "reentry-matrix-svc",
+        "status": "Active",
+        "purpose": "Re-entry decision matrix"
+      },
+      {
+        "service": "reporter",
+        "status": "Active",
+        "purpose": "Report generation/publishing"
+      },
+      {
+        "service": "risk-manager",
+        "status": "Active",
+        "purpose": "Risk management and mitigation"
+      },
+      {
+        "service": "scripts",
+        "status": "Utility",
+        "purpose": "Shell scripts for enterprise service integration/validation"
+      },
+      {
+        "service": "signal-generator",
+        "status": "Active",
+        "purpose": "Signal processing from indicators"
+      },
+      {
+        "service": "telemetry-daemon",
+        "status": "Active",
+        "purpose": "System-wide health monitoring, alerting, observability"
+      },
+      {
+        "service": "transport-router",
+        "status": "Active",
+        "purpose": "Event routing and validation between services"
+      }
+    ],
+    "stable_import_wrappers_identified": [
+      "services/data_ingestor",
+      "services/execution_engine",
+      "services/indicator_engine",
+      "services/reentry_engine",
+      "services/reentry_matrix_svc",
+      "services/risk_manager",
+      "services/signal_generator",
+      "services/telemetry_daemon",
+      "services/transport_router"
+    ],
+    "root_children_identified_from_tree": [],
+    "key_service_flow": {
+      "primary_chain": [
+        "data-ingestor",
+        "indicator-engine",
+        "signal-generator",
+        "execution-engine"
+      ],
+      "risk_branch": [
+        "execution-engine",
+        "risk-manager"
+      ],
+      "reentry_branch": [
+        "risk-manager",
+        "reentry-engine",
+        "reentry-matrix-svc"
+      ],
+      "routing_and_observability": [
+        "reentry-engine",
+        "transport-router",
+        "telemetry-daemon"
+      ],
+      "flow_text": "data-ingestor -> indicator-engine -> signal-generator -> execution-engine -> risk-manager -> reentry-engine <- reentry-matrix-svc -> transport-router -> telemetry-daemon; telemetry-daemon is cross-cutting."
+    },
+    "normalized_paths": [
+      {
+        "path": "services/",
+        "kind": "directory",
+        "source_line": "services/"
+      },
+      {
+        "path": "services/.dir_id",
+        "kind": "file",
+        "source_line": "├── .dir_id"
+      },
+      {
+        "path": "services/__init__.py",
+        "kind": "file",
+        "source_line": "├── __init__.py"
+      },
+      {
+        "path": "services/_id_loader.py",
+        "kind": "file",
+        "source_line": "├── _id_loader.py"
+      },
+      {
+        "path": "services/calendar-ingestor/",
+        "kind": "directory",
+        "source_line": "├── calendar-ingestor/"
+      },
+      {
+        "path": "services/calendar-ingestor/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/calendar-ingestor/docs/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── docs/.dir_id"
+      },
+      {
+        "path": "services/calendar-ingestor/src/",
+        "kind": "directory",
+        "source_line": "│   ├── src/"
+      },
+      {
+        "path": "services/calendar-ingestor/src/.dir_id",
+        "kind": "file",
+        "source_line": "│   │   ├── .dir_id"
+      },
+      {
+        "path": "services/calendar-ingestor/src/2099900089260118_config.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900089260118_config.py"
+      },
+      {
+        "path": "services/calendar-ingestor/src/2099900091260118_health.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900091260118_health.py"
+      },
+      {
+        "path": "services/calendar-ingestor/src/2099900092260118_ingestor.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900092260118_ingestor.py"
+      },
+      {
+        "path": "services/calendar-ingestor/src/2099900093260118_main.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900093260118_main.py"
+      },
+      {
+        "path": "services/calendar-ingestor/src/2099900094260118_metrics.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900094260118_metrics.py"
+      },
+      {
+        "path": "services/calendar-ingestor/src/2099900095260118_plugin.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900095260118_plugin.py"
+      },
+      {
+        "path": "services/calendar-ingestor/src/2099900098260118___init__.py",
+        "kind": "file",
+        "source_line": "│   │   └── 2099900098260118___init__.py"
+      },
+      {
+        "path": "services/calendar-ingestor/tests/",
+        "kind": "directory",
+        "source_line": "│   └── tests/"
+      },
+      {
+        "path": "services/calendar-ingestor/tests/.dir_id",
+        "kind": "file",
+        "source_line": "│       ├── .dir_id"
+      },
+      {
+        "path": "services/calendar-ingestor/tests/2099900099260118_test_ingestor.py",
+        "kind": "file",
+        "source_line": "│       └── 2099900099260118_test_ingestor.py"
+      },
+      {
+        "path": "services/common/",
+        "kind": "directory",
+        "source_line": "├── common/"
+      },
+      {
+        "path": "services/common/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/common/__init__.py",
+        "kind": "file",
+        "source_line": "│   ├── __init__.py"
+      },
+      {
+        "path": "services/common/2099900100260118_base_enterprise_service.py",
+        "kind": "file",
+        "source_line": "│   ├── 2099900100260118_base_enterprise_service.py"
+      },
+      {
+        "path": "services/common/2099900101260118_base_service.py",
+        "kind": "file",
+        "source_line": "│   ├── 2099900101260118_base_service.py"
+      },
+      {
+        "path": "services/common/2099900102260118_test_service_template.py",
+        "kind": "file",
+        "source_line": "│   ├── 2099900102260118_test_service_template.py"
+      },
+      {
+        "path": "services/common/2099900103260118___init__.py",
+        "kind": "file",
+        "source_line": "│   ├── 2099900103260118___init__.py"
+      },
+      {
+        "path": "services/common/base_service.py",
+        "kind": "file",
+        "source_line": "│   ├── base_service.py"
+      },
+      {
+        "path": "services/common/startup_health_gate.py",
+        "kind": "file",
+        "source_line": "│   ├── startup_health_gate.py"
+      },
+      {
+        "path": "services/common/test_service_template.py",
+        "kind": "file",
+        "source_line": "│   └── test_service_template.py"
+      },
+      {
+        "path": "services/compliance-monitor/",
+        "kind": "directory",
+        "source_line": "├── compliance-monitor/"
+      },
+      {
+        "path": "services/compliance-monitor/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/compliance-monitor/0299900016260118_requirements.txt",
+        "kind": "file",
+        "source_line": "│   └── 0299900016260118_requirements.txt"
+      },
+      {
+        "path": "services/dashboard-backend/",
+        "kind": "directory",
+        "source_line": "├── dashboard-backend/"
+      },
+      {
+        "path": "services/dashboard-backend/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/dashboard-backend/docs/",
+        "kind": "directory",
+        "source_line": "│   ├── docs/"
+      },
+      {
+        "path": "services/dashboard-backend/docs/.dir_id",
+        "kind": "file",
+        "source_line": "│   │   ├── .dir_id"
+      },
+      {
+        "path": "services/dashboard-backend/docs/0199900102260118_integration_guide.md",
+        "kind": "file",
+        "source_line": "│   │   ├── 0199900102260118_integration_guide.md"
+      },
+      {
+        "path": "services/dashboard-backend/docs/0199900103260118_Py Qt6 Trading Signals Dashboard Tab (dashboard Tab.md",
+        "kind": "file",
+        "source_line": "│   │   └── 0199900103260118_Py Qt6 Trading Signals Dashboard Tab (dashboard Tab.md"
+      },
+      {
+        "path": "services/dashboard-backend/frontend/",
+        "kind": "directory",
+        "source_line": "│   ├── frontend/"
+      },
+      {
+        "path": "services/dashboard-backend/frontend/.dir_id",
+        "kind": "file",
+        "source_line": "│   │   ├── .dir_id"
+      },
+      {
+        "path": "services/dashboard-backend/frontend/0099900037260118_trading_dashboard.tsx",
+        "kind": "file",
+        "source_line": "│   │   └── 0099900037260118_trading_dashboard.tsx"
+      },
+      {
+        "path": "services/dashboard-backend/src/",
+        "kind": "directory",
+        "source_line": "│   └── src/"
+      },
+      {
+        "path": "services/dashboard-backend/src/.dir_id",
+        "kind": "file",
+        "source_line": "│       ├── .dir_id"
+      },
+      {
+        "path": "services/dashboard-backend/src/2099900104260118_advanced_indicators.py",
+        "kind": "file",
+        "source_line": "│       ├── 2099900104260118_advanced_indicators.py"
+      },
+      {
+        "path": "services/dashboard-backend/src/2099900105260118_dashboard_backend.py",
+        "kind": "file",
+        "source_line": "│       ├── 2099900105260118_dashboard_backend.py"
+      },
+      {
+        "path": "services/dashboard-backend/src/2099900106260118_main.py",
+        "kind": "file",
+        "source_line": "│       ├── 2099900106260118_main.py"
+      },
+      {
+        "path": "services/dashboard-backend/src/2099900107260118_plugin.py",
+        "kind": "file",
+        "source_line": "│       ├── 2099900107260118_plugin.py"
+      },
+      {
+        "path": "services/dashboard-backend/src/2099900108260118_tkinter_dashboard_gui.py",
+        "kind": "file",
+        "source_line": "│       └── 2099900108260118_tkinter_dashboard_gui.py"
+      },
+      {
+        "path": "services/data-ingestor/",
+        "kind": "directory",
+        "source_line": "├── data-ingestor/"
+      },
+      {
+        "path": "services/data-ingestor/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/data-ingestor/0099900038260118_.env.template",
+        "kind": "file",
+        "source_line": "│   ├── 0099900038260118_.env.template"
+      },
+      {
+        "path": "services/data-ingestor/0299900018260118_requirements.txt",
+        "kind": "file",
+        "source_line": "│   ├── 0299900018260118_requirements.txt"
+      },
+      {
+        "path": "services/data-ingestor/src/",
+        "kind": "directory",
+        "source_line": "│   ├── src/"
+      },
+      {
+        "path": "services/data-ingestor/src/.dir_id",
+        "kind": "file",
+        "source_line": "│   │   ├── .dir_id"
+      },
+      {
+        "path": "services/data-ingestor/src/2099900109260118_config.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900109260118_config.py"
+      },
+      {
+        "path": "services/data-ingestor/src/2099900110260118_health.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900110260118_health.py"
+      },
+      {
+        "path": "services/data-ingestor/src/2099900111260118_ingestor.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900111260118_ingestor.py"
+      },
+      {
+        "path": "services/data-ingestor/src/2099900112260118_main.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900112260118_main.py"
+      },
+      {
+        "path": "services/data-ingestor/src/2099900113260118_main_enterprise.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900113260118_main_enterprise.py"
+      },
+      {
+        "path": "services/data-ingestor/src/2099900114260118_metrics.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900114260118_metrics.py"
+      },
+      {
+        "path": "services/data-ingestor/src/2099900115260118_models.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900115260118_models.py"
+      },
+      {
+        "path": "services/data-ingestor/src/2099900116260118_plugin.py",
+        "kind": "file",
+        "source_line": "│   │   └── 2099900116260118_plugin.py"
+      },
+      {
+        "path": "services/data-ingestor/tests/",
+        "kind": "directory",
+        "source_line": "│   └── tests/"
+      },
+      {
+        "path": "services/data-ingestor/tests/integration/",
+        "kind": "directory",
+        "source_line": "│       ├── integration/"
+      },
+      {
+        "path": "services/data-ingestor/tests/integration/.dir_id",
+        "kind": "file",
+        "source_line": "│       │   ├── .dir_id"
+      },
+      {
+        "path": "services/data-ingestor/tests/integration/2099900117260118___init__.py",
+        "kind": "file",
+        "source_line": "│       │   └── 2099900117260118___init__.py"
+      },
+      {
+        "path": "services/data-ingestor/tests/unit/",
+        "kind": "directory",
+        "source_line": "│       └── unit/"
+      },
+      {
+        "path": "services/data-ingestor/tests/unit/.dir_id",
+        "kind": "file",
+        "source_line": "│           ├── .dir_id"
+      },
+      {
+        "path": "services/data-ingestor/tests/unit/2099900118260118_test_data_ingestor_enterprise.py",
+        "kind": "file",
+        "source_line": "│           ├── 2099900118260118_test_data_ingestor_enterprise.py"
+      },
+      {
+        "path": "services/data-ingestor/tests/unit/2099900119260118_test_data_ingestor_service.py",
+        "kind": "file",
+        "source_line": "│           ├── 2099900119260118_test_data_ingestor_service.py"
+      },
+      {
+        "path": "services/data-ingestor/tests/unit/2099900120260118___init__.py",
+        "kind": "file",
+        "source_line": "│           └── 2099900120260118___init__.py"
+      },
+      {
+        "path": "services/data-validator/",
+        "kind": "directory",
+        "source_line": "├── data-validator/"
+      },
+      {
+        "path": "services/data-validator/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/data-validator/src/.dir_id",
+        "kind": "file",
+        "source_line": "│   └── src/.dir_id"
+      },
+      {
+        "path": "services/data_ingestor/",
+        "kind": "directory",
+        "source_line": "├── data_ingestor/  (stable import wrapper)",
+        "note": "stable import wrapper"
+      },
+      {
+        "path": "services/data_ingestor/__init__.py",
+        "kind": "file",
+        "source_line": "│   ├── __init__.py"
+      },
+      {
+        "path": "services/data_ingestor/src/",
+        "kind": "directory",
+        "source_line": "│   └── src/"
+      },
+      {
+        "path": "services/data_ingestor/src/__init__.py",
+        "kind": "file",
+        "source_line": "│       ├── __init__.py"
+      },
+      {
+        "path": "services/data_ingestor/src/config.py",
+        "kind": "file",
+        "source_line": "│       ├── config.py"
+      },
+      {
+        "path": "services/data_ingestor/src/health.py",
+        "kind": "file",
+        "source_line": "│       ├── health.py"
+      },
+      {
+        "path": "services/data_ingestor/src/ingestor.py",
+        "kind": "file",
+        "source_line": "│       ├── ingestor.py"
+      },
+      {
+        "path": "services/data_ingestor/src/main.py",
+        "kind": "file",
+        "source_line": "│       ├── main.py"
+      },
+      {
+        "path": "services/data_ingestor/src/main_enterprise.py",
+        "kind": "file",
+        "source_line": "│       ├── main_enterprise.py"
+      },
+      {
+        "path": "services/data_ingestor/src/metrics.py",
+        "kind": "file",
+        "source_line": "│       ├── metrics.py"
+      },
+      {
+        "path": "services/data_ingestor/src/models.py",
+        "kind": "file",
+        "source_line": "│       ├── models.py"
+      },
+      {
+        "path": "services/data_ingestor/src/plugin.py",
+        "kind": "file",
+        "source_line": "│       └── plugin.py"
+      },
+      {
+        "path": "services/desktop-ui/",
+        "kind": "directory",
+        "source_line": "├── desktop-ui/"
+      },
+      {
+        "path": "services/desktop-ui/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/desktop-ui/0099900039260118_desktop.ini",
+        "kind": "file",
+        "source_line": "│   ├── 0099900039260118_desktop.ini"
+      },
+      {
+        "path": "services/desktop-ui/0199900104260118_GUI_Spec_Controls_Sections.md",
+        "kind": "file",
+        "source_line": "│   ├── 0199900104260118_GUI_Spec_Controls_Sections.md"
+      },
+      {
+        "path": "services/desktop-ui/0199900105260118_indicator_integration_guide.md",
+        "kind": "file",
+        "source_line": "│   ├── 0199900105260118_indicator_integration_guide.md"
+      },
+      {
+        "path": "services/desktop-ui/1199900030260118_settings.friday_move.overlay.json",
+        "kind": "file",
+        "source_line": "│   ├── 1199900030260118_settings.friday_move.overlay.json"
+      },
+      {
+        "path": "services/desktop-ui/2099900128260118_expiry_indicator_service.py",
+        "kind": "file",
+        "source_line": "│   ├── 2099900128260118_expiry_indicator_service.py"
+      },
+      {
+        "path": "services/desktop-ui/2099900129260118_expiry_service.py",
+        "kind": "file",
+        "source_line": "│   ├── 2099900129260118_expiry_service.py"
+      },
+      {
+        "path": "services/desktop-ui/2099900130260118_friday_vol_indicator.py",
+        "kind": "file",
+        "source_line": "│   ├── 2099900130260118_friday_vol_indicator.py"
+      },
+      {
+        "path": "services/desktop-ui/2099900131260118_friday_vol_signal.py",
+        "kind": "file",
+        "source_line": "│   ├── 2099900131260118_friday_vol_signal.py"
+      },
+      {
+        "path": "services/desktop-ui/2099900132260118_outbound.py",
+        "kind": "file",
+        "source_line": "│   ├── 2099900132260118_outbound.py"
+      },
+      {
+        "path": "services/desktop-ui/2099900133260118_test_friday_vol_indicator.py",
+        "kind": "file",
+        "source_line": "│   ├── 2099900133260118_test_friday_vol_indicator.py"
+      },
+      {
+        "path": "services/desktop-ui/2099900134260118_test_friday_vol_signal.py",
+        "kind": "file",
+        "source_line": "│   ├── 2099900134260118_test_friday_vol_signal.py"
+      },
+      {
+        "path": "services/desktop-ui/2099900135260118_tkinter_dashboard_gui.py",
+        "kind": "file",
+        "source_line": "│   ├── 2099900135260118_tkinter_dashboard_gui.py"
+      },
+      {
+        "path": "services/desktop-ui/2299900003260118_ExpiryZones.mq4",
+        "kind": "file",
+        "source_line": "│   ├── 2299900003260118_ExpiryZones.mq4"
+      },
+      {
+        "path": "services/desktop-ui/dashboard/",
+        "kind": "directory",
+        "source_line": "│   ├── dashboard/"
+      },
+      {
+        "path": "services/desktop-ui/dashboard/.dir_id",
+        "kind": "file",
+        "source_line": "│   │   ├── .dir_id"
+      },
+      {
+        "path": "services/desktop-ui/dashboard/2099900136260118_tkinter_dashboard_gui.py",
+        "kind": "file",
+        "source_line": "│   │   └── 2099900136260118_tkinter_dashboard_gui.py"
+      },
+      {
+        "path": "services/desktop-ui/indicators/currency_strength/",
+        "kind": "directory",
+        "source_line": "│   ├── indicators/currency_strength/"
+      },
+      {
+        "path": "services/desktop-ui/indicators/currency_strength/.dir_id",
+        "kind": "file",
+        "source_line": "│   │   ├── .dir_id"
+      },
+      {
+        "path": "services/desktop-ui/indicators/currency_strength/4399900001260118_currency_strength_mockup.html",
+        "kind": "file",
+        "source_line": "│   │   ├── 4399900001260118_currency_strength_mockup.html"
+      },
+      {
+        "path": "services/desktop-ui/indicators/currency_strength/DDE + Currency Strength Tab — Brainstorm Spec.md",
+        "kind": "file",
+        "source_line": "│   │   └── DDE + Currency Strength Tab — Brainstorm Spec.md"
+      },
+      {
+        "path": "services/desktop-ui/testing/.dir_id",
+        "kind": "file",
+        "source_line": "│   └── testing/.dir_id"
+      },
+      {
+        "path": "services/event-gateway/",
+        "kind": "directory",
+        "source_line": "├── event-gateway/"
+      },
+      {
+        "path": "services/event-gateway/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/event-gateway/src/",
+        "kind": "directory",
+        "source_line": "│   └── src/"
+      },
+      {
+        "path": "services/event-gateway/src/.dir_id",
+        "kind": "file",
+        "source_line": "│       ├── .dir_id"
+      },
+      {
+        "path": "services/event-gateway/src/2099900138260118_config.py",
+        "kind": "file",
+        "source_line": "│       ├── 2099900138260118_config.py"
+      },
+      {
+        "path": "services/event-gateway/src/2099900139260118_gateway.py",
+        "kind": "file",
+        "source_line": "│       ├── 2099900139260118_gateway.py"
+      },
+      {
+        "path": "services/event-gateway/src/2099900140260118_health.py",
+        "kind": "file",
+        "source_line": "│       ├── 2099900140260118_health.py"
+      },
+      {
+        "path": "services/event-gateway/src/2099900141260118_main.py",
+        "kind": "file",
+        "source_line": "│       ├── 2099900141260118_main.py"
+      },
+      {
+        "path": "services/event-gateway/src/2099900142260118_metrics.py",
+        "kind": "file",
+        "source_line": "│       ├── 2099900142260118_metrics.py"
+      },
+      {
+        "path": "services/event-gateway/src/2099900143260118_plugin.py",
+        "kind": "file",
+        "source_line": "│       └── 2099900143260118_plugin.py"
+      },
+      {
+        "path": "services/execution-engine/",
+        "kind": "directory",
+        "source_line": "├── execution-engine/"
+      },
+      {
+        "path": "services/execution-engine/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/execution-engine/src/",
+        "kind": "directory",
+        "source_line": "│   ├── src/"
+      },
+      {
+        "path": "services/execution-engine/src/.dir_id",
+        "kind": "file",
+        "source_line": "│   │   ├── .dir_id"
+      },
+      {
+        "path": "services/execution-engine/src/2099900144260118_plugin.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900144260118_plugin.py"
+      },
+      {
+        "path": "services/execution-engine/src/2099900145260118_oms.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900145260118_oms.py"
+      },
+      {
+        "path": "services/execution-engine/src/2099900146260118_trade_close_classifier.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900146260118_trade_close_classifier.py"
+      },
+      {
+        "path": "services/execution-engine/src/2099900147260118_outcome_bucketizer.py",
+        "kind": "file",
+        "source_line": "│   │   └── 2099900147260118_outcome_bucketizer.py"
+      },
+      {
+        "path": "services/execution-engine/tests/",
+        "kind": "directory",
+        "source_line": "│   └── tests/"
+      },
+      {
+        "path": "services/execution-engine/tests/.dir_id",
+        "kind": "file",
+        "source_line": "│       ├── .dir_id"
+      },
+      {
+        "path": "services/execution-engine/tests/2099900145260118_test_execution_engine_plugin.py",
+        "kind": "file",
+        "source_line": "│       └── 2099900145260118_test_execution_engine_plugin.py"
+      },
+      {
+        "path": "services/execution_engine/",
+        "kind": "directory",
+        "source_line": "├── execution_engine/  (stable import wrapper)",
+        "note": "stable import wrapper"
+      },
+      {
+        "path": "services/execution_engine/__init__.py",
+        "kind": "file",
+        "source_line": "│   ├── __init__.py"
+      },
+      {
+        "path": "services/execution_engine/src/",
+        "kind": "directory",
+        "source_line": "│   └── src/"
+      },
+      {
+        "path": "services/execution_engine/src/__init__.py",
+        "kind": "file",
+        "source_line": "│       ├── __init__.py"
+      },
+      {
+        "path": "services/execution_engine/src/oms.py",
+        "kind": "file",
+        "source_line": "│       ├── oms.py"
+      },
+      {
+        "path": "services/execution_engine/src/outcome_bucketizer.py",
+        "kind": "file",
+        "source_line": "│       ├── outcome_bucketizer.py"
+      },
+      {
+        "path": "services/execution_engine/src/plugin.py",
+        "kind": "file",
+        "source_line": "│       ├── plugin.py"
+      },
+      {
+        "path": "services/execution_engine/src/trade_close_classifier.py",
+        "kind": "file",
+        "source_line": "│       └── trade_close_classifier.py"
+      },
+      {
+        "path": "services/flow-monitor/",
+        "kind": "directory",
+        "source_line": "├── flow-monitor/"
+      },
+      {
+        "path": "services/flow-monitor/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/flow-monitor/src/",
+        "kind": "directory",
+        "source_line": "│   └── src/"
+      },
+      {
+        "path": "services/flow-monitor/src/.dir_id",
+        "kind": "file",
+        "source_line": "│       ├── .dir_id"
+      },
+      {
+        "path": "services/flow-monitor/src/2099900146260118_config.py",
+        "kind": "file",
+        "source_line": "│       ├── 2099900146260118_config.py"
+      },
+      {
+        "path": "services/flow-monitor/src/2099900147260118_monitor.py",
+        "kind": "file",
+        "source_line": "│       └── 2099900147260118_monitor.py"
+      },
+      {
+        "path": "services/flow-orchestrator/",
+        "kind": "directory",
+        "source_line": "├── flow-orchestrator/"
+      },
+      {
+        "path": "services/flow-orchestrator/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/flow-orchestrator/src/",
+        "kind": "directory",
+        "source_line": "│   └── src/"
+      },
+      {
+        "path": "services/flow-orchestrator/src/.dir_id",
+        "kind": "file",
+        "source_line": "│       ├── .dir_id"
+      },
+      {
+        "path": "services/flow-orchestrator/src/2099900148260118_config.py",
+        "kind": "file",
+        "source_line": "│       ├── 2099900148260118_config.py"
+      },
+      {
+        "path": "services/flow-orchestrator/src/2099900149260118_coordinator.py",
+        "kind": "file",
+        "source_line": "│       ├── 2099900149260118_coordinator.py"
+      },
+      {
+        "path": "services/flow-orchestrator/src/2099900150260118_plugin.py",
+        "kind": "file",
+        "source_line": "│       └── 2099900150260118_plugin.py"
+      },
+      {
+        "path": "services/gui-gateway/",
+        "kind": "directory",
+        "source_line": "├── gui-gateway/"
+      },
+      {
+        "path": "services/gui-gateway/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/gui-gateway/src/",
+        "kind": "directory",
+        "source_line": "│   └── src/"
+      },
+      {
+        "path": "services/gui-gateway/src/.dir_id",
+        "kind": "file",
+        "source_line": "│       ├── .dir_id"
+      },
+      {
+        "path": "services/gui-gateway/src/2099900155260118_config.py",
+        "kind": "file",
+        "source_line": "│       ├── 2099900155260118_config.py"
+      },
+      {
+        "path": "services/gui-gateway/src/2099900156260118_main.py",
+        "kind": "file",
+        "source_line": "│       ├── 2099900156260118_main.py"
+      },
+      {
+        "path": "services/gui-gateway/src/2099900157260118_models.py",
+        "kind": "file",
+        "source_line": "│       ├── 2099900157260118_models.py"
+      },
+      {
+        "path": "services/gui-gateway/src/2099900158260118_plugin.py",
+        "kind": "file",
+        "source_line": "│       └── 2099900158260118_plugin.py"
+      },
+      {
+        "path": "services/indicator-engine/",
+        "kind": "directory",
+        "source_line": "├── indicator-engine/"
+      },
+      {
+        "path": "services/indicator-engine/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/indicator-engine/docs/",
+        "kind": "directory",
+        "source_line": "│   ├── docs/"
+      },
+      {
+        "path": "services/indicator-engine/docs/.dir_id",
+        "kind": "file",
+        "source_line": "│   │   ├── .dir_id"
+      },
+      {
+        "path": "services/indicator-engine/docs/0199900110260118_currency-strength-report.md",
+        "kind": "file",
+        "source_line": "│   │   ├── 0199900110260118_currency-strength-report.md"
+      },
+      {
+        "path": "services/indicator-engine/docs/4399900002260118_currency_strength_mockup.html",
+        "kind": "file",
+        "source_line": "│   │   ├── 4399900002260118_currency_strength_mockup.html"
+      },
+      {
+        "path": "services/indicator-engine/docs/DDE + Currency Strength Tab — Brainstorm Spec.md",
+        "kind": "file",
+        "source_line": "│   │   └── DDE + Currency Strength Tab — Brainstorm Spec.md"
+      },
+      {
+        "path": "services/indicator-engine/src/",
+        "kind": "directory",
+        "source_line": "│   ├── src/"
+      },
+      {
+        "path": "services/indicator-engine/src/.dir_id",
+        "kind": "file",
+        "source_line": "│   │   ├── .dir_id"
+      },
+      {
+        "path": "services/indicator-engine/src/2099900159260118_plugin.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900159260118_plugin.py"
+      },
+      {
+        "path": "services/indicator-engine/src/currency_strength/",
+        "kind": "directory",
+        "source_line": "│   │   ├── currency_strength/"
+      },
+      {
+        "path": "services/indicator-engine/src/currency_strength/.dir_id",
+        "kind": "file",
+        "source_line": "│   │   │   ├── .dir_id"
+      },
+      {
+        "path": "services/indicator-engine/src/currency_strength/2099900160260118_strength_calculator.py",
+        "kind": "file",
+        "source_line": "│   │   │   └── 2099900160260118_strength_calculator.py"
+      },
+      {
+        "path": "services/indicator-engine/src/indicators/",
+        "kind": "directory",
+        "source_line": "│   │   └── indicators/"
+      },
+      {
+        "path": "services/indicator-engine/src/indicators/.dir_id",
+        "kind": "file",
+        "source_line": "│   │       ├── .dir_id"
+      },
+      {
+        "path": "services/indicator-engine/src/indicators/2099900161260118_advanced_indicators.py",
+        "kind": "file",
+        "source_line": "│   │       └── 2099900161260118_advanced_indicators.py"
+      },
+      {
+        "path": "services/indicator-engine/tests/",
+        "kind": "directory",
+        "source_line": "│   └── tests/"
+      },
+      {
+        "path": "services/indicator-engine/tests/.dir_id",
+        "kind": "file",
+        "source_line": "│       ├── .dir_id"
+      },
+      {
+        "path": "services/indicator-engine/tests/2099900162260118_test_indicator_plugin.py",
+        "kind": "file",
+        "source_line": "│       └── 2099900162260118_test_indicator_plugin.py"
+      },
+      {
+        "path": "services/indicator_engine/",
+        "kind": "directory",
+        "source_line": "├── indicator_engine/  (stable import wrapper)",
+        "note": "stable import wrapper"
+      },
+      {
+        "path": "services/indicator_engine/__init__.py",
+        "kind": "file",
+        "source_line": "│   ├── __init__.py"
+      },
+      {
+        "path": "services/indicator_engine/src/",
+        "kind": "directory",
+        "source_line": "│   └── src/"
+      },
+      {
+        "path": "services/indicator_engine/src/__init__.py",
+        "kind": "file",
+        "source_line": "│       ├── __init__.py"
+      },
+      {
+        "path": "services/indicator_engine/src/plugin.py",
+        "kind": "file",
+        "source_line": "│       └── plugin.py"
+      },
+      {
+        "path": "services/reentry-engine/",
+        "kind": "directory",
+        "source_line": "├── reentry-engine/"
+      },
+      {
+        "path": "services/reentry-engine/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/reentry-engine/0299900024260118_requirements.txt",
+        "kind": "file",
+        "source_line": "│   ├── 0299900024260118_requirements.txt"
+      },
+      {
+        "path": "services/reentry-engine/src/",
+        "kind": "directory",
+        "source_line": "│   ├── src/"
+      },
+      {
+        "path": "services/reentry-engine/src/.dir_id",
+        "kind": "file",
+        "source_line": "│   │   ├── .dir_id"
+      },
+      {
+        "path": "services/reentry-engine/src/2099900163260118_config.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900163260118_config.py"
+      },
+      {
+        "path": "services/reentry-engine/src/2099900164260118_decision_client.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900164260118_decision_client.py"
+      },
+      {
+        "path": "services/reentry-engine/src/2099900165260118_health.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900165260118_health.py"
+      },
+      {
+        "path": "services/reentry-engine/src/2099900166260118_main.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900166260118_main.py"
+      },
+      {
+        "path": "services/reentry-engine/src/2099900167260118_metrics.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900167260118_metrics.py"
+      },
+      {
+        "path": "services/reentry-engine/src/2099900168260118_plugin.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900168260118_plugin.py"
+      },
+      {
+        "path": "services/reentry-engine/src/2099900169260118_processor.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900169260118_processor.py"
+      },
+      {
+        "path": "services/reentry-engine/src/2099900170260118___init__.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900170260118___init__.py"
+      },
+      {
+        "path": "services/reentry-engine/src/2099900171260118_calendar_cache.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900171260118_calendar_cache.py"
+      },
+      {
+        "path": "services/reentry-engine/src/2099900172260118_chain_store.py",
+        "kind": "file",
+        "source_line": "│   │   └── 2099900172260118_chain_store.py"
+      },
+      {
+        "path": "services/reentry-engine/tests/",
+        "kind": "directory",
+        "source_line": "│   └── tests/"
+      },
+      {
+        "path": "services/reentry-engine/tests/.dir_id",
+        "kind": "file",
+        "source_line": "│       ├── .dir_id"
+      },
+      {
+        "path": "services/reentry-engine/tests/2099900171260118_test_integration.py",
+        "kind": "file",
+        "source_line": "│       └── 2099900171260118_test_integration.py"
+      },
+      {
+        "path": "services/reentry-matrix-svc/",
+        "kind": "directory",
+        "source_line": "├── reentry-matrix-svc/"
+      },
+      {
+        "path": "services/reentry-matrix-svc/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/reentry-matrix-svc/0299900025260118_requirements.txt",
+        "kind": "file",
+        "source_line": "│   ├── 0299900025260118_requirements.txt"
+      },
+      {
+        "path": "services/reentry-matrix-svc/src/",
+        "kind": "directory",
+        "source_line": "│   ├── src/"
+      },
+      {
+        "path": "services/reentry-matrix-svc/src/.dir_id",
+        "kind": "file",
+        "source_line": "│   │   ├── .dir_id"
+      },
+      {
+        "path": "services/reentry-matrix-svc/src/2099900172260118_config.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900172260118_config.py"
+      },
+      {
+        "path": "services/reentry-matrix-svc/src/2099900173260118_health.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900173260118_health.py"
+      },
+      {
+        "path": "services/reentry-matrix-svc/src/2099900174260118_main.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900174260118_main.py"
+      },
+      {
+        "path": "services/reentry-matrix-svc/src/2099900175260118_metrics.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900175260118_metrics.py"
+      },
+      {
+        "path": "services/reentry-matrix-svc/src/2099900176260118_plugin.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900176260118_plugin.py"
+      },
+      {
+        "path": "services/reentry-matrix-svc/src/2099900177260118_processor.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900177260118_processor.py"
+      },
+      {
+        "path": "services/reentry-matrix-svc/src/2099900178260118_resolver.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900178260118_resolver.py"
+      },
+      {
+        "path": "services/reentry-matrix-svc/src/2099900179260118___init__.py",
+        "kind": "file",
+        "source_line": "│   │   └── 2099900179260118___init__.py"
+      },
+      {
+        "path": "services/reentry-matrix-svc/tests/",
+        "kind": "directory",
+        "source_line": "│   └── tests/"
+      },
+      {
+        "path": "services/reentry-matrix-svc/tests/.dir_id",
+        "kind": "file",
+        "source_line": "│       ├── .dir_id"
+      },
+      {
+        "path": "services/reentry-matrix-svc/tests/2099900180260118_test_processor.py",
+        "kind": "file",
+        "source_line": "│       └── 2099900180260118_test_processor.py"
+      },
+      {
+        "path": "services/reentry_engine/",
+        "kind": "directory",
+        "source_line": "├── reentry_engine/  (stable import wrapper)",
+        "note": "stable import wrapper"
+      },
+      {
+        "path": "services/reentry_engine/__init__.py",
+        "kind": "file",
+        "source_line": "│   ├── __init__.py"
+      },
+      {
+        "path": "services/reentry_engine/src/",
+        "kind": "directory",
+        "source_line": "│   └── src/"
+      },
+      {
+        "path": "services/reentry_engine/src/__init__.py",
+        "kind": "file",
+        "source_line": "│       ├── __init__.py"
+      },
+      {
+        "path": "services/reentry_engine/src/calendar_cache.py",
+        "kind": "file",
+        "source_line": "│       ├── calendar_cache.py"
+      },
+      {
+        "path": "services/reentry_engine/src/chain_store.py",
+        "kind": "file",
+        "source_line": "│       ├── chain_store.py"
+      },
+      {
+        "path": "services/reentry_engine/src/config.py",
+        "kind": "file",
+        "source_line": "│       ├── config.py"
+      },
+      {
+        "path": "services/reentry_engine/src/decision_client.py",
+        "kind": "file",
+        "source_line": "│       ├── decision_client.py"
+      },
+      {
+        "path": "services/reentry_engine/src/health.py",
+        "kind": "file",
+        "source_line": "│       ├── health.py"
+      },
+      {
+        "path": "services/reentry_engine/src/main.py",
+        "kind": "file",
+        "source_line": "│       ├── main.py"
+      },
+      {
+        "path": "services/reentry_engine/src/metrics.py",
+        "kind": "file",
+        "source_line": "│       ├── metrics.py"
+      },
+      {
+        "path": "services/reentry_engine/src/plugin.py",
+        "kind": "file",
+        "source_line": "│       ├── plugin.py"
+      },
+      {
+        "path": "services/reentry_engine/src/processor.py",
+        "kind": "file",
+        "source_line": "│       └── processor.py"
+      },
+      {
+        "path": "services/reentry_matrix_svc/",
+        "kind": "directory",
+        "source_line": "├── reentry_matrix_svc/  (stable import wrapper)",
+        "note": "stable import wrapper"
+      },
+      {
+        "path": "services/reentry_matrix_svc/__init__.py",
+        "kind": "file",
+        "source_line": "│   ├── __init__.py"
+      },
+      {
+        "path": "services/reentry_matrix_svc/src/",
+        "kind": "directory",
+        "source_line": "│   └── src/"
+      },
+      {
+        "path": "services/reentry_matrix_svc/src/__init__.py",
+        "kind": "file",
+        "source_line": "│       ├── __init__.py"
+      },
+      {
+        "path": "services/reentry_matrix_svc/src/config.py",
+        "kind": "file",
+        "source_line": "│       ├── config.py"
+      },
+      {
+        "path": "services/reentry_matrix_svc/src/health.py",
+        "kind": "file",
+        "source_line": "│       ├── health.py"
+      },
+      {
+        "path": "services/reentry_matrix_svc/src/main.py",
+        "kind": "file",
+        "source_line": "│       ├── main.py"
+      },
+      {
+        "path": "services/reentry_matrix_svc/src/metrics.py",
+        "kind": "file",
+        "source_line": "│       ├── metrics.py"
+      },
+      {
+        "path": "services/reentry_matrix_svc/src/plugin.py",
+        "kind": "file",
+        "source_line": "│       ├── plugin.py"
+      },
+      {
+        "path": "services/reentry_matrix_svc/src/processor.py",
+        "kind": "file",
+        "source_line": "│       ├── processor.py"
+      },
+      {
+        "path": "services/reentry_matrix_svc/src/resolver.py",
+        "kind": "file",
+        "source_line": "│       └── resolver.py"
+      },
+      {
+        "path": "services/reporter/",
+        "kind": "directory",
+        "source_line": "├── reporter/"
+      },
+      {
+        "path": "services/reporter/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/reporter/__init__.py",
+        "kind": "file",
+        "source_line": "│   ├── __init__.py"
+      },
+      {
+        "path": "services/reporter/src/",
+        "kind": "directory",
+        "source_line": "│   ├── src/"
+      },
+      {
+        "path": "services/reporter/src/.dir_id",
+        "kind": "file",
+        "source_line": "│   │   ├── .dir_id"
+      },
+      {
+        "path": "services/reporter/src/__init__.py",
+        "kind": "file",
+        "source_line": "│   │   ├── __init__.py"
+      },
+      {
+        "path": "services/reporter/src/2099900181260118_plugin.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900181260118_plugin.py"
+      },
+      {
+        "path": "services/reporter/src/plugin.py",
+        "kind": "file",
+        "source_line": "│   │   └── plugin.py"
+      },
+      {
+        "path": "services/reporter/tests/",
+        "kind": "directory",
+        "source_line": "│   └── tests/"
+      },
+      {
+        "path": "services/reporter/tests/.dir_id",
+        "kind": "file",
+        "source_line": "│       ├── .dir_id"
+      },
+      {
+        "path": "services/reporter/tests/2099900182260118_test_reporter_plugin.py",
+        "kind": "file",
+        "source_line": "│       └── 2099900182260118_test_reporter_plugin.py"
+      },
+      {
+        "path": "services/risk-manager/",
+        "kind": "directory",
+        "source_line": "├── risk-manager/"
+      },
+      {
+        "path": "services/risk-manager/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/risk-manager/src/",
+        "kind": "directory",
+        "source_line": "│   ├── src/"
+      },
+      {
+        "path": "services/risk-manager/src/.dir_id",
+        "kind": "file",
+        "source_line": "│   │   ├── .dir_id"
+      },
+      {
+        "path": "services/risk-manager/src/2099900183260118_plugin.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900183260118_plugin.py"
+      },
+      {
+        "path": "services/risk-manager/src/2099900184260118_config.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900184260118_config.py"
+      },
+      {
+        "path": "services/risk-manager/src/2099900185260118_processor.py",
+        "kind": "file",
+        "source_line": "│   │   └── 2099900185260118_processor.py"
+      },
+      {
+        "path": "services/risk-manager/tests/",
+        "kind": "directory",
+        "source_line": "│   └── tests/"
+      },
+      {
+        "path": "services/risk-manager/tests/.dir_id",
+        "kind": "file",
+        "source_line": "│       ├── .dir_id"
+      },
+      {
+        "path": "services/risk-manager/tests/2099900184260118_test_risk_manager_plugin.py",
+        "kind": "file",
+        "source_line": "│       └── 2099900184260118_test_risk_manager_plugin.py"
+      },
+      {
+        "path": "services/risk_manager/",
+        "kind": "directory",
+        "source_line": "├── risk_manager/  (stable import wrapper)",
+        "note": "stable import wrapper"
+      },
+      {
+        "path": "services/risk_manager/__init__.py",
+        "kind": "file",
+        "source_line": "│   ├── __init__.py"
+      },
+      {
+        "path": "services/risk_manager/src/",
+        "kind": "directory",
+        "source_line": "│   └── src/"
+      },
+      {
+        "path": "services/risk_manager/src/__init__.py",
+        "kind": "file",
+        "source_line": "│       ├── __init__.py"
+      },
+      {
+        "path": "services/risk_manager/src/config.py",
+        "kind": "file",
+        "source_line": "│       ├── config.py"
+      },
+      {
+        "path": "services/risk_manager/src/plugin.py",
+        "kind": "file",
+        "source_line": "│       ├── plugin.py"
+      },
+      {
+        "path": "services/risk_manager/src/processor.py",
+        "kind": "file",
+        "source_line": "│       └── processor.py"
+      },
+      {
+        "path": "services/scripts/",
+        "kind": "directory",
+        "source_line": "├── scripts/"
+      },
+      {
+        "path": "services/scripts/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/scripts/0099900040260118_integrate-enterprise-service.sh",
+        "kind": "file",
+        "source_line": "│   ├── 0099900040260118_integrate-enterprise-service.sh"
+      },
+      {
+        "path": "services/scripts/0099900041260118_validate-enterprise-service.sh",
+        "kind": "file",
+        "source_line": "│   └── 0099900041260118_validate-enterprise-service.sh"
+      },
+      {
+        "path": "services/signal-generator/",
+        "kind": "directory",
+        "source_line": "├── signal-generator/"
+      },
+      {
+        "path": "services/signal-generator/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/signal-generator/src/",
+        "kind": "directory",
+        "source_line": "│   ├── src/"
+      },
+      {
+        "path": "services/signal-generator/src/.dir_id",
+        "kind": "file",
+        "source_line": "│   │   ├── .dir_id"
+      },
+      {
+        "path": "services/signal-generator/src/2099900185260118_config.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900185260118_config.py"
+      },
+      {
+        "path": "services/signal-generator/src/2099900186260118_processor.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900186260118_processor.py"
+      },
+      {
+        "path": "services/signal-generator/src/2099900187260118_plugin.py",
+        "kind": "file",
+        "source_line": "│   │   └── 2099900187260118_plugin.py"
+      },
+      {
+        "path": "services/signal-generator/tests/",
+        "kind": "directory",
+        "source_line": "│   └── tests/"
+      },
+      {
+        "path": "services/signal-generator/tests/.dir_id",
+        "kind": "file",
+        "source_line": "│       ├── .dir_id"
+      },
+      {
+        "path": "services/signal-generator/tests/2099900186260118_test_signal_generator_plugin.py",
+        "kind": "file",
+        "source_line": "│       └── 2099900186260118_test_signal_generator_plugin.py"
+      },
+      {
+        "path": "services/signal_generator/",
+        "kind": "directory",
+        "source_line": "├── signal_generator/  (stable import wrapper)",
+        "note": "stable import wrapper"
+      },
+      {
+        "path": "services/signal_generator/__init__.py",
+        "kind": "file",
+        "source_line": "│   ├── __init__.py"
+      },
+      {
+        "path": "services/signal_generator/src/",
+        "kind": "directory",
+        "source_line": "│   └── src/"
+      },
+      {
+        "path": "services/signal_generator/src/__init__.py",
+        "kind": "file",
+        "source_line": "│       ├── __init__.py"
+      },
+      {
+        "path": "services/signal_generator/src/config.py",
+        "kind": "file",
+        "source_line": "│       ├── config.py"
+      },
+      {
+        "path": "services/signal_generator/src/plugin.py",
+        "kind": "file",
+        "source_line": "│       ├── plugin.py"
+      },
+      {
+        "path": "services/signal_generator/src/processor.py",
+        "kind": "file",
+        "source_line": "│       └── processor.py"
+      },
+      {
+        "path": "services/telemetry-daemon/",
+        "kind": "directory",
+        "source_line": "├── telemetry-daemon/"
+      },
+      {
+        "path": "services/telemetry-daemon/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/telemetry-daemon/src/",
+        "kind": "directory",
+        "source_line": "│   ├── src/"
+      },
+      {
+        "path": "services/telemetry-daemon/src/.dir_id",
+        "kind": "file",
+        "source_line": "│   │   ├── .dir_id"
+      },
+      {
+        "path": "services/telemetry-daemon/src/2099900187260118_aggregator.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900187260118_aggregator.py"
+      },
+      {
+        "path": "services/telemetry-daemon/src/2099900188260118_alerting.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900188260118_alerting.py"
+      },
+      {
+        "path": "services/telemetry-daemon/src/2099900188260118_risk_off_emitter.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900188260118_risk_off_emitter.py"
+      },
+      {
+        "path": "services/telemetry-daemon/src/2099900189260118_collector.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900189260118_collector.py"
+      },
+      {
+        "path": "services/telemetry-daemon/src/2099900190260118_config.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900190260118_config.py"
+      },
+      {
+        "path": "services/telemetry-daemon/src/2099900191260118_health.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900191260118_health.py"
+      },
+      {
+        "path": "services/telemetry-daemon/src/2099900192260118_main.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900192260118_main.py"
+      },
+      {
+        "path": "services/telemetry-daemon/src/2099900193260118_metrics.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900193260118_metrics.py"
+      },
+      {
+        "path": "services/telemetry-daemon/src/2099900194260118_plugin.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900194260118_plugin.py"
+      },
+      {
+        "path": "services/telemetry-daemon/src/2099900195260118___init__.py",
+        "kind": "file",
+        "source_line": "│   │   └── 2099900195260118___init__.py"
+      },
+      {
+        "path": "services/telemetry-daemon/tests/",
+        "kind": "directory",
+        "source_line": "│   └── tests/"
+      },
+      {
+        "path": "services/telemetry-daemon/tests/.dir_id",
+        "kind": "file",
+        "source_line": "│       ├── .dir_id"
+      },
+      {
+        "path": "services/telemetry-daemon/tests/2099900196260118_test_telemetry_daemon.py",
+        "kind": "file",
+        "source_line": "│       └── 2099900196260118_test_telemetry_daemon.py"
+      },
+      {
+        "path": "services/telemetry_daemon/",
+        "kind": "directory",
+        "source_line": "├── telemetry_daemon/  (stable import wrapper)",
+        "note": "stable import wrapper"
+      },
+      {
+        "path": "services/telemetry_daemon/__init__.py",
+        "kind": "file",
+        "source_line": "│   ├── __init__.py"
+      },
+      {
+        "path": "services/telemetry_daemon/src/",
+        "kind": "directory",
+        "source_line": "│   └── src/"
+      },
+      {
+        "path": "services/telemetry_daemon/src/__init__.py",
+        "kind": "file",
+        "source_line": "│       ├── __init__.py"
+      },
+      {
+        "path": "services/telemetry_daemon/src/aggregator.py",
+        "kind": "file",
+        "source_line": "│       ├── aggregator.py"
+      },
+      {
+        "path": "services/telemetry_daemon/src/alerting.py",
+        "kind": "file",
+        "source_line": "│       ├── alerting.py"
+      },
+      {
+        "path": "services/telemetry_daemon/src/collector.py",
+        "kind": "file",
+        "source_line": "│       ├── collector.py"
+      },
+      {
+        "path": "services/telemetry_daemon/src/config.py",
+        "kind": "file",
+        "source_line": "│       ├── config.py"
+      },
+      {
+        "path": "services/telemetry_daemon/src/health.py",
+        "kind": "file",
+        "source_line": "│       ├── health.py"
+      },
+      {
+        "path": "services/telemetry_daemon/src/main.py",
+        "kind": "file",
+        "source_line": "│       ├── main.py"
+      },
+      {
+        "path": "services/telemetry_daemon/src/metrics.py",
+        "kind": "file",
+        "source_line": "│       ├── metrics.py"
+      },
+      {
+        "path": "services/telemetry_daemon/src/plugin.py",
+        "kind": "file",
+        "source_line": "│       ├── plugin.py"
+      },
+      {
+        "path": "services/telemetry_daemon/src/risk_off_emitter.py",
+        "kind": "file",
+        "source_line": "│       └── risk_off_emitter.py"
+      },
+      {
+        "path": "services/transport-router/",
+        "kind": "directory",
+        "source_line": "├── transport-router/"
+      },
+      {
+        "path": "services/transport-router/.dir_id",
+        "kind": "file",
+        "source_line": "│   ├── .dir_id"
+      },
+      {
+        "path": "services/transport-router/0299900027260118_requirements.txt",
+        "kind": "file",
+        "source_line": "│   ├── 0299900027260118_requirements.txt"
+      },
+      {
+        "path": "services/transport-router/src/",
+        "kind": "directory",
+        "source_line": "│   ├── src/"
+      },
+      {
+        "path": "services/transport-router/src/.dir_id",
+        "kind": "file",
+        "source_line": "│   │   ├── .dir_id"
+      },
+      {
+        "path": "services/transport-router/src/2099900197260118_config.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900197260118_config.py"
+      },
+      {
+        "path": "services/transport-router/src/2099900198260118_health.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900198260118_health.py"
+      },
+      {
+        "path": "services/transport-router/src/2099900199260118_main.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900199260118_main.py"
+      },
+      {
+        "path": "services/transport-router/src/2099900200260118_metrics.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900200260118_metrics.py"
+      },
+      {
+        "path": "services/transport-router/src/2099900201260118_plugin.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900201260118_plugin.py"
+      },
+      {
+        "path": "services/transport-router/src/2099900202260118_router.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900202260118_router.py"
+      },
+      {
+        "path": "services/transport-router/src/2099900203260118_validator.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900203260118_validator.py"
+      },
+      {
+        "path": "services/transport-router/src/2099900204260118_watcher.py",
+        "kind": "file",
+        "source_line": "│   │   ├── 2099900204260118_watcher.py"
+      },
+      {
+        "path": "services/transport-router/src/2099900205260118___init__.py",
+        "kind": "file",
+        "source_line": "│   │   └── 2099900205260118___init__.py"
+      },
+      {
+        "path": "services/transport-router/tests/",
+        "kind": "directory",
+        "source_line": "│   └── tests/"
+      },
+      {
+        "path": "services/transport-router/tests/.dir_id",
+        "kind": "file",
+        "source_line": "│       ├── .dir_id"
+      },
+      {
+        "path": "services/transport-router/tests/2099900205260118___init__.py",
+        "kind": "file",
+        "source_line": "│   │   └── 2099900205260118___init__.py"
+      },
+      {
+        "path": "services/transport-router/tests/2099900206260118_test_integration.py",
+        "kind": "file",
+        "source_line": "│       └── 2099900206260118_test_integration.py"
+      },
+      {
+        "path": "services/transport_router/",
+        "kind": "directory",
+        "source_line": "└── transport_router/  (stable import wrapper)",
+        "note": "stable import wrapper"
+      },
+      {
+        "path": "services/transport_router/__init__.py",
+        "kind": "file",
+        "source_line": "├── __init__.py"
+      },
+      {
+        "path": "services/transport_router/src/",
+        "kind": "directory",
+        "source_line": "└── src/"
+      },
+      {
+        "path": "services/transport_router/src/__init__.py",
+        "kind": "file",
+        "source_line": "├── __init__.py"
+      },
+      {
+        "path": "services/transport_router/src/config.py",
+        "kind": "file",
+        "source_line": "├── config.py"
+      },
+      {
+        "path": "services/transport_router/src/health.py",
+        "kind": "file",
+        "source_line": "├── health.py"
+      },
+      {
+        "path": "services/transport_router/src/main.py",
+        "kind": "file",
+        "source_line": "├── main.py"
+      },
+      {
+        "path": "services/transport_router/src/metrics.py",
+        "kind": "file",
+        "source_line": "├── metrics.py"
+      },
+      {
+        "path": "services/transport_router/src/plugin.py",
+        "kind": "file",
+        "source_line": "├── plugin.py"
+      },
+      {
+        "path": "services/transport_router/src/router.py",
+        "kind": "file",
+        "source_line": "├── router.py"
+      },
+      {
+        "path": "services/transport_router/src/validator.py",
+        "kind": "file",
+        "source_line": "├── validator.py"
+      },
+      {
+        "path": "services/transport_router/src/watcher.py",
+        "kind": "file",
+        "source_line": "└── watcher.py"
+      }
+    ],
+    "services_tree_raw": "  services/\n  ├── .dir_id\n  ├── __init__.py\n  ├── _id_loader.py\n  │\n  ├── calendar-ingestor/\n  │   ├── .dir_id\n  │   ├── docs/.dir_id\n  │   ├── src/\n  │   │   ├── .dir_id\n  │   │   ├── 2099900089260118_config.py\n  │   │   ├── 2099900091260118_health.py\n  │   │   ├── 2099900092260118_ingestor.py\n  │   │   ├── 2099900093260118_main.py\n  │   │   ├── 2099900094260118_metrics.py\n  │   │   ├── 2099900095260118_plugin.py\n  │   │   └── 2099900098260118___init__.py\n  │   └── tests/\n  │       ├── .dir_id\n  │       └── 2099900099260118_test_ingestor.py\n  │\n  ├── common/\n  │   ├── .dir_id\n  │   ├── __init__.py\n  │   ├── 2099900100260118_base_enterprise_service.py\n  │   ├── 2099900101260118_base_service.py\n  │   ├── 2099900102260118_test_service_template.py\n  │   ├── 2099900103260118___init__.py\n  │   ├── base_service.py\n  │   ├── startup_health_gate.py\n  │   └── test_service_template.py\n  │\n  ├── compliance-monitor/\n  │   ├── .dir_id\n  │   └── 0299900016260118_requirements.txt\n  │\n  ├── dashboard-backend/\n  │   ├── .dir_id\n  │   ├── docs/\n  │   │   ├── .dir_id\n  │   │   ├── 0199900102260118_integration_guide.md\n  │   │   └── 0199900103260118_Py Qt6 Trading Signals Dashboard Tab (dashboard Tab.md\n  │   ├── frontend/\n  │   │   ├── .dir_id\n  │   │   └── 0099900037260118_trading_dashboard.tsx\n  │   └── src/\n  │       ├── .dir_id\n  │       ├── 2099900104260118_advanced_indicators.py\n  │       ├── 2099900105260118_dashboard_backend.py\n  │       ├── 2099900106260118_main.py\n  │       ├── 2099900107260118_plugin.py\n  │       └── 2099900108260118_tkinter_dashboard_gui.py\n  │\n  ├── data-ingestor/\n  │   ├── .dir_id\n  │   ├── 0099900038260118_.env.template\n  │   ├── 0299900018260118_requirements.txt\n  │   ├── src/\n  │   │   ├── .dir_id\n  │   │   ├── 2099900109260118_config.py\n  │   │   ├── 2099900110260118_health.py\n  │   │   ├── 2099900111260118_ingestor.py\n  │   │   ├── 2099900112260118_main.py\n  │   │   ├── 2099900113260118_main_enterprise.py\n  │   │   ├── 2099900114260118_metrics.py\n  │   │   ├── 2099900115260118_models.py\n  │   │   └── 2099900116260118_plugin.py\n  │   └── tests/\n  │       ├── integration/\n  │       │   ├── .dir_id\n  │       │   └── 2099900117260118___init__.py\n  │       └── unit/\n  │           ├── .dir_id\n  │           ├── 2099900118260118_test_data_ingestor_enterprise.py\n  │           ├── 2099900119260118_test_data_ingestor_service.py\n  │           └── 2099900120260118___init__.py\n  │\n  ├── data-validator/\n  │   ├── .dir_id\n  │   └── src/.dir_id\n  │\n  ├── data_ingestor/  (stable import wrapper)\n  │   ├── __init__.py\n  │   └── src/\n  │       ├── __init__.py\n  │       ├── config.py\n  │       ├── health.py\n  │       ├── ingestor.py\n  │       ├── main.py\n  │       ├── main_enterprise.py\n  │       ├── metrics.py\n  │       ├── models.py\n  │       └── plugin.py\n  │\n  ├── desktop-ui/\n  │   ├── .dir_id\n  │   ├── 0099900039260118_desktop.ini\n  │   ├── 0199900104260118_GUI_Spec_Controls_Sections.md\n  │   ├── 0199900105260118_indicator_integration_guide.md\n  │   ├── 1199900030260118_settings.friday_move.overlay.json\n  │   ├── 2099900128260118_expiry_indicator_service.py\n  │   ├── 2099900129260118_expiry_service.py\n  │   ├── 2099900130260118_friday_vol_indicator.py\n  │   ├── 2099900131260118_friday_vol_signal.py\n  │   ├── 2099900132260118_outbound.py\n  │   ├── 2099900133260118_test_friday_vol_indicator.py\n  │   ├── 2099900134260118_test_friday_vol_signal.py\n  │   ├── 2099900135260118_tkinter_dashboard_gui.py\n  │   ├── 2299900003260118_ExpiryZones.mq4\n  │   ├── dashboard/\n  │   │   ├── .dir_id\n  │   │   └── 2099900136260118_tkinter_dashboard_gui.py\n  │   ├── indicators/currency_strength/\n  │   │   ├── .dir_id\n  │   │   ├── 4399900001260118_currency_strength_mockup.html\n  │   │   └── DDE + Currency Strength Tab — Brainstorm Spec.md\n  │   └── testing/.dir_id\n  │\n  ├── event-gateway/\n  │   ├── .dir_id\n  │   └── src/\n  │       ├── .dir_id\n  │       ├── 2099900138260118_config.py\n  │       ├── 2099900139260118_gateway.py\n  │       ├── 2099900140260118_health.py\n  │       ├── 2099900141260118_main.py\n  │       ├── 2099900142260118_metrics.py\n  │       └── 2099900143260118_plugin.py\n  │\n  ├── execution-engine/\n  │   ├── .dir_id\n  │   ├── src/\n  │   │   ├── .dir_id\n  │   │   ├── 2099900144260118_plugin.py\n  │   │   ├── 2099900145260118_oms.py\n  │   │   ├── 2099900146260118_trade_close_classifier.py\n  │   │   └── 2099900147260118_outcome_bucketizer.py\n  │   └── tests/\n  │       ├── .dir_id\n  │       └── 2099900145260118_test_execution_engine_plugin.py\n  │\n  ├── execution_engine/  (stable import wrapper)\n  │   ├── __init__.py\n  │   └── src/\n  │       ├── __init__.py\n  │       ├── oms.py\n  │       ├── outcome_bucketizer.py\n  │       ├── plugin.py\n  │       └── trade_close_classifier.py\n  │\n  ├── flow-monitor/\n  │   ├── .dir_id\n  │   └── src/\n  │       ├── .dir_id\n  │       ├── 2099900146260118_config.py\n  │       └── 2099900147260118_monitor.py\n  │\n  ├── flow-orchestrator/\n  │   ├── .dir_id\n  │   └── src/\n  │       ├── .dir_id\n  │       ├── 2099900148260118_config.py\n  │       ├── 2099900149260118_coordinator.py\n  │       └── 2099900150260118_plugin.py\n  │\n  ├── gui-gateway/\n  │   ├── .dir_id\n  │   └── src/\n  │       ├── .dir_id\n  │       ├── 2099900155260118_config.py\n  │       ├── 2099900156260118_main.py\n  │       ├── 2099900157260118_models.py\n  │       └── 2099900158260118_plugin.py\n  │\n  ├── indicator-engine/\n  │   ├── .dir_id\n  │   ├── docs/\n  │   │   ├── .dir_id\n  │   │   ├── 0199900110260118_currency-strength-report.md\n  │   │   ├── 4399900002260118_currency_strength_mockup.html\n  │   │   └── DDE + Currency Strength Tab — Brainstorm Spec.md\n  │   ├── src/\n  │   │   ├── .dir_id\n  │   │   ├── 2099900159260118_plugin.py\n  │   │   ├── currency_strength/\n  │   │   │   ├── .dir_id\n  │   │   │   └── 2099900160260118_strength_calculator.py\n  │   │   └── indicators/\n  │   │       ├── .dir_id\n  │   │       └── 2099900161260118_advanced_indicators.py\n  │   └── tests/\n  │       ├── .dir_id\n  │       └── 2099900162260118_test_indicator_plugin.py\n  │\n  ├── indicator_engine/  (stable import wrapper)\n  │   ├── __init__.py\n  │   └── src/\n  │       ├── __init__.py\n  │       └── plugin.py\n  │\n  ├── reentry-engine/\n  │   ├── .dir_id\n  │   ├── 0299900024260118_requirements.txt\n  │   ├── src/\n  │   │   ├── .dir_id\n  │   │   ├── 2099900163260118_config.py\n  │   │   ├── 2099900164260118_decision_client.py\n  │   │   ├── 2099900165260118_health.py\n  │   │   ├── 2099900166260118_main.py\n  │   │   ├── 2099900167260118_metrics.py\n  │   │   ├── 2099900168260118_plugin.py\n  │   │   ├── 2099900169260118_processor.py\n  │   │   ├── 2099900170260118___init__.py\n  │   │   ├── 2099900171260118_calendar_cache.py\n  │   │   └── 2099900172260118_chain_store.py\n  │   └── tests/\n  │       ├── .dir_id\n  │       └── 2099900171260118_test_integration.py\n  │\n  ├── reentry-matrix-svc/\n  │   ├── .dir_id\n  │   ├── 0299900025260118_requirements.txt\n  │   ├── src/\n  │   │   ├── .dir_id\n  │   │   ├── 2099900172260118_config.py\n  │   │   ├── 2099900173260118_health.py\n  │   │   ├── 2099900174260118_main.py\n  │   │   ├── 2099900175260118_metrics.py\n  │   │   ├── 2099900176260118_plugin.py\n  │   │   ├── 2099900177260118_processor.py\n  │   │   ├── 2099900178260118_resolver.py\n  │   │   └── 2099900179260118___init__.py\n  │   └── tests/\n  │       ├── .dir_id\n  │       └── 2099900180260118_test_processor.py\n  │\n  ├── reentry_engine/  (stable import wrapper)\n  │   ├── __init__.py\n  │   └── src/\n  │       ├── __init__.py\n  │       ├── calendar_cache.py\n  │       ├── chain_store.py\n  │       ├── config.py\n  │       ├── decision_client.py\n  │       ├── health.py\n  │       ├── main.py\n  │       ├── metrics.py\n  │       ├── plugin.py\n  │       └── processor.py\n  │\n  ├── reentry_matrix_svc/  (stable import wrapper)\n  │   ├── __init__.py\n  │   └── src/\n  │       ├── __init__.py\n  │       ├── config.py\n  │       ├── health.py\n  │       ├── main.py\n  │       ├── metrics.py\n  │       ├── plugin.py\n  │       ├── processor.py\n  │       └── resolver.py\n  │\n  ├── reporter/\n  │   ├── .dir_id\n  │   ├── __init__.py\n  │   ├── src/\n  │   │   ├── .dir_id\n  │   │   ├── __init__.py\n  │   │   ├── 2099900181260118_plugin.py\n  │   │   └── plugin.py\n  │   └── tests/\n  │       ├── .dir_id\n  │       └── 2099900182260118_test_reporter_plugin.py\n  │\n  ├── risk-manager/\n  │   ├── .dir_id\n  │   ├── src/\n  │   │   ├── .dir_id\n  │   │   ├── 2099900183260118_plugin.py\n  │   │   ├── 2099900184260118_config.py\n  │   │   └── 2099900185260118_processor.py\n  │   └── tests/\n  │       ├── .dir_id\n  │       └── 2099900184260118_test_risk_manager_plugin.py\n  │\n  ├── risk_manager/  (stable import wrapper)\n  │   ├── __init__.py\n  │   └── src/\n  │       ├── __init__.py\n  │       ├── config.py\n  │       ├── plugin.py\n  │       └── processor.py\n  │\n  ├── scripts/\n  │   ├── .dir_id\n  │   ├── 0099900040260118_integrate-enterprise-service.sh\n  │   └── 0099900041260118_validate-enterprise-service.sh\n  │\n  ├── signal-generator/\n  │   ├── .dir_id\n  │   ├── src/\n  │   │   ├── .dir_id\n  │   │   ├── 2099900185260118_config.py\n  │   │   ├── 2099900186260118_processor.py\n  │   │   └── 2099900187260118_plugin.py\n  │   └── tests/\n  │       ├── .dir_id\n  │       └── 2099900186260118_test_signal_generator_plugin.py\n  │\n  ├── signal_generator/  (stable import wrapper)\n  │   ├── __init__.py\n  │   └── src/\n  │       ├── __init__.py\n  │       ├── config.py\n  │       ├── plugin.py\n  │       └── processor.py\n  │\n  ├── telemetry-daemon/\n  │   ├── .dir_id\n  │   ├── src/\n  │   │   ├── .dir_id\n  │   │   ├── 2099900187260118_aggregator.py\n  │   │   ├── 2099900188260118_alerting.py\n  │   │   ├── 2099900188260118_risk_off_emitter.py\n  │   │   ├── 2099900189260118_collector.py\n  │   │   ├── 2099900190260118_config.py\n  │   │   ├── 2099900191260118_health.py\n  │   │   ├── 2099900192260118_main.py\n  │   │   ├── 2099900193260118_metrics.py\n  │   │   ├── 2099900194260118_plugin.py\n  │   │   └── 2099900195260118___init__.py\n  │   └── tests/\n  │       ├── .dir_id\n  │       └── 2099900196260118_test_telemetry_daemon.py\n  │\n  ├── telemetry_daemon/  (stable import wrapper)\n  │   ├── __init__.py\n  │   └── src/\n  │       ├── __init__.py\n  │       ├── aggregator.py\n  │       ├── alerting.py\n  │       ├── collector.py\n  │       ├── config.py\n  │       ├── health.py\n  │       ├── main.py\n  │       ├── metrics.py\n  │       ├── plugin.py\n  │       └── risk_off_emitter.py\n  │\n  ├── transport-router/\n  │   ├── .dir_id\n  │   ├── 0299900027260118_requirements.txt\n  │   ├── src/\n  │   │   ├── .dir_id\n  │   │   ├── 2099900197260118_config.py\n  │   │   ├── 2099900198260118_health.py\n  │   │   ├── 2099900199260118_main.py\n  │   │   ├── 2099900200260118_metrics.py\n  │   │   ├── 2099900201260118_plugin.py\n  │   │   ├── 2099900202260118_router.py\n  │   │   ├── 2099900203260118_validator.py\n  │   │   ├── 2099900204260118_watcher.py\n  │   │   └── 2099900205260118___init__.py\n  │   │   ├── 2099900200260118_metrics.py\n  │   │   ├── 2099900201260118_plugin.py\n  │   │   ├── 2099900202260118_router.py\n  │   │   ├── 2099900203260118_validator.py\n  │   │   ├── 2099900204260118_watcher.py\n  │   │   └── 2099900205260118___init__.py\n  │   └── tests/\n  │       ├── .dir_id\n  │   │   └── 2099900205260118___init__.py\n  │   └── tests/\n  │       ├── .dir_id\n  │       └── 2099900206260118_test_integration.py\n  │\n  └── transport_router/  (stable import wrapper)\n      ├── __init__.py\n      └── src/\n          ├── __init__.py\n          ├── config.py\n          ├── health.py\n          ├── main.py\n          ├── metrics.py\n          ├── plugin.py\n          ├── router.py\n          ├── validator.py\n          └── watcher.py"
+  },
+  "ai_usage_guidance": {
+    "how_to_use_this_reference": [
+      "Use techspec_folder.listed_items to locate authoritative Markdown documents downloaded into EAFIX_auth_docs.",
+      "Use services_directory.service_inventory to understand service purposes before reading implementation files.",
+      "Use services_directory.architecture_patterns to avoid breaking naming, identity, plugin, or wrapper conventions.",
+      "Use services_directory.normalized_paths for machine-readable path lookup; use services_tree_raw if exact transcript fidelity is needed.",
+      "Treat this file as a session-derived reference, not as a substitute for reading current source files before making code changes."
+    ],
+    "development_warnings": [
+      "Do not remove numeric ID prefixes without a migration plan.",
+      "Do not treat underscore wrapper directories as duplicate dead code; they provide stable import paths.",
+      "Do not ignore .dir_id files; they are part of the project identity scheme.",
+      "Do not create a custom service shape that bypasses config/health/metrics/main/plugin conventions unless explicitly justified.",
+      "Before implementing or modifying a service, cross-check the relevant techspec document and service inventory entry."
+    ],
+    "recommended_next_ai_actions": [
+      "Generate or update a repository-level service registry from normalized_paths and service_inventory.",
+      "Validate each service has expected config/health/metrics/main/plugin files or document exceptions.",
+      "Map service files to module_catalog.json and process_step_catalog.json for traceability.",
+      "Create drift report comparing EAFIX_auth_docs techspec expectations to services implementation paths."
+    ]
+  }
+}

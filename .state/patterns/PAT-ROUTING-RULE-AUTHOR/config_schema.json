@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PAT-ROUTING-RULE-AUTHOR configuration schema",
+  "type": "object",
+  "required": [
+    "pattern_id",
+    "executor_id",
+    "input_refs",
+    "output_refs"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "pattern_id": {
+      "const": "PAT-ROUTING-RULE-AUTHOR"
+    },
+    "executor_id": {
+      "const": "EXEC-ROUTING-RULE-WRITER"
+    },
+    "input_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "output_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "options": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

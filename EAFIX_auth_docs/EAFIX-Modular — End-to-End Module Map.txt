@@ -1,0 +1,455 @@
+ EAFIX-Modular — End-to-End Module Map
+
+  ▎ Structured per Module-Centric Repository Best Practices: each module
+  ▎  is an atomic context unit with co-located artifacts, a single
+  ▎ manifest, and a numeric identity (^5\d{19}$). 28 canonical modules +
+  ▎  SHARED_LIBS. The EA-side is a separate deployable (MQL4) decomposed
+  ▎  into Systems A–G.
+
+  ---
+  Group 0 — Infrastructure Platform (F-prefix, INFRA_PLATFORM_MODULE)
+
+  These are cross-cutting platform concerns that every other module
+  depends on.
+
+  Module ID: 50000000000000000001
+  Symbol: F1_CONFIG_PREFERENCES
+  Service Home: services/calendar-ingestor or standalone
+  Purpose: Resolve + validate config snapshot; immutable once locked
+  Process Step: Step 1
+  ────────────────────────────────────────
+  Module ID: 50000000000000000002
+  Symbol: F3_CLOCK_SCHEDULER
+  Service Home: services/calendar-ingestor
+  Purpose: Emit schedule ticks for polling cadence
+  Process Step: Step 2
+  ────────────────────────────────────────
+  Module ID: 50000000000000000005
+  Symbol: F2_EVENT_LOG
+  Service Home: Postgres via event_log.py
+  Purpose: Append-only persistence for CalendarEvent stream
+  Process Step: Step 5
+  ────────────────────────────────────────
+  Module ID: 50000000000000000025
+  Symbol: F1_FLOW_ORCHESTRATOR
+  Service Home: flow-orchestrator (port 8088)
+  Purpose: Central state machine: IDLE → SIGNAL_RECEIVED → … →
+  MONITORING
+  Process Step: Step 25 (loop sentinel remapped here)
+  ────────────────────────────────────────
+  Module ID: 50000000000000000026
+  Symbol: P1_HEALTH_AGGREGATOR
+  Service Home: telemetry-daemon / flow-monitor
+  Purpose: Aggregate service health, emit HealthReport alerts
+  Process Step: Step 26
+
+  ---
+  Group 1 — Data Ingest Layer (D-prefix, INTEGRATION_BRIDGE_MODULE)
+
+  Adapts and normalizes external data sources into internal contracts.
+
+  Microservice home: calendar-ingestor (port 8084), data-ingestor (port
+  8081)
+
+  Module ID: 50000000000000000007
+  Symbol: D1_MARKET_FEED_ADAPTER
+  Sub-modules / Key Functions: MT4Adapter, CSVAdapter, SocketAdapter
+  Input → Output: Raw price tick → PriceTick (idempotency key:
+    {symbol}:{ts}:{bid}:{ask})
+  ────────────────────────────────────────
+  Module ID: 50000000000000000003
+  Symbol: D2_CALENDAR_SOURCE_ADAPTER
+  Sub-modules / Key Functions: poll_scheduler (ForexFactory scraper)
+  Input → Output: ScheduleTick + CalendarSourceConfig → CalendarRaw
+  ────────────────────────────────────────
+  Module ID: 50000000000000000004
+  Symbol: D3_CALENDAR_NORMALIZER
+  Sub-modules / Key Functions: normalize_events
+  Input → Output: CalendarRaw + ResolvedConfig → CalendarEvent (UTC,
+    dedup, impact enum)
+  ────────────────────────────────────────
+  Module ID: 50000000000000000006
+  Symbol: D4_CALENDAR_TRIGGER_BUILDER
+  Sub-modules / Key Functions: calendar_anticipator
+  Input → Output: CalendarEvent + ScheduleTick → CalendarTrigger
+    (ANTICIPATION_1HR / 8HR windows)
+
+  ---
+  Group 2 — Compute / Feature Layer (C-prefix, COMPUTE_MODULE)
+
+  Microservice home: indicator-engine (port 8082) — 500 symbols × 10
+  ticks/sec, <10ms calc latency
+
+  Module ID: 50000000000000000008
+  Symbol: C1_BAR_BUILDER
+  Sub-modules / Key Functions: OHLCV aggregator
+  Input → Output: PriceTick → Bar (M1/M5/M15/H1/H4/D1)
+  ────────────────────────────────────────
+  Module ID: 50000000000000000009
+  Symbol: C2_INDICATOR_ENGINE
+  Sub-modules / Key Functions: RSI, MACD, BB, ATR, EMA calculators
+  Input → Output: Bar → IndicatorVector
+  ────────────────────────────────────────
+  Module ID: 50000000000000000010
+  Symbol: C3_FEATURE_PACKAGER
+  Sub-modules / Key Functions: Feature assembler, normalization
+  Input → Output: IndicatorVector + CalendarTrigger → FeaturePacket
+
+  ---
+  Group 3 — Signal & Intent Layer (S-prefix, SIGNAL_MODULE)
+
+  Microservice home: signal-generator (port 8083)
+
+  Module ID: 50000000000000000011
+  Symbol: S1_SIGNAL_ENGINE
+  Sub-modules / Key Functions: Confidence scorer (0.5–1.0), signal
+  types:
+    ECO_HIGH/MED, ANTICIPATION_*, EQUITY_OPEN_*, ALL_INDICATORS,
+    FridayMove
+  Input → Output: FeaturePacket → Signal
+  ────────────────────────────────────────
+  Module ID: 50000000000000000012
+  Symbol: S2_INTENT_BUILDER
+  Sub-modules / Key Functions: TradeIntent assembler; calls risk-manager
+
+    via HTTP sync
+  Input → Output: Signal → TradeIntent (calls R1 for validation)
+
+  ---
+  Group 4 — Risk Management (R-prefix, RISK_MODULE)
+
+  Microservice home: risk-manager (port 8087) — 📋 Planned
+
+  Module ID: 50000000000000000013
+  Symbol: R1_RISK_EVALUATOR
+  Sub-modules / Key Functions: Position size limits, exposure limits,
+    margin check, correlation guard
+  Input → Output: TradeIntent → RiskDecision {approved, reason,
+    max_allowed}
+  ────────────────────────────────────────
+  Module ID: 50000000000000000014
+  Symbol: R2_ORDER_INTENT_COMPILER
+  Sub-modules / Key Functions: Compile approved intent into OrderIntent
+  Input → Output: RiskDecision(approved) → OrderIntent
+
+  ---
+  Group 5 — Order Management & Routing (O-prefix, OMS_MODULE)
+
+  Module ID: 50000000000000000015
+  Symbol: O1_ORDER_ROUTER
+  Sub-modules / Key Functions: Route OrderIntent to active broker bridge
+  Input → Output: OrderIntent → routed to B1
+  ────────────────────────────────────────
+  Module ID: (canonical, formerly O2_OMS)
+  Symbol: O2_OMS_STATE_MACHINE
+  Sub-modules / Key Functions: Trade lifecycle: NEW → PENDING → FILLED →
+
+    CLOSED; hybrid_id ownership
+  Input → Output: OrderIntent → PositionRecord
+  ────────────────────────────────────────
+  Module ID: (canonical, formerly O3_PNL_CLASSIFIER)
+  Symbol: O3_TRADE_CLOSE_CLASSIFIER
+  Sub-modules / Key Functions: Classify closed trade outcome:
+    WIN/LOSS/BE; emit OutcomeRecord
+  Input → Output: PositionRecord(closed) → OutcomeRecord
+
+  ---
+  Group 6 — MT4 Bridge Layer (B-prefix, INTEGRATION_BRIDGE_MODULE)
+
+  Implements the 14-phase Atomic Process Flow v3.0 (CSV-first, socket
+  fallback).
+
+  Module ID: B1_MT4_ADAPTER_TRANSPORT
+  Symbol: Bridge Transport
+  Sub-modules / Key Functions: CSV atomic write (file_seq +
+    checksum_sha256 + temp→rename), Socket bridge (port 5555)
+  Input → Output: OrderIntent → CSV/socket signal files
+  ────────────────────────────────────────
+  Module ID: B2_MT4_EA_EXECUTOR
+  Symbol: MT4 EA (MQL4 v7.10)
+  Sub-modules / Key Functions: EA-side: reads signal CSVs, executes via
+    OrderSend(), writes feedback; DLL socket bridge
+  Input → Output: CSV/socket → MT4 execution → feedback CSVs
+  ────────────────────────────────────────
+  Module ID: B3_EXEC_EVENT_NORMALIZER
+  Symbol: Exec Event Normalizer
+  Sub-modules / Key Functions: Parse MT4 feedback CSVs; normalize into
+    ExecutionReport
+  Input → Output: Feedback CSV → ExecutionReport → Redis
+    reentry_decisions
+
+  Bridge Protocol — 14 Phases:
+
+  ┌───────┬────────────────────────────────────┬────────────────────┐
+  │ Phase │                Name                │     Direction      │
+  ├───────┼────────────────────────────────────┼────────────────────┤
+  │ 0     │ Bootstrap                          │ Python init        │
+  ├───────┼────────────────────────────────────┼────────────────────┤
+  │ 1     │ Config resolve                     │ Python → EA        │
+  ├───────┼────────────────────────────────────┼────────────────────┤
+  │ 2–4   │ Signal build + validate + export   │ Python → CSV       │
+  ├───────┼────────────────────────────────────┼────────────────────┤
+  │ 5     │ EA poll + receive                  │ EA reads CSV       │
+  ├───────┼────────────────────────────────────┼────────────────────┤
+  │ 6–8   │ Reentry request + decision +       │ EA ↔ Python socket │
+  │       │ response                           │                    │
+  ├───────┼────────────────────────────────────┼────────────────────┤
+  │ 9–11  │ Execution + ACK + result write     │ EA → feedback CSV  │
+  ├───────┼────────────────────────────────────┼────────────────────┤
+  │ 12–13 │ Feedback read + chain advance      │ Python reads CSV   │
+  ├───────┼────────────────────────────────────┼────────────────────┤
+  │ 14    │ Test cues                          │ Python test        │
+  │       │                                    │ harness            │
+  └───────┴────────────────────────────────────┴────────────────────┘
+
+  ---
+  Group 7 — Reentry Decision Engine (E-prefix, REENTRY_MODULE)
+
+  Microservice home: reentry-matrix-svc + reentry-engine (port 8085)
+
+  The 4D Reentry Matrix v3.0: 8 signal types × 6 outcomes × 4 proximity
+  zones × conditional duration = 652 combinations, max chain O→R1→R2.
+
+  Module ID: E1_OUTCOME_BUCKETIZER
+  Symbol: Outcome Bucketizer
+  Sub-modules / Key Functions: Classify closed position as outcome 1–6
+    (WIN_LARGE, WIN_SMALL, BE, LOSS_SMALL, LOSS_LARGE, TIMEOUT)
+  Input → Output: OutcomeRecord → OutcomeBucket
+  ────────────────────────────────────────
+  Module ID: E2_PROXIMITY_EVALUATOR
+  Symbol: Proximity Evaluator
+  Sub-modules / Key Functions: Classify next event proximity:
+    IMMEDIATE/NEAR/MEDIUM/FAR
+  Input → Output: CalendarEvent + ScheduleTick → ProximityBucket
+  ────────────────────────────────────────
+  Module ID: E3_MATRIX_LOOKUP
+  Symbol: Matrix Lookup
+  Sub-modules / Key Functions: Query original_combinations /
+    reentry_combinations tables; return action, multiplier, delay,
+    combination_id
+  Input → Output: OutcomeBucket + ProximityBucket + SignalType +
+    ChainPosition → MatrixAction
+  ────────────────────────────────────────
+  Module ID: E4_REENTRY_INTENT_BUILDER
+  Symbol: Reentry Intent Builder
+  Sub-modules / Key Functions: Build ReentryDecision; enforce
+    MaxReentryGenerations=2, MinReentryConfidence; spread guard
+  Input → Output: MatrixAction → ReentryDecision → Redis
+    reentry_decisions
+
+  Default Matrix Rules (priority order):
+  1. Future Proximity → if IMMEDIATE, HOLD/CLOSE
+  2. Flash Move → if recent high-volatility, conservative
+  3. Regional Equity Open → EQUITY_OPEN signal override
+  4. Anticipation Timing → 1HR/8HR window gating
+  5. Generation Limit → hard stop after R2
+  6. Conservative Fallback → default HOLD
+
+  ---
+  Group 8 — UI & Gateway Layer (Tier 4)
+
+  Component: event-gateway
+  Port: —
+  State: ✅ Active
+  Sub-modules: Redis pub/sub multiplexer
+  ────────────────────────────────────────
+  Component: dashboard-backend
+  Port: 8092
+  State: ✅ Active
+  Sub-modules: REST API (/api/signals, /api/positions, /api/trades,
+    /api/calendar, /api/audit/{hybrid_id}); Postgres query layer; 30s
+    cache
+  ────────────────────────────────────────
+  Component: gui-gateway
+  Port: 8091
+  State: ✅ Active
+  Sub-modules: WebSocket server; channel subscriptions: signals,
+    positions, alerts
+  ────────────────────────────────────────
+  Component: Desktop App (Electron)
+  Port: local
+  State: ✅ Active
+  Sub-modules: React + TypeScript frontend; TailwindCSS; 4 tabs: Live
+    Trading, Signals History, Configuration, System Status; TradingView
+    embedded
+  ────────────────────────────────────────
+  Component: Desktop Python backend
+  Port: embedded
+  State: ✅ Active
+  Sub-modules: FastAPI REST; MT4 CSV/socket bridge proxy;
+    dashboard-backend proxy
+
+  ---
+  Group 9 — EA-Side System Decomposition (MQL4, Systems A–G)
+
+  The Expert Advisor is an independent deployable (MetaTrader 4) with
+  its own internal systems:
+
+  System: A
+  Name: Signal Pipeline
+  Sub-components: A1 SignalTriggerHandler, A2 SignalValidator (3-tier:
+    structural/business/market), A3 ConflictManager (±5-min dedup), A4
+    SignalExporter (atomic rename), A5 MT4 Feedback Monitor
+  Functional Requirements: FR-P1, FR-P2, FR-S1, FR-S2, FR-S3
+  ────────────────────────────────────────
+  System: B
+  Name: Communication Bridges
+  Sub-components: B1 Socket/FastAPI (primary, <1s), B2 Enhanced Signals
+    CSV+JSON (fallback), B3 Static CSV Profile (legacy)
+  Functional Requirements: FR-C1, FR-C2, FR-C3, FR-E2
+  ────────────────────────────────────────
+  System: C
+  Name: Reentry Decision Engine
+  Sub-components: C1 Matrix Evaluator, C2 EA Gate & Validator
+    (MinReentryConfidence, MaxReentryGenerations, spread guard), C3
+    Decision Serializer
+  Functional Requirements: FR-R1, FR-R2
+  ────────────────────────────────────────
+  System: D
+  Name: EA Execution & Feedback
+  Sub-components: ProcessReentryDecision, ExecuteReentryAction
+    (OrderSend), FeedbackWriter (CSV + DB)
+  Functional Requirements: FR-E1
+  ────────────────────────────────────────
+  System: E
+  Name: Persistence & Analytics
+  Sub-components: E1 SQLite Migrator & Views (idempotent, per-symbol),
+  E2
+    KPI Export Jobs (weekly CSV), E3 Governance Mapping
+  Functional Requirements: FR-DB1, FR-DB2
+  ────────────────────────────────────────
+  System: F
+  Name: Configuration & Profiles
+  Sub-components: reentry_pack_config.json SSOT; Profile Rotate task;
+    persona per symbol; daily rotation
+  Functional Requirements: FR-CFG1
+  ────────────────────────────────────────
+  System: G
+  Name: Monitoring & Deployment
+  Sub-components: verify_reentry_install.ps1, Task_ProfileRotate.xml,
+    Task_KPIWeekly.xml, freeze/unfreeze counters
+  Functional Requirements: FR-OPS1, FR-OPS2
+
+  ---
+  Group 10 — Shared Libraries (SHARED_LIBS, 50000000000000000099)
+
+  Cross-cutting utilities owned by no single pipeline module. Lives in
+  shared/.
+
+  Sub-module: plugin_interface
+  Path: shared/plugin_interface.py
+  Key Classes: IPlugin, BasePlugin, PluginMetadata, PluginState — base
+    for all plugin-mode deployables
+  ────────────────────────────────────────
+  Sub-module: idempotency
+  Path: shared/idempotency/
+  Key Classes: IdempotencyManager — Redis SET with TTL; key
+    idem:{service}:{key}
+  ────────────────────────────────────────
+  Sub-module: reentry
+  Path: shared/reentry/
+  Key Classes: ReentryLogic, PositionTracker, ChainManager
+  ────────────────────────────────────────
+  Sub-module: positioning
+  Path: shared/positioning/
+  Key Classes: PositionCalculator (lot size formula), RiskSizer (Kelly
+    criterion, fixed fractional)
+
+  ---
+  Group 11 — Infrastructure (not modules, but dependencies)
+
+  Component: Redis 7 (port 6379)
+  Role: Message bus; streams: prices_stream, indicators_stream,
+    signals_stream, calendar_events, reentry_decisions, events:*,
+    alerts:*
+  Key Config: maxmemory 2gb, AOF persistence
+  ────────────────────────────────────────
+  Component: Postgres 15 (port 5432)
+  Role: Relational store; tables: positions, signals, audit_log,
+    risk_limits
+  Key Config: WAL archiving, 6h snapshots, 30-day retention
+  ────────────────────────────────────────
+  Component: Prometheus (9090) + Alertmanager (9093)
+  Role: Metrics scrape all service /metrics endpoints; alert on
+    RedisDown, HighSignalLatency
+  Key Config: 15s scrape interval
+  ────────────────────────────────────────
+  Component: Docker Compose
+  Role: Orchestration for local dev; eafix-redis, eafix-postgres
+    containers
+  Key Config: deploy/compose/
+
+  ---
+  Data Flow Summary (end-to-end)
+
+  [MT4/CSV Feed] → D1_MARKET_FEED_ADAPTER → C1_BAR_BUILDER →
+  C2_INDICATOR_ENGINE
+
+    ↓
+  [ForexFactory] → D2 → D3 → D4 → CalendarTrigger → C3_FEATURE_PACKAGER
+
+    ↓
+                                                 S1_SIGNAL_ENGINE →
+  S2_INTENT_BUILDER
+
+    ↓
+                                                 R1_RISK_EVALUATOR →
+  R2_ORDER_INTENT_COMPILER
+
+    ↓
+                                      F1_FLOW_ORCHESTRATOR (state
+  machine gate)
+
+    ↓
+                                            O1_ORDER_ROUTER →
+  O2_OMS_STATE_MACHINE
+
+    ↓
+                                      B1_MT4_ADAPTER_TRANSPORT →
+  [CSV/Socket] → B2_MT4_EA_EXECUTOR (MQL4)
+
+    ↓
+                                      B3_EXEC_EVENT_NORMALIZER ←
+  feedback CSVs
+
+    ↓
+                               O3_TRADE_CLOSE_CLASSIFIER →
+  E1_OUTCOME_BUCKETIZER
+                               E2_PROXIMITY_EVALUATOR
+  ─────────────────────┘
+                                                  ↓
+                               E3_MATRIX_LOOKUP →
+  E4_REENTRY_INTENT_BUILDER → [O→R1→R2 chain]
+
+    ↓
+                               P1_HEALTH_AGGREGATOR (observability
+  throughout)
+
+  ---
+  Module Classification Summary
+
+  ┌───────────────────────────┬───────┬──────────────────────────────┐
+  │           Kind            │ Count │           Symbols            │
+  ├───────────────────────────┼───────┼──────────────────────────────┤
+  │                           │       │ F1_CONFIG, F2_EVENT_LOG,     │
+  │ INFRA_PLATFORM_MODULE     │ 5     │ F3_CLOCK, F1_FLOW_ORCH,      │
+  │                           │       │ P1_HEALTH                    │
+  ├───────────────────────────┼───────┼──────────────────────────────┤
+  │ INTEGRATION_BRIDGE_MODULE │ 7     │ D1–D4, B1–B3                 │
+  ├───────────────────────────┼───────┼──────────────────────────────┤
+  │ COMPUTE_MODULE            │ 3     │ C1–C3                        │
+  ├───────────────────────────┼───────┼──────────────────────────────┤
+  │ SIGNAL_MODULE             │ 2     │ S1–S2                        │
+  ├───────────────────────────┼───────┼──────────────────────────────┤
+  │ RISK_MODULE               │ 2     │ R1–R2                        │
+  ├───────────────────────────┼───────┼──────────────────────────────┤
+  │ OMS_MODULE                │ 3     │ O1, O2_OMS_STATE_MACHINE,    │
+  │                           │       │ O3_CLOSE_CLASSIFIER          │
+  ├───────────────────────────┼───────┼──────────────────────────────┤
+  │ REENTRY_MODULE            │ 4     │ E1–E4                        │
+  ├───────────────────────────┼───────┼──────────────────────────────┤
+  │ SHARED_LIBS               │ 1     │ SHARED_LIBS (4 sub-modules)  │
+  ├───────────────────────────┼───────┼──────────────────────────────┤
+  │ Total canonical           │ 28    │ (27 pipeline + 1             │
+  │                           │       │ SHARED_LIBS)                 │
+  └───────────────────────────┴───────┴──────────────────────────────┘

@@ -15,7 +15,7 @@ from shared.plugin_interface import PluginContext
 
 
 def _load_plugin_class():
-    module = importlib.import_module("services.indicator-engine.src.plugin")
+    module = importlib.import_module("services.indicator_engine.src.plugin")
     return module.IndicatorEnginePlugin
 
 

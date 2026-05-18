@@ -8,15 +8,28 @@ Processes economic calendar events and generates ActiveCalendarSignal CSV files 
 import asyncio
 import csv
 import hashlib
+import json
 import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
 import tempfile
+from zoneinfo import ZoneInfo
 
 import structlog
-import redis.asyncio as redis
+
+try:
+    import redis.asyncio as redis
+except ImportError:  # pragma: no cover - exercised only in minimal test envs
+    class _MissingRedis:
+        Redis = Any
+
+        @staticmethod
+        def from_url(*args, **kwargs):
+            raise RuntimeError("redis package is not installed")
+
+    redis = _MissingRedis()
 
 # Add contracts to path for imports
 sys.path.append(str(Path(__file__).parent.parent.parent.parent))
@@ -26,6 +39,19 @@ from .config import Settings
 from .metrics import MetricsCollector
 
 logger = structlog.get_logger(__name__)
+
+ACTIVE_SIGNAL_FIELDS = [
+    "file_seq",
+    "checksum_sha256",
+    "timestamp",
+    "calendar_id",
+    "symbol",
+    "impact_level",
+    "proximity_state",
+    "anticipation_event",
+    "direction_bias",
+    "confidence_score",
+]
 
 
 class CalendarIngestor:
@@ -66,8 +92,32 @@ class CalendarIngestor:
             raise
 
     async def fetch_events(self) -> List[Dict[str, Any]]:
-        """Fetch calendar events from configured sources (placeholder)."""
-        return []
+        """Fetch and normalize calendar events from the configured CSV source."""
+        source_path = getattr(self.settings, "calendar_source_path", None)
+        if not source_path:
+            logger.info("No calendar source path configured")
+            return []
+
+        path = Path(source_path)
+        if not path.exists():
+            logger.warning("Calendar source path does not exist", source_path=str(path))
+            return []
+
+        events: List[Dict[str, Any]] = []
+        with path.open("r", newline="", encoding="utf-8-sig") as handle:
+            reader = csv.DictReader(handle)
+            for row_number, row in enumerate(reader, start=2):
+                try:
+                    events.append(self._normalize_event(row))
+                except Exception as exc:
+                    logger.warning(
+                        "Skipping invalid calendar source row",
+                        row_number=row_number,
+                        error=str(exc),
+                    )
+
+        logger.info("Fetched calendar events", count=len(events), source_path=str(path))
+        return events
     
     async def stop(self):
         """Stop the calendar ingestor service"""
@@ -78,10 +128,96 @@ class CalendarIngestor:
             logger.info("Disconnected from Redis")
         
         logger.info("Calendar ingestor stopped")
+
+    def _normalize_event(self, event: Dict[str, Any]) -> Dict[str, Any]:
+        """Normalize raw/vendor calendar rows into CalendarEvent@1.0 shape."""
+        title = (
+            event.get("title")
+            or event.get("name")
+            or event.get("event")
+            or event.get("Event")
+            or event.get("Title")
+        )
+        if not title:
+            raise ValueError("Calendar event title/name is required")
+
+        currency = (
+            event.get("currency")
+            or event.get("Currency")
+            or event.get("country")
+            or event.get("Country")
+            or "USD"
+        )
+        currency = str(currency).strip().upper()
+        if len(currency) != 3:
+            raise ValueError(f"Currency must be a 3-letter code: {currency}")
+
+        event_time = self._parse_event_time(event)
+        impact = self._normalize_impact(
+            event.get("impact") or event.get("Impact") or event.get("importance") or event.get("Importance")
+        )
+
+        event_id = event.get("id") or event.get("event_id")
+        if not event_id:
+            stable_key = f"{event_time.isoformat()}|{currency}|{title}"
+            event_id = hashlib.sha256(stable_key.encode("utf-8")).hexdigest()[:16]
+
+        event_time_text = event_time.isoformat().replace("+00:00", "Z")
+        return {
+            "id": str(event_id),
+            "start_ts": event_time_text,
+            "datetime": event_time_text,
+            "title": str(title).strip(),
+            "name": str(title).strip(),
+            "currency": currency,
+            "impact": impact,
+            "forecast": event.get("forecast") or event.get("Forecast"),
+            "actual": event.get("actual") or event.get("Actual"),
+            "previous": event.get("previous") or event.get("Previous"),
+            "source": event.get("source") or event.get("Source") or self.settings.data_source,
+            "ingested_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        }
+
+    def _parse_event_time(self, event: Dict[str, Any]) -> datetime:
+        """Parse event datetime fields and normalize to UTC."""
+        raw_datetime = (
+            event.get("start_ts")
+            or event.get("datetime")
+            or event.get("timestamp")
+            or event.get("event_time_utc")
+            or event.get("DateTime")
+        )
+
+        if raw_datetime:
+            parsed = datetime.fromisoformat(str(raw_datetime).replace("Z", "+00:00"))
+        else:
+            raw_date = event.get("raw_date") or event.get("date") or event.get("Date") or event.get("day")
+            raw_time = event.get("raw_time") or event.get("time") or event.get("Time") or event.get("hour")
+            if not raw_date or not raw_time:
+                raise ValueError("Calendar event requires start_ts/datetime or date+time fields")
+            parsed = datetime.fromisoformat(f"{raw_date} {raw_time}")
+
+        if parsed.tzinfo is None:
+            try:
+                source_tz = ZoneInfo(self.settings.source_timezone)
+            except Exception:
+                source_tz = timezone.utc
+            parsed = parsed.replace(tzinfo=source_tz)
+
+        return parsed.astimezone(timezone.utc)
+
+    def _normalize_impact(self, impact: Any) -> str:
+        """Normalize vendor impact labels into HIGH/MEDIUM/LOW."""
+        value = str(impact or "MEDIUM").strip().upper()
+        if value in {"H", "HIGH", "3", "RED"}:
+            return "HIGH"
+        if value in {"M", "MED", "MEDIUM", "2", "ORANGE"}:
+            return "MEDIUM"
+        return "LOW"
     
     def _determine_calendar_id(self, event: Dict[str, Any]) -> str:
         """Determine calendar ID (CAL8 or CAL5) based on event characteristics"""
-        event_name = event.get("name", "").lower()
+        event_name = (event.get("name") or event.get("title") or "").lower()
         currency = event.get("currency", "USD").upper()
         impact = event.get("impact", "MEDIUM").upper()
         
@@ -130,11 +266,11 @@ class CalendarIngestor:
         """Determine proximity state based on time difference"""
         time_diff_minutes = (event_time - current_time).total_seconds() / 60
         
-        if -self.settings.anticipation_window_minutes <= time_diff_minutes <= 0:
-            return "PRE_1H"  # Anticipation window
-        elif 0 <= time_diff_minutes <= self.settings.event_window_minutes:
+        if 0 < time_diff_minutes <= self.settings.anticipation_window_minutes:
+            return "PRE_1H"  # Pre-event anticipation window
+        elif -self.settings.event_window_minutes <= time_diff_minutes <= self.settings.event_window_minutes:
             return "AT_EVENT"  # Event happening now
-        elif self.settings.event_window_minutes < time_diff_minutes <= self.settings.stabilization_window_minutes:
+        elif -self.settings.stabilization_window_minutes <= time_diff_minutes < -self.settings.event_window_minutes:
             return "POST_30M"  # Stabilization period
         else:
             return "FAR"  # Too far from event
@@ -142,7 +278,7 @@ class CalendarIngestor:
     def _determine_direction_bias(self, event: Dict[str, Any]) -> str:
         """Determine expected market direction bias"""
         # This is a simplified implementation - in practice would use more sophisticated logic
-        event_name = event.get("name", "").lower()
+        event_name = (event.get("name") or event.get("title") or "").lower()
         impact = event.get("impact", "MEDIUM").upper()
         currency = event.get("currency", "USD").upper()
         
@@ -196,8 +332,9 @@ class CalendarIngestor:
     async def process_calendar_event(self, event: Dict[str, Any]) -> Dict[str, Any]:
         """Process a single calendar event and generate signals"""
         try:
+            event = self._normalize_event(event)
             current_time = datetime.now(timezone.utc)
-            event_time = datetime.fromisoformat(event.get("datetime", current_time.isoformat()))
+            event_time = datetime.fromisoformat(event["start_ts"].replace("Z", "+00:00"))
             
             # Determine calendar characteristics
             calendar_id = self._determine_calendar_id(event)
@@ -206,7 +343,7 @@ class CalendarIngestor:
             
             # Skip if too far from event
             if proximity_state == "FAR":
-                logger.debug("Event too far, skipping", event_name=event.get("name"))
+                logger.debug("Event too far, skipping", event_name=event.get("title"))
                 return {"status": "skipped", "reason": "too_far_from_event"}
             
             # Generate signals for each currency pair
@@ -275,7 +412,9 @@ class CalendarIngestor:
                 "status": "success",
                 "signals_generated": len(generated_signals),
                 "calendar_id": calendar_id,
-                "proximity_state": proximity_state
+                "proximity_state": proximity_state,
+                "signals": generated_signals,
+                "event": event,
             }
             
         except Exception as e:
@@ -293,11 +432,12 @@ class CalendarIngestor:
             # Write to temporary file
             with open(temp_path, 'w', newline='', encoding='utf-8') as f:
                 if signals:
-                    # Get headers from first signal
-                    headers = list(signals[0].keys())
-                    writer = csv.DictWriter(f, fieldnames=headers)
+                    writer = csv.DictWriter(f, fieldnames=ACTIVE_SIGNAL_FIELDS)
                     writer.writeheader()
-                    writer.writerows(signals)
+                    writer.writerows(
+                        {field: signal.get(field) for field in ACTIVE_SIGNAL_FIELDS}
+                        for signal in signals
+                    )
                     
                     # Force write to disk
                     f.flush()
@@ -320,18 +460,31 @@ class CalendarIngestor:
             raise
     
     async def _publish_calendar_event(self, event: Dict[str, Any], signals: List[Dict[str, Any]]):
-        """Publish calendar event to Redis"""
+        """Publish normalized calendar event and active signals to Redis topics."""
         try:
             event_data = {
                 "event_type": "CalendarEvent",
+                "schema_version": "1.0",
                 "timestamp": datetime.now(timezone.utc).isoformat(),
-                "source_event": event,
+                "event": event,
                 "generated_signals": len(signals),
-                "calendar_signals": signals
             }
             
-            # Publish to calendar events channel
-            await self.redis_client.publish("calendar_events", str(event_data))
+            await self.redis_client.publish(
+                self.settings.calendar_events_topic,
+                json.dumps(event_data),
+            )
+
+            for signal in signals:
+                signal_data = {
+                    "event_type": "ActiveCalendarSignal",
+                    "schema_version": "1.0",
+                    **signal,
+                }
+                await self.redis_client.publish(
+                    self.settings.calendar_signals_topic,
+                    json.dumps(signal_data),
+                )
             
             logger.debug("Published calendar event to Redis", signal_count=len(signals))
             

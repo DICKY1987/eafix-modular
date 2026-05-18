@@ -1,0 +1,401 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/module_catalog.schema.json",
+  "title": "Module Catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "document_type",
+    "catalog_id",
+    "modules"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "document_type": {
+      "type": "string",
+      "const": "module_catalog"
+    },
+    "catalog_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]+$"
+    },
+    "catalog_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "$ref": "#/$defs/semver"
+    },
+    "created_at_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "process_context": {
+      "$ref": "#/$defs/processContext"
+    },
+    "modules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/module"
+      }
+    }
+  },
+  "$defs": {
+    "moduleId": {
+      "type": "string",
+      "pattern": "^(?:\\(loop\\)|[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*|[a-z0-9]+(?:-[a-z0-9]+)*)$"
+    },
+    "semver": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "planned",
+        "experimental",
+        "deprecated",
+        "archived"
+      ]
+    },
+    "moduleKind": {
+      "type": "string",
+      "enum": [
+        "PIPELINE_STAGE_MODULE",
+        "FEATURE_SERVICE_MODULE",
+        "INTEGRATION_BRIDGE_MODULE",
+        "INTERFACE_MODULE",
+        "REGISTRY_METADATA_MODULE",
+        "INFRA_PLATFORM_MODULE",
+        "OBSERVABILITY_REPORTING_MODULE",
+        "GOVERNANCE_KNOWLEDGE_MODULE",
+        "SANDBOX_EXPERIMENTAL_MODULE",
+        "ARCHIVE_LEGACY_BUCKET"
+      ]
+    },
+    "layer": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        {
+          "type": "string",
+          "enum": [
+            "unassigned"
+          ]
+        }
+      ]
+    },
+    "stringList": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target_type",
+        "target_id",
+        "relationship"
+      ],
+      "properties": {
+        "target_type": {
+          "type": "string",
+          "enum": [
+            "module",
+            "external_system",
+            "library",
+            "file",
+            "directory",
+            "process_step",
+            "service"
+          ]
+        },
+        "target_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relationship": {
+          "type": "string",
+          "enum": [
+            "requires",
+            "reads_from",
+            "writes_to",
+            "publishes_to",
+            "subscribes_to",
+            "calls",
+            "implements",
+            "uses"
+          ]
+        },
+        "version_constraint": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "optional": {
+          "type": "boolean"
+        }
+      }
+    },
+    "interfaceContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "input",
+            "output",
+            "request",
+            "response",
+            "event_in",
+            "event_out",
+            "state",
+            "other"
+          ]
+        },
+        "contract_type": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "schema_ref": {
+          "type": "string"
+        }
+      }
+    },
+    "processBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "process_id",
+        "process_version",
+        "step_number",
+        "step_name"
+      ],
+      "properties": {
+        "process_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "process_version": {
+          "$ref": "#/$defs/semver"
+        },
+        "step_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "step_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "responsible": {
+          "type": "string"
+        },
+        "input_contract": {
+          "type": "string"
+        },
+        "output_contract": {
+          "type": "string"
+        },
+        "validation": {
+          "type": "string"
+        },
+        "failure": {
+          "type": "string"
+        },
+        "entrypoint_files": {
+          "$ref": "#/$defs/stringList"
+        }
+      }
+    },
+    "qualityGates": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "test_coverage_minimum": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "required_validators": {
+          "$ref": "#/$defs/stringList"
+        },
+        "invariants": {
+          "$ref": "#/$defs/stringList"
+        }
+      }
+    },
+    "filesystemHints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "module_root": {
+          "type": "string"
+        },
+        "expected_directories": {
+          "$ref": "#/$defs/stringList"
+        },
+        "entrypoint_files": {
+          "$ref": "#/$defs/stringList"
+        },
+        "manifest_path": {
+          "type": "string"
+        },
+        "state_schema": {
+          "type": "string"
+        }
+      }
+    },
+    "mvpClassification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "essential_for_mvp": {
+          "type": "boolean"
+        },
+        "defer_reason": {
+          "type": "string"
+        },
+        "consolidation_candidate": {
+          "type": "boolean"
+        },
+        "suggested_target_module_id": {
+          "$ref": "#/$defs/moduleId"
+        }
+      }
+    },
+    "module": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "module_id",
+        "module_name",
+        "module_kind",
+        "version",
+        "status",
+        "purpose",
+        "responsibilities",
+        "dependencies",
+        "key_functions"
+      ],
+      "properties": {
+        "module_id": {
+          "$ref": "#/$defs/moduleId"
+        },
+        "module_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "module_kind": {
+          "$ref": "#/$defs/moduleKind"
+        },
+        "version": {
+          "$ref": "#/$defs/semver"
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "layer": {
+          "$ref": "#/$defs/layer"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope_in": {
+          "$ref": "#/$defs/stringList"
+        },
+        "scope_out": {
+          "$ref": "#/$defs/stringList"
+        },
+        "responsibilities": {
+          "$ref": "#/$defs/stringList"
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dependency"
+          }
+        },
+        "key_functions": {
+          "$ref": "#/$defs/stringList"
+        },
+        "interfaces": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/interfaceContract"
+          }
+        },
+        "process_bindings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/processBinding"
+          }
+        },
+        "filesystem_hints": {
+          "$ref": "#/$defs/filesystemHints"
+        },
+        "quality_gates": {
+          "$ref": "#/$defs/qualityGates"
+        },
+        "mvp_classification": {
+          "$ref": "#/$defs/mvpClassification"
+        },
+        "tags": {
+          "$ref": "#/$defs/stringList"
+        },
+        "notes": {
+          "$ref": "#/$defs/stringList"
+        }
+      }
+    },
+    "processContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "process_id": {
+          "type": "string"
+        },
+        "process_version": {
+          "$ref": "#/$defs/semver"
+        },
+        "module_registry_file": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

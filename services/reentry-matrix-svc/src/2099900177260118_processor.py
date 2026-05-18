@@ -108,7 +108,10 @@ class ReentryProcessor:
                 "stop_loss": stop_loss,
                 "take_profit": take_profit,
                 "confidence_score": confidence_score,
-                "processing_time_ms": (asyncio.get_event_loop().time() - start_time) * 1000
+                "processing_time_ms": (asyncio.get_event_loop().time() - start_time) * 1000,
+                # Extended matrix fields (GAP-33, GAP-34, GAP-35)
+                "action_type": resolved_params.get("action_type", "SAME_TRADE"),
+                "delay_minutes": resolved_params.get("delay_minutes", 0),
             }
             
             # Write to CSV using atomic policy
@@ -179,22 +182,32 @@ class ReentryProcessor:
         """Determine the re-entry action based on parameters."""
         if not resolved_params["reentry_enabled"]:
             return "NO_REENTRY"
-        
+
         if not resolved_params["generation_allowed"]:
             return "NO_REENTRY"
-        
+
         # Check generation limits
         if request.generation >= resolved_params["max_generation"]:
             return "HOLD"
-        
-        # Determine next action based on current generation
-        next_gen = request.generation + 1
-        if next_gen == 2:
-            return "R1"
-        elif next_gen == 3:
-            return "R2"
+
+        # Use action_type from resolved params when it overrides default R1/R2 logic
+        action_type = resolved_params.get("action_type", "SAME_TRADE")
+
+        if action_type == "NO_REENTRY":
+            return "NO_REENTRY"
+        elif action_type == "REVERSE":
+            return "R1"  # Reentry with reversed direction
+        elif action_type == "INCREASE_SIZE":
+            return "R2"  # Higher-lot reentry
         else:
-            return "HOLD"
+            # SAME_TRADE or missing: use existing generation-based R1/R2 logic
+            next_gen = request.generation + 1
+            if next_gen == 2:
+                return "R1"
+            elif next_gen == 3:
+                return "R2"
+            else:
+                return "HOLD"
     
     def _calculate_lot_size(self, request, resolved_params: Dict[str, Any]) -> float:
         """Calculate lot size for re-entry."""

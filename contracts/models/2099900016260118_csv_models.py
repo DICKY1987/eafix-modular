@@ -55,7 +55,10 @@ class ActiveCalendarSignal(BaseCSVModel):
     calendar_id: str = Field(..., description="Calendar identifier (CAL8 or CAL5)")
     symbol: str = Field(..., min_length=6, max_length=8, description="Currency pair")
     impact_level: Literal["HIGH", "MEDIUM", "LOW"] = Field(..., description="Event impact level")
-    proximity_state: Literal["IMMEDIATE", "NEAR", "FAR"] = Field(..., description="Distance to event")
+    proximity_state: Literal["PRE_1H", "AT_EVENT", "POST_30M"] = Field(
+        ...,
+        description="Calendar proximity state relative to event time",
+    )
     anticipation_event: bool = Field(..., description="Whether this is an anticipation signal")
     direction_bias: Literal["BULLISH", "BEARISH", "NEUTRAL"] = Field(..., description="Expected direction")
     confidence_score: float = Field(..., ge=0.0, le=1.0, description="Signal confidence (0.0-1.0)")
@@ -84,6 +87,7 @@ class ReentryDecision(BaseCSVModel):
     """Trading re-entry decision from the re-entry engine."""
     
     trade_id: str = Field(..., description="Original trade identifier")
+    decision_id: Optional[str] = Field(None, description="Unique decision identifier: sha256(hybrid_id:utc_iso)[:16]")
     hybrid_id: str = Field(..., description="Hybrid reentry identifier")
     symbol: str = Field(..., min_length=6, max_length=8, description="Currency pair")
     outcome_class: Literal["WIN", "LOSS", "BREAKEVEN"] = Field(..., description="Trade outcome")
@@ -99,12 +103,17 @@ class ReentryDecision(BaseCSVModel):
     @validator('hybrid_id')
     def validate_hybrid_id(cls, v):
         """Validate hybrid ID format."""
-        parts = v.split('_')
-        if len(parts) < 5:
-            raise ValueError('hybrid_id must have at least 5 components')
-        
-        # Basic format validation - detailed validation in shared.reentry module
-        outcome, duration, proximity, calendar, direction = parts[:5]
+        try:
+            from shared.reentry import parse as parse_hybrid_id
+
+            components = parse_hybrid_id(v)
+        except Exception as exc:
+            raise ValueError(f'Invalid hybrid_id: {exc}')
+
+        outcome = components.get("outcome")
+        duration = components.get("duration")
+        proximity = components.get("proximity")
+        direction = components.get("direction")
         
         valid_outcomes = ['W2', 'W1', 'BE', 'L1', 'L2']
         valid_durations = ['FLASH', 'QUICK', 'LONG', 'EXTENDED']

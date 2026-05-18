@@ -23,7 +23,7 @@ Calendar signals generated from economic calendar events with proximity states a
 | `calendar_id` | String | Calendar identifier (CAL8 or CAL5) | `CAL8_USD_NFP_HIGH` |
 | `symbol` | String | Currency pair | `EURUSD`, `GBPJPY` |
 | `impact_level` | String | Event impact level | `HIGH`, `MEDIUM`, `LOW` |
-| `proximity_state` | String | Distance to event | `IMMEDIATE`, `NEAR`, `FAR` |
+| `proximity_state` | String | Event proximity state | `PRE_1H`, `AT_EVENT`, `POST_30M` |
 | `anticipation_event` | Boolean | Whether this is an anticipation signal | `true`, `false` |
 | `direction_bias` | String | Expected market direction | `BULLISH`, `BEARISH`, `NEUTRAL` |
 | `confidence_score` | Float | Signal confidence (0.0-1.0) | `0.85` |

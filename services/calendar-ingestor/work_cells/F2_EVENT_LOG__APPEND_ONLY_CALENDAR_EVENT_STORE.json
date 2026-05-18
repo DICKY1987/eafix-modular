@@ -1,0 +1,56 @@
+{
+  "manifest_type": "service_work_cell_binding",
+  "generated_at_utc": "2026-05-18T05:47:05Z",
+  "work_cell_id": "F2_EVENT_LOG__APPEND_ONLY_CALENDAR_EVENT_STORE",
+  "work_cell_type": "module_boundary",
+  "parent_module_symbol": "F2_EVENT_LOG",
+  "requires_agent_capability": [
+    "python"
+  ],
+  "context_packet_path": "context_packets/50000000000000000005/F2_EVENT_LOG__APPEND_ONLY_CALENDAR_EVENT_STORE/work_cell_context.json",
+  "service": "calendar-ingestor",
+  "source_files": [
+    "services\\calendar-ingestor\\src\\2099900089260118_config.py",
+    "services\\calendar-ingestor\\src\\2099900090260118_ff_auto_downloader.py",
+    "services\\calendar-ingestor\\src\\2099900091260118_health.py",
+    "services\\calendar-ingestor\\src\\2099900092260118_ingestor.py",
+    "services\\calendar-ingestor\\src\\2099900093260118_main.py",
+    "services\\calendar-ingestor\\src\\2099900094260118_metrics.py",
+    "services\\calendar-ingestor\\src\\2099900095260118_plugin.py",
+    "services\\calendar-ingestor\\src\\2099900096260118_python_calendar_system.py",
+    "services\\calendar-ingestor\\src\\2099900097260118_python_calendar_system_patched.py",
+    "services\\calendar-ingestor\\src\\2099900098260118___init__.py"
+  ],
+  "test_files": [
+    "services\\calendar-ingestor\\tests\\2099900099260118_test_ingestor.py"
+  ],
+  "allowed_dependencies": [
+    "D3_CALENDAR_NORMALIZER"
+  ],
+  "forbidden_dependencies": [
+    "B1_MT4_ADAPTER_TRANSPORT",
+    "B2_MT4_EA_EXECUTOR",
+    "B3_EXEC_EVENT_NORMALIZER",
+    "D1_MARKET_FEED_ADAPTER",
+    "O1_ORDER_ROUTER",
+    "O2_OMS_STATE_MACHINE",
+    "O3_TRADE_CLOSE_CLASSIFIER"
+  ],
+  "required_reference_documents": [
+    "DOC_MODULE_CATALOG",
+    "DOC_PROCESS_STEP_CATALOG",
+    "DOC_ALIGNED_PROCESS",
+    "DOC_ROUTING_INSTRUCTIONS",
+    "DOC_DECOMPOSITION_MODEL",
+    "DOC_SERVICES_AI_REFERENCE",
+    "DOC_CAL_DES_RULES",
+    "DOC_ECON_CAL_TECH_ANALYSIS",
+    "DOC_ECON_CAL_ENHANCEMENT_PLAN",
+    "DOC_CAL_CONFIG_DEPLOYMENT",
+    "DOC_DEPENDENCY_LAYERS"
+  ],
+  "notes": [
+    "Manifest-only Phase 3 binding; no runtime logic was moved by this completion pass.",
+    "Use this file as the source-scope contract for subsequent behavior-preserving extraction."
+  ]
+}

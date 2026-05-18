@@ -78,15 +78,33 @@ class CalendarIngestorPlugin(BasePlugin):
             try:
                 # Fetch and process calendar events
                 events = await self._ingestor.fetch_events()
+                processed_count = 0
+                signal_count = 0
                 
-                if events:
-                    # Emit calendar events
+                for event in events:
+                    result = await self._ingestor.process_calendar_event(event)
+                    if result.get("status") != "success":
+                        continue
+
+                    processed_count += 1
+                    normalized_event = result.get("event", event)
+                    self.emit_event("eafix.calendar.events", normalized_event)
+
+                    for signal in result.get("signals", []):
+                        self.emit_event("eafix.calendar.signals", signal)
+                        signal_count += 1
+
+                if processed_count:
                     self.emit_event("calendar_update", {
-                        "events": events,
-                        "count": len(events)
+                        "events_processed": processed_count,
+                        "signals_generated": signal_count,
                     })
                     
-                    logger.info(f"Calendar updated with {len(events)} events")
+                    logger.info(
+                        "Calendar updated",
+                        events_processed=processed_count,
+                        signals_generated=signal_count,
+                    )
                 
                 # Wait for next update
                 await asyncio.sleep(update_interval_sec)

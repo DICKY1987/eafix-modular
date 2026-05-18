@@ -1,0 +1,44 @@
+{
+  "manifest_type": "service_work_cell_binding",
+  "generated_at_utc": "2026-05-18T05:47:05Z",
+  "work_cell_id": "UI_UI_SCREEN_SIGNALS_HISTORY",
+  "work_cell_type": "ui_screen",
+  "parent_module_symbol": "SHARED_LIBS",
+  "requires_agent_capability": [
+    "ui"
+  ],
+  "context_packet_path": "context_packets/50000000000000000099/UI_UI_SCREEN_SIGNALS_HISTORY/work_cell_context.json",
+  "service": "desktop-ui",
+  "source_files": [
+    "services\\desktop-ui\\2099900128260118_expiry_indicator_service.py",
+    "services\\desktop-ui\\2099900129260118_expiry_service.py",
+    "services\\desktop-ui\\2099900130260118_friday_vol_indicator.py",
+    "services\\desktop-ui\\2099900131260118_friday_vol_signal.py",
+    "services\\desktop-ui\\2099900132260118_outbound.py",
+    "services\\desktop-ui\\2099900135260118_tkinter_dashboard_gui.py",
+    "services\\desktop-ui\\dashboard\\2099900136260118_tkinter_dashboard_gui.py"
+  ],
+  "test_files": [
+    "services\\desktop-ui\\2099900133260118_test_friday_vol_indicator.py",
+    "services\\desktop-ui\\2099900134260118_test_friday_vol_signal.py",
+    "services\\desktop-ui\\testing\\2099900137260118_manual_testing_control_panel.py"
+  ],
+  "allowed_dependencies": [],
+  "forbidden_dependencies": [
+    "B2_MT4_EA_EXECUTOR",
+    "O1_ORDER_ROUTER",
+    "R2_ORDER_INTENT_COMPILER"
+  ],
+  "required_reference_documents": [
+    "DOC_UI_CATALOG",
+    "DOC_COMM_CHANNELS",
+    "DOC_MODULE_CATALOG",
+    "DOC_PROCESS_STEP_CATALOG",
+    "DOC_ROUTING_INSTRUCTIONS",
+    "DOC_DECOMPOSITION_MODEL"
+  ],
+  "notes": [
+    "Manifest-only Phase 3 binding; no runtime logic was moved by this completion pass.",
+    "Use this file as the source-scope contract for subsequent behavior-preserving extraction."
+  ]
+}

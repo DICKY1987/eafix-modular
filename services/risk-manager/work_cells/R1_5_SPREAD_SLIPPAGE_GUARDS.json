@@ -1,0 +1,44 @@
+{
+  "manifest_type": "service_work_cell_binding",
+  "generated_at_utc": "2026-05-18T05:47:05Z",
+  "work_cell_id": "R1_5_SPREAD_SLIPPAGE_GUARDS",
+  "work_cell_type": "risk_rule_family",
+  "parent_module_symbol": "R1_RISK_EVALUATOR",
+  "requires_agent_capability": [
+    "python"
+  ],
+  "context_packet_path": "context_packets/50000000000000000013/R1_5_SPREAD_SLIPPAGE_GUARDS/work_cell_context.json",
+  "service": "risk-manager",
+  "source_files": [
+    "services\\risk-manager\\src\\2099900183260118_plugin.py"
+  ],
+  "test_files": [
+    "services\\risk-manager\\tests\\2099900184260118_test_risk_manager_plugin.py"
+  ],
+  "allowed_dependencies": [
+    "F1_CONFIG_PREFERENCES",
+    "S2_INTENT_BUILDER"
+  ],
+  "forbidden_dependencies": [
+    "B2_MT4_EA_EXECUTOR",
+    "B3_EXEC_EVENT_NORMALIZER",
+    "D2_CALENDAR_SOURCE_ADAPTER",
+    "D3_CALENDAR_NORMALIZER",
+    "D4_CALENDAR_TRIGGER_BUILDER"
+  ],
+  "required_reference_documents": [
+    "DOC_MODULE_CATALOG",
+    "DOC_PROCESS_STEP_CATALOG",
+    "DOC_ALIGNED_PROCESS",
+    "DOC_ROUTING_INSTRUCTIONS",
+    "DOC_DECOMPOSITION_MODEL",
+    "DOC_MT4_AUTHORITATIVE_REF",
+    "DOC_ATOMIC_LIFECYCLE_MD",
+    "DOC_FILE_MODULE_MAPPING",
+    "DOC_SERVICES_AI_REFERENCE"
+  ],
+  "notes": [
+    "Manifest-only Phase 3 binding; no runtime logic was moved by this completion pass.",
+    "Use this file as the source-scope contract for subsequent behavior-preserving extraction."
+  ]
+}

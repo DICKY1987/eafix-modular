@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "routing_rules_schema.json",
+  "title": "EAFIX AI Work-Cell Routing Rules",
+  "type": "object",
+  "required": [
+    "metadata",
+    "rules"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "generated_at_utc",
+        "source_catalog",
+        "rule_count"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "schema_version": {
+          "type": "string"
+        },
+        "generated_at_utc": {
+          "type": "string"
+        },
+        "source_catalog": {
+          "type": "string"
+        },
+        "rule_count": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "rule_id",
+          "work_cell_id",
+          "parent_module_symbol",
+          "context_packet_path",
+          "match_terms",
+          "required_reference_documents",
+          "route_priority",
+          "agent_capabilities"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "rule_id": {
+            "type": "string"
+          },
+          "work_cell_id": {
+            "type": "string"
+          },
+          "parent_module_symbol": {
+            "type": "string"
+          },
+          "work_cell_type": {
+            "type": "string"
+          },
+          "context_packet_path": {
+            "type": "string"
+          },
+          "match_terms": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "required_reference_documents": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "route_priority": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "agent_capabilities": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_backing": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "routing_notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

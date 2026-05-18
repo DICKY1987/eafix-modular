@@ -81,7 +81,7 @@ class TestTransportRouterIntegration:
                     'calendar_id': 'CAL8_USD_NFP_H',
                     'symbol': 'EURUSD',
                     'impact_level': 'HIGH',
-                    'proximity_state': 'IMMEDIATE',
+                    'proximity_state': 'AT_EVENT',
                     'anticipation_event': 'true',
                     'direction_bias': 'BULLISH',
                     'confidence_score': '0.75'
@@ -325,7 +325,7 @@ class TestTransportRouterIntegration:
             # Row with bad checksum
             writer.writerow([
                 '1', 'bad_checksum_12345', datetime.utcnow().isoformat(),
-                'CAL8_USD_NFP_H', 'EURUSD', 'HIGH', 'IMMEDIATE',
+                'CAL8_USD_NFP_H', 'EURUSD', 'HIGH', 'AT_EVENT',
                 'true', 'BULLISH', '0.75'
             ])
         

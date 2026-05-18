@@ -1,0 +1,69 @@
+{
+  "manifest_type": "service_work_cell_binding",
+  "generated_at_utc": "2026-05-18T05:47:05Z",
+  "work_cell_id": "R2_ORDER_INTENT_COMPILER__MODULE_CONTEXT_BOUNDARY",
+  "work_cell_type": "module_boundary",
+  "parent_module_symbol": "R2_ORDER_INTENT_COMPILER",
+  "requires_agent_capability": [
+    "python"
+  ],
+  "context_packet_path": "context_packets/50000000000000000014/R2_ORDER_INTENT_COMPILER__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+  "service": "transport-router",
+  "source_files": [
+    "services\\transport-router\\src\\2099900197260118_config.py",
+    "services\\transport-router\\src\\2099900198260118_health.py",
+    "services\\transport-router\\src\\2099900199260118_main.py",
+    "services\\transport-router\\src\\2099900200260118_metrics.py",
+    "services\\transport-router\\src\\2099900201260118_plugin.py",
+    "services\\transport-router\\src\\2099900202260118_router.py",
+    "services\\transport-router\\src\\2099900203260118_validator.py",
+    "services\\transport-router\\src\\2099900204260118_watcher.py",
+    "services\\transport-router\\src\\2099900205260118___init__.py"
+  ],
+  "test_files": [
+    "services\\transport-router\\tests\\2099900206260118_test_integration.py"
+  ],
+  "allowed_dependencies": [
+    "F1_CONFIG_PREFERENCES",
+    "R1_RISK_EVALUATOR"
+  ],
+  "forbidden_dependencies": [
+    "B1_MT4_ADAPTER_TRANSPORT",
+    "B2_MT4_EA_EXECUTOR",
+    "B3_EXEC_EVENT_NORMALIZER",
+    "C1_BAR_BUILDER",
+    "C2_INDICATOR_ENGINE",
+    "C3_FEATURE_PACKAGER",
+    "D1_MARKET_FEED_ADAPTER",
+    "D2_CALENDAR_SOURCE_ADAPTER",
+    "D3_CALENDAR_NORMALIZER",
+    "D4_CALENDAR_TRIGGER_BUILDER",
+    "E1_OUTCOME_BUCKETIZER",
+    "E2_PROXIMITY_EVALUATOR",
+    "E3_MATRIX_LOOKUP",
+    "E4_REENTRY_INTENT_BUILDER",
+    "F1_FLOW_ORCHESTRATOR",
+    "F2_EVENT_LOG",
+    "F3_CLOCK_SCHEDULER",
+    "O1_ORDER_ROUTER",
+    "O2_OMS_STATE_MACHINE",
+    "O3_TRADE_CLOSE_CLASSIFIER",
+    "P1_HEALTH_AGGREGATOR",
+    "S1_SIGNAL_ENGINE",
+    "S2_INTENT_BUILDER",
+    "SHARED_LIBS"
+  ],
+  "required_reference_documents": [
+    "DOC_MODULE_CATALOG",
+    "DOC_PROCESS_STEP_CATALOG",
+    "DOC_ALIGNED_PROCESS",
+    "DOC_ROUTING_INSTRUCTIONS",
+    "DOC_DECOMPOSITION_MODEL",
+    "DOC_MT4_AUTHORITATIVE_REF",
+    "DOC_ATOMIC_LIFECYCLE_MD"
+  ],
+  "notes": [
+    "Manifest-only Phase 3 binding; no runtime logic was moved by this completion pass.",
+    "Use this file as the source-scope contract for subsequent behavior-preserving extraction."
+  ]
+}

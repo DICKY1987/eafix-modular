@@ -1,0 +1,492 @@
+{
+  "spec_id": "STRIPPED_DOWN_ID_MIGRATION_SPEC_V1",
+  "spec_version": "1.0.0",
+  "status": "proposed_replacement",
+  "source_document": {
+    "title": "AI_CLI_ID_ASSIGNMENT_COMPLETE_GUIDE.md",
+    "created": "2026-03-09",
+    "basis": [
+      "single source of truth allocator via COUNTER_STORE.json",
+      "directories identified by .dir_id anchor files",
+      "files identified by 20-digit filename prefixes",
+      "dry-run before apply",
+      "validate after mutation",
+      "check duplicates",
+      "sync registry after mutation"
+    ]
+  },
+  "objective": "Replace the current multi-layer ID package with a minimal deterministic migration utility that assigns directory IDs, assigns file IDs, validates results, and writes a derived registry.",
+  "normative_rules": {
+    "allocation": {
+      "id_length": 20,
+      "id_pattern": "^\\d{20}$",
+      "single_allocator_source": "COUNTER_STORE.json",
+      "manual_counter_edit_forbidden": true,
+      "id_reuse_forbidden": true
+    },
+    "directory_identity": {
+      "identity_mechanism": ".dir_id",
+      "one_anchor_per_governed_directory": true,
+      "root_directory_anchor_required": false,
+      "semantic_identity_layer_allowed": false
+    },
+    "file_identity": {
+      "identity_mechanism": "filename_prefix",
+      "python_prefix_format": "P_{20_digit_id}_",
+      "default_prefix_format": "{20_digit_id}_",
+      "existing_prefixed_files_must_not_be_renamed_again": true
+    },
+    "execution": {
+      "dry_run_required_before_apply": true,
+      "validation_required_after_apply": true,
+      "registry_is_derived_artifact": true,
+      "allocator_is_not_allowed_to_write_registry": true,
+      "sync_registry_must_not_allocate_ids": true
+    }
+  },
+  "default_config_values": {
+    "target_extensions": [
+      ".md",
+      ".txt",
+      ".py",
+      ".ps1",
+      ".yaml",
+      ".json",
+      ".yml"
+    ],
+    "excluded_directories": [
+      ".git",
+      "__pycache__",
+      "node_modules",
+      ".pytest_cache",
+      ".mypy_cache",
+      "htmlcov",
+      "out",
+      ".runs",
+      ".state",
+      ".coverage"
+    ],
+    "governed_directory_rule": "all directories at depth >= 1 that are not excluded",
+    "counter_store_path": "COUNTER_STORE.json",
+    "registry_output_path": "registry/file_system_id_registry.jsonl",
+    "manifest_output_path": "id_migration/output/migration_manifest.jsonl"
+  },
+  "required_repository_files": [
+    {
+      "path": "COUNTER_STORE.json",
+      "kind": "state_file",
+      "required": true,
+      "owner": "allocator",
+      "purpose": "Single source of truth for next ID allocation state.",
+      "inputs": [],
+      "outputs": [
+        "allocated 20-digit IDs"
+      ],
+      "must_do": [
+        "persist monotonically increasing allocation state",
+        "support atomic update during allocation"
+      ],
+      "must_not_do": [
+        "store registry rows",
+        "store semantic aliases",
+        "be edited by hand"
+      ]
+    },
+    {
+      "path": "id_migration/config/id_migration_config.json",
+      "kind": "config_file",
+      "required": true,
+      "owner": "all_scripts",
+      "purpose": "Central configuration for paths, exclusions, target file extensions, and output locations.",
+      "inputs": [],
+      "outputs": [
+        "runtime configuration object"
+      ],
+      "required_fields": [
+        "project_root",
+        "project_root_id",
+        "counter_store_path",
+        "target_extensions",
+        "excluded_directories",
+        "registry_output_path",
+        "manifest_output_path"
+      ]
+    },
+    {
+      "path": "id_migration/schemas/dir_id.schema.json",
+      "kind": "schema_file",
+      "required": true,
+      "owner": "03_validate_ids.py",
+      "purpose": "JSON Schema for .dir_id anchor files.",
+      "inputs": [],
+      "outputs": [
+        "schema validation results"
+      ],
+      "must_validate_fields": [
+        "dir_id",
+        "allocated_at_utc",
+        "allocator_version",
+        "project_root_id",
+        "relative_path"
+      ]
+    },
+    {
+      "path": "id_migration/scripts/00_run_migration.py",
+      "kind": "script",
+      "required": true,
+      "owner": "migration_orchestrator",
+      "purpose": "Single entrypoint that runs the migration in a fixed order.",
+      "inputs": [
+        "id_migration/config/id_migration_config.json",
+        "COUNTER_STORE.json"
+      ],
+      "outputs": [
+        "plan or apply result",
+        "id_migration/output/migration_manifest.jsonl"
+      ],
+      "must_do": [
+        "support --mode plan and --mode apply",
+        "run 01_generate_dir_ids.py before 02_assign_file_ids.py",
+        "run 03_validate_ids.py after mutations",
+        "run 04_sync_registry.py only after successful validation",
+        "stop on first non-zero exit code"
+      ],
+      "must_not_do": [
+        "perform allocation logic directly",
+        "contain duplicate scan logic already owned by child scripts"
+      ]
+    },
+    {
+      "path": "id_migration/scripts/01_generate_dir_ids.py",
+      "kind": "script",
+      "required": true,
+      "owner": "directory_identity_stage",
+      "purpose": "Create .dir_id anchor files for governed directories that do not already have one.",
+      "inputs": [
+        "id_migration/config/id_migration_config.json",
+        "COUNTER_STORE.json"
+      ],
+      "outputs": [
+        ".dir_id files",
+        "manifest rows"
+      ],
+      "must_do": [
+        "scan all directories under project_root",
+        "skip excluded directories",
+        "treat depth >= 1 non-excluded directories as governed",
+        "detect existing .dir_id and leave it unchanged",
+        "allocate one 20-digit ID per missing governed directory",
+        "write one .dir_id file per allocated directory",
+        "support plan mode without filesystem mutation"
+      ],
+      "must_not_do": [
+        "write semantic alias files",
+        "update registry output",
+        "rename files"
+      ]
+    },
+    {
+      "path": "id_migration/scripts/02_assign_file_ids.py",
+      "kind": "script",
+      "required": true,
+      "owner": "file_identity_stage",
+      "purpose": "Rename target files that do not already contain a valid ID prefix.",
+      "inputs": [
+        "id_migration/config/id_migration_config.json",
+        "COUNTER_STORE.json"
+      ],
+      "outputs": [
+        "renamed files",
+        "manifest rows"
+      ],
+      "must_do": [
+        "scan recursively for files with configured target extensions",
+        "skip files under excluded directories",
+        "detect existing valid file IDs and skip them",
+        "allocate one 20-digit ID per file being renamed",
+        "rename .py files using P_{id}_ prefix",
+        "rename non-.py files using {id}_ prefix",
+        "support plan mode without filesystem mutation"
+      ],
+      "must_not_do": [
+        "write .dir_id files",
+        "update registry output",
+        "allocate IDs for skipped files"
+      ]
+    },
+    {
+      "path": "id_migration/scripts/03_validate_ids.py",
+      "kind": "script",
+      "required": true,
+      "owner": "validation_stage",
+      "purpose": "Validate all directory and file IDs after mutation.",
+      "inputs": [
+        "id_migration/config/id_migration_config.json",
+        "id_migration/schemas/dir_id.schema.json"
+      ],
+      "outputs": [
+        "validation report",
+        "exit code"
+      ],
+      "must_do": [
+        "validate every .dir_id file against schema",
+        "check every dir_id matches ^\\\\d{20}$",
+        "check every file ID matches required prefix pattern",
+        "check for duplicate dir_ids",
+        "check for duplicate file_ids",
+        "fail if any governed directory lacks .dir_id after apply"
+      ],
+      "must_not_do": [
+        "allocate new IDs",
+        "rename files",
+        "modify .dir_id files",
+        "write registry rows"
+      ]
+    },
+    {
+      "path": "id_migration/scripts/04_sync_registry.py",
+      "kind": "script",
+      "required": true,
+      "owner": "registry_sync_stage",
+      "purpose": "Generate a derived filesystem ID registry from the current filesystem state only.",
+      "inputs": [
+        "id_migration/config/id_migration_config.json"
+      ],
+      "outputs": [
+        "registry/file_system_id_registry.jsonl"
+      ],
+      "must_do": [
+        "read current filesystem state after validation succeeds",
+        "emit one registry row per governed directory and one registry row per ID-bearing file",
+        "record relative_path, object_type, physical_id, source_of_truth, and status",
+        "overwrite registry output atomically"
+      ],
+      "must_not_do": [
+        "allocate IDs",
+        "repair invalid IDs",
+        "rename files",
+        "change .dir_id files"
+      ]
+    },
+    {
+      "path": "id_migration/output/migration_manifest.jsonl",
+      "kind": "generated_log",
+      "required": true,
+      "owner": "all_scripts",
+      "purpose": "Append-only execution log for plan and apply runs.",
+      "inputs": [
+        "events emitted by scripts"
+      ],
+      "outputs": [
+        "auditable line-delimited JSON event stream"
+      ],
+      "event_types": [
+        "plan_dir_id_create",
+        "apply_dir_id_create",
+        "plan_file_rename",
+        "apply_file_rename",
+        "validation_success",
+        "validation_failure",
+        "registry_sync"
+      ]
+    },
+    {
+      "path": "registry/file_system_id_registry.jsonl",
+      "kind": "generated_registry",
+      "required": true,
+      "owner": "04_sync_registry.py",
+      "purpose": "Derived registry of current physical filesystem identities.",
+      "inputs": [
+        "current filesystem state"
+      ],
+      "outputs": [
+        "jsonl rows"
+      ],
+      "required_row_fields": [
+        "object_type",
+        "relative_path",
+        "physical_id",
+        "source_of_truth",
+        "status"
+      ]
+    }
+  ],
+  "generated_runtime_artifacts": [
+    {
+      "path_pattern": "**/.dir_id",
+      "kind": "directory_anchor",
+      "created_by": "01_generate_dir_ids.py",
+      "required_for": "every governed directory",
+      "json_contract": {
+        "dir_id": {
+          "type": "string",
+          "pattern": "^\\d{20}$"
+        },
+        "allocated_at_utc": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "allocator_version": {
+          "type": "string"
+        },
+        "project_root_id": {
+          "type": "string",
+          "pattern": "^\\d{20}$"
+        },
+        "relative_path": {
+          "type": "string"
+        }
+      }
+    }
+  ],
+  "command_contracts": [
+    {
+      "script": "id_migration/scripts/00_run_migration.py",
+      "accepted_args": {
+        "--config": "required path",
+        "--mode": [
+          "plan",
+          "apply"
+        ]
+      },
+      "exit_codes": {
+        "0": "success",
+        "1": "validation_or_runtime_failure",
+        "2": "configuration_error"
+      }
+    },
+    {
+      "script": "id_migration/scripts/01_generate_dir_ids.py",
+      "accepted_args": {
+        "--config": "required path",
+        "--mode": [
+          "plan",
+          "apply"
+        ]
+      }
+    },
+    {
+      "script": "id_migration/scripts/02_assign_file_ids.py",
+      "accepted_args": {
+        "--config": "required path",
+        "--mode": [
+          "plan",
+          "apply"
+        ]
+      }
+    },
+    {
+      "script": "id_migration/scripts/03_validate_ids.py",
+      "accepted_args": {
+        "--config": "required path"
+      }
+    },
+    {
+      "script": "id_migration/scripts/04_sync_registry.py",
+      "accepted_args": {
+        "--config": "required path"
+      }
+    }
+  ],
+  "execution_order": [
+    {
+      "step": 1,
+      "script": "id_migration/scripts/01_generate_dir_ids.py",
+      "mode": "plan",
+      "required": true
+    },
+    {
+      "step": 2,
+      "script": "id_migration/scripts/02_assign_file_ids.py",
+      "mode": "plan",
+      "required": true
+    },
+    {
+      "step": 3,
+      "script": "id_migration/scripts/01_generate_dir_ids.py",
+      "mode": "apply",
+      "required": true
+    },
+    {
+      "step": 4,
+      "script": "id_migration/scripts/02_assign_file_ids.py",
+      "mode": "apply",
+      "required": true
+    },
+    {
+      "step": 5,
+      "script": "id_migration/scripts/03_validate_ids.py",
+      "mode": "apply",
+      "required": true
+    },
+    {
+      "step": 6,
+      "script": "id_migration/scripts/04_sync_registry.py",
+      "mode": "apply",
+      "required": true
+    }
+  ],
+  "must_not_exist_in_replacement_design": [
+    {
+      "item": "semantic directory identity registry",
+      "examples": [
+        "path_index.yaml",
+        "human-readable directory alias layer"
+      ],
+      "reason": "not required for physical ID migration"
+    },
+    {
+      "item": "manual allocation path as an official execution path",
+      "reason": "creates drift and duplicate behavior"
+    },
+    {
+      "item": "duplicate allocator implementations in multiple packages",
+      "reason": "single allocator source is required"
+    },
+    {
+      "item": "registry mutation inside allocator or validator",
+      "reason": "registry must be derived after validation"
+    }
+  ],
+  "deprecation_map_from_current_guide": [
+    {
+      "current_item": "P_01999000042260125100_generate_dir_ids_gov_reg.py",
+      "replacement_item": "id_migration/scripts/01_generate_dir_ids.py",
+      "action": "replace"
+    },
+    {
+      "current_item": "P_01999000042260125101_validate_dir_ids.py",
+      "replacement_item": "id_migration/scripts/03_validate_ids.py",
+      "action": "replace_and_expand_to_include_file_ids"
+    },
+    {
+      "current_item": "P_01999000042260125102_populate_registry_dir_ids.py",
+      "replacement_item": "id_migration/scripts/04_sync_registry.py",
+      "action": "replace"
+    },
+    {
+      "current_item": "P_01260207201000000198_add_ids_recursive.py",
+      "replacement_item": "id_migration/scripts/02_assign_file_ids.py",
+      "action": "replace"
+    },
+    {
+      "current_item": "P_01999000042260124031_unified_id_allocator.py",
+      "replacement_item": "allocator implementation retained behind COUNTER_STORE.json contract",
+      "action": "retain_single_implementation"
+    },
+    {
+      "current_item": "path_index.yaml semantic identity layer",
+      "replacement_item": null,
+      "action": "remove"
+    }
+  ],
+  "acceptance_criteria": [
+    "every governed directory has exactly one valid .dir_id file",
+    "every target file has exactly one valid filename ID prefix",
+    "no duplicate directory IDs exist",
+    "no duplicate file IDs exist",
+    "COUNTER_STORE.json remains the only allocator state file",
+    "registry/file_system_id_registry.jsonl is reproducible from filesystem state alone",
+    "all scripts are runnable through 00_run_migration.py"
+  ]
+}

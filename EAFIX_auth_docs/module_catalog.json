@@ -1,0 +1,2495 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "module_catalog",
+  "catalog_id": "HUEY_P_EAFIX_CATALOG",
+  "catalog_name": "HUEY_P EAFIX Module Catalog",
+  "version": "1.0.0",
+  "process_context": {
+    "process_id": "HUEY_P_EAFIX_END_TO_END",
+    "process_version": "2.0.0",
+    "module_registry_file": "2026012201113002_updated_trading_process_v2.yaml"
+  },
+  "modules": [
+    {
+      "module_id": "50000000000000000001",
+      "canonical_symbol": "F1_CONFIG_PREFERENCES",
+      "module_name": "Configuration Service",
+      "module_kind": "INFRA_PLATFORM_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 1,
+      "purpose": "Owns process step 1: Resolve configuration snapshot.",
+      "scope_in": [
+        "ConfigSource"
+      ],
+      "scope_out": [
+        "ResolvedConfig"
+      ],
+      "responsibilities": [
+        "Resolve configuration snapshot"
+      ],
+      "dependencies": [],
+      "key_functions": [
+        "configuration_service"
+      ],
+      "interfaces": [
+        {
+          "name": "ConfigSource",
+          "kind": "input",
+          "contract_type": "ConfigSource"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "output",
+          "contract_type": "ResolvedConfig"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 1,
+          "step_name": "Resolve configuration snapshot",
+          "responsible": "configuration_service.py",
+          "input_contract": "ConfigSource (defaults + overrides)",
+          "output_contract": "ResolvedConfig (immutable snapshot)",
+          "validation": "Schema validate; stable ordering; hash snapshot",
+          "failure": "Reject invalid config; continue using last known good snapshot",
+          "entrypoint_files": []
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": []
+      },
+      "quality_gates": {
+        "invariants": [
+          "Schema validate; stable ordering; hash snapshot"
+        ]
+      },
+      "notes": [
+        "Reject invalid config; continue using last known good snapshot"
+      ]
+    },
+    {
+      "module_id": "50000000000000000002",
+      "canonical_symbol": "F3_CLOCK_SCHEDULER",
+      "module_name": "Clock Scheduler",
+      "module_kind": "INFRA_PLATFORM_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 1,
+      "purpose": "Owns process step 2: Emit schedule tick (calendar polling cadence).",
+      "scope_in": [
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "ScheduleTick"
+      ],
+      "responsibilities": [
+        "Emit schedule tick (calendar polling cadence)"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        }
+      ],
+      "key_functions": [
+        "scheduler"
+      ],
+      "interfaces": [
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "ScheduleTick",
+          "kind": "output",
+          "contract_type": "ScheduleTick"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 2,
+          "step_name": "Emit schedule tick (calendar polling cadence)",
+          "responsible": "scheduler.py",
+          "input_contract": "ResolvedConfig",
+          "output_contract": "ScheduleTick",
+          "validation": "Frozen-time mode supported for tests",
+          "failure": "If scheduler stalls, emit HealthReport alert and pause polling",
+          "entrypoint_files": [
+            "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+          ]
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": [
+          "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+        ],
+        "module_root": "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+      },
+      "quality_gates": {
+        "invariants": [
+          "Frozen-time mode supported for tests"
+        ]
+      },
+      "notes": [
+        "If scheduler stalls, emit HealthReport alert and pause polling"
+      ]
+    },
+    {
+      "module_id": "50000000000000000003",
+      "canonical_symbol": "D2_CALENDAR_SOURCE_ADAPTER",
+      "module_name": "Calendar Source Adapter",
+      "module_kind": "INTEGRATION_BRIDGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 2,
+      "purpose": "Owns process step 3: Poll calendar source(s).",
+      "scope_in": [
+        "CalendarSourceConfig",
+        "ScheduleTick"
+      ],
+      "scope_out": [
+        "CalendarRaw"
+      ],
+      "responsibilities": [
+        "Poll calendar source(s)"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000002",
+          "relationship": "requires",
+          "reason": "Produces ScheduleTick."
+        }
+      ],
+      "key_functions": [
+        "poll_scheduler"
+      ],
+      "interfaces": [
+        {
+          "name": "CalendarSourceConfig",
+          "kind": "input",
+          "contract_type": "CalendarSourceConfig"
+        },
+        {
+          "name": "ScheduleTick",
+          "kind": "input",
+          "contract_type": "ScheduleTick"
+        },
+        {
+          "name": "CalendarRaw",
+          "kind": "output",
+          "contract_type": "CalendarRaw"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 3,
+          "step_name": "Poll calendar source(s)",
+          "responsible": "calendar_service.py::poll_scheduler",
+          "input_contract": "CalendarSourceConfig + ScheduleTick",
+          "output_contract": "CalendarRaw",
+          "validation": "HTTP 200; payload parsable; source_event_id present",
+          "failure": "Retry w/ deterministic backoff; on persistent failure emit IngestError and skip cycle",
+          "entrypoint_files": [
+            "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+          ]
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": [
+          "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+        ],
+        "module_root": "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+      },
+      "quality_gates": {
+        "invariants": [
+          "HTTP 200; payload parsable; source_event_id present"
+        ]
+      },
+      "notes": [
+        "Retry w/ deterministic backoff; on persistent failure emit IngestError and skip cycle"
+      ],
+      "microservice_port": 8084
+    },
+    {
+      "module_id": "50000000000000000004",
+      "canonical_symbol": "D3_CALENDAR_NORMALIZER",
+      "module_name": "Calendar Normalizer",
+      "module_kind": "INTEGRATION_BRIDGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 2,
+      "purpose": "Owns process step 4: Normalize raw calendar entries.",
+      "scope_in": [
+        "CalendarRaw",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "CalendarEvent"
+      ],
+      "responsibilities": [
+        "Normalize raw calendar entries"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000003",
+          "relationship": "requires",
+          "reason": "Produces CalendarRaw."
+        }
+      ],
+      "key_functions": [
+        "normalize_events"
+      ],
+      "interfaces": [
+        {
+          "name": "CalendarRaw",
+          "kind": "input",
+          "contract_type": "CalendarRaw"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "CalendarEvent",
+          "kind": "output",
+          "contract_type": "CalendarEvent"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 4,
+          "step_name": "Normalize raw calendar entries",
+          "responsible": "calendar_service.py::normalize_events",
+          "input_contract": "CalendarRaw + ResolvedConfig",
+          "output_contract": "CalendarEvent (UTC timestamps, standardized impact, dedup keys)",
+          "validation": "UTC conversion success; impact in enum; dedup policy applied",
+          "failure": "Emit NormalizationError for malformed rows; continue with valid CalendarEvent",
+          "entrypoint_files": [
+            "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+          ]
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": [
+          "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+        ],
+        "module_root": "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+      },
+      "quality_gates": {
+        "invariants": [
+          "UTC conversion success; impact in enum; dedup policy applied"
+        ]
+      },
+      "notes": [
+        "Emit NormalizationError for malformed rows; continue with valid CalendarEvent"
+      ],
+      "microservice_port": 8084
+    },
+    {
+      "module_id": "50000000000000000005",
+      "canonical_symbol": "F2_EVENT_LOG",
+      "module_name": "Event Log",
+      "module_kind": "INFRA_PLATFORM_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 1,
+      "purpose": "Owns process step 5: Persist calendar events (append-only).",
+      "scope_in": [
+        "CalendarEvent"
+      ],
+      "scope_out": [
+        "EventStream"
+      ],
+      "responsibilities": [
+        "Persist calendar events (append-only)"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000004",
+          "relationship": "requires",
+          "reason": "Produces CalendarEvent."
+        }
+      ],
+      "key_functions": [
+        "event_log"
+      ],
+      "interfaces": [
+        {
+          "name": "CalendarEvent",
+          "kind": "input",
+          "contract_type": "CalendarEvent"
+        },
+        {
+          "name": "EventStream",
+          "kind": "output",
+          "contract_type": "EventStream"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 5,
+          "step_name": "Persist calendar events (append-only)",
+          "responsible": "event_log.py",
+          "input_contract": "CalendarEvent",
+          "output_contract": "EventStream (calendar.* events)",
+          "validation": "Idempotent by message_id; ordered by created_utc + tie-breaker",
+          "failure": "Rollback and retry once; on persistent failure halt calendar pipeline",
+          "entrypoint_files": [
+            "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+          ]
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": [
+          "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+        ],
+        "module_root": "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+      },
+      "quality_gates": {
+        "invariants": [
+          "Idempotent by message_id; ordered by created_utc + tie-breaker"
+        ]
+      },
+      "notes": [
+        "Rollback and retry once; on persistent failure halt calendar pipeline"
+      ],
+      "microservice_port": 8084
+    },
+    {
+      "module_id": "50000000000000000006",
+      "canonical_symbol": "D4_CALENDAR_TRIGGER_BUILDER",
+      "module_name": "Calendar Trigger Builder",
+      "module_kind": "INTEGRATION_BRIDGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 2,
+      "purpose": "Owns process step 6: Build anticipation triggers from calendar.",
+      "scope_in": [
+        "CalendarEvent",
+        "ScheduleTick",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "CalendarTrigger"
+      ],
+      "responsibilities": [
+        "Build anticipation triggers from calendar"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000002",
+          "relationship": "requires",
+          "reason": "Produces ScheduleTick."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000004",
+          "relationship": "requires",
+          "reason": "Produces CalendarEvent."
+        }
+      ],
+      "key_functions": [
+        "calendar_anticipator"
+      ],
+      "interfaces": [
+        {
+          "name": "CalendarEvent",
+          "kind": "input",
+          "contract_type": "CalendarEvent"
+        },
+        {
+          "name": "ScheduleTick",
+          "kind": "input",
+          "contract_type": "ScheduleTick"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "CalendarTrigger",
+          "kind": "output",
+          "contract_type": "CalendarTrigger"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 6,
+          "step_name": "Build anticipation triggers from calendar",
+          "responsible": "calendar_anticipator.py",
+          "input_contract": "CalendarEvent + ScheduleTick + ResolvedConfig",
+          "output_contract": "CalendarTrigger (symbol set + window + suppression metadata)",
+          "validation": "No duplicate trigger for event+offset; TTL rules applied",
+          "failure": "Default to conservative suppression metadata; emit error event",
+          "entrypoint_files": [
+            "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+          ]
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": [
+          "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+        ],
+        "module_root": "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+      },
+      "quality_gates": {
+        "invariants": [
+          "No duplicate trigger for event+offset; TTL rules applied"
+        ]
+      },
+      "notes": [
+        "Default to conservative suppression metadata; emit error event"
+      ],
+      "microservice_port": 8084
+    },
+    {
+      "module_id": "50000000000000000007",
+      "canonical_symbol": "D1_MARKET_FEED_ADAPTER",
+      "module_name": "Market Feed Adapter",
+      "module_kind": "INTEGRATION_BRIDGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 2,
+      "purpose": "Owns process step 7: Ingest market ticks.",
+      "scope_in": [
+        "RawTick",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "MarketTick"
+      ],
+      "responsibilities": [
+        "Ingest market ticks"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        }
+      ],
+      "key_functions": [
+        "market_feed_adapter"
+      ],
+      "interfaces": [
+        {
+          "name": "RawTick",
+          "kind": "input",
+          "contract_type": "RawTick"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "MarketTick",
+          "kind": "output",
+          "contract_type": "MarketTick"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 7,
+          "step_name": "Ingest market ticks",
+          "responsible": "market_feed_adapter.py",
+          "input_contract": "RawTick + ResolvedConfig",
+          "output_contract": "MarketTick",
+          "validation": "Timestamp freshness; symbol normalization; reject malformed",
+          "failure": "Emit IngestError; skip malformed ticks",
+          "entrypoint_files": [
+            "services\\data-ingestor\\src\\2099900112260118_main.py"
+          ]
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": [
+          "services\\data-ingestor\\src\\2099900112260118_main.py"
+        ],
+        "module_root": "services\\data-ingestor\\src\\2099900112260118_main.py"
+      },
+      "quality_gates": {
+        "invariants": [
+          "Timestamp freshness; symbol normalization; reject malformed"
+        ]
+      },
+      "notes": [
+        "Emit IngestError; skip malformed ticks"
+      ],
+      "microservice_port": 8081,
+      "communication_channel_bindings": [
+        {
+          "channel_id": "dde_price_feed",
+          "channel_type": "Windows DDE",
+          "direction": "MT4 -> Python",
+          "poll_interval_ms": 100,
+          "redis_publish_topic": "eafix.data.prices",
+          "data_contracts": [
+            "PriceTick_v1"
+          ],
+          "associated_files": [
+            "services/data-ingestor/src/2099900111260118_ingestor.py"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "50000000000000000008",
+      "canonical_symbol": "C1_BAR_BUILDER",
+      "module_name": "Bar Builder",
+      "module_kind": "PIPELINE_STAGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 3,
+      "purpose": "Owns process step 8: Aggregate ticks into bars.",
+      "scope_in": [
+        "MarketTick",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "Bar"
+      ],
+      "responsibilities": [
+        "Aggregate ticks into bars"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000007",
+          "relationship": "requires",
+          "reason": "Produces MarketTick."
+        }
+      ],
+      "key_functions": [
+        "bar_builder"
+      ],
+      "interfaces": [
+        {
+          "name": "MarketTick",
+          "kind": "input",
+          "contract_type": "MarketTick"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "Bar",
+          "kind": "output",
+          "contract_type": "Bar"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 8,
+          "step_name": "Aggregate ticks into bars",
+          "responsible": "bar_builder.py",
+          "input_contract": "MarketTick + ResolvedConfig",
+          "output_contract": "Bar",
+          "validation": "Deterministic bar boundaries; tie-breaker rules",
+          "failure": "Drop out-of-order ticks per policy; emit error event",
+          "entrypoint_files": []
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": []
+      },
+      "quality_gates": {
+        "invariants": [
+          "Deterministic bar boundaries; tie-breaker rules"
+        ]
+      },
+      "notes": [
+        "Drop out-of-order ticks per policy; emit error event"
+      ],
+      "microservice_port": 8082
+    },
+    {
+      "module_id": "50000000000000000009",
+      "canonical_symbol": "C2_INDICATOR_ENGINE",
+      "module_name": "Indicator Engine",
+      "module_kind": "PIPELINE_STAGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 3,
+      "purpose": "Owns process step 9: Compute indicators.",
+      "scope_in": [
+        "Bar",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "IndicatorSnapshot"
+      ],
+      "responsibilities": [
+        "Compute indicators"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000008",
+          "relationship": "requires",
+          "reason": "Produces Bar."
+        }
+      ],
+      "key_functions": [
+        "indicator_engine"
+      ],
+      "interfaces": [
+        {
+          "name": "Bar",
+          "kind": "input",
+          "contract_type": "Bar"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "IndicatorSnapshot",
+          "kind": "output",
+          "contract_type": "IndicatorSnapshot"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 9,
+          "step_name": "Compute indicators",
+          "responsible": "indicator_engine.py",
+          "input_contract": "Bar + ResolvedConfig",
+          "output_contract": "IndicatorSnapshot",
+          "validation": "Deterministic rounding; indicator params pinned by config snapshot",
+          "failure": "Emit indicator error; do not output partial snapshots unless flagged",
+          "entrypoint_files": [
+            "services\\desktop-ui\\2099900128260118_expiry_indicator_service.py"
+          ]
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": [
+          "services\\desktop-ui\\2099900128260118_expiry_indicator_service.py"
+        ],
+        "module_root": "services\\desktop-ui\\2099900128260118_expiry_indicator_service.py"
+      },
+      "quality_gates": {
+        "invariants": [
+          "Deterministic rounding; indicator params pinned by config snapshot"
+        ]
+      },
+      "notes": [
+        "Emit indicator error; do not output partial snapshots unless flagged"
+      ],
+      "microservice_port": 8082
+    },
+    {
+      "module_id": "50000000000000000010",
+      "canonical_symbol": "C3_FEATURE_PACKAGER",
+      "module_name": "Feature Packager",
+      "module_kind": "PIPELINE_STAGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 3,
+      "purpose": "Owns process step 10: Assemble strategy feature frame.",
+      "scope_in": [
+        "IndicatorSnapshot",
+        "CalendarTrigger",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "FeatureFrame"
+      ],
+      "responsibilities": [
+        "Assemble strategy feature frame"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000006",
+          "relationship": "requires",
+          "reason": "Produces CalendarTrigger."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000009",
+          "relationship": "requires",
+          "reason": "Produces IndicatorSnapshot."
+        }
+      ],
+      "key_functions": [
+        "feature_packager"
+      ],
+      "interfaces": [
+        {
+          "name": "IndicatorSnapshot",
+          "kind": "input",
+          "contract_type": "IndicatorSnapshot"
+        },
+        {
+          "name": "CalendarTrigger",
+          "kind": "input",
+          "contract_type": "CalendarTrigger"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "FeatureFrame",
+          "kind": "output",
+          "contract_type": "FeatureFrame"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 10,
+          "step_name": "Assemble strategy feature frame",
+          "responsible": "feature_packager.py",
+          "input_contract": "IndicatorSnapshot + CalendarTrigger + ResolvedConfig",
+          "output_contract": "FeatureFrame",
+          "validation": "Exact declared feature set; stable ordering",
+          "failure": "Emit packaging error; do not emit FeatureFrame",
+          "entrypoint_files": []
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": []
+      },
+      "quality_gates": {
+        "invariants": [
+          "Exact declared feature set; stable ordering"
+        ]
+      },
+      "notes": [
+        "Emit packaging error; do not emit FeatureFrame"
+      ],
+      "microservice_port": 8082
+    },
+    {
+      "module_id": "50000000000000000011",
+      "canonical_symbol": "S1_SIGNAL_ENGINE",
+      "module_name": "Signal Engine",
+      "module_kind": "PIPELINE_STAGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 3,
+      "purpose": "Owns process step 11: Generate signal (or suppression).",
+      "scope_in": [
+        "FeatureFrame",
+        "PositionSummary",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "Signal",
+        "SignalSuppressed"
+      ],
+      "responsibilities": [
+        "Generate signal (or suppression)"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000010",
+          "relationship": "requires",
+          "reason": "Produces FeatureFrame."
+        }
+      ],
+      "key_functions": [
+        "signal_generator"
+      ],
+      "interfaces": [
+        {
+          "name": "FeatureFrame",
+          "kind": "input",
+          "contract_type": "FeatureFrame"
+        },
+        {
+          "name": "PositionSummary",
+          "kind": "input",
+          "contract_type": "PositionSummary"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "Signal",
+          "kind": "output",
+          "contract_type": "Signal"
+        },
+        {
+          "name": "SignalSuppressed",
+          "kind": "output",
+          "contract_type": "SignalSuppressed"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 11,
+          "step_name": "Generate signal (or suppression)",
+          "responsible": "signal_generator.py",
+          "input_contract": "FeatureFrame + PositionSummary + ResolvedConfig",
+          "output_contract": "Signal OR SignalSuppressed",
+          "validation": "Suppression reasons enumerated; no sizing/broker specifics",
+          "failure": "On internal error, emit SignalSuppressed with deterministic reason code",
+          "entrypoint_files": [
+            "compliance\\auto-remediation\\2099900012260118_remediation-engine.py"
+          ]
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": [
+          "compliance\\auto-remediation\\2099900012260118_remediation-engine.py"
+        ],
+        "module_root": "compliance\\auto-remediation\\2099900012260118_remediation-engine.py"
+      },
+      "quality_gates": {
+        "invariants": [
+          "Suppression reasons enumerated; no sizing/broker specifics"
+        ]
+      },
+      "notes": [
+        "On internal error, emit SignalSuppressed with deterministic reason code"
+      ],
+      "microservice_port": 8083
+    },
+    {
+      "module_id": "50000000000000000012",
+      "canonical_symbol": "S2_INTENT_BUILDER",
+      "module_name": "Intent Builder",
+      "module_kind": "PIPELINE_STAGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 3,
+      "purpose": "Owns process step 12: Convert signal to trade intent.",
+      "scope_in": [
+        "Signal",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "TradeIntent"
+      ],
+      "responsibilities": [
+        "Convert signal to trade intent"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000011",
+          "relationship": "requires",
+          "reason": "Produces Signal."
+        }
+      ],
+      "key_functions": [
+        "intent_builder"
+      ],
+      "interfaces": [
+        {
+          "name": "Signal",
+          "kind": "input",
+          "contract_type": "Signal"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "TradeIntent",
+          "kind": "output",
+          "contract_type": "TradeIntent"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 12,
+          "step_name": "Convert signal to trade intent",
+          "responsible": "intent_builder.py",
+          "input_contract": "Signal + ResolvedConfig",
+          "output_contract": "TradeIntent",
+          "validation": "Stable correlation_id from Signal; constraints + rationale attached",
+          "failure": "Reject intent; emit error event",
+          "entrypoint_files": []
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": []
+      },
+      "quality_gates": {
+        "invariants": [
+          "Stable correlation_id from Signal; constraints + rationale attached"
+        ]
+      },
+      "notes": [
+        "Reject intent; emit error event"
+      ],
+      "microservice_port": 8083
+    },
+    {
+      "module_id": "50000000000000000013",
+      "canonical_symbol": "R1_RISK_EVALUATOR",
+      "module_name": "Risk Evaluator",
+      "module_kind": "PIPELINE_STAGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 4,
+      "purpose": "Owns process step 13: Evaluate risk and size.",
+      "scope_in": [
+        "TradeIntent",
+        "PortfolioState",
+        "RiskPolicy",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "RiskDecision"
+      ],
+      "responsibilities": [
+        "Evaluate risk and size"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000012",
+          "relationship": "requires",
+          "reason": "Produces TradeIntent."
+        }
+      ],
+      "key_functions": [
+        "risk_manager"
+      ],
+      "interfaces": [
+        {
+          "name": "TradeIntent",
+          "kind": "input",
+          "contract_type": "TradeIntent"
+        },
+        {
+          "name": "PortfolioState",
+          "kind": "input",
+          "contract_type": "PortfolioState"
+        },
+        {
+          "name": "RiskPolicy",
+          "kind": "input",
+          "contract_type": "RiskPolicy"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "RiskDecision",
+          "kind": "output",
+          "contract_type": "RiskDecision"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 13,
+          "step_name": "Evaluate risk and size",
+          "responsible": "risk_manager.py",
+          "input_contract": "TradeIntent + PortfolioState + RiskPolicy + ResolvedConfig",
+          "output_contract": "RiskDecision (APPROVE/REJECT + reason codes + sized params)",
+          "validation": "Idempotent for same inputs; deterministic sizing + rounding",
+          "failure": "On rule engine failure default to REJECT with SAFETY_FAIL reason",
+          "entrypoint_files": []
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": []
+      },
+      "quality_gates": {
+        "invariants": [
+          "Idempotent for same inputs; deterministic sizing + rounding"
+        ]
+      },
+      "notes": [
+        "On rule engine failure default to REJECT with SAFETY_FAIL reason"
+      ],
+      "microservice_port": 8087
+    },
+    {
+      "module_id": "50000000000000000014",
+      "canonical_symbol": "R2_ORDER_INTENT_COMPILER",
+      "module_name": "Order Intent Compiler",
+      "module_kind": "PIPELINE_STAGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 4,
+      "purpose": "Owns process step 14: Compile order intent.",
+      "scope_in": [
+        "RiskDecision",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "OrderIntent"
+      ],
+      "responsibilities": [
+        "Compile order intent"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000013",
+          "relationship": "requires",
+          "reason": "Produces RiskDecision."
+        }
+      ],
+      "key_functions": [
+        "order_intent_compiler"
+      ],
+      "interfaces": [
+        {
+          "name": "RiskDecision",
+          "kind": "input",
+          "contract_type": "RiskDecision"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "OrderIntent",
+          "kind": "output",
+          "contract_type": "OrderIntent"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 14,
+          "step_name": "Compile order intent",
+          "responsible": "order_intent_compiler.py",
+          "input_contract": "RiskDecision + ResolvedConfig",
+          "output_contract": "OrderIntent",
+          "validation": "client_order_id + idempotency_key assigned per policy",
+          "failure": "If compilation fails, emit error; do not proceed to routing",
+          "entrypoint_files": [
+            "services\\transport-router\\src\\2099900199260118_main.py"
+          ]
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": [
+          "services\\transport-router\\src\\2099900199260118_main.py"
+        ],
+        "module_root": "services\\transport-router\\src\\2099900199260118_main.py"
+      },
+      "quality_gates": {
+        "invariants": [
+          "client_order_id + idempotency_key assigned per policy"
+        ]
+      },
+      "notes": [
+        "If compilation fails, emit error; do not proceed to routing"
+      ],
+      "microservice_port": 8087
+    },
+    {
+      "module_id": "50000000000000000015",
+      "canonical_symbol": "O1_ORDER_ROUTER",
+      "module_name": "Order Router",
+      "module_kind": "PIPELINE_STAGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 4,
+      "purpose": "Owns process step 15: Route order to broker.",
+      "scope_in": [
+        "OrderIntent",
+        "BrokerPolicy",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "RoutedOrderIntent"
+      ],
+      "responsibilities": [
+        "Route order to broker"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000014",
+          "relationship": "requires",
+          "reason": "Produces OrderIntent."
+        }
+      ],
+      "key_functions": [
+        "order_router"
+      ],
+      "interfaces": [
+        {
+          "name": "OrderIntent",
+          "kind": "input",
+          "contract_type": "OrderIntent"
+        },
+        {
+          "name": "BrokerPolicy",
+          "kind": "input",
+          "contract_type": "BrokerPolicy"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "RoutedOrderIntent",
+          "kind": "output",
+          "contract_type": "RoutedOrderIntent"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 15,
+          "step_name": "Route order to broker",
+          "responsible": "order_router.py",
+          "input_contract": "OrderIntent + BrokerPolicy + ResolvedConfig",
+          "output_contract": "RoutedOrderIntent",
+          "validation": "Routing deterministic; preserves OrderIntent hash",
+          "failure": "If routing fails, emit error and reject",
+          "entrypoint_files": [
+            "services\\transport-router\\src\\2099900199260118_main.py"
+          ]
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": [
+          "services\\transport-router\\src\\2099900199260118_main.py"
+        ],
+        "module_root": "services\\transport-router\\src\\2099900199260118_main.py"
+      },
+      "quality_gates": {
+        "invariants": [
+          "Routing deterministic; preserves OrderIntent hash"
+        ]
+      },
+      "notes": [
+        "If routing fails, emit error and reject"
+      ]
+    },
+    {
+      "module_id": "50000000000000000016",
+      "canonical_symbol": "B1_MT4_ADAPTER_TRANSPORT",
+      "module_name": "MT4 Adapter Transport",
+      "module_kind": "INTEGRATION_BRIDGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 4,
+      "purpose": "Owns process step 16: Serialize and send to MT4 adapter.",
+      "scope_in": [
+        "RoutedOrderIntent",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "BrokerOrderEnvelope",
+        "AdapterAck"
+      ],
+      "responsibilities": [
+        "Serialize and send to MT4 adapter"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000015",
+          "relationship": "requires",
+          "reason": "Produces RoutedOrderIntent."
+        }
+      ],
+      "key_functions": [
+        "transport_service"
+      ],
+      "interfaces": [
+        {
+          "name": "RoutedOrderIntent",
+          "kind": "input",
+          "contract_type": "RoutedOrderIntent"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "BrokerOrderEnvelope",
+          "kind": "output",
+          "contract_type": "BrokerOrderEnvelope"
+        },
+        {
+          "name": "AdapterAck",
+          "kind": "output",
+          "contract_type": "AdapterAck"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 16,
+          "step_name": "Serialize and send to MT4 adapter",
+          "responsible": "transport_service.py",
+          "input_contract": "RoutedOrderIntent + ResolvedConfig",
+          "output_contract": "BrokerOrderEnvelope + AdapterAck",
+          "validation": "Atomic write+rename (no partial reads); sequence + hash; idempotent resend",
+          "failure": "Deterministic retry schedule; on persistent failure emit TransportError and stop",
+          "entrypoint_files": [
+            "services\\transport-router\\src\\2099900199260118_main.py"
+          ]
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": [
+          "services\\transport-router\\src\\2099900199260118_main.py"
+        ],
+        "module_root": "services\\transport-router\\src\\2099900199260118_main.py"
+      },
+      "quality_gates": {
+        "invariants": [
+          "Atomic write+rename (no partial reads); sequence + hash; idempotent resend"
+        ]
+      },
+      "notes": [
+        "Deterministic retry schedule; on persistent failure emit TransportError and stop"
+      ],
+      "microservice_port": 5555,
+      "ea_system": "B",
+      "communication_channel_bindings": [
+        {
+          "channel_id": "jsonl_outbox",
+          "channel_type": "File-Based Outbox (JSON Lines)",
+          "direction": "Python -> MT4",
+          "data_contracts": [
+            "Signal_v1"
+          ]
+        },
+        {
+          "channel_id": "csv_transport",
+          "channel_type": "CSV File Polling",
+          "direction": "Python <-> MT4",
+          "data_contracts": [
+            "OrderIntent_v1_2"
+          ],
+          "associated_files": [
+            "services/transport-router/src/2099900202260118_router.py",
+            "services/transport-router/src/2099900204260118_watcher.py"
+          ]
+        },
+        {
+          "channel_id": "tcp_socket_fallback",
+          "channel_type": "TCP Socket",
+          "port": 5555,
+          "direction": "Python <-> MT4",
+          "enabled_by_default": false,
+          "data_contracts": [
+            "OrderIntent_v1_2"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "50000000000000000017",
+      "canonical_symbol": "B2_MT4_EA_EXECUTOR",
+      "module_name": "MT4 EA Executor",
+      "module_kind": "INTEGRATION_BRIDGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 4,
+      "purpose": "Owns process step 17: EA executes broker order.",
+      "scope_in": [
+        "BrokerOrderEnvelope"
+      ],
+      "scope_out": [
+        "BrokerExecEvent",
+        "EAHealth"
+      ],
+      "responsibilities": [
+        "EA executes broker order"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000016",
+          "relationship": "requires",
+          "reason": "Produces BrokerOrderEnvelope."
+        }
+      ],
+      "key_functions": [
+        "EAFIX"
+      ],
+      "interfaces": [
+        {
+          "name": "BrokerOrderEnvelope",
+          "kind": "input",
+          "contract_type": "BrokerOrderEnvelope"
+        },
+        {
+          "name": "BrokerExecEvent",
+          "kind": "output",
+          "contract_type": "BrokerExecEvent"
+        },
+        {
+          "name": "EAHealth",
+          "kind": "output",
+          "contract_type": "EAHealth"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 17,
+          "step_name": "EA executes broker order",
+          "responsible": "EAFIX.mq4",
+          "input_contract": "BrokerOrderEnvelope",
+          "output_contract": "BrokerExecEvent (accept/fill/reject/close) + EAHealth",
+          "validation": "EA contains no strategy/risk logic; only execution",
+          "failure": "Classify and emit error events; retries per deterministic policy",
+          "entrypoint_files": [
+            "services\\transport-router\\src\\2099900199260118_main.py"
+          ]
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": [
+          "services\\transport-router\\src\\2099900199260118_main.py"
+        ],
+        "module_root": "services\\transport-router\\src\\2099900199260118_main.py"
+      },
+      "quality_gates": {
+        "invariants": [
+          "EA contains no strategy/risk logic; only execution"
+        ]
+      },
+      "notes": [
+        "Classify and emit error events; retries per deterministic policy"
+      ],
+      "microservice_port": 5001,
+      "ea_system": "A",
+      "communication_channel_bindings": [
+        {
+          "channel_id": "http_rest_primary",
+          "channel_type": "HTTP REST API",
+          "port": 5001,
+          "direction": "MT4 -> Python",
+          "routes": [
+            "/expiries.csv",
+            "/indicators.csv",
+            "/health",
+            "/spot"
+          ],
+          "data_contracts": [
+            "ExecutionReport_v1"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "50000000000000000018",
+      "canonical_symbol": "B3_EXEC_EVENT_NORMALIZER",
+      "module_name": "Exec Event Normalizer",
+      "module_kind": "INTEGRATION_BRIDGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 4,
+      "purpose": "Owns process step 18: Normalize broker events to canonical reports.",
+      "scope_in": [
+        "BrokerExecEvent",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "ExecutionReport",
+        "PositionSnapshot"
+      ],
+      "responsibilities": [
+        "Normalize broker events to canonical reports"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000017",
+          "relationship": "requires",
+          "reason": "Produces BrokerExecEvent."
+        }
+      ],
+      "key_functions": [
+        "result_processor"
+      ],
+      "interfaces": [
+        {
+          "name": "BrokerExecEvent",
+          "kind": "input",
+          "contract_type": "BrokerExecEvent"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "ExecutionReport",
+          "kind": "output",
+          "contract_type": "ExecutionReport"
+        },
+        {
+          "name": "PositionSnapshot",
+          "kind": "output",
+          "contract_type": "PositionSnapshot"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 18,
+          "step_name": "Normalize broker events to canonical reports",
+          "responsible": "result_processor.py",
+          "input_contract": "BrokerExecEvent + ResolvedConfig",
+          "output_contract": "ExecutionReport + PositionSnapshot",
+          "validation": "Dedup + ordering policy; canonical rounding",
+          "failure": "Emit NormalizationError; quarantine malformed broker events",
+          "entrypoint_files": [
+            "services\\event-gateway\\src\\2099900141260118_main.py"
+          ]
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": [
+          "services\\event-gateway\\src\\2099900141260118_main.py"
+        ],
+        "module_root": "services\\event-gateway\\src\\2099900141260118_main.py"
+      },
+      "quality_gates": {
+        "invariants": [
+          "Dedup + ordering policy; canonical rounding"
+        ]
+      },
+      "notes": [
+        "Emit NormalizationError; quarantine malformed broker events"
+      ],
+      "ea_system": "D",
+      "communication_channel_bindings": [
+        {
+          "channel_id": "redis_pubsub_bus",
+          "channel_type": "Redis Pub/Sub",
+          "direction": "Python internal",
+          "redis_topics": [
+            {
+              "topic": "eafix.data.prices",
+              "purpose": "Price ticks from DDE ingestor"
+            },
+            {
+              "topic": "eafix.orders.validated",
+              "purpose": "Order intents to execution engine"
+            },
+            {
+              "topic": "eafix.execution.completed",
+              "purpose": "Fill reports back from MT4"
+            }
+          ],
+          "data_contracts": [
+            "ExecutionReport_v1"
+          ]
+        }
+      ]
+    },
+    {
+      "module_id": "50000000000000000019",
+      "canonical_symbol": "O2_OMS_STATE_MACHINE",
+      "module_name": "OMS State Machine",
+      "module_kind": "PIPELINE_STAGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 4,
+      "purpose": "Owns process step 19: Apply execution reports to OMS state.",
+      "scope_in": [
+        "RoutedOrderIntent",
+        "ExecutionReport",
+        "PositionSnapshot",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "OrderStateChanged",
+        "PositionStateChanged",
+        "TradeClosedRaw"
+      ],
+      "responsibilities": [
+        "Apply execution reports to OMS state"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000015",
+          "relationship": "requires",
+          "reason": "Produces RoutedOrderIntent."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000018",
+          "relationship": "requires",
+          "reason": "Produces ExecutionReport. Produces PositionSnapshot."
+        }
+      ],
+      "key_functions": [
+        "oms"
+      ],
+      "interfaces": [
+        {
+          "name": "RoutedOrderIntent",
+          "kind": "input",
+          "contract_type": "RoutedOrderIntent"
+        },
+        {
+          "name": "ExecutionReport",
+          "kind": "input",
+          "contract_type": "ExecutionReport"
+        },
+        {
+          "name": "PositionSnapshot",
+          "kind": "input",
+          "contract_type": "PositionSnapshot"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "OrderStateChanged",
+          "kind": "output",
+          "contract_type": "OrderStateChanged"
+        },
+        {
+          "name": "PositionStateChanged",
+          "kind": "output",
+          "contract_type": "PositionStateChanged"
+        },
+        {
+          "name": "TradeClosedRaw",
+          "kind": "output",
+          "contract_type": "TradeClosedRaw"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 19,
+          "step_name": "Apply execution reports to OMS state",
+          "responsible": "oms.py",
+          "input_contract": "RoutedOrderIntent + ExecutionReport + PositionSnapshot + ResolvedConfig",
+          "output_contract": "OrderStateChanged + PositionStateChanged + TradeClosedRaw",
+          "validation": "Idempotent fills; out-of-order handling per policy; stable final state",
+          "failure": "On OMS inconsistency, quarantine stream and halt new orders",
+          "entrypoint_files": []
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": []
+      },
+      "quality_gates": {
+        "invariants": [
+          "Idempotent fills; out-of-order handling per policy; stable final state"
+        ]
+      },
+      "notes": [
+        "On OMS inconsistency, quarantine stream and halt new orders"
+      ],
+      "legacy_aliases": [
+        "O2_OMS"
+      ]
+    },
+    {
+      "module_id": "50000000000000000020",
+      "canonical_symbol": "O3_TRADE_CLOSE_CLASSIFIER",
+      "module_name": "Trade Close Classifier",
+      "module_kind": "PIPELINE_STAGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 4,
+      "purpose": "Owns process step 20: Classify trade close and compute canonical PnL.",
+      "scope_in": [
+        "TradeClosedRaw",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "TradeClosed"
+      ],
+      "responsibilities": [
+        "Classify trade close and compute canonical PnL"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000019",
+          "relationship": "requires",
+          "reason": "Produces TradeClosedRaw."
+        }
+      ],
+      "key_functions": [
+        "trade_close_classifier"
+      ],
+      "interfaces": [
+        {
+          "name": "TradeClosedRaw",
+          "kind": "input",
+          "contract_type": "TradeClosedRaw"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "TradeClosed",
+          "kind": "output",
+          "contract_type": "TradeClosed"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 20,
+          "step_name": "Classify trade close and compute canonical PnL",
+          "responsible": "trade_close_classifier.py",
+          "input_contract": "TradeClosedRaw + ResolvedConfig",
+          "output_contract": "TradeClosed",
+          "validation": "Close reason enum; deterministic PnL rounding rules",
+          "failure": "If PnL cannot be computed, emit TradeClosed with COMPUTATION_ERROR flag",
+          "entrypoint_files": []
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": []
+      },
+      "quality_gates": {
+        "invariants": [
+          "Close reason enum; deterministic PnL rounding rules"
+        ]
+      },
+      "notes": [
+        "If PnL cannot be computed, emit TradeClosed with COMPUTATION_ERROR flag"
+      ],
+      "legacy_aliases": [
+        "O3_PNL_CLASSIFIER"
+      ]
+    },
+    {
+      "module_id": "50000000000000000021",
+      "canonical_symbol": "E1_OUTCOME_BUCKETIZER",
+      "module_name": "Outcome Bucketizer",
+      "module_kind": "PIPELINE_STAGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 4,
+      "purpose": "Owns process step 21: Bucketize outcome.",
+      "scope_in": [
+        "TradeClosed",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "OutcomeBucket"
+      ],
+      "responsibilities": [
+        "Bucketize outcome"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000020",
+          "relationship": "requires",
+          "reason": "Produces TradeClosed."
+        }
+      ],
+      "key_functions": [
+        "outcome_bucketizer"
+      ],
+      "interfaces": [
+        {
+          "name": "TradeClosed",
+          "kind": "input",
+          "contract_type": "TradeClosed"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "OutcomeBucket",
+          "kind": "output",
+          "contract_type": "OutcomeBucket"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 21,
+          "step_name": "Bucketize outcome",
+          "responsible": "outcome_bucketizer.py",
+          "input_contract": "TradeClosed + ResolvedConfig",
+          "output_contract": "OutcomeBucket",
+          "validation": "Only enumerated buckets; stable bucket mapping",
+          "failure": "If mapping fails, emit UNKNOWN bucket and quarantine for review",
+          "entrypoint_files": []
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": []
+      },
+      "quality_gates": {
+        "invariants": [
+          "Only enumerated buckets; stable bucket mapping"
+        ]
+      },
+      "notes": [
+        "If mapping fails, emit UNKNOWN bucket and quarantine for review",
+        "Reentry matrix v1.0 pre-modular detail: EA-REG/superseded/LEGACY_HUEY_P_TACTICAL_SPEC_pre-modular.txt (superseded by v3.0)"
+      ],
+      "reentry_matrix_ref": {
+        "matrix_version": "v3.0",
+        "dimensions": {
+          "signal_types": 8,
+          "outcomes": 6,
+          "proximity_zones": 4,
+          "duration_conditional": true
+        },
+        "combinations_per_symbol": 652,
+        "generation_hard_stop": "R2",
+        "signal_types": [
+          "ECO_HIGH",
+          "ECO_MED",
+          "ANTICIPATION_1HR",
+          "ANTICIPATION_8HR",
+          "EQUITY_OPEN_ASIA",
+          "EQUITY_OPEN_EUROPE",
+          "EQUITY_OPEN_USA",
+          "ALL_INDICATORS"
+        ],
+        "proximity_zones": {
+          "IMMEDIATE": "0-15m",
+          "SHORT": "16-60m",
+          "LONG": "61-480m",
+          "EXTENDED": "481-1440m"
+        },
+        "source": "EA-REG/superseded/LEGACY_HUEY_P_TACTICAL_SPEC_pre-modular.txt + EAFIX Module Map Group 7"
+      }
+    },
+    {
+      "module_id": "50000000000000000022",
+      "canonical_symbol": "E2_PROXIMITY_EVALUATOR",
+      "module_name": "Proximity Evaluator",
+      "module_kind": "PIPELINE_STAGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 4,
+      "purpose": "Owns process step 22: Compute event proximity.",
+      "scope_in": [
+        "CalendarEvent",
+        "ClockTick",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "EventProximity"
+      ],
+      "responsibilities": [
+        "Compute event proximity"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000004",
+          "relationship": "requires",
+          "reason": "Produces CalendarEvent."
+        }
+      ],
+      "key_functions": [
+        "proximity_evaluator"
+      ],
+      "interfaces": [
+        {
+          "name": "CalendarEvent",
+          "kind": "input",
+          "contract_type": "CalendarEvent"
+        },
+        {
+          "name": "ClockTick",
+          "kind": "input",
+          "contract_type": "ClockTick"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "EventProximity",
+          "kind": "output",
+          "contract_type": "EventProximity"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 22,
+          "step_name": "Compute event proximity",
+          "responsible": "proximity_evaluator.py",
+          "input_contract": "CalendarEvent + ClockTick + ResolvedConfig",
+          "output_contract": "EventProximity",
+          "validation": "Frozen-time supported; thresholds validated (no overlaps/gaps)",
+          "failure": "Emit proximity error; default to MOST_CONSERVATIVE proximity bucket",
+          "entrypoint_files": [
+            "services\\event-gateway\\src\\2099900141260118_main.py"
+          ]
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": [
+          "services\\event-gateway\\src\\2099900141260118_main.py"
+        ],
+        "module_root": "services\\event-gateway\\src\\2099900141260118_main.py"
+      },
+      "quality_gates": {
+        "invariants": [
+          "Frozen-time supported; thresholds validated (no overlaps/gaps)"
+        ]
+      },
+      "notes": [
+        "Emit proximity error; default to MOST_CONSERVATIVE proximity bucket",
+        "Reentry matrix v1.0 pre-modular detail: EA-REG/superseded/LEGACY_HUEY_P_TACTICAL_SPEC_pre-modular.txt (superseded by v3.0)"
+      ],
+      "microservice_port": 8085,
+      "reentry_matrix_ref": {
+        "matrix_version": "v3.0",
+        "dimensions": {
+          "signal_types": 8,
+          "outcomes": 6,
+          "proximity_zones": 4,
+          "duration_conditional": true
+        },
+        "combinations_per_symbol": 652,
+        "generation_hard_stop": "R2",
+        "signal_types": [
+          "ECO_HIGH",
+          "ECO_MED",
+          "ANTICIPATION_1HR",
+          "ANTICIPATION_8HR",
+          "EQUITY_OPEN_ASIA",
+          "EQUITY_OPEN_EUROPE",
+          "EQUITY_OPEN_USA",
+          "ALL_INDICATORS"
+        ],
+        "proximity_zones": {
+          "IMMEDIATE": "0-15m",
+          "SHORT": "16-60m",
+          "LONG": "61-480m",
+          "EXTENDED": "481-1440m"
+        },
+        "source": "EA-REG/superseded/LEGACY_HUEY_P_TACTICAL_SPEC_pre-modular.txt + EAFIX Module Map Group 7"
+      }
+    },
+    {
+      "module_id": "50000000000000000023",
+      "canonical_symbol": "E3_MATRIX_LOOKUP",
+      "module_name": "Matrix Lookup",
+      "module_kind": "PIPELINE_STAGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 4,
+      "purpose": "Owns process step 23: Lookup matrix decision.",
+      "scope_in": [
+        "OutcomeBucket",
+        "EventProximity",
+        "SignalContext",
+        "MatrixProfile",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "MatrixDecision"
+      ],
+      "responsibilities": [
+        "Lookup matrix decision"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000021",
+          "relationship": "requires",
+          "reason": "Produces OutcomeBucket."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000022",
+          "relationship": "requires",
+          "reason": "Produces EventProximity."
+        }
+      ],
+      "key_functions": [
+        "matrix_lookup"
+      ],
+      "interfaces": [
+        {
+          "name": "OutcomeBucket",
+          "kind": "input",
+          "contract_type": "OutcomeBucket"
+        },
+        {
+          "name": "EventProximity",
+          "kind": "input",
+          "contract_type": "EventProximity"
+        },
+        {
+          "name": "SignalContext",
+          "kind": "input",
+          "contract_type": "SignalContext"
+        },
+        {
+          "name": "MatrixProfile",
+          "kind": "input",
+          "contract_type": "MatrixProfile"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "MatrixDecision",
+          "kind": "output",
+          "contract_type": "MatrixDecision"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 23,
+          "step_name": "Lookup matrix decision",
+          "responsible": "matrix_lookup.py",
+          "input_contract": "OutcomeBucket + EventProximity + SignalContext + MatrixProfile + ResolvedConfig",
+          "output_contract": "MatrixDecision (or MatrixFallbackUsed)",
+          "validation": "Deterministic fallback hierarchy; matrix version pinned",
+          "failure": "If matrix missing, emit MatrixFallbackUsed + safest MatrixDecision",
+          "entrypoint_files": [
+            "services\\reentry-matrix-svc\\src\\2099900174260118_main.py"
+          ]
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": [
+          "services\\reentry-matrix-svc\\src\\2099900174260118_main.py"
+        ],
+        "module_root": "services\\reentry-matrix-svc\\src\\2099900174260118_main.py"
+      },
+      "quality_gates": {
+        "invariants": [
+          "Deterministic fallback hierarchy; matrix version pinned"
+        ]
+      },
+      "notes": [
+        "If matrix missing, emit MatrixFallbackUsed + safest MatrixDecision",
+        "Reentry matrix v1.0 pre-modular detail: EA-REG/superseded/LEGACY_HUEY_P_TACTICAL_SPEC_pre-modular.txt (superseded by v3.0)"
+      ],
+      "microservice_port": 8085,
+      "reentry_matrix_ref": {
+        "matrix_version": "v3.0",
+        "dimensions": {
+          "signal_types": 8,
+          "outcomes": 6,
+          "proximity_zones": 4,
+          "duration_conditional": true
+        },
+        "combinations_per_symbol": 652,
+        "generation_hard_stop": "R2",
+        "signal_types": [
+          "ECO_HIGH",
+          "ECO_MED",
+          "ANTICIPATION_1HR",
+          "ANTICIPATION_8HR",
+          "EQUITY_OPEN_ASIA",
+          "EQUITY_OPEN_EUROPE",
+          "EQUITY_OPEN_USA",
+          "ALL_INDICATORS"
+        ],
+        "proximity_zones": {
+          "IMMEDIATE": "0-15m",
+          "SHORT": "16-60m",
+          "LONG": "61-480m",
+          "EXTENDED": "481-1440m"
+        },
+        "source": "EA-REG/superseded/LEGACY_HUEY_P_TACTICAL_SPEC_pre-modular.txt + EAFIX Module Map Group 7"
+      }
+    },
+    {
+      "module_id": "50000000000000000024",
+      "canonical_symbol": "E4_REENTRY_INTENT_BUILDER",
+      "module_name": "Reentry Intent Builder",
+      "module_kind": "PIPELINE_STAGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 4,
+      "purpose": "Owns process step 24: Build reentry trade intent (or suppress).",
+      "scope_in": [
+        "MatrixDecision",
+        "ReentryChainState",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "TradeIntent",
+        "ReentrySuppressed"
+      ],
+      "responsibilities": [
+        "Build reentry trade intent (or suppress)"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000023",
+          "relationship": "requires",
+          "reason": "Produces MatrixDecision."
+        }
+      ],
+      "key_functions": [
+        "reentry_intent_builder"
+      ],
+      "interfaces": [
+        {
+          "name": "MatrixDecision",
+          "kind": "input",
+          "contract_type": "MatrixDecision"
+        },
+        {
+          "name": "ReentryChainState",
+          "kind": "input",
+          "contract_type": "ReentryChainState"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "TradeIntent",
+          "kind": "output",
+          "contract_type": "TradeIntent"
+        },
+        {
+          "name": "ReentrySuppressed",
+          "kind": "output",
+          "contract_type": "ReentrySuppressed"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 24,
+          "step_name": "Build reentry trade intent (or suppress)",
+          "responsible": "reentry_intent_builder.py",
+          "input_contract": "MatrixDecision + ReentryChainState + ResolvedConfig",
+          "output_contract": "TradeIntent OR ReentrySuppressed",
+          "validation": "Hard cap: no reentry beyond R2; no circular chains",
+          "failure": "Emit ReentrySuppressed with deterministic reason",
+          "entrypoint_files": [
+            "services\\reentry-engine\\src\\2099900166260118_main.py"
+          ]
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": [
+          "services\\reentry-engine\\src\\2099900166260118_main.py"
+        ],
+        "module_root": "services\\reentry-engine\\src\\2099900166260118_main.py"
+      },
+      "quality_gates": {
+        "invariants": [
+          "Hard cap: no reentry beyond R2; no circular chains"
+        ]
+      },
+      "notes": [
+        "Emit ReentrySuppressed with deterministic reason",
+        "Reentry matrix v1.0 pre-modular detail: EA-REG/superseded/LEGACY_HUEY_P_TACTICAL_SPEC_pre-modular.txt (superseded by v3.0)"
+      ],
+      "reentry_matrix_ref": {
+        "matrix_version": "v3.0",
+        "dimensions": {
+          "signal_types": 8,
+          "outcomes": 6,
+          "proximity_zones": 4,
+          "duration_conditional": true
+        },
+        "combinations_per_symbol": 652,
+        "generation_hard_stop": "R2",
+        "signal_types": [
+          "ECO_HIGH",
+          "ECO_MED",
+          "ANTICIPATION_1HR",
+          "ANTICIPATION_8HR",
+          "EQUITY_OPEN_ASIA",
+          "EQUITY_OPEN_EUROPE",
+          "EQUITY_OPEN_USA",
+          "ALL_INDICATORS"
+        ],
+        "proximity_zones": {
+          "IMMEDIATE": "0-15m",
+          "SHORT": "16-60m",
+          "LONG": "61-480m",
+          "EXTENDED": "481-1440m"
+        },
+        "source": "EA-REG/superseded/LEGACY_HUEY_P_TACTICAL_SPEC_pre-modular.txt + EAFIX Module Map Group 7"
+      }
+    },
+    {
+      "module_id": "50000000000000000025",
+      "canonical_symbol": "F1_FLOW_ORCHESTRATOR",
+      "module_name": "Flow Orchestrator",
+      "module_kind": "INFRA_PLATFORM_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": "unassigned",
+      "purpose": "Owns process step 25: Loop: reentry intent follows same risk->order->route->transport->execute chain.",
+      "scope_in": [
+        "TradeIntent"
+      ],
+      "scope_out": [
+        "Either",
+        "RoutedOrderIntent",
+        "OutcomeBucket"
+      ],
+      "responsibilities": [
+        "Loop: reentry intent follows same risk->order->route->transport->execute chain"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000012",
+          "relationship": "requires",
+          "reason": "Produces TradeIntent."
+        },
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000024",
+          "relationship": "requires",
+          "reason": "Explicitly references step 24. Produces TradeIntent."
+        }
+      ],
+      "key_functions": [
+        "orchestrator"
+      ],
+      "interfaces": [
+        {
+          "name": "TradeIntent",
+          "kind": "input",
+          "contract_type": "TradeIntent"
+        },
+        {
+          "name": "Either",
+          "kind": "output",
+          "contract_type": "Either"
+        },
+        {
+          "name": "RoutedOrderIntent",
+          "kind": "output",
+          "contract_type": "RoutedOrderIntent"
+        },
+        {
+          "name": "OutcomeBucket",
+          "kind": "output",
+          "contract_type": "OutcomeBucket"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 25,
+          "step_name": "Loop: reentry intent follows same risk->order->route->transport->execute chain",
+          "responsible": "orchestrator",
+          "input_contract": "TradeIntent from Step 24",
+          "output_contract": "Either (a) new RoutedOrderIntent executed, producing new OutcomeBucket, or (b) suppression/cooldown state update",
+          "validation": "Chain depth < configured max; velocity limits; idempotency keys enforced",
+          "failure": "On loop prevention trigger, enforce terminal cooldown and stop",
+          "entrypoint_files": [
+            "services\\transport-router\\src\\2099900199260118_main.py"
+          ]
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": [
+          "services\\transport-router\\src\\2099900199260118_main.py"
+        ],
+        "module_root": "services\\transport-router\\src\\2099900199260118_main.py"
+      },
+      "quality_gates": {
+        "invariants": [
+          "Chain depth < configured max; velocity limits; idempotency keys enforced"
+        ]
+      },
+      "notes": [
+        "On loop prevention trigger, enforce terminal cooldown and stop"
+      ],
+      "microservice_port": 8088
+    },
+    {
+      "module_id": "50000000000000000026",
+      "canonical_symbol": "P1_HEALTH_AGGREGATOR",
+      "module_name": "Health Aggregator",
+      "module_kind": "OBSERVABILITY_REPORTING_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": 1,
+      "purpose": "Owns process step 26: Health aggregation + SLO evaluation.",
+      "scope_in": [
+        "AdapterHealth",
+        "ModuleHealth",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "HealthReport"
+      ],
+      "responsibilities": [
+        "Health aggregation + SLO evaluation"
+      ],
+      "dependencies": [
+        {
+          "target_type": "module",
+          "target_id": "50000000000000000001",
+          "relationship": "requires",
+          "reason": "Produces ResolvedConfig."
+        }
+      ],
+      "key_functions": [
+        "health_service"
+      ],
+      "interfaces": [
+        {
+          "name": "AdapterHealth",
+          "kind": "input",
+          "contract_type": "AdapterHealth"
+        },
+        {
+          "name": "ModuleHealth",
+          "kind": "input",
+          "contract_type": "ModuleHealth"
+        },
+        {
+          "name": "ResolvedConfig",
+          "kind": "input",
+          "contract_type": "ResolvedConfig"
+        },
+        {
+          "name": "HealthReport",
+          "kind": "output",
+          "contract_type": "HealthReport"
+        }
+      ],
+      "process_bindings": [
+        {
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_version": "2.0.0",
+          "step_number": 26,
+          "step_name": "Health aggregation + SLO evaluation",
+          "responsible": "health_service.py",
+          "input_contract": "AdapterHealth + ModuleHealth + ResolvedConfig",
+          "output_contract": "HealthReport",
+          "validation": "Deterministic thresholds; stable report format",
+          "failure": "If health is unknown, default to risk-off posture (suppress new intents)",
+          "entrypoint_files": [
+            "services\\telemetry-daemon\\src\\2099900192260118_main.py"
+          ]
+        }
+      ],
+      "filesystem_hints": {
+        "entrypoint_files": [
+          "services\\telemetry-daemon\\src\\2099900192260118_main.py"
+        ],
+        "module_root": "services\\telemetry-daemon\\src\\2099900192260118_main.py"
+      },
+      "quality_gates": {
+        "invariants": [
+          "Deterministic thresholds; stable report format"
+        ]
+      },
+      "notes": [
+        "If health is unknown, default to risk-off posture (suppress new intents)"
+      ]
+    },
+    {
+      "module_id": "50000000000000000099",
+      "canonical_symbol": "SHARED_LIBS",
+      "module_name": "Shared Libraries",
+      "module_kind": "PIPELINE_STAGE_MODULE",
+      "version": "1.0.0",
+      "status": "canonical",
+      "layer": "unassigned",
+      "purpose": "Owns cross-cutting shared libraries used across canonical modules.",
+      "scope_in": [],
+      "scope_out": [],
+      "responsibilities": [
+        "Provide reusable shared utilities and middleware."
+      ],
+      "dependencies": [],
+      "key_functions": [],
+      "interfaces": [],
+      "process_bindings": [],
+      "filesystem_hints": {
+        "module_root": "shared"
+      }
+    }
+  ],
+  "created_at_utc": "2026-03-11T00:00:00Z",
+  "updated_at_utc": "2026-05-04T00:00:00Z"
+}

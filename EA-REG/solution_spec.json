@@ -1,0 +1,4150 @@
+{
+  "template_metadata": {
+    "version": "3.0.0",
+    "last_updated": "2026-03-15",
+    "purpose": "Plan to migrate eafix-modular repository to unified physical and semantic identity system, update generation and validation scripts.",
+    "format": "json",
+    "schema_version": "3.0.0",
+    "breaking_changes": [
+      "Added step-level contracts with inputs/outputs/invariants",
+      "Added step_id tracking throughout pipeline",
+      "Added step evidence requirements",
+      "Added step-level file scoping",
+      "Removed PH-08 Archive & Cleanup (deferred to separate follow-on plan)",
+      "Added path normalization contract",
+      "Formalized 11-column physical_id_registry.csv schema",
+      "Added file_scope_class column to file_registry.csv",
+      "Added semantic_coverage_pct metric and acceptance gate",
+      "Absorbed contracts from numeric_only_identifier_migration.json and stripped_down_id_migration_spec.json"
+    ]
+  },
+  "critical_constraint": {
+    "name": "NO_IMPLIED_BEHAVIOR",
+    "rules": [
+      "Every rule, gate, and contract must be expressible as: config entry, executable command, evidence artifact path, pass/fail condition",
+      "Items that cannot be expressed this way MUST be marked NOT_AUTOMATABLE and escalated to manual steps",
+      "EVERY STEP must have explicit inputs/outputs/invariants defined"
+    ]
+  },
+  "usage_instructions": {
+    "steps": [
+      "Read the entire template to understand the structure",
+      "Fill in all sections with project-specific details",
+      "Define step-level contracts for EVERY execution step",
+      "Generate complete file manifest with read/write permissions for each phase AND step",
+      "Generate executable commands for every gate and validation",
+      "Define regex patterns for all expected outputs",
+      "Create decision ledger entries for all choices made",
+      "Output ONE complete plan document following this structure"
+    ]
+  },
+  "v3_enhancements": {
+    "step_level_contracts": {
+      "description": "Machine-checkable contracts at individual step granularity",
+      "features": [
+        "inputs: explicit file/data requirements with must_exist checks",
+        "outputs: guaranteed artifacts with path policies",
+        "invariants: things that must remain true during step execution",
+        "preconditions: checks before step starts",
+        "postconditions: checks after step completes",
+        "failure_modes: enumerated error codes with remediation",
+        "file_scope: per-step allowed/forbidden paths"
+      ],
+      "enforcement": {
+        "validator_command": "python scripts/validate_step_contract.py {phase} {step_id}",
+        "expect_exit_code": 0,
+        "evidence": ".state/evidence/{phase}/{step_id}/contract_validation.json"
+      }
+    },
+    "step_evidence_chain": {
+      "description": "Cryptographic evidence chain linking steps",
+      "features": [
+        "step_start_hash: SHA256 of inputs + preconditions",
+        "step_end_hash: SHA256 of outputs + postconditions",
+        "previous_step_hash: link to parent step",
+        "chain_validation: verify unbroken evidence chain"
+      ],
+      "validation_command": "python scripts/validate_evidence_chain.py {phase}",
+      "evidence": ".state/evidence/{phase}/evidence_chain.json"
+    },
+    "step_file_scoping": {
+      "description": "Per-step file access control",
+      "features": [
+        "allowed_paths: glob patterns for permitted access",
+        "forbidden_paths: glob patterns for denied access",
+        "read_only_paths: paths that cannot be modified",
+        "enforcement via git hooks or pre-execution checks"
+      ],
+      "violation_action": "abort_step",
+      "validator_command": "python scripts/check_step_file_scope.py {phase} {step_id}"
+    }
+  },
+  "task_analysis": {
+    "original_request": "Analyze all provided project source files and attached artifacts to identify the exact remaining development steps required to deliver a 100% production-ready, fully functional version of this project.",
+    "specificity_transformation": {
+      "objective": {
+        "project_name": "eafix-modular identity migration",
+        "ground_truth_level": "L5",
+        "quantified_targets": [
+          "95% test coverage minimum",
+          "0 duplicate identifiers",
+          "All semantic keys numeric",
+          "All physical objects covered"
+        ]
+      },
+      "methodology": {
+        "phases": [
+          "PH-00",
+          "PH-01",
+          "PH-02",
+          "PH-03",
+          "PH-04",
+          "PH-05",
+          "PH-06",
+          "PH-07"
+        ],
+        "parallel_groups": [
+          [
+            "PH-04"
+          ]
+        ],
+        "steps_per_phase": {
+          "PH-00": 4,
+          "PH-01": 2,
+          "PH-02": 5,
+          "PH-03": 2,
+          "PH-04": 2,
+          "PH-05": 2,
+          "PH-06": 3,
+          "PH-07": 4
+        }
+      },
+      "success_criteria": {
+        "gates": [
+          "G-00",
+          "G-01",
+          "G-02",
+          "G-03",
+          "G-04",
+          "G-05",
+          "G-06",
+          "G-07"
+        ],
+        "steps": []
+      }
+    },
+    "classification": {
+      "complexity": "enterprise",
+      "domain": "software migration",
+      "quality": "production-ready",
+      "inferred_behavior": {
+        "verification_level": 3,
+        "test_coverage_min": 95,
+        "phases": [
+          "bootstrap",
+          "scanner",
+          "allocation",
+          "validation",
+          "semantic_map",
+          "generator_update",
+          "validator_update",
+          "regeneration"
+        ],
+        "parallel_groups": [
+          [
+            "semantic_map"
+          ]
+        ],
+        "steps_per_phase": {
+          "bootstrap": 4,
+          "scanner": 2,
+          "allocation": 5,
+          "validation": 2,
+          "semantic_map": 2,
+          "generator_update": 2,
+          "validator_update": 3,
+          "regeneration": 4
+        }
+      },
+      "decision_log_entry": {
+        "decision_id": "CLASS-0001",
+        "category": "classification",
+        "context": {
+          "file_count": "unknown_until_PH-01",
+          "requires_contracts": true
+        },
+        "options": [
+          "simple",
+          "moderate",
+          "complex",
+          "enterprise"
+        ],
+        "selected_option": "enterprise",
+        "rationale": "Migration touches more than 30 files and requires contract-first design.",
+        "timestamp": "2026-03-13T04:15:53.377188"
+      }
+    },
+    "classification_rules": {
+      "simple": {
+        "condition": "file_count <= 3 AND loc < 200",
+        "verification_level": 1,
+        "test_coverage_min": 70,
+        "phases": [
+          "intake",
+          "implement",
+          "verify"
+        ],
+        "avg_steps_per_phase": 3
+      },
+      "moderate": {
+        "condition": "file_count <= 10 AND loc < 1000",
+        "verification_level": 2,
+        "test_coverage_min": 80,
+        "phases": [
+          "intake",
+          "plan",
+          "implement",
+          "verify"
+        ],
+        "avg_steps_per_phase": 5
+      },
+      "complex": {
+        "condition": "file_count <= 30 OR requires_integration_tests",
+        "verification_level": 2,
+        "test_coverage_min": 90,
+        "phases": [
+          "intake",
+          "architecture",
+          "implement",
+          "integration",
+          "verify"
+        ],
+        "avg_steps_per_phase": 7
+      },
+      "enterprise": {
+        "condition": "file_count > 30 OR requires_contracts",
+        "verification_level": 3,
+        "test_coverage_min": 95,
+        "phases": [
+          "bootstrap",
+          "architecture",
+          "contracts",
+          "implement_parallel",
+          "integration",
+          "hardening",
+          "package"
+        ],
+        "avg_steps_per_phase": 10
+      }
+    }
+  },
+  "assumptions_scope": {
+    "assumptions": [
+      "The repository root contains all necessary scripts and catalogs for migration.",
+      "Existing module_catalog.json and process_step_catalog.json accurately represent the current semantic state.",
+      "Only two legacy module aliases exist (O2_OMS and O3_PNL_CLASSIFIER) and are well-documented.",
+      "User has necessary permissions to create and modify files, run Python scripts, and move files to archive.",
+      "All cross-layer joins by relative_path use normalized forward-slash paths relative to repo root (path normalization contract)."
+    ],
+    "in_scope": [
+      "Creation of physical identity configuration and scaffolding.",
+      "Development of scripts for scanning, assigning IDs, validating physical layer, mapping semantic IDs, updating generators and validators, and archiving superseded artifacts.",
+      "Modification of existing generator and validator scripts to emit and enforce numeric identifiers and cross-layer linkage.",
+      "Generation of identifier_map.json and associated schema.",
+      "Running the full pipeline end-to-end and validating PASS statuses."
+    ],
+    "out_of_scope": [
+      "Changes to core business logic or trading strategies within modules.",
+      "Refactoring of application code not directly related to identity migration or archiving.",
+      "Implementation of component_id (7-prefix) allocation (future work).",
+      "Any operations requiring external network or API access."
+    ],
+    "definition_of_done": [
+      "All non-excluded directories contain a .dir_id file with a 20-digit directory_id starting with 2.",
+      "All non-excluded files appear in physical_id_registry.csv with a 20-digit file_id starting with 1.",
+      "identifier_map.json assigns unique 5-prefix module_ids to all canonical modules and resolves legacy aliases.",
+      "generate_three_artifact_catalogs.py outputs module_catalog.json, process_step_catalog.json, and file_registry.csv with numeric IDs only and canonical_symbol metadata.",
+      "validate_three_artifact_alignment.py returns physical_status: PASS, alignment_status: PASS, readiness_status: PASS.",
+      "No symbolic module_id values remain in any machine key fields across artifacts.",
+      "file_registry.csv includes file_scope_class column (11 columns total).",
+      "semantic_coverage_pct >= 85%.",
+      "All paths normalized per path normalization contract.",
+      "Parent linkage valid in physical_id_registry.csv.",
+      "physical_id_registry.csv uses 11-column schema."
+    ]
+  },
+  "file_manifest": {
+    "description": "Complete list of files read or written during migration.",
+    "purpose": "Enable change impact analysis, conflict detection, parallel execution safety, and review scoping.",
+    "global_files": [
+      "physical_id_config_schema.json",
+      "baseline_scanner_spec.json",
+      "P12changes.txt",
+      "Immediate next steps.txt",
+      "module_catalog.json",
+      "process_step_catalog.json",
+      "file_registry.csv"
+    ],
+    "by_phase": {
+      "PH-00": [
+        "id_migration/config/physical_id_config.json",
+        "id_migration/schemas/dir_id.schema.json",
+        "COUNTER_STORE.json",
+        "id_migration/config/path_normalization_rules.json",
+        "id_migration/config/file_classification_rules.json",
+        "id_migration/schemas/physical_id_registry.schema.json"
+      ],
+      "PH-01": [
+        "id_migration/scripts/01_scan_repo_objects.py",
+        "id_migration/output/physical_inventory_baseline.csv"
+      ],
+      "PH-02": [
+        "id_migration/scripts/02_assign_physical_ids.py",
+        "id_migration/scripts/00_run_migration.py",
+        "id_migration/output/migration_manifest.jsonl",
+        "id_migration/output/physical_id_registry.csv",
+        "**/.dir_id"
+      ],
+      "PH-03": [
+        "id_migration/scripts/03_validate_physical_ids.py",
+        "id_migration/output/physical_validation_report.json"
+      ],
+      "PH-04": [
+        "identifier_map.json",
+        "schemas/identifier_map.schema.json"
+      ],
+      "PH-05": [
+        "generate_three_artifact_catalogs.py"
+      ],
+      "PH-06": [
+        "schemas/module_catalog.schema.json",
+        "validate_three_artifact_alignment.py"
+      ],
+      "PH-07": [
+        "module_catalog.json",
+        "process_step_catalog.json",
+        "file_registry.csv",
+        "ALIGNMENT_VALIDATION_REPORT.md"
+      ]
+    },
+    "by_step": {},
+    "conflict_analysis": {
+      "command": "python scripts/P_01260207233100000222_analyze_file_conflicts.py .state/file_manifest.json",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/file_conflict_analysis.json"
+    },
+    "validation": {
+      "command": "python scripts/P_01260207233100000252_validate_file_manifest.py .state/file_manifest.json",
+      "expect_exit_code": 0,
+      "checks": [
+        "All paths are absolute or relative to repo root",
+        "No duplicate entries within same phase or step",
+        "Write permissions don't overlap across parallel phases/steps",
+        "All files marked for write have corresponding read permission",
+        "File scopes respect worktree isolation boundaries",
+        "Step-level scopes are subsets of phase-level scopes"
+      ]
+    }
+  },
+  "phase_plan": {
+    "phase_overview": [
+      {
+        "id": "PH-00",
+        "name": "Bootstrap",
+        "description": "Create migration configuration and scaffolding.",
+        "prerequisites": []
+      },
+      {
+        "id": "PH-01",
+        "name": "Baseline Scan",
+        "description": "Enumerate repo objects and produce baseline inventory.",
+        "prerequisites": [
+          "PH-00"
+        ]
+      },
+      {
+        "id": "PH-02",
+        "name": "ID Allocation",
+        "description": "Assign unique physical IDs and create .dir_id files.",
+        "prerequisites": [
+          "PH-01"
+        ]
+      },
+      {
+        "id": "PH-03",
+        "name": "Physical Validation",
+        "description": "Validate physical identity coverage and integrity.",
+        "prerequisites": [
+          "PH-02"
+        ]
+      },
+      {
+        "id": "PH-04",
+        "name": "Semantic Map",
+        "description": "Create identifier_map.json assigning numeric module IDs and alias resolution.",
+        "prerequisites": []
+      },
+      {
+        "id": "PH-05",
+        "name": "Generator Update",
+        "description": "Modify generator to use numeric IDs and physical registry.",
+        "prerequisites": [
+          "PH-03",
+          "PH-04"
+        ]
+      },
+      {
+        "id": "PH-06",
+        "name": "Validator & Schema Update",
+        "description": "Update schemas and validators to enforce numeric patterns and cross-layer linkage.",
+        "prerequisites": [
+          "PH-05"
+        ]
+      },
+      {
+        "id": "PH-07",
+        "name": "Regenerate & Validate",
+        "description": "Generate updated artifacts and validate full alignment.",
+        "prerequisites": [
+          "PH-05",
+          "PH-06"
+        ]
+      }
+    ],
+    "parallel_execution_groups": [
+      [
+        "PH-04"
+      ]
+    ],
+    "execution_strategy": {
+      "parallel_execution": true,
+      "max_concurrent": null,
+      "scheduling_policy": "priority_queue",
+      "step_ordering": "dependency_graph"
+    },
+    "time_estimate": {
+      "sequential_total_min": null,
+      "parallel_total_min": null,
+      "speedup_percent": null,
+      "formula": "1 - (parallel / sequential)",
+      "per_step_estimates": {}
+    },
+    "dag_validation": {
+      "command": "python scripts/P_01260207233100000238_generate_dag.py --input .state/phase_plan.json --validate",
+      "expect": "exit_code == 0 AND no_cycles == true",
+      "evidence": ".state/evidence/PH-00/dag_validation.json"
+    }
+  },
+  "self_healing": {
+    "enabled": true,
+    "budgets": {
+      "per_phase_max_attempts": 2,
+      "per_gate_max_attempts": 1,
+      "per_step_max_attempts": 2,
+      "global_max_attempts": 10
+    },
+    "failure_types": [
+      {
+        "id": "DEP_INSTALL_FAIL",
+        "allowed_actions": [
+          "pip install -r requirements.txt",
+          "pip install -r requirements-dev.txt"
+        ],
+        "max_attempts": 2,
+        "abort_if": [
+          "error_matches: /permission denied|access is denied|EACCES/i",
+          "error_matches: /no space left on device/i"
+        ],
+        "commands": {
+          "pip install -r requirements.txt": "pip install -r requirements.txt",
+          "pip install -r requirements-dev.txt": "pip install -r requirements-dev.txt"
+        },
+        "step_context_required": true
+      },
+      {
+        "id": "TEST_FAIL",
+        "allowed_actions": [
+          "pytest -q --last-failed",
+          "pytest -q --maxfail=1"
+        ],
+        "max_attempts": 2,
+        "abort_if": [
+          "error_matches: /segmentation fault|core dumped/i",
+          "error_matches: /ImportError: No module named/i"
+        ],
+        "commands": {
+          "pytest -q --last-failed": "pytest -q --last-failed",
+          "pytest -q --maxfail=1": "pytest -q --maxfail=1"
+        },
+        "step_context_required": true
+      },
+      {
+        "id": "LINT_FAIL",
+        "allowed_actions": [
+          "python -m ruff check . --fix",
+          "python -m ruff check ."
+        ],
+        "max_attempts": 2,
+        "abort_if": [
+          "error_matches: /invalid configuration|config error/i"
+        ],
+        "commands": {
+          "python -m ruff check . --fix": "python -m ruff check . --fix",
+          "python -m ruff check .": "python -m ruff check ."
+        },
+        "step_context_required": false
+      },
+      {
+        "id": "TYPE_CHECK_FAIL",
+        "allowed_actions": [
+          "python -m mypy .",
+          "python -m mypy . --ignore-missing-imports"
+        ],
+        "max_attempts": 2,
+        "abort_if": [
+          "error_matches: /mypy: error:.*config/i"
+        ],
+        "commands": {
+          "python -m mypy .": "python -m mypy .",
+          "python -m mypy . --ignore-missing-imports": "python -m mypy . --ignore-missing-imports"
+        },
+        "step_context_required": false
+      },
+      {
+        "id": "INTEGRATION_TEST_FAIL",
+        "allowed_actions": [
+          "pytest -q -m integration",
+          "pytest -q -m integration --maxfail=1"
+        ],
+        "max_attempts": 2,
+        "abort_if": [
+          "error_matches: /connection refused|timeout/i"
+        ],
+        "commands": {
+          "pytest -q -m integration": "pytest -q -m integration",
+          "pytest -q -m integration --maxfail=1": "pytest -q -m integration --maxfail=1"
+        },
+        "step_context_required": true
+      }
+    ],
+    "attempt_evidence": {
+      "required_files": [
+        ".state/attempts/{phase}/{step_id}/{gate}/attempt_{n}/stdout.log",
+        ".state/attempts/{phase}/{step_id}/{gate}/attempt_{n}/stderr.log",
+        ".state/attempts/{phase}/{step_id}/{gate}/attempt_{n}/diff.patch",
+        ".state/attempts/{phase}/{step_id}/{gate}/attempt_{n}/result.json"
+      ],
+      "required_fields_in_result_json": [
+        "timestamp",
+        "phase",
+        "step_id",
+        "gate",
+        "failure_type",
+        "action_taken",
+        "root_cause_hypothesis",
+        "change_summary",
+        "verification_commands",
+        "result",
+        "abort_reason"
+      ]
+    },
+    "convergence_detection": {
+      "metric": "levenshtein_distance(attempt_n, attempt_n_minus_1)",
+      "threshold": "< 10% change",
+      "window": 2,
+      "action_if_not_converging": "abort_and_escalate",
+      "per_step_tracking": true
+    },
+    "escalation": {
+      "trigger": [
+        "per_phase_max_attempts exceeded",
+        "per_step_max_attempts exceeded",
+        "abort_if condition met",
+        "not converging after 2 attempts"
+      ],
+      "action": [
+        "write .state/escalation/{phase}_{step_id}_{gate}_escalation.json",
+        "emit structured error report",
+        "stop execution"
+      ]
+    }
+  },
+  "worktree_isolation": {
+    "enabled": true,
+    "base_ref": "main",
+    "max_parallel": 3,
+    "naming": {
+      "pattern": ".worktrees/{phase}/{task_id}",
+      "branch_pattern": "wt/{phase}/{task_id}",
+      "example": ".worktrees/PH-03A/DESCRIPTIVE_NAME"
+    },
+    "rules": [
+      "Each worktree writes ONLY inside its own root",
+      "Shared artifacts written only by orchestrator after validation",
+      "No direct commits to base_ref; merge via squash-merge",
+      "Worktree must pass all validation gates before merge",
+      "Step-level file scopes enforced within worktree"
+    ],
+    "lifecycle": {
+      "create": {
+        "command": "git worktree add {worktree_path} -b {branch_name} {base_ref}",
+        "validation": [
+          "test -d {worktree_path}",
+          "cd {worktree_path} && git branch --show-current | grep -q '^{branch_name}$'"
+        ],
+        "evidence": ".state/evidence/{phase}/worktree_created.log"
+      },
+      "execute": {
+        "working_directory": "{worktree_path}",
+        "file_scope_enforcement": {
+          "command": "python scripts/P_01260207233100000227_check_file_scope.py {phase_file_scope} {step_file_scope}",
+          "expect_exit_code": 0
+        },
+        "violations_action": "abort_phase"
+      },
+      "validate": {
+        "required_checks": [
+          {
+            "check": "schema_validate",
+            "command": "",
+            "expect_exit_code": 0
+          },
+          {
+            "check": "step_contracts",
+            "command": "python scripts/validate_all_step_contracts.py {phase}",
+            "expect_exit_code": 0
+          },
+          {
+            "check": "unit_tests",
+            "command": "cd {worktree_path} && {TEST_COMMAND}",
+            "expect_exit_code": 0
+          },
+          {
+            "check": "gate_suite",
+            "command": "cd {worktree_path} && {GATE_COMMAND}",
+            "expect_exit_code": 0
+          }
+        ]
+      },
+      "merge": {
+        "strategy": "squash",
+        "conflict_policy": "abort_and_escalate",
+        "command": "git checkout {base_ref} && git merge --squash {branch_name} && git commit -m '[{phase}] {summary}'",
+        "precondition": [
+          "all required_checks passed",
+          "no uncommitted changes in {worktree_path}",
+          "all step contracts validated"
+        ],
+        "postcondition": [
+          "git log -1 --pretty=%B | grep -q '\\[{phase}\\]'"
+        ],
+        "evidence": ".state/evidence/{phase}/merge_result.json"
+      },
+      "cleanup": {
+        "on_success": true,
+        "on_failure": false,
+        "command": "git worktree remove {worktree_path} && git branch -D {branch_name}",
+        "retention_on_failure": "7 days",
+        "evidence": ".state/evidence/{phase}/worktree_cleanup.log"
+      }
+    },
+    "concurrency": {
+      "limit": null,
+      "scheduling_policy": "priority_queue",
+      "priority_rules": [
+        "Phases with more dependents have higher priority",
+        "Phases in critical path have higher priority"
+      ]
+    }
+  },
+  "ground_truth_levels": {
+    "L1": "Schema-valid config files and initial scaffolding",
+    "L2": "Deterministic scanning and mapping scripts",
+    "L3": "Idempotent assignment and deterministic generation",
+    "L4": "Cross-layer validation with rejection on invalid states",
+    "L5": "End-to-end acceptance with all gates passing, semantic_coverage_pct >= 85%"
+  },
+  "metrics": {
+    "metrics": [
+      {
+        "id": "M-01",
+        "description": "Physical coverage",
+        "target": "100% of non-excluded objects have IDs"
+      },
+      {
+        "id": "M-02",
+        "description": "Duplicate identifier rate",
+        "target": "0 duplicates across physical and semantic IDs"
+      },
+      {
+        "id": "M-03",
+        "description": "Alias resolution accuracy",
+        "target": "100% of legacy aliases resolved correctly"
+      },
+      {
+        "id": "M-04",
+        "description": "Generator determinism",
+        "target": "Rerun of generator produces byte-identical outputs"
+      },
+      {
+        "id": "M-05",
+        "description": "Validation status pass rate",
+        "target": "physical_status, alignment_status, readiness_status all PASS"
+      },
+      {
+        "id": "M-06",
+        "description": "Test coverage",
+        "target": "95% of migration scripts covered by unit tests"
+      },
+      {
+        "id": "M-08",
+        "description": "Idempotent rerun",
+        "target": "No new IDs allocated on second run"
+      },
+      {
+        "id": "M-09",
+        "description": "Script failure remediation",
+        "target": "All failures remediated within 2 attempts"
+      },
+      {
+        "id": "M-10",
+        "description": "Conformance to templates",
+        "target": "All generated artifacts validate against schemas"
+      },
+      {
+        "id": "M-11",
+        "description": "Semantic coverage percentage",
+        "target": ">= 85% of non-out_of_scope files have module_id assigned"
+      }
+    ]
+  },
+  "infrastructure": {
+    "python_version": "3.10+",
+    "dependencies": [
+      "jsonschema",
+      "pytest",
+      "csv",
+      "pandas",
+      "yaml"
+    ],
+    "tools": [
+      "git",
+      "python",
+      "bash"
+    ],
+    "operating_system": "cross-platform (tested on Windows and Linux)"
+  },
+  "final_summary": {
+    "what_was_delivered": "A comprehensive migration plan detailing phases, steps, contracts, and validation gates to implement unified physical and semantic identity and update generator and validator scripts.",
+    "next_steps": "Implement each phase in sequence or parallel where allowed, create scripts and configs, run the pipeline in a sandbox, iterate until all gates pass, then apply to production repository.",
+    "acceptance_criteria": [
+      "All non-excluded directories contain a .dir_id file with a 20-digit directory_id starting with 2.",
+      "All non-excluded files appear in physical_id_registry.csv (11-column schema) with a 20-digit file_id starting with 1.",
+      "identifier_map.json assigns unique 5-prefix module_ids to all 28 canonical modules (27 pipeline + 1 SHARED_LIBS) and resolves legacy aliases.",
+      "generate_three_artifact_catalogs.py outputs module_catalog.json, process_step_catalog.json, and file_registry.csv with numeric IDs only and canonical_symbol metadata.",
+      "file_registry.csv includes file_scope_class column (11 columns total).",
+      "validate_three_artifact_alignment.py returns physical_status: PASS, alignment_status: PASS, readiness_status: PASS.",
+      "semantic_coverage_pct >= 85%.",
+      "No symbolic module_id values remain in any machine key fields across artifacts.",
+      "All paths in physical_id_registry and file_registry are normalized per path normalization contract.",
+      "Parent linkage valid: every parent_directory_id in physical_id_registry exists as a directory_id."
+    ]
+  },
+  "phase_contracts": {
+    "PH-00": {
+      "purpose": "Set up configuration and scaffolding for identity migration.",
+      "inputs": [
+        {
+          "id": "REPO_ROOT",
+          "path": ".",
+          "type": "dir",
+          "must_exist": true,
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "id": "PHYSICAL_ID_CONFIG",
+          "path": "id_migration/config/physical_id_config.json",
+          "type": "file",
+          "required": true
+        },
+        {
+          "id": "DIR_ID_SCHEMA",
+          "path": "id_migration/schemas/dir_id.schema.json",
+          "type": "file",
+          "required": true
+        },
+        {
+          "id": "COUNTER_STORE",
+          "path": "COUNTER_STORE.json",
+          "type": "file",
+          "required": true
+        },
+        {
+          "id": "PATH_NORM_RULES",
+          "path": "id_migration/config/path_normalization_rules.json",
+          "type": "file",
+          "required": true
+        },
+        {
+          "id": "FILE_CLASS_RULES",
+          "path": "id_migration/config/file_classification_rules.json",
+          "type": "file",
+          "required": true
+        },
+        {
+          "id": "PHYSICAL_REGISTRY_SCHEMA",
+          "path": "id_migration/schemas/physical_id_registry.schema.json",
+          "type": "file",
+          "required": true
+        }
+      ],
+      "invariants": [
+        "No modifications outside id_migration/ and root files"
+      ],
+      "preconditions": [
+        "Repository root exists"
+      ],
+      "postconditions": [
+        "Configuration files created and valid"
+      ],
+      "failure_modes": [
+        {
+          "code": "PH-00-MISSING-ROOT",
+          "meaning": "Repository root not found",
+          "remediation": "Confirm working directory and retry"
+        }
+      ],
+      "steps": [
+        "PH-00-STEP-001",
+        "PH-00-STEP-002",
+        "PH-00-STEP-003",
+        "PH-00-STEP-004"
+      ]
+    },
+    "PH-01": {
+      "purpose": "Enumerate all repository objects and classify included/excluded objects.",
+      "inputs": [
+        {
+          "id": "PHYSICAL_CONFIG",
+          "path": "id_migration/config/physical_id_config.json",
+          "type": "file",
+          "must_exist": true,
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "id": "BASELINE_CSV",
+          "path": "id_migration/output/physical_inventory_baseline.csv",
+          "type": "file",
+          "required": true
+        }
+      ],
+      "invariants": [
+        "Scanner does not modify repository contents"
+      ],
+      "preconditions": [
+        "physical_id_config.json exists"
+      ],
+      "postconditions": [
+        "Baseline CSV exists with expected columns"
+      ],
+      "failure_modes": [
+        {
+          "code": "PH-01-SCAN-FAIL",
+          "meaning": "Scanner execution failed",
+          "remediation": "Review scanner logs, fix issues, and rerun"
+        }
+      ],
+      "steps": [
+        "PH-01-STEP-001",
+        "PH-01-STEP-002"
+      ]
+    },
+    "PH-02": {
+      "purpose": "Assign physical IDs to all repo objects and produce physical registry.",
+      "inputs": [
+        {
+          "id": "BASELINE_CSV",
+          "path": "id_migration/output/physical_inventory_baseline.csv",
+          "type": "file",
+          "must_exist": true,
+          "required": true
+        },
+        {
+          "id": "PHYSICAL_CONFIG",
+          "path": "id_migration/config/physical_id_config.json",
+          "type": "file",
+          "must_exist": true,
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "id": "MIGRATION_MANIFEST",
+          "path": "id_migration/output/migration_manifest.jsonl",
+          "type": "file",
+          "required": true
+        },
+        {
+          "id": "PHYSICAL_REGISTRY",
+          "path": "id_migration/output/physical_id_registry.csv",
+          "type": "file",
+          "required": true
+        },
+        {
+          "id": "DIR_ID_FILES",
+          "path": "**/.dir_id",
+          "type": "file",
+          "required": true
+        }
+      ],
+      "invariants": [
+        "Assignment is idempotent",
+        "Existing IDs preserved",
+        "Only non-excluded directories get .dir_id"
+      ],
+      "preconditions": [
+        "Baseline CSV exists",
+        "COUNTER_STORE.json exists"
+      ],
+      "postconditions": [
+        "Physical registry generated",
+        "No duplicates in IDs",
+        ".dir_id coverage complete"
+      ],
+      "failure_modes": [
+        {
+          "code": "PH-02-ALLOC-FAIL",
+          "meaning": "ID allocation failed",
+          "remediation": "Investigate manifest and counters, ensure no conflicting IDs, and rerun"
+        }
+      ],
+      "steps": [
+        "PH-02-STEP-001",
+        "PH-02-STEP-002",
+        "PH-02-STEP-003",
+        "PH-02-STEP-004",
+        "PH-02-STEP-005"
+      ]
+    },
+    "PH-03": {
+      "purpose": "Validate physical ID coverage and integrity.",
+      "inputs": [
+        {
+          "id": "PHYSICAL_REGISTRY",
+          "path": "id_migration/output/physical_id_registry.csv",
+          "type": "file",
+          "must_exist": true,
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "id": "PHYSICAL_REPORT",
+          "path": "id_migration/output/physical_validation_report.json",
+          "type": "file",
+          "required": true
+        }
+      ],
+      "invariants": [
+        "No modifications to filesystem during validation",
+        "Registry checked for exactly 11 columns",
+        "Every row has exactly one of file_id or directory_id non-empty",
+        "Parent linkage validated: every parent_directory_id exists as a directory_id",
+        "No orphaned IDs: every .dir_id file appears in registry"
+      ],
+      "preconditions": [
+        "Physical registry exists"
+      ],
+      "postconditions": [
+        "Physical_status PASS or appropriate error report"
+      ],
+      "failure_modes": [
+        {
+          "code": "PH-03-VAL-FAIL",
+          "meaning": "Physical validation failed",
+          "remediation": "Review report and fix ID allocation issues"
+        }
+      ],
+      "steps": [
+        "PH-03-STEP-001",
+        "PH-03-STEP-002"
+      ]
+    },
+    "PH-04": {
+      "purpose": "Map symbolic module identifiers to numeric identifiers and define schema.",
+      "inputs": [
+        {
+          "id": "MODULE_CATALOG",
+          "path": "module_catalog.json",
+          "type": "file",
+          "must_exist": true,
+          "required": true
+        },
+        {
+          "id": "PROCESS_STEP_CATALOG",
+          "path": "process_step_catalog.json",
+          "type": "file",
+          "must_exist": true,
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "id": "IDENTIFIER_MAP",
+          "path": "identifier_map.json",
+          "type": "file",
+          "required": true
+        },
+        {
+          "id": "IDENTIFIER_SCHEMA",
+          "path": "schemas/identifier_map.schema.json",
+          "type": "file",
+          "required": true
+        }
+      ],
+      "invariants": [
+        "Unique numeric IDs for 28 canonical modules (27 pipeline + 1 SHARED_LIBS)",
+        "Alias mapping is explicit; aliases only in identifier_map.json",
+        "Schema defined",
+        "No alias entries in module_catalog.json"
+      ],
+      "preconditions": [
+        "module_catalog.json and process_step_catalog.json exist"
+      ],
+      "postconditions": [
+        "identifier_map.json created and validated against schema"
+      ],
+      "failure_modes": [
+        {
+          "code": "PH-04-INVALID-MAP",
+          "meaning": "Identifier map creation failed",
+          "remediation": "Ensure module list completeness and correct alias resolution"
+        }
+      ],
+      "steps": [
+        "PH-04-STEP-001",
+        "PH-04-STEP-002"
+      ]
+    },
+    "PH-05": {
+      "purpose": "Update generation scripts to use numeric module IDs and import physical IDs.",
+      "inputs": [
+        {
+          "id": "IDENTIFIER_MAP",
+          "path": "identifier_map.json",
+          "type": "file",
+          "must_exist": true,
+          "required": true
+        },
+        {
+          "id": "PHYSICAL_REGISTRY",
+          "path": "id_migration/output/physical_id_registry.csv",
+          "type": "file",
+          "must_exist": true,
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "id": "UPDATED_GENERATOR",
+          "path": "generate_three_artifact_catalogs.py",
+          "type": "file",
+          "required": true
+        }
+      ],
+      "invariants": [
+        "Generator deterministic",
+        "No symbolic module_id in output"
+      ],
+      "preconditions": [
+        "identifier_map.json and physical_id_registry.csv exist"
+      ],
+      "postconditions": [
+        "Generator loads identifier_map and physical registry"
+      ],
+      "failure_modes": [
+        {
+          "code": "PH-05-GEN-FAIL",
+          "meaning": "Generator modification failed",
+          "remediation": "Review changes and ensure functions updated correctly"
+        }
+      ],
+      "steps": [
+        "PH-05-STEP-001",
+        "PH-05-STEP-002"
+      ]
+    },
+    "PH-06": {
+      "purpose": "Update schemas and validators to enforce numeric patterns and cross-layer linkage.",
+      "inputs": [
+        {
+          "id": "UPDATED_GENERATOR",
+          "path": "generate_three_artifact_catalogs.py",
+          "type": "file",
+          "must_exist": true,
+          "required": true
+        },
+        {
+          "id": "PHYSICAL_REGISTRY",
+          "path": "id_migration/output/physical_id_registry.csv",
+          "type": "file",
+          "must_exist": true,
+          "required": true
+        },
+        {
+          "id": "IDENTIFIER_MAP",
+          "path": "identifier_map.json",
+          "type": "file",
+          "must_exist": true,
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "id": "UPDATED_MODULE_SCHEMA",
+          "path": "schemas/module_catalog.schema.json",
+          "type": "file",
+          "required": true
+        },
+        {
+          "id": "UPDATED_VALIDATOR",
+          "path": "validate_three_artifact_alignment.py",
+          "type": "file",
+          "required": true
+        }
+      ],
+      "invariants": [
+        "Validator rejects invalid states",
+        "Schemas enforce numeric patterns",
+        "Cross-layer linkage established",
+        "file_scope_class validated against 7 allowed values",
+        "Blank module_id allowed only for test, tooling, legacy, out_of_scope",
+        "semantic_coverage_pct emitted in validation output"
+      ],
+      "preconditions": [
+        "Physical registry and identifier_map exist"
+      ],
+      "postconditions": [
+        "Updated schemas and validators available"
+      ],
+      "failure_modes": [
+        {
+          "code": "PH-06-VAL-FAIL",
+          "meaning": "Validator or schema update failed",
+          "remediation": "Review patterns and ensure correct modifications"
+        }
+      ],
+      "steps": [
+        "PH-06-STEP-001",
+        "PH-06-STEP-002"
+      ]
+    },
+    "PH-07": {
+      "purpose": "Run generator, validate outputs, and confirm all statuses PASS.",
+      "inputs": [
+        {
+          "id": "UPDATED_GENERATOR",
+          "path": "generate_three_artifact_catalogs.py",
+          "type": "file",
+          "must_exist": true,
+          "required": true
+        },
+        {
+          "id": "UPDATED_VALIDATOR",
+          "path": "validate_three_artifact_alignment.py",
+          "type": "file",
+          "must_exist": true,
+          "required": true
+        },
+        {
+          "id": "PHYSICAL_VALIDATOR",
+          "path": "id_migration/scripts/03_validate_physical_ids.py",
+          "type": "file",
+          "must_exist": true,
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "id": "MODULE_CATALOG_NEW",
+          "path": "module_catalog.json",
+          "type": "file",
+          "required": true
+        },
+        {
+          "id": "PROCESS_STEP_CATALOG_NEW",
+          "path": "process_step_catalog.json",
+          "type": "file",
+          "required": true
+        },
+        {
+          "id": "FILE_REGISTRY_NEW",
+          "path": "file_registry.csv",
+          "type": "file",
+          "required": true
+        },
+        {
+          "id": "FINAL_STATUS",
+          "path": ".state/final_status.json",
+          "type": "file",
+          "required": true
+        }
+      ],
+      "invariants": [
+        "All outputs generated",
+        "All statuses PASS"
+      ],
+      "preconditions": [
+        "Generator and validators updated"
+      ],
+      "postconditions": [
+        "module_catalog.json, process_step_catalog.json, file_registry.csv regenerated",
+        "Statuses recorded",
+        "semantic_coverage_pct >= 85%"
+      ],
+      "failure_modes": [
+        {
+          "code": "PH-07-FAIL",
+          "meaning": "Regeneration or validation failed",
+          "remediation": "Review reports, fix issues, and rerun"
+        }
+      ],
+      "steps": [
+        "PH-07-STEP-001",
+        "PH-07-STEP-002",
+        "PH-07-STEP-003",
+        "PH-07-STEP-004"
+      ]
+    }
+  },
+  "step_contracts": {
+    "PH-00": {
+      "PH-00-STEP-001": {
+        "step_id": "PH-00-STEP-001",
+        "purpose": "Create migration directory scaffolding",
+        "inputs": [
+          {
+            "id": "REPO_ROOT",
+            "path": ".",
+            "type": "dir",
+            "must_exist": true,
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "ID_MIGRATION_DIR",
+            "path": "id_migration",
+            "type": "dir",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "No code files modified outside id_migration/"
+        ],
+        "preconditions": [
+          "test -d ."
+        ],
+        "postconditions": [
+          "test -d id_migration/config",
+          "test -d id_migration/schemas",
+          "test -d id_migration/scripts",
+          "test -d id_migration/output"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "id_migration/**"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-00-STEP-001-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-00/PH-00-STEP-001",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L1",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      },
+      "PH-00-STEP-002": {
+        "step_id": "PH-00-STEP-002",
+        "purpose": "Create physical_id_config.json",
+        "inputs": [
+          {
+            "id": "CONFIG_SCHEMA",
+            "path": "physical_id_config_schema.json",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "PHYSICAL_ID_CONFIG",
+            "path": "id_migration/config/physical_id_config.json",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "Config adheres to schema"
+        ],
+        "preconditions": [
+          "test -d id_migration/config"
+        ],
+        "postconditions": [
+          "test -f id_migration/config/physical_id_config.json"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "id_migration/config/physical_id_config.json"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-00-STEP-002-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-00/PH-00-STEP-002",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L1",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      },
+      "PH-00-STEP-003": {
+        "step_id": "PH-00-STEP-003",
+        "purpose": "Create dir_id.schema.json",
+        "inputs": [],
+        "outputs": [
+          {
+            "id": "DIR_ID_SCHEMA",
+            "path": "id_migration/schemas/dir_id.schema.json",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "Schema defines directory_id pattern"
+        ],
+        "preconditions": [
+          "test -d id_migration/schemas"
+        ],
+        "postconditions": [
+          "test -f id_migration/schemas/dir_id.schema.json"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "id_migration/schemas/dir_id.schema.json"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-00-STEP-003-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-00/PH-00-STEP-003",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L1",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      },
+      "PH-00-STEP-004": {
+        "step_id": "PH-00-STEP-004",
+        "purpose": "Create COUNTER_STORE.json",
+        "inputs": [],
+        "outputs": [
+          {
+            "id": "COUNTER_STORE",
+            "path": "COUNTER_STORE.json",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "Counter values initialised to starting IDs"
+        ],
+        "preconditions": [
+          "test -d ."
+        ],
+        "postconditions": [
+          "test -f COUNTER_STORE.json"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "COUNTER_STORE.json"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-00-STEP-004-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-00/PH-00-STEP-004",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L1",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "PH-01": {
+      "PH-01-STEP-001": {
+        "step_id": "PH-01-STEP-001",
+        "purpose": "Build scanner script",
+        "inputs": [
+          {
+            "id": "BASELINE_SPEC",
+            "path": "baseline_scanner_spec.json",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "SCAN_SCRIPT",
+            "path": "id_migration/scripts/01_scan_repo_objects.py",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "Script reads repository and writes no modifications",
+          "Scanner produces classification columns: object_scope_class, candidate_semantic_role, path_normalized, is_semantic_candidate, inferred_module_hint"
+        ],
+        "preconditions": [
+          "test -d id_migration/scripts"
+        ],
+        "postconditions": [
+          "test -f id_migration/scripts/01_scan_repo_objects.py"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "id_migration/scripts/01_scan_repo_objects.py"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-01-STEP-001-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-01/PH-01-STEP-001",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L2",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      },
+      "PH-01-STEP-002": {
+        "step_id": "PH-01-STEP-002",
+        "purpose": "Run baseline scanner",
+        "inputs": [
+          {
+            "id": "SCAN_SCRIPT",
+            "path": "id_migration/scripts/01_scan_repo_objects.py",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          },
+          {
+            "id": "PHYSICAL_CONFIG",
+            "path": "id_migration/config/physical_id_config.json",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "BASELINE_CSV",
+            "path": "id_migration/output/physical_inventory_baseline.csv",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "No files modified during scan"
+        ],
+        "preconditions": [
+          "test -f id_migration/scripts/01_scan_repo_objects.py",
+          "test -f id_migration/config/physical_id_config.json"
+        ],
+        "postconditions": [
+          "test -f id_migration/output/physical_inventory_baseline.csv"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "id_migration/output/physical_inventory_baseline.csv"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-01-STEP-002-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-01/PH-01-STEP-002",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L2",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "PH-02": {
+      "PH-02-STEP-001": {
+        "step_id": "PH-02-STEP-001",
+        "purpose": "Build ID assignment script",
+        "inputs": [
+          {
+            "id": "BASELINE_CSV",
+            "path": "id_migration/output/physical_inventory_baseline.csv",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "ASSIGN_SCRIPT",
+            "path": "id_migration/scripts/02_assign_physical_ids.py",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "Script is idempotent"
+        ],
+        "preconditions": [
+          "test -d id_migration/scripts"
+        ],
+        "postconditions": [
+          "test -f id_migration/scripts/02_assign_physical_ids.py"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "id_migration/scripts/02_assign_physical_ids.py"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-02-STEP-001-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-02/PH-02-STEP-001",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L3",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      },
+      "PH-02-STEP-002": {
+        "step_id": "PH-02-STEP-002",
+        "purpose": "Build migration orchestrator",
+        "inputs": [],
+        "outputs": [
+          {
+            "id": "ORCHESTRATOR",
+            "path": "id_migration/scripts/00_run_migration.py",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "Orchestrator drives plan/apply modes"
+        ],
+        "preconditions": [
+          "test -d id_migration/scripts"
+        ],
+        "postconditions": [
+          "test -f id_migration/scripts/00_run_migration.py"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "id_migration/scripts/00_run_migration.py"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-02-STEP-002-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-02/PH-02-STEP-002",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L3",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      },
+      "PH-02-STEP-003": {
+        "step_id": "PH-02-STEP-003",
+        "purpose": "Run assign script in plan mode",
+        "inputs": [
+          {
+            "id": "ASSIGN_SCRIPT",
+            "path": "id_migration/scripts/02_assign_physical_ids.py",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          },
+          {
+            "id": "PHYSICAL_CONFIG",
+            "path": "id_migration/config/physical_id_config.json",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "MIGRATION_MANIFEST",
+            "path": "id_migration/output/migration_manifest.jsonl",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "Plan does not mutate repository"
+        ],
+        "preconditions": [
+          "test -f id_migration/scripts/02_assign_physical_ids.py"
+        ],
+        "postconditions": [
+          "test -f id_migration/output/migration_manifest.jsonl"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "id_migration/output/migration_manifest.jsonl"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-02-STEP-003-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-02/PH-02-STEP-003",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L3",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      },
+      "PH-02-STEP-004": {
+        "step_id": "PH-02-STEP-004",
+        "purpose": "Run assign script in apply mode",
+        "inputs": [
+          {
+            "id": "MIGRATION_MANIFEST",
+            "path": "id_migration/output/migration_manifest.jsonl",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "DIR_ID_FILES",
+            "path": "**/.dir_id",
+            "type": "file",
+            "required": true
+          },
+          {
+            "id": "UPDATED_COUNTER_STORE",
+            "path": "COUNTER_STORE.json",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "Existing .dir_id files are preserved",
+          "Assignment idempotent"
+        ],
+        "preconditions": [
+          "test -f id_migration/output/migration_manifest.jsonl"
+        ],
+        "postconditions": [
+          "test -f COUNTER_STORE.json"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "**/.dir_id",
+            "COUNTER_STORE.json"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-02-STEP-004-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-02/PH-02-STEP-004",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L3",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      },
+      "PH-02-STEP-005": {
+        "step_id": "PH-02-STEP-005",
+        "purpose": "Generate physical_id_registry.csv",
+        "inputs": [
+          {
+            "id": "ASSIGN_SCRIPT",
+            "path": "id_migration/scripts/02_assign_physical_ids.py",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "PHYSICAL_REGISTRY",
+            "path": "id_migration/output/physical_id_registry.csv",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "Registry derived deterministically from filesystem"
+        ],
+        "preconditions": [
+          "test -f id_migration/scripts/02_assign_physical_ids.py"
+        ],
+        "postconditions": [
+          "test -f id_migration/output/physical_id_registry.csv"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "id_migration/output/physical_id_registry.csv"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-02-STEP-005-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-02/PH-02-STEP-005",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L3",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "PH-03": {
+      "PH-03-STEP-001": {
+        "step_id": "PH-03-STEP-001",
+        "purpose": "Build physical validation script",
+        "inputs": [],
+        "outputs": [
+          {
+            "id": "PHYSICAL_VALIDATOR",
+            "path": "id_migration/scripts/03_validate_physical_ids.py",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "Validator reads registry and filesystem only"
+        ],
+        "preconditions": [
+          "test -d id_migration/scripts"
+        ],
+        "postconditions": [
+          "test -f id_migration/scripts/03_validate_physical_ids.py"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "id_migration/scripts/03_validate_physical_ids.py"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-03-STEP-001-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-03/PH-03-STEP-001",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L4",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      },
+      "PH-03-STEP-002": {
+        "step_id": "PH-03-STEP-002",
+        "purpose": "Run physical validator",
+        "inputs": [
+          {
+            "id": "PHYSICAL_REGISTRY",
+            "path": "id_migration/output/physical_id_registry.csv",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          },
+          {
+            "id": "PHYSICAL_VALIDATOR",
+            "path": "id_migration/scripts/03_validate_physical_ids.py",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "PHYSICAL_REPORT",
+            "path": "id_migration/output/physical_validation_report.json",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "Validator does not modify repo"
+        ],
+        "preconditions": [
+          "test -f id_migration/output/physical_id_registry.csv"
+        ],
+        "postconditions": [
+          "test -f id_migration/output/physical_validation_report.json"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "id_migration/output/physical_validation_report.json"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-03-STEP-002-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-03/PH-03-STEP-002",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L4",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "PH-04": {
+      "PH-04-STEP-001": {
+        "step_id": "PH-04-STEP-001",
+        "purpose": "Create identifier_map.json",
+        "inputs": [
+          {
+            "id": "MODULE_CATALOG",
+            "path": "module_catalog.json",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          },
+          {
+            "id": "PROCESS_STEP_CATALOG",
+            "path": "process_step_catalog.json",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "IDENTIFIER_MAP",
+            "path": "identifier_map.json",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "Assign unique numeric IDs to modules",
+          "Aliases resolved"
+        ],
+        "preconditions": [
+          "test -f module_catalog.json",
+          "test -f process_step_catalog.json"
+        ],
+        "postconditions": [
+          "test -f identifier_map.json"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "identifier_map.json"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-04-STEP-001-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-04/PH-04-STEP-001",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L2",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      },
+      "PH-04-STEP-002": {
+        "step_id": "PH-04-STEP-002",
+        "purpose": "Create identifier_map.schema.json",
+        "inputs": [],
+        "outputs": [
+          {
+            "id": "IDENTIFIER_SCHEMA",
+            "path": "schemas/identifier_map.schema.json",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "Schema validates identifier_map structure"
+        ],
+        "preconditions": [
+          "test -d schemas"
+        ],
+        "postconditions": [
+          "test -f schemas/identifier_map.schema.json"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "schemas/identifier_map.schema.json"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-04-STEP-002-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-04/PH-04-STEP-002",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L2",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "PH-05": {
+      "PH-05-STEP-001": {
+        "step_id": "PH-05-STEP-001",
+        "purpose": "Modify generator to emit numeric IDs",
+        "inputs": [
+          {
+            "id": "GENERATOR",
+            "path": "generate_three_artifact_catalogs.py",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          },
+          {
+            "id": "IDENTIFIER_MAP",
+            "path": "identifier_map.json",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          },
+          {
+            "id": "PHYSICAL_REGISTRY",
+            "path": "id_migration/output/physical_id_registry.csv",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "UPDATED_GENERATOR",
+            "path": "generate_three_artifact_catalogs.py",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "Generator remains deterministic",
+          "Module_id and process_step_id replaced with numeric"
+        ],
+        "preconditions": [
+          "test -f generate_three_artifact_catalogs.py"
+        ],
+        "postconditions": [
+          "grep -q '^ *module_id' generate_three_artifact_catalogs.py || true"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "generate_three_artifact_catalogs.py"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-05-STEP-001-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-05/PH-05-STEP-001",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L3",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      },
+      "PH-05-STEP-002": {
+        "step_id": "PH-05-STEP-002",
+        "purpose": "Modify file registry builder to import physical IDs",
+        "inputs": [
+          {
+            "id": "UPDATED_GENERATOR",
+            "path": "generate_three_artifact_catalogs.py",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "UPDATED_GENERATOR",
+            "path": "generate_three_artifact_catalogs.py",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "File registry uses file_id and directory_id from physical registry",
+          "file_scope_class column added to output",
+          "Aliases resolved through identifier_map.json before emitting module_id"
+        ],
+        "preconditions": [
+          "test -f generate_three_artifact_catalogs.py"
+        ],
+        "postconditions": [
+          "grep -q 'file_id' generate_three_artifact_catalogs.py || true"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "generate_three_artifact_catalogs.py"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-05-STEP-002-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-05/PH-05-STEP-002",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L3",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "PH-06": {
+      "PH-06-STEP-001": {
+        "step_id": "PH-06-STEP-001",
+        "purpose": "Update module_catalog schema",
+        "inputs": [
+          {
+            "id": "SCHEMA",
+            "path": "schemas/module_catalog.schema.json",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "UPDATED_MODULE_SCHEMA",
+            "path": "schemas/module_catalog.schema.json",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "module_id pattern updated to ^5\\d{19}$",
+          "canonical_symbol required"
+        ],
+        "preconditions": [
+          "test -f schemas/module_catalog.schema.json"
+        ],
+        "postconditions": [
+          "grep -q '^5' schemas/module_catalog.schema.json || true"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "schemas/module_catalog.schema.json"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-06-STEP-001-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-06/PH-06-STEP-001",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L4",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      },
+      "PH-06-STEP-002": {
+        "step_id": "PH-06-STEP-002",
+        "purpose": "Modify validator to enforce numeric IDs and cross-layer linkage",
+        "inputs": [
+          {
+            "id": "VALIDATOR",
+            "path": "validate_three_artifact_alignment.py",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "UPDATED_VALIDATOR",
+            "path": "validate_three_artifact_alignment.py",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "Validator emits physical_status, alignment_status, readiness_status, semantic_coverage_pct",
+          "Rejects symbolic keys",
+          "Checks file_id/directory_id exist in physical registry",
+          "Validates file_scope_class column values",
+          "Validates blank module_id policy per file_scope_class"
+        ],
+        "preconditions": [
+          "test -f validate_three_artifact_alignment.py"
+        ],
+        "postconditions": [
+          "grep -q 'physical_status' validate_three_artifact_alignment.py || true"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "validate_three_artifact_alignment.py"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-06-STEP-002-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-06/PH-06-STEP-002",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L4",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "PH-07": {
+      "PH-07-STEP-001": {
+        "step_id": "PH-07-STEP-001",
+        "purpose": "Run generator to produce updated artifacts",
+        "inputs": [
+          {
+            "id": "UPDATED_GENERATOR",
+            "path": "generate_three_artifact_catalogs.py",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          },
+          {
+            "id": "IDENTIFIER_MAP",
+            "path": "identifier_map.json",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          },
+          {
+            "id": "PHYSICAL_REGISTRY",
+            "path": "id_migration/output/physical_id_registry.csv",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "MODULE_CATALOG_NEW",
+            "path": "module_catalog.json",
+            "type": "file",
+            "required": true
+          },
+          {
+            "id": "PROCESS_STEP_CATALOG_NEW",
+            "path": "process_step_catalog.json",
+            "type": "file",
+            "required": true
+          },
+          {
+            "id": "FILE_REGISTRY_NEW",
+            "path": "file_registry.csv",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "Generation deterministic",
+          "Numeric IDs only"
+        ],
+        "preconditions": [
+          "test -f generate_three_artifact_catalogs.py"
+        ],
+        "postconditions": [
+          "test -f module_catalog.json",
+          "test -f process_step_catalog.json",
+          "test -f file_registry.csv"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "module_catalog.json",
+            "process_step_catalog.json",
+            "file_registry.csv"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-07-STEP-001-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-07/PH-07-STEP-001",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L5",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      },
+      "PH-07-STEP-002": {
+        "step_id": "PH-07-STEP-002",
+        "purpose": "Run validator to check alignment statuses",
+        "inputs": [
+          {
+            "id": "UPDATED_VALIDATOR",
+            "path": "validate_three_artifact_alignment.py",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "ALIGNMENT_REPORT",
+            "path": "ALIGNMENT_VALIDATION_REPORT.md",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "Validator checks physical_status, alignment_status, readiness_status"
+        ],
+        "preconditions": [
+          "test -f validate_three_artifact_alignment.py",
+          "test -f module_catalog.json"
+        ],
+        "postconditions": [
+          "grep -q 'physical_status' ALIGNMENT_VALIDATION_REPORT.md || true"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "ALIGNMENT_VALIDATION_REPORT.md"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-07-STEP-002-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-07/PH-07-STEP-002",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L5",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      },
+      "PH-07-STEP-003": {
+        "step_id": "PH-07-STEP-003",
+        "purpose": "Run physical validator again for final check",
+        "inputs": [
+          {
+            "id": "PHYSICAL_VALIDATOR",
+            "path": "id_migration/scripts/03_validate_physical_ids.py",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "PHYSICAL_FINAL_REPORT",
+            "path": "id_migration/output/physical_validation_report.json",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "No modifications"
+        ],
+        "preconditions": [
+          "test -f id_migration/scripts/03_validate_physical_ids.py"
+        ],
+        "postconditions": [
+          "test -f id_migration/output/physical_validation_report.json"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            "id_migration/output/physical_validation_report.json"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-07-STEP-003-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-07/PH-07-STEP-003",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L5",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      },
+      "PH-07-STEP-004": {
+        "step_id": "PH-07-STEP-004",
+        "purpose": "Evaluate statuses and ensure PASS",
+        "inputs": [
+          {
+            "id": "ALIGNMENT_REPORT",
+            "path": "ALIGNMENT_VALIDATION_REPORT.md",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          },
+          {
+            "id": "PHYSICAL_REPORT",
+            "path": "id_migration/output/physical_validation_report.json",
+            "type": "file",
+            "must_exist": true,
+            "required": true
+          }
+        ],
+        "outputs": [
+          {
+            "id": "FINAL_STATUS",
+            "path": ".state/final_status.json",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "invariants": [
+          "All statuses must be PASS"
+        ],
+        "preconditions": [
+          "test -f ALIGNMENT_VALIDATION_REPORT.md",
+          "test -f id_migration/output/physical_validation_report.json"
+        ],
+        "postconditions": [
+          "grep -q 'PASS' .state/final_status.json || true"
+        ],
+        "file_scope": {
+          "allowed_paths": [
+            ".state/final_status.json"
+          ],
+          "forbidden_paths": [
+            "src/**"
+          ],
+          "read_only_paths": []
+        },
+        "failure_modes": [
+          {
+            "code": "PH-07-STEP-004-FAIL",
+            "meaning": "Step execution failed",
+            "remediation": "Check inputs, configuration, and permissions, then retry."
+          }
+        ],
+        "evidence": {
+          "directory": ".state/evidence/PH-07/PH-07-STEP-004",
+          "required_files": [
+            "precondition_checks.log",
+            "postcondition_checks.log",
+            "file_scope_validation.json",
+            "step_result.json"
+          ]
+        },
+        "ground_truth_level": "L5",
+        "retries": 0,
+        "execution_policy": {
+          "file_editing": {
+            "allowed_methods": [
+              "FULL_REWRITE",
+              "UNIFIED_DIFF_APPLY"
+            ],
+            "default_method": "FULL_REWRITE",
+            "method_constraints": {
+              "FULL_REWRITE": {
+                "line_endings": "PRESERVE",
+                "require_exact_after_hash": true
+              },
+              "UNIFIED_DIFF_APPLY": {
+                "allow_fuzz": false,
+                "rejects_allowed": false,
+                "require_before_after_hash": true
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "validation_gates": {
+    "G-00": {
+      "description": "Bootstrap validation",
+      "command": "python id_migration/scripts/validate_physical_id_config.py id_migration/config/physical_id_config.json",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-00/G-00.json"
+    },
+    "G-01": {
+      "description": "Baseline scan validation",
+      "command": "python id_migration/scripts/validate_baseline_csv.py id_migration/output/physical_inventory_baseline.csv",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-01/G-01.json"
+    },
+    "G-02": {
+      "description": "Physical validation",
+      "command": "python id_migration/scripts/03_validate_physical_ids.py --config id_migration/config/physical_id_config.json",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-03/G-02.json"
+    },
+    "G-03": {
+      "description": "Semantic map validation",
+      "command": "python scripts/validate_identifier_map.py identifier_map.json",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-04/G-03.json"
+    },
+    "G-04": {
+      "description": "Generator update validation",
+      "command": "pytest -q tests/test_generator_update.py",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-05/G-04.json"
+    },
+    "G-05": {
+      "description": "Validator update validation",
+      "command": "pytest -q tests/test_validator_update.py",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-06/G-05.json"
+    },
+    "G-06": {
+      "description": "Regenerate validation",
+      "command": "python validate_three_artifact_alignment.py",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-07/G-06.json"
+    }
+  },
+  "path_normalization_contract": {
+    "description": "All cross-layer joins by relative_path MUST follow these rules.",
+    "rules": {
+      "root_stripping": "All paths relative to REPO_ROOT. No leading / or \\.",
+      "separator_normalization": "Convert all path separators to forward slash / for storage and comparison.",
+      "case_handling": "Preserve original case. Comparisons case-sensitive on Linux, case-insensitive on Windows.",
+      "duplicate_separators": "Collapse consecutive separators: dir//file.py -> dir/file.py",
+      "trailing_separators": "Strip trailing separators from directory paths.",
+      "dot_segments": "Resolve . and .. segments before storage.",
+      "encoding": "UTF-8 throughout."
+    },
+    "enforcement_points": [
+      "01_scan_repo_objects.py produces normalized paths in physical_inventory_baseline.csv",
+      "02_assign_physical_ids.py uses normalized paths in physical_id_registry.csv",
+      "generate_three_artifact_catalogs.py normalizes paths before join",
+      "validate_three_artifact_alignment.py verifies normalization consistency"
+    ],
+    "validation_gate": "Physical validator checks that every .dir_id file relative_path matches the normalized path computed from filesystem position."
+  },
+  "physical_id_registry_contract": {
+    "description": "physical_id_registry.csv has exactly 11 columns.",
+    "columns": [
+      {
+        "name": "object_type",
+        "type": "enum",
+        "constraint": "file or directory",
+        "source": "Scanner"
+      },
+      {
+        "name": "file_id",
+        "type": "string(20)",
+        "constraint": "^1\\d{19}$ or empty (if directory)",
+        "source": "Allocator"
+      },
+      {
+        "name": "directory_id",
+        "type": "string(20)",
+        "constraint": "^2\\d{19}$ or empty (if file)",
+        "source": "Allocator (.dir_id)"
+      },
+      {
+        "name": "relative_path",
+        "type": "string",
+        "constraint": "Normalized per path contract",
+        "source": "Scanner"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "constraint": "Basename only",
+        "source": "Scanner"
+      },
+      {
+        "name": "parent_relative_path",
+        "type": "string",
+        "constraint": "Normalized parent path",
+        "source": "Scanner"
+      },
+      {
+        "name": "parent_directory_id",
+        "type": "string(20)",
+        "constraint": "^2\\d{19}$ or empty (if root)",
+        "source": "Linkage resolver"
+      },
+      {
+        "name": "extension",
+        "type": "string",
+        "constraint": "With leading . or empty",
+        "source": "Scanner"
+      },
+      {
+        "name": "id_source",
+        "type": "enum",
+        "constraint": "COUNTER_STORE or preserved",
+        "source": "Allocator"
+      },
+      {
+        "name": "is_excluded",
+        "type": "boolean",
+        "constraint": "true/false",
+        "source": "Scanner"
+      },
+      {
+        "name": "exists_on_disk",
+        "type": "boolean",
+        "constraint": "true/false",
+        "source": "Scanner"
+      }
+    ],
+    "invariants": [
+      "Exactly one of file_id or directory_id is non-empty per row",
+      "Every parent_directory_id (when non-empty) appears as a directory_id in another row",
+      "No duplicate file_id values across all rows",
+      "No duplicate directory_id values across all rows",
+      "Every row with is_excluded=false has a non-empty ID",
+      "object_type=file implies file_id non-empty and directory_id empty",
+      "object_type=directory implies directory_id non-empty and file_id empty"
+    ],
+    "generation": "Registry is derived after allocator runs, never written by allocator directly."
+  },
+  "file_registry_contract": {
+    "description": "file_registry.csv has 11 columns (was 10), adding file_scope_class.",
+    "columns": [
+      "file_id",
+      "relative_path",
+      "directory_id",
+      "file_name",
+      "extension",
+      "module_id",
+      "assigned_module_name",
+      "process_steps",
+      "component_ids",
+      "last_verified_utc",
+      "file_scope_class"
+    ],
+    "file_scope_class_values": {
+      "module_owned": {
+        "meaning": "File belongs to one of 28 canonical modules",
+        "module_id": "Valid ^5\\d{19}$"
+      },
+      "shared": {
+        "meaning": "Cross-cutting utility under shared/",
+        "module_id": "50000000000000000099 (SHARED_LIBS)"
+      },
+      "test": {
+        "meaning": "Test files under tests/",
+        "module_id": "Blank"
+      },
+      "tooling": {
+        "meaning": "Scripts, CI, governance",
+        "module_id": "Blank"
+      },
+      "legacy": {
+        "meaning": "Deprecated or unmaintained (e.g., Directory management system/)",
+        "module_id": "Blank"
+      },
+      "config_data": {
+        "meaning": "Static config files",
+        "module_id": "50000000000000000001 (F1_CONFIG_PREFERENCES)"
+      },
+      "out_of_scope": {
+        "meaning": "Files that don't fit above",
+        "module_id": "Blank"
+      }
+    },
+    "blank_module_id_policy": "Blank module_id is allowed ONLY for test, tooling, legacy, or out_of_scope files."
+  },
+  "semantic_identity_contract": {
+    "canonical_module_count": 28,
+    "breakdown": "27 pipeline modules + 1 SHARED_LIBS",
+    "shared_libs": {
+      "module_id": "50000000000000000099",
+      "module_symbol": "SHARED_LIBS",
+      "module_name": "Shared Libraries",
+      "scope": "Only files under shared/ directory qualify"
+    },
+    "legacy_aliases": {
+      "count": 2,
+      "policy": "Aliases exist ONLY in identifier_map.json, never as rows in module_catalog.json",
+      "aliases": {
+        "O2_OMS": "O2_OMS_STATE_MACHINE",
+        "O3_PNL_CLASSIFIER": "O3_TRADE_CLOSE_CLASSIFIER"
+      }
+    },
+    "process_steps": {
+      "count": 26,
+      "id_pattern": "^6\\d{19}$"
+    },
+    "component_ids": {
+      "prefix": "7*",
+      "status": "future_work_only"
+    },
+    "control_flow_sentinels": {
+      "(loop)": {
+        "assigned_module": "F1_FLOW_ORCHESTRATOR",
+        "rationale": "Step 25 is a control-flow marker for reentry loop-back, not an independent module."
+      }
+    }
+  },
+  "absorbed_contracts": {
+    "source_artifacts": [
+      "numeric_only_identifier_migration.json (semantic layer)",
+      "stripped_down_id_migration_spec.json (physical layer)"
+    ],
+    "semantic_migration_contracts": {
+      "target_rules": {
+        "machine_join_keys": {
+          "module_id": {
+            "type": "string",
+            "pattern": "^5\\d{19}$",
+            "description": "Numeric-only module identifier"
+          },
+          "process_step_id": {
+            "type": "string",
+            "pattern": "^6\\d{19}$",
+            "description": "Numeric-only process step identifier"
+          },
+          "component_id": {
+            "type": "string",
+            "pattern": "^7\\d{19}$",
+            "description": "Numeric-only component/service identifier",
+            "status": "future_optional"
+          }
+        },
+        "non_join_metadata_fields": {
+          "canonical_symbol": {
+            "type": "string",
+            "description": "Former symbolic identifier retained for readability and search"
+          },
+          "module_name": {
+            "type": "string",
+            "description": "Human-readable label"
+          },
+          "process_step_name": {
+            "type": "string",
+            "description": "Human-readable label"
+          },
+          "module_symbol": {
+            "type": "string",
+            "description": "Optional copied symbol on process-step records for readability only"
+          }
+        },
+        "forbidden_as_primary_keys": [
+          "symbolic module_id values such as D2_CALENDAR_SOURCE_ADAPTER",
+          "symbolic process references used as join keys",
+          "human-readable names used as join keys"
+        ]
+      },
+      "artifact_changes": [
+        {
+          "artifact": "module_catalog.json",
+          "current_state": {
+            "primary_key": "symbolic module_id",
+            "example": "D2_CALENDAR_SOURCE_ADAPTER"
+          },
+          "target_state": {
+            "primary_key": "numeric module_id",
+            "example": "50000000000000000009"
+          },
+          "required_fields": [
+            {
+              "name": "module_id",
+              "type": "string",
+              "pattern": "^5\\d{19}$",
+              "required": true,
+              "role": "primary_machine_identifier"
+            },
+            {
+              "name": "canonical_symbol",
+              "type": "string",
+              "required": true,
+              "role": "metadata_only"
+            },
+            {
+              "name": "module_name",
+              "type": "string",
+              "required": true,
+              "role": "metadata_only"
+            },
+            {
+              "name": "module_kind",
+              "type": "string",
+              "required": true,
+              "role": "metadata_only"
+            },
+            {
+              "name": "description",
+              "type": "string",
+              "required": false,
+              "role": "metadata_only"
+            },
+            {
+              "name": "legacy_aliases",
+              "type": "array",
+              "items": "string",
+              "required": false,
+              "role": "metadata_only"
+            },
+            {
+              "name": "status",
+              "type": "string",
+              "enum": [
+                "canonical",
+                "legacy_alias",
+                "deprecated"
+              ],
+              "required": false,
+              "role": "metadata_only"
+            }
+          ],
+          "field_migrations": [
+            {
+              "from": "module_id(symbolic)",
+              "to": "canonical_symbol"
+            },
+            {
+              "from": "new mapping from identifier_map.json",
+              "to": "module_id(numeric)"
+            }
+          ]
+        },
+        {
+          "artifact": "process_step_catalog.json",
+          "current_state": {
+            "primary_key": "numeric process_step_id",
+            "module_reference": "symbolic module_id"
+          },
+          "target_state": {
+            "primary_key": "numeric process_step_id",
+            "module_reference": "numeric module_id"
+          },
+          "required_fields": [
+            {
+              "name": "process_step_id",
+              "type": "string",
+              "pattern": "^6\\d{19}$",
+              "required": true,
+              "role": "primary_machine_identifier"
+            },
+            {
+              "name": "process_step_name",
+              "type": "string",
+              "required": true,
+              "role": "metadata_only"
+            },
+            {
+              "name": "step_number",
+              "type": "integer",
+              "required": true,
+              "role": "ordering_metadata"
+            },
+            {
+              "name": "module_id",
+              "type": "string",
+              "pattern": "^5\\d{19}$",
+              "required": true,
+              "role": "foreign_key_to_module_catalog"
+            },
+            {
+              "name": "module_symbol",
+              "type": "string",
+              "required": false,
+              "role": "metadata_only"
+            }
+          ],
+          "field_migrations": [
+            {
+              "from": "module_id(symbolic)",
+              "to": "module_symbol"
+            },
+            {
+              "from": "lookup identifier_map.json using module_symbol",
+              "to": "module_id(numeric)"
+            }
+          ]
+        },
+        {
+          "artifact": "file_registry.csv",
+          "current_state": {
+            "module_reference": "symbolic module_id",
+            "process_reference": "numeric process_step_id"
+          },
+          "target_state": {
+            "module_reference": "numeric module_id",
+            "process_reference": "numeric process_step_id"
+          },
+          "required_column_policy": {
+            "preserve_column_count": true,
+            "preserve_existing_10_column_shape": true,
+            "replace_symbolic_module_id_values_only": true
+          },
+          "field_migrations": [
+            {
+              "column": "module_id",
+              "from": "symbolic module_id",
+              "to": "numeric module_id"
+            },
+            {
+              "column": "module_name",
+              "from": "humanized symbolic label",
+              "to": "human-readable label retained"
+            },
+            {
+              "column": "process_step_id",
+              "from": "numeric process_step_id",
+              "to": "unchanged"
+            },
+            {
+              "column": "process_step_name",
+              "from": "human-readable label",
+              "to": "unchanged"
+            }
+          ]
+        },
+        {
+          "artifact": "schemas/module_catalog.schema.json",
+          "current_state": {
+            "status": "supports symbolic-keyed catalog behavior"
+          },
+          "target_state": {
+            "status": "enforces numeric-only module machine identifiers"
+          },
+          "required_schema_rules": [
+            {
+              "field": "module_id",
+              "rule": "must match ^5\\\\d{19}$"
+            },
+            {
+              "field": "canonical_symbol",
+              "rule": "required string"
+            },
+            {
+              "field": "module_name",
+              "rule": "required string"
+            },
+            {
+              "field": "module_kind",
+              "rule": "required string"
+            }
+          ]
+        }
+      ],
+      "script_changes": [
+        {
+          "script": "generate_three_artifact_catalogs.py",
+          "required_modifications": [
+            {
+              "id": "GEN-001",
+              "title": "Load identifier map",
+              "action": "Add logic to load identifier_map.json before generating outputs",
+              "required": true
+            },
+            {
+              "id": "GEN-002",
+              "title": "Resolve canonical module symbol",
+              "action": "Normalize all incoming symbolic module references through aliases mapping before lookup",
+              "required": true
+            },
+            {
+              "id": "GEN-003",
+              "title": "Write numeric module IDs into module catalog",
+              "action": "Set module_id to numeric 5-prefix value and move symbolic identifier into canonical_symbol",
+              "required": true
+            },
+            {
+              "id": "GEN-004",
+              "title": "Write numeric module IDs into process step catalog",
+              "action": "Set module_id on each step record to numeric module ID and optionally add module_symbol",
+              "required": true
+            },
+            {
+              "id": "GEN-005",
+              "title": "Write numeric module IDs into file registry",
+              "action": "Replace symbolic module_id output with numeric module_id output",
+              "required": true
+            },
+            {
+              "id": "GEN-006",
+              "title": "Stop deriving identity from symbolic parsing",
+              "action": "Use explicit metadata from identifier_map.json instead of treating symbolic prefixes as identity source",
+              "required": true
+            }
+          ],
+          "input_normalization_rules": [
+            {
+              "source_value_type": "legacy symbolic module ID",
+              "resolution": "map through aliases then modules table"
+            },
+            {
+              "source_value_type": "canonical symbolic module ID",
+              "resolution": "lookup directly in modules table"
+            }
+          ],
+          "output_rules": [
+            {
+              "artifact": "module_catalog.json",
+              "rule": "never write symbolic values into module_id"
+            },
+            {
+              "artifact": "process_step_catalog.json",
+              "rule": "never write symbolic values into module_id"
+            },
+            {
+              "artifact": "file_registry.csv",
+              "rule": "never write symbolic values into module_id"
+            }
+          ]
+        },
+        {
+          "script": "validate_three_artifact_alignment.py",
+          "required_modifications": [
+            {
+              "id": "VAL-001",
+              "title": "Validate numeric module IDs",
+              "action": "Check that every module_catalog.module_id matches ^5\\\\d{19}$ and is unique",
+              "required": true
+            },
+            {
+              "id": "VAL-002",
+              "title": "Validate numeric process step IDs",
+              "action": "Check that every process_step_catalog.process_step_id matches ^6\\\\d{19}$ and is unique",
+              "required": true
+            },
+            {
+              "id": "VAL-003",
+              "title": "Validate numeric process-to-module foreign keys",
+              "action": "Check that every process_step_catalog.module_id exists in module_catalog.module_id",
+              "required": true
+            },
+            {
+              "id": "VAL-004",
+              "title": "Validate numeric registry-to-module foreign keys",
+              "action": "Check that every file_registry.module_id exists in module_catalog.module_id",
+              "required": true
+            },
+            {
+              "id": "VAL-005",
+              "title": "Reject symbolic module IDs in machine key fields",
+              "action": "Fail if any module_id field contains non-numeric symbolic values in canonical artifacts",
+              "required": true
+            },
+            {
+              "id": "VAL-006",
+              "title": "Validate metadata separately",
+              "action": "Check canonical_symbol uniqueness and non-empty values, but do not use them as join keys",
+              "required": true
+            },
+            {
+              "id": "VAL-007",
+              "title": "Split alignment and readiness",
+              "action": "Emit separate alignment_status and readiness_status results",
+              "required": true
+            }
+          ],
+          "readiness_failure_conditions": [
+            {
+              "field": "file_registry.file_id",
+              "condition": "blank_count > 0",
+              "severity": "fail_readiness"
+            },
+            {
+              "field": "file_registry.module_id",
+              "condition": "blank_count > 0",
+              "severity": "fail_readiness"
+            },
+            {
+              "field": "file_registry.directory_id",
+              "condition": "blank_count > 0",
+              "severity": "configurable_fail_readiness"
+            }
+          ]
+        }
+      ],
+      "compatibility_policy": {
+        "transition_mode": "one_cycle_only",
+        "allowed_inputs_during_transition": [
+          "legacy symbolic module references in source material"
+        ],
+        "required_outputs_during_transition": [
+          "numeric-only module_id values in canonical artifacts"
+        ],
+        "prohibited_after_transition": [
+          "symbolic module_id values in module_catalog.json",
+          "symbolic module_id values in process_step_catalog.json",
+          "symbolic module_id values in file_registry.csv"
+        ]
+      },
+      "acceptance_criteria": {
+        "module_catalog": [
+          "every module_id matches ^5\\d{19}$",
+          "every canonical_symbol is unique",
+          "no symbolic value is used as the primary key"
+        ],
+        "process_step_catalog": [
+          "every process_step_id matches ^6\\d{19}$",
+          "every module_id matches a module_catalog.module_id",
+          "no process step joins to a symbolic module identifier"
+        ],
+        "file_registry": [
+          "every nonblank module_id matches ^5\\d{19}$",
+          "every nonblank process_step_id matches ^6\\d{19}$",
+          "no registry row uses a symbolic module identifier in module_id"
+        ],
+        "validator": [
+          "alignment_status PASS requires numeric-only joins",
+          "readiness_status PASS requires no blank file_id and no blank module_id"
+        ]
+      }
+    },
+    "physical_migration_contracts": {
+      "normative_rules": {
+        "allocation": {
+          "id_length": 20,
+          "id_pattern": "^\\d{20}$",
+          "single_allocator_source": "COUNTER_STORE.json",
+          "manual_counter_edit_forbidden": true,
+          "id_reuse_forbidden": true
+        },
+        "directory_identity": {
+          "identity_mechanism": ".dir_id",
+          "one_anchor_per_governed_directory": true,
+          "root_directory_anchor_required": false,
+          "semantic_identity_layer_allowed": false
+        },
+        "file_identity": {
+          "identity_mechanism": "filename_prefix",
+          "python_prefix_format": "P_{20_digit_id}_",
+          "default_prefix_format": "{20_digit_id}_",
+          "existing_prefixed_files_must_not_be_renamed_again": true
+        },
+        "execution": {
+          "dry_run_required_before_apply": true,
+          "validation_required_after_apply": true,
+          "registry_is_derived_artifact": true,
+          "allocator_is_not_allowed_to_write_registry": true,
+          "sync_registry_must_not_allocate_ids": true
+        }
+      },
+      "default_config_values": {
+        "target_extensions": [
+          ".md",
+          ".txt",
+          ".py",
+          ".ps1",
+          ".yaml",
+          ".json",
+          ".yml"
+        ],
+        "excluded_directories": [
+          ".git",
+          "__pycache__",
+          "node_modules",
+          ".pytest_cache",
+          ".mypy_cache",
+          "htmlcov",
+          "out",
+          ".runs",
+          ".state",
+          ".coverage"
+        ],
+        "governed_directory_rule": "all directories at depth >= 1 that are not excluded",
+        "counter_store_path": "COUNTER_STORE.json",
+        "registry_output_path": "registry/file_system_id_registry.jsonl",
+        "manifest_output_path": "id_migration/output/migration_manifest.jsonl"
+      },
+      "required_repository_files": [
+        {
+          "path": "COUNTER_STORE.json",
+          "kind": "state_file",
+          "required": true,
+          "owner": "allocator",
+          "purpose": "Single source of truth for next ID allocation state.",
+          "inputs": [],
+          "outputs": [
+            "allocated 20-digit IDs"
+          ],
+          "must_do": [
+            "persist monotonically increasing allocation state",
+            "support atomic update during allocation"
+          ],
+          "must_not_do": [
+            "store registry rows",
+            "store semantic aliases",
+            "be edited by hand"
+          ]
+        },
+        {
+          "path": "id_migration/config/id_migration_config.json",
+          "kind": "config_file",
+          "required": true,
+          "owner": "all_scripts",
+          "purpose": "Central configuration for paths, exclusions, target file extensions, and output locations.",
+          "inputs": [],
+          "outputs": [
+            "runtime configuration object"
+          ],
+          "required_fields": [
+            "project_root",
+            "project_root_id",
+            "counter_store_path",
+            "target_extensions",
+            "excluded_directories",
+            "registry_output_path",
+            "manifest_output_path"
+          ]
+        },
+        {
+          "path": "id_migration/schemas/dir_id.schema.json",
+          "kind": "schema_file",
+          "required": true,
+          "owner": "03_validate_ids.py",
+          "purpose": "JSON Schema for .dir_id anchor files.",
+          "inputs": [],
+          "outputs": [
+            "schema validation results"
+          ],
+          "must_validate_fields": [
+            "dir_id",
+            "allocated_at_utc",
+            "allocator_version",
+            "project_root_id",
+            "relative_path"
+          ]
+        },
+        {
+          "path": "id_migration/scripts/00_run_migration.py",
+          "kind": "script",
+          "required": true,
+          "owner": "migration_orchestrator",
+          "purpose": "Single entrypoint that runs the migration in a fixed order.",
+          "inputs": [
+            "id_migration/config/id_migration_config.json",
+            "COUNTER_STORE.json"
+          ],
+          "outputs": [
+            "plan or apply result",
+            "id_migration/output/migration_manifest.jsonl"
+          ],
+          "must_do": [
+            "support --mode plan and --mode apply",
+            "run 01_generate_dir_ids.py before 02_assign_file_ids.py",
+            "run 03_validate_ids.py after mutations",
+            "run 04_sync_registry.py only after successful validation",
+            "stop on first non-zero exit code"
+          ],
+          "must_not_do": [
+            "perform allocation logic directly",
+            "contain duplicate scan logic already owned by child scripts"
+          ]
+        },
+        {
+          "path": "id_migration/scripts/01_generate_dir_ids.py",
+          "kind": "script",
+          "required": true,
+          "owner": "directory_identity_stage",
+          "purpose": "Create .dir_id anchor files for governed directories that do not already have one.",
+          "inputs": [
+            "id_migration/config/id_migration_config.json",
+            "COUNTER_STORE.json"
+          ],
+          "outputs": [
+            ".dir_id files",
+            "manifest rows"
+          ],
+          "must_do": [
+            "scan all directories under project_root",
+            "skip excluded directories",
+            "treat depth >= 1 non-excluded directories as governed",
+            "detect existing .dir_id and leave it unchanged",
+            "allocate one 20-digit ID per missing governed directory",
+            "write one .dir_id file per allocated directory",
+            "support plan mode without filesystem mutation"
+          ],
+          "must_not_do": [
+            "write semantic alias files",
+            "update registry output",
+            "rename files"
+          ]
+        },
+        {
+          "path": "id_migration/scripts/02_assign_file_ids.py",
+          "kind": "script",
+          "required": true,
+          "owner": "file_identity_stage",
+          "purpose": "Rename target files that do not already contain a valid ID prefix.",
+          "inputs": [
+            "id_migration/config/id_migration_config.json",
+            "COUNTER_STORE.json"
+          ],
+          "outputs": [
+            "renamed files",
+            "manifest rows"
+          ],
+          "must_do": [
+            "scan recursively for files with configured target extensions",
+            "skip files under excluded directories",
+            "detect existing valid file IDs and skip them",
+            "allocate one 20-digit ID per file being renamed",
+            "rename .py files using P_{id}_ prefix",
+            "rename non-.py files using {id}_ prefix",
+            "support plan mode without filesystem mutation"
+          ],
+          "must_not_do": [
+            "write .dir_id files",
+            "update registry output",
+            "allocate IDs for skipped files"
+          ]
+        },
+        {
+          "path": "id_migration/scripts/03_validate_ids.py",
+          "kind": "script",
+          "required": true,
+          "owner": "validation_stage",
+          "purpose": "Validate all directory and file IDs after mutation.",
+          "inputs": [
+            "id_migration/config/id_migration_config.json",
+            "id_migration/schemas/dir_id.schema.json"
+          ],
+          "outputs": [
+            "validation report",
+            "exit code"
+          ],
+          "must_do": [
+            "validate every .dir_id file against schema",
+            "check every dir_id matches ^\\\\d{20}$",
+            "check every file ID matches required prefix pattern",
+            "check for duplicate dir_ids",
+            "check for duplicate file_ids",
+            "fail if any governed directory lacks .dir_id after apply"
+          ],
+          "must_not_do": [
+            "allocate new IDs",
+            "rename files",
+            "modify .dir_id files",
+            "write registry rows"
+          ]
+        },
+        {
+          "path": "id_migration/scripts/04_sync_registry.py",
+          "kind": "script",
+          "required": true,
+          "owner": "registry_sync_stage",
+          "purpose": "Generate a derived filesystem ID registry from the current filesystem state only.",
+          "inputs": [
+            "id_migration/config/id_migration_config.json"
+          ],
+          "outputs": [
+            "registry/file_system_id_registry.jsonl"
+          ],
+          "must_do": [
+            "read current filesystem state after validation succeeds",
+            "emit one registry row per governed directory and one registry row per ID-bearing file",
+            "record relative_path, object_type, physical_id, source_of_truth, and status",
+            "overwrite registry output atomically"
+          ],
+          "must_not_do": [
+            "allocate IDs",
+            "repair invalid IDs",
+            "rename files",
+            "change .dir_id files"
+          ]
+        },
+        {
+          "path": "id_migration/output/migration_manifest.jsonl",
+          "kind": "generated_log",
+          "required": true,
+          "owner": "all_scripts",
+          "purpose": "Append-only execution log for plan and apply runs.",
+          "inputs": [
+            "events emitted by scripts"
+          ],
+          "outputs": [
+            "auditable line-delimited JSON event stream"
+          ],
+          "event_types": [
+            "plan_dir_id_create",
+            "apply_dir_id_create",
+            "plan_file_rename",
+            "apply_file_rename",
+            "validation_success",
+            "validation_failure",
+            "registry_sync"
+          ]
+        },
+        {
+          "path": "registry/file_system_id_registry.jsonl",
+          "kind": "generated_registry",
+          "required": true,
+          "owner": "04_sync_registry.py",
+          "purpose": "Derived registry of current physical filesystem identities.",
+          "inputs": [
+            "current filesystem state"
+          ],
+          "outputs": [
+            "jsonl rows"
+          ],
+          "required_row_fields": [
+            "object_type",
+            "relative_path",
+            "physical_id",
+            "source_of_truth",
+            "status"
+          ]
+        }
+      ],
+      "command_contracts": [
+        {
+          "script": "id_migration/scripts/00_run_migration.py",
+          "accepted_args": {
+            "--config": "required path",
+            "--mode": [
+              "plan",
+              "apply"
+            ]
+          },
+          "exit_codes": {
+            "0": "success",
+            "1": "validation_or_runtime_failure",
+            "2": "configuration_error"
+          }
+        },
+        {
+          "script": "id_migration/scripts/01_generate_dir_ids.py",
+          "accepted_args": {
+            "--config": "required path",
+            "--mode": [
+              "plan",
+              "apply"
+            ]
+          }
+        },
+        {
+          "script": "id_migration/scripts/02_assign_file_ids.py",
+          "accepted_args": {
+            "--config": "required path",
+            "--mode": [
+              "plan",
+              "apply"
+            ]
+          }
+        },
+        {
+          "script": "id_migration/scripts/03_validate_ids.py",
+          "accepted_args": {
+            "--config": "required path"
+          }
+        },
+        {
+          "script": "id_migration/scripts/04_sync_registry.py",
+          "accepted_args": {
+            "--config": "required path"
+          }
+        }
+      ],
+      "execution_order": [
+        {
+          "step": 1,
+          "script": "id_migration/scripts/01_generate_dir_ids.py",
+          "mode": "plan",
+          "required": true
+        },
+        {
+          "step": 2,
+          "script": "id_migration/scripts/02_assign_file_ids.py",
+          "mode": "plan",
+          "required": true
+        },
+        {
+          "step": 3,
+          "script": "id_migration/scripts/01_generate_dir_ids.py",
+          "mode": "apply",
+          "required": true
+        },
+        {
+          "step": 4,
+          "script": "id_migration/scripts/02_assign_file_ids.py",
+          "mode": "apply",
+          "required": true
+        },
+        {
+          "step": 5,
+          "script": "id_migration/scripts/03_validate_ids.py",
+          "mode": "apply",
+          "required": true
+        },
+        {
+          "step": 6,
+          "script": "id_migration/scripts/04_sync_registry.py",
+          "mode": "apply",
+          "required": true
+        }
+      ],
+      "deprecation_map": [
+        {
+          "current_item": "P_01999000042260125100_generate_dir_ids_gov_reg.py",
+          "replacement_item": "id_migration/scripts/01_generate_dir_ids.py",
+          "action": "replace"
+        },
+        {
+          "current_item": "P_01999000042260125101_validate_dir_ids.py",
+          "replacement_item": "id_migration/scripts/03_validate_ids.py",
+          "action": "replace_and_expand_to_include_file_ids"
+        },
+        {
+          "current_item": "P_01999000042260125102_populate_registry_dir_ids.py",
+          "replacement_item": "id_migration/scripts/04_sync_registry.py",
+          "action": "replace"
+        },
+        {
+          "current_item": "P_01260207201000000198_add_ids_recursive.py",
+          "replacement_item": "id_migration/scripts/02_assign_file_ids.py",
+          "action": "replace"
+        },
+        {
+          "current_item": "P_01999000042260124031_unified_id_allocator.py",
+          "replacement_item": "allocator implementation retained behind COUNTER_STORE.json contract",
+          "action": "retain_single_implementation"
+        },
+        {
+          "current_item": "path_index.yaml semantic identity layer",
+          "replacement_item": null,
+          "action": "remove"
+        }
+      ],
+      "must_not_exist_in_design": [
+        {
+          "item": "semantic directory identity registry",
+          "examples": [
+            "path_index.yaml",
+            "human-readable directory alias layer"
+          ],
+          "reason": "not required for physical ID migration"
+        },
+        {
+          "item": "manual allocation path as an official execution path",
+          "reason": "creates drift and duplicate behavior"
+        },
+        {
+          "item": "duplicate allocator implementations in multiple packages",
+          "reason": "single allocator source is required"
+        },
+        {
+          "item": "registry mutation inside allocator or validator",
+          "reason": "registry must be derived after validation"
+        }
+      ]
+    }
+  }
+}

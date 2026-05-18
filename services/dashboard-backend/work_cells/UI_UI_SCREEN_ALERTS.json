@@ -1,0 +1,38 @@
+{
+  "manifest_type": "service_work_cell_binding",
+  "generated_at_utc": "2026-05-18T05:47:05Z",
+  "work_cell_id": "UI_UI_SCREEN_ALERTS",
+  "work_cell_type": "ui_screen",
+  "parent_module_symbol": "SHARED_LIBS",
+  "requires_agent_capability": [
+    "ui"
+  ],
+  "context_packet_path": "context_packets/50000000000000000099/UI_UI_SCREEN_ALERTS/work_cell_context.json",
+  "service": "dashboard-backend",
+  "source_files": [
+    "services\\dashboard-backend\\src\\2099900104260118_advanced_indicators.py",
+    "services\\dashboard-backend\\src\\2099900105260118_dashboard_backend.py",
+    "services\\dashboard-backend\\src\\2099900106260118_main.py",
+    "services\\dashboard-backend\\src\\2099900107260118_plugin.py",
+    "services\\dashboard-backend\\src\\2099900108260118_tkinter_dashboard_gui.py"
+  ],
+  "test_files": [],
+  "allowed_dependencies": [],
+  "forbidden_dependencies": [
+    "B2_MT4_EA_EXECUTOR",
+    "O1_ORDER_ROUTER",
+    "R2_ORDER_INTENT_COMPILER"
+  ],
+  "required_reference_documents": [
+    "DOC_UI_CATALOG",
+    "DOC_COMM_CHANNELS",
+    "DOC_MODULE_CATALOG",
+    "DOC_PROCESS_STEP_CATALOG",
+    "DOC_ROUTING_INSTRUCTIONS",
+    "DOC_DECOMPOSITION_MODEL"
+  ],
+  "notes": [
+    "Manifest-only Phase 3 binding; no runtime logic was moved by this completion pass.",
+    "Use this file as the source-scope contract for subsequent behavior-preserving extraction."
+  ]
+}

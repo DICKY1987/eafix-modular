@@ -1,0 +1,667 @@
+{
+  "plan_name": "numeric_only_identifier_migration",
+  "plan_version": "1.0.0",
+  "objective": "Convert the three-artifact system from mixed symbolic-plus-numeric identifiers to numeric-only machine identifiers, while retaining symbolic values and human-readable names as metadata only.",
+  "scope": {
+    "artifacts": [
+      "module_catalog.json",
+      "process_step_catalog.json",
+      "file_registry.csv",
+      "schemas/module_catalog.schema.json"
+    ],
+    "scripts": [
+      "generate_three_artifact_catalogs.py",
+      "validate_three_artifact_alignment.py"
+    ]
+  },
+  "target_rules": {
+    "machine_join_keys": {
+      "module_id": {
+        "type": "string",
+        "pattern": "^5\\d{19}$",
+        "description": "Numeric-only module identifier"
+      },
+      "process_step_id": {
+        "type": "string",
+        "pattern": "^6\\d{19}$",
+        "description": "Numeric-only process step identifier"
+      },
+      "component_id": {
+        "type": "string",
+        "pattern": "^7\\d{19}$",
+        "description": "Numeric-only component/service identifier",
+        "status": "future_optional"
+      }
+    },
+    "non_join_metadata_fields": {
+      "canonical_symbol": {
+        "type": "string",
+        "description": "Former symbolic identifier retained for readability and search"
+      },
+      "module_name": {
+        "type": "string",
+        "description": "Human-readable label"
+      },
+      "process_step_name": {
+        "type": "string",
+        "description": "Human-readable label"
+      },
+      "module_symbol": {
+        "type": "string",
+        "description": "Optional copied symbol on process-step records for readability only"
+      }
+    },
+    "forbidden_as_primary_keys": [
+      "symbolic module_id values such as D2_CALENDAR_SOURCE_ADAPTER",
+      "symbolic process references used as join keys",
+      "human-readable names used as join keys"
+    ]
+  },
+  "authoritative_mapping_artifact": {
+    "file_name": "identifier_map.json",
+    "status": "required_new_artifact",
+    "purpose": "Single source of truth for numeric identifiers, symbols, names, aliases, and optional component IDs",
+    "schema": {
+      "modules": {
+        "<canonical_symbol>": {
+          "module_id": "5xxxxxxxxxxxxxxxxxxx",
+          "module_name": "string",
+          "module_kind": "string",
+          "status": "canonical|legacy_alias|deprecated",
+          "legacy_aliases": [
+            "string"
+          ]
+        }
+      },
+      "process_steps": {
+        "<process_step_name_or_key>": {
+          "process_step_id": "6xxxxxxxxxxxxxxxxxxx",
+          "step_number": 0,
+          "module_symbol": "string"
+        }
+      },
+      "components": {
+        "<component_name>": {
+          "component_id": "7xxxxxxxxxxxxxxxxxxx"
+        }
+      },
+      "aliases": {
+        "<legacy_symbol>": "<canonical_symbol>"
+      }
+    },
+    "minimum_required_entries": {
+      "modules": 28,
+      "process_steps": 26
+    }
+  },
+  "artifact_changes": [
+    {
+      "artifact": "module_catalog.json",
+      "current_state": {
+        "primary_key": "symbolic module_id",
+        "example": "D2_CALENDAR_SOURCE_ADAPTER"
+      },
+      "target_state": {
+        "primary_key": "numeric module_id",
+        "example": "50000000000000000009"
+      },
+      "required_fields": [
+        {
+          "name": "module_id",
+          "type": "string",
+          "pattern": "^5\\d{19}$",
+          "required": true,
+          "role": "primary_machine_identifier"
+        },
+        {
+          "name": "canonical_symbol",
+          "type": "string",
+          "required": true,
+          "role": "metadata_only"
+        },
+        {
+          "name": "module_name",
+          "type": "string",
+          "required": true,
+          "role": "metadata_only"
+        },
+        {
+          "name": "module_kind",
+          "type": "string",
+          "required": true,
+          "role": "metadata_only"
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "required": false,
+          "role": "metadata_only"
+        },
+        {
+          "name": "legacy_aliases",
+          "type": "array",
+          "items": "string",
+          "required": false,
+          "role": "metadata_only"
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "enum": [
+            "canonical",
+            "legacy_alias",
+            "deprecated"
+          ],
+          "required": false,
+          "role": "metadata_only"
+        }
+      ],
+      "field_migrations": [
+        {
+          "from": "module_id(symbolic)",
+          "to": "canonical_symbol"
+        },
+        {
+          "from": "new mapping from identifier_map.json",
+          "to": "module_id(numeric)"
+        }
+      ]
+    },
+    {
+      "artifact": "process_step_catalog.json",
+      "current_state": {
+        "primary_key": "numeric process_step_id",
+        "module_reference": "symbolic module_id"
+      },
+      "target_state": {
+        "primary_key": "numeric process_step_id",
+        "module_reference": "numeric module_id"
+      },
+      "required_fields": [
+        {
+          "name": "process_step_id",
+          "type": "string",
+          "pattern": "^6\\d{19}$",
+          "required": true,
+          "role": "primary_machine_identifier"
+        },
+        {
+          "name": "process_step_name",
+          "type": "string",
+          "required": true,
+          "role": "metadata_only"
+        },
+        {
+          "name": "step_number",
+          "type": "integer",
+          "required": true,
+          "role": "ordering_metadata"
+        },
+        {
+          "name": "module_id",
+          "type": "string",
+          "pattern": "^5\\d{19}$",
+          "required": true,
+          "role": "foreign_key_to_module_catalog"
+        },
+        {
+          "name": "module_symbol",
+          "type": "string",
+          "required": false,
+          "role": "metadata_only"
+        }
+      ],
+      "field_migrations": [
+        {
+          "from": "module_id(symbolic)",
+          "to": "module_symbol"
+        },
+        {
+          "from": "lookup identifier_map.json using module_symbol",
+          "to": "module_id(numeric)"
+        }
+      ]
+    },
+    {
+      "artifact": "file_registry.csv",
+      "current_state": {
+        "module_reference": "symbolic module_id",
+        "process_reference": "numeric process_step_id"
+      },
+      "target_state": {
+        "module_reference": "numeric module_id",
+        "process_reference": "numeric process_step_id"
+      },
+      "required_column_policy": {
+        "preserve_column_count": true,
+        "preserve_existing_10_column_shape": true,
+        "replace_symbolic_module_id_values_only": true
+      },
+      "field_migrations": [
+        {
+          "column": "module_id",
+          "from": "symbolic module_id",
+          "to": "numeric module_id"
+        },
+        {
+          "column": "module_name",
+          "from": "humanized symbolic label",
+          "to": "human-readable label retained"
+        },
+        {
+          "column": "process_step_id",
+          "from": "numeric process_step_id",
+          "to": "unchanged"
+        },
+        {
+          "column": "process_step_name",
+          "from": "human-readable label",
+          "to": "unchanged"
+        }
+      ]
+    },
+    {
+      "artifact": "schemas/module_catalog.schema.json",
+      "current_state": {
+        "status": "supports symbolic-keyed catalog behavior"
+      },
+      "target_state": {
+        "status": "enforces numeric-only module machine identifiers"
+      },
+      "required_schema_rules": [
+        {
+          "field": "module_id",
+          "rule": "must match ^5\\\\d{19}$"
+        },
+        {
+          "field": "canonical_symbol",
+          "rule": "required string"
+        },
+        {
+          "field": "module_name",
+          "rule": "required string"
+        },
+        {
+          "field": "module_kind",
+          "rule": "required string"
+        }
+      ]
+    }
+  ],
+  "script_changes": [
+    {
+      "script": "generate_three_artifact_catalogs.py",
+      "required_modifications": [
+        {
+          "id": "GEN-001",
+          "title": "Load identifier map",
+          "action": "Add logic to load identifier_map.json before generating outputs",
+          "required": true
+        },
+        {
+          "id": "GEN-002",
+          "title": "Resolve canonical module symbol",
+          "action": "Normalize all incoming symbolic module references through aliases mapping before lookup",
+          "required": true
+        },
+        {
+          "id": "GEN-003",
+          "title": "Write numeric module IDs into module catalog",
+          "action": "Set module_id to numeric 5-prefix value and move symbolic identifier into canonical_symbol",
+          "required": true
+        },
+        {
+          "id": "GEN-004",
+          "title": "Write numeric module IDs into process step catalog",
+          "action": "Set module_id on each step record to numeric module ID and optionally add module_symbol",
+          "required": true
+        },
+        {
+          "id": "GEN-005",
+          "title": "Write numeric module IDs into file registry",
+          "action": "Replace symbolic module_id output with numeric module_id output",
+          "required": true
+        },
+        {
+          "id": "GEN-006",
+          "title": "Stop deriving identity from symbolic parsing",
+          "action": "Use explicit metadata from identifier_map.json instead of treating symbolic prefixes as identity source",
+          "required": true
+        }
+      ],
+      "input_normalization_rules": [
+        {
+          "source_value_type": "legacy symbolic module ID",
+          "resolution": "map through aliases then modules table"
+        },
+        {
+          "source_value_type": "canonical symbolic module ID",
+          "resolution": "lookup directly in modules table"
+        }
+      ],
+      "output_rules": [
+        {
+          "artifact": "module_catalog.json",
+          "rule": "never write symbolic values into module_id"
+        },
+        {
+          "artifact": "process_step_catalog.json",
+          "rule": "never write symbolic values into module_id"
+        },
+        {
+          "artifact": "file_registry.csv",
+          "rule": "never write symbolic values into module_id"
+        }
+      ]
+    },
+    {
+      "script": "validate_three_artifact_alignment.py",
+      "required_modifications": [
+        {
+          "id": "VAL-001",
+          "title": "Validate numeric module IDs",
+          "action": "Check that every module_catalog.module_id matches ^5\\\\d{19}$ and is unique",
+          "required": true
+        },
+        {
+          "id": "VAL-002",
+          "title": "Validate numeric process step IDs",
+          "action": "Check that every process_step_catalog.process_step_id matches ^6\\\\d{19}$ and is unique",
+          "required": true
+        },
+        {
+          "id": "VAL-003",
+          "title": "Validate numeric process-to-module foreign keys",
+          "action": "Check that every process_step_catalog.module_id exists in module_catalog.module_id",
+          "required": true
+        },
+        {
+          "id": "VAL-004",
+          "title": "Validate numeric registry-to-module foreign keys",
+          "action": "Check that every file_registry.module_id exists in module_catalog.module_id",
+          "required": true
+        },
+        {
+          "id": "VAL-005",
+          "title": "Reject symbolic module IDs in machine key fields",
+          "action": "Fail if any module_id field contains non-numeric symbolic values in canonical artifacts",
+          "required": true
+        },
+        {
+          "id": "VAL-006",
+          "title": "Validate metadata separately",
+          "action": "Check canonical_symbol uniqueness and non-empty values, but do not use them as join keys",
+          "required": true
+        },
+        {
+          "id": "VAL-007",
+          "title": "Split alignment and readiness",
+          "action": "Emit separate alignment_status and readiness_status results",
+          "required": true
+        }
+      ],
+      "readiness_failure_conditions": [
+        {
+          "field": "file_registry.file_id",
+          "condition": "blank_count > 0",
+          "severity": "fail_readiness"
+        },
+        {
+          "field": "file_registry.module_id",
+          "condition": "blank_count > 0",
+          "severity": "fail_readiness"
+        },
+        {
+          "field": "file_registry.directory_id",
+          "condition": "blank_count > 0",
+          "severity": "configurable_fail_readiness"
+        }
+      ]
+    }
+  ],
+  "migration_sequence": [
+    {
+      "phase": 1,
+      "name": "establish_identifier_map",
+      "tasks": [
+        {
+          "id": "P1-T1",
+          "action": "Create identifier_map.json",
+          "outputs": [
+            "identifier_map.json"
+          ]
+        },
+        {
+          "id": "P1-T2",
+          "action": "Populate all 28 canonical modules with numeric IDs, names, kinds, status, and aliases",
+          "depends_on": [
+            "P1-T1"
+          ]
+        },
+        {
+          "id": "P1-T3",
+          "action": "Populate all 26 process steps with numeric IDs and canonical module symbol references",
+          "depends_on": [
+            "P1-T1"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 2,
+      "name": "update_generator",
+      "tasks": [
+        {
+          "id": "P2-T1",
+          "action": "Modify generate_three_artifact_catalogs.py to load identifier_map.json"
+        },
+        {
+          "id": "P2-T2",
+          "action": "Modify generator to resolve aliases before writing any module references",
+          "depends_on": [
+            "P2-T1"
+          ]
+        },
+        {
+          "id": "P2-T3",
+          "action": "Modify generator to emit numeric module_id in module_catalog.json",
+          "depends_on": [
+            "P2-T1",
+            "P2-T2"
+          ]
+        },
+        {
+          "id": "P2-T4",
+          "action": "Modify generator to emit numeric module_id in process_step_catalog.json",
+          "depends_on": [
+            "P2-T1",
+            "P2-T2"
+          ]
+        },
+        {
+          "id": "P2-T5",
+          "action": "Modify generator to emit numeric module_id in file_registry.csv",
+          "depends_on": [
+            "P2-T1",
+            "P2-T2"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "update_schema_and_validator",
+      "tasks": [
+        {
+          "id": "P3-T1",
+          "action": "Update module catalog schema to require numeric module_id and metadata fields"
+        },
+        {
+          "id": "P3-T2",
+          "action": "Update validate_three_artifact_alignment.py to validate numeric joins only",
+          "depends_on": [
+            "P3-T1"
+          ]
+        },
+        {
+          "id": "P3-T3",
+          "action": "Add readiness_status output and fail conditions for blank IDs",
+          "depends_on": [
+            "P3-T2"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "regenerate_artifacts",
+      "tasks": [
+        {
+          "id": "P4-T1",
+          "action": "Run generator to regenerate module_catalog.json"
+        },
+        {
+          "id": "P4-T2",
+          "action": "Run generator to regenerate process_step_catalog.json"
+        },
+        {
+          "id": "P4-T3",
+          "action": "Run generator to regenerate file_registry.csv"
+        }
+      ]
+    },
+    {
+      "phase": 5,
+      "name": "validate_and_inspect",
+      "tasks": [
+        {
+          "id": "P5-T1",
+          "action": "Run validator against regenerated artifacts"
+        },
+        {
+          "id": "P5-T2",
+          "action": "Confirm no symbolic values remain in canonical module_id fields",
+          "depends_on": [
+            "P5-T1"
+          ]
+        },
+        {
+          "id": "P5-T3",
+          "action": "Confirm all process step module references are numeric",
+          "depends_on": [
+            "P5-T1"
+          ]
+        },
+        {
+          "id": "P5-T4",
+          "action": "Confirm all registry module references are numeric",
+          "depends_on": [
+            "P5-T1"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": 6,
+      "name": "enforce_hard_rules",
+      "tasks": [
+        {
+          "id": "P6-T1",
+          "action": "Remove any temporary compatibility logic that allows symbolic module_id values in canonical outputs"
+        },
+        {
+          "id": "P6-T2",
+          "action": "Fail validation on any future symbolic module_id usage in machine key fields",
+          "depends_on": [
+            "P6-T1"
+          ]
+        }
+      ]
+    }
+  ],
+  "compatibility_policy": {
+    "transition_mode": "one_cycle_only",
+    "allowed_inputs_during_transition": [
+      "legacy symbolic module references in source material"
+    ],
+    "required_outputs_during_transition": [
+      "numeric-only module_id values in canonical artifacts"
+    ],
+    "prohibited_after_transition": [
+      "symbolic module_id values in module_catalog.json",
+      "symbolic module_id values in process_step_catalog.json",
+      "symbolic module_id values in file_registry.csv"
+    ]
+  },
+  "acceptance_criteria": {
+    "module_catalog": [
+      "every module_id matches ^5\\d{19}$",
+      "every canonical_symbol is unique",
+      "no symbolic value is used as the primary key"
+    ],
+    "process_step_catalog": [
+      "every process_step_id matches ^6\\d{19}$",
+      "every module_id matches a module_catalog.module_id",
+      "no process step joins to a symbolic module identifier"
+    ],
+    "file_registry": [
+      "every nonblank module_id matches ^5\\d{19}$",
+      "every nonblank process_step_id matches ^6\\d{19}$",
+      "no registry row uses a symbolic module identifier in module_id"
+    ],
+    "validator": [
+      "alignment_status PASS requires numeric-only joins",
+      "readiness_status PASS requires no blank file_id and no blank module_id"
+    ]
+  },
+  "risks": [
+    {
+      "id": "R-001",
+      "title": "Alias collapse errors",
+      "description": "Legacy symbolic aliases may accidentally map to the wrong canonical module during normalization",
+      "mitigation": "Require explicit aliases table in identifier_map.json and validator alias integrity checks"
+    },
+    {
+      "id": "R-002",
+      "title": "Hidden symbolic parsing dependencies",
+      "description": "Existing logic may depend on prefixes such as D2, B2, or O3",
+      "mitigation": "Move all semantic classification to explicit metadata fields"
+    },
+    {
+      "id": "R-003",
+      "title": "Reduced human readability",
+      "description": "Numeric-only keys are opaque during manual review",
+      "mitigation": "Retain canonical_symbol and module_name as required metadata"
+    }
+  ],
+  "example_target_records": {
+    "module_catalog_record": {
+      "module_id": "50000000000000000009",
+      "canonical_symbol": "D2_CALENDAR_SOURCE_ADAPTER",
+      "module_name": "Calendar Source Adapter",
+      "module_kind": "data",
+      "description": "Polls external calendar sources for raw events.",
+      "legacy_aliases": [],
+      "status": "canonical"
+    },
+    "process_step_catalog_record": {
+      "process_step_id": "60000000000000000023",
+      "process_step_name": "Poll calendar source(s)",
+      "step_number": 23,
+      "module_id": "50000000000000000009",
+      "module_symbol": "D2_CALENDAR_SOURCE_ADAPTER"
+    },
+    "file_registry_row": {
+      "file_id": "01999000000000000001",
+      "directory_id": "02999000000000000001",
+      "file_name": "2099900093260118_main.py",
+      "relative_path": "services/calendar-ingestor/src/2099900093260118_main.py",
+      "process_step_id": "60000000000000000023",
+      "process_step_name": "Poll calendar source(s)",
+      "module_id": "50000000000000000009",
+      "module_name": "Calendar Source Adapter",
+      "entrypoint_name": "2099900093260118_main.py",
+      "entrypoint_path": "services/calendar-ingestor/src/2099900093260118_main.py"
+    }
+  }
+}

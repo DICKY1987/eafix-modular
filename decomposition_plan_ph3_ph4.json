@@ -1,0 +1,1352 @@
+{
+  "plan_metadata": {
+    "title": "EAFIX Work-Cell Decomposition — Phase 3 & 4 Execution Plan",
+    "version": "1.0.0",
+    "created": "2026-05-16",
+    "template_version": "newPhasePlanProcess v3.3.1",
+    "tier": "full",
+    "tier_rationale": "Phases 3 and 4 involve executable source mutations and routing rule production. Full pattern-first enforcement, worktree isolation, rollback plans, and all GATE-CFG-001 through GATE-CFG-006 are mandatory.",
+    "parent_plan": "decomposition_plan_ph1_ph2.json",
+    "phases_covered": ["PH-03A", "PH-03B", "PH-03C", "PH-03D", "PH-04A", "PH-04B"],
+    "phase_descriptions": {
+      "PH-03A": "Pattern Bootstrap — create PATTERN_INDEX.yaml and all patterns required for refactoring. MUST complete before any PH-03B/C/D work begins.",
+      "PH-03B": "Refactor Calendar Pipeline services (calendar-ingestor). Splits monolithic service into D2/D3/F2/D4 work-cell-scoped modules.",
+      "PH-03C": "Refactor MT4 Bridge services (transport-router, EA executor). Splits into B1/B2/B3 work-cell-scoped modules.",
+      "PH-03D": "Refactor remaining dense services (risk-manager, reentry-engine, gui-gateway). Splits into R1-R9, E1-E4, UI work cells.",
+      "PH-04A": "Routing Rule Pattern Bootstrap — create PAT-ROUTING-RULE-AUTHOR and register EXEC-ROUTING-RULE-WRITER before any PH-04B work begins.",
+      "PH-04B": "Author and validate AI routing rules (routing_rules.json) mapping natural language task keywords to work cell context."
+    },
+    "prerequisite_check": {
+      "required_artifacts_from_ph1_ph2": [
+        "submodule_context_catalog.json (GATE-SCHEMA-001 passed)",
+        "context_packets/{all modules}/ (GATE-PKT-001 passed)",
+        "GATE-NOOVERRIDE-001 clean pass on all AUTHORITATIVE artifacts"
+      ],
+      "required_baseline_state": "Git working tree clean on base branch before PH-03A begins."
+    }
+  },
+
+  "critical_constraint": {
+    "name": "NO_IMPLIED_BEHAVIOR",
+    "rules": [
+      "Every executable step MUST declare pattern_id, executor_id, spec_file, config_schema_file before execution.",
+      "No source file may be refactored without a matching context_packet.json from Phase 2 defining its allowed_files.",
+      "Behavior may only be bound through registered executors plus approved spec/config/schema artifacts.",
+      "Ad hoc script creation where a registered pattern exists is forbidden.",
+      "Every planned source mutation MUST be pre-declared in artifact_intent_manifest.",
+      "Worktrees must be isolated: no PH-03B worktree may write into a PH-03C directory.",
+      "Protected paths must never be modified — enforcement is halt_and_rollback.",
+      "Pattern creation (PH-03A) MUST complete and all GATE-CFG-001 through GATE-CFG-006 MUST pass before any refactoring step begins.",
+      "Routing rules MUST be derived from submodule_context_catalog.json — no keyword or mapping invented without catalog backing.",
+      "step_id values are phase-scoped; global references use phase_step_key = {phase_id}/{step_id}."
+    ]
+  },
+
+  "platform_profile": {
+    "os_support": ["Windows", "Linux"],
+    "primary_os": "Windows",
+    "commands": {
+      "Windows": "powershell -Command",
+      "Linux": "bash -c"
+    },
+    "path_separators": {
+      "Windows": "\\",
+      "Linux": "/"
+    },
+    "python_invocation": {
+      "Windows": "python",
+      "Linux": "python3"
+    },
+    "notes": [
+      "All paths in this plan use forward-slash notation; the executor normalizes to OS path separator at runtime.",
+      "Git commands are cross-platform via Git for Windows on Windows.",
+      "Avoid shell-specific pipe syntax in commands; use Python scripts for complex operations."
+    ]
+  },
+
+  "protected_paths": {
+    "paths": [
+      ".git/objects/**",
+      ".git/refs/heads/main",
+      "module_catalog.json",
+      "process_step_catalog.json",
+      "updated_trading_process_aligned.json",
+      "communication_channels.json",
+      "ui_catalog.json",
+      "EAFIX CALENDAR DES RULES.pdf",
+      "mt4_authoritative_reference_for_ai.json",
+      "file_module_mapping.csv",
+      "eafix_services_ai_reference_20260510.json",
+      "eafix_project_knowledge_reference_routing_instructions.json",
+      "decomposition_model.json",
+      "submodule_context_catalog.json",
+      "submodule_catalog_schema.json",
+      "context_packet_schema.json",
+      "context_packets/**",
+      "decomposition_plan_ph1_ph2.json",
+      "decomposition_plan_ph3_ph4.json",
+      "PATTERN_INDEX.yaml"
+    ],
+    "enforcement": {
+      "runtime_block": true,
+      "post_run_verification": true,
+      "violation_action": "halt_and_rollback"
+    },
+    "note": "PATTERN_INDEX.yaml is protected once authored in PH-03A — it may only be extended by an approved PATTERN_CREATION step, never edited in-place by a refactoring or routing step."
+  },
+
+  "run_artifact_policy": {
+    "run_root_pattern": ".state/",
+    "all_artifacts_must_be_under_run_root": true,
+    "worktree_root_pattern": ".worktrees/",
+    "leak_detection_command": "python scripts/check_artifact_containment.py --roots .state/ .worktrees/ --source-dirs services/",
+    "on_leak_action": "halt_and_report",
+    "note": "Refactored source files in services/ are the intended product, not run artifacts. Run artifacts (logs, evidence, diffs, patches) must stay under .state/."
+  },
+
+  "execution_baseline": {
+    "description": "Capture repo state immediately before PH-03A begins. Used for drift detection and rollback reference.",
+    "commit_hash": "CAPTURE_AT_RUNTIME",
+    "dependencies": [
+      {"name": "python", "version_command": "python --version", "required_min": "3.11"},
+      {"name": "git", "version_command": "git --version", "required_min": "2.30"},
+      {"name": "jsonschema", "version_command": "python -m jsonschema --version", "required_min": "4.0"},
+      {"name": "pytest", "version_command": "pytest --version", "required_min": "7.0"}
+    ],
+    "scripts": [
+      "git rev-parse HEAD > .state/baseline/commit_hash.txt",
+      "git status --porcelain > .state/baseline/git_status.txt",
+      "pip freeze > .state/baseline/pip_freeze.txt"
+    ],
+    "git_state": {
+      "required_clean": true,
+      "must_match_base_ref": true,
+      "check_commands": [
+        "git rev-parse HEAD",
+        "git status --porcelain"
+      ],
+      "on_dirty_action": "halt — commit or stash all changes before beginning Phase 3"
+    },
+    "artifact_root_baseline": {
+      "allowed_roots": [".state/", ".worktrees/"],
+      "note": "Any file created outside these roots and outside declared work cell source dirs is a containment leak."
+    }
+  },
+
+  "concurrency_control": {
+    "max_global_concurrency": 3,
+    "concurrency_groups": [
+      {
+        "name": "pattern_bootstrap",
+        "max_concurrency": 1,
+        "applies_to": ["PH-03A", "PH-04A"],
+        "note": "Bootstrap phases must run serially — PATTERN_INDEX.yaml has single-writer semantics."
+      },
+      {
+        "name": "module_refactoring",
+        "max_concurrency": 3,
+        "applies_to": ["PH-03B", "PH-03C", "PH-03D"],
+        "independence_condition": "Phases are independent if and only if no two phases share a source file path (verified by GATE-CONFLICT-001)."
+      },
+      {
+        "name": "routing_rules",
+        "max_concurrency": 1,
+        "applies_to": ["PH-04B"],
+        "note": "Single routing_rules.json output; serial authoring avoids merge conflicts."
+      }
+    ],
+    "policies": [
+      "No two concurrent steps may modify the same file path.",
+      "PH-03A must reach completed before PH-03B, PH-03C, or PH-03D may start.",
+      "PH-04A must reach completed before PH-04B may start.",
+      "PH-03B, PH-03C, and PH-03D may run in parallel once PH-03A is complete, subject to GATE-CONFLICT-001 passing.",
+      "All PH-03* phases must reach completed before PH-04A may start."
+    ]
+  },
+
+  "pattern_governance": {
+    "mode": "PATTERN_FIRST_REQUIRED",
+    "registry_path": "PATTERN_INDEX.yaml",
+    "unknown_pattern_policy": "CREATE_AND_VALIDATE_BEFORE_EXECUTION",
+    "ad_hoc_execution_policy": "FORBIDDEN",
+    "pre_execution_gate": "GATE-CFG-001",
+    "bootstrap_required": true,
+    "bootstrap_note": "PATTERN_INDEX.yaml does not exist at plan creation time. PH-03A creates it. No step in PH-03B/C/D or PH-04B may begin until GATE-CFG-001 through GATE-CFG-006 all pass.",
+    "required_patterns": [
+      "PAT-WORKCELL-SPLIT",
+      "PAT-IMPORT-UPDATE",
+      "PAT-WORKCELL-VERIFY",
+      "PAT-ROUTING-RULE-AUTHOR"
+    ],
+    "pattern_creation_contract": {
+      "trigger": "NO_MATCHING_PATTERN_FOUND",
+      "required_outputs": [
+        "execution_pattern_file (.state/patterns/{PAT-ID}/spec.yaml)",
+        "config_schema_file (.state/patterns/{PAT-ID}/config_schema.json)",
+        "parameter_schema_file (.state/patterns/{PAT-ID}/parameter_schema.json)",
+        "pattern_registry_entry in PATTERN_INDEX.yaml",
+        "pattern_validation_report (.state/evidence/PH-03A/{PAT-ID}/validation.json)",
+        "golden_test_fixture (.state/patterns/{PAT-ID}/test_fixture/)"
+      ],
+      "must_complete_before": ["task_decomposition", "file_modification", "tool_execution"]
+    },
+    "enforcement_gates": ["GATE-CFG-001", "GATE-CFG-002", "GATE-CFG-003", "GATE-CFG-004", "GATE-CFG-005", "GATE-CFG-006"]
+  },
+
+  "executor_registry": {
+    "registered_executors": [
+      {
+        "executor_id": "EXEC-PYTHON-CLI-V1",
+        "executor_entrypoint": "python scripts/execute_pattern.py",
+        "supported_pattern_ids": ["PAT-WORKCELL-SPLIT", "PAT-IMPORT-UPDATE", "PAT-WORKCELL-VERIFY", "PAT-ROUTING-RULE-AUTHOR"],
+        "supported_config_schema_versions": ["1.0.0"],
+        "supported_parameter_schema_versions": ["1.0.0"],
+        "output_contract_refs": ["OUT-WORKCELL-SPLIT", "OUT-IMPORT-UPDATED", "OUT-WORKCELL-VERIFIED", "OUT-ROUTING-RULE"],
+        "determinism_requirements": ["stable_input_order", "no_runtime_prompt_override", "schema_backed_defaults_only"],
+        "forbidden_capabilities": ["write_outside_file_scope", "invoke_unregistered_subexecutor", "modify_protected_path"]
+      },
+      {
+        "executor_id": "EXEC-WORKCELL-SPLITTER",
+        "executor_entrypoint": "python scripts/execute_pattern.py --executor workcell_splitter",
+        "supported_pattern_ids": ["PAT-WORKCELL-SPLIT"],
+        "supported_config_schema_versions": ["1.0.0"],
+        "output_contract_refs": ["OUT-WORKCELL-SPLIT"],
+        "determinism_requirements": [
+          "split_spec_file_is_sole_behavioral_input",
+          "no_logic_beyond_approved_extension_slots",
+          "output_file_list_matches_context_packet_allowed_files"
+        ],
+        "forbidden_capabilities": [
+          "write_outside_declared_work_cell_source_dirs",
+          "modify_protected_path",
+          "invoke_unregistered_subexecutor",
+          "create_new_service_boundary"
+        ]
+      },
+      {
+        "executor_id": "EXEC-IMPORT-FIXER",
+        "executor_entrypoint": "python scripts/execute_pattern.py --executor import_fixer",
+        "supported_pattern_ids": ["PAT-IMPORT-UPDATE"],
+        "supported_config_schema_versions": ["1.0.0"],
+        "output_contract_refs": ["OUT-IMPORT-UPDATED"],
+        "determinism_requirements": ["import_map_is_sole_behavioral_input", "no_semantic_changes_to_logic"],
+        "forbidden_capabilities": ["modify_logic_outside_import_statements", "modify_protected_path"]
+      },
+      {
+        "executor_id": "EXEC-ROUTING-RULE-WRITER",
+        "executor_entrypoint": "python scripts/execute_pattern.py --executor routing_rule_writer",
+        "supported_pattern_ids": ["PAT-ROUTING-RULE-AUTHOR"],
+        "supported_config_schema_versions": ["1.0.0"],
+        "output_contract_refs": ["OUT-ROUTING-RULE"],
+        "determinism_requirements": [
+          "catalog_is_sole_keyword_source",
+          "no_invented_keywords",
+          "routing_schema_backed_defaults_only"
+        ],
+        "forbidden_capabilities": ["invent_keywords_without_catalog_backing", "modify_submodule_context_catalog"]
+      }
+    ],
+    "validation_command": "python scripts/validate_executor_registry.py decomposition_plan_ph3_ph4.json",
+    "expect_exit_code": 0
+  },
+
+  "mutation_model": {
+    "allowed_mutation_types": ["edit_existing", "create_new", "remove_existing"],
+    "workstream_decomposition_rules": [
+      "Each phase (PH-03B, PH-03C, PH-03D) is a separate workstream corresponding to non-overlapping service directories.",
+      "A workstream may only touch source files listed in the context packets for its module group.",
+      "Workstreams execute in separate git worktrees with dedicated branches.",
+      "The routing_rules.json workstream (PH-04B) is independent of all PH-03 workstreams."
+    ],
+    "independence_criteria": [
+      "No two workstreams modify the same file path.",
+      "Independence is verified by GATE-CONFLICT-001 before parallel execution begins.",
+      "If a file appears in two workstreams, the overlapping workstreams must serialize."
+    ]
+  },
+
+  "referenced_context_artifacts": {
+    "enabled": true,
+    "policy": {
+      "required_when_external_context_needed": true,
+      "unbound_context_action": "fail_closed",
+      "informational_artifacts_cannot_override_authoritative": true
+    },
+    "artifacts": [
+      {"context_artifact_id": "CA-001", "authority_level": "AUTHORITATIVE", "path": "module_catalog.json", "must_not_be_modified": true},
+      {"context_artifact_id": "CA-004", "authority_level": "AUTHORITATIVE", "path": "communication_channels.json", "must_not_be_modified": true},
+      {"context_artifact_id": "CA-006", "authority_level": "AUTHORITATIVE", "path": "EAFIX CALENDAR DES RULES.pdf", "must_not_be_modified": true},
+      {"context_artifact_id": "CA-007", "authority_level": "AUTHORITATIVE", "path": "mt4_authoritative_reference_for_ai.json", "must_not_be_modified": true},
+      {"context_artifact_id": "CA-008", "authority_level": "AUTHORITATIVE", "path": "file_module_mapping.csv", "must_not_be_modified": true},
+      {"context_artifact_id": "CA-CATALOG", "authority_level": "CONSTRAINING", "path": "submodule_context_catalog.json", "must_not_be_modified": true, "note": "Produced by Phase 1. Governs all split specs and routing rule derivation."},
+      {"context_artifact_id": "CA-PACKETS", "authority_level": "CONSTRAINING", "path": "context_packets/", "must_not_be_modified": true, "note": "Produced by Phase 2. Governs allowed_files per work cell split."},
+      {"context_artifact_id": "CA-PH12-PLAN", "authority_level": "CONSTRAINING", "path": "decomposition_plan_ph1_ph2.json", "must_not_be_modified": true}
+    ]
+  },
+
+  "artifact_intent_manifest": {
+    "description": "Pre-execution declaration of all files to be created, modified, or removed in Phases 3 and 4.",
+    "policy": {
+      "no_undeclared_mutations_allowed": true,
+      "all_definition_of_done_artifacts_declared": true,
+      "authoritative_artifacts_must_not_appear_as_edit_or_remove": true
+    },
+    "records": [
+      {
+        "artifact_intent_id": "AINT-PH3-001",
+        "planned_relative_path": "PATTERN_INDEX.yaml",
+        "artifact_kind": "pattern_registry",
+        "mutation_type": "create_new",
+        "phase_id": "PH-03A",
+        "step_id": "STEP-001",
+        "purpose": "Master pattern registry. Lists PAT-WORKCELL-SPLIT, PAT-IMPORT-UPDATE, PAT-WORKCELL-VERIFY.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-CFG-001", "GATE-CFG-004"],
+        "traceability_refs": ["PAT-WORKCELL-SPLIT", "PAT-IMPORT-UPDATE", "PAT-WORKCELL-VERIFY"]
+      },
+      {
+        "artifact_intent_id": "AINT-PH3-002",
+        "planned_relative_path": ".state/patterns/PAT-WORKCELL-SPLIT/",
+        "artifact_kind": "pattern_package_directory",
+        "mutation_type": "create_new",
+        "phase_id": "PH-03A",
+        "step_id": "STEP-002",
+        "purpose": "Pattern package for splitting a dense service module into work-cell-scoped files.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-CFG-001", "GATE-CFG-002"]
+      },
+      {
+        "artifact_intent_id": "AINT-PH3-003",
+        "planned_relative_path": ".state/patterns/PAT-IMPORT-UPDATE/",
+        "artifact_kind": "pattern_package_directory",
+        "mutation_type": "create_new",
+        "phase_id": "PH-03A",
+        "step_id": "STEP-003",
+        "purpose": "Pattern package for updating module imports after a work cell split.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-CFG-001", "GATE-CFG-002"]
+      },
+      {
+        "artifact_intent_id": "AINT-PH3-004",
+        "planned_relative_path": ".state/patterns/PAT-WORKCELL-VERIFY/",
+        "artifact_kind": "pattern_package_directory",
+        "mutation_type": "create_new",
+        "phase_id": "PH-03A",
+        "step_id": "STEP-004",
+        "purpose": "Pattern package for verifying a refactored work cell against its context packet and running tests.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-CFG-001", "GATE-CFG-002"]
+      },
+      {
+        "artifact_intent_id": "AINT-PH3-005",
+        "planned_relative_path": "services/calendar-ingestor/",
+        "artifact_kind": "source_directory_refactored",
+        "mutation_type": "edit_existing",
+        "phase_id": "PH-03B",
+        "step_id": "STEP-001 through STEP-004",
+        "purpose": "Calendar-ingestor service refactored into D2/D3/F2/D4 work-cell-scoped module structure.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-SPLIT-VERIFY-001", "GATE-TEST-001"]
+      },
+      {
+        "artifact_intent_id": "AINT-PH3-006",
+        "planned_relative_path": "services/transport-router/",
+        "artifact_kind": "source_directory_refactored",
+        "mutation_type": "edit_existing",
+        "phase_id": "PH-03C",
+        "step_id": "STEP-001 through STEP-003",
+        "purpose": "Transport-router service refactored into B1/B2 work-cell-scoped module structure.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-SPLIT-VERIFY-001", "GATE-TEST-001"]
+      },
+      {
+        "artifact_intent_id": "AINT-PH3-007",
+        "planned_relative_path": "services/execution-engine/",
+        "artifact_kind": "source_directory_refactored",
+        "mutation_type": "edit_existing",
+        "phase_id": "PH-03C",
+        "step_id": "STEP-004 through STEP-006",
+        "purpose": "Execution-engine service refactored into B2/B3 work-cell-scoped module structure.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-SPLIT-VERIFY-001", "GATE-TEST-001"]
+      },
+      {
+        "artifact_intent_id": "AINT-PH3-008",
+        "planned_relative_path": "services/risk-manager/",
+        "artifact_kind": "source_directory_refactored",
+        "mutation_type": "edit_existing",
+        "phase_id": "PH-03D",
+        "step_id": "STEP-001 through STEP-003",
+        "purpose": "Risk-manager service refactored into R1-R9 work-cell-scoped module structure.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-SPLIT-VERIFY-001", "GATE-TEST-001"]
+      },
+      {
+        "artifact_intent_id": "AINT-PH3-009",
+        "planned_relative_path": "services/reentry-engine/",
+        "artifact_kind": "source_directory_refactored",
+        "mutation_type": "edit_existing",
+        "phase_id": "PH-03D",
+        "step_id": "STEP-004 through STEP-006",
+        "purpose": "Reentry-engine service refactored into E1-E4 work-cell-scoped module structure.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-SPLIT-VERIFY-001", "GATE-TEST-001"]
+      },
+      {
+        "artifact_intent_id": "AINT-PH3-010",
+        "planned_relative_path": "services/gui-gateway/",
+        "artifact_kind": "source_directory_refactored",
+        "mutation_type": "edit_existing",
+        "phase_id": "PH-03D",
+        "step_id": "STEP-007 through STEP-009",
+        "purpose": "GUI-gateway service refactored into UI screen and gateway work-cell-scoped module structure.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-SPLIT-VERIFY-001", "GATE-TEST-001"]
+      },
+      {
+        "artifact_intent_id": "AINT-PH4-001",
+        "planned_relative_path": ".state/patterns/PAT-ROUTING-RULE-AUTHOR/",
+        "artifact_kind": "pattern_package_directory",
+        "mutation_type": "create_new",
+        "phase_id": "PH-04A",
+        "step_id": "STEP-001",
+        "purpose": "Pattern package for authoring routing rule entries from catalog keyword mappings.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-CFG-001", "GATE-CFG-002"]
+      },
+      {
+        "artifact_intent_id": "AINT-PH4-002",
+        "planned_relative_path": "routing_rules.json",
+        "artifact_kind": "routing_config",
+        "mutation_type": "create_new",
+        "phase_id": "PH-04B",
+        "step_id": "STEP-001 through STEP-004",
+        "purpose": "AI context routing rules: maps task keywords/archetypes to work cell IDs and context packet paths.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-ROUTING-COMPLETE-001", "GATE-ROUTING-COVERAGE-001", "GATE-ROUTING-CATALOG-SYNC-001"]
+      },
+      {
+        "artifact_intent_id": "AINT-PH4-003",
+        "planned_relative_path": "routing_rules_schema.json",
+        "artifact_kind": "json_schema",
+        "mutation_type": "create_new",
+        "phase_id": "PH-04A",
+        "step_id": "STEP-002",
+        "purpose": "JSON Schema governing the structure of routing_rules.json.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-ROUTING-COMPLETE-001"]
+      }
+    ]
+  },
+
+  "rollback_plan": {
+    "global_procedure": "git checkout {BASE_COMMIT} -- . && git worktree prune",
+    "global_procedure_note": "Restores all source files to the pre-Phase-3 baseline commit. Evidence artifacts under .state/ are not restored — they are diagnostic.",
+    "fail_if_no_recovery_path": true,
+    "per_phase": {
+      "PH-03A": {
+        "procedure": "rm -f PATTERN_INDEX.yaml && rm -rf .state/patterns/ && git restore PATTERN_INDEX.yaml 2>/dev/null || true",
+        "note": "PATTERN_INDEX.yaml does not exist before PH-03A; safe to remove."
+      },
+      "PH-03B": {
+        "procedure": "git worktree remove .worktrees/PH-03B --force && git branch -D wt/PH-03B && git checkout origin/main -- services/calendar-ingestor/",
+        "note": "Worktree removal discards all PH-03B changes. Source is restored from main."
+      },
+      "PH-03C": {
+        "procedure": "git worktree remove .worktrees/PH-03C --force && git branch -D wt/PH-03C && git checkout origin/main -- services/transport-router/ services/execution-engine/",
+        "note": "Same pattern as PH-03B."
+      },
+      "PH-03D": {
+        "procedure": "git worktree remove .worktrees/PH-03D --force && git branch -D wt/PH-03D && git checkout origin/main -- services/risk-manager/ services/reentry-engine/ services/gui-gateway/",
+        "note": "Same pattern."
+      },
+      "PH-04A": {
+        "procedure": "rm -rf .state/patterns/PAT-ROUTING-RULE-AUTHOR/ && rm -f routing_rules_schema.json",
+        "note": "Pattern package and schema not yet committed."
+      },
+      "PH-04B": {
+        "procedure": "git worktree remove .worktrees/PH-04B --force && git branch -D wt/PH-04B && rm -f routing_rules.json",
+        "note": "Routing rules not yet merged to main."
+      }
+    },
+    "failure_mode_to_recovery_mapping": [
+      {"failure_mode": "SPLIT_BREAKS_TESTS", "recovery": "Remove worktree for affected phase; restore from main; review split_spec.yaml and context packet allowed_files before retrying."},
+      {"failure_mode": "IMPORT_UPDATE_CIRCULAR_DEPENDENCY", "recovery": "Revert import changes in worktree; redesign work cell boundaries to eliminate the cycle; update context packet forbidden_dependencies before retrying."},
+      {"failure_mode": "PATTERN_VALIDATION_FAIL", "recovery": "Correct the failing pattern package fields; re-run GATE-CFG-001 through GATE-CFG-006 before any implementation step."},
+      {"failure_mode": "PROTECTED_PATH_VIOLATION", "recovery": "halt_and_rollback immediately; investigate how the write reached a protected path; add a file_scope check to the offending step."},
+      {"failure_mode": "ROUTING_RULE_MISSING_CATALOG_BACKING", "recovery": "Return to PH-04B authoring step; add catalog entry to submodule_context_catalog.json via a Phase 1 amendment before routing rule can be authored."},
+      {"failure_mode": "WORKTREE_CONTAMINATION", "recovery": "Remove the contaminated worktree; verify independence via GATE-CONFLICT-001 before re-creating worktree."},
+      {"failure_mode": "GATE_CFG_FAIL_ANY", "recovery": "Do not proceed with refactoring. Return to PH-03A and correct the failing pattern or executor registration."}
+    ]
+  },
+
+  "evidence_requirements": {
+    "by_phase": {
+      "PH-03A": [".state/evidence/PH-03A/pattern_validation_report.json", ".state/evidence/GATE-CFG-001/validation.json through GATE-CFG-006/validation.json"],
+      "PH-03B": [".state/evidence/PH-03B/split_verification_report.json", ".state/evidence/PH-03B/test_results.xml"],
+      "PH-03C": [".state/evidence/PH-03C/split_verification_report.json", ".state/evidence/PH-03C/test_results.xml"],
+      "PH-03D": [".state/evidence/PH-03D/split_verification_report.json", ".state/evidence/PH-03D/test_results.xml"],
+      "PH-04A": [".state/evidence/PH-04A/routing_pattern_validation.json"],
+      "PH-04B": [".state/evidence/PH-04B/routing_rules_validation.json"]
+    },
+    "audit_trail": {
+      "path": ".state/audit/pattern_audit.jsonl",
+      "required_fields": ["pattern_id", "phase_step_key", "start_timestamp", "end_timestamp", "inputs", "outputs", "guardrail_results", "success_failure_status"],
+      "atomic_append": true
+    },
+    "observable_success_requirements": {
+      "require_exit_code": true,
+      "require_expected_files": true,
+      "require_validation_proof": true,
+      "require_ledger_update": true
+    }
+  },
+
+  "lifecycle_states": {
+    "states": ["pending", "in_progress", "completed", "failed", "rolled_back", "PLANNED_CREATE", "PLANNED_EDIT", "PLANNED_DELETE", "OBSERVED_PRESENT", "OBSERVED_MODIFIED", "OBSERVED_DELETED", "FAILED_RECONCILIATION"],
+    "initial_state": "pending",
+    "run_status_states": ["pending", "running", "blocked", "failed", "completed", "rolled_back"],
+    "mutation_ledger_states": ["created", "validated", "queued", "applied", "verified", "committed", "rejected", "failed", "rolled_back"]
+  },
+
+  "state_transitions": {
+    "task_allowed": [
+      {"from": "pending", "to": "in_progress"},
+      {"from": "in_progress", "to": "completed"},
+      {"from": "in_progress", "to": "failed"},
+      {"from": "failed", "to": "rolled_back"},
+      {"from": "rolled_back", "to": "pending"}
+    ],
+    "run_status_allowed": [
+      {"from": "pending", "to": "running"},
+      {"from": "running", "to": "blocked"},
+      {"from": "blocked", "to": "running"},
+      {"from": "running", "to": "failed"},
+      {"from": "running", "to": "completed"},
+      {"from": "failed", "to": "rolled_back"}
+    ],
+    "mutation_ledger_allowed": [
+      {"from": "created", "to": "validated"},
+      {"from": "validated", "to": "queued"},
+      {"from": "queued", "to": "applied"},
+      {"from": "applied", "to": "verified"},
+      {"from": "verified", "to": "committed"},
+      {"from": "created", "to": "rejected"},
+      {"from": "queued", "to": "failed"},
+      {"from": "applied", "to": "rolled_back"}
+    ],
+    "lock_required_for_mutation_ledger": true,
+    "atomic_update_required": true
+  },
+
+  "canonicalization_contract": {
+    "json_outputs": {"key_order": "sorted", "indentation": 2, "trailing_newline": true},
+    "yaml_outputs": {"key_order": "sorted", "indent": 2},
+    "timestamps": "UTC ISO-8601",
+    "line_endings": "LF",
+    "python_file_endings": "LF",
+    "note": "All generated JSON and YAML artifacts must be canonicalized before hash comparison and before writing to .state/evidence/."
+  },
+
+  "merge_policy": {
+    "strategy": "squash",
+    "base_branch": "main",
+    "conflict_policy": "abort_and_escalate",
+    "command_template": "git checkout main && git merge --squash {branch_name} && git commit -m '[{phase_id}] {summary}'",
+    "approval_evidence_required": true,
+    "manual_review_triggers": [
+      "bulk_rename_over_threshold (>20 files renamed)",
+      "schema_change (any .json schema file modified)",
+      "pattern_addition (new PAT-* added to PATTERN_INDEX.yaml)",
+      "protected_path_request (any worktree touches a protected path — should trigger halt, not merge)",
+      "service_boundary_change (any __init__.py or module entry point renamed or moved)"
+    ],
+    "review_evidence_path": ".state/evidence/{phase_id}/merge_approval.json"
+  },
+
+  "worktree_isolation": {
+    "enabled": true,
+    "base_ref": "main",
+    "max_parallel": 3,
+    "naming": {
+      "pattern": ".worktrees/{phase_id}",
+      "branch_pattern": "wt/{phase_id}",
+      "examples": [".worktrees/PH-03B → wt/PH-03B", ".worktrees/PH-03C → wt/PH-03C"]
+    },
+    "rules": [
+      "Each worktree writes ONLY inside its declared source directory scope.",
+      "Shared artifacts (.state/) are written only by the orchestrator after merge.",
+      "No direct commits to main; all changes merge via squash.",
+      "Each worktree must pass GATE-SPLIT-VERIFY-001 and GATE-TEST-001 before merge.",
+      "Step-level file scopes are enforced within each worktree."
+    ],
+    "preflight": {
+      "clean_base_branch_required": true,
+      "base_branch_name": "main",
+      "clean_check_commands": ["git checkout main", "git status --porcelain"],
+      "on_dirty_action": "fail_or_require_manual_cleanup",
+      "forbid_untracked_sensitive_files": true
+    },
+    "lifecycle": {
+      "create": "git worktree add .worktrees/{phase_id} -b wt/{phase_id} main",
+      "validate_before_merge": ["GATE-SPLIT-VERIFY-001", "GATE-TEST-001", "GATE-NOOVERRIDE-001"],
+      "merge": "git checkout main && git merge --squash wt/{phase_id} && git commit -m '[{phase_id}] refactor {module_group}'",
+      "cleanup_on_success": "git worktree remove .worktrees/{phase_id} && git branch -D wt/{phase_id}",
+      "cleanup_on_failure": "retain for 7 days for debugging"
+    },
+    "post_run_verification": {
+      "verify_base_ref_unchanged_before_merge": true,
+      "verify_no_direct_writes_to_base_ref": true
+    }
+  },
+
+  "run_status_contract": {
+    "path": ".state/run_status.json",
+    "required_fields": ["run_id", "current_phase", "phase_counts", "task_counts", "status", "timestamps"],
+    "coherence_checks": ["task_counts_match_actual_tasks", "phase_progression_valid", "timestamps_monotonic", "status_matches_reality"],
+    "validation_command": "python scripts/NEWPHASEPLANPROCESS_plan_cli.py validate decomposition_plan_ph3_ph4.json",
+    "expect_exit_code": 0
+  },
+
+  "mutation_ledger": {
+    "path": ".state/mutation_ledger.jsonl",
+    "states": ["created", "validated", "queued", "applied", "verified", "committed", "rejected", "failed", "rolled_back"],
+    "allowed_transitions": [
+      {"from": "created", "to": "validated"},
+      {"from": "validated", "to": "queued"},
+      {"from": "queued", "to": "applied"},
+      {"from": "applied", "to": "verified"},
+      {"from": "verified", "to": "committed"},
+      {"from": "created", "to": "rejected"},
+      {"from": "queued", "to": "failed"},
+      {"from": "applied", "to": "rolled_back"}
+    ],
+    "atomic_update_required": true,
+    "lock_required": true,
+    "validation_command": "python scripts/NEWPHASEPLANPROCESS_plan_cli.py run-gates decomposition_plan_ph3_ph4.json",
+    "expect_exit_code": 0
+  },
+
+  "phase_plan": {
+    "phases": [
+      {"phase_id": "PH-03A", "name": "Pattern Bootstrap", "depends_on": [], "parallel_with": [], "produces": ["AINT-PH3-001", "AINT-PH3-002", "AINT-PH3-003", "AINT-PH3-004"]},
+      {"phase_id": "PH-03B", "name": "Calendar Pipeline Refactor", "depends_on": ["PH-03A"], "parallel_with": ["PH-03C", "PH-03D"], "produces": ["AINT-PH3-005"]},
+      {"phase_id": "PH-03C", "name": "MT4 Bridge Refactor", "depends_on": ["PH-03A"], "parallel_with": ["PH-03B", "PH-03D"], "produces": ["AINT-PH3-006", "AINT-PH3-007"]},
+      {"phase_id": "PH-03D", "name": "Remaining Services Refactor", "depends_on": ["PH-03A"], "parallel_with": ["PH-03B", "PH-03C"], "produces": ["AINT-PH3-008", "AINT-PH3-009", "AINT-PH3-010"]},
+      {"phase_id": "PH-04A", "name": "Routing Rule Pattern Bootstrap", "depends_on": ["PH-03B", "PH-03C", "PH-03D"], "parallel_with": [], "produces": ["AINT-PH4-001", "AINT-PH4-003"]},
+      {"phase_id": "PH-04B", "name": "Routing Rules Authoring", "depends_on": ["PH-04A"], "parallel_with": [], "produces": ["AINT-PH4-002"]}
+    ]
+  },
+
+  "step_contracts": {
+    "PH-03A": {
+      "STEP-001": {
+        "step_id": "STEP-001",
+        "phase_step_key": "PH-03A/STEP-001",
+        "purpose": "Create PATTERN_INDEX.yaml and bootstrap the .state/patterns/ directory. This is a PATTERN_CREATION step — no pattern exists for this operation, which is the sole exception to the pattern-first law.",
+        "implementation_mode": "PATTERN_CREATION",
+        "pattern_id": "SELF_BOOTSTRAPPING",
+        "pattern_creation_exception_reason": "Creating the pattern registry itself cannot be governed by a pattern that does not yet exist. This is the one-time bootstrapping exception. All subsequent steps must be pattern-bound.",
+        "inputs": [
+          {"id": "DECOMPOSITION_CATALOG", "type": "file", "path": "submodule_context_catalog.json", "required": true, "must_exist": true},
+          {"id": "BASELINE_COMMIT", "type": "env", "required": true, "description": "Git commit hash captured at execution_baseline time"}
+        ],
+        "outputs": [
+          {"id": "PATTERN_INDEX", "type": "file", "path": "PATTERN_INDEX.yaml", "required": true,
+           "content_requirements": [
+             "Lists stub entries for: PAT-WORKCELL-SPLIT, PAT-IMPORT-UPDATE, PAT-WORKCELL-VERIFY",
+             "Each entry includes: pattern_id, version, status (pending_validation), spec_file, config_schema_file, parameter_schema_file, executor_id",
+             "Valid YAML"
+           ]},
+          {"id": "PATTERNS_DIR", "type": "directory", "path": ".state/patterns/", "required": true}
+        ],
+        "invariants": ["No source files modified.", "Protected paths (other than creating PATTERN_INDEX.yaml) are not touched."],
+        "preconditions": ["execution_baseline captured and committed to .state/baseline/.", "git status --porcelain returns empty (clean tree).", "GATE-NOOVERRIDE-001 from Phase 2 is on record."],
+        "postconditions": ["PATTERN_INDEX.yaml exists and is valid YAML.", ".state/patterns/ directory exists."],
+        "file_scope": {
+          "allowed_paths": ["PATTERN_INDEX.yaml", ".state/patterns/", ".state/evidence/PH-03A/STEP-001/**", ".state/baseline/**"],
+          "forbidden_paths": ["services/**", "submodule_context_catalog.json", "context_packets/**", "module_catalog.json"]
+        },
+        "failure_modes": [
+          {"code": "BOOTSTRAP-YAML-INVALID", "meaning": "PATTERN_INDEX.yaml is not valid YAML.", "remediation": "Correct and re-run. No subsequent step may proceed."},
+          {"code": "DIRTY-TREE", "meaning": "Git working tree is not clean.", "remediation": "Commit or stash changes before beginning."}
+        ],
+        "rollback_strategy": {"commands": ["rm -f PATTERN_INDEX.yaml", "rm -rf .state/patterns/"], "idempotent": true},
+        "idempotency": {"is_idempotent": true, "enforcement": "Re-running recreates the index from scratch; pattern package dirs are recreated."},
+        "backup_requirements": {"required": false},
+        "audit_fields": {"emit_audit_record": true, "audit_event_type": "pattern_registry_bootstrap"},
+        "failure_logging": {"require_error_message": true, "require_stack_trace": true, "require_retry_history": true},
+        "acceptance_gates": ["GATE-PATTERN-INDEX-VALID-001"]
+      },
+
+      "STEP-002": {
+        "step_id": "STEP-002",
+        "phase_step_key": "PH-03A/STEP-002",
+        "purpose": "Author and validate PAT-WORKCELL-SPLIT pattern package. Defines how a dense service module is split into work-cell-scoped files using a split_spec.yaml config.",
+        "implementation_mode": "PATTERN_CREATION",
+        "pattern_id": "SELF_BOOTSTRAPPING",
+        "pattern_creation_exception_reason": "This step creates PAT-WORKCELL-SPLIT; it cannot itself be governed by that pattern.",
+        "inputs": [
+          {"id": "PATTERN_INDEX", "type": "file", "path": "PATTERN_INDEX.yaml", "required": true, "must_exist": true},
+          {"id": "CATALOG", "type": "file", "path": "submodule_context_catalog.json", "required": true, "must_exist": true},
+          {"id": "CONTEXT_PACKETS", "type": "directory", "path": "context_packets/", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "SPLIT_PATTERN_SPEC", "type": "file", "path": ".state/patterns/PAT-WORKCELL-SPLIT/spec.yaml",
+           "content_requirements": [
+             "Defines: input contract (source_dir, work_cell_id, context_packet_path, split_spec_file)",
+             "Defines: output contract (list of created/modified files, import_map.json)",
+             "Defines: guardrails (max_files_touched, forbidden_paths, allowed_extension_slots)",
+             "Defines: determinism requirements (split_spec_file is sole behavioral input)",
+             "Defines: test fixture path (.state/patterns/PAT-WORKCELL-SPLIT/test_fixture/)"
+           ]},
+          {"id": "SPLIT_CONFIG_SCHEMA", "type": "file", "path": ".state/patterns/PAT-WORKCELL-SPLIT/config_schema.json",
+           "content_requirements": [
+             "Validates split_spec.yaml fields: work_cell_id (required), source_files_to_extract (array), target_module_path (required), preserve_public_api (boolean)"
+           ]},
+          {"id": "SPLIT_PARAM_SCHEMA", "type": "file", "path": ".state/patterns/PAT-WORKCELL-SPLIT/parameter_schema.json"},
+          {"id": "SPLIT_TEST_FIXTURE", "type": "directory", "path": ".state/patterns/PAT-WORKCELL-SPLIT/test_fixture/",
+           "content_requirements": ["Contains a minimal example service directory and expected output after split"]},
+          {"id": "PATTERN_VALIDATION_REPORT", "type": "file", "path": ".state/evidence/PH-03A/STEP-002/validation.json",
+           "content_requirements": ["passed: true", "golden_test_fixture: passed"]}
+        ],
+        "invariants": ["No source files in services/ modified.", "PATTERN_INDEX.yaml updated to set PAT-WORKCELL-SPLIT status to validated."],
+        "preconditions": ["STEP-001 completed."],
+        "postconditions": ["PAT-WORKCELL-SPLIT status is 'validated' in PATTERN_INDEX.yaml.", "Golden test fixture passes.", "GATE-CFG-002 passes for this pattern."],
+        "file_scope": {
+          "allowed_paths": [".state/patterns/PAT-WORKCELL-SPLIT/**", "PATTERN_INDEX.yaml", ".state/evidence/PH-03A/STEP-002/**"],
+          "forbidden_paths": ["services/**", "submodule_context_catalog.json", "context_packets/**"]
+        },
+        "failure_modes": [
+          {"code": "GOLDEN-TEST-FAIL", "meaning": "Pattern golden test fixture fails.", "remediation": "Correct spec.yaml or test fixture. Pattern must not be registered until golden test passes."},
+          {"code": "SPEC-MISSING-GUARDRAILS", "meaning": "spec.yaml does not define forbidden_paths or max_files_touched guardrails.", "remediation": "Add guardrails. GATE-CFG-002 requires all behavior to be externally specified."}
+        ],
+        "rollback_strategy": {"commands": ["rm -rf .state/patterns/PAT-WORKCELL-SPLIT/", "python scripts/pattern_index_set_status.py PAT-WORKCELL-SPLIT pending_validation"]},
+        "idempotency": {"is_idempotent": true},
+        "audit_fields": {"emit_audit_record": true, "audit_event_type": "pattern_creation"},
+        "failure_logging": {"require_error_message": true, "require_stack_trace": true, "require_retry_history": true},
+        "acceptance_gates": ["GATE-CFG-002", "GATE-PATTERN-GOLDEN-001"]
+      },
+
+      "STEP-003": {
+        "step_id": "STEP-003",
+        "phase_step_key": "PH-03A/STEP-003",
+        "purpose": "Author and validate PAT-IMPORT-UPDATE pattern package. Updates Python import statements after a work cell split using an import_map.json config.",
+        "implementation_mode": "PATTERN_CREATION",
+        "pattern_id": "SELF_BOOTSTRAPPING",
+        "inputs": [
+          {"id": "PATTERN_INDEX", "type": "file", "path": "PATTERN_INDEX.yaml", "required": true},
+          {"id": "SPLIT_PATTERN", "type": "file", "path": ".state/patterns/PAT-WORKCELL-SPLIT/spec.yaml", "required": true}
+        ],
+        "outputs": [
+          {"id": "IMPORT_PATTERN_SPEC", "type": "file", "path": ".state/patterns/PAT-IMPORT-UPDATE/spec.yaml",
+           "content_requirements": [
+             "Input contract: import_map.json (maps old import paths to new work-cell-scoped paths)",
+             "Output contract: list of modified files with before/after import diffs",
+             "Guardrail: only import statements may change — no logic modifications allowed",
+             "Guardrail: import_map.json must be generated by PAT-WORKCELL-SPLIT, never hand-authored"
+           ]},
+          {"id": "IMPORT_CONFIG_SCHEMA", "type": "file", "path": ".state/patterns/PAT-IMPORT-UPDATE/config_schema.json"},
+          {"id": "IMPORT_TEST_FIXTURE", "type": "directory", "path": ".state/patterns/PAT-IMPORT-UPDATE/test_fixture/"},
+          {"id": "IMPORT_VALIDATION_REPORT", "type": "file", "path": ".state/evidence/PH-03A/STEP-003/validation.json", "content_requirements": ["passed: true"]}
+        ],
+        "invariants": ["No source files modified.", "import_map.json consumed by this pattern must be produced by PAT-WORKCELL-SPLIT, not hand-authored."],
+        "preconditions": ["STEP-002 completed and PAT-WORKCELL-SPLIT validated."],
+        "postconditions": ["PAT-IMPORT-UPDATE status is 'validated' in PATTERN_INDEX.yaml."],
+        "file_scope": {
+          "allowed_paths": [".state/patterns/PAT-IMPORT-UPDATE/**", "PATTERN_INDEX.yaml", ".state/evidence/PH-03A/STEP-003/**"],
+          "forbidden_paths": ["services/**"]
+        },
+        "failure_modes": [
+          {"code": "IMPORT-LOGIC-MODIFICATION", "meaning": "Pattern spec allows modifications beyond import statements.", "remediation": "Tighten guardrails to restrict to import-only changes."}
+        ],
+        "rollback_strategy": {"commands": ["rm -rf .state/patterns/PAT-IMPORT-UPDATE/"]},
+        "idempotency": {"is_idempotent": true},
+        "audit_fields": {"emit_audit_record": true, "audit_event_type": "pattern_creation"},
+        "failure_logging": {"require_error_message": true, "require_stack_trace": true, "require_retry_history": true},
+        "acceptance_gates": ["GATE-CFG-002", "GATE-PATTERN-GOLDEN-001"]
+      },
+
+      "STEP-004": {
+        "step_id": "STEP-004",
+        "phase_step_key": "PH-03A/STEP-004",
+        "purpose": "Author and validate PAT-WORKCELL-VERIFY pattern package. Runs context-packet compliance check and test suite for a refactored work cell.",
+        "implementation_mode": "PATTERN_CREATION",
+        "pattern_id": "SELF_BOOTSTRAPPING",
+        "inputs": [
+          {"id": "PATTERN_INDEX", "type": "file", "path": "PATTERN_INDEX.yaml", "required": true}
+        ],
+        "outputs": [
+          {"id": "VERIFY_PATTERN_SPEC", "type": "file", "path": ".state/patterns/PAT-WORKCELL-VERIFY/spec.yaml",
+           "content_requirements": [
+             "Input: work_cell_id, context_packet_path, source_dir",
+             "Checks: (1) all files in source_dir are in context_packet allowed_files list; (2) no file in source_dir is in forbidden_files list; (3) pytest passes for work-cell-scoped tests",
+             "Output: verification_report.json with pass/fail per check",
+             "Guardrail: no source modifications — read-only verification"
+           ]},
+          {"id": "VERIFY_CONFIG_SCHEMA", "type": "file", "path": ".state/patterns/PAT-WORKCELL-VERIFY/config_schema.json"},
+          {"id": "VERIFY_TEST_FIXTURE", "type": "directory", "path": ".state/patterns/PAT-WORKCELL-VERIFY/test_fixture/"},
+          {"id": "VERIFY_VALIDATION_REPORT", "type": "file", "path": ".state/evidence/PH-03A/STEP-004/validation.json", "content_requirements": ["passed: true"]}
+        ],
+        "invariants": ["Read-only pattern — must never modify source files."],
+        "preconditions": ["STEP-003 completed."],
+        "postconditions": ["PAT-WORKCELL-VERIFY status is 'validated' in PATTERN_INDEX.yaml.", "All three pattern packages present. GATE-CFG-001 through GATE-CFG-006 now runnable."],
+        "file_scope": {
+          "allowed_paths": [".state/patterns/PAT-WORKCELL-VERIFY/**", "PATTERN_INDEX.yaml", ".state/evidence/PH-03A/STEP-004/**"],
+          "forbidden_paths": ["services/**"]
+        },
+        "failure_modes": [
+          {"code": "VERIFY-WRITES-SOURCE", "meaning": "Pattern spec allows writes to source files.", "remediation": "Set all output contracts to read-only. Verification must never mutate."}
+        ],
+        "rollback_strategy": {"commands": ["rm -rf .state/patterns/PAT-WORKCELL-VERIFY/"]},
+        "idempotency": {"is_idempotent": true},
+        "audit_fields": {"emit_audit_record": true, "audit_event_type": "pattern_creation"},
+        "failure_logging": {"require_error_message": true, "require_stack_trace": true, "require_retry_history": true},
+        "acceptance_gates": ["GATE-CFG-001", "GATE-CFG-002", "GATE-CFG-003", "GATE-CFG-004", "GATE-CFG-005", "GATE-CFG-006"]
+      }
+    },
+
+    "PH-03B": {
+      "STEP-001": {
+        "step_id": "STEP-001",
+        "phase_step_key": "PH-03B/STEP-001",
+        "purpose": "Create worktree for calendar-ingestor refactoring and author split_spec.yaml files for D2, D3, F2, D4 work cells by reading their context packets.",
+        "implementation_mode": "PATTERN_EXECUTION",
+        "pattern_id": "PAT-WORKCELL-SPLIT",
+        "executor_binding": {"executor_id": "EXEC-WORKCELL-SPLITTER", "executor_version": "1.0.0", "invocation_ref": "python scripts/execute_pattern.py --executor workcell_splitter --config .state/config/PH-03B_STEP-001.json"},
+        "behavior_spec": {"pattern_id": "PAT-WORKCELL-SPLIT", "pattern_version": "1.0.0", "spec_file": ".state/patterns/PAT-WORKCELL-SPLIT/spec.yaml", "config_instance_file": ".state/config/PH-03B_STEP-001.json", "config_schema_file": ".state/patterns/PAT-WORKCELL-SPLIT/config_schema.json", "parameter_schema_file": ".state/patterns/PAT-WORKCELL-SPLIT/parameter_schema.json"},
+        "behavior_binding_proof": {"command": "python scripts/validate_behavior_binding.py --executor EXEC-WORKCELL-SPLITTER --pattern PAT-WORKCELL-SPLIT --config .state/config/PH-03B_STEP-001.json", "evidence": ".state/evidence/PH-03B/STEP-001/behavior_binding.json"},
+        "bespoke_logic_allowed": false,
+        "requires_manual_review": false,
+        "high_risk_operation": true,
+        "high_risk_reason": "Modifies production service source files.",
+        "inputs": [
+          {"id": "CONTEXT_PACKETS_CALENDAR", "type": "directory", "path": "context_packets/D2_CALENDAR_SOURCE_ADAPTER/", "required": true, "must_exist": true},
+          {"id": "CONTEXT_PACKETS_D3", "type": "directory", "path": "context_packets/D3_CALENDAR_NORMALIZER/", "required": true},
+          {"id": "CONTEXT_PACKETS_F2", "type": "directory", "path": "context_packets/F2_EVENT_LOG/", "required": true},
+          {"id": "CONTEXT_PACKETS_D4", "type": "directory", "path": "context_packets/D4_CALENDAR_TRIGGER_BUILDER/", "required": true},
+          {"id": "SOURCE_SERVICE", "type": "directory", "path": ".worktrees/PH-03B/services/calendar-ingestor/", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "SPLIT_SPECS", "type": "file_set", "paths": [".state/config/PH-03B/D2_split_spec.yaml", ".state/config/PH-03B/D3_split_spec.yaml", ".state/config/PH-03B/F2_split_spec.yaml", ".state/config/PH-03B/D4_split_spec.yaml"],
+           "content_requirements": ["Each spec lists source_files_to_extract from calendar-ingestor per work cell", "Each target_module_path matches context packet allowed_files"]}
+        ],
+        "invariants": ["Split specs are config artifacts — no source files modified in this step.", "Worktree created from clean main."],
+        "preconditions": ["All GATE-CFG-001 through GATE-CFG-006 passed.", "GATE-CONFLICT-001 passed confirming PH-03B/C/D have no file path overlap.", "Worktree .worktrees/PH-03B created from main."],
+        "postconditions": ["4 split_spec.yaml files present in .state/config/PH-03B/.", "Each spec validated against PAT-WORKCELL-SPLIT config_schema.json."],
+        "file_scope": {
+          "allowed_paths": [".state/config/PH-03B/**", ".state/evidence/PH-03B/STEP-001/**", ".worktrees/PH-03B/**"],
+          "forbidden_paths": ["services/**", "submodule_context_catalog.json", "context_packets/**", "PATTERN_INDEX.yaml"],
+          "read_only_paths": ["context_packets/D2_*/**", "context_packets/D3_*/**", "context_packets/F2_*/**", "context_packets/D4_*/**"]
+        },
+        "before_after_hash": {"enabled": true, "paths": [".worktrees/PH-03B/services/calendar-ingestor/"]},
+        "runtime_limits": {"max_files_touched": 0, "note": "Step 1 authors config only; source files touched = 0."},
+        "failure_modes": [
+          {"code": "SPEC-SCHEMA-FAIL", "meaning": "A split_spec.yaml fails PAT-WORKCELL-SPLIT config_schema.json validation.", "remediation": "Correct the spec. Do not proceed to STEP-002 until all 4 specs validate."}
+        ],
+        "rollback_strategy": {"commands": ["rm -f .state/config/PH-03B/*.yaml"], "note": "No source mutations yet; trivial rollback."},
+        "idempotency": {"is_idempotent": true},
+        "audit_fields": {"emit_audit_record": true, "audit_event_type": "split_spec_authoring"},
+        "failure_logging": {"require_error_message": true, "require_stack_trace": true, "require_retry_history": true},
+        "acceptance_gates": ["GATE-CFG-001", "GATE-CFG-004"]
+      },
+
+      "STEP-002": {
+        "step_id": "STEP-002",
+        "phase_step_key": "PH-03B/STEP-002",
+        "purpose": "Execute PAT-WORKCELL-SPLIT against calendar-ingestor source using each split spec. Produces work-cell-scoped module files and import_map.json.",
+        "implementation_mode": "PATTERN_EXECUTION",
+        "pattern_id": "PAT-WORKCELL-SPLIT",
+        "executor_binding": {"executor_id": "EXEC-WORKCELL-SPLITTER", "executor_version": "1.0.0", "invocation_ref": "python scripts/execute_pattern.py --executor workcell_splitter --config .state/config/PH-03B/{work_cell_id}_split_spec.yaml"},
+        "behavior_spec": {"pattern_id": "PAT-WORKCELL-SPLIT", "spec_file": ".state/patterns/PAT-WORKCELL-SPLIT/spec.yaml", "config_instance_file": ".state/config/PH-03B/{work_cell_id}_split_spec.yaml", "config_schema_file": ".state/patterns/PAT-WORKCELL-SPLIT/config_schema.json"},
+        "bespoke_logic_allowed": false,
+        "requires_manual_review": true,
+        "manual_review_reason": "Source mutations to a production service. Human must review diff before merge.",
+        "high_risk_operation": true,
+        "inputs": [
+          {"id": "SPLIT_SPECS", "type": "file_set", "paths": [".state/config/PH-03B/D2_split_spec.yaml", ".state/config/PH-03B/D3_split_spec.yaml", ".state/config/PH-03B/F2_split_spec.yaml", ".state/config/PH-03B/D4_split_spec.yaml"], "required": true, "must_exist": true},
+          {"id": "SOURCE", "type": "directory", "path": ".worktrees/PH-03B/services/calendar-ingestor/", "required": true}
+        ],
+        "outputs": [
+          {"id": "SPLIT_SOURCE", "type": "directory", "path": ".worktrees/PH-03B/services/calendar-ingestor/", "content_requirements": ["Work-cell-scoped submodule directories created per split spec", "Original monolithic files preserved or moved per spec"]},
+          {"id": "IMPORT_MAP", "type": "file", "path": ".state/config/PH-03B/import_map.json", "required": true}
+        ],
+        "invariants": ["Changes confined to .worktrees/PH-03B/services/calendar-ingestor/ only.", "No other service directories touched."],
+        "preconditions": ["STEP-001 completed. All 4 split specs validated."],
+        "postconditions": ["import_map.json exists.", "Before/after hashes recorded in .state/evidence/PH-03B/STEP-002/."],
+        "file_scope": {
+          "allowed_paths": [".worktrees/PH-03B/services/calendar-ingestor/**", ".state/config/PH-03B/import_map.json", ".state/evidence/PH-03B/STEP-002/**"],
+          "forbidden_paths": ["services/**", ".worktrees/PH-03C/**", ".worktrees/PH-03D/**", "PATTERN_INDEX.yaml", "submodule_context_catalog.json"]
+        },
+        "before_after_hash": {"enabled": true, "paths": [".worktrees/PH-03B/services/calendar-ingestor/"]},
+        "runtime_limits": {"max_files_touched": 50, "max_total_loc_changed": 5000},
+        "failure_modes": [
+          {"code": "SPLIT-SCOPE-VIOLATION", "meaning": "Executor wrote files outside calendar-ingestor directory.", "remediation": "halt_and_rollback. Investigate executor file_scope enforcement. EXEC-WORKCELL-SPLITTER has write_outside_file_scope forbidden."},
+          {"code": "SPLIT-BREAKS-INTERFACE", "meaning": "Public API of calendar-ingestor changed unexpectedly.", "remediation": "Review split spec preserve_public_api flag. Rollback and revise spec."}
+        ],
+        "rollback_strategy": {"commands": ["git -C .worktrees/PH-03B checkout -- services/calendar-ingestor/", "rm -f .state/config/PH-03B/import_map.json"]},
+        "idempotency": {"is_idempotent": false, "enforcement": "Backup before_hashes enable detection of re-run drift."},
+        "backup_requirements": {"required": true, "location": ".state/backups/PH-03B/calendar-ingestor-pre-split/", "command": "cp -r .worktrees/PH-03B/services/calendar-ingestor/ .state/backups/PH-03B/calendar-ingestor-pre-split/"},
+        "audit_fields": {"emit_audit_record": true, "audit_event_type": "workcell_split_execution"},
+        "failure_logging": {"require_error_message": true, "require_stack_trace": true, "require_retry_history": true},
+        "acceptance_gates": ["GATE-SPLIT-VERIFY-001"]
+      },
+
+      "STEP-003": {
+        "step_id": "STEP-003",
+        "phase_step_key": "PH-03B/STEP-003",
+        "purpose": "Execute PAT-IMPORT-UPDATE to fix import statements in calendar-ingestor using the import_map.json produced in STEP-002.",
+        "implementation_mode": "PATTERN_EXECUTION",
+        "pattern_id": "PAT-IMPORT-UPDATE",
+        "executor_binding": {"executor_id": "EXEC-IMPORT-FIXER", "executor_version": "1.0.0", "invocation_ref": "python scripts/execute_pattern.py --executor import_fixer --import-map .state/config/PH-03B/import_map.json --target .worktrees/PH-03B/services/calendar-ingestor/"},
+        "bespoke_logic_allowed": false,
+        "requires_manual_review": true,
+        "high_risk_operation": true,
+        "inputs": [
+          {"id": "IMPORT_MAP", "type": "file", "path": ".state/config/PH-03B/import_map.json", "required": true, "must_exist": true},
+          {"id": "SPLIT_SOURCE", "type": "directory", "path": ".worktrees/PH-03B/services/calendar-ingestor/", "required": true}
+        ],
+        "outputs": [
+          {"id": "UPDATED_SOURCE", "type": "directory", "path": ".worktrees/PH-03B/services/calendar-ingestor/", "content_requirements": ["All import statements updated to new work-cell-scoped paths", "No logic changes outside import lines"]}
+        ],
+        "invariants": ["Only import statements changed — no business logic altered.", "Changes confined to .worktrees/PH-03B/."],
+        "preconditions": ["STEP-002 completed. import_map.json exists."],
+        "postconditions": ["All old import paths in import_map.json are replaced.", "grep -r 'from old_module' finds 0 matches."],
+        "file_scope": {
+          "allowed_paths": [".worktrees/PH-03B/services/calendar-ingestor/**", ".state/evidence/PH-03B/STEP-003/**"],
+          "forbidden_paths": ["services/**", ".worktrees/PH-03C/**", ".worktrees/PH-03D/**"]
+        },
+        "runtime_limits": {"max_files_touched": 50},
+        "failure_modes": [
+          {"code": "IMPORT-LOGIC-CHANGE", "meaning": "Import fixer modified logic beyond import statements.", "remediation": "Rollback. Investigate import_fixer executor. Review diff before any retry."}
+        ],
+        "rollback_strategy": {"commands": ["git -C .worktrees/PH-03B checkout -- services/calendar-ingestor/", "# Then re-run STEP-002 split before retrying STEP-003"]},
+        "idempotency": {"is_idempotent": false},
+        "audit_fields": {"emit_audit_record": true, "audit_event_type": "import_update_execution"},
+        "failure_logging": {"require_error_message": true, "require_stack_trace": true, "require_retry_history": true},
+        "acceptance_gates": ["GATE-SPLIT-VERIFY-001"]
+      },
+
+      "STEP-004": {
+        "step_id": "STEP-004",
+        "phase_step_key": "PH-03B/STEP-004",
+        "purpose": "Execute PAT-WORKCELL-VERIFY for each D2/D3/F2/D4 work cell. Confirm all files comply with context packets and all tests pass.",
+        "implementation_mode": "PATTERN_EXECUTION",
+        "pattern_id": "PAT-WORKCELL-VERIFY",
+        "executor_binding": {"executor_id": "EXEC-PYTHON-CLI-V1", "executor_version": "1.0.0", "invocation_ref": "python scripts/execute_pattern.py --executor workcell_verifier --context-packet context_packets/{work_cell_id}/ --source .worktrees/PH-03B/services/calendar-ingestor/"},
+        "bespoke_logic_allowed": false,
+        "requires_manual_review": false,
+        "high_risk_operation": false,
+        "inputs": [
+          {"id": "CONTEXT_PACKETS", "type": "directory", "path": "context_packets/", "required": true},
+          {"id": "SPLIT_SOURCE", "type": "directory", "path": ".worktrees/PH-03B/services/calendar-ingestor/", "required": true}
+        ],
+        "outputs": [
+          {"id": "VERIFY_REPORT", "type": "file", "path": ".state/evidence/PH-03B/STEP-004/verification_report.json",
+           "content_requirements": ["Per-work-cell: file compliance check passed/failed", "Per-work-cell: pytest exit code", "Overall: passed true/false"]},
+          {"id": "TEST_RESULTS", "type": "file", "path": ".state/evidence/PH-03B/STEP-004/test_results.xml"}
+        ],
+        "invariants": ["Read-only verification — no source mutations."],
+        "preconditions": ["STEP-003 completed."],
+        "postconditions": ["verification_report.json shows passed: true.", "test_results.xml shows 0 failures."],
+        "file_scope": {
+          "allowed_paths": [".state/evidence/PH-03B/STEP-004/**"],
+          "forbidden_paths": ["services/**"],
+          "read_only_paths": ["context_packets/**", ".worktrees/PH-03B/services/calendar-ingestor/**"]
+        },
+        "failure_modes": [
+          {"code": "VERIFY-FILE-SCOPE-FAIL", "meaning": "A file in the refactored source is not in the context packet allowed_files.", "remediation": "Return to STEP-001 and revise the split_spec to align file placement with context packet allowed_files."},
+          {"code": "VERIFY-TEST-FAIL", "meaning": "Tests fail after split.", "remediation": "Diagnose: likely a missed import update or broken public API. Revise STEP-003 or STEP-002 accordingly."}
+        ],
+        "rollback_strategy": {"commands": ["# Read-only step — no rollback needed; source rollback handled by STEP-002/003"]},
+        "idempotency": {"is_idempotent": true},
+        "audit_fields": {"emit_audit_record": true, "audit_event_type": "workcell_verification"},
+        "failure_logging": {"require_error_message": true, "require_stack_trace": true, "require_retry_history": true},
+        "acceptance_gates": ["GATE-SPLIT-VERIFY-001", "GATE-TEST-001"]
+      }
+    },
+
+    "PH-03C": {
+      "_note": "Steps follow identical structure to PH-03B but target services/transport-router/ (B1) and services/execution-engine/ (B2, B3). Split specs authored from context_packets/B1_*/, context_packets/B2_*/, context_packets/B3_*/. All step contracts use the same PAT-WORKCELL-SPLIT → PAT-IMPORT-UPDATE → PAT-WORKCELL-VERIFY sequence. Worktree: .worktrees/PH-03C. Branch: wt/PH-03C.",
+      "step_contract_template": "Same 4-step structure as PH-03B. STEP-001: author split specs from context packets. STEP-002: execute split. STEP-003: update imports. STEP-004: verify and test.",
+      "module_targets": ["services/transport-router/ (B1_MT4_ADAPTER_TRANSPORT work cells)", "services/execution-engine/ (B2_MT4_EA_EXECUTOR and B3_EXECUTION_EVENT_NORMALIZER work cells)"],
+      "additional_constraint": "B2 steps must list mt4_authoritative_reference_for_ai.json in required_reference_documents within their split specs, consistent with PH-01 catalog entries.",
+      "acceptance_gates_per_step": ["GATE-SPLIT-VERIFY-001", "GATE-TEST-001", "GATE-NOOVERRIDE-001"]
+    },
+
+    "PH-03D": {
+      "_note": "Steps follow identical structure to PH-03B but target services/risk-manager/ (R1-R9), services/reentry-engine/ (E1-E4), and services/gui-gateway/ (UI work cells). Worktree: .worktrees/PH-03D. Branch: wt/PH-03D.",
+      "step_contract_template": "Same 4-step structure as PH-03B per service. Risk and reentry run serially within PH-03D. GUI-gateway runs after risk and reentry pass verification.",
+      "module_targets": ["services/risk-manager/ (R1-R9)", "services/reentry-engine/ (E1-E4)", "services/gui-gateway/ (UI screen + gateway work cells)"],
+      "additional_constraint": "R8_SIZING_ENGINE split spec must include a determinism verification gate in PAT-WORKCELL-VERIFY config: same inputs must produce identical output on consecutive runs.",
+      "acceptance_gates_per_step": ["GATE-SPLIT-VERIFY-001", "GATE-TEST-001", "GATE-NOOVERRIDE-001"]
+    },
+
+    "PH-04A": {
+      "STEP-001": {
+        "step_id": "STEP-001",
+        "phase_step_key": "PH-04A/STEP-001",
+        "purpose": "Author and validate PAT-ROUTING-RULE-AUTHOR pattern package. Defines how routing rule entries are generated from catalog work cells, with keyword derivation governed solely by submodule_context_catalog.json.",
+        "implementation_mode": "PATTERN_CREATION",
+        "pattern_id": "SELF_BOOTSTRAPPING",
+        "pattern_creation_exception_reason": "This step creates PAT-ROUTING-RULE-AUTHOR. The pattern cannot govern its own creation.",
+        "inputs": [
+          {"id": "PATTERN_INDEX", "type": "file", "path": "PATTERN_INDEX.yaml", "required": true},
+          {"id": "CATALOG", "type": "file", "path": "submodule_context_catalog.json", "required": true},
+          {"id": "ROUTING_INSTRUCTIONS", "type": "file", "path": "eafix_project_knowledge_reference_routing_instructions.json", "required": true}
+        ],
+        "outputs": [
+          {"id": "ROUTING_PATTERN_SPEC", "type": "file", "path": ".state/patterns/PAT-ROUTING-RULE-AUTHOR/spec.yaml",
+           "content_requirements": [
+             "Input contract: work_cell_id, keyword_list (derived from work cell purpose + required_reference_documents), context_packet_path",
+             "Output contract: one routing rule record with fields: rule_id, keywords (array), work_cell_id, context_packet_path, required_docs (array), forbidden_context (array)",
+             "Guardrail: all keywords must appear verbatim in the work cell's purpose or required_reference_documents — no invented keywords",
+             "Guardrail: EXEC-ROUTING-RULE-WRITER must not modify submodule_context_catalog.json",
+             "Determinism requirement: same catalog input produces identical routing rule output on consecutive runs"
+           ]},
+          {"id": "ROUTING_CONFIG_SCHEMA", "type": "file", "path": ".state/patterns/PAT-ROUTING-RULE-AUTHOR/config_schema.json"},
+          {"id": "ROUTING_RULES_SCHEMA", "type": "file", "path": "routing_rules_schema.json",
+           "content_requirements": [
+             "Validates routing_rules.json structure",
+             "Requires fields: rule_id (string), keywords (array, min 1), work_cell_id (string), context_packet_path (string), required_docs (array), forbidden_context (array)",
+             "Requires: work_cell_id must resolve in submodule_context_catalog.json (enforced at GATE-ROUTING-CATALOG-SYNC-001 time)"
+           ]},
+          {"id": "ROUTING_PATTERN_VALIDATION", "type": "file", "path": ".state/evidence/PH-04A/STEP-001/validation.json", "content_requirements": ["passed: true"]}
+        ],
+        "invariants": ["No routing_rules.json created yet.", "submodule_context_catalog.json read-only."],
+        "preconditions": ["All PH-03 phases completed and merged to main.", "PH-03 GATE-NOOVERRIDE-001 final pass on record."],
+        "postconditions": ["PAT-ROUTING-RULE-AUTHOR validated in PATTERN_INDEX.yaml.", "routing_rules_schema.json exists and passes JSON Schema meta-validation."],
+        "file_scope": {
+          "allowed_paths": [".state/patterns/PAT-ROUTING-RULE-AUTHOR/**", "PATTERN_INDEX.yaml", "routing_rules_schema.json", ".state/evidence/PH-04A/STEP-001/**"],
+          "forbidden_paths": ["routing_rules.json", "submodule_context_catalog.json", "services/**"]
+        },
+        "failure_modes": [
+          {"code": "KEYWORD-INVENTION-ALLOWED", "meaning": "Pattern spec does not constrain keywords to catalog-backed terms.", "remediation": "Add guardrail: keywords must be drawn from work cell purpose text and required_reference_documents names only."}
+        ],
+        "rollback_strategy": {"commands": ["rm -rf .state/patterns/PAT-ROUTING-RULE-AUTHOR/", "rm -f routing_rules_schema.json"]},
+        "idempotency": {"is_idempotent": true},
+        "audit_fields": {"emit_audit_record": true, "audit_event_type": "pattern_creation"},
+        "failure_logging": {"require_error_message": true, "require_stack_trace": true, "require_retry_history": true},
+        "acceptance_gates": ["GATE-CFG-001", "GATE-CFG-002", "GATE-CFG-004", "GATE-CFG-006"]
+      }
+    },
+
+    "PH-04B": {
+      "STEP-001": {
+        "step_id": "STEP-001",
+        "phase_step_key": "PH-04B/STEP-001",
+        "purpose": "Create worktree for routing rule authoring. Generate routing rule entries for Calendar Pipeline work cells (D2, D3, F2, D4).",
+        "implementation_mode": "PATTERN_EXECUTION",
+        "pattern_id": "PAT-ROUTING-RULE-AUTHOR",
+        "executor_binding": {"executor_id": "EXEC-ROUTING-RULE-WRITER", "executor_version": "1.0.0", "invocation_ref": "python scripts/execute_pattern.py --executor routing_rule_writer --work-cells D2,D3,F2,D4 --catalog submodule_context_catalog.json --output .worktrees/PH-04B/routing_rules.json"},
+        "behavior_spec": {"pattern_id": "PAT-ROUTING-RULE-AUTHOR", "spec_file": ".state/patterns/PAT-ROUTING-RULE-AUTHOR/spec.yaml", "config_instance_file": ".state/config/PH-04B_STEP-001.json", "config_schema_file": ".state/patterns/PAT-ROUTING-RULE-AUTHOR/config_schema.json"},
+        "bespoke_logic_allowed": false,
+        "requires_manual_review": false,
+        "high_risk_operation": false,
+        "inputs": [
+          {"id": "CATALOG", "type": "file", "path": "submodule_context_catalog.json", "required": true, "must_exist": true},
+          {"id": "CONTEXT_PACKETS_CALENDAR", "type": "directory", "path": "context_packets/", "required": true},
+          {"id": "ROUTING_INSTRUCTIONS", "type": "file", "path": "eafix_project_knowledge_reference_routing_instructions.json", "required": true}
+        ],
+        "outputs": [
+          {"id": "ROUTING_RULES_PARTIAL", "type": "file", "path": ".worktrees/PH-04B/routing_rules.json",
+           "content_requirements": [
+             "Contains rule entries for all D2.*, D3.*, F2.*, D4.* work cells",
+             "Each entry has: rule_id, keywords (calendar-domain terms), work_cell_id, context_packet_path, required_docs, forbidden_context",
+             "Calendar work cells: keywords include 'calendar', 'polling', 'normalization', 'trigger', 'event', 'impact', 'timezone', 'CAL5', 'CAL8' as applicable per work cell purpose",
+             "No keyword invented without catalog backing"
+           ]}
+        ],
+        "invariants": ["submodule_context_catalog.json read-only.", "No source files modified."],
+        "preconditions": ["PH-04A/STEP-001 completed.", "Worktree .worktrees/PH-04B created from clean main."],
+        "postconditions": ["routing_rules.json partial file passes routing_rules_schema.json validation for written entries."],
+        "file_scope": {
+          "allowed_paths": [".worktrees/PH-04B/routing_rules.json", ".state/evidence/PH-04B/STEP-001/**", ".state/config/PH-04B_STEP-001.json"],
+          "forbidden_paths": ["submodule_context_catalog.json", "context_packets/**", "services/**", "PATTERN_INDEX.yaml"],
+          "read_only_paths": ["submodule_context_catalog.json", "context_packets/**", "eafix_project_knowledge_reference_routing_instructions.json"]
+        },
+        "failure_modes": [
+          {"code": "KEYWORD-NOT-IN-CATALOG", "meaning": "A routing rule keyword was invented without catalog backing.", "remediation": "GATE-ROUTING-CATALOG-SYNC-001 will catch this. Remove the invented keyword; only catalog-derived terms allowed."}
+        ],
+        "rollback_strategy": {"commands": ["git -C .worktrees/PH-04B checkout -- routing_rules.json 2>/dev/null || rm -f .worktrees/PH-04B/routing_rules.json"]},
+        "idempotency": {"is_idempotent": true},
+        "audit_fields": {"emit_audit_record": true, "audit_event_type": "routing_rule_authoring"},
+        "failure_logging": {"require_error_message": true, "require_stack_trace": true, "require_retry_history": true},
+        "acceptance_gates": ["GATE-ROUTING-CATALOG-SYNC-001"]
+      },
+
+      "STEP-002": {
+        "step_id": "STEP-002",
+        "phase_step_key": "PH-04B/STEP-002",
+        "purpose": "Generate routing rule entries for MT4 Bridge (B1, B2, B3), EA-Side MQL4 (A, B_MQL4, D_MQL4) work cells.",
+        "implementation_mode": "PATTERN_EXECUTION",
+        "pattern_id": "PAT-ROUTING-RULE-AUTHOR",
+        "executor_binding": {"executor_id": "EXEC-ROUTING-RULE-WRITER", "executor_version": "1.0.0", "invocation_ref": "python scripts/execute_pattern.py --executor routing_rule_writer --work-cells B1,B2,B3,A_MQL4,B_MQL4,D_MQL4 --catalog submodule_context_catalog.json --output .worktrees/PH-04B/routing_rules.json --append"},
+        "bespoke_logic_allowed": false,
+        "requires_manual_review": false,
+        "high_risk_operation": false,
+        "inputs": [{"id": "CATALOG", "type": "file", "path": "submodule_context_catalog.json", "required": true}, {"id": "ROUTING_RULES_PARTIAL", "type": "file", "path": ".worktrees/PH-04B/routing_rules.json", "required": true}],
+        "outputs": [{"id": "ROUTING_RULES_MT4", "type": "file", "path": ".worktrees/PH-04B/routing_rules.json", "content_requirements": ["Appends B1/B2/B3 rules with keywords: 'MT4', 'transport', 'CSV', 'OrderSend', 'broker', 'execution', 'feedback'", "EA-side rules with keywords: 'MQL4', 'signal', 'bridge', 'EA', 'expert advisor'"]}],
+        "invariants": ["Append-only — no existing rules overwritten."],
+        "preconditions": ["STEP-001 completed."],
+        "postconditions": ["routing_rules.json passes schema for all entries written so far."],
+        "file_scope": {"allowed_paths": [".worktrees/PH-04B/routing_rules.json", ".state/evidence/PH-04B/STEP-002/**"], "forbidden_paths": ["submodule_context_catalog.json", "services/**"], "read_only_paths": ["submodule_context_catalog.json"]},
+        "failure_modes": [{"code": "RULE-ID-COLLISION", "meaning": "A new rule_id collides with an existing entry.", "remediation": "EXEC-ROUTING-RULE-WRITER must generate unique rule_ids. Correct and re-run."}],
+        "rollback_strategy": {"commands": ["git -C .worktrees/PH-04B checkout -- routing_rules.json"]},
+        "idempotency": {"is_idempotent": false, "enforcement": "Append-only; re-run would duplicate entries. Use a deduplicate pass if re-running."},
+        "audit_fields": {"emit_audit_record": true, "audit_event_type": "routing_rule_authoring"},
+        "failure_logging": {"require_error_message": true, "require_stack_trace": true, "require_retry_history": true},
+        "acceptance_gates": ["GATE-ROUTING-CATALOG-SYNC-001"]
+      },
+
+      "STEP-003": {
+        "step_id": "STEP-003",
+        "phase_step_key": "PH-04B/STEP-003",
+        "purpose": "Generate routing rule entries for Risk Engine (R1-R9), Signal Engine (S1-S7), Reentry Engine (E1-E4), and UI work cells.",
+        "implementation_mode": "PATTERN_EXECUTION",
+        "pattern_id": "PAT-ROUTING-RULE-AUTHOR",
+        "executor_binding": {"executor_id": "EXEC-ROUTING-RULE-WRITER", "executor_version": "1.0.0", "invocation_ref": "python scripts/execute_pattern.py --executor routing_rule_writer --work-cells R1,R2,R3,R4,R5,R6,R7,R8,R9,S1,S2,S3,S4,S5,S6,S7,E1,E2,E3,E4,UI_ALL --catalog submodule_context_catalog.json --output .worktrees/PH-04B/routing_rules.json --append"},
+        "bespoke_logic_allowed": false,
+        "requires_manual_review": false,
+        "high_risk_operation": false,
+        "inputs": [{"id": "CATALOG", "type": "file", "path": "submodule_context_catalog.json", "required": true}, {"id": "ROUTING_RULES_PARTIAL", "type": "file", "path": ".worktrees/PH-04B/routing_rules.json", "required": true}],
+        "outputs": [{"id": "ROUTING_RULES_COMPLETE", "type": "file", "path": ".worktrees/PH-04B/routing_rules.json", "content_requirements": ["All work cells from catalog have at least one routing rule entry", "UI rules reference ui_catalog.json screen names exactly"]}],
+        "invariants": ["Append-only."],
+        "preconditions": ["STEP-002 completed."],
+        "postconditions": ["routing_rules.json passes routing_rules_schema.json for all entries."],
+        "file_scope": {"allowed_paths": [".worktrees/PH-04B/routing_rules.json", ".state/evidence/PH-04B/STEP-003/**"], "forbidden_paths": ["submodule_context_catalog.json", "services/**"], "read_only_paths": ["submodule_context_catalog.json"]},
+        "failure_modes": [{"code": "COVERAGE-GAP", "meaning": "One or more work cells have no routing rule.", "remediation": "GATE-ROUTING-COVERAGE-001 identifies gaps. Add missing rules before closing Phase 4."}],
+        "rollback_strategy": {"commands": ["git -C .worktrees/PH-04B checkout -- routing_rules.json"]},
+        "idempotency": {"is_idempotent": false},
+        "audit_fields": {"emit_audit_record": true, "audit_event_type": "routing_rule_authoring"},
+        "failure_logging": {"require_error_message": true, "require_stack_trace": true, "require_retry_history": true},
+        "acceptance_gates": ["GATE-ROUTING-COVERAGE-001", "GATE-ROUTING-CATALOG-SYNC-001"]
+      },
+
+      "STEP-004": {
+        "step_id": "STEP-004",
+        "phase_step_key": "PH-04B/STEP-004",
+        "purpose": "Final routing rules validation: schema check, full coverage check, catalog sync check, then merge routing_rules.json to main.",
+        "implementation_mode": "PATTERN_EXECUTION",
+        "pattern_id": "PAT-WORKCELL-VERIFY",
+        "executor_binding": {"executor_id": "EXEC-PYTHON-CLI-V1", "executor_version": "1.0.0", "invocation_ref": "python scripts/execute_pattern.py --executor routing_rule_validator --routing-rules .worktrees/PH-04B/routing_rules.json --catalog submodule_context_catalog.json --schema routing_rules_schema.json"},
+        "bespoke_logic_allowed": false,
+        "requires_manual_review": true,
+        "manual_review_reason": "Final routing rules require human sign-off before merge to main — they govern all future AI task routing.",
+        "high_risk_operation": false,
+        "inputs": [{"id": "ROUTING_RULES_COMPLETE", "type": "file", "path": ".worktrees/PH-04B/routing_rules.json", "required": true}, {"id": "CATALOG", "type": "file", "path": "submodule_context_catalog.json", "required": true}, {"id": "ROUTING_RULES_SCHEMA", "type": "file", "path": "routing_rules_schema.json", "required": true}],
+        "outputs": [
+          {"id": "ROUTING_VALIDATION_REPORT", "type": "file", "path": ".state/evidence/PH-04B/STEP-004/routing_rules_validation.json", "content_requirements": ["schema_valid: true", "coverage: {total_work_cells, covered_work_cells, gaps:[]}", "catalog_sync: {orphan_rules:[], missing_work_cells:[]}", "overall_passed: true"]},
+          {"id": "MERGE_APPROVAL", "type": "file", "path": ".state/evidence/PH-04B/STEP-004/merge_approval.json", "content_requirements": ["approved_by: human reviewer name/ID", "timestamp: ISO-8601", "notes: string"]}
+        ],
+        "invariants": ["Read-only validation step plus final merge commit."],
+        "preconditions": ["STEP-003 completed.", "Human reviewer available for merge approval."],
+        "postconditions": ["GATE-ROUTING-COMPLETE-001, GATE-ROUTING-COVERAGE-001, GATE-ROUTING-CATALOG-SYNC-001 all pass.", "routing_rules.json merged to main via squash.", "merge_approval.json on record."],
+        "file_scope": {"allowed_paths": [".state/evidence/PH-04B/STEP-004/**", ".worktrees/PH-04B/routing_rules.json"], "forbidden_paths": ["submodule_context_catalog.json", "services/**"], "read_only_paths": [".worktrees/PH-04B/routing_rules.json", "submodule_context_catalog.json", "routing_rules_schema.json"]},
+        "failure_modes": [{"code": "ROUTING-COVERAGE-GAP", "meaning": "One or more catalog work cells have no routing rule.", "remediation": "Return to STEP-003 and author missing rules. Do not merge until coverage is complete."}],
+        "rollback_strategy": {"commands": ["# If merged: git revert HEAD --no-edit", "# If not merged: rm -f .worktrees/PH-04B/routing_rules.json"]},
+        "idempotency": {"is_idempotent": true, "enforcement": "Validation is idempotent. Merge is one-time."},
+        "audit_fields": {"emit_audit_record": true, "audit_event_type": "routing_rules_final_validation"},
+        "failure_logging": {"require_error_message": true, "require_stack_trace": true, "require_retry_history": true},
+        "acceptance_gates": ["GATE-ROUTING-COMPLETE-001", "GATE-ROUTING-COVERAGE-001", "GATE-ROUTING-CATALOG-SYNC-001", "GATE-NOOVERRIDE-001"]
+      }
+    }
+  },
+
+  "validation_gates": [
+    {
+      "gate_id": "GATE-CFG-001",
+      "gate_execution_stage": "pre_execution",
+      "purpose": "Every executable step has pattern_id, executor_id, spec_file, config_schema_file declared.",
+      "command": "python scripts/validate_pattern_completeness.py decomposition_plan_ph3_ph4.json",
+      "timeout_sec": 120,
+      "retries": 0,
+      "expect_exit_code": 0,
+      "expect_stdout_regex": ["GATE-CFG-001 PASSED"],
+      "forbid_stdout_regex": ["GATE-CFG-001 FAILED"],
+      "evidence": ".state/evidence/GATE-CFG-001/validation.json",
+      "required_before": ["PH-03B", "PH-03C", "PH-03D", "PH-04B"],
+      "failure_action": "halt — do not begin any refactoring until all executable steps are pattern-bound"
+    },
+    {
+      "gate_id": "GATE-CFG-002",
+      "gate_execution_stage": "pre_execution",
+      "purpose": "Behavior is supplied by external spec/config artifacts — not step prose or bespoke commands.",
+      "command": "python scripts/validate_engine_spec_separation.py decomposition_plan_ph3_ph4.json",
+      "timeout_sec": 120,
+      "retries": 0,
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/GATE-CFG-002/validation.json",
+      "required_before": ["PH-03B", "PH-03C", "PH-03D", "PH-04B"]
+    },
+    {
+      "gate_id": "GATE-CFG-003",
+      "gate_execution_stage": "pre_execution",
+      "purpose": "Reject bespoke commands where a registered pattern exists.",
+      "command": "python scripts/validate_no_adhoc_execution.py decomposition_plan_ph3_ph4.json",
+      "timeout_sec": 120,
+      "retries": 0,
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/GATE-CFG-003/validation.json",
+      "required_before": ["PH-03B", "PH-03C", "PH-03D", "PH-04B"]
+    },
+    {
+      "gate_id": "GATE-CFG-004",
+      "gate_execution_stage": "pre_execution",
+      "purpose": "Reject executor_ids not present in executor_registry.",
+      "command": "python scripts/validate_executor_registration.py decomposition_plan_ph3_ph4.json",
+      "timeout_sec": 120,
+      "retries": 0,
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/GATE-CFG-004/validation.json",
+      "required_before": ["PH-03B", "PH-03C", "PH-03D", "PH-04B"]
+    },
+    {
+      "gate_id": "GATE-CFG-005",
+      "gate_execution_stage": "pre_execution",
+      "purpose": "Pattern creation steps (PH-03A) must complete before any implementation steps begin.",
+      "command": "python scripts/validate_pattern_first_gap_resolution.py decomposition_plan_ph3_ph4.json",
+      "timeout_sec": 120,
+      "retries": 0,
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/GATE-CFG-005/validation.json",
+      "required_before": ["PH-03B", "PH-03C", "PH-03D", "PH-04B"]
+    },
+    {
+      "gate_id": "GATE-CFG-006",
+      "gate_execution_stage": "pre_execution",
+      "purpose": "All patterns in PATTERN_INDEX.yaml have golden test fixtures that pass.",
+      "command": "python scripts/validate_pattern_golden_tests.py PATTERN_INDEX.yaml .state/patterns/",
+      "timeout_sec": 300,
+      "retries": 0,
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/GATE-CFG-006/validation.json",
+      "required_before": ["PH-03B", "PH-03C", "PH-03D", "PH-04B"]
+    },
+    {
+      "gate_id": "GATE-PATTERN-INDEX-VALID-001",
+      "phase_step_key": "PH-03A/STEP-001",
+      "purpose": "PATTERN_INDEX.yaml exists and is valid YAML with at least the required stub entries.",
+      "command": "python -c \"import yaml, sys; y=yaml.safe_load(open('PATTERN_INDEX.yaml')); pids={p['pattern_id'] for p in y['patterns']}; required={'PAT-WORKCELL-SPLIT','PAT-IMPORT-UPDATE','PAT-WORKCELL-VERIFY'}; missing=required-pids; print(missing); sys.exit(1 if missing else 0)\"",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-03A/STEP-001/pattern_index_validation.json"
+    },
+    {
+      "gate_id": "GATE-PATTERN-GOLDEN-001",
+      "phase_step_key": "PH-03A/STEP-002 through STEP-004",
+      "purpose": "Each pattern's golden test fixture passes before the pattern is registered as validated.",
+      "command": "python scripts/run_pattern_golden_test.py .state/patterns/{PAT-ID}/test_fixture/",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-03A/{step_id}/validation.json"
+    },
+    {
+      "gate_id": "GATE-CONFLICT-001",
+      "gate_execution_stage": "pre_parallel_execution",
+      "purpose": "Verify PH-03B, PH-03C, PH-03D have no overlapping file paths before parallel execution begins.",
+      "command": "python scripts/check_workstream_independence.py --phases PH-03B PH-03C PH-03D --catalog submodule_context_catalog.json --mapping file_module_mapping.csv",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/GATE-CONFLICT-001/validation.json",
+      "failure_action": "Serialize the conflicting phases; do not run them in parallel."
+    },
+    {
+      "gate_id": "GATE-SPLIT-VERIFY-001",
+      "phase_step_key": "PH-03B/STEP-002, PH-03B/STEP-003, PH-03C equivalents, PH-03D equivalents",
+      "purpose": "All files in refactored work cell source dir are in the context packet allowed_files list; no file in forbidden_files list.",
+      "command": "python scripts/execute_pattern.py --executor workcell_verifier --check file_scope_only --work-cell {work_cell_id} --context-packet context_packets/{work_cell_id}/ --source .worktrees/{phase_id}/services/{service}/",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/{phase_id}/STEP-00X/verification_report.json"
+    },
+    {
+      "gate_id": "GATE-TEST-001",
+      "phase_step_key": "PH-03B/STEP-004, PH-03C equivalents, PH-03D equivalents",
+      "purpose": "pytest passes for all tests in the refactored work cell scope.",
+      "command": "pytest .worktrees/{phase_id}/services/{service}/ -v --tb=short --junitxml=.state/evidence/{phase_id}/STEP-00X/test_results.xml",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/{phase_id}/STEP-00X/test_results.xml"
+    },
+    {
+      "gate_id": "GATE-NOOVERRIDE-001",
+      "gate_execution_stage": "post_phase",
+      "purpose": "No AUTHORITATIVE or CONSTRAINING context artifact was modified during execution.",
+      "command": "python scripts/validate_nooverride.py --baseline .state/baseline/commit_hash.txt --protected module_catalog.json process_step_catalog.json communication_channels.json ui_catalog.json mt4_authoritative_reference_for_ai.json file_module_mapping.csv submodule_context_catalog.json context_packets/",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/GATE-NOOVERRIDE-001/validation.json",
+      "failure_action": "HALT. Restore from baseline. Investigate source of violation."
+    },
+    {
+      "gate_id": "GATE-ROUTING-COMPLETE-001",
+      "phase_step_key": "PH-04B/STEP-004",
+      "purpose": "routing_rules.json is valid JSON and passes routing_rules_schema.json for all entries.",
+      "command": "python -m jsonschema -i .worktrees/PH-04B/routing_rules.json routing_rules_schema.json",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-04B/STEP-004/routing_rules_validation.json"
+    },
+    {
+      "gate_id": "GATE-ROUTING-COVERAGE-001",
+      "phase_step_key": "PH-04B/STEP-004",
+      "purpose": "Every work cell in submodule_context_catalog.json has at least one routing rule in routing_rules.json.",
+      "command": "python -c \"import json, sys; rules=json.load(open('.worktrees/PH-04B/routing_rules.json')); cat=json.load(open('submodule_context_catalog.json')); covered={r['work_cell_id'] for r in rules['rules']}; all_cells={c['work_cell_id'] for c in cat['work_cells']}; gaps=all_cells-covered; print('GAPS:', gaps); sys.exit(1 if gaps else 0)\"",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-04B/STEP-004/routing_rules_validation.json",
+      "failure_action": "Author missing rules in PH-04B/STEP-003 before closing."
+    },
+    {
+      "gate_id": "GATE-ROUTING-CATALOG-SYNC-001",
+      "phase_step_key": "PH-04B/STEP-004",
+      "purpose": "Every work_cell_id in routing_rules.json resolves in submodule_context_catalog.json. No orphan rules.",
+      "command": "python -c \"import json, sys; rules=json.load(open('.worktrees/PH-04B/routing_rules.json')); cat=json.load(open('submodule_context_catalog.json')); all_cells={c['work_cell_id'] for c in cat['work_cells']}; orphans=[r['rule_id'] for r in rules['rules'] if r['work_cell_id'] not in all_cells]; print('ORPHANS:', orphans); sys.exit(1 if orphans else 0)\"",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-04B/STEP-004/routing_rules_validation.json",
+      "failure_action": "Remove orphan rules or add missing work cells to catalog via Phase 1 amendment."
+    }
+  ],
+
+  "anti_pattern_detection": {
+    "enabled": true,
+    "triggers": [
+      {"id": "APD-PH3-001", "name": "patternless_execution", "description": "An implementation step executes without a bound pattern_id.", "severity": "critical", "detection": "GATE-CFG-001 fails", "action": "halt"},
+      {"id": "APD-PH3-002", "name": "unregistered_executor_invocation", "description": "A step invokes an executor_id not in executor_registry.", "severity": "critical", "detection": "GATE-CFG-004 fails", "action": "halt"},
+      {"id": "APD-PH3-003", "name": "freehand_script_created_where_pattern_exists", "description": "A bespoke script is created for file splitting instead of using PAT-WORKCELL-SPLIT.", "severity": "critical", "detection": "GATE-CFG-003 fails", "action": "halt — delete bespoke script; use PAT-WORKCELL-SPLIT"},
+      {"id": "APD-PH3-004", "name": "worktree_contamination", "description": "A PH-03B worktree step writes to PH-03C or PH-03D directories.", "severity": "critical", "detection": "file_scope validation post-step", "action": "halt_and_rollback — remove contaminated worktree"},
+      {"id": "APD-PH3-005", "name": "protected_path_modification", "description": "A step modifies a file in protected_paths.", "severity": "critical", "detection": "post-step protected path hash check", "action": "halt_and_rollback immediately"},
+      {"id": "APD-PH3-006", "name": "split_without_context_packet_backing", "description": "A source file is split into a path not declared in the work cell's context packet allowed_files.", "severity": "critical", "detection": "GATE-SPLIT-VERIFY-001 fails", "action": "halt — revise split_spec to align with context packet"},
+      {"id": "APD-PH3-007", "name": "implementation_before_pattern_validation", "description": "A PH-03B/C/D step begins before PH-03A patterns are all in validated status.", "severity": "critical", "detection": "GATE-CFG-005 fails", "action": "halt — complete PH-03A first"},
+      {"id": "APD-PH4-001", "name": "routing_keyword_invented", "description": "A routing rule keyword was not derived from the catalog work cell purpose or required_reference_documents.", "severity": "critical", "detection": "GATE-ROUTING-CATALOG-SYNC-001 or manual review", "action": "halt — remove invented keyword; source only from catalog"},
+      {"id": "APD-PH4-002", "name": "routing_rule_modifies_catalog", "description": "EXEC-ROUTING-RULE-WRITER attempts to modify submodule_context_catalog.json.", "severity": "critical", "detection": "file_scope violation in PH-04B step", "action": "halt — catalog is protected; add to catalog via Phase 1 amendment"},
+      {"id": "APD-PH4-003", "name": "routing_coverage_gap_ignored", "description": "Phase 4 is closed with GATE-ROUTING-COVERAGE-001 showing uncovered work cells.", "severity": "critical", "detection": "GATE-ROUTING-COVERAGE-001 fails at STEP-004", "action": "halt — author missing rules before merge"},
+      {"id": "APD-COMMON-001", "name": "undeclared_file_mutation", "description": "A file is created or modified not declared in artifact_intent_manifest.", "severity": "critical", "detection": "Post-step file diff vs manifest", "action": "halt — add to manifest or delete undeclared file"},
+      {"id": "APD-COMMON-002", "name": "runtime_behavior_override", "description": "Step behavior is altered at runtime via prompt or inline logic outside approved extension slots.", "severity": "critical", "detection": "GATE-CFG-002 fails", "action": "halt — behavior must come from spec/config/schema only"}
+    ],
+    "checkpoints": ["post_step", "post_phase", "pre_merge", "pre_phase_transition"],
+    "actions": {
+      "critical": "halt — do not proceed to next step or phase",
+      "recoverable": "self_heal_or_escalate"
+    }
+  },
+
+  "definition_of_done": {
+    "phase_3": [
+      "PATTERN_INDEX.yaml exists with PAT-WORKCELL-SPLIT, PAT-IMPORT-UPDATE, PAT-WORKCELL-VERIFY all in status validated.",
+      "GATE-CFG-001 through GATE-CFG-006 all pass.",
+      "services/calendar-ingestor/, services/transport-router/, services/execution-engine/, services/risk-manager/, services/reentry-engine/, services/gui-gateway/ all refactored into work-cell-scoped module structures.",
+      "GATE-SPLIT-VERIFY-001 passes for all work cells in all refactored services.",
+      "GATE-TEST-001 passes for all refactored services.",
+      "GATE-NOOVERRIDE-001 confirms no AUTHORITATIVE artifact was modified.",
+      "All worktrees merged to main via squash with human-approved merge records."
+    ],
+    "phase_4": [
+      "PAT-ROUTING-RULE-AUTHOR validated in PATTERN_INDEX.yaml.",
+      "routing_rules.json exists and passes GATE-ROUTING-COMPLETE-001.",
+      "GATE-ROUTING-COVERAGE-001: every catalog work cell has at least one routing rule.",
+      "GATE-ROUTING-CATALOG-SYNC-001: no orphan rules.",
+      "routing_rules.json merged to main with human merge_approval.json on record.",
+      "GATE-NOOVERRIDE-001 final pass confirms no source artifact modified during Phase 4."
+    ],
+    "project_complete": [
+      "submodule_context_catalog.json, context_packets/, routing_rules.json, and all refactored services are on main.",
+      "GATE-NOOVERRIDE-001 clean across the full project lifecycle.",
+      "All .worktrees/ cleaned up.",
+      "Routing rules are ready for use as context injection instructions in AI agent sessions."
+    ]
+  }
+}

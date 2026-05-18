@@ -1,0 +1,1698 @@
+{
+  "schema_version": "2.0.0",
+  "document_type": "authoritative_platform_reference",
+  "reference_id": "MT4-AUTH-REF-AI-0001",
+  "title": "MetaTrader 4 Authoritative Reference for AI-Assisted HUEY_P/EAFIX Development",
+  "status": "active_governance_baseline",
+  "supersedes": [
+    {
+      "reference_path": "mt4_authoritative_reference_for_ai.json",
+      "schema_version": "1.0.0",
+      "status": "obsolete_historical_baseline"
+    }
+  ],
+  "last_reviewed_utc": "2026-05-05T00:00:00Z",
+  "platform": {
+    "platform_id": "METATRADER_4",
+    "platform_name": "MetaTrader 4",
+    "vendor": "MetaQuotes Ltd",
+    "vendor_website": "https://www.metaquotes.net",
+    "platform_website": "https://www.metatrader4.com/en",
+    "primary_use_cases": [
+      "forex_trading",
+      "cfd_trading",
+      "technical_analysis",
+      "algorithmic_trading",
+      "expert_advisor_execution",
+      "broker_terminal_operations"
+    ],
+    "supported_platforms": {
+      "desktop": ["Windows", "Mac_OS", "Linux"],
+      "mobile": ["iPhone_iPad", "Android", "Huawei_AppGallery"],
+      "web": "any_browser_any_OS_via_web_terminal"
+    },
+    "download_urls": {
+      "windows": "https://download.terminal.free/cdn/web/metaquotes.software.corp/mt4/mt4setup.exe",
+      "macos": "https://download.terminal.free/cdn/web/metaquotes.software.corp/mt4/MetaTrader4.pkg.zip",
+      "ios": "https://download.terminal.free/cdn/mobile/mt4/ios?hl=en",
+      "android": "https://download.terminal.free/cdn/mobile/mt4/android?hl=en",
+      "huawei": "https://download.terminal.free/cdn/mobile/mt4/android/app-gallery?hl=en"
+    },
+    "web_terminal_url": "https://web.metatrader.app/terminal?mode=demo&lang=en",
+    "latest_verified_public_build": {
+      "build": 1470,
+      "release_date": "2026-03-12",
+      "release_summary": [
+        "improved interface translations",
+        "bug fixes",
+        "enhanced platform stability"
+      ],
+      "source_ref_ids": ["SRC-METAQUOTES-RELEASE-1470"]
+    },
+    "recent_release_history": [
+      {
+        "build": 1470,
+        "release_date": "2026-03-12",
+        "summary": "Improved interface translations, bug fixes, enhanced platform stability.",
+        "source_ref_id": "SRC-METAQUOTES-RELEASE-1470"
+      },
+      {
+        "build": 1460,
+        "release_date": "2026-03-05",
+        "summary": "Important security improvements, bug fixes, platform stability enhancements. Distributed via Live Update.",
+        "source_ref_id": "SRC-METAQUOTES-RELEASE-1460"
+      },
+      {
+        "build": 1440,
+        "release_date": "2025-02-21",
+        "summary": "Minimum supported build as of July 1 2025. Details in Build 1440 release notes.",
+        "source_ref_id": "SRC-METAQUOTES-RELEASE-1440"
+      },
+      {
+        "build": 1420,
+        "release_date": "unknown",
+        "summary": "See release notes 562.",
+        "source_ref_id": null
+      },
+      {
+        "build": 1415,
+        "release_date": "unknown",
+        "summary": "See release notes 561.",
+        "source_ref_id": null
+      },
+      {
+        "build": 1409,
+        "release_date": "unknown",
+        "summary": "See release notes 560.",
+        "source_ref_id": null
+      },
+      {
+        "build": 1400,
+        "release_date": "2023-11-10",
+        "summary": "Improved Market DRM security. Market products now require MQL5 account authorization in MT4.",
+        "drm_detail": {
+          "ui_path": "Tools > Options > Community",
+          "error_message_format": "'ProductName' requires active MQL5 account in Tools->Options->Community",
+          "enforcement": "Product will not start and message is printed to platform journal if account invalid or missing."
+        },
+        "source_ref_id": "SRC-METAQUOTES-RELEASE-1400"
+      }
+    ],
+    "minimum_supported_build_policy": {
+      "effective_date": "2025-07-01",
+      "minimum_mt4_build": 1440,
+      "minimum_mt4_build_release_date": "2025-02-21",
+      "announcement_date": "2025-05-12",
+      "source_ref_ids": ["SRC-METAQUOTES-HOME", "SRC-METAQUOTES-RELEASE-1440"]
+    },
+    "strategic_status": {
+      "status": "legacy_maintained",
+      "official_statement": "The MetaTrader 4 trading platform licenses are no longer available for purchase. We focus our efforts on the development of MetaTrader 5, and further conceptual updates will only be released for this multi-asset platform.",
+      "official_statement_source": "SRC-METAQUOTES-BROKER-API",
+      "summary": "MT4 remains usable and maintained with bug fixes and stability releases, but MetaQuotes has formally ended server license sales and shifted all conceptual development to MT5.",
+      "planning_implications": [
+        "Avoid designs that require new MT4 server-side licensing.",
+        "Prefer retail-terminal-safe integrations unless a broker supplies authorized APIs.",
+        "Do not expect new MT4 order types, asset classes, or conceptual features.",
+        "Plan for long-term migration path to MT5 if needed."
+      ]
+    }
+  },
+  "authority_model": {
+    "source_priority_order": [
+      {
+        "rank": 1,
+        "source_type": "official_vendor_documentation",
+        "examples": [
+          "metatrader4.com",
+          "docs.mql4.com",
+          "mql5.com official docs",
+          "official release notes"
+        ]
+      },
+      {
+        "rank": 2,
+        "source_type": "broker_user_guides",
+        "examples": [
+          "Pepperstone MT4 guide",
+          "IG Asia MT4 guide"
+        ],
+        "note": "Broker guides describe terminal behavior and broker-specific constraints. Rules may differ by broker."
+      },
+      {
+        "rank": 3,
+        "source_type": "project_design_documents",
+        "examples": [
+          "updated_trading_process_aligned.yaml",
+          "MT4_Python communication channels.txt",
+          "HUEY_P tactical specification"
+        ]
+      },
+      {
+        "rank": 4,
+        "source_type": "implementation_observation",
+        "note": "Code inventory proves local implementation presence, not platform capability."
+      }
+    ],
+    "ai_decision_rules": [
+      {
+        "rule_id": "MT4-AI-RULE-001",
+        "rule": "Before proposing a custom feature, check whether MT4 natively provides the same capability.",
+        "default_action": "reuse_native_or_export_native_data",
+        "allowed_custom_exceptions": [
+          "audit_requirement",
+          "cross_service_contract_requirement",
+          "broker_specific_gap",
+          "multi_terminal_orchestration",
+          "custom_risk_policy",
+          "custom_reentry_logic",
+          "external_ui_requirement"
+        ]
+      },
+      {
+        "rule_id": "MT4-AI-RULE-002",
+        "rule": "If MT4 already owns an authoritative value, copy/export/normalize it instead of recomputing it.",
+        "native_authoritative_examples": [
+          "bid", "ask", "spread", "account_balance", "equity", "margin", "free_margin",
+          "open_orders", "closed_trades", "ticket", "stop_loss", "take_profit",
+          "swap", "commission", "magic_number", "order_comment"
+        ]
+      },
+      {
+        "rule_id": "MT4-AI-RULE-003",
+        "rule": "Every UI-visible field must declare source_authority and derivation_mode.",
+        "required_fields": [
+          "source_authority",
+          "derivation_mode",
+          "native_capability_id",
+          "broker_variability"
+        ]
+      },
+      {
+        "rule_id": "MT4-AI-RULE-004",
+        "rule": "Do not assume a public retail REST API for MT4. Retail integrations require MQL4, files, DDE, WebRequest, DLL import, sockets via DLL, or a broker/third-party bridge."
+      },
+      {
+        "rule_id": "MT4-AI-RULE-005",
+        "rule": "Broker-sensitive assumptions require a broker profile and validation gate before execution code is changed.",
+        "broker_sensitive_examples": [
+          "execution_mode", "minimum_lot", "lot_step", "max_lot", "maximum_orders",
+          "margin_method", "stop_level", "freeze_level", "market_hours",
+          "guaranteed_stops", "price_improvement"
+        ]
+      },
+      {
+        "rule_id": "MT4-AI-RULE-006",
+        "rule": "EAs, scripts, custom indicators, file bridges, WebRequest, DLL imports, and trailing stops ALL require the desktop client terminal to be running and connected. The web terminal does NOT support any of these.",
+        "web_terminal_limitations": [
+          "No Expert Advisors",
+          "No custom indicators",
+          "No scripts",
+          "No DLL imports",
+          "No WebRequest",
+          "No file-based bridges",
+          "No trailing stop management",
+          "No Market product DLL execution"
+        ]
+      },
+      {
+        "rule_id": "MT4-AI-RULE-007",
+        "rule": "Market products (EAs, indicators purchased/rented from MT4 Market) can only run when the user is logged into MT4 with the same MQL5 account used to purchase the product (enforced since Build 1400). If account is invalid/missing, product will not start.",
+        "drm_check_path": "Tools > Options > Community",
+        "error_message_format": "'ProductName' requires active MQL5 account in Tools->Options->Community"
+      }
+    ]
+  },
+  "source_registry": [
+    {
+      "source_id": "SRC-METAQUOTES-HOME",
+      "source_type": "official_vendor_web",
+      "title": "MetaTrader 4 Platform for Forex Trading and Technical Analysis",
+      "url": "https://www.metatrader4.com/en",
+      "retrieved_date": "2026-05-05",
+      "relevance": [
+        "platform_overview", "supported_devices", "core_services", "latest_news",
+        "minimum_supported_build", "download_links"
+      ]
+    },
+    {
+      "source_id": "SRC-METAQUOTES-RELEASE-1470",
+      "source_type": "official_vendor_web",
+      "title": "MetaTrader 4 Platform Build 1470 - Release Notes",
+      "url": "https://www.metatrader4.com/en/releasenotes/566",
+      "retrieved_date": "2026-05-05",
+      "relevance": ["latest_verified_build", "stability", "bug_fixes"]
+    },
+    {
+      "source_id": "SRC-METAQUOTES-RELEASE-1460",
+      "source_type": "official_vendor_web",
+      "title": "MetaTrader 4 Build 1460 - Release Notes",
+      "url": "https://www.metatrader4.com/en/releasenotes/565",
+      "retrieved_date": "2026-05-05",
+      "relevance": ["security_improvements", "bug_fixes", "stability"]
+    },
+    {
+      "source_id": "SRC-METAQUOTES-RELEASE-1440",
+      "source_type": "official_vendor_web",
+      "title": "MetaTrader 4 Build 1440 - Release Notes (minimum supported)",
+      "url": "https://www.metatrader4.com/en/releasenotes/563",
+      "retrieved_date": "2026-05-05",
+      "relevance": ["minimum_supported_build"]
+    },
+    {
+      "source_id": "SRC-METAQUOTES-RELEASE-1400",
+      "source_type": "official_vendor_web",
+      "title": "MetaTrader 4 Build 1400 - Improved Market Security",
+      "url": "https://www.metatrader4.com/en/releasenotes/559",
+      "retrieved_date": "2026-05-05",
+      "relevance": ["market_drm", "mql5_account_requirement", "security"]
+    },
+    {
+      "source_id": "SRC-METAQUOTES-ORDERS",
+      "source_type": "official_vendor_web",
+      "title": "Trading system and Orders Set in MetaTrader 4",
+      "url": "https://www.metatrader4.com/en/trading-platform/orders",
+      "retrieved_date": "2026-05-05",
+      "relevance": [
+        "execution_modes", "market_orders", "pending_orders", "stop_orders",
+        "trailing_stop", "terminal_trade_window", "one_click_trading"
+      ]
+    },
+    {
+      "source_id": "SRC-METAQUOTES-TECHNICAL-ANALYSIS",
+      "source_type": "official_vendor_web",
+      "title": "Powerful Technical Analysis in MetaTrader 4",
+      "url": "https://www.metatrader4.com/en/trading-platform/technical-analysis",
+      "retrieved_date": "2026-05-05",
+      "relevance": ["indicators", "analytical_objects", "timeframes", "charts"]
+    },
+    {
+      "source_id": "SRC-METAQUOTES-ALERTS-NEWS",
+      "source_type": "official_vendor_web",
+      "title": "Alerts and Financial News in MetaTrader 4",
+      "url": "https://www.metatrader4.com/en/trading-platform/alerts-news",
+      "retrieved_date": "2026-05-05",
+      "relevance": ["alerts", "news", "notifications"]
+    },
+    {
+      "source_id": "SRC-METAQUOTES-VPS",
+      "source_type": "official_vendor_web",
+      "title": "Virtual Hosting in MetaTrader 4",
+      "url": "https://www.metatrader4.com/en/trading-platform/vps",
+      "retrieved_date": "2026-05-05",
+      "relevance": ["vps", "ea_continuity", "signal_continuity", "24_7_operation"]
+    },
+    {
+      "source_id": "SRC-METAQUOTES-WEB-TRADING",
+      "source_type": "official_vendor_web",
+      "title": "MetaTrader 4 Web Trading",
+      "url": "https://www.metatrader4.com/en/trading-platform/web-trading",
+      "web_terminal_url": "https://web.metatrader.app/terminal?mode=demo&lang=en",
+      "retrieved_date": "2026-05-05",
+      "relevance": ["web_platform", "browser_trading", "platform_limitations"],
+      "web_platform_features": [
+        "trading_directly_via_browser",
+        "any_OS_compatible",
+        "encrypted_data_protection",
+        "one_click_trading",
+        "trading_operations_history",
+        "30_technical_indicators",
+        "graphical_objects",
+        "all_order_types",
+        "real_time_quotes",
+        "9_timeframes"
+      ],
+      "web_platform_CRITICAL_limitations": [
+        "NO Expert Advisors",
+        "NO custom indicators",
+        "NO scripts",
+        "NO DLL imports",
+        "NO WebRequest",
+        "NO file-based bridges",
+        "NO Strategy Tester",
+        "NO trailing stop automation beyond manual",
+        "NO Market product execution requiring DLL"
+      ]
+    },
+    {
+      "source_id": "SRC-METAQUOTES-MQL4-IDE",
+      "source_type": "official_vendor_web",
+      "title": "MQL4 IDE - Integrated Development Environment",
+      "url": "https://www.metatrader4.com/en/automated-trading/mql4-ide",
+      "retrieved_date": "2026-05-05",
+      "relevance": [
+        "mql4_language", "metaeditor", "strategy_tester", "documentation", "mql5_community"
+      ],
+      "ide_components": [
+        "MQL4_language",
+        "MetaEditor",
+        "Strategy_Tester",
+        "Documentation_docs.mql4.com",
+        "MQL5.com_community"
+      ]
+    },
+    {
+      "source_id": "SRC-METAQUOTES-MQL4-PROGRAMMING",
+      "source_type": "official_vendor_web",
+      "title": "MetaQuotes Language 4 Programming",
+      "url": "https://www.metatrader4.com/en/automated-trading/mql4-programming",
+      "retrieved_date": "2026-05-05",
+      "relevance": [
+        "mql4_language_basis", "oop_c_plus_plus", "program_types", "library_type"
+      ],
+      "mql4_program_types": [
+        {
+          "type": "Expert_Advisor",
+          "description": "Autonomous trading application that can analyze markets and perform trades automatically."
+        },
+        {
+          "type": "Custom_Indicator",
+          "description": "Market analysis tool similar to built-in indicators; can implement any algorithm."
+        },
+        {
+          "type": "Script",
+          "description": "Single-run application for frequently used actions such as closing all orders or placing pending orders."
+        },
+        {
+          "type": "Library",
+          "description": "Set of custom functions intended for storing and distributing algorithms used across multiple MQL4 programs. Cannot run independently."
+        }
+      ],
+      "mql4_language_basis": "Based on C++ concepts; object-oriented (OOP); high-level; designed for speed and flexibility with large calculation loads."
+    },
+    {
+      "source_id": "SRC-METAQUOTES-STRATEGY-TESTER",
+      "source_type": "official_vendor_web",
+      "title": "MetaTrader 4 Strategy Tester",
+      "url": "https://www.metatrader4.com/en/automated-trading/strategy-tester",
+      "retrieved_date": "2026-05-05",
+      "relevance": [
+        "backtesting", "optimization", "visual_testing", "ea_validation"
+      ],
+      "tester_features": [
+        "historical_quote_based_backtesting",
+        "visual_real_time_mode_in_chart_window",
+        "optimization_function_for_best_parameters",
+        "full_report_graphical_and_quantitative",
+        "profit_loss_ratio",
+        "win_loss_trade_counts",
+        "risk_factor",
+        "flaw_detection_in_trading_strategy"
+      ]
+    },
+    {
+      "source_id": "SRC-METAQUOTES-METAEDITOR",
+      "source_type": "official_vendor_web",
+      "title": "MetaEditor - MQL4 Code Editor",
+      "url": "https://www.metatrader4.com/en/automated-trading/metaeditor",
+      "retrieved_date": "2026-05-05",
+      "relevance": ["mql4_ide", "code_editor", "debugging", "templates"]
+    },
+    {
+      "source_id": "SRC-METAQUOTES-BROKER-API",
+      "source_type": "official_vendor_web",
+      "title": "MetaTrader 4 API",
+      "url": "https://www.metatrader4.com/en/brokers/api",
+      "retrieved_date": "2026-05-05",
+      "relevance": [
+        "server_api", "manager_api", "datafeed_api", "report_api",
+        "webservices_api", "broker_scope", "mt5_migration_statement"
+      ],
+      "api_types": [
+        {
+          "api": "Server_API",
+          "purpose": "Develop server plugins with unlimited possibilities including management of server parameters, order and customer base, processing trade requests."
+        },
+        {
+          "api": "Manager_API",
+          "purpose": "Integration and customization of platform management functions; can create a custom manager terminal."
+        },
+        {
+          "api": "DataFeed_API",
+          "purpose": "Development of news and quote data feeds."
+        },
+        {
+          "api": "Report_API",
+          "purpose": "Create custom reports on financial operations and trader accounts."
+        },
+        {
+          "api": "WebServices_API",
+          "purpose": "Integrate platform with websites for user accounts and quote display."
+        }
+      ],
+      "scope_note": "ALL APIs are broker-scope only. No public retail REST API exists.",
+      "mt5_migration_statement": "The MetaTrader 4 trading platform licenses are no longer available for purchase. MetaQuotes focuses on MetaTrader 5; further conceptual updates will only be released for MT5."
+    },
+    {
+      "source_id": "SRC-METAQUOTES-SIGNALS",
+      "source_type": "official_vendor_web",
+      "title": "Forex Signals and Copy Trading in MetaTrader 4",
+      "url": "https://www.metatrader4.com/en/signals",
+      "retrieved_date": "2026-05-05",
+      "relevance": ["signal_service", "copy_trading", "signal_providers", "signal_subscription"]
+    },
+    {
+      "source_id": "SRC-METAQUOTES-MARKET",
+      "source_type": "official_vendor_web",
+      "title": "MetaTrader Market",
+      "url": "https://www.metatrader4.com/en/market",
+      "retrieved_date": "2026-05-05",
+      "relevance": ["market_ea_purchase", "market_indicator_purchase", "demo_versions", "drm"]
+    },
+    {
+      "source_id": "SRC-METAQUOTES-ROBOTS-INDICATORS",
+      "source_type": "official_vendor_web",
+      "title": "Where to Get a Robot or Indicator for MT4",
+      "url": "https://www.metatrader4.com/en/automated-trading/robots-indicators",
+      "retrieved_date": "2026-05-05",
+      "relevance": ["code_base", "market", "freelance", "distribution"]
+    },
+    {
+      "source_id": "SRC-METAQUOTES-DOCS-MQL4",
+      "source_type": "official_vendor_web",
+      "title": "MQL4 Documentation Reference",
+      "url": "https://docs.mql4.com/en",
+      "retrieved_date": "2026-05-05",
+      "relevance": ["mql4_api_reference", "functions", "operations", "language_elements"]
+    },
+    {
+      "source_id": "SRC-PEPPERSTONE-MT4-GUIDE",
+      "source_type": "broker_pdf",
+      "title": "Pepperstone MetaTrader 4 User Guide",
+      "file_name": "Pepperstone-Metatrader-4-User-Guide.pdf",
+      "relevance": [
+        "terminal_navigation", "market_watch", "data_folder", "order_window",
+        "trailing_stop", "hotkeys", "chart_types", "pending_orders", "alerts",
+        "account_history", "partial_close", "market_depth"
+      ]
+    },
+    {
+      "source_id": "SRC-IG-MT4-GUIDE",
+      "source_type": "broker_pdf",
+      "title": "IG Asia MetaTrader 4 Guide",
+      "file_name": "170200_IGM_SGX_MT4Guide.pdf",
+      "relevance": [
+        "broker_specific_execution", "force_open_behavior", "margin_differences",
+        "order_limits", "guaranteed_stop_absence", "no_price_improvement",
+        "ea_suspension_policy", "closeout_process", "telephone_trading_absence"
+      ]
+    },
+    {
+      "source_id": "SRC-HUEY-P-PROCESS",
+      "source_type": "project_file",
+      "title": "updated_trading_process_aligned.yaml",
+      "relevance": [
+        "canonical_project_chain", "FeatureFrame_to_ExecutionReport", "MT4_execution_context"
+      ]
+    },
+    {
+      "source_id": "SRC-HUEY-P-COMMS",
+      "source_type": "project_file",
+      "title": "MT4_Python communication channels.txt",
+      "relevance": ["DDE", "WebRequest", "CSV", "JSONL", "Redis", "TCP_socket_gap"]
+    }
+  ],
+  "native_capability_catalog": [
+    {
+      "capability_id": "MT4-CAP-TRADING-001",
+      "name": "market_orders",
+      "native_status": "native",
+      "summary": "MT4 supports market orders for immediate execution subject to broker execution mode.",
+      "project_policy": "Use native MT4 order placement through EA/OrderSend or terminal UI. Do not build a custom market-order engine outside MT4 unless routing across brokers.",
+      "broker_variability": true,
+      "project_contracts": ["OrderIntent", "RoutedOrderIntent", "BrokerExecEvent", "ExecutionReport"]
+    },
+    {
+      "capability_id": "MT4-CAP-TRADING-002",
+      "name": "pending_orders",
+      "native_status": "native",
+      "summary": "MT4 supports four pending order types: Buy Limit, Sell Limit, Buy Stop, Sell Stop.",
+      "pending_order_types": {
+        "Buy_Stop": "Order to open a Buy position at a price HIGHER than current price.",
+        "Sell_Stop": "Order to open a Sell position at a price LOWER than current price.",
+        "Buy_Limit": "Order to open a Buy position at a price LOWER than current price (expects reversal).",
+        "Sell_Limit": "Order to open a Sell position at a price HIGHER than current price (expects reversal)."
+      },
+      "project_policy": "Use native pending orders for straddle placement and staged entries. Project logic should decide parameters; MT4 should hold and execute the order.",
+      "broker_variability": true,
+      "project_contracts": ["OrderIntent", "RoutedOrderIntent"]
+    },
+    {
+      "capability_id": "MT4-CAP-TRADING-003",
+      "name": "stop_loss_take_profit",
+      "native_status": "native",
+      "summary": "MT4 supports Stop Loss and Take Profit with market orders, pending orders, and already open positions.",
+      "stop_order_details": {
+        "Stop_Loss": "Closes position automatically when price moves adversely to a pre-set level; minimizes losses.",
+        "Take_Profit": "Closes position automatically when price reaches a favorable pre-set level; locks profits."
+      },
+      "project_policy": "Use native SL/TP as the primary broker-side protection layer. Custom risk code should supervise and audit, not replace broker-side protection.",
+      "broker_variability": true,
+      "project_contracts": ["RiskDecision", "OrderIntent", "ExecutionReport"]
+    },
+    {
+      "capability_id": "MT4-CAP-TRADING-004",
+      "name": "trailing_stop",
+      "native_status": "native_client_terminal_feature",
+      "summary": "MT4 trailing stop automatically moves Stop Loss a fixed distance from current price as price moves favorably. Stops moving on adverse price reversal.",
+      "important_limitation": "Native trailing stop is CLIENT-TERMINAL DEPENDENT. It requires the desktop terminal to be running and connected. NOT available in web terminal.",
+      "trailing_stop_mechanics": {
+        "unit": "points (not pips; 10 points = 1 pip in 5-decimal brokers)",
+        "trigger_rule": "No SL is placed until the open position is in profit by at least the trailing stop value.",
+        "update_rule": "MT4 modifies SL each time the distance between current price and SL exceeds the trailing value."
+      },
+      "project_policy": "Use native trailing stop for simple fixed-distance rules. Build custom trailing only for dynamic rules, auditability, persistence, multi-position logic, or cross-service governance.",
+      "broker_variability": false,
+      "project_contracts": ["OMS", "RiskDecision", "PositionSnapshot"]
+    },
+    {
+      "capability_id": "MT4-CAP-TRADING-005",
+      "name": "terminal_trade_window",
+      "native_status": "native",
+      "summary": "The Terminal Trade window (Ctrl+T) exposes: all open positions, open prices, volumes, SL/TP, profit, swap, commission, magic number, comment, and account state.",
+      "project_policy": "External UI should mirror/export Terminal Trade data instead of recomputing order state.",
+      "broker_variability": false,
+      "project_contracts": ["PositionSnapshot", "OrderHistory", "ExecutionReport"]
+    },
+    {
+      "capability_id": "MT4-CAP-TRADING-006",
+      "name": "one_click_trading",
+      "native_status": "native",
+      "summary": "One-Click Trading allows placing trades with a single mouse click without additional confirmation dialog. Available in both desktop terminal and web terminal.",
+      "activation": "ALT+T in terminal; also configurable in Tools > Options > Trade",
+      "project_policy": "Not relevant to automated EA execution but relevant for operator terminal UI design.",
+      "broker_variability": false,
+      "project_contracts": []
+    },
+    {
+      "capability_id": "MT4-CAP-TRADING-007",
+      "name": "execution_modes",
+      "native_status": "native_broker_configured",
+      "summary": "MT4 supports three order execution modes that determine how orders are filled.",
+      "execution_modes": {
+        "instant_execution": "Broker executes at the requested price; may provide requote if price changes.",
+        "request_execution": "Trader sees price, then requests execution; broker confirms.",
+        "market_execution": "Broker opens position at current market price immediately without requote."
+      },
+      "broker_variability": true,
+      "project_policy": "Execution mode is broker-configured and broker-dependent. Validate in BrokerProfile@1.0.",
+      "project_contracts": ["BrokerProfile", "RoutedOrderIntent"]
+    },
+    {
+      "capability_id": "MT4-CAP-TRADING-008",
+      "name": "market_depth",
+      "native_status": "native",
+      "summary": "Market Depth window (ALT+B) shows multiple price levels with Buy/Sell options; allows setting SL and TP simultaneously with trade entry.",
+      "project_policy": "Operator-facing feature. Not relevant to automated execution paths.",
+      "broker_variability": true,
+      "project_contracts": []
+    },
+    {
+      "capability_id": "MT4-CAP-TRADING-009",
+      "name": "partial_close",
+      "native_status": "native",
+      "summary": "MT4 allows partial closing of positions by specifying a smaller volume than the full position in the Order window.",
+      "project_policy": "Use native partial close via OrderClose with reduced volume when custom risk scaling requires it.",
+      "broker_variability": true,
+      "project_contracts": ["OMS", "RiskDecision"]
+    },
+    {
+      "capability_id": "MT4-CAP-HISTORY-001",
+      "name": "account_history_and_statements",
+      "native_status": "native",
+      "summary": "MT4 Terminal History tab shows closed trades with all raw fields. Can export as standard report or detailed report.",
+      "history_features": [
+        "all_closed_transaction_details",
+        "drag_trade_to_chart_for_visual_replay",
+        "export_as_report_or_detailed_report",
+        "filter_by_period"
+      ],
+      "project_policy": "Use MT4 history as raw authority for completed trades. Store normalized copies and derived analytics separately.",
+      "broker_variability": true,
+      "project_contracts": ["TradeClosedRaw", "TradeClosed", "OutcomeBucket"]
+    },
+    {
+      "capability_id": "MT4-CAP-MARKET-DATA-001",
+      "name": "market_watch_quotes",
+      "native_status": "native",
+      "summary": "Market Watch (Ctrl+M) provides real-time Bid/Ask quotes, symbol visibility, tick charts, and popup prices.",
+      "market_watch_features": [
+        "real_time_bid_ask",
+        "high_low_for_period",
+        "quote_arrival_time",
+        "tick_chart_per_symbol",
+        "symbol_hide_show_filter",
+        "popup_prices_window",
+        "new_order_from_symbol"
+      ],
+      "project_policy": "For broker-executed symbols, MT4/broker quote data is source authority. Python may normalize ticks but must not synthesize broker prices.",
+      "broker_variability": true,
+      "project_contracts": ["RawTick", "PriceTick", "MarketTick"]
+    },
+    {
+      "capability_id": "MT4-CAP-MARKET-DATA-002",
+      "name": "symbol_specifications",
+      "native_status": "native",
+      "summary": "MT4 exposes symbol metadata through Specifications: digits, spread, stops level, contract size, margin fields, profit calculation mode, margin initial, margin percentage.",
+      "key_specification_fields": [
+        "spread", "digits", "stops_level", "freeze_level", "contract_size",
+        "profit_calculation_mode", "margin_calculation_mode", "margin_initial",
+        "margin_percentage", "margin_currency"
+      ],
+      "pip_decimal_rules": {
+        "3_decimal_places": "Pip is on 2nd decimal (0.0X)",
+        "5_decimal_places": "Pip is on 4th decimal (0.000X0)"
+      },
+      "margin_formula_fx": "Initial Margin * Volume / Leverage",
+      "margin_formula_indices": "Initial Margin * Price * Volume / Leverage",
+      "project_policy": "Use native symbol metadata for point/pip conversion, min/max lot, lot step, stop level, freeze level, margin checks, and spread limits.",
+      "broker_variability": true,
+      "project_contracts": ["ResolvedConfig", "BrokerProfile", "RiskDecision"]
+    },
+    {
+      "capability_id": "MT4-CAP-CHARTING-001",
+      "name": "charts_timeframes_templates_profiles",
+      "native_status": "native",
+      "summary": "MT4 provides unlimited simultaneous charts, 4 chart types, 9 standard timeframes, templates, profiles, and full chart customization.",
+      "chart_types": {
+        "Line_Chart": "Shows close prices only. Recommended for periods up to 5 minutes. ALT+3.",
+        "Bar_Chart": "OHLC bars. Recommended for 5 minutes or more. ALT+1.",
+        "Candlestick_Chart": "OHLC candlesticks. ALT+2.",
+        "Tick_Chart": "Visualizes real-time Ask vs Bid price movement including spread."
+      },
+      "timeframes": ["M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN"],
+      "chart_tools": [
+        "templates_save_load_visual_settings_including_indicators",
+        "profiles_save_load_chart_sets",
+        "ALT_R_to_tile_all_open_charts",
+        "crosshair_distance_measurement",
+        "objects_list_CTRL_B",
+        "show_ask_line_via_chart_properties"
+      ],
+      "project_policy": "Use MT4 charts for operator visual inspection. Build custom UI charts only for cross-service aggregation, audit replay, or dashboard context.",
+      "broker_variability": false,
+      "project_contracts": ["UI_LiveTrading", "UI_HistoryAnalytics"]
+    },
+    {
+      "capability_id": "MT4-CAP-TECHNICAL-001",
+      "name": "technical_indicators",
+      "native_status": "native_and_extensible",
+      "summary": "MT4 includes 30 built-in technical indicators, supports 2000+ free custom indicators from Code Base, and 700+ paid indicators from Market.",
+      "built_in_indicator_count": 30,
+      "indicator_categories": [
+        "Trend", "Oscillators", "Volumes", "Bill_Williams", "Custom", "Lines",
+        "Channels", "Gann", "Fibonacci", "Shapes", "Arrows"
+      ],
+      "analytical_objects_count": 24,
+      "custom_indicator_installation": "Copy .ex4 or .mq4 to MQL4/Indicators folder, restart terminal.",
+      "project_policy": "Before writing a Python indicator, check whether an MT4 built-in, Code Base indicator, or Market indicator already exists. Use Python indicators for deterministic service contracts, multi-symbol scaling, or non-MT4 data inputs.",
+      "broker_variability": false,
+      "project_contracts": ["IndicatorSnapshot", "IndicatorVector", "FeatureFrame"]
+    },
+    {
+      "capability_id": "MT4-CAP-ALERTS-001",
+      "name": "alerts",
+      "native_status": "native",
+      "summary": "MT4 supports price-level alerts with delivery via sound, email, SMS, or push notifications.",
+      "alert_configuration": "Set via Terminal > Alerts tab. Specify symbol, condition (Bid/Ask above/below value), action (sound, email, etc.), expiry, and iteration count.",
+      "project_policy": "Use native alerts for simple price thresholds. Use custom telemetry alerts for service health, governance, risk posture, bridge failure, and cross-module events.",
+      "broker_variability": false,
+      "project_contracts": ["AlertEvent", "HealthReport", "SLOReport"]
+    },
+    {
+      "capability_id": "MT4-CAP-NEWS-001",
+      "name": "financial_news",
+      "native_status": "native_broker_dependent",
+      "summary": "MT4 can provide a financial news feed from exchanges, banks, and institutions via the News tab in the Terminal.",
+      "project_policy": "Use native news for operator awareness. Do not use it as a deterministic CalendarEvent input unless the feed is structured and machine-verifiable.",
+      "broker_variability": true,
+      "project_contracts": ["CalendarRaw", "CalendarEvent"]
+    },
+    {
+      "capability_id": "MT4-CAP-AUTOMATION-001",
+      "name": "expert_advisors",
+      "native_status": "native_extensibility",
+      "summary": "Expert Advisors (EAs) are native MQL4 programs that autonomously analyze markets and place trades. Enabled via Tools > Options > Expert Advisors tab.",
+      "important_limitations": [
+        "Requires desktop client terminal to be running and connected.",
+        "Not available in web terminal.",
+        "Suspended by some brokers around economic announcements."
+      ],
+      "ea_deployment_notes": {
+        "installation_path": "MQL4/Experts folder in Data Folder",
+        "enable_setting": "Tools > Options > Expert Advisors > Allow automated trading",
+        "dll_setting_if_needed": "Tools > Options > Expert Advisors > Allow DLL imports"
+      },
+      "project_policy": "For MT4 broker execution, keep the final execution substrate inside an EA. Python services should provide decisions, risk evaluation, data aggregation, and audit.",
+      "project_contracts": [
+        "OrderIntent", "RoutedOrderIntent", "BrokerExecEvent", "ExecutionReport"
+      ]
+    },
+    {
+      "capability_id": "MT4-CAP-AUTOMATION-002",
+      "name": "scripts",
+      "native_status": "native_extensibility",
+      "summary": "MQL4 scripts automate one-time trading or analytical actions (e.g., close all orders, delete all objects, place multiple pending orders). Run once on demand; cannot run continuously.",
+      "important_limitations": [
+        "Single-run only, not continuous.",
+        "Requires desktop terminal."
+      ],
+      "installation_path": "MQL4/Scripts folder in Data Folder",
+      "project_policy": "Use scripts for one-off terminal actions. Use EAs or services for continuous monitoring and event-driven behavior.",
+      "project_contracts": []
+    },
+    {
+      "capability_id": "MT4-CAP-AUTOMATION-003",
+      "name": "custom_indicators",
+      "native_status": "native_extensibility",
+      "summary": "Custom indicators are MQL4 programs that analyze market data and render visual output on charts. Can implement any algorithm. Not self-executing for trading.",
+      "important_limitations": [
+        "Requires desktop terminal for chart rendering.",
+        "Limited versions available in web terminal (30 built-ins only).",
+        "Cannot place trades; output is visual/data only."
+      ],
+      "installation_path": "MQL4/Indicators folder in Data Folder",
+      "project_policy": "Use MQL4 custom indicators when output belongs on the MT4 chart. Use Python services when output belongs in the HUEY_P contract chain.",
+      "project_contracts": ["IndicatorSnapshot", "FeatureFrame"]
+    },
+    {
+      "capability_id": "MT4-CAP-AUTOMATION-004",
+      "name": "mql4_libraries",
+      "native_status": "native_extensibility",
+      "summary": "MQL4 Libraries are shared function sets (.ex4 files) that can be called by EAs, indicators, and scripts. They cannot run independently. Used to share common algorithms across multiple MQL4 programs.",
+      "installation_path": "MQL4/Libraries folder in Data Folder",
+      "important_note": "Libraries do NOT run autonomously. They are dependencies included by other MQL4 programs.",
+      "project_policy": "Use MQL4 Libraries to share common EA utility functions (e.g., OrderSend wrappers, bridge helpers). Do not duplicate shared logic across EAs.",
+      "project_contracts": []
+    },
+    {
+      "capability_id": "MT4-CAP-TESTING-001",
+      "name": "strategy_tester",
+      "native_status": "native",
+      "summary": "MT4 Strategy Tester backtests and optimizes EAs using historical quote data. Provides visual testing mode, optimization, and detailed performance reports.",
+      "tester_capabilities": [
+        "historical_data_backtesting",
+        "visual_real_time_mode_with_chart_window",
+        "optimization_for_parameter_selection",
+        "multi_objective_optimization",
+        "detailed_graphical_and_quantitative_report",
+        "profit_loss_ratio_stats",
+        "win_loss_trade_counts",
+        "risk_factor_analysis",
+        "drawdown_analysis"
+      ],
+      "tester_limitations": [
+        "Single-symbol testing only in standard mode.",
+        "Historical data quality affects accuracy.",
+        "Optimization may overfit."
+      ],
+      "access_key": "CTRL+R or F6 for attached EA",
+      "project_policy": "Use Strategy Tester for EA-level behavior and parameter checks. Use external tests for contract validation, integration, and service behavior.",
+      "project_contracts": []
+    },
+    {
+      "capability_id": "MT4-CAP-HOSTING-001",
+      "name": "virtual_hosting_vps",
+      "native_status": "native_service",
+      "summary": "MT4 built-in virtual server (Forex VPS) can be rented directly from MT4 for 24/7 EA and signal operation. Offers low latency to broker servers and seamless migration of terminal settings.",
+      "project_policy": "Any live EA/signal process requiring continuity needs MT4 VPS or equivalent hosted terminal. Do not assume a local laptop terminal is always online.",
+      "project_contracts": []
+    },
+    {
+      "capability_id": "MT4-CAP-SIGNALS-001",
+      "name": "copy_trading_signals",
+      "native_status": "native_service",
+      "summary": "MT4 Signals service allows subscribing to 3200+ signal providers for copy trading. Providers ranked by performance. Can subscribe on demo or real accounts. Providers can earn subscription fees.",
+      "continuity_requirement": "Continuous signal copying requires MT4 VPS service.",
+      "project_policy": "Do not recreate generic copy trading. Custom signal generation is justified only for HUEY_P-specific strategy, risk, audit, and reentry behavior.",
+      "project_contracts": []
+    },
+    {
+      "capability_id": "MT4-CAP-MARKET-001",
+      "name": "marketplace",
+      "native_status": "native_service",
+      "summary": "MT4 Market provides 1700+ trading robots and 2100+ indicators. Free demos available. Can purchase, rent monthly or yearly. Code Base has ~2000 free indicators and 950 free robots.",
+      "marketplace_ecosystem": {
+        "market_products": "1700+ robots, 2100+ indicators; purchase or rent",
+        "code_base": "~2000 free indicators, ~950 free robots; download directly",
+        "freelance": "Hire MQL4 developers for custom work"
+      },
+      "payment_methods": ["MQL5_account", "Visa", "MasterCard", "UnionPay", "PayPal", "WebMoney", "Neteller"],
+      "drm_policy": {
+        "effective_from_build": 1400,
+        "effective_date": "2023-11-10",
+        "requirement": "User must be logged into MT4 with same MQL5 account used to purchase product.",
+        "ui_path": "Tools > Options > Community",
+        "failure_message": "'ProductName' requires active MQL5 account in Tools->Options->Community",
+        "consequence": "Product will NOT start if MQL5 account is invalid or missing."
+      },
+      "project_policy": "Search existing Market/Code Base tools before building common indicators/EAs. Account for Market DRM requiring MQL5 account authorization in automated deployments.",
+      "project_contracts": []
+    },
+    {
+      "capability_id": "MT4-CAP-FILES-001",
+      "name": "data_folder_mql4_structure",
+      "native_status": "native",
+      "summary": "MT4 Data Folder (File > Open Data Folder) contains the MQL4 directory with structured subfolders for all platform artifacts.",
+      "mql4_folder_structure": {
+        "Experts": "Expert Advisor .ex4/.mq4 files",
+        "Indicators": "Custom indicator .ex4/.mq4 files",
+        "Scripts": "Script .ex4/.mq4 files",
+        "Libraries": "Shared library .ex4/.mq4 files",
+        "Files": "Sandboxed read/write zone for MQL4 file I/O operations",
+        "Include": "Header .mqh files for shared declarations",
+        "Logs": "Platform log files",
+        "Presets": "Indicator/EA parameter preset files",
+        "Profiles": "Chart layout profiles",
+        "templates": "Chart template files"
+      },
+      "integration_note": "MQL4/Files is the standard safe zone for file-based bridge I/O between MT4 and Python services.",
+      "project_policy": "Use Data Folder and MQL4/Files as default safe on-disk integration zones. Avoid hard-coded terminal IDs except through configuration or path resolver.",
+      "project_contracts": []
+    },
+    {
+      "capability_id": "MT4-CAP-INTEGRATION-001",
+      "name": "dde",
+      "native_status": "native_legacy",
+      "summary": "MT4 has DDE (Dynamic Data Exchange) quote publishing used by Excel and some local integrations for read-only price access.",
+      "project_policy": "Use DDE only for read-only quote export where acceptable. Do not use DDE for governed command execution.",
+      "project_contracts": ["RawTick", "PriceTick"]
+    },
+    {
+      "capability_id": "MT4-CAP-INTEGRATION-002",
+      "name": "webrequest",
+      "native_status": "native_permissioned_mql4_function",
+      "summary": "MQL4 WebRequest() function can send HTTP/HTTPS requests to explicitly allowed URLs configured in terminal settings.",
+      "configuration_required": "URL must be added to allowed list in Tools > Options > Expert Advisors > Allow WebRequest for listed URLs.",
+      "project_policy": "Use WebRequest for EA-to-local-service telemetry and decision requests when latency and permission model are acceptable. Require explicit URL allowlist validation.",
+      "project_contracts": ["BRIDGE-HTTP-REST"]
+    },
+    {
+      "capability_id": "MT4-CAP-INTEGRATION-003",
+      "name": "dll_imports",
+      "native_status": "native_permissioned_extension",
+      "summary": "MT4 can call DLLs from MQL4 when DLL imports are explicitly enabled in terminal settings.",
+      "configuration_required": "Tools > Options > Expert Advisors > Allow DLL imports",
+      "security_risk": "DLLs have full system access. High-risk deployment artifact.",
+      "project_policy": "Use DLLs only when native MQL4 is insufficient (e.g., socket bridging, OS integration). Treat DLLs as high-risk requiring integrity checks and explicit permission.",
+      "project_contracts": ["BRIDGE-DLL-SOCKET"]
+    },
+    {
+      "capability_id": "MT4-CAP-INTEGRATION-004",
+      "name": "broker_side_apis",
+      "native_status": "broker_scope_not_normal_retail_terminal",
+      "summary": "Official MT4 APIs (Server, Manager, DataFeed, Report, WebServices) are for brokers only. No public retail REST API exists.",
+      "project_policy": "Do not assume retail access to broker-side APIs. Use only with explicit broker authorization.",
+      "project_contracts": []
+    },
+    {
+      "capability_id": "MT4-CAP-INTEGRATION-005",
+      "name": "navigator_window",
+      "native_status": "native",
+      "summary": "Navigator (Ctrl+N) shows all accounts, EAs, custom indicators, scripts, and libraries. Allows applying indicators to charts and configuring hotkeys.",
+      "project_policy": "Operator-facing tool. Not relevant to automated execution.",
+      "project_contracts": []
+    }
+  ],
+  "known_limitations_and_risks": [
+    {
+      "limitation_id": "MT4-LIM-001",
+      "name": "legacy_platform_trajectory",
+      "risk_level": "medium",
+      "description": "MT4 is maintained (security fixes, stability, translations) but MetaQuotes has formally ended server license sales and all conceptual development is focused on MT5.",
+      "official_confirmation": "SRC-METAQUOTES-BROKER-API",
+      "project_impact": "Avoid designs dependent on new MT4 platform features. No new order types or asset classes will be added to MT4."
+    },
+    {
+      "limitation_id": "MT4-LIM-002",
+      "name": "no_general_public_retail_rest_api",
+      "risk_level": "high",
+      "description": "Retail MT4 integrations generally require terminal-side mechanisms (MQL4, file, DDE, WebRequest, DLL, socket via DLL) rather than any public REST API.",
+      "project_impact": "Custom bridge architecture remains necessary for Python/UI integration."
+    },
+    {
+      "limitation_id": "MT4-LIM-003",
+      "name": "broker_variability",
+      "risk_level": "high",
+      "description": "Execution mode, symbols, margin calculation, trade sizes, order limits, stop behavior, guaranteed stops, price improvement, and closeout method vary by broker.",
+      "project_impact": "BrokerProfile@1.0 is required before final execution assumptions."
+    },
+    {
+      "limitation_id": "MT4-LIM-004",
+      "name": "client_terminal_dependency",
+      "risk_level": "high",
+      "description": "EAs, scripts, trailing stop management, file/DLL/WebRequest bridges, DDE publishing, and local signal copy all require the DESKTOP CLIENT TERMINAL to be running and connected. The web terminal cannot run any of these.",
+      "project_impact": "Use MT4 VPS or equivalent hosting for live continuous operation. Document that web terminal is monitoring/manual-trading only."
+    },
+    {
+      "limitation_id": "MT4-LIM-005",
+      "name": "permissions_required",
+      "risk_level": "medium",
+      "description": "Automated trading, WebRequest for specific URLs, DDE, and DLL imports depend on explicit terminal settings that must be enabled by the operator.",
+      "required_settings": [
+        "Tools > Options > Expert Advisors > Allow automated trading",
+        "Tools > Options > Expert Advisors > Allow DLL imports (if DLL bridge used)",
+        "Tools > Options > Expert Advisors > Allow WebRequest for listed URL (if HTTP bridge used)"
+      ],
+      "project_impact": "Deployment must validate terminal settings via MT4TerminalSettingsCheck@1.0."
+    },
+    {
+      "limitation_id": "MT4-LIM-006",
+      "name": "mql4_data_handling_limits",
+      "risk_level": "medium",
+      "description": "MQL4 can process text/files but lacks Python's native JSON/data tooling, complex data structures, and library ecosystem.",
+      "project_impact": "Keep EA-side schemas small, stable, and validated. Complex data processing belongs in Python services."
+    },
+    {
+      "limitation_id": "MT4-LIM-007",
+      "name": "marketplace_drm",
+      "risk_level": "medium",
+      "description": "Since Build 1400 (Nov 2023), purchased Market products require the same MQL5 account in Tools > Options > Community. Product will not start otherwise.",
+      "error_message": "'ProductName' requires active MQL5 account in Tools->Options->Community",
+      "project_impact": "Automated deployment must validate MQL5 account authorization before relying on Market products."
+    },
+    {
+      "limitation_id": "MT4-LIM-008",
+      "name": "web_terminal_capability_gap",
+      "risk_level": "high",
+      "description": "The MT4 web terminal does NOT support EAs, custom indicators, scripts, DLL imports, WebRequest, file bridges, or Strategy Tester. It provides only basic trading, 30 built-in indicators, and charting.",
+      "web_terminal_url": "https://web.metatrader.app/terminal?mode=demo&lang=en",
+      "project_impact": "HUEY_P/EAFIX automated execution CANNOT use the web terminal. All automated workflows require the desktop client terminal."
+    },
+    {
+      "limitation_id": "MT4-LIM-009",
+      "name": "ea_suspension_by_broker",
+      "risk_level": "medium",
+      "description": "Some brokers (e.g., IG) may suspend EA/script operation immediately before and after major economic announcements. Orders submitted via EA during suspension will be rejected.",
+      "project_impact": "EAFIX must handle EA suspension gracefully and log rejected orders. Calendar event awareness may help pre-position ahead of suspension windows."
+    },
+    {
+      "limitation_id": "MT4-LIM-010",
+      "name": "single_asset_class",
+      "risk_level": "low",
+      "description": "MT4 primarily supports Forex and CFDs. Multi-asset trading (stocks, futures, options) is not fully supported; MT5 handles multi-asset.",
+      "project_impact": "HUEY_P/EAFIX is designed for Forex/CFD; no MT4 limitation impact expected for current scope."
+    },
+    {
+      "limitation_id": "MT4-LIM-011",
+      "name": "strategy_tester_single_symbol",
+      "risk_level": "low",
+      "description": "MT4 Strategy Tester tests one EA on one symbol at a time. Multi-symbol backtesting requires MT5 or custom external frameworks.",
+      "project_impact": "Run separate Strategy Tester instances per symbol. Multi-symbol integration testing belongs in Python test harnesses."
+    }
+  ],
+  "broker_variability_catalog": [
+    {
+      "broker_issue_id": "BROKER-VAR-001",
+      "name": "execution_mode",
+      "description": "Instant, request, and market execution modes exist, but behavior and requote frequency depend on broker/account type.",
+      "ig_specific": "IG MT4 may requote on market moves; Maximum Deviation setting controls slippage acceptance."
+    },
+    {
+      "broker_issue_id": "BROKER-VAR-002",
+      "name": "margin_method",
+      "description": "Broker MT4 accounts may use points-based (not percentage-based) margin calculations. Attaching stops to positions does not reduce margin on some brokers (e.g., IG).",
+      "ig_specific": "IG uses points-based margin; stops do not reduce margin; recalculation occurs on Friday evenings."
+    },
+    {
+      "broker_issue_id": "BROKER-VAR-003",
+      "name": "symbol_set_and_hours",
+      "description": "Tradable instruments and market hours vary by broker. MT4 may offer fewer markets than a broker's proprietary platform.",
+      "ig_specific": "IG offers fewer tradable markets on MT4 than on their IG platform."
+    },
+    {
+      "broker_issue_id": "BROKER-VAR-004",
+      "name": "lot_constraints",
+      "description": "Minimum lot, maximum lot, and lot step are symbol-specific and broker-specific.",
+      "ig_specific": "IG minimum lot is 0.01 contracts (1000 units of first named currency). Reduced sizes from intro programme not available on MT4."
+    },
+    {
+      "broker_issue_id": "BROKER-VAR-005",
+      "name": "maximum_order_count",
+      "description": "Some brokers impose a maximum number of open and pending orders per account.",
+      "ig_specific": "IG: maximum 5000 open/pending orders per MT4 account."
+    },
+    {
+      "broker_issue_id": "BROKER-VAR-006",
+      "name": "platform_feature_mismatch",
+      "description": "Features on a broker's proprietary platform may not exist in MT4.",
+      "ig_specific": "IG MT4 does NOT support: guaranteed stop-loss orders, price improvement, telephone trading."
+    },
+    {
+      "broker_issue_id": "BROKER-VAR-007",
+      "name": "force_open_behavior",
+      "description": "MT4 'force open' behavior: opening an opposite position does NOT automatically close the existing one (unlike some proprietary platforms).",
+      "ig_specific": "IG MT4: all new positions are force-open. To close a position, use the yellow Close Position button in the order window.",
+      "project_impact": "EAFIX order management must track positions by ticket, not by net direction assumption."
+    },
+    {
+      "broker_issue_id": "BROKER-VAR-008",
+      "name": "closeout_process",
+      "description": "When positions are closed due to insufficient margin, the order of closure varies by broker.",
+      "ig_specific": "IG MT4: closes starting from LARGEST LOSS position. IG proprietary: FIFO basis.",
+      "project_impact": "Risk management must not assume FIFO liquidation order on MT4."
+    },
+    {
+      "broker_issue_id": "BROKER-VAR-009",
+      "name": "pending_order_margin_check",
+      "description": "MT4 typically does not check available funds when a pending order is placed. Funds check occurs at execution time.",
+      "ig_specific": "IG MT4: MT4 performs no funds check on pending order placement. If funds insufficient at trigger, pending order is deleted.",
+      "project_impact": "EAFIX must monitor account equity vs pending order exposure, not rely on MT4 to reject under-funded pending orders at placement time."
+    },
+    {
+      "broker_issue_id": "BROKER-VAR-010",
+      "name": "base_currency_constraint",
+      "description": "MT4 account base currency is set at account opening and may be constrained by broker's supported currency list.",
+      "ig_specific": "IG MT4: base currency matches standard CFD account if supported; otherwise account creation fails."
+    }
+  ],
+  "mql4_key_functions_reference": {
+    "note": "Canonical reference is docs.mql4.com. Below are the most critical functions for HUEY_P/EAFIX integration.",
+    "order_management": [
+      "OrderSend(symbol, cmd, volume, price, slippage, stoploss, takeprofit, comment, magic, expiration, arrow_color)",
+      "OrderModify(ticket, price, stoploss, takeprofit, expiration, arrow_color)",
+      "OrderClose(ticket, lots, price, slippage, arrow_color)",
+      "OrderCloseBy(ticket, opposite, arrow_color)",
+      "OrderDelete(ticket)"
+    ],
+    "order_selection_and_properties": [
+      "OrdersTotal()",
+      "OrderSelect(index_or_ticket, select, pool)",
+      "OrderTicket()", "OrderType()", "OrderLots()", "OrderSymbol()",
+      "OrderOpenPrice()", "OrderClosePrice()", "OrderOpenTime()", "OrderCloseTime()",
+      "OrderStopLoss()", "OrderTakeProfit()", "OrderProfit()", "OrderSwap()", "OrderCommission()",
+      "OrderMagicNumber()", "OrderComment()", "OrderExpiration()"
+    ],
+    "account_functions": [
+      "AccountBalance()", "AccountEquity()", "AccountMargin()", "AccountFreeMargin()",
+      "AccountMarginLevel()", "AccountName()", "AccountNumber()", "AccountCurrency()",
+      "AccountLeverage()", "AccountServer()", "AccountStopoutLevel()", "AccountStopoutMode()"
+    ],
+    "market_info_functions": [
+      "MarketInfo(symbol, type)",
+      "Bid", "Ask",
+      "iHigh(symbol,timeframe,shift)", "iLow(symbol,timeframe,shift)",
+      "iOpen(symbol,timeframe,shift)", "iClose(symbol,timeframe,shift)",
+      "iVolume(symbol,timeframe,shift)", "iTime(symbol,timeframe,shift)",
+      "iBars(symbol,timeframe)"
+    ],
+    "file_io_functions": [
+      "FileOpen(filename, flags)", "FileClose(handle)",
+      "FileWrite(handle, ...)", "FileReadString(handle)", "FileReadInteger(handle)",
+      "FileIsExist(filename)", "FileDelete(filename)", "FileTell(handle)", "FileSeek(handle, offset, origin)"
+    ],
+    "http_function": [
+      "WebRequest(method, url, headers, timeout, data, result, result_headers)"
+    ],
+    "common_constants": {
+      "order_types": {
+        "OP_BUY": 0, "OP_SELL": 1, "OP_BUYLIMIT": 2, "OP_SELLLIMIT": 3,
+        "OP_BUYSTOP": 4, "OP_SELLSTOP": 5
+      },
+      "timeframes": {
+        "PERIOD_M1": 1, "PERIOD_M5": 5, "PERIOD_M15": 15, "PERIOD_M30": 30,
+        "PERIOD_H1": 60, "PERIOD_H4": 240, "PERIOD_D1": 1440, "PERIOD_W1": 10080, "PERIOD_MN1": 43200
+      },
+      "order_pool": {
+        "MODE_TRADES": 0,
+        "MODE_HISTORY": 1
+      },
+      "select_mode": {
+        "SELECT_BY_POS": 0,
+        "SELECT_BY_TICKET": 1
+      },
+      "market_info_modes": {
+        "MODE_SPREAD": 8, "MODE_DIGITS": 12, "MODE_POINT": 9, "MODE_LOTSIZE": 15,
+        "MODE_TICKVALUE": 14, "MODE_TICKSIZE": 13, "MODE_MINLOT": 23, "MODE_MAXLOT": 24,
+        "MODE_LOTSTEP": 25, "MODE_STOPLEVEL": 10, "MODE_FREEZELEVEL": 33,
+        "MODE_SWAPLONG": 17, "MODE_SWAPSHORT": 18, "MODE_MARGINREQUIRED": 28,
+        "MODE_MARGINHEDGED": 29, "MODE_MARGINMAINTENANCE": 30
+      }
+    }
+  },
+  "huey_p_project_alignment": {
+    "canonical_contract_chain": [
+      "FeatureFrame",
+      "Signal",
+      "TradeIntent",
+      "RiskDecision",
+      "OrderIntent",
+      "RoutedOrderIntent",
+      "Transport",
+      "EA",
+      "BrokerExecEvent",
+      "ExecutionReport",
+      "PositionSnapshot",
+      "OMS",
+      "TradeClosedRaw",
+      "TradeClosed",
+      "OutcomeBucket",
+      "EventProximity",
+      "MatrixDecision",
+      "ReentryTradeIntent"
+    ],
+    "native_vs_custom_boundary": [
+      {
+        "domain": "price_feed",
+        "mt4_native_authority": ["bid", "ask", "spread", "tick_time", "digits", "point"],
+        "custom_allowed": ["normalization", "staleness_check", "idempotency_key", "Redis_publishing", "historical_storage"],
+        "project_modules": ["D1_MARKET_FEED_ADAPTER", "C1_BAR_BUILDER"]
+      },
+      {
+        "domain": "order_execution",
+        "mt4_native_authority": ["OrderSend", "OrderModify", "OrderClose", "open_orders", "pending_orders", "ticket", "SL", "TP"],
+        "custom_allowed": ["risk_decision", "order_intent_generation", "audit", "fallback_transport", "post_execution_reconciliation"],
+        "project_modules": ["R1_RISK_EVALUATOR", "R2_ORDER_INTENT_COMPILER", "O1_ORDER_ROUTER", "O2_OMS_STATE_MACHINE"]
+      },
+      {
+        "domain": "trade_history",
+        "mt4_native_authority": ["closed_order_ticket", "close_time", "open_price", "close_price", "profit", "swap", "commission", "comment", "magic_number"],
+        "custom_allowed": ["TradeClosedRaw_normalization", "OutcomeBucket_classification", "analytics", "reentry_matrix_input"],
+        "project_modules": ["OMS", "REENTRY_MATRIX"]
+      },
+      {
+        "domain": "technical_indicators",
+        "mt4_native_authority": ["built_in_indicators", "custom_mql4_indicators", "chart_indicator_values"],
+        "custom_allowed": ["multi_symbol_service_indicators", "cross_data_source_features", "deterministic_contract_output", "FeatureFrame_packaging"],
+        "project_modules": ["C2_INDICATOR_ENGINE", "C3_FEATURE_PACKAGER"]
+      },
+      {
+        "domain": "operator_ui",
+        "mt4_native_authority": ["Terminal_Trade_tab", "Market_Watch", "History_tab", "charts", "alerts"],
+        "custom_allowed": ["cross_service_dashboard", "audit_ui", "risk_ribbon", "reentry_matrix_view", "system_health", "traceability_reports"],
+        "project_modules": ["GUI_GATEWAY", "DASHBOARD_BACKEND", "DESKTOP_OPERATOR_UI"]
+      }
+    ],
+    "current_bridge_channels": [
+      {
+        "channel_id": "BRIDGE-HTTP-REST",
+        "native_dependency": "MQL4 WebRequest plus allowed URL configuration (Tools > Options > Expert Advisors)",
+        "direction": "MT4_to_Python_and_response",
+        "status": "active_or_documented",
+        "observed_project_use": "ExpiryZones.mq4 calls local FastAPI service on port 5001."
+      },
+      {
+        "channel_id": "BRIDGE-DDE",
+        "native_dependency": "MT4 DDE quote server",
+        "direction": "MT4_to_Python_or_Excel",
+        "status": "active_or_documented",
+        "observed_project_use": "Data ingestor polls DDE and publishes normalized prices."
+      },
+      {
+        "channel_id": "BRIDGE-FILE-CSV",
+        "native_dependency": "MQL4 Files folder and CSV parsing/writing",
+        "direction": "bidirectional_with_polling",
+        "status": "documented_fallback",
+        "observed_project_use": "Signals, execution results, and trade results can use CSV fallback."
+      },
+      {
+        "channel_id": "BRIDGE-FILE-JSONL",
+        "native_dependency": "MQL4 file polling plus JSON parser",
+        "direction": "Python_to_MT4",
+        "status": "partial_gap",
+        "observed_project_use": "Python writes JSONL outbox files; explicit EA reader was not confirmed in prior project note.",
+        "gap_action_required": "Confirm or build EA-side JSONL reader. Validate schema and polling interval."
+      },
+      {
+        "channel_id": "BRIDGE-DLL-SOCKET",
+        "native_dependency": "DLL imports enabled plus custom socket DLL",
+        "direction": "bidirectional",
+        "status": "documented_or_legacy",
+        "observed_project_use": "Older architecture describes MQL4_DLL_SocketBridge.dll and socket ports 5555/9999.",
+        "risk_note": "DLL deployment requires careful integrity management and explicit terminal permissions."
+      },
+      {
+        "channel_id": "BRIDGE-REDIS",
+        "native_dependency": "Python internal only",
+        "direction": "python_service_bus",
+        "status": "python_backbone",
+        "observed_project_use": "Routes normalized prices, validated orders, and execution events between Python services."
+      }
+    ]
+  },
+  "stable_identifier_architecture": {
+    "registry_id": "MT4-ID-ARCH-001",
+    "status": "required_for_governance_enforcement",
+    "rule": "Every governance object that can be referenced by AI, CI, docs, code, tests, broker profiles, contracts, or validation evidence must carry a deterministic stable ID.",
+    "id_namespaces": [
+      {
+        "namespace": "native_capability_id",
+        "canonical_field": "capability_id",
+        "format": "MT4-CAP-{DOMAIN}-{NNN}",
+        "registry": "native_capability_catalog"
+      },
+      {
+        "namespace": "gate_id",
+        "canonical_field": "gate_id",
+        "format": "MT4-GATE-{NNN}",
+        "registry": "validation_gates"
+      },
+      {
+        "namespace": "contract_id",
+        "canonical_field": "contract_id",
+        "format": "{ContractName}@{major.minor}",
+        "registry": "proposed_contracts"
+      },
+      {
+        "namespace": "decision_id",
+        "canonical_field": "decision_id",
+        "format": "MT4-DECISION-{NNN}",
+        "registry": "custom_development_decision_matrix"
+      },
+      {
+        "namespace": "field_authority_id",
+        "canonical_field": "field_authority_id",
+        "format": "MT4-FIELD-AUTH-{NNN}",
+        "registry": "ui_data_authority_matrix"
+      },
+      {
+        "namespace": "source_pointer_id",
+        "canonical_field": "source_id",
+        "format": "SRC-{AUTHORITY}-{TOPIC}",
+        "registry": "source_registry"
+      },
+      {
+        "namespace": "broker_profile_id",
+        "canonical_field": "broker_profile_id",
+        "format": "MT4-BROKER-{BROKER}-{ACCOUNT_CLASS}-{NNN}",
+        "registry": "future_broker_profiles"
+      },
+      {
+        "namespace": "bridge_channel_id",
+        "canonical_field": "channel_id",
+        "format": "BRIDGE-{TRANSPORT}-{MODE}",
+        "registry": "huey_p_project_alignment.current_bridge_channels"
+      },
+      {
+        "namespace": "validation_result_id",
+        "canonical_field": "validation_result_id",
+        "format": "MT4-VAL-RESULT-{YYYYMMDD}-{NNN}",
+        "registry": "future_validation_results"
+      },
+      {
+        "namespace": "traceability_id",
+        "canonical_field": "traceability_id",
+        "format": "MT4-TRACE-{DOMAIN}-{NNN}",
+        "registry": "mt4_capability_traceability_matrix"
+      }
+    ],
+    "ci_rules": [
+      {
+        "ci_rule_id": "MT4-CI-RULE-001",
+        "rule": "The active MT4 reference must parse as JSON with no duplicate object keys at any level."
+      },
+      {
+        "ci_rule_id": "MT4-CI-RULE-002",
+        "rule": "Exactly one MT4 reference file may have an active status."
+      },
+      {
+        "ci_rule_id": "MT4-CI-RULE-003",
+        "rule": "Every traceability row must reference existing capability, gate, bridge, contract, and file targets or explicitly declare status as gap."
+      }
+    ]
+  },
+  "mt4_capability_traceability_matrix": [
+    {
+      "traceability_id": "MT4-TRACE-BRIDGE-001",
+      "native_capability_id": "MT4-CAP-INTEGRATION-002",
+      "bridge_channel_id": "BRIDGE-HTTP-REST",
+      "module_id": "DESKTOP_UI_EXPIRY_BRIDGE",
+      "files": [
+        "services\\desktop-ui\\2299900003260118_ExpiryZones.mq4",
+        "services\\desktop-ui\\2099900129260118_expiry_service.py",
+        "services\\desktop-ui\\2099900128260118_expiry_indicator_service.py"
+      ],
+      "contracts": ["MT4TerminalSettingsCheck@1.0"],
+      "validation_gates": ["MT4-GATE-004", "MT4-GATE-005", "MT4-GATE-006"],
+      "source_pointer_ids": ["SRC-HUEY-P-COMMS", "SRC-METAQUOTES-DOCS-MQL4"],
+      "status": "active_or_documented",
+      "notes": "MT4 WebRequest calls local FastAPI services on port 5001. Requires desktop terminal and allowed URL configuration."
+    },
+    {
+      "traceability_id": "MT4-TRACE-MARKET-DATA-001",
+      "native_capability_id": "MT4-CAP-INTEGRATION-001",
+      "bridge_channel_id": "BRIDGE-DDE",
+      "module_id": "D1_MARKET_FEED_ADAPTER",
+      "files": [
+        "services\\data-ingestor\\src\\2099900111260118_ingestor.py",
+        "services\\data-ingestor\\src\\2099900109260118_config.py",
+        "services\\data-ingestor\\src\\2099900115260118_models.py"
+      ],
+      "contracts": ["MT4RawSnapshot@1.0", "PriceTick_v1"],
+      "validation_gates": ["MT4-GATE-001", "MT4-GATE-004", "MT4-GATE-005"],
+      "source_pointer_ids": ["SRC-HUEY-P-COMMS"],
+      "status": "active_or_documented",
+      "notes": "MT4 DDE quote feed is normalized by the data ingestor before Redis publication."
+    },
+    {
+      "traceability_id": "MT4-TRACE-ORDER-001",
+      "native_capability_id": "MT4-CAP-TRADING-001",
+      "bridge_channel_id": "BRIDGE-FILE-CSV",
+      "module_id": "O1_ORDER_ROUTER",
+      "files": [
+        "services\\transport-router\\src\\2099900199260118_main.py",
+        "services\\transport-router\\src\\2099900202260118_router.py",
+        "services\\transport-router\\src\\2099900203260118_validator.py",
+        "contracts\\schemas\\json\\1199900012260118_orders_in.schema.json",
+        "contracts\\schemas\\json\\1199900013260118_orders_out.schema.json"
+      ],
+      "contracts": ["OrderIntent", "RoutedOrderIntent", "BrokerProfile@1.0"],
+      "validation_gates": ["MT4-GATE-001", "MT4-GATE-003", "MT4-GATE-005"],
+      "source_pointer_ids": ["SRC-HUEY-P-PROCESS", "SRC-HUEY-P-COMMS"],
+      "status": "active_or_documented",
+      "notes": "Routes validated order intent toward MT4 adapter transport; broker-sensitive assumptions require BrokerProfile evidence."
+    },
+    {
+      "traceability_id": "MT4-TRACE-OUTBOX-001",
+      "native_capability_id": "MT4-CAP-FILES-001",
+      "bridge_channel_id": "BRIDGE-FILE-JSONL",
+      "module_id": "DESKTOP_UI_SIGNAL_OUTBOX",
+      "files": [
+        "services\\desktop-ui\\2099900132260118_outbound.py"
+      ],
+      "contracts": ["Signal_v1"],
+      "validation_gates": ["MT4-GATE-004", "MT4-GATE-005"],
+      "source_pointer_ids": ["SRC-HUEY-P-COMMS"],
+      "status": "gap",
+      "gap_id": "MT4-GAP-BRIDGE-JSONL-001",
+      "gap_action_required": "Confirm or build EA-side JSONL reader before treating BRIDGE-FILE-JSONL as executable.",
+      "notes": "Python writes JSONL outbox files; EA-side reader remains unconfirmed."
+    }
+  ],
+  "ui_data_authority_matrix": [
+    {
+      "field_authority_id": "MT4-FIELD-AUTH-001",
+      "ui_field_group": "live_quotes",
+      "fields": ["symbol", "bid", "ask", "spread", "quote_time"],
+      "source_authority": "MT4_TERMINAL_OR_BROKER_FEED",
+      "derivation_mode": "COPIED_OR_NORMALIZED_ONLY",
+      "custom_solution_policy": "No custom price generation."
+    },
+    {
+      "field_authority_id": "MT4-FIELD-AUTH-002",
+      "ui_field_group": "account_state",
+      "fields": ["balance", "equity", "margin", "free_margin", "margin_level", "server_time"],
+      "source_authority": "MT4_TERMINAL_ACCOUNT_FUNCTIONS",
+      "derivation_mode": "COPIED_OR_NORMALIZED_ONLY",
+      "custom_solution_policy": "Custom UI may display normalized values but must not recompute account authority."
+    },
+    {
+      "field_authority_id": "MT4-FIELD-AUTH-003",
+      "ui_field_group": "open_positions_and_orders",
+      "fields": ["ticket", "symbol", "type", "lots", "open_price", "stop_loss", "take_profit", "profit", "swap", "commission", "magic_number", "comment"],
+      "source_authority": "MT4_TERMINAL_ORDER_POOL",
+      "derivation_mode": "COPIED_OR_NORMALIZED_ONLY",
+      "custom_solution_policy": "Custom OMS may mirror and reconcile; MT4 ticket/order pool remains execution authority."
+    },
+    {
+      "field_authority_id": "MT4-FIELD-AUTH-004",
+      "ui_field_group": "closed_trades",
+      "fields": ["ticket", "close_time", "close_price", "profit", "duration", "outcome_bucket"],
+      "source_authority": "MT4_HISTORY_FOR_RAW_FIELDS_AND_EAFIX_FOR_BUCKET",
+      "derivation_mode": "HYBRID_NATIVE_PLUS_DERIVED",
+      "custom_solution_policy": "Raw closed-trade fields from MT4; bucket and reentry data from custom logic."
+    },
+    {
+      "field_authority_id": "MT4-FIELD-AUTH-005",
+      "ui_field_group": "signals",
+      "fields": ["signal_id", "confidence", "source_indicators", "trace_id", "status"],
+      "source_authority": "EAFIX_SIGNAL_ENGINE",
+      "derivation_mode": "DERIVED",
+      "custom_solution_policy": "Custom HUEY_P signal logic is justified because MT4 native Signals are generic copy-trading, not HUEY_P strategy signals."
+    },
+    {
+      "field_authority_id": "MT4-FIELD-AUTH-006",
+      "ui_field_group": "risk_posture",
+      "fields": ["risk_state", "drawdown", "circuit_breaker", "position_limit_status", "correlation_guard"],
+      "source_authority": "EAFIX_RISK_MANAGER_WITH_MT4_ACCOUNT_DATA_INPUTS",
+      "derivation_mode": "HYBRID_NATIVE_PLUS_DERIVED",
+      "custom_solution_policy": "Use MT4 account/trade data as inputs; custom risk policy controls decisions."
+    },
+    {
+      "field_authority_id": "MT4-FIELD-AUTH-007",
+      "ui_field_group": "health_and_telemetry",
+      "fields": ["service_health", "latency", "fallback_rate", "bridge_status", "clock_skew", "queue_depth"],
+      "source_authority": "EAFIX_TELEMETRY",
+      "derivation_mode": "DERIVED",
+      "custom_solution_policy": "Custom required because MT4 does not own Python service health."
+    }
+  ],
+  "custom_development_decision_matrix": [
+    {
+      "decision_id": "MT4-DECISION-001",
+      "question_id": "Q1",
+      "question": "Does MT4 already expose this exact data or behavior?",
+      "if_yes": "Use native capability or export/copy from MT4.",
+      "if_no": "Continue to Q2."
+    },
+    {
+      "decision_id": "MT4-DECISION-002",
+      "question_id": "Q2",
+      "question": "Is the requirement a policy, audit, cross-service, multi-account, or multi-symbol behavior not owned by MT4?",
+      "if_yes": "Build custom service/contract, but tag native MT4 inputs separately.",
+      "if_no": "Search MT4 built-ins, Code Base, Market, broker documentation, and existing project files first."
+    },
+    {
+      "decision_id": "MT4-DECISION-003",
+      "question_id": "Q3",
+      "question": "Does the feature require continuous execution?",
+      "if_yes": "Require VPS/hosted terminal or service deployment plan. Web terminal cannot be used.",
+      "if_no": "Script or manual terminal action may be sufficient."
+    },
+    {
+      "decision_id": "MT4-DECISION-004",
+      "question_id": "Q4",
+      "question": "Does the feature affect orders, positions, risk, or broker state?",
+      "if_yes": "Require high/critical safety controls, audit logging, and explicit confirmation/permission model.",
+      "if_no": "Treat as display/analytics unless it feeds decisions."
+    },
+    {
+      "decision_id": "MT4-DECISION-005",
+      "question_id": "Q5",
+      "question": "Does broker behavior affect this capability?",
+      "if_yes": "Add broker profile field, broker validation gate, and fallback behavior.",
+      "if_no": "Use platform-level rule."
+    },
+    {
+      "decision_id": "MT4-DECISION-006",
+      "question_id": "Q6",
+      "question": "Does this capability need to work in the web terminal?",
+      "if_yes": "Restrict to: basic order types, 30 built-in indicators, 9 timeframes, manual trading only. EAs/scripts/custom indicators/WebRequest/DLLs are NOT available.",
+      "if_no": "Full desktop terminal feature set applies."
+    }
+  ],
+  "proposed_contracts": [
+    {
+      "contract_id": "MT4RawSnapshot@1.0",
+      "purpose": "Canonical copied snapshot of MT4 terminal data before custom derivation.",
+      "source_authority": "MT4_TERMINAL",
+      "derivation_mode": "COPIED_OR_NORMALIZED_ONLY",
+      "fields": [
+        "snapshot_id", "terminal_id", "account_number_hash", "broker_server",
+        "server_time", "local_time", "quotes[]", "symbol_specs[]",
+        "account_state", "open_orders[]", "closed_orders_delta[]",
+        "terminal_permissions", "collection_errors[]"
+      ]
+    },
+    {
+      "contract_id": "BrokerProfile@1.0",
+      "purpose": "Machine-readable broker/account behavior constraints.",
+      "source_authority": "BROKER_AND_MT4_SYMBOL_SPECIFICATIONS",
+      "derivation_mode": "CONFIG_PLUS_NATIVE_METADATA",
+      "fields": [
+        "broker_name", "server_name", "account_type", "base_currency",
+        "supported_symbols[]", "execution_modes", "force_open_behavior",
+        "min_lot_by_symbol", "lot_step_by_symbol", "max_lot_by_symbol",
+        "stop_level_by_symbol", "freeze_level_by_symbol", "max_orders",
+        "margin_method_notes", "guaranteed_stops_supported",
+        "price_improvement_supported", "telephone_trading_supported",
+        "ea_suspension_policy", "closeout_method", "market_hours_by_symbol",
+        "pending_order_margin_check_at_placement"
+      ]
+    },
+    {
+      "contract_id": "MT4TerminalSettingsCheck@1.0",
+      "purpose": "Deployment gate proving MT4 settings support intended bridge behavior.",
+      "source_authority": "OPERATOR_TERMINAL_CONFIGURATION",
+      "derivation_mode": "VALIDATED_OBSERVATION",
+      "fields": [
+        "automated_trading_enabled",
+        "dll_imports_enabled",
+        "external_experts_enabled",
+        "webrequest_enabled",
+        "webrequest_allowed_urls[]",
+        "dde_enabled_if_used",
+        "mql5_community_account_set",
+        "terminal_build",
+        "data_folder_path",
+        "mql4_files_path",
+        "mql4_libraries_path"
+      ]
+    }
+  ],
+  "validation_gates": [
+    {
+      "gate_id": "MT4-GATE-001",
+      "name": "native_capability_check",
+      "trigger": "before_custom_feature_design",
+      "pass_condition": "feature.native_equivalent_checked == true AND decision.native_reuse_or_custom_justification is not empty",
+      "evidence_required": ["native_capability_id_or_none", "source_ref_ids", "reuse_or_custom_justification"]
+    },
+    {
+      "gate_id": "MT4-GATE-002",
+      "name": "mt4_source_authority_check",
+      "trigger": "before_ui_or_contract_field_added",
+      "pass_condition": "every UI-visible field has source_authority and derivation_mode",
+      "evidence_required": ["field_authority_matrix"]
+    },
+    {
+      "gate_id": "MT4-GATE-003",
+      "name": "broker_variability_check",
+      "trigger": "before_execution_or_risk_change",
+      "pass_condition": "all broker-sensitive assumptions have BrokerProfile references",
+      "evidence_required": ["BrokerProfile@1.0"]
+    },
+    {
+      "gate_id": "MT4-GATE-004",
+      "name": "terminal_permission_check",
+      "trigger": "before_demo_or_live_execution",
+      "pass_condition": "required terminal settings are true for selected bridge channels",
+      "evidence_required": ["MT4TerminalSettingsCheck@1.0"]
+    },
+    {
+      "gate_id": "MT4-GATE-005",
+      "name": "bridge_channel_selection_check",
+      "trigger": "before_implementation",
+      "pass_condition": "bridge.channel is selected and fallback is declared",
+      "evidence_required": ["channel_id", "fallback_channel_id", "failure_policy"]
+    },
+    {
+      "gate_id": "MT4-GATE-006",
+      "name": "web_terminal_compatibility_check",
+      "trigger": "if_any_feature_targets_web_terminal",
+      "pass_condition": "feature uses only: basic order types, 30 built-in indicators, 9 timeframes, manual operations. No EA/script/custom indicator/DLL/WebRequest dependency.",
+      "evidence_required": ["web_terminal_feature_list_review"]
+    }
+  ],
+  "recommended_project_changes": [
+    {
+      "change_id": "MT4-REF-CHANGE-001",
+      "title": "Add source_authority and derivation_mode to UI data contracts",
+      "priority": "high",
+      "reason": "Prevents duplicating MT4 terminal data and distinguishes copied native fields from custom derived fields."
+    },
+    {
+      "change_id": "MT4-REF-CHANGE-002",
+      "title": "Add broker_profile.json",
+      "priority": "high",
+      "reason": "Broker execution, margin, symbols, and order behavior vary. Broker-specific fields (force_open, closeout_method, ea_suspension) now documented."
+    },
+    {
+      "change_id": "MT4-REF-CHANGE-003",
+      "title": "Add native_capability_check gate before new custom feature approval",
+      "priority": "high",
+      "reason": "Forces AI to verify MT4-native features before implementing custom versions."
+    },
+    {
+      "change_id": "MT4-REF-CHANGE-004",
+      "title": "Add terminal_settings_validation gate",
+      "priority": "medium",
+      "reason": "Automated trading, WebRequest, DDE, DLL imports, and MQL5 Community account depend on terminal settings."
+    },
+    {
+      "change_id": "MT4-REF-CHANGE-005",
+      "title": "Use MQL4/Files and configured terminal IDs through path resolver",
+      "priority": "medium",
+      "reason": "Avoids brittle absolute paths and terminal-ID drift."
+    },
+    {
+      "change_id": "MT4-REF-CHANGE-006",
+      "title": "Create MT4 raw snapshot contract",
+      "priority": "high",
+      "reason": "Raw MT4 snapshot separates copied terminal data from downstream derived transformations."
+    },
+    {
+      "change_id": "MT4-REF-CHANGE-007",
+      "title": "Confirm or build EA-side JSONL reader for BRIDGE-FILE-JSONL",
+      "priority": "high",
+      "reason": "BRIDGE-FILE-JSONL has a documented partial gap: Python writes JSONL outbox files but EA reader was not confirmed. This is a live architectural gap."
+    },
+    {
+      "change_id": "MT4-REF-CHANGE-008",
+      "title": "Add web terminal limitation warnings to any feature specification",
+      "priority": "high",
+      "reason": "MT4 web terminal cannot run EAs, scripts, custom indicators, DLL imports, or WebRequest. This must be gated explicitly to prevent design assumptions leaking into web context."
+    },
+    {
+      "change_id": "MT4-REF-CHANGE-009",
+      "title": "Validate MQL5 Community account configuration in deployment checklist",
+      "priority": "medium",
+      "reason": "Since Build 1400, any Market-purchased product requires MQL5 account in Tools > Options > Community. Automated deployments must check this setting."
+    },
+    {
+      "change_id": "MT4-REF-CHANGE-010",
+      "title": "Document and handle broker EA suspension policy in EAFIX",
+      "priority": "medium",
+      "reason": "Brokers (e.g., IG) may reject EA/script orders around economic announcements. EAFIX must detect rejections and log them with correct attribution."
+    }
+  ],
+  "extension_slots": {
+    "future_sources": [],
+    "future_capabilities": [],
+    "future_broker_profiles": [],
+    "future_project_mappings": [],
+    "future_validation_results": []
+  },
+  "change_log": [
+    {
+      "version": "1.0.0",
+      "date": "2026-05-04",
+      "change": "Initial authoritative MT4 AI reference created from official MetaQuotes sources, broker PDFs, and HUEY_P/EAFIX project files."
+    },
+    {
+      "version": "1.1.0",
+      "date": "2026-05-05",
+      "changes": [
+        "Added Build 1460 (2026-03-05) to source_registry and recent_release_history — was missing entirely.",
+        "Added Build 1400 DRM detail: exact UI path (Tools > Options > Community) and exact journal error message format.",
+        "Added MT4-LIM-008: Web terminal capability gap — documented as HIGH risk limitation. Web terminal cannot run EAs, scripts, custom indicators, DLLs, WebRequest, or file bridges.",
+        "Added MT4-AI-RULE-006 explicitly calling out web terminal restrictions.",
+        "Added MT4-AI-RULE-007 for Market DRM enforcement detail.",
+        "Added MT4-GATE-006 web terminal compatibility gate.",
+        "Added MT4-CAP-AUTOMATION-004: MQL4 Libraries capability (was entirely missing).",
+        "Added MT4-CAP-TRADING-006 through 009: one_click_trading, execution_modes, market_depth, partial_close.",
+        "Added mql4_key_functions_reference section with authoritative MQL4 function signatures and constants.",
+        "Added mql4_program_types to SRC-METAQUOTES-MQL4-PROGRAMMING source entry.",
+        "Added mql4_language_basis: C++ OOP basis of MQL4.",
+        "Added Strategy Tester visual_real_time_mode to MT4-CAP-TESTING-001.",
+        "Added web_terminal_url to platform section.",
+        "Added download_urls for all platforms to platform section.",
+        "Added 10 new source registry entries: releases 1460, 1440, 1400; mql4-programming, strategy-tester, metaeditor, web-trading, signals, market, robots-indicators, docs.mql4.com.",
+        "Added 4 new broker variability entries: force_open_behavior, closeout_process, pending_order_margin_check, base_currency_constraint.",
+        "Added MT4-LIM-009 through 011: ea_suspension, single_asset_class, strategy_tester_single_symbol.",
+        "Added MT4-REF-CHANGE-007 through 010: JSONL gap, web terminal gate, MQL5 account deployment check, EA suspension handling.",
+        "Added pip_decimal_rules and margin_formula to symbol_specifications capability.",
+        "Added trailing_stop_mechanics detail (points vs pips, trigger rule, update rule).",
+        "Added mt5_migration_statement verbatim from official MetaQuotes broker API page.",
+        "Added mql4_folder_structure detail to data_folder capability.",
+        "Added BrokerProfile fields: force_open_behavior, closeout_method, ea_suspension_policy, pending_order_margin_check_at_placement.",
+        "Added MT4TerminalSettingsCheck field: mql5_community_account_set.",
+        "Added decision matrix Q6 for web terminal compatibility check.",
+        "Schema version bumped from 1.0.0 to 1.1.0."
+      ]
+    },
+    {
+      "version": "2.0.0",
+      "date": "2026-05-05",
+      "changes": [
+        "Removed duplicate top-level authority_model so parsers cannot silently overwrite governance rules.",
+        "Marked mt4_authoritative_reference_for_ai.json as obsolete and declared this file as the active governance baseline.",
+        "Added stable_identifier_architecture for native capabilities, gates, contracts, decisions, field authority rows, sources, broker profiles, bridge channels, validation results, and traceability rows.",
+        "Added mt4_capability_traceability_matrix linking MT4 capabilities to bridge channels, modules, files, contracts, validation gates, and source pointers.",
+        "Added stable field_authority_id values to UI data authority rows.",
+        "Added stable decision_id values to the custom development decision matrix.",
+        "Declared CI rules for duplicate-key prevention, single active authority source, and traceability reference checks."
+      ]
+    }
+  ]
+}

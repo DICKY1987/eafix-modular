@@ -1,0 +1,292 @@
+# Solution File Manifest
+
+Generated on: 2026-03-19
+
+- Primary solution files: 31
+- Generated .dir_id anchor files: 250
+- Total paths listed: 281
+
+## Primary Solution Files
+- C:\Users\richg\eafix-modular\COUNTER_STORE.json
+- C:\Users\richg\eafix-modular\.state\final_status.json
+- C:\Users\richg\eafix-modular\id_migration\config\physical_id_config.json
+- C:\Users\richg\eafix-modular\id_migration\config\path_normalization_rules.json
+- C:\Users\richg\eafix-modular\id_migration\config\file_classification_rules.json
+- C:\Users\richg\eafix-modular\id_migration\schemas\dir_id.schema.json
+- C:\Users\richg\eafix-modular\id_migration\schemas\physical_id_registry.schema.json
+- C:\Users\richg\eafix-modular\id_migration\scripts\00_run_migration.py
+- C:\Users\richg\eafix-modular\id_migration\scripts\01_scan_repo_objects.py
+- C:\Users\richg\eafix-modular\id_migration\scripts\02_assign_physical_ids.py
+- C:\Users\richg\eafix-modular\id_migration\scripts\03_validate_physical_ids.py
+- C:\Users\richg\eafix-modular\id_migration\scripts\validate_baseline_csv.py
+- C:\Users\richg\eafix-modular\id_migration\scripts\validate_physical_id_config.py
+- C:\Users\richg\eafix-modular\id_migration\output\.gitkeep
+- C:\Users\richg\eafix-modular\id_migration\output\physical_inventory_baseline.csv
+- C:\Users\richg\eafix-modular\id_migration\output\migration_manifest.jsonl
+- C:\Users\richg\eafix-modular\id_migration\output\physical_id_registry.csv
+- C:\Users\richg\eafix-modular\id_migration\output\physical_validation_report.json
+- C:\Users\richg\eafix-modular\EA-REG\identifier_map.json
+- C:\Users\richg\eafix-modular\EA-REG\physical_id_config_schema.json
+- C:\Users\richg\eafix-modular\EA-REG\schemas\identifier_map.schema.json
+- C:\Users\richg\eafix-modular\EA-REG\schemas\module_catalog.schema.json
+- C:\Users\richg\eafix-modular\EA-REG\scripts\validate_identifier_map.py
+- C:\Users\richg\eafix-modular\EA-REG\generate_three_artifact_catalogs.py
+- C:\Users\richg\eafix-modular\EA-REG\validate_three_artifact_alignment.py
+- C:\Users\richg\eafix-modular\EA-REG\module_catalog.json
+- C:\Users\richg\eafix-modular\EA-REG\process_step_catalog.json
+- C:\Users\richg\eafix-modular\EA-REG\file_registry.csv
+- C:\Users\richg\eafix-modular\EA-REG\ALIGNMENT_VALIDATION_REPORT.md
+- C:\Users\richg\eafix-modular\tests\test_generator_update.py
+- C:\Users\richg\eafix-modular\tests\test_validator_update.py
+
+## Generated .dir_id Anchor Files
+- C:\Users\richg\eafix-modular\.aider.tags.cache.v4\.dir_id
+- C:\Users\richg\eafix-modular\.benchmarks\.dir_id
+- C:\Users\richg\eafix-modular\.claude\.dir_id
+- C:\Users\richg\eafix-modular\.github\.dir_id
+- C:\Users\richg\eafix-modular\.github\codeql\.dir_id
+- C:\Users\richg\eafix-modular\.github\ISSUE_TEMPLATE\.dir_id
+- C:\Users\richg\eafix-modular\.github\workflows\.dir_id
+- C:\Users\richg\eafix-modular\.pre-commit-hooks\.dir_id
+- C:\Users\richg\eafix-modular\backups\.dir_id
+- C:\Users\richg\eafix-modular\ci\.dir_id
+- C:\Users\richg\eafix-modular\compliance\.dir_id
+- C:\Users\richg\eafix-modular\compliance\auto-remediation\.dir_id
+- C:\Users\richg\eafix-modular\compliance\config\.dir_id
+- C:\Users\richg\eafix-modular\compliance\monitoring\.dir_id
+- C:\Users\richg\eafix-modular\compliance\webhooks\.dir_id
+- C:\Users\richg\eafix-modular\config\.dir_id
+- C:\Users\richg\eafix-modular\config\module_contracts\.dir_id
+- C:\Users\richg\eafix-modular\contracts\.dir_id
+- C:\Users\richg\eafix-modular\contracts\events\.dir_id
+- C:\Users\richg\eafix-modular\contracts\identifiers\.dir_id
+- C:\Users\richg\eafix-modular\contracts\models\.dir_id
+- C:\Users\richg\eafix-modular\contracts\policies\.dir_id
+- C:\Users\richg\eafix-modular\contracts\schemas\.dir_id
+- C:\Users\richg\eafix-modular\contracts\schemas\csv\.dir_id
+- C:\Users\richg\eafix-modular\contracts\schemas\json\.dir_id
+- C:\Users\richg\eafix-modular\contracts\specs\.dir_id
+- C:\Users\richg\eafix-modular\contracts\triggers\.dir_id
+- C:\Users\richg\eafix-modular\dag\.dir_id
+- C:\Users\richg\eafix-modular\dag\config\.dir_id
+- C:\Users\richg\eafix-modular\dag\patterns\.dir_id
+- C:\Users\richg\eafix-modular\dag\prompts\.dir_id
+- C:\Users\richg\eafix-modular\dag\prompts\blocks\.dir_id
+- C:\Users\richg\eafix-modular\dag\workstreams\.dir_id
+- C:\Users\richg\eafix-modular\data\.dir_id
+- C:\Users\richg\eafix-modular\data\analysis\.dir_id
+- C:\Users\richg\eafix-modular\data\calendar\.dir_id
+- C:\Users\richg\eafix-modular\data\transport-router\.dir_id
+- C:\Users\richg\eafix-modular\data\transport-router\dead-letters\.dir_id
+- C:\Users\richg\eafix-modular\deploy\.dir_id
+- C:\Users\richg\eafix-modular\deploy\compose\.dir_id
+- C:\Users\richg\eafix-modular\deploy\helm\.dir_id
+- C:\Users\richg\eafix-modular\deploy\helm\eafix-trading\.dir_id
+- C:\Users\richg\eafix-modular\deploy\helm\eafix-trading\templates\.dir_id
+- C:\Users\richg\eafix-modular\deploy\helm\eafix-trading\templates\deployments\.dir_id
+- C:\Users\richg\eafix-modular\deploy\kubernetes\.dir_id
+- C:\Users\richg\eafix-modular\deploy\kubernetes\configmaps\.dir_id
+- C:\Users\richg\eafix-modular\deploy\kubernetes\deployments\.dir_id
+- C:\Users\richg\eafix-modular\deploy\kubernetes\ingress\.dir_id
+- C:\Users\richg\eafix-modular\deploy\kubernetes\istio\.dir_id
+- C:\Users\richg\eafix-modular\deploy\kubernetes\istio\authorization-policies\.dir_id
+- C:\Users\richg\eafix-modular\deploy\kubernetes\istio\destination-rules\.dir_id
+- C:\Users\richg\eafix-modular\deploy\kubernetes\istio\gateways\.dir_id
+- C:\Users\richg\eafix-modular\deploy\kubernetes\istio\peer-authentication\.dir_id
+- C:\Users\richg\eafix-modular\deploy\kubernetes\istio\virtual-services\.dir_id
+- C:\Users\richg\eafix-modular\deploy\kubernetes\namespaces\.dir_id
+- C:\Users\richg\eafix-modular\deploy\kubernetes\secrets\.dir_id
+- C:\Users\richg\eafix-modular\deploy\kubernetes\services\.dir_id
+- C:\Users\richg\eafix-modular\deploy\kubernetes\storage\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\01_CORE_SPECS\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\01_CORE_SPECS\DOD_modules_contracts\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\01_CORE_SPECS\DOD_modules_contracts\evidence\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\01_CORE_SPECS\DOD_modules_contracts\evidence\acceptance\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\01_CORE_SPECS\DOD_modules_contracts\evidence\runs\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\01_CORE_SPECS\DOD_modules_contracts\evidence\validation\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\01_CORE_SPECS\DOD_modules_contracts\schemas\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\01_CORE_SPECS\DOD_modules_contracts\scripts\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\id_16_digit\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\id_16_digit\archive\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\id_16_digit\archive\design-decisions\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\id_16_digit\archive\superseded\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\id_16_digit\automation\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\id_16_digit\contracts\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\id_16_digit\contracts\schemas\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\id_16_digit\contracts\schemas\json\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\id_16_digit\core\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\id_16_digit\design_specs\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\id_16_digit\docs\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\id_16_digit\hooks\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\id_16_digit\monitoring\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\id_16_digit\registry\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\id_16_digit\registry\backups\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\id_16_digit\tests\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\id_16_digit\validation\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\Multi_project_glossary\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\Multi_project_glossary\config\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\Multi_project_glossary\docs\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\Multi_project_glossary\examples\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\Multi_project_glossary\schemas\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\Multi_project_glossary\scripts\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\02_DOCUMENTATION\Multi_project_glossary\updates\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\03_IMPLEMENTATION\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\03_IMPLEMENTATION\file watcher\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\03_IMPLEMENTATION\UI\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\04_STATUS_REPORTS\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\05_LEGACY_DEPRECATED\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\06_UTILITIES\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\07_ARCHIVES\.dir_id
+- C:\Users\richg\eafix-modular\Directory management system\DOD_modules_contracts\.dir_id
+- C:\Users\richg\eafix-modular\docs\.dir_id
+- C:\Users\richg\eafix-modular\docs\adr\.dir_id
+- C:\Users\richg\eafix-modular\docs\api\.dir_id
+- C:\Users\richg\eafix-modular\docs\gaps\.dir_id
+- C:\Users\richg\eafix-modular\docs\gaps\fmea\.dir_id
+- C:\Users\richg\eafix-modular\docs\gaps\invariants\.dir_id
+- C:\Users\richg\eafix-modular\docs\gaps\slo\.dir_id
+- C:\Users\richg\eafix-modular\docs\idempotency\.dir_id
+- C:\Users\richg\eafix-modular\docs\mapping_system\.dir_id
+- C:\Users\richg\eafix-modular\docs\modernization\.dir_id
+- C:\Users\richg\eafix-modular\docs\observability\.dir_id
+- C:\Users\richg\eafix-modular\docs\on-call\.dir_id
+- C:\Users\richg\eafix-modular\docs\pdr\.dir_id
+- C:\Users\richg\eafix-modular\docs\reference\.dir_id
+- C:\Users\richg\eafix-modular\docs\release\.dir_id
+- C:\Users\richg\eafix-modular\docs\runbooks\.dir_id
+- C:\Users\richg\eafix-modular\docs\runbooks\chaos\.dir_id
+- C:\Users\richg\eafix-modular\docs\runbooks\dr\.dir_id
+- C:\Users\richg\eafix-modular\docs\runbooks\on-call\.dir_id
+- C:\Users\richg\eafix-modular\docs\security\.dir_id
+- C:\Users\richg\eafix-modular\docs\summaries\.dir_id
+- C:\Users\richg\eafix-modular\docs\techspec\.dir_id
+- C:\Users\richg\eafix-modular\docs\techspec\archive\.dir_id
+- C:\Users\richg\eafix-modular\EA-REG\.dir_id
+- C:\Users\richg\eafix-modular\EA-REG\schemas\.dir_id
+- C:\Users\richg\eafix-modular\EA-REG\scripts\.dir_id
+- C:\Users\richg\eafix-modular\EA-REG\superseded\.dir_id
+- C:\Users\richg\eafix-modular\id_migration\.dir_id
+- C:\Users\richg\eafix-modular\id_migration\config\.dir_id
+- C:\Users\richg\eafix-modular\id_migration\output\.dir_id
+- C:\Users\richg\eafix-modular\id_migration\schemas\.dir_id
+- C:\Users\richg\eafix-modular\id_migration\scripts\.dir_id
+- C:\Users\richg\eafix-modular\mt4\.dir_id
+- C:\Users\richg\eafix-modular\mt4\helpers\.dir_id
+- C:\Users\richg\eafix-modular\observability\.dir_id
+- C:\Users\richg\eafix-modular\observability\dashboards\.dir_id
+- C:\Users\richg\eafix-modular\observability\rules\.dir_id
+- C:\Users\richg\eafix-modular\plugins\.dir_id
+- C:\Users\richg\eafix-modular\plugins\validators\.dir_id
+- C:\Users\richg\eafix-modular\repo_autoops.egg-info\.dir_id
+- C:\Users\richg\eafix-modular\reports\.dir_id
+- C:\Users\richg\eafix-modular\reports\alvt\.dir_id
+- C:\Users\richg\eafix-modular\reports\coverage\.dir_id
+- C:\Users\richg\eafix-modular\scan_output\.dir_id
+- C:\Users\richg\eafix-modular\schemas - Copy\.dir_id
+- C:\Users\richg\eafix-modular\schemas\.dir_id
+- C:\Users\richg\eafix-modular\scripts\.dir_id
+- C:\Users\richg\eafix-modular\scripts\chaos\.dir_id
+- C:\Users\richg\eafix-modular\scripts\codebase_analysis\.dir_id
+- C:\Users\richg\eafix-modular\scripts\exporters\.dir_id
+- C:\Users\richg\eafix-modular\scripts\migration\.dir_id
+- C:\Users\richg\eafix-modular\scripts\perf\.dir_id
+- C:\Users\richg\eafix-modular\scripts\perf\k6\.dir_id
+- C:\Users\richg\eafix-modular\scripts\perf\locust\.dir_id
+- C:\Users\richg\eafix-modular\scripts\phase_a\.dir_id
+- C:\Users\richg\eafix-modular\scripts\phase_b\.dir_id
+- C:\Users\richg\eafix-modular\scripts\replay\.dir_id
+- C:\Users\richg\eafix-modular\scripts\validators\.dir_id
+- C:\Users\richg\eafix-modular\services\.dir_id
+- C:\Users\richg\eafix-modular\services\calendar-ingestor\.dir_id
+- C:\Users\richg\eafix-modular\services\calendar-ingestor\docs\.dir_id
+- C:\Users\richg\eafix-modular\services\calendar-ingestor\src\.dir_id
+- C:\Users\richg\eafix-modular\services\calendar-ingestor\tests\.dir_id
+- C:\Users\richg\eafix-modular\services\common\.dir_id
+- C:\Users\richg\eafix-modular\services\compliance-monitor\.dir_id
+- C:\Users\richg\eafix-modular\services\dashboard-backend\.dir_id
+- C:\Users\richg\eafix-modular\services\dashboard-backend\docs\.dir_id
+- C:\Users\richg\eafix-modular\services\dashboard-backend\frontend\.dir_id
+- C:\Users\richg\eafix-modular\services\dashboard-backend\src\.dir_id
+- C:\Users\richg\eafix-modular\services\data-ingestor\.dir_id
+- C:\Users\richg\eafix-modular\services\data-ingestor\src\.dir_id
+- C:\Users\richg\eafix-modular\services\data-ingestor\tests\.dir_id
+- C:\Users\richg\eafix-modular\services\data-ingestor\tests\integration\.dir_id
+- C:\Users\richg\eafix-modular\services\data-ingestor\tests\unit\.dir_id
+- C:\Users\richg\eafix-modular\services\data-validator\.dir_id
+- C:\Users\richg\eafix-modular\services\data-validator\src\.dir_id
+- C:\Users\richg\eafix-modular\services\desktop-ui\.dir_id
+- C:\Users\richg\eafix-modular\services\desktop-ui\dashboard\.dir_id
+- C:\Users\richg\eafix-modular\services\desktop-ui\indicators\.dir_id
+- C:\Users\richg\eafix-modular\services\desktop-ui\indicators\currency_strength\.dir_id
+- C:\Users\richg\eafix-modular\services\desktop-ui\testing\.dir_id
+- C:\Users\richg\eafix-modular\services\event-gateway\.dir_id
+- C:\Users\richg\eafix-modular\services\event-gateway\src\.dir_id
+- C:\Users\richg\eafix-modular\services\execution-engine\.dir_id
+- C:\Users\richg\eafix-modular\services\execution-engine\src\.dir_id
+- C:\Users\richg\eafix-modular\services\execution-engine\tests\.dir_id
+- C:\Users\richg\eafix-modular\services\flow-monitor\.dir_id
+- C:\Users\richg\eafix-modular\services\flow-monitor\src\.dir_id
+- C:\Users\richg\eafix-modular\services\flow-orchestrator\.dir_id
+- C:\Users\richg\eafix-modular\services\flow-orchestrator\src\.dir_id
+- C:\Users\richg\eafix-modular\services\gui-gateway\.dir_id
+- C:\Users\richg\eafix-modular\services\gui-gateway\src\.dir_id
+- C:\Users\richg\eafix-modular\services\indicator-engine\.dir_id
+- C:\Users\richg\eafix-modular\services\indicator-engine\docs\.dir_id
+- C:\Users\richg\eafix-modular\services\indicator-engine\src\.dir_id
+- C:\Users\richg\eafix-modular\services\indicator-engine\src\currency_strength\.dir_id
+- C:\Users\richg\eafix-modular\services\indicator-engine\src\indicators\.dir_id
+- C:\Users\richg\eafix-modular\services\indicator-engine\tests\.dir_id
+- C:\Users\richg\eafix-modular\services\reentry-engine\.dir_id
+- C:\Users\richg\eafix-modular\services\reentry-engine\src\.dir_id
+- C:\Users\richg\eafix-modular\services\reentry-engine\tests\.dir_id
+- C:\Users\richg\eafix-modular\services\reentry-matrix-svc\.dir_id
+- C:\Users\richg\eafix-modular\services\reentry-matrix-svc\src\.dir_id
+- C:\Users\richg\eafix-modular\services\reentry-matrix-svc\tests\.dir_id
+- C:\Users\richg\eafix-modular\services\reporter\.dir_id
+- C:\Users\richg\eafix-modular\services\reporter\src\.dir_id
+- C:\Users\richg\eafix-modular\services\reporter\tests\.dir_id
+- C:\Users\richg\eafix-modular\services\risk-manager\.dir_id
+- C:\Users\richg\eafix-modular\services\risk-manager\src\.dir_id
+- C:\Users\richg\eafix-modular\services\risk-manager\tests\.dir_id
+- C:\Users\richg\eafix-modular\services\scripts\.dir_id
+- C:\Users\richg\eafix-modular\services\signal-generator\.dir_id
+- C:\Users\richg\eafix-modular\services\signal-generator\src\.dir_id
+- C:\Users\richg\eafix-modular\services\signal-generator\tests\.dir_id
+- C:\Users\richg\eafix-modular\services\telemetry-daemon\.dir_id
+- C:\Users\richg\eafix-modular\services\telemetry-daemon\src\.dir_id
+- C:\Users\richg\eafix-modular\services\telemetry-daemon\tests\.dir_id
+- C:\Users\richg\eafix-modular\services\transport-router\.dir_id
+- C:\Users\richg\eafix-modular\services\transport-router\src\.dir_id
+- C:\Users\richg\eafix-modular\services\transport-router\tests\.dir_id
+- C:\Users\richg\eafix-modular\shared\.dir_id
+- C:\Users\richg\eafix-modular\shared\idempotency\.dir_id
+- C:\Users\richg\eafix-modular\shared\idempotency\middleware\.dir_id
+- C:\Users\richg\eafix-modular\shared\idempotency\models\.dir_id
+- C:\Users\richg\eafix-modular\shared\idempotency\patterns\.dir_id
+- C:\Users\richg\eafix-modular\shared\idempotency\stores\.dir_id
+- C:\Users\richg\eafix-modular\shared\positioning\.dir_id
+- C:\Users\richg\eafix-modular\shared\reentry\.dir_id
+- C:\Users\richg\eafix-modular\tests\.dir_id
+- C:\Users\richg\eafix-modular\tests\automation_descriptor\.dir_id
+- C:\Users\richg\eafix-modular\tests\contracts\.dir_id
+- C:\Users\richg\eafix-modular\tests\contracts\consumer\.dir_id
+- C:\Users\richg\eafix-modular\tests\contracts\fixtures\.dir_id
+- C:\Users\richg\eafix-modular\tests\contracts\framework\.dir_id
+- C:\Users\richg\eafix-modular\tests\contracts\properties\.dir_id
+- C:\Users\richg\eafix-modular\tests\contracts\provider\.dir_id
+- C:\Users\richg\eafix-modular\tests\contracts\scenarios\.dir_id
+- C:\Users\richg\eafix-modular\tests\e2e\.dir_id
+- C:\Users\richg\eafix-modular\tests\fixtures\.dir_id
+- C:\Users\richg\eafix-modular\tests\fixtures\test_data\.dir_id
+- C:\Users\richg\eafix-modular\tests\infrastructure\.dir_id
+- C:\Users\richg\eafix-modular\tests\integration\.dir_id
+- C:\Users\richg\eafix-modular\tests\legacy\.dir_id
+- C:\Users\richg\eafix-modular\tests\legacy\contracts\.dir_id
+- C:\Users\richg\eafix-modular\tests\legacy\contracts\golden_fixtures\.dir_id
+- C:\Users\richg\eafix-modular\tests\legacy\integration\.dir_id
+- C:\Users\richg\eafix-modular\tests\signal_flow_testing\.dir_id
+- C:\Users\richg\eafix-modular\tests\unit\.dir_id
+- C:\Users\richg\eafix-modular\tools\.dir_id
+- C:\Users\richg\eafix-modular\tools\alvt\.dir_id

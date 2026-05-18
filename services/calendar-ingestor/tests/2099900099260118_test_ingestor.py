@@ -5,6 +5,7 @@ Tests for Calendar Ingestor Service
 """
 
 import pytest
+import pytest_asyncio
 import asyncio
 import json
 import tempfile
@@ -13,12 +14,13 @@ from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 import sys
 
-# Add parent directory to path to import service modules
-sys.path.append(str(Path(__file__).parent.parent.parent.parent))
+# Add service src and repo root to path to import package and contracts.
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
-from services.calendar_ingestor.src.ingestor import CalendarIngestor
-from services.calendar_ingestor.src.config import Settings
-from services.calendar_ingestor.src.metrics import MetricsCollector
+from calendar_ingestor.ingestor import CalendarIngestor
+from calendar_ingestor.config import Settings
+from calendar_ingestor.metrics import MetricsCollector
 
 
 class TestCalendarIngestor:
@@ -38,7 +40,7 @@ class TestCalendarIngestor:
         """Create metrics collector"""
         return MetricsCollector()
     
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def calendar_ingestor(self, test_settings, metrics_collector):
         """Create calendar ingestor instance"""
         ingestor = CalendarIngestor(test_settings, metrics_collector)
@@ -72,6 +74,49 @@ class TestCalendarIngestor:
         assert result["signals_generated"] > 0
         assert "CAL8_USD_NFP_H" in result["calendar_id"]
         assert result["proximity_state"] in ["PRE_1H", "AT_EVENT", "POST_30M"]
+
+    @pytest.mark.asyncio
+    async def test_fetch_events_from_csv_source(self, test_settings, metrics_collector):
+        """Test fetching and normalizing events from configured CSV source."""
+        source_file = Path(test_settings.output_directory) / "calendar_source.csv"
+        source_file.write_text(
+            "title,currency,impact,start_ts,forecast,previous\n"
+            f"Non-Farm Payrolls,USD,HIGH,{datetime.now(timezone.utc).isoformat()},150K,140K\n",
+            encoding="utf-8",
+        )
+        test_settings.calendar_source_path = str(source_file)
+
+        ingestor = CalendarIngestor(test_settings, metrics_collector)
+        events = await ingestor.fetch_events()
+
+        assert len(events) == 1
+        assert events[0]["title"] == "Non-Farm Payrolls"
+        assert events[0]["currency"] == "USD"
+        assert events[0]["impact"] == "HIGH"
+        assert events[0]["start_ts"].endswith("Z")
+
+    @pytest.mark.asyncio
+    async def test_platform_topic_publish(self, test_settings, metrics_collector):
+        """Test publishing normalized events and active signals to platform topics."""
+        ingestor = CalendarIngestor(test_settings, metrics_collector)
+        ingestor.redis_client = AsyncMock()
+        ingestor.redis_client.publish = AsyncMock()
+
+        result = await ingestor.process_calendar_event({
+            "title": "Non-Farm Payrolls",
+            "currency": "USD",
+            "impact": "HIGH",
+            "start_ts": datetime.now(timezone.utc).isoformat(),
+        })
+
+        assert result["status"] == "success"
+        assert result["signals_generated"] > 0
+
+        published_topics = [
+            call.args[0] for call in ingestor.redis_client.publish.await_args_list
+        ]
+        assert "eafix.calendar.events" in published_topics
+        assert "eafix.calendar.signals" in published_topics
     
     @pytest.mark.asyncio  
     async def test_process_medium_impact_event(self, calendar_ingestor):
@@ -121,11 +166,16 @@ class TestCalendarIngestor:
         proximity = calendar_ingestor._determine_proximity_state(current_time, current_time)
         assert proximity == "AT_EVENT"
         
-        # Event 30 minutes ago should be PRE_1H  
+        # Event 30 minutes in the future should be PRE_1H
         from datetime import timedelta
-        past_time = current_time - timedelta(minutes=30)
-        proximity = calendar_ingestor._determine_proximity_state(current_time, past_time)
+        future_time = current_time + timedelta(minutes=30)
+        proximity = calendar_ingestor._determine_proximity_state(future_time, current_time)
         assert proximity == "PRE_1H"
+
+        # Event 30 minutes ago should be POST_30M
+        past_time = current_time - timedelta(minutes=30)
+        proximity = calendar_ingestor._determine_proximity_state(past_time, current_time)
+        assert proximity == "POST_30M"
     
     def test_confidence_score_calculation(self, calendar_ingestor):
         """Test confidence score calculation"""

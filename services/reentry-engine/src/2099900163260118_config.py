@@ -134,7 +134,29 @@ class Settings(BaseSettings):
         ge=5,
         description="Window in minutes to detect proximity to calendar events"
     )
-    
+
+    # Calendar signal cache (Phase 1 — GAP-29, GAP-30)
+    calendar_signal_ttl_seconds: int = Field(
+        120,
+        ge=10,
+        description="TTL in seconds for cached ActiveCalendarSignal entries"
+    )
+
+    calendar_fallback_proximity: str = Field(
+        "POST_30M",
+        description="Fallback proximity_state when no calendar signal in cache"
+    )
+
+    calendar_fallback_calendar_id: str = Field(
+        "NONE",
+        description="Fallback calendar_id when no calendar signal in cache"
+    )
+
+    calendar_signals_topic: str = Field(
+        "eafix.calendar.signals",
+        description="Redis topic to subscribe for calendar signals"
+    )
+
     # CSV output settings
     csv_atomic_writes: bool = Field(
         True,

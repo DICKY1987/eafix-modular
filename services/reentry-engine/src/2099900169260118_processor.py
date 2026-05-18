@@ -25,6 +25,17 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "shared"))
 from shared.reentry import HybridIdHelper, ReentryVocabulary, compose, parse, validate_key
 from contracts.models import TradeResult, ReentryDecision
 
+import hashlib
+import importlib.util as _ilu
+_src_dir = Path(__file__).parent
+def _load_local(fname, mname):
+    s = _ilu.spec_from_file_location(mname, _src_dir / fname)
+    m = _ilu.module_from_spec(s); s.loader.exec_module(m); return m
+_cal_mod = _load_local("2099900171260118_calendar_cache.py", "re_cal_cache")
+_chain_mod = _load_local("2099900172260118_chain_store.py", "re_chain_store")
+CalendarContextCache = _cal_mod.CalendarContextCache
+ReentryChainStore = _chain_mod.ReentryChainStore
+
 logger = structlog.get_logger(__name__)
 
 
@@ -51,11 +62,21 @@ class TradeResultProcessor:
         self.recent_decisions: List[Dict[str, Any]] = []
         self._decisions_lock = asyncio.Lock()
         
-        # Cooldown tracking
+        # Cooldown tracking (legacy in-memory — superseded by chain_store)
         self.symbol_cooldowns: Dict[str, datetime] = {}
         self.daily_attempt_counts: Dict[str, int] = {}
         self.last_reset_date = datetime.utcnow().date()
-        
+
+        # Phase 1: Calendar cache for proximity/calendar_id resolution
+        self._calendar_cache = CalendarContextCache(
+            ttl_seconds=getattr(self.settings, "calendar_signal_ttl_seconds", 120),
+            fallback_proximity=getattr(self.settings, "calendar_fallback_proximity", "POST_30M"),
+            fallback_calendar_id=getattr(self.settings, "calendar_fallback_calendar_id", "NONE"),
+        )
+
+        # Phase 4: Durable chain store (Redis-backed)
+        self._chain_store = ReentryChainStore(redis_client=None)  # Redis wired in start()
+
         self.running = False
     
     async def start(self) -> None:
@@ -141,7 +162,14 @@ class TradeResultProcessor:
             
             # Update cooldown and attempt tracking
             await self._update_reentry_tracking(validated_trade.symbol, decision_response)
-            
+
+            # Phase 4: Enforce delay_minutes from resolved params (GAP-35)
+            delay_minutes = decision_response.get("delay_minutes", 0)
+            if delay_minutes and int(delay_minutes) > 0:
+                logger.info("Reentry delayed", symbol=validated_trade.symbol,
+                            delay_minutes=delay_minutes)
+                await asyncio.sleep(int(delay_minutes) * 60)
+
             # Create and write ReentryDecision CSV record
             csv_result = await self._write_reentry_decision_csv(validated_trade, decision_response)
             
@@ -276,33 +304,19 @@ class TradeResultProcessor:
             return None
     
     async def _determine_proximity_state(self, trade_result: TradeResult) -> str:
-        """Determine proximity state relative to calendar events."""
-        # Simplified implementation - in practice, would query calendar service
-        # For now, use trade timing heuristics
-        
-        # Check if trade was opened/closed during typical news hours
-        open_hour = trade_result.open_time.hour
-        
-        if 8 <= open_hour <= 10 or 13 <= open_hour <= 15:  # Common news times
-            return "AT_EVENT"
-        elif 7 <= open_hour <= 11 or 12 <= open_hour <= 16:  # Near news times
-            return "PRE_1H"
-        else:
-            return "POST_30M"
+        """Determine proximity state from cached ActiveCalendarSignal (GAP-29)."""
+        return await self._calendar_cache.get_proximity_state(trade_result.symbol)
     
     async def _get_associated_calendar_id(self, trade_result: TradeResult) -> str:
-        """Get associated calendar ID for the trade."""
-        # Simplified implementation - in practice, would query calendar service
-        # For now, return NONE unless we can infer from trade characteristics
-        
-        symbol = trade_result.symbol
-        
-        # Major USD pairs might have CAL8 events
-        if "USD" in symbol and abs(trade_result.profit_loss_pips) > 20:
-            return "CAL8_USD_UNKNOWN_H"
-        
-        return "NONE"
-    
+        """Get calendar_id from cached ActiveCalendarSignal (GAP-30)."""
+        return await self._calendar_cache.get_calendar_id(
+            trade_result.symbol, trade_result.close_time
+        )
+
+    async def on_calendar_signal(self, signal: dict) -> None:
+        """Feed a new ActiveCalendarSignal into the calendar cache."""
+        await self._calendar_cache.update(signal)
+
     def _determine_generation(self, existing_hybrid_id: Optional[str]) -> int:
         """Determine generation number from existing hybrid ID or start at 1."""
         if not existing_hybrid_id:
@@ -354,6 +368,13 @@ class TradeResultProcessor:
                 file_seq = self.csv_sequence
                 self.csv_sequence += 1
             
+            # Generate decision_id: sha256(hybrid_id + ":" + utc_iso)[:16]
+            hybrid_id_val = decision_response.get("hybrid_id", "UNKNOWN")
+            utc_iso = datetime.utcnow().isoformat()
+            decision_id = hashlib.sha256(
+                f"{hybrid_id_val}:{utc_iso}".encode()
+            ).hexdigest()[:16]
+
             # Create ReentryDecision model for validation
             csv_record = ReentryDecision(
                 file_seq=file_seq,

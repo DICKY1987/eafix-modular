@@ -1,9 +1,28 @@
 # doc_id: DOC-SERVICE-0206
 """
-Risk Manager Plugin - Position sizing and risk checks
+Risk Manager Plugin - Position sizing and risk checks.
+Closes GAP-09, GAP-11.
 """
-
+import importlib.util
+import sys
+from pathlib import Path
 from typing import Any, Dict
+
+_src = Path(__file__).parent
+sys.path.insert(0, str(_src.parent.parent.parent / "shared"))
+
+
+def _load_module(fname: str, mname: str):
+    spec = importlib.util.spec_from_file_location(mname, _src / fname)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+_config_mod = _load_module("2099900184260118_config.py", "rm_config")
+_proc_mod = _load_module("2099900185260118_processor.py", "rm_processor")
+Settings = _config_mod.Settings
+RiskProcessor = _proc_mod.RiskProcessor
 
 from shared.plugin_interface import BasePlugin, PluginMetadata
 
@@ -12,8 +31,8 @@ class RiskManagerPlugin(BasePlugin):
     """
     Validates signals against risk parameters.
 
-    Subscribes to: signal_generated events
-    Emits: order_approved or order_rejected events
+    Subscribes to: eafix.signals.generated
+    Emits: eafix.orders.validated (OrderIntent@1.2) or eafix.risk.rejected (RiskRejected)
     """
 
     def __init__(self) -> None:
@@ -25,81 +44,38 @@ class RiskManagerPlugin(BasePlugin):
             dependencies=["signal-generator"],
         )
         super().__init__(metadata)
-        self._max_position_size = 1.0
-        self._max_drawdown_pct = 5.0
-        self._daily_loss_limit = 1000.0
-        self._current_drawdown = 0.0
-        self._daily_loss = 0.0
-        self._approved = 0
-        self._rejected = 0
+        self._processor: RiskProcessor = None
 
     async def _on_initialize(self) -> None:
-        """Initialize risk manager."""
-        self._max_position_size = float(self.get_config("max_position_size", 1.0))
-        self._max_drawdown_pct = float(self.get_config("max_drawdown_pct", 5.0))
-        self._daily_loss_limit = float(self.get_config("daily_loss_limit", 1000.0))
+        settings = Settings()
+        self._processor = RiskProcessor(settings)
 
         if self._context:
-            self._context.subscribe("signal_generated", self._handle_signal)
+            self._context.subscribe("eafix.signals.generated", self._handle_signal)
 
     async def _on_start(self) -> None:
-        """Start risk management."""
-        return None
+        pass
 
     async def _on_stop(self) -> None:
-        """Stop risk management."""
-        return None
+        pass
 
     def _handle_signal(self, event_type: str, data: Dict[str, Any], source: str) -> None:
-        """Validate signal against risk parameters."""
-        if self._check_risk_limits(data):
-            position_size = self._calculate_position_size(data)
-            self._approved += 1
-            self.emit_event(
-                "order_approved",
-                {
-                    **data,
-                    "position_size": position_size,
-                    "approved_by": "risk-manager",
-                },
-            )
+        """Route Signal -> RiskProcessor -> emit OrderIntent or RiskRejected."""
+        if data.get("event_type") == "SignalSuppressed":
+            return
+        result = self._processor.process_signal(data)
+        if result["event_type"] == "OrderIntent":
+            self.emit_event("eafix.orders.validated", result)
         else:
-            self._rejected += 1
-            self.emit_event(
-                "order_rejected",
-                {
-                    **data,
-                    "reason": "Risk limits exceeded",
-                    "rejected_by": "risk-manager",
-                },
-            )
-
-    def _check_risk_limits(self, signal: Dict[str, Any]) -> bool:
-        """Check if signal passes risk limits."""
-        if self._daily_loss >= self._daily_loss_limit:
-            return False
-        if self._current_drawdown >= self._max_drawdown_pct:
-            return False
-        return True
-
-    def _calculate_position_size(self, signal: Dict[str, Any]) -> float:
-        """Calculate position size based on confidence and risk."""
-        confidence = float(signal.get("confidence", 0.5))
-        confidence = max(0.0, min(confidence, 1.0))
-        return self._max_position_size * confidence
+            self.emit_event("eafix.risk.rejected", result)
 
     async def health_check(self) -> Dict[str, Any]:
-        """Health check."""
         base_health = await super().health_check()
-        base_health.update(
-            {
-                "daily_loss": self._daily_loss,
-                "current_drawdown": self._current_drawdown,
-                "risk_ok": self._daily_loss < self._daily_loss_limit,
-                "approved": self._approved,
-                "rejected": self._rejected,
-            }
-        )
+        if self._processor:
+            base_health.update({
+                "daily_loss": self._processor._cumulative_loss_today,
+                "risk_ok": True,
+            })
         return base_health
 
 

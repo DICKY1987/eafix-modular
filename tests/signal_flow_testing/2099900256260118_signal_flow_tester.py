@@ -216,8 +216,11 @@ class SignalFlowTester:
             timeout_seconds=60,
             validation_func=lambda: self.validate_csv_structure(
                 self.eafix_dir / "active_calendar_signals.csv",
-                ['symbol', 'cal8', 'cal5', 'signal_type', 'proximity', 'event_time_utc', 
-                 'state', 'priority_weight', 'file_seq', 'created_at_utc', 'checksum_sha256']
+                [
+                    'file_seq', 'checksum_sha256', 'timestamp', 'calendar_id',
+                    'symbol', 'impact_level', 'proximity_state',
+                    'anticipation_event', 'direction_bias', 'confidence_score'
+                ]
             )
         )
         
@@ -230,15 +233,12 @@ class SignalFlowTester:
             # Create immediate proximity event to trigger processing
             event_config = {
                 'symbol': 'EURUSD',
-                'region': 'A',
-                'country': 'US', 
-                'impact': 'H',
-                'event_type': 'NF',
-                'signal_type': 'ECO_HIGH_USD',
-                'state': 'ACTIVE',
-                'proximity': 'IM',  # Immediate
-                'minutes_from_now': 0,  # Now
-                'priority_weight': 1.0
+                'currency': 'USD',
+                'impact_level': 'HIGH',
+                'event_code': 'NFP',
+                'proximity_state': 'AT_EVENT',
+                'minutes_from_now': 0,
+                'confidence_score': 0.9,
             }
             
             event = simulator.create_test_event(event_config)

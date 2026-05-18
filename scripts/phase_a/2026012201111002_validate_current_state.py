@@ -9,6 +9,10 @@ import sys
 from pathlib import Path
 from typing import Dict, List
 
+# Add shared directory to path
+sys.path.insert(0, str(Path(__file__).parents[3]))
+from shared.registry_config import REGISTRY_PATH, LEGACY_REGISTRY_PATH
+
 class PhaseAValidator:
     def __init__(self, repo_root: str):
         self.repo_root = Path(repo_root)
@@ -26,7 +30,7 @@ class PhaseAValidator:
     
     def validate_id_registry(self) -> Dict:
         """Validate ID_REGISTRY.json structure and content."""
-        registry_path = self.repo_root / "Directory management system" / "id_16_digit" / "registry" / "ID_REGISTRY.json"
+        registry_path = LEGACY_REGISTRY_PATH
         
         if not registry_path.exists():
             self.errors.append("ID_REGISTRY.json not found")

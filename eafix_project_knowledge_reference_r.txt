@@ -1,0 +1,73 @@
+eafix_project_knowledge_reference_routing_instructions.json
+File
+Attached is the missing file. Does this change your response materially?
+Convert this file into machine optimized .JSON format. Ensure no information is lost 
+would structuring the plan based on the template below be beneficial? the enforcement layer of the template is not complete, but the structure may help prevent some mistakes or omissions, what are thoughts on this approch.
+
+"C:\Users\richg\Gov_Reg\newPhasePlanProcess\NEWPHASEPLANPROCESS_TECHNICAL_SPECIFICATION_V3_3.json"
+"C:\Users\richg\Gov_Reg\newPhasePlanProcess\NEWPHASEPLANPROCESS_INSTRUCTION_DOCUMENT_V3_3.json"
+"C:\Users\richg\Gov_Reg\newPhasePlanProcess\NEWPHASEPLANPROCESS_AUTONOMOUS_DELIVERY_TEMPLATE_V3_3.json"
+NEWPHASEPLANPROCESS_AUTONOMOUS_DELIVERY_TEMPLATE_V3_3.json
+File
+NEWPHASEPLANPROCESS_TECHNICAL_SPECIFICATION_V3_3.json
+File
+NEWPHASEPLANPROCESS_INSTRUCTION_DOCUMENT_V3_3.json
+File
+here are the files
+Apply the template in two tiers:
+For Phases 1 and 2 (catalog and context packets), borrow these specific sections without the full machinery: referenced_context_artifacts, artifact_intent_manifest, step_contracts (inputs/outputs/acceptance gates), and anti_pattern_detection. These directly address the gaps without requiring a pattern registry you don't have yet.
+For Phases 3 and 4 (source refactoring and routing rules), apply the full template. That's exactly the kind of work it's designed for — executable file mutations, worktree isolation, rollback plans, pattern-first execution, and protected paths enforcement.
+
+One structural observation
+The template's abstraction_governance section and the decomposition model's governance principle are saying the same thing from different angles. The template calls it "contracts are the mandatory abstraction at governed boundaries." The decomposition model calls it "derived catalog must not override canonical sources." Reconciling those two into a single governing statement before you start filling out the template would prevent a lot of friction later.
+Worked for 2 minutes
+
+For Phases 1 and 2 of your decomposition (catalog creation and context packet generation), borrowing only the referenced_context_artifacts, artifact_intent_manifest, step_contracts, and anti_pattern_detection sections from the newPhasePlanProcess template is a pragmatic way to fill the gaps without adopting the entire registry framework. Those sections collectively enforce:
+
+Explicit external dependencies: The referenced_context_artifacts block requires you to declare and validate any external context or documents referenced by the plan and to fail closed if an unbound dependency is found
+.
+Declared outputs: The artifact_intent_manifest section forces you to list every file or artefact the phase will create, ensuring there are no undeclared mutations and that definition‑of‑done outputs are traceable
+.
+Step‑level contracts: The step_contracts block defines inputs, outputs and acceptance criteria for each step (e.g., PH‑00 STEP‑001 enumerates required input directories and specific output files)
+. This mirrors the decomposition model’s requirement for idempotent work cells with clear input/output contracts.
+Anti‑pattern detection: The anti_pattern_detection section specifies triggers such as hallucinated success or patternless execution and mandates halting or self‑healing actions
+. This is particularly useful for early‑phase planning, where pattern enforcement isn’t yet available.
+
+These four sections directly address the current deficiencies in phase‑1 and phase‑2 work by ensuring every context reference, deliverable, step contract and potential planning anti‑pattern is explicitly captured and validated, without requiring a pattern registry you don’t yet have.
+
+For Phases 3 and 4 (source refactoring and routing‑rule design), the full template becomes highly relevant. The later phases involve executable file mutations, worktree isolation, rollback planning, and enforcing safe mutation boundaries—capabilities that the complete template explicitly supports through its mutation model, concurrency control, rollback plans and resolver enforcement. Using the full template here will make your refactoring and routing changes deterministic and auditable.
+
+On governance: the template’s abstraction_governance rule states that “contracts are the mandatory abstraction at governed boundaries”
+. Your existing decomposition model says that “derived catalog must not override canonical sources.” Both are essentially the same principle viewed from opposite directions: every boundary must be defined by formal contracts, and derived artefacts must never supersede canonical definitions. Reconciling these into a single governance statement—e.g., “At every module and phase boundary, contract definitions are the only valid abstraction; derived context packets may supplement but never override the canonical catalog or process definitions”—will reduce friction when you populate the template.
+
+I couldn’t consult the EAFIX process‑step catalogue or other companion documents, so this advice is based on the template content and the decomposition model alone. However, within those constraints the two‑tier application and unified governance statement you propose are well‑aligned.
+
+Sources
+"C:\Users\richg\eafix-modular" & "C:\Users\richg\Gov_Reg\newPhasePlanProcess" are the needed files located in these dir
+Worked for 18 seconds
+
+I don’t have direct access to your local directories on C:\—I can only work with the files you’ve uploaded here. If there are additional files from eafix-modular or newPhasePlanProcess that you’d like me to process, please upload them and let me know how you’d like to proceed.
+
+how do i give you direct access to your local directories on C:\
+Worked for 8 seconds
+
+I don’t have the ability to browse your local file system. The only way for me to work with your data is if you upload the relevant files here. Once you provide them, I’ll be able to process or refer to them as needed.
+
+list the files needed
+Worked for 5 minutes
+
+For implementation planning and execution in the EA_MOD project, the routing instructions specify a core set of reference documents that must be consulted. At minimum you should have:
+
+Process step catalogue (process_step_catalog.json)
+Module catalogue (module_catalog.json)
+File‑to‑module mapping (file_module_mapping.csv)
+Services AI reference (eafix_services_ai_reference_20260510.json)
+Capability registry (converted_capability_registry.json)
+
+Depending on what your plan covers, additional documents may be required:
+
+If your work touches the economic calendar subsystem: include the calendar deterministic rules PDF (EAFIX CALENDAR DES RULES.pdf) and related enhancement/configuration PDFs.
+If it involves MT4 integration or transport: include the MT4 authoritative reference (mt4 authoritative reference for ai.json) and the communication channels catalogue (communication_channels.json).
+For any UI‑related planning: include the UI catalogue (ui_catalog.json).
+
+Those documents, along with the newPhasePlanProcess template files you’ve uploaded (Technical Specification, Instruction Document, and Autonomous Delivery Template), give you the complete set of inputs needed to assemble the phase plans and context packets in line with the routing rules

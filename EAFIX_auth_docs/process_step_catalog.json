@@ -1,0 +1,712 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "process_step_catalog",
+  "catalog_id": "HUEY_P_EAFIX_PROCESS_STEP_CATALOG",
+  "catalog_name": "HUEY P EAFIX Process Step Catalog",
+  "process_context": {
+    "process_id": "HUEY_P_EAFIX_END_TO_END",
+    "process_version": "2.0.0",
+    "source_file": "2026012201113002_updated_trading_process_v2.yaml"
+  },
+  "steps": [
+    {
+      "process_step_id": "60000000000000000001",
+      "step_code": "S01",
+      "step_number": 1,
+      "step_name": "Resolve configuration snapshot",
+      "module_id": "50000000000000000001",
+      "module_symbol": "F1_CONFIG_PREFERENCES",
+      "responsible": "configuration_service.py",
+      "input_contract": "ConfigSource (defaults + overrides)",
+      "output_contract": "ResolvedConfig (immutable snapshot)",
+      "input_contracts": [
+        "ConfigSource"
+      ],
+      "output_contracts": [
+        "ResolvedConfig"
+      ],
+      "dependency_step_ids": [],
+      "validation": "Schema validate; stable ordering; hash snapshot",
+      "failure": "Reject invalid config; continue using last known good snapshot",
+      "entrypoint_files": []
+    },
+    {
+      "process_step_id": "60000000000000000002",
+      "step_code": "S02",
+      "step_number": 2,
+      "step_name": "Emit schedule tick (calendar polling cadence)",
+      "module_id": "50000000000000000002",
+      "module_symbol": "F3_CLOCK_SCHEDULER",
+      "responsible": "scheduler.py",
+      "input_contract": "ResolvedConfig",
+      "output_contract": "ScheduleTick",
+      "input_contracts": [
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "ScheduleTick"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001"
+      ],
+      "validation": "Frozen-time mode supported for tests",
+      "failure": "If scheduler stalls, emit HealthReport alert and pause polling",
+      "entrypoint_files": [
+        "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+      ]
+    },
+    {
+      "process_step_id": "60000000000000000003",
+      "step_code": "S03",
+      "step_number": 3,
+      "step_name": "Poll calendar source(s)",
+      "module_id": "50000000000000000003",
+      "module_symbol": "D2_CALENDAR_SOURCE_ADAPTER",
+      "responsible": "calendar_service.py::poll_scheduler",
+      "input_contract": "CalendarSourceConfig + ScheduleTick",
+      "output_contract": "CalendarRaw",
+      "input_contracts": [
+        "CalendarSourceConfig",
+        "ScheduleTick"
+      ],
+      "output_contracts": [
+        "CalendarRaw"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000002"
+      ],
+      "validation": "HTTP 200; payload parsable; source_event_id present",
+      "failure": "Retry w/ deterministic backoff; on persistent failure emit IngestError and skip cycle",
+      "entrypoint_files": [
+        "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+      ]
+    },
+    {
+      "process_step_id": "60000000000000000004",
+      "step_code": "S04",
+      "step_number": 4,
+      "step_name": "Normalize raw calendar entries",
+      "module_id": "50000000000000000004",
+      "module_symbol": "D3_CALENDAR_NORMALIZER",
+      "responsible": "calendar_service.py::normalize_events",
+      "input_contract": "CalendarRaw + ResolvedConfig",
+      "output_contract": "CalendarEvent (UTC timestamps, standardized impact, dedup keys)",
+      "input_contracts": [
+        "CalendarRaw",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "CalendarEvent"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000003"
+      ],
+      "validation": "UTC conversion success; impact in enum; dedup policy applied",
+      "failure": "Emit NormalizationError for malformed rows; continue with valid CalendarEvent",
+      "entrypoint_files": [
+        "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+      ]
+    },
+    {
+      "process_step_id": "60000000000000000005",
+      "step_code": "S05",
+      "step_number": 5,
+      "step_name": "Persist calendar events (append-only)",
+      "module_id": "50000000000000000005",
+      "module_symbol": "F2_EVENT_LOG",
+      "responsible": "event_log.py",
+      "input_contract": "CalendarEvent",
+      "output_contract": "EventStream (calendar.* events)",
+      "input_contracts": [
+        "CalendarEvent"
+      ],
+      "output_contracts": [
+        "EventStream"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000004"
+      ],
+      "validation": "Idempotent by message_id; ordered by created_utc + tie-breaker",
+      "failure": "Rollback and retry once; on persistent failure halt calendar pipeline",
+      "entrypoint_files": [
+        "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+      ]
+    },
+    {
+      "process_step_id": "60000000000000000006",
+      "step_code": "S06",
+      "step_number": 6,
+      "step_name": "Build anticipation triggers from calendar",
+      "module_id": "50000000000000000006",
+      "module_symbol": "D4_CALENDAR_TRIGGER_BUILDER",
+      "responsible": "calendar_anticipator.py",
+      "input_contract": "CalendarEvent + ScheduleTick + ResolvedConfig",
+      "output_contract": "CalendarTrigger (symbol set + window + suppression metadata)",
+      "input_contracts": [
+        "CalendarEvent",
+        "ScheduleTick",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "CalendarTrigger"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000002",
+        "60000000000000000004"
+      ],
+      "validation": "No duplicate trigger for event+offset; TTL rules applied",
+      "failure": "Default to conservative suppression metadata; emit error event",
+      "entrypoint_files": [
+        "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+      ]
+    },
+    {
+      "process_step_id": "60000000000000000007",
+      "step_code": "S07",
+      "step_number": 7,
+      "step_name": "Ingest market ticks",
+      "module_id": "50000000000000000007",
+      "module_symbol": "D1_MARKET_FEED_ADAPTER",
+      "responsible": "market_feed_adapter.py",
+      "input_contract": "RawTick + ResolvedConfig",
+      "output_contract": "MarketTick",
+      "input_contracts": [
+        "RawTick",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "MarketTick"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001"
+      ],
+      "validation": "Timestamp freshness; symbol normalization; reject malformed",
+      "failure": "Emit IngestError; skip malformed ticks",
+      "entrypoint_files": [
+        "services\\data-ingestor\\src\\2099900112260118_main.py"
+      ]
+    },
+    {
+      "process_step_id": "60000000000000000008",
+      "step_code": "S08",
+      "step_number": 8,
+      "step_name": "Aggregate ticks into bars",
+      "module_id": "50000000000000000008",
+      "module_symbol": "C1_BAR_BUILDER",
+      "responsible": "bar_builder.py",
+      "input_contract": "MarketTick + ResolvedConfig",
+      "output_contract": "Bar",
+      "input_contracts": [
+        "MarketTick",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "Bar"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000007"
+      ],
+      "validation": "Deterministic bar boundaries; tie-breaker rules",
+      "failure": "Drop out-of-order ticks per policy; emit error event",
+      "entrypoint_files": []
+    },
+    {
+      "process_step_id": "60000000000000000009",
+      "step_code": "S09",
+      "step_number": 9,
+      "step_name": "Compute indicators",
+      "module_id": "50000000000000000009",
+      "module_symbol": "C2_INDICATOR_ENGINE",
+      "responsible": "indicator_engine.py",
+      "input_contract": "Bar + ResolvedConfig",
+      "output_contract": "IndicatorSnapshot",
+      "input_contracts": [
+        "Bar",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "IndicatorSnapshot"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000008"
+      ],
+      "validation": "Deterministic rounding; indicator params pinned by config snapshot",
+      "failure": "Emit indicator error; do not output partial snapshots unless flagged",
+      "entrypoint_files": [
+        "services\\desktop-ui\\2099900128260118_expiry_indicator_service.py"
+      ]
+    },
+    {
+      "process_step_id": "60000000000000000010",
+      "step_code": "S10",
+      "step_number": 10,
+      "step_name": "Assemble strategy feature frame",
+      "module_id": "50000000000000000010",
+      "module_symbol": "C3_FEATURE_PACKAGER",
+      "responsible": "feature_packager.py",
+      "input_contract": "IndicatorSnapshot + CalendarTrigger + ResolvedConfig",
+      "output_contract": "FeatureFrame",
+      "input_contracts": [
+        "IndicatorSnapshot",
+        "CalendarTrigger",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "FeatureFrame"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000006",
+        "60000000000000000009"
+      ],
+      "validation": "Exact declared feature set; stable ordering",
+      "failure": "Emit packaging error; do not emit FeatureFrame",
+      "entrypoint_files": []
+    },
+    {
+      "process_step_id": "60000000000000000011",
+      "step_code": "S11",
+      "step_number": 11,
+      "step_name": "Generate signal (or suppression)",
+      "module_id": "50000000000000000011",
+      "module_symbol": "S1_SIGNAL_ENGINE",
+      "responsible": "signal_generator.py",
+      "input_contract": "FeatureFrame + PositionSummary + ResolvedConfig",
+      "output_contract": "Signal OR SignalSuppressed",
+      "input_contracts": [
+        "FeatureFrame",
+        "PositionSummary",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "Signal",
+        "SignalSuppressed"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000010"
+      ],
+      "validation": "Suppression reasons enumerated; no sizing/broker specifics",
+      "failure": "On internal error, emit SignalSuppressed with deterministic reason code",
+      "entrypoint_files": [
+        "compliance\\auto-remediation\\2099900012260118_remediation-engine.py"
+      ]
+    },
+    {
+      "process_step_id": "60000000000000000012",
+      "step_code": "S12",
+      "step_number": 12,
+      "step_name": "Convert signal to trade intent",
+      "module_id": "50000000000000000012",
+      "module_symbol": "S2_INTENT_BUILDER",
+      "responsible": "intent_builder.py",
+      "input_contract": "Signal + ResolvedConfig",
+      "output_contract": "TradeIntent",
+      "input_contracts": [
+        "Signal",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "TradeIntent"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000011"
+      ],
+      "validation": "Stable correlation_id from Signal; constraints + rationale attached",
+      "failure": "Reject intent; emit error event",
+      "entrypoint_files": []
+    },
+    {
+      "process_step_id": "60000000000000000013",
+      "step_code": "S13",
+      "step_number": 13,
+      "step_name": "Evaluate risk and size",
+      "module_id": "50000000000000000013",
+      "module_symbol": "R1_RISK_EVALUATOR",
+      "responsible": "risk_manager.py",
+      "input_contract": "TradeIntent + PortfolioState + RiskPolicy + ResolvedConfig",
+      "output_contract": "RiskDecision (APPROVE/REJECT + reason codes + sized params)",
+      "input_contracts": [
+        "TradeIntent",
+        "PortfolioState",
+        "RiskPolicy",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "RiskDecision"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000012"
+      ],
+      "validation": "Idempotent for same inputs; deterministic sizing + rounding",
+      "failure": "On rule engine failure default to REJECT with SAFETY_FAIL reason",
+      "entrypoint_files": []
+    },
+    {
+      "process_step_id": "60000000000000000014",
+      "step_code": "S14",
+      "step_number": 14,
+      "step_name": "Compile order intent",
+      "module_id": "50000000000000000014",
+      "module_symbol": "R2_ORDER_INTENT_COMPILER",
+      "responsible": "order_intent_compiler.py",
+      "input_contract": "RiskDecision + ResolvedConfig",
+      "output_contract": "OrderIntent",
+      "input_contracts": [
+        "RiskDecision",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "OrderIntent"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000013"
+      ],
+      "validation": "client_order_id + idempotency_key assigned per policy",
+      "failure": "If compilation fails, emit error; do not proceed to routing",
+      "entrypoint_files": [
+        "services\\transport-router\\src\\2099900199260118_main.py"
+      ]
+    },
+    {
+      "process_step_id": "60000000000000000015",
+      "step_code": "S15",
+      "step_number": 15,
+      "step_name": "Route order to broker",
+      "module_id": "50000000000000000015",
+      "module_symbol": "O1_ORDER_ROUTER",
+      "responsible": "order_router.py",
+      "input_contract": "OrderIntent + BrokerPolicy + ResolvedConfig",
+      "output_contract": "RoutedOrderIntent",
+      "input_contracts": [
+        "OrderIntent",
+        "BrokerPolicy",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "RoutedOrderIntent"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000014"
+      ],
+      "validation": "Routing deterministic; preserves OrderIntent hash",
+      "failure": "If routing fails, emit error and reject",
+      "entrypoint_files": [
+        "services\\transport-router\\src\\2099900199260118_main.py"
+      ]
+    },
+    {
+      "process_step_id": "60000000000000000016",
+      "step_code": "S16",
+      "step_number": 16,
+      "step_name": "Serialize and send to MT4 adapter",
+      "module_id": "50000000000000000016",
+      "module_symbol": "B1_MT4_ADAPTER_TRANSPORT",
+      "responsible": "transport_service.py",
+      "input_contract": "RoutedOrderIntent + ResolvedConfig",
+      "output_contract": "BrokerOrderEnvelope + AdapterAck",
+      "input_contracts": [
+        "RoutedOrderIntent",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "BrokerOrderEnvelope",
+        "AdapterAck"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000015"
+      ],
+      "validation": "Atomic write+rename (no partial reads); sequence + hash; idempotent resend",
+      "failure": "Deterministic retry schedule; on persistent failure emit TransportError and stop",
+      "entrypoint_files": [
+        "services\\transport-router\\src\\2099900199260118_main.py"
+      ]
+    },
+    {
+      "process_step_id": "60000000000000000017",
+      "step_code": "S17",
+      "step_number": 17,
+      "step_name": "EA executes broker order",
+      "module_id": "50000000000000000017",
+      "module_symbol": "B2_MT4_EA_EXECUTOR",
+      "responsible": "EAFIX.mq4",
+      "input_contract": "BrokerOrderEnvelope",
+      "output_contract": "BrokerExecEvent (accept/fill/reject/close) + EAHealth",
+      "input_contracts": [
+        "BrokerOrderEnvelope"
+      ],
+      "output_contracts": [
+        "BrokerExecEvent",
+        "EAHealth"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000016"
+      ],
+      "validation": "EA contains no strategy/risk logic; only execution",
+      "failure": "Classify and emit error events; retries per deterministic policy",
+      "entrypoint_files": [
+        "services\\transport-router\\src\\2099900199260118_main.py"
+      ]
+    },
+    {
+      "process_step_id": "60000000000000000018",
+      "step_code": "S18",
+      "step_number": 18,
+      "step_name": "Normalize broker events to canonical reports",
+      "module_id": "50000000000000000018",
+      "module_symbol": "B3_EXEC_EVENT_NORMALIZER",
+      "responsible": "result_processor.py",
+      "input_contract": "BrokerExecEvent + ResolvedConfig",
+      "output_contract": "ExecutionReport + PositionSnapshot",
+      "input_contracts": [
+        "BrokerExecEvent",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "ExecutionReport",
+        "PositionSnapshot"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000017"
+      ],
+      "validation": "Dedup + ordering policy; canonical rounding",
+      "failure": "Emit NormalizationError; quarantine malformed broker events",
+      "entrypoint_files": [
+        "services\\event-gateway\\src\\2099900141260118_main.py"
+      ]
+    },
+    {
+      "process_step_id": "60000000000000000019",
+      "step_code": "S19",
+      "step_number": 19,
+      "step_name": "Apply execution reports to OMS state",
+      "module_id": "50000000000000000019",
+      "module_symbol": "O2_OMS_STATE_MACHINE",
+      "responsible": "oms.py",
+      "input_contract": "RoutedOrderIntent + ExecutionReport + PositionSnapshot + ResolvedConfig",
+      "output_contract": "OrderStateChanged + PositionStateChanged + TradeClosedRaw",
+      "input_contracts": [
+        "RoutedOrderIntent",
+        "ExecutionReport",
+        "PositionSnapshot",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "OrderStateChanged",
+        "PositionStateChanged",
+        "TradeClosedRaw"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000015",
+        "60000000000000000018"
+      ],
+      "validation": "Idempotent fills; out-of-order handling per policy; stable final state",
+      "failure": "On OMS inconsistency, quarantine stream and halt new orders",
+      "entrypoint_files": []
+    },
+    {
+      "process_step_id": "60000000000000000020",
+      "step_code": "S20",
+      "step_number": 20,
+      "step_name": "Classify trade close and compute canonical PnL",
+      "module_id": "50000000000000000020",
+      "module_symbol": "O3_TRADE_CLOSE_CLASSIFIER",
+      "responsible": "trade_close_classifier.py",
+      "input_contract": "TradeClosedRaw + ResolvedConfig",
+      "output_contract": "TradeClosed",
+      "input_contracts": [
+        "TradeClosedRaw",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "TradeClosed"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000019"
+      ],
+      "validation": "Close reason enum; deterministic PnL rounding rules",
+      "failure": "If PnL cannot be computed, emit TradeClosed with COMPUTATION_ERROR flag",
+      "entrypoint_files": []
+    },
+    {
+      "process_step_id": "60000000000000000021",
+      "step_code": "S21",
+      "step_number": 21,
+      "step_name": "Bucketize outcome",
+      "module_id": "50000000000000000021",
+      "module_symbol": "E1_OUTCOME_BUCKETIZER",
+      "responsible": "outcome_bucketizer.py",
+      "input_contract": "TradeClosed + ResolvedConfig",
+      "output_contract": "OutcomeBucket",
+      "input_contracts": [
+        "TradeClosed",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "OutcomeBucket"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000020"
+      ],
+      "validation": "Only enumerated buckets; stable bucket mapping",
+      "failure": "If mapping fails, emit UNKNOWN bucket and quarantine for review",
+      "entrypoint_files": []
+    },
+    {
+      "process_step_id": "60000000000000000022",
+      "step_code": "S22",
+      "step_number": 22,
+      "step_name": "Compute event proximity",
+      "module_id": "50000000000000000022",
+      "module_symbol": "E2_PROXIMITY_EVALUATOR",
+      "responsible": "proximity_evaluator.py",
+      "input_contract": "CalendarEvent + ClockTick + ResolvedConfig",
+      "output_contract": "EventProximity",
+      "input_contracts": [
+        "CalendarEvent",
+        "ClockTick",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "EventProximity"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000004"
+      ],
+      "validation": "Frozen-time supported; thresholds validated (no overlaps/gaps)",
+      "failure": "Emit proximity error; default to MOST_CONSERVATIVE proximity bucket",
+      "entrypoint_files": [
+        "services\\event-gateway\\src\\2099900141260118_main.py"
+      ]
+    },
+    {
+      "process_step_id": "60000000000000000023",
+      "step_code": "S23",
+      "step_number": 23,
+      "step_name": "Lookup matrix decision",
+      "module_id": "50000000000000000023",
+      "module_symbol": "E3_MATRIX_LOOKUP",
+      "responsible": "matrix_lookup.py",
+      "input_contract": "OutcomeBucket + EventProximity + SignalContext + MatrixProfile + ResolvedConfig",
+      "output_contract": "MatrixDecision (or MatrixFallbackUsed)",
+      "input_contracts": [
+        "OutcomeBucket",
+        "EventProximity",
+        "SignalContext",
+        "MatrixProfile",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "MatrixDecision"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000021",
+        "60000000000000000022"
+      ],
+      "validation": "Deterministic fallback hierarchy; matrix version pinned",
+      "failure": "If matrix missing, emit MatrixFallbackUsed + safest MatrixDecision",
+      "entrypoint_files": [
+        "services\\reentry-matrix-svc\\src\\2099900174260118_main.py"
+      ]
+    },
+    {
+      "process_step_id": "60000000000000000024",
+      "step_code": "S24",
+      "step_number": 24,
+      "step_name": "Build reentry trade intent (or suppress)",
+      "module_id": "50000000000000000024",
+      "module_symbol": "E4_REENTRY_INTENT_BUILDER",
+      "responsible": "reentry_intent_builder.py",
+      "input_contract": "MatrixDecision + ReentryChainState + ResolvedConfig",
+      "output_contract": "TradeIntent OR ReentrySuppressed",
+      "input_contracts": [
+        "MatrixDecision",
+        "ReentryChainState",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "TradeIntent",
+        "ReentrySuppressed"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000023"
+      ],
+      "validation": "Hard cap: no reentry beyond R2; no circular chains",
+      "failure": "Emit ReentrySuppressed with deterministic reason",
+      "entrypoint_files": [
+        "services\\reentry-engine\\src\\2099900166260118_main.py"
+      ]
+    },
+    {
+      "process_step_id": "60000000000000000025",
+      "step_code": "S25",
+      "step_number": 25,
+      "step_name": "Loop: reentry intent follows same risk->order->route->transport->execute chain",
+      "module_id": "50000000000000000025",
+      "module_symbol": "F1_FLOW_ORCHESTRATOR",
+      "responsible": "orchestrator",
+      "input_contract": "TradeIntent from Step 24",
+      "output_contract": "Either (a) new RoutedOrderIntent executed, producing new OutcomeBucket, or (b) suppression/cooldown state update",
+      "input_contracts": [
+        "TradeIntent"
+      ],
+      "output_contracts": [
+        "Either",
+        "RoutedOrderIntent",
+        "OutcomeBucket"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000012",
+        "60000000000000000024"
+      ],
+      "validation": "Chain depth < configured max; velocity limits; idempotency keys enforced",
+      "failure": "On loop prevention trigger, enforce terminal cooldown and stop",
+      "entrypoint_files": [
+        "services\\transport-router\\src\\2099900199260118_main.py"
+      ]
+    },
+    {
+      "process_step_id": "60000000000000000026",
+      "step_code": "S26",
+      "step_number": 26,
+      "step_name": "Health aggregation + SLO evaluation",
+      "module_id": "50000000000000000026",
+      "module_symbol": "P1_HEALTH_AGGREGATOR",
+      "responsible": "health_service.py",
+      "input_contract": "AdapterHealth + ModuleHealth + ResolvedConfig",
+      "output_contract": "HealthReport",
+      "input_contracts": [
+        "AdapterHealth",
+        "ModuleHealth",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "HealthReport"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001"
+      ],
+      "validation": "Deterministic thresholds; stable report format",
+      "failure": "If health is unknown, default to risk-off posture (suppress new intents)",
+      "entrypoint_files": [
+        "services\\telemetry-daemon\\src\\2099900192260118_main.py"
+      ]
+    }
+  ]
+}

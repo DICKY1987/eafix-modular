@@ -1,0 +1,899 @@
+spec_meta:
+  spec_name: ECONOMIC_CALENDAR_MVP_SPEC
+  spec_version: "1.1.0"
+  status: DRAFT
+  purpose: >
+    Define the minimum viable economic calendar subsystem that converts
+    upcoming economic events into a per-symbol trading gate consumed by the EA.
+  changelog:
+    - version: "1.1.0"
+      changes:
+        - "Resolved gap: source timezone pinned to America/New_York (ForexFactory ET with DST)"
+        - "Resolved gap: refresh_interval_seconds added to config schema with cadence enforcement rule"
+        - "Added NORM_001 clarification: source_timezone is the authoritative input timezone"
+        - "Added RUN_001 and RUN_002 processing rules for cadence guardrail"
+        - "Added staleness_threshold_seconds to config for EA-side detection"
+        - "Added generated_at_utc column to output_csv contract"
+        - "Added TC_006 and TC_007 test cases for cadence and timezone edge cases"
+    - version: "1.0.0"
+      changes:
+        - "Initial draft"
+  scope_boundary:
+    included:
+      - single_source_calendar_ingestion
+      - event_normalization
+      - medium_and_high_impact_filtering
+      - static_symbol_currency_mapping
+      - pre_event_and_post_event_trade_block_windows
+      - per_symbol_context_evaluation
+      - csv_context_export
+      - EA_file_consumption_for_trade_blocking
+    excluded:
+      - multi_source_aggregation
+      - fastapi
+      - websockets
+      - dashboards
+      - hybrid_calendar_matrix_ids
+      - anticipation_signal_families
+      - advanced_lifecycle_state_machine
+      - mandatory_database_persistence
+      - dynamic_matrix_population
+      - advanced_monitoring_framework
+      - backup_orchestration_framework
+
+system_identity:
+  system_name: economic_calendar_mvp
+  subsystem_type: context_service
+  primary_business_question: "Is this symbol safe to trade right now based on upcoming news?"
+  primary_deliverable: active_calendar_signals
+
+interfaces:
+  upstream_input:
+    type: file
+    format: csv_like
+    source_name: forexfactory
+    source_timezone: America/New_York  # ForexFactory publishes all event times in ET (observes US DST)
+    required: true
+  downstream_output:
+    type: file
+    format: csv
+    file_name: active_calendar_signals_YYYYMMDD_HHMMSS.csv
+    required: true
+  downstream_consumer:
+    name: MT4_EA
+    integration_mode: file_read
+
+objectives:
+  required_outcomes:
+    - avoid_new_trades_near_major_economic_events
+    - provide_deterministic_per_symbol_allow_or_block_decision
+    - keep_output_small_and_easy_for_EA_to_parse
+    - minimize_system_complexity
+  non_goals:
+    - full_event_analytics_platform
+    - signal_taxonomy_expansion
+    - matrix_driven_calendar_identity_model
+
+configuration_schema:
+  type: object
+  required:
+    - calendar_source_path
+    - output_context_path
+    - source_timezone
+    - timezone
+    - refresh_interval_seconds
+    - staleness_threshold_seconds
+    - impact_windows
+    - tracked_symbols
+    - symbol_currency_map
+    - fail_safe_policy
+  properties:
+    calendar_source_path:
+      type: string
+    output_context_path:
+      type: string
+    source_timezone:
+      type: string
+      description: >
+        IANA timezone name of the raw calendar input. ForexFactory publishes
+        event times in Eastern Time (America/New_York), which observes US DST.
+        This value must match the actual source and must not be hardcoded to a
+        fixed UTC offset. Changing this requires re-validation of NORM_001.
+      allowed_values:
+        - America/New_York
+      note: >
+        Only America/New_York is permitted in MVP. Other values are reserved
+        for future sources with different timezones.
+    timezone:
+      type: string
+      description: Timezone for all output datetimes. Must be UTC.
+      allowed_values:
+        - UTC
+    refresh_interval_seconds:
+      type: integer
+      minimum: 30
+      description: >
+        How frequently the Python pipeline re-ingests the source file and
+        rewrites the output CSV. Must be strictly less than the smallest
+        configured pre-event block window in seconds. Enforced by RUN_001.
+        Recommended: 60 (1 minute) for production.
+    staleness_threshold_seconds:
+      type: integer
+      minimum: 60
+      description: >
+        Maximum age of the output CSV before the EA should treat it as
+        missing and apply fail_safe_policy. EA reads generated_at_utc from
+        the output CSV header and compares to current broker time. Should be
+        set to at least 2x refresh_interval_seconds to tolerate one missed
+        refresh cycle without false positives.
+      recommended_formula: "2 * refresh_interval_seconds + 30"
+    impact_windows:
+      type: object
+      required:
+        - HIGH
+        - MEDIUM
+      properties:
+        HIGH:
+          type: object
+          required:
+            - minutes_before_block
+            - minutes_after_block
+          properties:
+            minutes_before_block:
+              type: integer
+              minimum: 0
+            minutes_after_block:
+              type: integer
+              minimum: 0
+        MEDIUM:
+          type: object
+          required:
+            - minutes_before_block
+            - minutes_after_block
+          properties:
+            minutes_before_block:
+              type: integer
+              minimum: 0
+            minutes_after_block:
+              type: integer
+              minimum: 0
+    tracked_symbols:
+      type: array
+      min_items: 1
+      items:
+        type: string
+    symbol_currency_map:
+      type: object
+      additional_properties:
+        type: array
+        min_items: 1
+        items:
+          type: string
+    fail_safe_policy:
+      type: string
+      allowed_values:
+        - BLOCK_IF_CONTEXT_MISSING
+        - ALLOW_IF_CONTEXT_MISSING
+
+default_configuration:
+  calendar_source_path: data/forexfactory_calendar.csv
+  output_context_path: data/economic_calendar_context.csv
+  source_timezone: America/New_York
+  timezone: UTC
+  refresh_interval_seconds: 60
+  staleness_threshold_seconds: 150  # 2 * 60 + 30
+  impact_windows:
+    HIGH:
+      minutes_before_block: 60
+      minutes_after_block: 30
+    MEDIUM:
+      minutes_before_block: 30
+      minutes_after_block: 15
+  tracked_symbols:
+    - EURUSD
+    - GBPUSD
+    - USDJPY
+    - XAUUSD
+  symbol_currency_map:
+    EURUSD: [EUR, USD]
+    GBPUSD: [GBP, USD]
+    USDJPY: [USD, JPY]
+    XAUUSD: [USD]
+  fail_safe_policy: BLOCK_IF_CONTEXT_MISSING
+
+data_contracts:
+  raw_event_input:
+    type: object
+    required:
+      - raw_date
+      - raw_time
+      - raw_currency_or_country
+      - raw_impact
+      - raw_title
+    properties:
+      raw_date:
+        type: string
+      raw_time:
+        type: string
+        note: >
+          Expressed in source_timezone (America/New_York). Must be parsed
+          using that timezone before UTC conversion. Do not assume UTC or
+          a fixed offset.
+      raw_currency_or_country:
+        type: string
+      raw_impact:
+        type: string
+      raw_title:
+        type: string
+      raw_forecast:
+        type: string
+        required: false
+      raw_previous:
+        type: string
+        required: false
+      raw_actual:
+        type: string
+        required: false
+
+  normalized_event:
+    type: object
+    required:
+      - event_time_utc
+      - currency
+      - impact
+      - title
+      - source
+      - raw_date_text
+      - raw_time_text
+    properties:
+      event_time_utc:
+        type: datetime_iso8601_utc
+        note: >
+          Derived by parsing raw_date + raw_time as America/New_York and
+          converting to UTC via pytz or zoneinfo. DST transitions are
+          handled automatically by IANA timezone resolution.
+      currency:
+        type: string
+      impact:
+        type: enum
+        allowed_values:
+          - HIGH
+          - MEDIUM
+          - LOW
+      title:
+        type: string
+      source:
+        type: string
+      raw_date_text:
+        type: string
+      raw_time_text:
+        type: string
+
+  filtered_event:
+    type: object
+    required:
+      - event_time_utc
+      - currency
+      - impact
+      - title
+    properties:
+      event_time_utc:
+        type: datetime_iso8601_utc
+      currency:
+        type: string
+      impact:
+        type: enum
+        allowed_values:
+          - HIGH
+          - MEDIUM
+      title:
+        type: string
+
+  symbol_context_row:
+    type: object
+    required:
+      - symbol
+      - current_time_utc
+      - next_event_time_utc
+      - next_event_currency
+      - next_event_impact
+      - minutes_to_event
+      - state
+      - allow_new_trades
+      - risk_mode
+      - event_title
+    properties:
+      symbol:
+        type: string
+      current_time_utc:
+        type: datetime_iso8601_utc
+      next_event_time_utc:
+        type: datetime_iso8601_utc_or_empty
+      next_event_currency:
+        type: string_or_empty
+      next_event_impact:
+        type: enum_or_empty
+        allowed_values:
+          - HIGH
+          - MEDIUM
+          - ""
+      minutes_to_event:
+        type: integer_or_empty
+        note: >
+          Positive integer = minutes until upcoming event (PRE_EVENT_BLOCK or CLEAR with future event).
+          Negative integer = minutes since past event (POST_EVENT_BLOCK).
+          Empty string = no relevant event found in either direction.
+      state:
+        type: enum
+        allowed_values:
+          - CLEAR
+          - PRE_EVENT_BLOCK
+          - POST_EVENT_BLOCK
+      allow_new_trades:
+        type: boolean
+      risk_mode:
+        type: enum
+        allowed_values:
+          - NORMAL
+          - BLOCKED
+      event_title:
+        type: string_or_empty
+
+state_model:
+  allowed_states:
+    - CLEAR
+    - PRE_EVENT_BLOCK
+    - POST_EVENT_BLOCK
+  prohibited_states:
+    - ANTICIPATION_8HR
+    - ANTICIPATION_1HR
+    - ACTIVE
+    - COOLDOWN
+    - EXPIRED
+    - REDUCED_RISK
+  state_definitions:
+    CLEAR: "No active pre-event or post-event block window for the symbol."
+    PRE_EVENT_BLOCK: "Current time is before a relevant event and inside configured pre-event block window."
+    POST_EVENT_BLOCK: "Current time is after a relevant event and inside configured post-event block window."
+
+processing_rules:
+  source_rules:
+    - rule_id: SRC_001
+      description: Only one source is supported in MVP.
+      enforcement: hard
+    - rule_id: SRC_002
+      description: Source must be file-based and readable from configured path.
+      enforcement: hard
+
+  runtime_rules:
+    - rule_id: RUN_001
+      description: >
+        refresh_interval_seconds must be strictly less than the smallest
+        configured pre-event block window converted to seconds.
+        Formula: refresh_interval_seconds < min(impact_windows.*.minutes_before_block) * 60.
+        This prevents a scenario where a block window opens and closes between
+        two refresh cycles, making the EA blind to the event entirely.
+      enforcement: hard
+      validation_point: startup_config_check
+      example: >
+        If MEDIUM.minutes_before_block = 30, then refresh_interval_seconds
+        must be < 1800. Default of 60 satisfies this for all standard configs.
+    - rule_id: RUN_002
+      description: >
+        The pipeline scheduler must guarantee that no two consecutive refresh
+        cycles are separated by more than refresh_interval_seconds + a
+        tolerance of 10 seconds. If a cycle is skipped or fails, the previous
+        output file must be preserved (not deleted) so the EA continues reading
+        the last valid state rather than triggering fail_safe_policy.
+      enforcement: hard
+
+  normalization_rules:
+    - rule_id: NORM_001
+      description: >
+        Convert source date and time into UTC datetime. The source timezone
+        is always America/New_York (Eastern Time), which observes US DST.
+        Parsing must use an IANA-aware library (pytz or zoneinfo). A fixed
+        UTC offset (e.g., -05:00 or -04:00) must never be used because it
+        will be wrong half the year.
+      enforcement: hard
+      implementation_note: >
+        Use zoneinfo.ZoneInfo("America/New_York") or
+        pytz.timezone("America/New_York"). Call .localize() then
+        .astimezone(UTC). Do not parse with dateutil without an explicit
+        tzinfo argument.
+    - rule_id: NORM_002
+      description: Normalize impact values into HIGH, MEDIUM, or LOW.
+      enforcement: hard
+    - rule_id: NORM_003
+      description: Convert country labels to tradable currency codes when needed.
+      enforcement: hard
+    - rule_id: NORM_004
+      description: Rows with invalid timestamp must be rejected.
+      enforcement: hard
+
+  filtering_rules:
+    - rule_id: FILT_001
+      description: LOW impact events must be discarded.
+      enforcement: hard
+    - rule_id: FILT_002
+      description: Events with unsupported or unmapped currencies must be discarded.
+      enforcement: hard
+    - rule_id: FILT_003
+      description: Events with missing title must be discarded.
+      enforcement: soft
+    - rule_id: FILT_004
+      description: >
+        Holidays and non-tradable noise events must be discarded unless the
+        event title matches an entry in the configured holiday_passthrough_keywords
+        list. Default list is empty (all holidays discarded).
+      enforcement: configurable
+
+  relevance_rules:
+    - rule_id: REL_001
+      description: An event is relevant to a symbol if the symbol's mapped currencies contain the event currency.
+      enforcement: hard
+    - rule_id: REL_002
+      description: Relevance mapping must use static symbol_currency_map from config.
+      enforcement: hard
+
+  window_rules:
+    - rule_id: WIN_001
+      description: HIGH impact pre-event block starts minutes_before_block before event_time_utc.
+      enforcement: hard
+    - rule_id: WIN_002
+      description: HIGH impact post-event block ends minutes_after_block after event_time_utc.
+      enforcement: hard
+    - rule_id: WIN_003
+      description: MEDIUM impact pre-event block starts minutes_before_block before event_time_utc.
+      enforcement: hard
+    - rule_id: WIN_004
+      description: MEDIUM impact post-event block ends minutes_after_block after event_time_utc.
+      enforcement: hard
+
+  decision_rules:
+    - rule_id: DEC_001
+      description: Output exactly one final context row per tracked symbol.
+      enforcement: hard
+    - rule_id: DEC_002
+      description: If no relevant event exists, state must be CLEAR and allow_new_trades must be true.
+      enforcement: hard
+    - rule_id: DEC_003
+      description: If current time is inside any relevant pre-event block window, state must be PRE_EVENT_BLOCK and allow_new_trades must be false.
+      enforcement: hard
+    - rule_id: DEC_004
+      description: If current time is inside any relevant post-event block window, state must be POST_EVENT_BLOCK and allow_new_trades must be false.
+      enforcement: hard
+    - rule_id: DEC_005
+      description: >
+        If multiple relevant events apply simultaneously, the most restrictive
+        active condition wins. Priority order: PRE_EVENT_BLOCK > POST_EVENT_BLOCK > CLEAR.
+        When multiple events are in the same active state class, the soonest
+        pre-event (smallest minutes_to_event) or most recent post-event
+        (largest absolute minutes since event) takes the next_event_* fields.
+      enforcement: hard
+    - rule_id: DEC_006
+      description: risk_mode must be BLOCKED whenever allow_new_trades is false.
+      enforcement: hard
+    - rule_id: DEC_007
+      description: risk_mode must be NORMAL whenever allow_new_trades is true.
+      enforcement: hard
+
+prohibited_features:
+  - hybrid_calendar_ids
+  - calendar_matrix_combination_ids
+  - anticipation_signal_generation
+  - expanded_signal_taxonomy
+  - mandatory_database_storage
+  - api_delivery_layer
+  - websocket_push_updates
+  - dashboard_dependencies
+  - multi_stage_event_lifecycle_engine
+
+algorithms:
+  evaluate_symbol_context:
+    inputs:
+      - symbol
+      - current_time_utc
+      - filtered_events
+      - symbol_currency_map
+      - impact_windows
+    outputs:
+      - symbol_context_row
+    deterministic_steps:
+      - step_id: EVAL_001
+        action: get_symbol_currencies
+        definition: "Lookup symbol in symbol_currency_map."
+      - step_id: EVAL_002
+        action: select_relevant_events
+        definition: "Keep filtered_events where event.currency is in symbol currencies."
+      - step_id: EVAL_003
+        action: sort_events
+        definition: "Sort relevant events ascending by event_time_utc."
+      - step_id: EVAL_004
+        action: compute_windows
+        definition: >
+          For each relevant event, derive pre_event_window_start and
+          post_event_window_end using configured impact windows.
+      - step_id: EVAL_005
+        action: detect_active_state
+        definition: >
+          For each relevant event, determine whether current_time_utc is in
+          PRE_EVENT_BLOCK, POST_EVENT_BLOCK, or neither.
+      - step_id: EVAL_006
+        action: resolve_priority
+        definition: >
+          If multiple events apply, choose the strongest active restriction
+          per DEC_005. If no active restriction exists, choose nearest
+          upcoming relevant event for next_event_* fields.
+      - step_id: EVAL_007
+        action: build_output_row
+        definition: >
+          Return a symbol_context_row with state, allow_new_trades, risk_mode,
+          next_event metadata, and event_title.
+
+file_contracts:
+  output_csv:
+    path_source: configuration.output_context_path
+    encoding: utf-8
+    header_required: true
+    columns_in_order:
+      - symbol
+      - current_time_utc
+      - next_event_time_utc
+      - next_event_currency
+      - next_event_impact
+      - minutes_to_event
+      - state
+      - allow_new_trades
+      - risk_mode
+      - event_title
+      - generated_at_utc   # UTC timestamp of when this file was written; used by EA for staleness detection
+    atomic_write_required: true
+    atomic_write_mechanism: >
+      Write to a temp file in the same directory, then rename (os.replace)
+      to the final path. This ensures the EA never reads a partial write.
+    partial_write_allowed: false
+
+  optional_debug_csv:
+    file_name: economic_calendar_filtered_events.csv
+    required: false
+    columns_in_order:
+      - event_time_utc
+      - currency
+      - impact
+      - title
+      - source
+
+ea_contract:
+  read_behavior:
+    - rule_id: EA_001
+      description: EA must read context file before evaluating new trade entry.
+    - rule_id: EA_002
+      description: EA must match current chart symbol to symbol column.
+    - rule_id: EA_003
+      description: If allow_new_trades is false, EA must suppress new trade entries.
+    - rule_id: EA_004
+      description: >
+        If context file is missing, EA behavior must follow its local
+        FailSafePolicyOnMissingFile input parameter. This parameter must be
+        set to match fail_safe_policy in the Python config. The EA cannot
+        read the Python config directly.
+    - rule_id: EA_005
+      description: >
+        EA must read generated_at_utc from the context file and compare to
+        current broker time. If (broker_time - generated_at_utc) exceeds
+        the configured staleness_threshold_seconds, the EA must treat the
+        file as missing and apply FailSafePolicyOnMissingFile.
+  ea_input_parameters:
+    - name: ContextFilePath
+      type: string
+      description: Full path to economic_calendar_context.csv
+    - name: FailSafePolicyOnMissingFile
+      type: enum
+      allowed_values:
+        - BLOCK
+        - ALLOW
+      description: >
+        Must be set by the operator to match Python config fail_safe_policy.
+        BLOCK = BLOCK_IF_CONTEXT_MISSING, ALLOW = ALLOW_IF_CONTEXT_MISSING.
+    - name: StalenessThresholdSeconds
+      type: integer
+      description: >
+        Must match staleness_threshold_seconds in Python config.
+        EA applies FailSafePolicyOnMissingFile if file age exceeds this value.
+  out_of_scope:
+    - lot_size_adjustment
+    - dynamic_spread_adjustment
+    - reentry_tuning
+    - matrix_parameter_selection
+
+error_handling:
+  policies:
+    missing_source_file:
+      action:
+        - log_error
+        - preserve_last_valid_output_if_present
+        - do_not_emit_partial_output
+    row_parse_failure:
+      action:
+        - skip_row
+        - log_warning
+    complete_parse_failure:
+      action:
+        - log_error
+        - preserve_last_valid_output_if_present
+    timezone_parse_failure:
+      description: >
+        Raised when a raw_date + raw_time cannot be localized to
+        America/New_York. Treat as row_parse_failure.
+      action:
+        - skip_row
+        - log_warning_with_raw_values
+    missed_refresh_cycle:
+      description: >
+        Raised when the scheduler detects a gap > refresh_interval_seconds + 10s
+        between consecutive successful pipeline runs.
+      action:
+        - log_error
+        - preserve_last_valid_output
+        - do_not_delete_existing_output
+    missing_context_at_consumer:
+      action_by_policy:
+        BLOCK_IF_CONTEXT_MISSING: block_new_trades
+        ALLOW_IF_CONTEXT_MISSING: allow_new_trades
+  logging_requirements:
+    required_events:
+      - source_file_loaded
+      - source_timezone_applied          # log "America/New_York" and UTC offset at parse time
+      - raw_row_count
+      - filtered_event_count
+      - tracked_symbol_count
+      - output_file_written
+      - generated_at_utc_value           # log the timestamp written to the file
+      - row_parse_failures
+      - timezone_parse_failures
+      - missing_source_file
+      - refresh_cycle_start
+      - refresh_cycle_duration_ms
+    prohibited_logging:
+      - verbose_telemetry_framework
+      - performance_dashboard_metrics
+
+components:
+  - component_name: calendar_loader
+    responsibility: read_raw_calendar_file
+    inputs:
+      - calendar_source_path
+    outputs:
+      - raw_event_rows
+    required_functions:
+      - file_exists_check
+      - file_read
+      - row_extraction
+
+  - component_name: event_normalizer
+    responsibility: convert_raw_rows_to_normalized_events
+    inputs:
+      - raw_event_rows
+      - source_timezone  # must be passed from config, not hardcoded
+    outputs:
+      - normalized_events
+    required_functions:
+      - datetime_normalization_with_iana_timezone  # replaces generic datetime_normalization
+      - impact_normalization
+      - country_to_currency_mapping
+      - invalid_row_rejection
+
+  - component_name: event_filter
+    responsibility: retain_only_relevant_events
+    inputs:
+      - normalized_events
+    outputs:
+      - filtered_events
+    required_functions:
+      - impact_filter
+      - currency_support_filter
+      - timestamp_validity_filter
+
+  - component_name: symbol_context_evaluator
+    responsibility: produce_symbol_level_trade_gate_context
+    inputs:
+      - filtered_events
+      - tracked_symbols
+      - symbol_currency_map
+      - impact_windows
+      - current_time_utc
+    outputs:
+      - symbol_context_rows
+    required_functions:
+      - relevance_mapping
+      - time_delta_calculation
+      - state_assignment
+      - priority_resolution
+
+  - component_name: context_exporter
+    responsibility: write_final_context_csv
+    inputs:
+      - symbol_context_rows
+      - output_context_path
+      - generated_at_utc  # injected at write time; written as last column
+    outputs:
+      - economic_calendar_context.csv
+    required_functions:
+      - schema_order_enforcement
+      - atomic_write            # temp file + os.replace
+      - overwrite_previous_output
+      - generated_at_utc_stamp  # appends current UTC timestamp to each row
+
+  - component_name: pipeline_scheduler
+    responsibility: >
+      Run the full pipeline (loader → normalizer → filter → evaluator → exporter)
+      on a fixed interval. Must enforce RUN_001 and RUN_002.
+    inputs:
+      - refresh_interval_seconds
+    required_functions:
+      - interval_loop
+      - cadence_guardrail_check  # validates refresh_interval_seconds < min block window at startup
+      - missed_cycle_detector
+      - preserve_output_on_failure
+
+  - component_name: ea_consumer
+    responsibility: enforce_trade_gate
+    inputs:
+      - economic_calendar_context.csv
+    outputs:
+      - allow_or_block_trade_entry
+    required_functions:
+      - symbol_row_lookup
+      - allow_new_trades_read
+      - generated_at_utc_staleness_check  # compares file age to StalenessThresholdSeconds
+      - entry_block_enforcement
+
+execution_flow:
+  ordered_steps:
+    - step_id: FLOW_000
+      component: pipeline_scheduler
+      action: validate_cadence_guardrail_on_startup
+      note: Abort startup if refresh_interval_seconds >= min block window in seconds.
+    - step_id: FLOW_001
+      component: calendar_loader
+      action: read_source_file
+    - step_id: FLOW_002
+      component: event_normalizer
+      action: normalize_rows_using_america_new_york_timezone
+    - step_id: FLOW_003
+      component: event_filter
+      action: filter_events
+    - step_id: FLOW_004
+      component: symbol_context_evaluator
+      action: evaluate_each_tracked_symbol
+    - step_id: FLOW_005
+      component: context_exporter
+      action: write_output_csv_with_generated_at_utc
+    - step_id: FLOW_006
+      component: pipeline_scheduler
+      action: sleep_until_next_refresh_cycle
+    - step_id: FLOW_007
+      component: ea_consumer
+      action: read_context_check_staleness_and_block_or_allow_trades
+      note: Runs independently inside MT4; not part of the Python process loop.
+
+acceptance_criteria:
+  - criterion_id: AC_001
+    description: One configured source file can be ingested without manual intervention.
+  - criterion_id: AC_002
+    description: All retained events are normalized into the normalized_event contract.
+  - criterion_id: AC_003
+    description: LOW impact events are excluded from final evaluation.
+  - criterion_id: AC_004
+    description: Exactly one context row exists for every tracked symbol.
+  - criterion_id: AC_005
+    description: Output CSV column order matches file_contracts.output_csv.columns_in_order exactly.
+  - criterion_id: AC_006
+    description: EA can block entries when allow_new_trades is false.
+  - criterion_id: AC_007
+    description: System functions without hybrid IDs, matrix IDs, API delivery, or anticipation signals.
+  - criterion_id: AC_008
+    description: >
+      A ForexFactory event time of 8:30 AM on a US DST day (e.g., March) is
+      stored as 13:30 UTC, and on a non-DST day (e.g., November) as 13:30 UTC
+      (EST) = 13:30 UTC. Verified by TC_007.
+  - criterion_id: AC_009
+    description: >
+      Pipeline completes a full refresh cycle within refresh_interval_seconds.
+      Verified by monitoring refresh_cycle_duration_ms log event.
+  - criterion_id: AC_010
+    description: >
+      EA detects and handles a stale context file (age > staleness_threshold_seconds)
+      by applying FailSafePolicyOnMissingFile.
+
+test_cases:
+  - test_id: TC_001
+    name: no_relevant_events
+    input_condition: "No HIGH or MEDIUM events relevant to EURUSD."
+    expected_output:
+      symbol: EURUSD
+      state: CLEAR
+      allow_new_trades: true
+      risk_mode: NORMAL
+
+  - test_id: TC_002
+    name: high_impact_pre_event_block
+    input_condition: "USD HIGH event occurs in 30 minutes; EURUSD is tracked."
+    expected_output:
+      symbol: EURUSD
+      state: PRE_EVENT_BLOCK
+      allow_new_trades: false
+      risk_mode: BLOCKED
+
+  - test_id: TC_003
+    name: medium_impact_post_event_block
+    input_condition: "EUR MEDIUM event occurred 10 minutes ago; EURUSD is tracked."
+    expected_output:
+      symbol: EURUSD
+      state: POST_EVENT_BLOCK
+      allow_new_trades: false
+      risk_mode: BLOCKED
+
+  - test_id: TC_004
+    name: unsupported_currency_dropped
+    input_condition: "Event currency is not mapped to any tracked symbol."
+    expected_output:
+      effect: event_not_present_in_symbol_evaluation
+
+  - test_id: TC_005
+    name: missing_context_fail_safe
+    input_condition: "Context file missing at EA read time and fail_safe_policy is BLOCK_IF_CONTEXT_MISSING."
+    expected_output:
+      effect: block_new_trades
+
+  - test_id: TC_006
+    name: stale_context_fail_safe
+    input_condition: >
+      Context file exists but generated_at_utc is older than
+      staleness_threshold_seconds. fail_safe_policy is BLOCK_IF_CONTEXT_MISSING.
+    expected_output:
+      effect: block_new_trades
+    notes: >
+      Simulates Python pipeline crash. EA must not trade on stale data.
+
+  - test_id: TC_007
+    name: dst_transition_timezone_correctness
+    input_condition: >
+      ForexFactory CSV contains event time "8:30am" on 2025-03-09 (US spring
+      DST changeover date). Source timezone is America/New_York = UTC-5 (EST)
+      before changeover, UTC-4 (EDT) after.
+    expected_output:
+      event_time_utc: "2025-03-09T13:30:00Z"
+      notes: >
+        8:30 AM ET on Mar 9 2025 = EDT (UTC-4) = 12:30 UTC. Verify parser
+        uses IANA-aware library so DST offset is correctly resolved.
+    validation_method: unit_test_with_frozen_datetime
+
+implementation_order:
+  - PHASE_001_parser_and_normalizer
+  - PHASE_002_symbol_currency_mapping
+  - PHASE_003_window_evaluator
+  - PHASE_004_csv_export
+  - PHASE_005_ea_reader_and_gate
+  - PHASE_006_replay_testing
+
+final_constraints:
+  - constraint_id: FC_001
+    statement: "This MVP must remain file-driven."
+  - constraint_id: FC_002
+    statement: "This MVP must remain deterministic."
+  - constraint_id: FC_003
+    statement: "This MVP must produce trade-gate context, not strategy taxonomy."
+  - constraint_id: FC_004
+    statement: "Complexity may only be added after MVP success is demonstrated."
+  - constraint_id: FC_005
+    statement: >
+      The source timezone (America/New_York) must be passed through config,
+      not hardcoded in parsing logic. This allows future sources with different
+      timezones to be supported by config change only.
+  - constraint_id: FC_006
+    statement: >
+      refresh_interval_seconds must always be validated against the minimum
+      configured block window at startup. A misconfigured cadence that could
+      cause a missed block window must prevent the pipeline from starting.

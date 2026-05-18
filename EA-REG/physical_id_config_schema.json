@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft/2020-12/schema",
+  "title": "Physical ID Assignment Config Schema",
+  "description": "Defines the allowed structure and required fields for the physical identity assignment configuration.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "repository_root",
+    "excluded_directories",
+    "excluded_files",
+    "assign_root_directory_id",
+    "directory_identity_mechanism",
+    "file_identity_mechanism",
+    "physical_id_patterns"
+  ],
+  "properties": {
+    "repository_root": {
+      "type": "string",
+      "description": "Absolute path to the repository root where IDs should be assigned."
+    },
+    "excluded_directories": {
+      "type": "array",
+      "description": "List of directory names or relative paths to exclude from physical ID assignment.",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "excluded_files": {
+      "type": "array",
+      "description": "List of file name patterns to exclude from physical ID assignment (e.g., file extensions or glob-like patterns).",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "assign_root_directory_id": {
+      "type": "boolean",
+      "description": "If true the repository root will receive its own directory_id; if false the root is omitted from the ID namespace."
+    },
+    "directory_identity_mechanism": {
+      "type": "object",
+      "description": "Specification of how directories are identified.",
+      "additionalProperties": false,
+      "required": ["mechanism", "anchor_filename", "anchor_required"],
+      "properties": {
+        "mechanism": {
+          "type": "string",
+          "enum": ["sidecar_anchor_file"],
+          "description": "Mechanism used to persist directory identity. Only 'sidecar_anchor_file' is supported."
+        },
+        "anchor_filename": {
+          "type": "string",
+          "description": "Name of the sidecar file used as the directory anchor (e.g., '.dir_id')."
+        },
+        "anchor_required": {
+          "type": "boolean",
+          "description": "Whether every non-excluded directory must contain an anchor file."
+        }
+      }
+    },
+    "file_identity_mechanism": {
+      "type": "object",
+      "description": "Specification of how files are assigned unique identifiers.",
+      "additionalProperties": false,
+      "required": ["mechanism", "rename_required"],
+      "properties": {
+        "mechanism": {
+          "type": "string",
+          "enum": ["registry_assigned", "filename_prefix"],
+          "description": "Method used to assign file identities. 'registry_assigned' means IDs are assigned by the registry and not embedded in filenames; 'filename_prefix' means IDs are embedded at the start of filenames."
+        },
+        "rename_required": {
+          "type": "boolean",
+          "description": "If true the file names will be mutated to embed the file_id; if false IDs are stored only in the registry."
+        }
+      }
+    },
+    "physical_id_patterns": {
+      "type": "object",
+      "description": "Defines prefix and length patterns for physical identifiers.",
+      "additionalProperties": false,
+      "required": ["file_id_pattern", "directory_id_pattern", "id_length"],
+      "properties": {
+        "id_length": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Total number of digits in physical identifiers."
+        },
+        "file_id_pattern": {
+          "type": "string",
+          "pattern": "^\\^1\\\\d\\{19\\}\\$$",
+          "description": "Regular expression pattern that all file_id values must match."
+        },
+        "directory_id_pattern": {
+          "type": "string",
+          "pattern": "^\\^2\\\\d\\{19\\}\\$$",
+          "description": "Regular expression pattern that all directory_id values must match."
+        }
+      }
+    }
+  }
+}

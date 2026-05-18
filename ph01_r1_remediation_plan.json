@@ -1,0 +1,339 @@
+{
+  "plan_metadata": {
+    "plan_id": "PH-01-R1",
+    "title": "Phase 1 Remediation R1 - Routing Disambiguation and UI Scope Clarity",
+    "version": "1.1.0",
+    "created": "2026-05-18",
+    "parent_plan": "decomposition_plan_ph1_ph2.json",
+    "current_state_assumption": {
+      "submodule_context_catalog_version_before": "1.0.2",
+      "reason": "Phase 2 warning remediation already moved test paths out of source scope and added file_scope_resolution, service_scope, and candidate_file_classification metadata.",
+      "submodule_context_catalog_version_after": "1.0.3"
+    },
+    "phases_covered": [
+      "PH-01-R1"
+    ],
+    "scope": "Apply targeted Phase 1 catalog/schema improvements that remain valid after Phase 2 warning remediation. This plan does not re-run Phase 1 generation and does not modify canonical source artifacts.",
+    "governing_rule": "Derived catalog metadata may clarify routing and dependency interpretation, but canonical documents remain authoritative."
+  },
+  "issue_registry": {
+    "ISSUE-001": {
+      "title": "Temporary helper script placement",
+      "severity": "process",
+      "description": "Phase helpers must not be written under .state/evidence because a crash could leave non-evidence artifacts in the audit trail.",
+      "resolution": "Use a root-level scratch helper named _ph01_r1_execute.py or a top-level _scratch/ directory, then delete it before completion.",
+      "catalog_mutation_required": false
+    },
+    "ISSUE-002": {
+      "title": "Deprecated jsonschema CLI",
+      "severity": "toolchain",
+      "description": "python -m jsonschema emits a deprecation warning and should not be the primary CLI validation mechanism.",
+      "resolution": "Use in-process Draft202012Validator as the required validator. If check-jsonschema is already installed, run it as an optional independent CLI check. Do not install packages as part of this remediation unless explicitly requested.",
+      "catalog_mutation_required": false
+    },
+    "ISSUE-003": {
+      "title": "B1 and B2 dual work-cell ambiguity",
+      "severity": "catalog_data",
+      "description": "B1_MT4_ADAPTER_TRANSPORT and B2_MT4_EA_EXECUTOR each have a Python-side work cell and an MQL4/EA-side work cell. Routing by parent_module_symbol alone is ambiguous.",
+      "resolution": "Add requires_agent_capability to all work cells. Validate uniqueness only for the known ambiguous B1/B2 dual-cell modules, not globally.",
+      "catalog_mutation_required": true,
+      "affected_work_cells": [
+        "B1_MT4_ADAPTER_TRANSPORT__CSV_SOCKET_BRIDGE",
+        "EA_SYSTEM_B_COMMUNICATION_BRIDGES__MQL4_TRANSPORTS",
+        "B2_MT4_EA_EXECUTOR__ORDERSEND_EXECUTION",
+        "EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT"
+      ]
+    },
+    "ISSUE-004": {
+      "title": "UI work cells use SHARED_LIBS as parent proxy",
+      "severity": "catalog_data",
+      "description": "UI work cells are parented to SHARED_LIBS because module_catalog.json has no dedicated UI module. Agents must not infer UI dependency constraints from SHARED_LIBS.",
+      "resolution": "Add dependency_scope_override_note to every ui_screen and ui_gateway work cell. Preserve existing file_scope_resolution=service_scope metadata from Phase 2 warning remediation.",
+      "catalog_mutation_required": true
+    }
+  },
+  "referenced_context_artifacts": {
+    "enabled": true,
+    "policy": {
+      "required_when_external_context_needed": true,
+      "unbound_context_action": "fail_closed",
+      "authoritative_artifacts_must_not_be_modified": true,
+      "constraining_artifacts_must_not_be_modified": true
+    },
+    "artifacts": [
+      {
+        "context_artifact_id": "CA-001",
+        "authority_level": "AUTHORITATIVE",
+        "path": "EAFIX_auth_docs/module_catalog.json",
+        "purpose": "Confirms canonical module IDs and SHARED_LIBS parent proxy status.",
+        "must_not_be_modified": true
+      },
+      {
+        "context_artifact_id": "CA-008",
+        "authority_level": "AUTHORITATIVE",
+        "path": "EAFIX_auth_docs/file_module_mapping.csv",
+        "purpose": "Read-only guard to ensure Phase 2 warning remediation remains intact.",
+        "must_not_be_modified": true
+      },
+      {
+        "context_artifact_id": "CA-010",
+        "authority_level": "CONSTRAINING",
+        "path": "eafix_project_knowledge_reference_routing_instructions.json",
+        "purpose": "Confirms B1/B2 routing trigger context.",
+        "must_not_be_modified": true
+      },
+      {
+        "context_artifact_id": "CA-011",
+        "authority_level": "CONSTRAINING",
+        "path": "decomposition_model.json",
+        "purpose": "Parent decomposition model. Remediation must not contradict its work-cell definitions.",
+        "must_not_be_modified": true
+      }
+    ]
+  },
+  "artifact_intent_manifest": {
+    "policy": {
+      "no_undeclared_mutations_allowed": true,
+      "canonical_artifacts_read_only": true,
+      "preserve_phase_2_warning_remediation": true
+    },
+    "records": [
+      {
+        "artifact_intent_id": "RAINT-001",
+        "planned_relative_path": "submodule_catalog_schema.json",
+        "artifact_kind": "json_schema",
+        "mutation_type": "edit_existing",
+        "change_summary": "Add optional work-cell properties requires_agent_capability and dependency_scope_override_note. Preserve existing Phase 2 remediation fields file_scope_resolution, service_scope, and candidate_file_classification.",
+        "validation_sources": [
+          "GATE-R-SCHEMA-001"
+        ]
+      },
+      {
+        "artifact_intent_id": "RAINT-002",
+        "planned_relative_path": "submodule_context_catalog.json",
+        "artifact_kind": "json_catalog",
+        "mutation_type": "edit_existing",
+        "change_summary": "Increment catalog_metadata.version from 1.0.2 to 1.0.3, add requires_agent_capability to every work cell, and add dependency_scope_override_note to all ui_screen/ui_gateway work cells. Do not change source_files, test_files, allowed dependencies, forbidden dependencies, or service-scope metadata.",
+        "validation_sources": [
+          "GATE-R-CATALOG-001",
+          "GATE-R-B1B2-DISAMBIGUATION-001",
+          "GATE-R-UI-SCOPE-001"
+        ]
+      },
+      {
+        "artifact_intent_id": "RAINT-003",
+        "planned_relative_path": ".state/evidence/PH-01/STEP-010/catalog_validation_report.json",
+        "artifact_kind": "json_evidence",
+        "mutation_type": "overwrite",
+        "change_summary": "Regenerate Phase 1 catalog validation report with original Phase 1 gates plus remediation gates.",
+        "validation_sources": [
+          "GATE-R-CATALOG-001"
+        ]
+      },
+      {
+        "artifact_intent_id": "RAINT-004",
+        "planned_relative_path": ".state/evidence/PH-01/phase_1_summary.json",
+        "artifact_kind": "json_evidence",
+        "mutation_type": "overwrite",
+        "change_summary": "Regenerate Phase 1 summary with remediation_plan_id PH-01-R1 and catalog version 1.0.3.",
+        "validation_sources": [
+          "GATE-R-SUMMARY-001"
+        ]
+      },
+      {
+        "artifact_intent_id": "RAINT-005",
+        "planned_relative_path": ".state/evidence/PH-01-R1/remediation_summary.json",
+        "artifact_kind": "json_evidence",
+        "mutation_type": "create_new",
+        "change_summary": "Record issue resolution, gate statuses, optional check-jsonschema status, and hashes of updated schema/catalog.",
+        "validation_sources": [
+          "GATE-R-SUMMARY-001"
+        ]
+      }
+    ]
+  },
+  "capability_assignment_rules": {
+    "ea_side_mql4_system": [
+      "mql4"
+    ],
+    "risk_rule_family": [
+      "python"
+    ],
+    "signal_rule_family": [
+      "python"
+    ],
+    "ui_screen": [
+      "ui"
+    ],
+    "ui_gateway": [
+      "ui"
+    ],
+    "module_boundary": [
+      "python"
+    ],
+    "default_if_unrecognized": [
+      "python"
+    ]
+  },
+  "ui_dependency_scope_override_note": "DEPENDENCY SCOPE: Use this work cell's own allowed_dependencies and forbidden_dependencies. Do not derive dependency constraints from parent module SHARED_LIBS in module_catalog.json. SHARED_LIBS is used as a Phase 1 parent proxy because module_catalog.json defines no dedicated canonical UI module. File scope is governed by this work cell's service_scope metadata and ui_catalog.json.",
+  "phase_plan": {
+    "phase_id": "PH-01-R1",
+    "name": "Phase 1 Remediation R1",
+    "description": "Apply routing and dependency-scope metadata to the Phase 1 catalog after Phase 2 warning remediation.",
+    "steps": [
+      {
+        "step_id": "STEP-R01",
+        "name": "Verify authoritative and constraining artifact hashes",
+        "inputs": [
+          ".state/evidence/PH-01/STEP-001/context_artifact_verification.json"
+        ],
+        "outputs": [],
+        "acceptance_gates": [
+          "GATE-R-NOOVERRIDE-001"
+        ]
+      },
+      {
+        "step_id": "STEP-R02",
+        "name": "Update submodule catalog schema",
+        "inputs": [
+          "submodule_catalog_schema.json"
+        ],
+        "outputs": [
+          "submodule_catalog_schema.json"
+        ],
+        "acceptance_gates": [
+          "GATE-R-SCHEMA-001"
+        ]
+      },
+      {
+        "step_id": "STEP-R03",
+        "name": "Update submodule context catalog",
+        "inputs": [
+          "submodule_context_catalog.json",
+          "submodule_catalog_schema.json"
+        ],
+        "outputs": [
+          "submodule_context_catalog.json"
+        ],
+        "acceptance_gates": [
+          "GATE-R-CATALOG-001",
+          "GATE-R-B1B2-DISAMBIGUATION-001",
+          "GATE-R-UI-SCOPE-001",
+          "GATE-R-PH02-PRESERVED-001"
+        ]
+      },
+      {
+        "step_id": "STEP-R04",
+        "name": "Run validation gates",
+        "inputs": [
+          "submodule_catalog_schema.json",
+          "submodule_context_catalog.json",
+          ".state/evidence/PH-02/STEP-005/packet_validation_report.json"
+        ],
+        "outputs": [
+          ".state/evidence/PH-01/STEP-010/catalog_validation_report.json"
+        ],
+        "acceptance_gates": [
+          "GATE-SCHEMA-001",
+          "GATE-CELL-001",
+          "GATE-DEPS-001",
+          "GATE-DOCS-001",
+          "GATE-R-CATALOG-001"
+        ]
+      },
+      {
+        "step_id": "STEP-R05",
+        "name": "Write remediation evidence",
+        "inputs": [
+          ".state/evidence/PH-01/STEP-010/catalog_validation_report.json"
+        ],
+        "outputs": [
+          ".state/evidence/PH-01/phase_1_summary.json",
+          ".state/evidence/PH-01-R1/remediation_summary.json"
+        ],
+        "acceptance_gates": [
+          "GATE-R-SUMMARY-001"
+        ]
+      }
+    ]
+  },
+  "validation_gates": {
+    "gates": [
+      {
+        "gate_id": "GATE-R-SCHEMA-001",
+        "title": "Updated schema is valid and backward compatible",
+        "pass_condition": "submodule_catalog_schema.json is valid Draft 2020-12 JSON Schema; requires_agent_capability and dependency_scope_override_note exist under work_cells.items.properties and are not added to work_cells.items.required."
+      },
+      {
+        "gate_id": "GATE-R-CATALOG-001",
+        "title": "All work cells have routing capability metadata",
+        "pass_condition": "Every work cell has requires_agent_capability as a non-empty array and the catalog validates against submodule_catalog_schema.json."
+      },
+      {
+        "gate_id": "GATE-R-B1B2-DISAMBIGUATION-001",
+        "title": "Only B1 and B2 dual-cell ambiguity is checked",
+        "pass_condition": "For B1_MT4_ADAPTER_TRANSPORT and B2_MT4_EA_EXECUTOR, each module has exactly one python-capable work cell and exactly one mql4-capable work cell. This gate does not require global uniqueness for R1, S1, SHARED_LIBS, or other intentionally decomposed modules."
+      },
+      {
+        "gate_id": "GATE-R-UI-SCOPE-001",
+        "title": "UI work cells have explicit dependency-scope override",
+        "pass_condition": "Every work cell with work_cell_type ui_screen or ui_gateway has dependency_scope_override_note, file_scope_resolution == service_scope, and service_scope includes dashboard-backend, desktop-ui, and gui-gateway."
+      },
+      {
+        "gate_id": "GATE-R-PH02-PRESERVED-001",
+        "title": "Phase 2 warning remediation remains intact",
+        "pass_condition": ".state/evidence/PH-02/STEP-005/packet_validation_report.json still reports warning_count == 0 and warnings == []; no test paths appear in work_cell source_files."
+      },
+      {
+        "gate_id": "GATE-R-NOOVERRIDE-001",
+        "title": "No canonical artifact modified",
+        "pass_condition": "CA-001 through CA-009 hashes match .state/evidence/PH-01/STEP-001/context_artifact_verification.json. CA-010 and CA-011 are also unchanged if present in the baseline."
+      },
+      {
+        "gate_id": "GATE-R-SUMMARY-001",
+        "title": "Remediation evidence is complete",
+        "pass_condition": ".state/evidence/PH-01-R1/remediation_summary.json records issues_resolved containing ISSUE-001 through ISSUE-004, catalog_version == 1.0.3, process_scratch_convention_documented == true, and overall_status == PASS."
+      }
+    ]
+  },
+  "anti_pattern_detection": [
+    {
+      "id": "APD-R1-001",
+      "name": "global_dual_cell_uniqueness_gate",
+      "trigger": "A validation gate requires all (parent_module_symbol, requires_agent_capability) pairs to be globally unique.",
+      "action": "Halt and narrow the gate to B1_MT4_ADAPTER_TRANSPORT and B2_MT4_EA_EXECUTOR only."
+    },
+    {
+      "id": "APD-R1-002",
+      "name": "phase_2_metadata_regression",
+      "trigger": "file_scope_resolution, service_scope, candidate_file_classification, or zero-warning Phase 2 evidence is removed or overwritten.",
+      "action": "Halt and restore the Phase 2 warning remediation fields."
+    },
+    {
+      "id": "APD-R1-003",
+      "name": "package_install_without_user_request",
+      "trigger": "The remediation attempts to install check-jsonschema or any package automatically.",
+      "action": "Halt; use in-process JSON Schema validation and record check-jsonschema as not_available if absent."
+    },
+    {
+      "id": "APD-R1-004",
+      "name": "canonical_artifact_mutation",
+      "trigger": "Any CA-001 through CA-011 artifact changes during remediation.",
+      "action": "Halt; restore the artifact and rerun from baseline."
+    }
+  ],
+  "definition_of_done": [
+    "submodule_catalog_schema.json validates and includes the two optional R1 fields.",
+    "submodule_context_catalog.json validates and has catalog_metadata.version == 1.0.3.",
+    "All 57 work cells have requires_agent_capability.",
+    "B1 and B2 each have distinct python and mql4 capability routing.",
+    "All UI work cells have dependency_scope_override_note and retain service_scope metadata.",
+    "Phase 2 warning remediation remains at zero warnings.",
+    "No authoritative or constraining context artifact is modified."
+  ],
+  "execution_notes": {
+    "scratch_script_rule": "If a helper script is used, write it at repo root as _ph01_r1_execute.py and delete it before completion. Do not write helper scripts under .state/evidence.",
+    "no_package_install_rule": "Do not install check-jsonschema automatically. If it is already available, record its version and exit code; otherwise record not_available and rely on Draft202012Validator.",
+    "no_phase_regeneration_rule": "Do not re-run full Phase 1 generation. Apply only declared metadata changes to the existing 1.0.2 catalog."
+  }
+}

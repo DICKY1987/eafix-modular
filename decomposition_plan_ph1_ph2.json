@@ -1,0 +1,1124 @@
+{
+  "plan_metadata": {
+    "title": "EAFIX Work-Cell Decomposition — Phase 1 & 2 Execution Plan",
+    "version": "1.0.0",
+    "created": "2026-05-16",
+    "tier": "lightweight",
+    "tier_rationale": "Phases 1 and 2 produce documentation and derived catalog artifacts, not executable code. Full pattern-registry machinery (PATTERN_INDEX.yaml, EXEC-* executors) does not yet exist. Template sections borrowed: referenced_context_artifacts, artifact_intent_manifest, step_contracts, anti_pattern_detection, validation_gates.",
+    "parent_document": "decomposition_model.json",
+    "phases_covered": ["PH-01", "PH-02"],
+    "phases_deferred": {
+      "PH-03": "Source refactoring — apply full newPhasePlanProcess v3.3 template when pattern registry is bootstrapped.",
+      "PH-04": "AI routing rules — apply full newPhasePlanProcess v3.3 template."
+    },
+    "critical_constraint": {
+      "name": "NO_IMPLIED_BEHAVIOR",
+      "rules": [
+        "Every intended file mutation MUST be declared in artifact_intent_manifest before execution begins.",
+        "No AUTHORITATIVE context artifact may be modified during Phases 1 or 2.",
+        "Every work cell entry in the catalog MUST reference at least one required_reference_document.",
+        "Every work cell MUST declare forbidden_dependencies that prevent cross-boundary contamination.",
+        "Every work cell MUST have its parent_module resolved to a canonical module in module_catalog.json.",
+        "Context packets MUST NOT override or contradict canonical source documents.",
+        "Steps that cannot be mechanically validated are marked NOT_AUTOMATABLE with manual evidence required.",
+        "Staleness policy: if any AUTHORITATIVE artifact changes after this plan is created, the catalog entries for affected modules must be re-derived before Phases 3 or 4 begin."
+      ]
+    }
+  },
+
+  "referenced_context_artifacts": {
+    "enabled": true,
+    "policy": {
+      "required_when_external_context_needed": true,
+      "unbound_context_action": "fail_closed",
+      "allowed_authority_levels": ["AUTHORITATIVE", "CONSTRAINING", "INFORMATIONAL"],
+      "informational_artifacts_cannot_override_authoritative": true,
+      "note": "Every step that touches a work cell or context packet MUST cite the applicable context_artifact_ids from this list. A step MAY NOT rely on unstated external context."
+    },
+    "artifacts": [
+      {
+        "context_artifact_id": "CA-001",
+        "authority_level": "AUTHORITATIVE",
+        "path": "module_catalog.json",
+        "purpose": "Canonical registry of all EAFIX modules. Work cell parent_module values must resolve here.",
+        "governs": ["all work cell parent_module fields", "PH-01 STEP-003 through STEP-011", "PH-02 all steps"],
+        "must_not_be_modified": true
+      },
+      {
+        "context_artifact_id": "CA-002",
+        "authority_level": "AUTHORITATIVE",
+        "path": "process_step_catalog.json",
+        "purpose": "Canonical process step definitions. Work cells within process-step boundaries must be consistent with these definitions.",
+        "governs": ["work cell input/output contracts", "PH-01 STEP-003 through STEP-011"],
+        "must_not_be_modified": true
+      },
+      {
+        "context_artifact_id": "CA-003",
+        "authority_level": "AUTHORITATIVE",
+        "path": "updated_trading_process_aligned.json",
+        "purpose": "Aligned trading process specification. Phase and lifecycle sequencing must be consistent with this document.",
+        "governs": ["work cell phase assignments", "PH-01 STEP-003 through STEP-011"],
+        "must_not_be_modified": true
+      },
+      {
+        "context_artifact_id": "CA-004",
+        "authority_level": "AUTHORITATIVE",
+        "path": "communication_channels.json",
+        "purpose": "Canonical transport and channel definitions. MT4 bridge work cells (B1-B3) must derive allowed/forbidden dependencies from this document.",
+        "governs": ["PH-01 STEP-004", "PH-02 STEP-003"],
+        "must_not_be_modified": true
+      },
+      {
+        "context_artifact_id": "CA-005",
+        "authority_level": "AUTHORITATIVE",
+        "path": "ui_catalog.json",
+        "purpose": "Canonical UI screen and gateway definitions. UI work cells must enumerate screens and endpoints from this document only.",
+        "governs": ["PH-01 STEP-009"],
+        "must_not_be_modified": true
+      },
+      {
+        "context_artifact_id": "CA-006",
+        "authority_level": "AUTHORITATIVE",
+        "path": "EAFIX CALENDAR DES RULES.pdf",
+        "purpose": "Deterministic calendar rules. Calendar work cells (D2, D3, F2, D4) must list this as a required_reference_document and must not contradict its rules.",
+        "governs": ["PH-01 STEP-003", "PH-02 STEP-002"],
+        "must_not_be_modified": true
+      },
+      {
+        "context_artifact_id": "CA-007",
+        "authority_level": "AUTHORITATIVE",
+        "path": "mt4_authoritative_reference_for_ai.json",
+        "purpose": "MT4 platform constraints and OrderSend semantics. B1-B3 work cells must treat this as the binding MT4 reference.",
+        "governs": ["PH-01 STEP-004", "PH-02 STEP-003"],
+        "must_not_be_modified": true
+      },
+      {
+        "context_artifact_id": "CA-008",
+        "authority_level": "AUTHORITATIVE",
+        "path": "file_module_mapping.csv",
+        "purpose": "Canonical mapping of source files to modules. Context packet allowed_files lists must be subsets of this mapping for the target module.",
+        "governs": ["PH-02 all steps", "GATE-PKT-001"],
+        "must_not_be_modified": true
+      },
+      {
+        "context_artifact_id": "CA-009",
+        "authority_level": "AUTHORITATIVE",
+        "path": "eafix_services_ai_reference_20260510.json",
+        "purpose": "Services reference. Work cells that cross service boundaries must verify those boundaries against this document.",
+        "governs": ["PH-01 STEP-003 through STEP-009", "PH-02 all steps"],
+        "must_not_be_modified": true
+      },
+      {
+        "context_artifact_id": "CA-010",
+        "authority_level": "CONSTRAINING",
+        "path": "eafix_project_knowledge_reference_routing_instructions.json",
+        "purpose": "Routing instructions for AI context. Work cell required_reference_documents lists must be consistent with this document's per-module routing rules.",
+        "governs": ["all work cell required_reference_documents fields"],
+        "must_not_be_modified": true
+      },
+      {
+        "context_artifact_id": "CA-011",
+        "authority_level": "CONSTRAINING",
+        "path": "decomposition_model.json",
+        "purpose": "Parent decomposition document. The submodule_context_catalog.json is a derived artifact of this document and must not contradict it. However, this plan may extend it with enforcement details not present in the original.",
+        "governs": ["all work cell definitions", "PH-01 all steps"],
+        "must_not_be_modified": true
+      }
+    ],
+    "validation_gate": "GATE-CTX-001"
+  },
+
+  "assumptions_scope": {
+    "assumptions": [
+      "All AUTHORITATIVE context artifacts listed above exist on disk and are readable before Phase 1 begins.",
+      "No pattern registry (PATTERN_INDEX.yaml) exists yet — steps are executed manually or by AI with NOT_AUTOMATABLE designation.",
+      "submodule_context_catalog.json does not yet exist; Phase 1 creates it.",
+      "Context packets do not yet exist; Phase 2 creates them.",
+      "The decomposition_model.json work cell definitions are the starting point but may be refined as canonical sources are consulted.",
+      "The eafix-modular working directory is the output location for all artifacts."
+    ],
+    "in_scope": [
+      "Authoring submodule_context_catalog.json with entries for all work cells in all modules.",
+      "Validating every work cell against canonical module and process step catalogs.",
+      "Generating per-module and per-work-cell context packets.",
+      "Writing AI-specific READMEs for each context packet.",
+      "Schema validation of all produced artifacts."
+    ],
+    "out_of_scope": [
+      "Modifying any AUTHORITATIVE source artifact.",
+      "Refactoring source code (Phase 3).",
+      "Writing routing rules (Phase 4).",
+      "Bootstrapping the pattern registry — that is a prerequisite for Phase 3.",
+      "Creating new runtime services or execution machinery."
+    ],
+    "definition_of_done": {
+      "phase_1": [
+        "submodule_context_catalog.json exists and passes GATE-SCHEMA-001.",
+        "Every work cell has parent_module resolving to CA-001 (module_catalog.json).",
+        "Every work cell declares forbidden_dependencies.",
+        "Every work cell lists at least one required_reference_document from the context artifacts above.",
+        "GATE-CELL-001 passes (all work cells present and complete).",
+        "GATE-NOOVERRIDE-001 passes (no AUTHORITATIVE artifact was modified)."
+      ],
+      "phase_2": [
+        "One context packet directory exists per canonical module.",
+        "Each packet contains: source_files list, contracts, test_files list, allowed_files list, acceptance_gates list, and ai_readme.md.",
+        "GATE-PKT-001 passes (all allowed_files are subsets of file_module_mapping.csv for that module).",
+        "GATE-STALE-001 passes (no context packet references a source file not in file_module_mapping.csv).",
+        "GATE-NOOVERRIDE-001 passes."
+      ]
+    }
+  },
+
+  "artifact_intent_manifest": {
+    "description": "Pre-execution declaration of all files that will be created or modified during Phases 1 and 2. No file mutation may occur that is not declared here.",
+    "policy": {
+      "no_undeclared_mutations_allowed": true,
+      "all_definition_of_done_artifacts_declared": true,
+      "authoritative_artifacts_must_not_appear_as_edit_or_remove": true
+    },
+    "records": [
+      {
+        "artifact_intent_id": "AINT-001",
+        "planned_relative_path": "submodule_context_catalog.json",
+        "artifact_kind": "json_catalog",
+        "mutation_type": "create_new",
+        "phase_id": "PH-01",
+        "step_id": "STEP-003 through STEP-010",
+        "purpose": "Derived AI context routing layer. Contains one entry per work cell across all canonical modules.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-SCHEMA-001", "GATE-CELL-001", "GATE-NOOVERRIDE-001"],
+        "context_artifact_dependencies": ["CA-001", "CA-002", "CA-003", "CA-009", "CA-010", "CA-011"],
+        "path_abstraction_required": false,
+        "path_abstraction_reason": "Single flat file in working directory; not a governed cross-service boundary in Phases 1-2."
+      },
+      {
+        "artifact_intent_id": "AINT-002",
+        "planned_relative_path": "submodule_catalog_schema.json",
+        "artifact_kind": "json_schema",
+        "mutation_type": "create_new",
+        "phase_id": "PH-01",
+        "step_id": "STEP-002",
+        "purpose": "JSON Schema defining the required fields for every work cell entry in submodule_context_catalog.json.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-SCHEMA-001"],
+        "context_artifact_dependencies": ["CA-011"],
+        "path_abstraction_required": false,
+        "path_abstraction_reason": "Schema artifact local to working directory."
+      },
+      {
+        "artifact_intent_id": "AINT-003",
+        "planned_relative_path": "context_packets/",
+        "artifact_kind": "directory_tree",
+        "mutation_type": "create_new",
+        "phase_id": "PH-02",
+        "step_id": "STEP-001 through STEP-005",
+        "purpose": "Root directory for all module context packets. Each subdirectory is one canonical module.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-PKT-001", "GATE-STALE-001"],
+        "context_artifact_dependencies": ["CA-001", "CA-008"],
+        "path_abstraction_required": false,
+        "path_abstraction_reason": "Output directory local to working directory."
+      },
+      {
+        "artifact_intent_id": "AINT-004",
+        "planned_relative_path": "context_packets/{module_id}/context_packet.json",
+        "artifact_kind": "json_context_packet",
+        "mutation_type": "create_new",
+        "phase_id": "PH-02",
+        "step_id": "STEP-002 through STEP-004",
+        "purpose": "Per-module context packet: source_files, contracts, test_files, allowed_files, acceptance_gates, forbidden_files, required_reference_documents.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-PKT-001", "GATE-STALE-001", "GATE-NOOVERRIDE-001"],
+        "context_artifact_dependencies": ["CA-001", "CA-008", "CA-009", "CA-010"],
+        "path_abstraction_required": false,
+        "path_abstraction_reason": "Per-module output artifacts; template path uses module_id placeholder."
+      },
+      {
+        "artifact_intent_id": "AINT-005",
+        "planned_relative_path": "context_packets/{module_id}/ai_readme.md",
+        "artifact_kind": "markdown_document",
+        "mutation_type": "create_new",
+        "phase_id": "PH-02",
+        "step_id": "STEP-002 through STEP-004",
+        "purpose": "Human/AI-readable README for each module context packet explaining its purpose, required documents, allowed files, and acceptance gates.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-PKT-001"],
+        "context_artifact_dependencies": ["CA-001", "CA-010"],
+        "path_abstraction_required": false,
+        "path_abstraction_reason": "Documentation artifact local to context packet directory."
+      },
+      {
+        "artifact_intent_id": "AINT-006",
+        "planned_relative_path": "context_packets/{module_id}/{work_cell_id}/work_cell_context.json",
+        "artifact_kind": "json_work_cell_context",
+        "mutation_type": "create_new",
+        "phase_id": "PH-02",
+        "step_id": "STEP-002 through STEP-004",
+        "purpose": "Per-work-cell context file: allowed_files, forbidden_files, required_reference_documents, acceptance_gates. Subset of the parent module context packet scoped to this work cell.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-PKT-001", "GATE-STALE-001"],
+        "context_artifact_dependencies": ["CA-008", "CA-010"],
+        "path_abstraction_required": false,
+        "path_abstraction_reason": "Per-work-cell output artifact."
+      },
+      {
+        "artifact_intent_id": "AINT-007",
+        "planned_relative_path": "context_packet_schema.json",
+        "artifact_kind": "json_schema",
+        "mutation_type": "create_new",
+        "phase_id": "PH-02",
+        "step_id": "STEP-001",
+        "purpose": "JSON Schema defining the required fields for every context packet and work cell context file.",
+        "required_for_definition_of_done": true,
+        "validation_sources": ["GATE-PKT-001"],
+        "context_artifact_dependencies": ["CA-011"],
+        "path_abstraction_required": false,
+        "path_abstraction_reason": "Schema artifact local to working directory."
+      }
+    ]
+  },
+
+  "phase_plan": {
+    "phases": [
+      {
+        "phase_id": "PH-01",
+        "name": "Derived Context Catalog",
+        "description": "Create submodule_context_catalog.json as the AI context routing layer. Enumerate all work cells from all canonical modules. Validate every entry against canonical sources.",
+        "ground_truth_level": "L1",
+        "steps": ["STEP-001", "STEP-002", "STEP-003", "STEP-004", "STEP-005", "STEP-006", "STEP-007", "STEP-008", "STEP-009", "STEP-010", "STEP-011"],
+        "produces": ["AINT-001", "AINT-002"],
+        "depends_on": [],
+        "parallel_with": []
+      },
+      {
+        "phase_id": "PH-02",
+        "name": "Module Context Packets",
+        "description": "For every canonical module, generate a context packet containing source files, contracts, tests, allowed/forbidden file lists, acceptance gates, and an AI-specific README. Each work cell within the module gets its own context file.",
+        "ground_truth_level": "L1",
+        "steps": ["STEP-001", "STEP-002", "STEP-003", "STEP-004", "STEP-005", "STEP-006"],
+        "produces": ["AINT-003", "AINT-004", "AINT-005", "AINT-006", "AINT-007"],
+        "depends_on": ["PH-01"],
+        "parallel_with": []
+      }
+    ]
+  },
+
+  "step_contracts": {
+    "PH-01": {
+      "STEP-001": {
+        "step_id": "STEP-001",
+        "phase_step_key": "PH-01/STEP-001",
+        "purpose": "Verify all AUTHORITATIVE and CONSTRAINING context artifacts are present on disk and readable before any catalog work begins.",
+        "implementation_mode": "NOT_AUTOMATABLE",
+        "not_automatable_reason": "Requires human or AI to navigate the actual filesystem and confirm each canonical source is accessible. No pattern or executor exists yet.",
+        "inputs": [
+          {"id": "CA-001", "type": "file", "path": "module_catalog.json", "required": true, "must_exist": true},
+          {"id": "CA-002", "type": "file", "path": "process_step_catalog.json", "required": true, "must_exist": true},
+          {"id": "CA-003", "type": "file", "path": "updated_trading_process_aligned.json", "required": true, "must_exist": true},
+          {"id": "CA-004", "type": "file", "path": "communication_channels.json", "required": true, "must_exist": true},
+          {"id": "CA-005", "type": "file", "path": "ui_catalog.json", "required": true, "must_exist": true},
+          {"id": "CA-006", "type": "file", "path": "EAFIX CALENDAR DES RULES.pdf", "required": true, "must_exist": true},
+          {"id": "CA-007", "type": "file", "path": "mt4_authoritative_reference_for_ai.json", "required": true, "must_exist": true},
+          {"id": "CA-008", "type": "file", "path": "file_module_mapping.csv", "required": true, "must_exist": true},
+          {"id": "CA-009", "type": "file", "path": "eafix_services_ai_reference_20260510.json", "required": true, "must_exist": true},
+          {"id": "CA-010", "type": "file", "path": "eafix_project_knowledge_reference_routing_instructions.json", "required": true, "must_exist": true},
+          {"id": "CA-011", "type": "file", "path": "decomposition_model.json", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "CTX_VERIFICATION_LOG", "type": "file", "path": ".state/evidence/PH-01/STEP-001/context_artifact_verification.json", "required": true,
+           "content_requirements": ["Lists each CA-* artifact", "Records: path, exists (bool), readable (bool), sha256"]}
+        ],
+        "invariants": ["No source files modified.", "No catalog files created yet."],
+        "preconditions": ["Working directory is eafix-modular or its equivalent path.", "Executor has read access to all listed artifact paths."],
+        "postconditions": ["All 11 context artifacts confirmed present and readable.", "Verification log written to .state/evidence/PH-01/STEP-001/."],
+        "file_scope": {
+          "allowed_paths": [".state/evidence/PH-01/STEP-001/context_artifact_verification.json"],
+          "forbidden_paths": ["submodule_context_catalog.json", "context_packets/**", "module_catalog.json", "*.pdf", "file_module_mapping.csv"],
+          "read_only_paths": ["module_catalog.json", "process_step_catalog.json", "updated_trading_process_aligned.json", "communication_channels.json", "ui_catalog.json", "EAFIX CALENDAR DES RULES.pdf", "mt4_authoritative_reference_for_ai.json", "file_module_mapping.csv", "eafix_services_ai_reference_20260510.json", "eafix_project_knowledge_reference_routing_instructions.json", "decomposition_model.json"]
+        },
+        "failure_modes": [
+          {"code": "CTX-MISSING", "meaning": "One or more AUTHORITATIVE context artifacts not found on disk.", "remediation": "Locate the missing file and update the working directory or file path. Do NOT proceed until all artifacts are present."},
+          {"code": "CTX-UNREADABLE", "meaning": "Artifact exists but cannot be parsed (corrupted, binary mismatch, etc.).", "remediation": "Restore from backup. Do NOT proceed with a corrupted source."}
+        ],
+        "acceptance_gates": ["GATE-CTX-001"],
+        "rollback_strategy": {"commands": ["rm -f .state/evidence/PH-01/STEP-001/context_artifact_verification.json"], "note": "No catalog changes were made; rollback is trivial."},
+        "idempotency": {"is_idempotent": true, "enforcement": "Re-running overwrites the verification log with fresh results."}
+      },
+
+      "STEP-002": {
+        "step_id": "STEP-002",
+        "phase_step_key": "PH-01/STEP-002",
+        "purpose": "Design and write submodule_catalog_schema.json — the JSON Schema that every work cell entry in the catalog must satisfy. Gates depend on this schema.",
+        "implementation_mode": "NOT_AUTOMATABLE",
+        "not_automatable_reason": "Schema design requires human judgment about required fields. Produces AINT-002.",
+        "context_artifact_refs": ["CA-011"],
+        "inputs": [
+          {"id": "DECOMPOSITION_MODEL", "type": "file", "path": "decomposition_model.json", "required": true, "must_exist": true},
+          {"id": "CTX_VERIFICATION_LOG", "type": "file", "path": ".state/evidence/PH-01/STEP-001/context_artifact_verification.json", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "CATALOG_SCHEMA", "type": "file", "path": "submodule_catalog_schema.json", "required": true,
+           "content_requirements": [
+             "Requires field: work_cell_id (string, pattern ^[A-Z][A-Z0-9]*\\.\\d+_.+$)",
+             "Requires field: parent_module (string, non-empty)",
+             "Requires field: purpose (string, non-empty)",
+             "Requires field: input_contracts (array, min 0)",
+             "Requires field: output_contracts (array, min 0)",
+             "Requires field: source_files (array, min 0)",
+             "Requires field: test_files (array, min 0)",
+             "Requires field: allowed_dependencies (array)",
+             "Requires field: forbidden_dependencies (array)",
+             "Requires field: required_reference_documents (array, min 1)",
+             "Requires field: validation_gates (array, min 1)",
+             "No additional properties allowed unless explicitly permitted"
+           ]}
+        ],
+        "invariants": ["No AUTHORITATIVE artifact modified.", "Schema must be stricter than the example in decomposition_model.json, not looser."],
+        "preconditions": ["STEP-001 completed successfully."],
+        "postconditions": ["submodule_catalog_schema.json validates as valid JSON Schema draft-07 or later.", "Schema requires all fields listed in content_requirements."],
+        "file_scope": {
+          "allowed_paths": ["submodule_catalog_schema.json", ".state/evidence/PH-01/STEP-002/**"],
+          "forbidden_paths": ["submodule_context_catalog.json", "module_catalog.json", "context_packets/**"],
+          "read_only_paths": ["decomposition_model.json"]
+        },
+        "failure_modes": [
+          {"code": "SCHEMA-INVALID", "meaning": "Produced schema is not valid JSON Schema.", "remediation": "Correct the schema and re-validate with a JSON Schema validator."},
+          {"code": "SCHEMA-TOO-PERMISSIVE", "meaning": "Schema does not require all mandatory fields.", "remediation": "Add missing required constraints. GATE-SCHEMA-001 will catch this at validation time."}
+        ],
+        "acceptance_gates": ["GATE-SCHEMA-001"],
+        "rollback_strategy": {"commands": ["rm -f submodule_catalog_schema.json"], "note": "No catalog entries written yet."},
+        "idempotency": {"is_idempotent": true, "enforcement": "Re-running rewrites the schema file."}
+      },
+
+      "STEP-003": {
+        "step_id": "STEP-003",
+        "phase_step_key": "PH-01/STEP-003",
+        "purpose": "Author Calendar Pipeline work cells (D2_CALENDAR_SOURCE_ADAPTER, D3_CALENDAR_NORMALIZER, F2_EVENT_LOG, D4_CALENDAR_TRIGGER_BUILDER) into submodule_context_catalog.json. Each work cell must be authored by consulting CA-001, CA-002, CA-006, CA-009, and CA-011.",
+        "implementation_mode": "NOT_AUTOMATABLE",
+        "context_artifact_refs": ["CA-001", "CA-002", "CA-003", "CA-006", "CA-009", "CA-010", "CA-011"],
+        "inputs": [
+          {"id": "CATALOG_SCHEMA", "type": "file", "path": "submodule_catalog_schema.json", "required": true, "must_exist": true},
+          {"id": "MODULE_CATALOG", "type": "file", "path": "module_catalog.json", "required": true, "must_exist": true},
+          {"id": "CALENDAR_RULES", "type": "file", "path": "EAFIX CALENDAR DES RULES.pdf", "required": true, "must_exist": true},
+          {"id": "SERVICES_REF", "type": "file", "path": "eafix_services_ai_reference_20260510.json", "required": true, "must_exist": true},
+          {"id": "DECOMPOSITION_MODEL", "type": "file", "path": "decomposition_model.json", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "CATALOG_CALENDAR_ENTRIES", "type": "json_fragment", "path": "submodule_context_catalog.json",
+           "content_requirements": [
+             "Entries for: D2.1_SOURCE_REGISTRY, D2.2_FEED_POLLING, D2.3_PAYLOAD_PARSING, D2.4_ERROR_CLASSIFICATION",
+             "Entries for: D3.1_TIMEZONE_NORMALIZATION, D3.2_CALENDAR_IMPACT_NORMALIZATION, D3.3_DEDUPLICATION, D3.4_IDENTIFIER_ASSIGNMENT",
+             "Entries for: F2.1_APPEND_WRITER, F2.2_IDEMPOTENCY_GUARD, F2.3_EVENT_STREAM_PUBLISH",
+             "Entries for: D4.1_ANTICIPATION_WINDOW, D4.2_SYMBOL_IMPACT_RESOLVE, D4.3_TTL_FRESHNESS_VALIDATE, D4.4_SUPPRESSION_METADATA, D4.5_TRIGGER_EMIT",
+             "All entries pass submodule_catalog_schema.json validation",
+             "All entries set forbidden_dependencies to exclude MT4 and EA namespaces",
+             "All D3.* and D4.* entries list 'EAFIX CALENDAR DES RULES.pdf' in required_reference_documents"
+           ]}
+        ],
+        "invariants": ["No AUTHORITATIVE artifact modified.", "Calendar work cells MUST NOT reference MT4 or EA files in allowed_dependencies."],
+        "preconditions": ["STEP-002 completed. submodule_catalog_schema.json exists."],
+        "postconditions": ["All 15 calendar work cell entries present in catalog.", "python -m jsonschema -i submodule_context_catalog.json submodule_catalog_schema.json exits 0 for all added entries."],
+        "file_scope": {
+          "allowed_paths": ["submodule_context_catalog.json", ".state/evidence/PH-01/STEP-003/**"],
+          "forbidden_paths": ["module_catalog.json", "EAFIX CALENDAR DES RULES.pdf", "file_module_mapping.csv", "context_packets/**"],
+          "read_only_paths": ["module_catalog.json", "process_step_catalog.json", "EAFIX CALENDAR DES RULES.pdf", "eafix_services_ai_reference_20260510.json", "decomposition_model.json", "submodule_catalog_schema.json"]
+        },
+        "failure_modes": [
+          {"code": "CELL-SCHEMA-FAIL", "meaning": "A work cell entry fails schema validation.", "remediation": "Correct the entry fields. All required fields must be present and non-empty."},
+          {"code": "CELL-PARENT-UNRESOLVED", "meaning": "parent_module value does not match any module in module_catalog.json.", "remediation": "Check module_catalog.json and correct the parent_module value."},
+          {"code": "CELL-FORBIDDEN-DEPS-MISSING", "meaning": "A calendar work cell does not declare forbidden_dependencies excluding MT4/EA.", "remediation": "Add MT4 and EA to forbidden_dependencies for all calendar work cells."}
+        ],
+        "acceptance_gates": ["GATE-CELL-001", "GATE-DEPS-001", "GATE-DOCS-001"]
+      },
+
+      "STEP-004": {
+        "step_id": "STEP-004",
+        "phase_step_key": "PH-01/STEP-004",
+        "purpose": "Author MT4 Bridge work cells (B1_MT4_ADAPTER_TRANSPORT, B2_MT4_EA_EXECUTOR, B3_EXECUTION_EVENT_NORMALIZER) by consulting CA-004, CA-007, CA-009, CA-011.",
+        "implementation_mode": "NOT_AUTOMATABLE",
+        "context_artifact_refs": ["CA-001", "CA-004", "CA-007", "CA-009", "CA-011"],
+        "inputs": [
+          {"id": "CATALOG_SCHEMA", "type": "file", "path": "submodule_catalog_schema.json", "required": true, "must_exist": true},
+          {"id": "MODULE_CATALOG", "type": "file", "path": "module_catalog.json", "required": true, "must_exist": true},
+          {"id": "COMMS_CHANNELS", "type": "file", "path": "communication_channels.json", "required": true, "must_exist": true},
+          {"id": "MT4_REF", "type": "file", "path": "mt4_authoritative_reference_for_ai.json", "required": true, "must_exist": true},
+          {"id": "SERVICES_REF", "type": "file", "path": "eafix_services_ai_reference_20260510.json", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "CATALOG_MT4_ENTRIES", "type": "json_fragment", "path": "submodule_context_catalog.json",
+           "content_requirements": [
+             "Entries for: B1.1_ENVELOPE_SERIALIZATION, B1.2_ATOMIC_CSV_WRITE, B1.3_DIR_WATCHER, B1.4_SOCKET_FALLBACK",
+             "Entries for: B2.1_EXECUTION_REQUEST_READ, B2.2_PREFLIGHT_CHECK, B2.3_ORDERSEND_WRAP, B2.4_ERROR_HANDLING, B2.5_RETRY_ABORT",
+             "Entries for: B3.1_FEEDBACK_CSV_PARSE, B3.2_BROKER_EVENT_DEDUP, B3.3_RESULT_MAPPING",
+             "All B2.* entries list mt4_authoritative_reference_for_ai.json in required_reference_documents",
+             "All B1.* entries list communication_channels.json in required_reference_documents"
+           ]}
+        ],
+        "invariants": ["No AUTHORITATIVE artifact modified."],
+        "preconditions": ["STEP-003 completed."],
+        "postconditions": ["All 12 MT4 bridge work cell entries present in catalog.", "Schema validation passes for all added entries."],
+        "file_scope": {
+          "allowed_paths": ["submodule_context_catalog.json", ".state/evidence/PH-01/STEP-004/**"],
+          "forbidden_paths": ["module_catalog.json", "communication_channels.json", "mt4_authoritative_reference_for_ai.json"],
+          "read_only_paths": ["module_catalog.json", "communication_channels.json", "mt4_authoritative_reference_for_ai.json", "eafix_services_ai_reference_20260510.json", "submodule_catalog_schema.json"]
+        },
+        "failure_modes": [
+          {"code": "CELL-MT4-REF-MISSING", "meaning": "B2.* work cell does not list mt4_authoritative_reference_for_ai.json as required_reference_document.", "remediation": "Add the reference. This is mandatory for any work cell that wraps OrderSend."}
+        ],
+        "acceptance_gates": ["GATE-CELL-001", "GATE-DEPS-001", "GATE-DOCS-001"]
+      },
+
+      "STEP-005": {
+        "step_id": "STEP-005",
+        "phase_step_key": "PH-01/STEP-005",
+        "purpose": "Author EA-Side MQL4 work cells (System A Signal Pipeline, System B Communication Bridges, System D Execution & Feedback).",
+        "implementation_mode": "NOT_AUTOMATABLE",
+        "context_artifact_refs": ["CA-001", "CA-004", "CA-007", "CA-009", "CA-011"],
+        "inputs": [
+          {"id": "CATALOG_SCHEMA", "type": "file", "path": "submodule_catalog_schema.json", "required": true, "must_exist": true},
+          {"id": "MODULE_CATALOG", "type": "file", "path": "module_catalog.json", "required": true, "must_exist": true},
+          {"id": "MT4_REF", "type": "file", "path": "mt4_authoritative_reference_for_ai.json", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "CATALOG_EA_ENTRIES", "type": "json_fragment", "path": "submodule_context_catalog.json",
+           "content_requirements": [
+             "Entries for System A: A.1_SIGNAL_TRIGGER, A.2_SIGNAL_VALIDATION, A.3_CONFLICT_MANAGEMENT, A.4_BRIDGE_EXPORT, A.5_FEEDBACK_MONITOR",
+             "Entries for System B: B_MQL4.1_SOCKET_BRIDGE, B_MQL4.2_FASTAPI_BRIDGE, B_MQL4.3_CSV_JSON_TRANSPORT, B_MQL4.4_LEGACY_PROFILES",
+             "Entries for System D: D_MQL4.1_ORDERSEND_WRAPPER, D_MQL4.2_RESPONSE_CLASSIFICATION, D_MQL4.3_RESULT_WRITING, D_MQL4.4_ERROR_HANDLING",
+             "All EA/MQL4 work cells list mt4_authoritative_reference_for_ai.json as required_reference_document"
+           ]}
+        ],
+        "invariants": ["No AUTHORITATIVE artifact modified.", "MQL4 work cells must not be confused with Python-side B1/B2/B3 work cells — use distinct IDs."],
+        "preconditions": ["STEP-004 completed."],
+        "postconditions": ["All 13 EA-side work cell entries present in catalog.", "No ID collision with B1/B2/B3 Python-side entries."],
+        "file_scope": {
+          "allowed_paths": ["submodule_context_catalog.json", ".state/evidence/PH-01/STEP-005/**"],
+          "forbidden_paths": ["module_catalog.json", "mt4_authoritative_reference_for_ai.json"],
+          "read_only_paths": ["module_catalog.json", "mt4_authoritative_reference_for_ai.json", "submodule_catalog_schema.json"]
+        },
+        "failure_modes": [
+          {"code": "CELL-ID-COLLISION", "meaning": "An EA-side work cell ID collides with an existing Python-side entry.", "remediation": "Use the B_MQL4.* prefix for MQL4 System B entries to distinguish from Python B1/B2/B3."}
+        ],
+        "acceptance_gates": ["GATE-CELL-001", "GATE-DEPS-001", "GATE-DOCS-001"]
+      },
+
+      "STEP-006": {
+        "step_id": "STEP-006",
+        "phase_step_key": "PH-01/STEP-006",
+        "purpose": "Author Risk Engine work cells (R1 through R9: position limits, portfolio exposure, margin, correlation, spread/slippage, circuit breakers, idempotency, sizing engine, decision assembler).",
+        "implementation_mode": "NOT_AUTOMATABLE",
+        "context_artifact_refs": ["CA-001", "CA-002", "CA-009", "CA-011"],
+        "inputs": [
+          {"id": "CATALOG_SCHEMA", "type": "file", "path": "submodule_catalog_schema.json", "required": true, "must_exist": true},
+          {"id": "MODULE_CATALOG", "type": "file", "path": "module_catalog.json", "required": true, "must_exist": true},
+          {"id": "PROCESS_STEP_CATALOG", "type": "file", "path": "process_step_catalog.json", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "CATALOG_RISK_ENTRIES", "type": "json_fragment", "path": "submodule_context_catalog.json",
+           "content_requirements": [
+             "Entries for: R1_POSITION_LIMIT, R2_PORTFOLIO_EXPOSURE, R3_MARGIN_CHECK, R4_CORRELATION_GUARD, R5_SPREAD_SLIPPAGE_GUARD, R6_CIRCUIT_BREAKER, R7_IDEMPOTENCY_DEDUP, R8_SIZING_ENGINE, R9_RISK_DECISION_ASSEMBLER",
+             "R8_SIZING_ENGINE must be marked as deterministic (validation_gates must include a determinism check)",
+             "All risk work cells must declare forbidden_dependencies excluding calendar and UI namespaces"
+           ]}
+        ],
+        "invariants": ["No AUTHORITATIVE artifact modified."],
+        "preconditions": ["STEP-005 completed."],
+        "postconditions": ["All 9 risk engine work cell entries present in catalog."],
+        "file_scope": {
+          "allowed_paths": ["submodule_context_catalog.json", ".state/evidence/PH-01/STEP-006/**"],
+          "forbidden_paths": ["module_catalog.json", "process_step_catalog.json"],
+          "read_only_paths": ["module_catalog.json", "process_step_catalog.json", "submodule_catalog_schema.json"]
+        },
+        "failure_modes": [
+          {"code": "SIZING-NOT-DETERMINISTIC", "meaning": "R8_SIZING_ENGINE work cell does not include a determinism validation gate.", "remediation": "Add a validation gate asserting deterministic sizing output for identical inputs."}
+        ],
+        "acceptance_gates": ["GATE-CELL-001", "GATE-DEPS-001", "GATE-DOCS-001"]
+      },
+
+      "STEP-007": {
+        "step_id": "STEP-007",
+        "phase_step_key": "PH-01/STEP-007",
+        "purpose": "Author Signal Engine work cells (S1 ECO_HIGH/ECO_MED, S2 anticipation 1h/8h, S3 equity open, S4 all-indicator, S5 confidence scoring, S6 suppression reason mapping, S7 signal validation).",
+        "implementation_mode": "NOT_AUTOMATABLE",
+        "context_artifact_refs": ["CA-001", "CA-002", "CA-006", "CA-009", "CA-011"],
+        "inputs": [
+          {"id": "CATALOG_SCHEMA", "type": "file", "path": "submodule_catalog_schema.json", "required": true, "must_exist": true},
+          {"id": "MODULE_CATALOG", "type": "file", "path": "module_catalog.json", "required": true, "must_exist": true},
+          {"id": "CALENDAR_RULES", "type": "file", "path": "EAFIX CALENDAR DES RULES.pdf", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "CATALOG_SIGNAL_ENTRIES", "type": "json_fragment", "path": "submodule_context_catalog.json",
+           "content_requirements": [
+             "Entries for: S1_ECO_HIGH_MED, S2_ANTICIPATION_1H, S2_ANTICIPATION_8H, S3_EQUITY_OPEN, S4_ALL_INDICATOR, S5_CONFIDENCE_SCORING, S6_SUPPRESSION_MAPPING, S7_SIGNAL_VALIDATION",
+             "S1.*, S2.* entries must reference EAFIX CALENDAR DES RULES.pdf in required_reference_documents"
+           ]}
+        ],
+        "invariants": ["No AUTHORITATIVE artifact modified."],
+        "preconditions": ["STEP-006 completed."],
+        "postconditions": ["All 8 signal engine work cell entries present in catalog."],
+        "file_scope": {
+          "allowed_paths": ["submodule_context_catalog.json", ".state/evidence/PH-01/STEP-007/**"],
+          "forbidden_paths": ["module_catalog.json", "EAFIX CALENDAR DES RULES.pdf"],
+          "read_only_paths": ["module_catalog.json", "EAFIX CALENDAR DES RULES.pdf", "submodule_catalog_schema.json"]
+        },
+        "failure_modes": [
+          {"code": "SIGNAL-CALENDAR-REF-MISSING", "meaning": "S1.* or S2.* work cell missing calendar rules reference.", "remediation": "Add EAFIX CALENDAR DES RULES.pdf to required_reference_documents."}
+        ],
+        "acceptance_gates": ["GATE-CELL-001", "GATE-DEPS-001", "GATE-DOCS-001"]
+      },
+
+      "STEP-008": {
+        "step_id": "STEP-008",
+        "phase_step_key": "PH-01/STEP-008",
+        "purpose": "Author Reentry Engine work cells (E1_OUTCOME_BUCKETIZER, E2_PROXIMITY_EVALUATOR, E3_MATRIX_LOOKUP, E4_REENTRY_INTENT_BUILDER).",
+        "implementation_mode": "NOT_AUTOMATABLE",
+        "context_artifact_refs": ["CA-001", "CA-002", "CA-006", "CA-009", "CA-011"],
+        "inputs": [
+          {"id": "CATALOG_SCHEMA", "type": "file", "path": "submodule_catalog_schema.json", "required": true, "must_exist": true},
+          {"id": "MODULE_CATALOG", "type": "file", "path": "module_catalog.json", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "CATALOG_REENTRY_ENTRIES", "type": "json_fragment", "path": "submodule_context_catalog.json",
+           "content_requirements": [
+             "Entries for: E1_OUTCOME_BUCKETIZER, E2_PROXIMITY_EVALUATOR, E3_MATRIX_LOOKUP, E4_REENTRY_INTENT_BUILDER",
+             "E3_MATRIX_LOOKUP must declare the reentry matrix version-pinning mechanism in its validation_gates",
+             "E2_PROXIMITY_EVALUATOR must list EAFIX CALENDAR DES RULES.pdf in required_reference_documents (calendar conflict guard)"
+           ]}
+        ],
+        "invariants": ["No AUTHORITATIVE artifact modified."],
+        "preconditions": ["STEP-007 completed."],
+        "postconditions": ["All 4 reentry engine work cell entries present in catalog."],
+        "file_scope": {
+          "allowed_paths": ["submodule_context_catalog.json", ".state/evidence/PH-01/STEP-008/**"],
+          "forbidden_paths": ["module_catalog.json"],
+          "read_only_paths": ["module_catalog.json", "submodule_catalog_schema.json"]
+        },
+        "failure_modes": [
+          {"code": "MATRIX-VERSION-UNSPECIFIED", "meaning": "E3_MATRIX_LOOKUP does not specify how the matrix version is pinned.", "remediation": "Add a validation gate: matrix version must be pinned at load time; mismatched version must raise an error."}
+        ],
+        "acceptance_gates": ["GATE-CELL-001", "GATE-DEPS-001", "GATE-DOCS-001"]
+      },
+
+      "STEP-009": {
+        "step_id": "STEP-009",
+        "phase_step_key": "PH-01/STEP-009",
+        "purpose": "Author UI Decomposition work cells (12 screen work cells + gateway endpoint work cells) by consulting CA-005.",
+        "implementation_mode": "NOT_AUTOMATABLE",
+        "context_artifact_refs": ["CA-001", "CA-005", "CA-009", "CA-011"],
+        "inputs": [
+          {"id": "CATALOG_SCHEMA", "type": "file", "path": "submodule_catalog_schema.json", "required": true, "must_exist": true},
+          {"id": "UI_CATALOG", "type": "file", "path": "ui_catalog.json", "required": true, "must_exist": true},
+          {"id": "MODULE_CATALOG", "type": "file", "path": "module_catalog.json", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "CATALOG_UI_ENTRIES", "type": "json_fragment", "path": "submodule_context_catalog.json",
+           "content_requirements": [
+             "Entries for screens: UI_LIVE_TRADING, UI_SIGNALS_HISTORY, UI_CONFIGURATION, UI_SYSTEM_STATUS, UI_TRADE_HISTORY, UI_HISTORY_ANALYTICS, UI_DDE_PRICE_FEED, UI_ECONOMIC_CALENDAR, UI_REENTRY_MATRIX, UI_REENTRY_PARAMETER_SETS, UI_ALERTS, UI_EQUITY_RISK",
+             "Entries for gateways matching ui_catalog.json REST and WebSocket endpoints",
+             "Screen names must match ui_catalog.json exactly — no renaming",
+             "Each UI work cell must declare its corresponding gateway endpoint in output_contracts"
+           ]}
+        ],
+        "invariants": ["No AUTHORITATIVE artifact modified.", "Screen names and endpoint IDs must be copied verbatim from ui_catalog.json, not inferred."],
+        "preconditions": ["STEP-008 completed."],
+        "postconditions": ["All UI screen and gateway work cells present in catalog.", "All screen names match ui_catalog.json exactly."],
+        "file_scope": {
+          "allowed_paths": ["submodule_context_catalog.json", ".state/evidence/PH-01/STEP-009/**"],
+          "forbidden_paths": ["ui_catalog.json", "module_catalog.json"],
+          "read_only_paths": ["ui_catalog.json", "module_catalog.json", "submodule_catalog_schema.json"]
+        },
+        "failure_modes": [
+          {"code": "UI-NAME-MISMATCH", "meaning": "Work cell ID or screen name does not match ui_catalog.json.", "remediation": "Correct the name. Derive from ui_catalog.json only — do not invent screen names."}
+        ],
+        "acceptance_gates": ["GATE-CELL-001", "GATE-DEPS-001", "GATE-DOCS-001"]
+      },
+
+      "STEP-010": {
+        "step_id": "STEP-010",
+        "phase_step_key": "PH-01/STEP-010",
+        "purpose": "Run full schema validation against submodule_context_catalog.json and validate all parent_module values resolve against module_catalog.json.",
+        "implementation_mode": "NOT_AUTOMATABLE",
+        "context_artifact_refs": ["CA-001"],
+        "inputs": [
+          {"id": "CATALOG", "type": "file", "path": "submodule_context_catalog.json", "required": true, "must_exist": true},
+          {"id": "CATALOG_SCHEMA", "type": "file", "path": "submodule_catalog_schema.json", "required": true, "must_exist": true},
+          {"id": "MODULE_CATALOG", "type": "file", "path": "module_catalog.json", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "VALIDATION_REPORT", "type": "file", "path": ".state/evidence/PH-01/STEP-010/catalog_validation_report.json",
+           "content_requirements": ["Lists every work cell entry", "Reports schema validation result per entry", "Reports parent_module resolution result per entry", "Reports forbidden_dependencies completeness per entry", "Reports required_reference_documents completeness per entry", "Overall pass/fail result"]}
+        ],
+        "invariants": ["No AUTHORITATIVE artifact modified.", "Catalog is read-only during this step."],
+        "preconditions": ["STEP-009 completed. All work cell entries authored."],
+        "postconditions": ["Validation report shows 0 failures.", "GATE-SCHEMA-001, GATE-CELL-001, GATE-DEPS-001, GATE-DOCS-001 all pass."],
+        "file_scope": {
+          "allowed_paths": [".state/evidence/PH-01/STEP-010/**"],
+          "forbidden_paths": ["module_catalog.json"],
+          "read_only_paths": ["submodule_context_catalog.json", "submodule_catalog_schema.json", "module_catalog.json"]
+        },
+        "failure_modes": [
+          {"code": "VALIDATION-FAILURES", "meaning": "One or more work cells fail schema or parent_module validation.", "remediation": "Return to the authoring step for the failing module and correct the entry. Re-run STEP-010."}
+        ],
+        "acceptance_gates": ["GATE-SCHEMA-001", "GATE-CELL-001", "GATE-DEPS-001", "GATE-DOCS-001", "GATE-NOOVERRIDE-001"]
+      },
+
+      "STEP-011": {
+        "step_id": "STEP-011",
+        "phase_step_key": "PH-01/STEP-011",
+        "purpose": "Verify that the routing instructions document (CA-010) is consistent with the work cells now in the catalog. Identify any routing instruction entries that reference module IDs not present in the catalog, or vice versa.",
+        "implementation_mode": "NOT_AUTOMATABLE",
+        "context_artifact_refs": ["CA-010", "CA-001"],
+        "inputs": [
+          {"id": "CATALOG", "type": "file", "path": "submodule_context_catalog.json", "required": true, "must_exist": true},
+          {"id": "ROUTING_INSTRUCTIONS", "type": "file", "path": "eafix_project_knowledge_reference_routing_instructions.json", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "ROUTING_CONSISTENCY_REPORT", "type": "file", "path": ".state/evidence/PH-01/STEP-011/routing_consistency_report.json",
+           "content_requirements": [
+             "Lists routing instructions that reference work cells present in the catalog",
+             "Lists routing instructions with no matching catalog entry (gap list)",
+             "Lists catalog entries with no routing instruction coverage (orphan list)",
+             "Recommendations for Phase 4 (routing rules) based on gaps and orphans"
+           ]}
+        ],
+        "invariants": ["CA-010 is read-only. This step produces a report, not edits."],
+        "preconditions": ["STEP-010 passed."],
+        "postconditions": ["Routing consistency report written. Any gaps or orphans documented for Phase 4 input."],
+        "file_scope": {
+          "allowed_paths": [".state/evidence/PH-01/STEP-011/**"],
+          "forbidden_paths": ["eafix_project_knowledge_reference_routing_instructions.json", "submodule_context_catalog.json"],
+          "read_only_paths": ["eafix_project_knowledge_reference_routing_instructions.json", "submodule_context_catalog.json"]
+        },
+        "failure_modes": [
+          {"code": "ROUTING-GAP-CRITICAL", "meaning": "A routing instruction references a module with no corresponding work cell in the catalog.", "remediation": "Return to PH-01 and author the missing work cells before closing Phase 1."}
+        ],
+        "acceptance_gates": ["GATE-ROUTING-CONSISTENCY-001"]
+      }
+    },
+
+    "PH-02": {
+      "STEP-001": {
+        "step_id": "STEP-001",
+        "phase_step_key": "PH-02/STEP-001",
+        "purpose": "Design and write context_packet_schema.json — the JSON Schema governing the structure of every module context packet and work cell context file. Ensures consistency and enables GATE-PKT-001.",
+        "implementation_mode": "NOT_AUTOMATABLE",
+        "context_artifact_refs": ["CA-011"],
+        "inputs": [
+          {"id": "CATALOG", "type": "file", "path": "submodule_context_catalog.json", "required": true, "must_exist": true},
+          {"id": "PH01_STEP010_REPORT", "type": "file", "path": ".state/evidence/PH-01/STEP-010/catalog_validation_report.json", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "PACKET_SCHEMA", "type": "file", "path": "context_packet_schema.json", "required": true,
+           "content_requirements": [
+             "module context packet requires: module_id, parent_catalog_ref, source_files (array), contracts (object with input/output arrays), test_files (array), allowed_files (array), forbidden_files (array), required_reference_documents (array, min 1), acceptance_gates (array, min 1), ai_readme_path (string)",
+             "work cell context file requires: work_cell_id, parent_module_id, allowed_files (array), forbidden_files (array), required_reference_documents (array, min 1), acceptance_gates (array, min 1)",
+             "Schema is valid JSON Schema draft-07 or later"
+           ]}
+        ],
+        "invariants": ["No AUTHORITATIVE artifact modified."],
+        "preconditions": ["PH-01 fully completed and validated.", "submodule_context_catalog.json exists and passed GATE-SCHEMA-001."],
+        "postconditions": ["context_packet_schema.json validates as valid JSON Schema."],
+        "file_scope": {
+          "allowed_paths": ["context_packet_schema.json", ".state/evidence/PH-02/STEP-001/**"],
+          "forbidden_paths": ["submodule_context_catalog.json", "module_catalog.json", "context_packets/**"],
+          "read_only_paths": ["submodule_context_catalog.json"]
+        },
+        "failure_modes": [
+          {"code": "PKT-SCHEMA-INVALID", "meaning": "Schema is not valid JSON Schema.", "remediation": "Run jsonschema meta-validation and correct errors."}
+        ],
+        "acceptance_gates": ["GATE-PKT-SCHEMA-001"]
+      },
+
+      "STEP-002": {
+        "step_id": "STEP-002",
+        "phase_step_key": "PH-02/STEP-002",
+        "purpose": "Generate context packets for Calendar Pipeline modules (D2, D3, F2, D4). Each packet lists source_files verified against file_module_mapping.csv, contracts from the catalog, and required_reference_documents including CA-006.",
+        "implementation_mode": "NOT_AUTOMATABLE",
+        "context_artifact_refs": ["CA-001", "CA-006", "CA-008", "CA-009", "CA-010"],
+        "inputs": [
+          {"id": "CATALOG", "type": "file", "path": "submodule_context_catalog.json", "required": true, "must_exist": true},
+          {"id": "FILE_MODULE_MAPPING", "type": "file", "path": "file_module_mapping.csv", "required": true, "must_exist": true},
+          {"id": "CALENDAR_RULES", "type": "file", "path": "EAFIX CALENDAR DES RULES.pdf", "required": true, "must_exist": true},
+          {"id": "PACKET_SCHEMA", "type": "file", "path": "context_packet_schema.json", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "CALENDAR_PACKETS", "type": "directory_tree", "path": "context_packets/",
+           "content_requirements": [
+             "context_packets/D2_CALENDAR_SOURCE_ADAPTER/context_packet.json",
+             "context_packets/D2_CALENDAR_SOURCE_ADAPTER/ai_readme.md",
+             "context_packets/D2_CALENDAR_SOURCE_ADAPTER/{work_cell_id}/work_cell_context.json for all D2.* work cells",
+             "Same pattern for D3, F2, D4",
+             "All source_files in packets must appear in file_module_mapping.csv for that module",
+             "All calendar packets list 'EAFIX CALENDAR DES RULES.pdf' in required_reference_documents",
+             "All packets pass context_packet_schema.json validation"
+           ]}
+        ],
+        "invariants": ["No AUTHORITATIVE artifact modified.", "source_files lists must be derived from file_module_mapping.csv only — no guessing."],
+        "preconditions": ["PH-02/STEP-001 completed."],
+        "postconditions": ["4 module context packet directories created under context_packets/.", "GATE-PKT-001 passes for all 4 modules.", "GATE-STALE-001 passes (no file reference outside file_module_mapping.csv)."],
+        "file_scope": {
+          "allowed_paths": ["context_packets/D2_*/**", "context_packets/D3_*/**", "context_packets/F2_*/**", "context_packets/D4_*/**", ".state/evidence/PH-02/STEP-002/**"],
+          "forbidden_paths": ["module_catalog.json", "file_module_mapping.csv", "EAFIX CALENDAR DES RULES.pdf", "submodule_context_catalog.json"],
+          "read_only_paths": ["submodule_context_catalog.json", "file_module_mapping.csv", "EAFIX CALENDAR DES RULES.pdf", "context_packet_schema.json"]
+        },
+        "failure_modes": [
+          {"code": "PKT-FILE-NOT-IN-MAPPING", "meaning": "A context packet source_files entry is not present in file_module_mapping.csv for that module.", "remediation": "Remove the file from the packet. Only files in the mapping are allowed. If the mapping is wrong, that is a Phase 3 concern, not a Phase 2 fix."},
+          {"code": "PKT-SCHEMA-FAIL", "meaning": "A generated packet fails context_packet_schema.json validation.", "remediation": "Correct the packet fields to match the schema."}
+        ],
+        "acceptance_gates": ["GATE-PKT-001", "GATE-STALE-001", "GATE-NOOVERRIDE-001"]
+      },
+
+      "STEP-003": {
+        "step_id": "STEP-003",
+        "phase_step_key": "PH-02/STEP-003",
+        "purpose": "Generate context packets for MT4 Bridge modules (B1, B2, B3) using CA-004, CA-007, CA-008.",
+        "implementation_mode": "NOT_AUTOMATABLE",
+        "context_artifact_refs": ["CA-001", "CA-004", "CA-007", "CA-008", "CA-010"],
+        "inputs": [
+          {"id": "CATALOG", "type": "file", "path": "submodule_context_catalog.json", "required": true, "must_exist": true},
+          {"id": "FILE_MODULE_MAPPING", "type": "file", "path": "file_module_mapping.csv", "required": true, "must_exist": true},
+          {"id": "COMMS_CHANNELS", "type": "file", "path": "communication_channels.json", "required": true, "must_exist": true},
+          {"id": "MT4_REF", "type": "file", "path": "mt4_authoritative_reference_for_ai.json", "required": true, "must_exist": true},
+          {"id": "PACKET_SCHEMA", "type": "file", "path": "context_packet_schema.json", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "MT4_PACKETS", "type": "directory_tree", "path": "context_packets/",
+           "content_requirements": [
+             "context_packets/B1_MT4_ADAPTER_TRANSPORT/context_packet.json and ai_readme.md",
+             "context_packets/B2_MT4_EA_EXECUTOR/context_packet.json and ai_readme.md",
+             "context_packets/B3_EXECUTION_EVENT_NORMALIZER/context_packet.json and ai_readme.md",
+             "All B2 packets list mt4_authoritative_reference_for_ai.json in required_reference_documents",
+             "All B1 packets list communication_channels.json in required_reference_documents"
+           ]}
+        ],
+        "invariants": ["No AUTHORITATIVE artifact modified."],
+        "preconditions": ["PH-02/STEP-002 completed."],
+        "postconditions": ["3 MT4 bridge module context packet directories created.", "GATE-PKT-001 and GATE-STALE-001 pass."],
+        "file_scope": {
+          "allowed_paths": ["context_packets/B1_*/**", "context_packets/B2_*/**", "context_packets/B3_*/**", ".state/evidence/PH-02/STEP-003/**"],
+          "forbidden_paths": ["module_catalog.json", "communication_channels.json", "mt4_authoritative_reference_for_ai.json", "file_module_mapping.csv"],
+          "read_only_paths": ["submodule_context_catalog.json", "file_module_mapping.csv", "communication_channels.json", "mt4_authoritative_reference_for_ai.json", "context_packet_schema.json"]
+        },
+        "failure_modes": [
+          {"code": "PKT-FILE-NOT-IN-MAPPING", "meaning": "Source file not in file_module_mapping.csv for the module.", "remediation": "Remove from packet. Do not add to mapping in Phase 2."}
+        ],
+        "acceptance_gates": ["GATE-PKT-001", "GATE-STALE-001", "GATE-NOOVERRIDE-001"]
+      },
+
+      "STEP-004": {
+        "step_id": "STEP-004",
+        "phase_step_key": "PH-02/STEP-004",
+        "purpose": "Generate context packets for all remaining modules: EA-Side MQL4 (A, B_MQL4, D_MQL4), Risk Engine (R1-R9), Signal Engine (S1-S7), Reentry Engine (E1-E4), and UI (all screens + gateways).",
+        "implementation_mode": "NOT_AUTOMATABLE",
+        "context_artifact_refs": ["CA-001", "CA-005", "CA-007", "CA-008", "CA-010"],
+        "inputs": [
+          {"id": "CATALOG", "type": "file", "path": "submodule_context_catalog.json", "required": true, "must_exist": true},
+          {"id": "FILE_MODULE_MAPPING", "type": "file", "path": "file_module_mapping.csv", "required": true, "must_exist": true},
+          {"id": "UI_CATALOG", "type": "file", "path": "ui_catalog.json", "required": true, "must_exist": true},
+          {"id": "PACKET_SCHEMA", "type": "file", "path": "context_packet_schema.json", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "REMAINING_PACKETS", "type": "directory_tree", "path": "context_packets/",
+           "content_requirements": [
+             "Packets for all EA-side, Risk, Signal, Reentry, and UI modules",
+             "UI packet screen IDs must match ui_catalog.json exactly",
+             "All packets pass context_packet_schema.json validation",
+             "All source_files verified against file_module_mapping.csv"
+           ]}
+        ],
+        "invariants": ["No AUTHORITATIVE artifact modified."],
+        "preconditions": ["PH-02/STEP-003 completed."],
+        "postconditions": ["All module context packet directories created.", "GATE-PKT-001 and GATE-STALE-001 pass for all modules."],
+        "file_scope": {
+          "allowed_paths": ["context_packets/**", ".state/evidence/PH-02/STEP-004/**"],
+          "forbidden_paths": ["module_catalog.json", "ui_catalog.json", "file_module_mapping.csv"],
+          "read_only_paths": ["submodule_context_catalog.json", "file_module_mapping.csv", "ui_catalog.json", "context_packet_schema.json"]
+        },
+        "failure_modes": [
+          {"code": "PKT-FILE-NOT-IN-MAPPING", "meaning": "Source file not in mapping for the module.", "remediation": "Remove from packet."},
+          {"code": "UI-SCREEN-MISMATCH", "meaning": "UI context packet ID does not match ui_catalog.json.", "remediation": "Correct to match ui_catalog.json exactly."}
+        ],
+        "acceptance_gates": ["GATE-PKT-001", "GATE-STALE-001", "GATE-NOOVERRIDE-001"]
+      },
+
+      "STEP-005": {
+        "step_id": "STEP-005",
+        "phase_step_key": "PH-02/STEP-005",
+        "purpose": "Run full validation across all context packets: schema check, file-in-mapping check, no-override check. Produce final validation report.",
+        "implementation_mode": "NOT_AUTOMATABLE",
+        "inputs": [
+          {"id": "ALL_PACKETS", "type": "directory_tree", "path": "context_packets/", "required": true, "must_exist": true},
+          {"id": "PACKET_SCHEMA", "type": "file", "path": "context_packet_schema.json", "required": true, "must_exist": true},
+          {"id": "FILE_MODULE_MAPPING", "type": "file", "path": "file_module_mapping.csv", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "PH02_VALIDATION_REPORT", "type": "file", "path": ".state/evidence/PH-02/STEP-005/packet_validation_report.json",
+           "content_requirements": [
+             "Lists all context_packet.json files found",
+             "Reports schema validation result per packet",
+             "Reports file-in-mapping result per packet",
+             "Reports whether any AUTHORITATIVE artifact was modified",
+             "Overall pass/fail"
+           ]}
+        ],
+        "invariants": ["All source documents read-only."],
+        "preconditions": ["STEP-004 completed."],
+        "postconditions": ["Report shows 0 failures across all gates."],
+        "file_scope": {
+          "allowed_paths": [".state/evidence/PH-02/STEP-005/**"],
+          "forbidden_paths": ["module_catalog.json", "file_module_mapping.csv"],
+          "read_only_paths": ["context_packets/**", "context_packet_schema.json", "file_module_mapping.csv"]
+        },
+        "failure_modes": [
+          {"code": "BATCH-VALIDATION-FAILURES", "meaning": "One or more packets fail validation.", "remediation": "Return to the authoring step for the failing module and correct. Re-run STEP-005."}
+        ],
+        "acceptance_gates": ["GATE-PKT-001", "GATE-STALE-001", "GATE-NOOVERRIDE-001"]
+      },
+
+      "STEP-006": {
+        "step_id": "STEP-006",
+        "phase_step_key": "PH-02/STEP-006",
+        "purpose": "Final non-override verification: confirm no AUTHORITATIVE context artifact (CA-001 through CA-009) has a modified timestamp or changed hash compared to STEP-001 baseline.",
+        "implementation_mode": "NOT_AUTOMATABLE",
+        "inputs": [
+          {"id": "CTX_VERIFICATION_BASELINE", "type": "file", "path": ".state/evidence/PH-01/STEP-001/context_artifact_verification.json", "required": true, "must_exist": true}
+        ],
+        "outputs": [
+          {"id": "FINAL_NOOVERRIDE_REPORT", "type": "file", "path": ".state/evidence/PH-02/STEP-006/final_nooverride_report.json",
+           "content_requirements": [
+             "For each CA-001 through CA-009: current sha256 vs baseline sha256",
+             "PASS if all hashes match; FAIL if any differ",
+             "If FAIL: identify which artifact changed and stop — do not proceed to Phase 3"
+           ]}
+        ],
+        "invariants": ["This step must not modify any file."],
+        "preconditions": ["STEP-005 passed."],
+        "postconditions": ["GATE-NOOVERRIDE-001 passes. All AUTHORITATIVE artifact hashes match PH-01 baseline."],
+        "file_scope": {
+          "allowed_paths": [".state/evidence/PH-02/STEP-006/**"],
+          "forbidden_paths": [],
+          "read_only_paths": ["module_catalog.json", "process_step_catalog.json", "updated_trading_process_aligned.json", "communication_channels.json", "ui_catalog.json", "EAFIX CALENDAR DES RULES.pdf", "mt4_authoritative_reference_for_ai.json", "file_module_mapping.csv", "eafix_services_ai_reference_20260510.json"]
+        },
+        "failure_modes": [
+          {"code": "AUTHORITATIVE-ARTIFACT-MODIFIED", "meaning": "A canonical source artifact hash differs from Phase 1 baseline. Something modified it.", "remediation": "Halt all Phase 2 work. Restore the artifact from backup. Identify how the modification occurred and prevent recurrence. The entire catalog may need re-derivation."}
+        ],
+        "acceptance_gates": ["GATE-NOOVERRIDE-001"]
+      }
+    }
+  },
+
+  "validation_gates": [
+    {
+      "gate_id": "GATE-CTX-001",
+      "phase_step_key": "PH-01/STEP-001",
+      "purpose": "All AUTHORITATIVE and CONSTRAINING context artifacts exist on disk and are readable.",
+      "command": "python -c \"import json, os, sys; log=json.load(open('.state/evidence/PH-01/STEP-001/context_artifact_verification.json')); failures=[a for a in log['artifacts'] if not a['exists'] or not a['readable']]; sys.exit(1 if failures else 0)\"",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-01/STEP-001/context_artifact_verification.json",
+      "failure_action": "halt — do not begin catalog authoring until all artifacts are confirmed present"
+    },
+    {
+      "gate_id": "GATE-SCHEMA-001",
+      "phase_step_key": "PH-01/STEP-010",
+      "purpose": "Every entry in submodule_context_catalog.json validates against submodule_catalog_schema.json.",
+      "command": "python -m jsonschema -i submodule_context_catalog.json submodule_catalog_schema.json",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-01/STEP-010/catalog_validation_report.json",
+      "failure_action": "return to authoring step for failing module and correct"
+    },
+    {
+      "gate_id": "GATE-CELL-001",
+      "phase_step_key": "PH-01/STEP-010",
+      "purpose": "Every work cell has parent_module resolving to a module ID present in module_catalog.json.",
+      "command": "python -c \"import json, sys; cat=json.load(open('submodule_context_catalog.json')); mods={m['module_id'] for m in json.load(open('module_catalog.json'))['modules']}; failures=[c['work_cell_id'] for c in cat['work_cells'] if c['parent_module'] not in mods]; print(failures); sys.exit(1 if failures else 0)\"",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-01/STEP-010/catalog_validation_report.json",
+      "failure_action": "correct parent_module values for failing entries"
+    },
+    {
+      "gate_id": "GATE-DEPS-001",
+      "phase_step_key": "PH-01/STEP-010",
+      "purpose": "Every work cell declares a non-empty forbidden_dependencies list.",
+      "command": "python -c \"import json, sys; cat=json.load(open('submodule_context_catalog.json')); failures=[c['work_cell_id'] for c in cat['work_cells'] if not c.get('forbidden_dependencies')]; print(failures); sys.exit(1 if failures else 0)\"",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-01/STEP-010/catalog_validation_report.json",
+      "failure_action": "add forbidden_dependencies to all failing work cells"
+    },
+    {
+      "gate_id": "GATE-DOCS-001",
+      "phase_step_key": "PH-01/STEP-010",
+      "purpose": "Every work cell lists at least one required_reference_document.",
+      "command": "python -c \"import json, sys; cat=json.load(open('submodule_context_catalog.json')); failures=[c['work_cell_id'] for c in cat['work_cells'] if not c.get('required_reference_documents')]; print(failures); sys.exit(1 if failures else 0)\"",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-01/STEP-010/catalog_validation_report.json",
+      "failure_action": "add at least one required_reference_document to each failing work cell"
+    },
+    {
+      "gate_id": "GATE-ROUTING-CONSISTENCY-001",
+      "phase_step_key": "PH-01/STEP-011",
+      "purpose": "No routing instruction in CA-010 references a module with zero work cells in the catalog.",
+      "command": "python -c \"import json, sys; report=json.load(open('.state/evidence/PH-01/STEP-011/routing_consistency_report.json')); failures=report.get('critical_gaps',[]); sys.exit(1 if failures else 0)\"",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-01/STEP-011/routing_consistency_report.json",
+      "failure_action": "author missing work cells before closing Phase 1"
+    },
+    {
+      "gate_id": "GATE-PKT-SCHEMA-001",
+      "phase_step_key": "PH-02/STEP-001",
+      "purpose": "context_packet_schema.json is a valid JSON Schema.",
+      "command": "python -m jsonschema --check-schema context_packet_schema.json",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-02/STEP-001/schema_meta_validation.log",
+      "failure_action": "correct schema and re-run"
+    },
+    {
+      "gate_id": "GATE-PKT-001",
+      "phase_step_key": "PH-02/STEP-005",
+      "purpose": "Every context_packet.json validates against context_packet_schema.json AND every source_file in each packet is present in file_module_mapping.csv for that module.",
+      "command": "python scripts/validate_context_packets.py context_packets/ context_packet_schema.json file_module_mapping.csv",
+      "command_note": "This script does not yet exist. Author it as part of PH-02/STEP-005 or treat as NOT_AUTOMATABLE with manual file-by-file review.",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-02/STEP-005/packet_validation_report.json",
+      "failure_action": "remove invalid file references; correct schema violations"
+    },
+    {
+      "gate_id": "GATE-STALE-001",
+      "phase_step_key": "PH-02/STEP-005",
+      "purpose": "No context packet references a source file not present in file_module_mapping.csv.",
+      "command": "python scripts/validate_context_packets.py context_packets/ context_packet_schema.json file_module_mapping.csv --check stale_only",
+      "command_note": "Subset check within GATE-PKT-001 script.",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-02/STEP-005/packet_validation_report.json",
+      "failure_action": "remove stale file references from packets"
+    },
+    {
+      "gate_id": "GATE-NOOVERRIDE-001",
+      "phase_step_key": "PH-02/STEP-006",
+      "purpose": "No AUTHORITATIVE context artifact (CA-001 through CA-009) was modified during Phases 1 or 2. Hash comparison against Phase 1 baseline.",
+      "command": "python -c \"import json, hashlib, sys; baseline=json.load(open('.state/evidence/PH-01/STEP-001/context_artifact_verification.json')); failures=[a for a in baseline['artifacts'] if hashlib.sha256(open(a['path'],'rb').read()).hexdigest()!=a['sha256']]; print(failures); sys.exit(1 if failures else 0)\"",
+      "expect_exit_code": 0,
+      "evidence": ".state/evidence/PH-02/STEP-006/final_nooverride_report.json",
+      "failure_action": "HALT. Restore modified artifact from backup. Do not proceed to Phase 3."
+    }
+  ],
+
+  "anti_pattern_detection": {
+    "enabled": true,
+    "tier_note": "Triggers are scoped to the documentation/catalog work of Phases 1-2. Code-execution triggers from the full template (patternless_execution, unregistered_executor_invocation, etc.) are not applicable here — those apply in Phases 3-4.",
+    "triggers": [
+      {
+        "id": "APD-001",
+        "name": "authoritative_artifact_modified",
+        "description": "Any CA-001 through CA-009 artifact is written, edited, or removed during Phases 1 or 2.",
+        "severity": "critical",
+        "detection": "GATE-NOOVERRIDE-001 fails",
+        "action": "halt — restore from backup, investigate, restart affected steps"
+      },
+      {
+        "id": "APD-002",
+        "name": "undeclared_file_mutation",
+        "description": "A file is created or modified that does not appear in artifact_intent_manifest.",
+        "severity": "critical",
+        "detection": "File diff at end of step reveals mutations outside declared AINT-* records",
+        "action": "halt — either add the file to artifact_intent_manifest (if intentional) or delete the undeclared file"
+      },
+      {
+        "id": "APD-003",
+        "name": "work_cell_without_parent_module",
+        "description": "A work cell entry in the catalog has a parent_module value that does not resolve in module_catalog.json.",
+        "severity": "critical",
+        "detection": "GATE-CELL-001 fails",
+        "action": "halt — correct parent_module before continuing"
+      },
+      {
+        "id": "APD-004",
+        "name": "work_cell_without_forbidden_dependencies",
+        "description": "A work cell has an empty or missing forbidden_dependencies list.",
+        "severity": "critical",
+        "detection": "GATE-DEPS-001 fails",
+        "action": "halt — declare forbidden_dependencies before the catalog is used for any AI context routing"
+      },
+      {
+        "id": "APD-005",
+        "name": "work_cell_without_required_reference_document",
+        "description": "A work cell has no required_reference_documents entry.",
+        "severity": "critical",
+        "detection": "GATE-DOCS-001 fails",
+        "action": "halt — an AI agent using this work cell would have no canonical reference to consult"
+      },
+      {
+        "id": "APD-006",
+        "name": "stale_file_reference_in_packet",
+        "description": "A context packet source_files entry is not present in file_module_mapping.csv for that module.",
+        "severity": "critical",
+        "detection": "GATE-STALE-001 fails",
+        "action": "halt — remove the stale reference; do not fix the mapping in Phase 2"
+      },
+      {
+        "id": "APD-007",
+        "name": "screen_name_invented",
+        "description": "A UI work cell ID or screen name was invented rather than copied from ui_catalog.json.",
+        "severity": "critical",
+        "detection": "Manual comparison of UI work cell IDs against ui_catalog.json; or GATE-CELL-001 structural check",
+        "action": "halt — correct to match ui_catalog.json exactly"
+      },
+      {
+        "id": "APD-008",
+        "name": "context_packet_contradicts_canonical",
+        "description": "A context packet ai_readme.md or context_packet.json contains a statement that contradicts an AUTHORITATIVE artifact (e.g., a different list of OrderSend parameters than mt4_authoritative_reference_for_ai.json).",
+        "severity": "critical",
+        "detection": "Manual review; no automated gate exists for semantic contradiction in Phase 2",
+        "action": "halt — correct packet content to match the AUTHORITATIVE artifact; the packet is derived from it, not the other way around"
+      },
+      {
+        "id": "APD-009",
+        "name": "routing_gap_ignored",
+        "description": "Phase 1 STEP-011 produced a critical_gaps report entry but it was not resolved before closing Phase 1.",
+        "severity": "critical",
+        "detection": "GATE-ROUTING-CONSISTENCY-001 fails",
+        "action": "halt — author the missing work cells before proceeding to Phase 2"
+      },
+      {
+        "id": "APD-010",
+        "name": "work_cell_id_collision",
+        "description": "Two work cells have the same work_cell_id, including Python-side vs MQL4-side entries.",
+        "severity": "critical",
+        "detection": "GATE-SCHEMA-001 catches duplicates if schema enforces uniqueness; also detectable by script",
+        "action": "halt — rename one of the colliding entries using a unique prefix convention"
+      }
+    ],
+    "checkpoints": ["post_step", "post_phase", "pre_phase_transition"],
+    "actions": {
+      "critical": "halt — do not proceed to the next step or phase",
+      "recoverable": "self_heal_or_escalate"
+    }
+  },
+
+  "staleness_policy": {
+    "description": "Defines what triggers re-derivation of the catalog and context packets when canonical sources change.",
+    "trigger_conditions": [
+      {"artifact": "module_catalog.json", "trigger": "Any module added, removed, or renamed requires re-derivation of all work cell parent_module references and all context packet module_id values."},
+      {"artifact": "file_module_mapping.csv", "trigger": "Any file added or removed from a module requires re-derivation of the affected module's context packet source_files and allowed_files lists."},
+      {"artifact": "ui_catalog.json", "trigger": "Any screen or endpoint added, removed, or renamed requires re-derivation of all UI work cells."},
+      {"artifact": "EAFIX CALENDAR DES RULES.pdf", "trigger": "Any rule change requires manual review of all D2, D3, D4, S1, S2, E2 work cells and their context packets for consistency."},
+      {"artifact": "communication_channels.json", "trigger": "Any transport change requires review of B1 and B2 work cells."},
+      {"artifact": "mt4_authoritative_reference_for_ai.json", "trigger": "Any change requires review of all B2 and EA-side work cells."}
+    ],
+    "re_derivation_gate": "GATE-CTX-001 must be re-run after any canonical source change before catalog use continues.",
+    "note": "Phases 3 and 4 must not begin until a clean GATE-NOOVERRIDE-001 and GATE-CTX-001 pass on the current state."
+  },
+
+  "phase_3_4_prerequisites": {
+    "description": "Conditions that must be true before Phases 3 (source refactoring) and 4 (routing rules) begin. These are NOT part of this plan; they are entry gates for the next plan document (to be authored under full newPhasePlanProcess v3.3 template).",
+    "required_conditions": [
+      "submodule_context_catalog.json passes GATE-SCHEMA-001, GATE-CELL-001, GATE-DEPS-001, GATE-DOCS-001.",
+      "All context packets pass GATE-PKT-001 and GATE-STALE-001.",
+      "GATE-NOOVERRIDE-001 passes.",
+      "PATTERN_INDEX.yaml bootstrapped with at minimum: PAT-FILE-REFACTOR and PAT-ROUTING-RULE patterns.",
+      "At least one registered executor (EXEC-*) exists for each pattern type.",
+      "Phase 3-4 plan document authored under full newPhasePlanProcess v3.3 template.",
+      "Phase 3-4 plan references this document (decomposition_plan_ph1_ph2.json) as CA-DERIVED-001 in its referenced_context_artifacts."
+    ]
+  }
+}

@@ -179,15 +179,12 @@ class TestingControlPanel:
         
         event_config = {
             'symbol': symbol,
-            'region': 'A',
-            'country': 'US',
-            'impact': 'H',
-            'event_type': 'NF',
-            'signal_type': 'ECO_HIGH_USD',
-            'state': 'SCHEDULED',
-            'proximity': 'SH',
+            'currency': 'USD',
+            'impact_level': 'HIGH',
+            'event_code': 'NFP',
+            'proximity_state': 'PRE_1H' if minutes > 5 else 'AT_EVENT',
             'minutes_from_now': minutes,
-            'priority_weight': 1.0
+            'confidence_score': 0.85,
         }
         
         try:
@@ -197,10 +194,10 @@ class TestingControlPanel:
             print(f"✅ Created event: {file_path}")
             print(f"📋 Event Details:")
             print(f"   Symbol: {event['symbol']}")
-            print(f"   CAL8: {event['cal8']}")
-            print(f"   Signal Type: {event['signal_type']}")
-            print(f"   Event Time: {event['event_time_utc']}")
-            print(f"   State: {event['state']}")
+            print(f"   Calendar ID: {event['calendar_id']}")
+            print(f"   Proximity: {event['proximity_state']}")
+            print(f"   Timestamp: {event['timestamp']}")
+            print(f"   Direction Bias: {event['direction_bias']}")
             
             # Copy to MT4 directory for processing
             import shutil

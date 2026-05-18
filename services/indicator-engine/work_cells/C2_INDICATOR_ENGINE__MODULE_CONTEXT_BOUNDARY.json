@@ -1,0 +1,62 @@
+{
+  "manifest_type": "service_work_cell_binding",
+  "generated_at_utc": "2026-05-18T05:47:05Z",
+  "work_cell_id": "C2_INDICATOR_ENGINE__MODULE_CONTEXT_BOUNDARY",
+  "work_cell_type": "module_boundary",
+  "parent_module_symbol": "C2_INDICATOR_ENGINE",
+  "requires_agent_capability": [
+    "python"
+  ],
+  "context_packet_path": "context_packets/50000000000000000009/C2_INDICATOR_ENGINE__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+  "service": "indicator-engine",
+  "source_files": [
+    "services\\indicator-engine\\src\\2099900159260118_plugin.py",
+    "services\\indicator-engine\\src\\currency_strength\\2099900160260118_strength_calculator.py",
+    "services\\indicator-engine\\src\\indicators\\2099900161260118_advanced_indicators.py"
+  ],
+  "test_files": [
+    "services\\indicator-engine\\tests\\2099900162260118_test_indicator_plugin.py"
+  ],
+  "allowed_dependencies": [
+    "F1_CONFIG_PREFERENCES",
+    "C1_BAR_BUILDER"
+  ],
+  "forbidden_dependencies": [
+    "B1_MT4_ADAPTER_TRANSPORT",
+    "B2_MT4_EA_EXECUTOR",
+    "B3_EXEC_EVENT_NORMALIZER",
+    "C3_FEATURE_PACKAGER",
+    "D1_MARKET_FEED_ADAPTER",
+    "D2_CALENDAR_SOURCE_ADAPTER",
+    "D3_CALENDAR_NORMALIZER",
+    "D4_CALENDAR_TRIGGER_BUILDER",
+    "E1_OUTCOME_BUCKETIZER",
+    "E2_PROXIMITY_EVALUATOR",
+    "E3_MATRIX_LOOKUP",
+    "E4_REENTRY_INTENT_BUILDER",
+    "F1_FLOW_ORCHESTRATOR",
+    "F2_EVENT_LOG",
+    "F3_CLOCK_SCHEDULER",
+    "O1_ORDER_ROUTER",
+    "O2_OMS_STATE_MACHINE",
+    "O3_TRADE_CLOSE_CLASSIFIER",
+    "P1_HEALTH_AGGREGATOR",
+    "R1_RISK_EVALUATOR",
+    "R2_ORDER_INTENT_COMPILER",
+    "S1_SIGNAL_ENGINE",
+    "S2_INTENT_BUILDER",
+    "SHARED_LIBS"
+  ],
+  "required_reference_documents": [
+    "DOC_MODULE_CATALOG",
+    "DOC_PROCESS_STEP_CATALOG",
+    "DOC_ALIGNED_PROCESS",
+    "DOC_ROUTING_INSTRUCTIONS",
+    "DOC_DECOMPOSITION_MODEL",
+    "DOC_MODULE_MAP"
+  ],
+  "notes": [
+    "Manifest-only Phase 3 binding; no runtime logic was moved by this completion pass.",
+    "Use this file as the source-scope contract for subsequent behavior-preserving extraction."
+  ]
+}

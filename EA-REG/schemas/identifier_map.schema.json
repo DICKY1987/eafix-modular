@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "identifier_map.schema.json",
+  "title": "Identifier Map Schema",
+  "description": "JSON Schema for the EA-REG semantic identifier map that maps symbolic module IDs to numeric IDs.",
+  "type": "object",
+  "required": ["version", "modules", "aliases", "process_steps"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Schema version"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of generation"
+    },
+    "id_patterns": {
+      "type": "object",
+      "properties": {
+        "module_id": {
+          "type": "string",
+          "description": "Regex pattern for module IDs"
+        },
+        "process_step_id": {
+          "type": "string",
+          "description": "Regex pattern for process step IDs"
+        }
+      }
+    },
+    "modules": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["numeric_id", "canonical_symbol", "module_name", "is_alias"],
+        "properties": {
+          "numeric_id": {
+            "type": "string",
+            "pattern": "^5\\d{19}$",
+            "description": "20-digit numeric module ID starting with 5"
+          },
+          "canonical_symbol": {
+            "type": "string",
+            "description": "Symbolic module identifier"
+          },
+          "module_name": {
+            "type": "string",
+            "description": "Human-readable module name"
+          },
+          "is_alias": {
+            "type": "boolean",
+            "const": false,
+            "description": "Must be false; aliases belong in the aliases section"
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Map of symbolic module ID to module metadata with numeric ID"
+    },
+    "aliases": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["resolves_to", "numeric_id"],
+        "properties": {
+          "resolves_to": {
+            "type": "string",
+            "description": "The canonical module symbol this alias resolves to"
+          },
+          "numeric_id": {
+            "type": "string",
+            "pattern": "^5\\d{19}$",
+            "description": "Numeric ID (same as the canonical module)"
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Map of alias symbols to their canonical module references"
+    },
+    "process_steps": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["numeric_id", "step_number", "step_name", "module_id"],
+        "properties": {
+          "numeric_id": {
+            "type": "string",
+            "pattern": "^6\\d{19}$",
+            "description": "20-digit numeric process step ID starting with 6"
+          },
+          "step_number": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Ordinal step number in the pipeline"
+          },
+          "step_name": {
+            "type": "string",
+            "description": "Human-readable step name"
+          },
+          "module_id": {
+            "type": "string",
+            "pattern": "^5\\d{19}$",
+            "description": "Numeric module ID that owns this step"
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Map of step keys to process step metadata with numeric IDs"
+    }
+  },
+  "additionalProperties": true
+}

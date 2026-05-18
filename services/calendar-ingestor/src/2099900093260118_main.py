@@ -164,7 +164,7 @@ def main():
     
     # Start the server
     uvicorn.run(
-        "src.main:app",
+        "calendar_ingestor.main:app",
         host="0.0.0.0",
         port=8086,  # Calendar ingestor runs on port 8086
         reload=False,

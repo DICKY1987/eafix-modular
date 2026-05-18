@@ -1,0 +1,46 @@
+registry_metadata:
+  registry_id: EAFIX_PATTERN_INDEX
+  version: 1.0.0
+  generated_at_utc: "2026-05-18T05:47:05Z"
+  source_plan: decomposition_plan_ph3_ph4.json
+patterns:
+  - pattern_id: PAT-WORKCELL-SPLIT
+    version: 1.0.0
+    status: validated
+    purpose: "Split or bind dense service files to work-cell-scoped module structures."
+    spec_file: .state/patterns/PAT-WORKCELL-SPLIT/spec.yaml
+    config_schema_file: .state/patterns/PAT-WORKCELL-SPLIT/config_schema.json
+    parameter_schema_file: .state/patterns/PAT-WORKCELL-SPLIT/parameter_schema.json
+    golden_test_fixture: .state/patterns/PAT-WORKCELL-SPLIT/test_fixture/
+    executor_id: EXEC-WORKCELL-SPLITTER
+    output_contract_ref: OUT-WORKCELL-SPLIT
+  - pattern_id: PAT-IMPORT-UPDATE
+    version: 1.0.0
+    status: validated
+    purpose: "Update imports after work-cell module extraction without changing behavior."
+    spec_file: .state/patterns/PAT-IMPORT-UPDATE/spec.yaml
+    config_schema_file: .state/patterns/PAT-IMPORT-UPDATE/config_schema.json
+    parameter_schema_file: .state/patterns/PAT-IMPORT-UPDATE/parameter_schema.json
+    golden_test_fixture: .state/patterns/PAT-IMPORT-UPDATE/test_fixture/
+    executor_id: EXEC-IMPORT-FIXER
+    output_contract_ref: OUT-IMPORT-UPDATED
+  - pattern_id: PAT-WORKCELL-VERIFY
+    version: 1.0.0
+    status: validated
+    purpose: "Verify refactored work-cell source scope, packets, and tests."
+    spec_file: .state/patterns/PAT-WORKCELL-VERIFY/spec.yaml
+    config_schema_file: .state/patterns/PAT-WORKCELL-VERIFY/config_schema.json
+    parameter_schema_file: .state/patterns/PAT-WORKCELL-VERIFY/parameter_schema.json
+    golden_test_fixture: .state/patterns/PAT-WORKCELL-VERIFY/test_fixture/
+    executor_id: EXEC-PYTHON-CLI-V1
+    output_contract_ref: OUT-WORKCELL-VERIFIED
+  - pattern_id: PAT-ROUTING-RULE-AUTHOR
+    version: 1.0.0
+    status: validated
+    purpose: "Author routing rules from catalog-backed work-cell metadata."
+    spec_file: .state/patterns/PAT-ROUTING-RULE-AUTHOR/spec.yaml
+    config_schema_file: .state/patterns/PAT-ROUTING-RULE-AUTHOR/config_schema.json
+    parameter_schema_file: .state/patterns/PAT-ROUTING-RULE-AUTHOR/parameter_schema.json
+    golden_test_fixture: .state/patterns/PAT-ROUTING-RULE-AUTHOR/test_fixture/
+    executor_id: EXEC-ROUTING-RULE-WRITER
+    output_contract_ref: OUT-ROUTING-RULE

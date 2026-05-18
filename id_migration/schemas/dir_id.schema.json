@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eafix.local/schemas/dir_id.schema.json",
+  "title": "Directory Identity Anchor Schema",
+  "description": "Schema for .dir_id sidecar files generated during physical identity migration.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "dir_id",
+    "allocated_at_utc",
+    "allocator_version",
+    "project_root_id",
+    "relative_path"
+  ],
+  "properties": {
+    "dir_id": {
+      "type": "string",
+      "pattern": "^2\\d{19}$"
+    },
+    "allocated_at_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "allocator_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "project_root_id": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^2\\d{19}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "relative_path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![\\\\/])(?!.*\\\\)(?!.*//).+[^/]$"
+    }
+  }
+}

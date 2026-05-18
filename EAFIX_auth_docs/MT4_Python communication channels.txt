@@ -1,0 +1,179 @@
+ full breakdown of the MT4 ↔ Python communication channels
+  found in this repo:
+
+  ---
+  MT4 ↔ Python Communication Channels
+
+  1. HTTP REST API (Primary Channel)
+
+  MT4 side: services/desktop-ui/2299900003260118_ExpiryZones.mq4
+  - Uses MT4's WebRequest() to call http://127.0.0.1:5001
+  - Routes: /expiries.csv, /indicators.csv, /health, /spot
+
+  Python side: services/desktop-ui/2099900129260118_expiry_service.py +
+  2099900128260118_expiry_indicator_service.py
+  - FastAPI server on port 5001
+  - Serves expiry zones, signal states, and indicator summaries as
+  JSON/CSV
+
+  ---
+  2. Windows DDE — Real-Time Price Feed
+
+  MT4 side: MT4's built-in DDE server ("MT4" topic "QUOTE")
+
+  Python side: services/data-ingestor/src/2099900111260118_ingestor.py
+  - Polls MT4 DDE at 100ms intervals
+  - Normalizes ticks and publishes to Redis channel eafix.data.prices
+  - Enabled by default (enable_dde: True in 2099900109260118_config.py)
+
+  ---
+  3. File-Based Outbox (JSON Lines)
+
+  Python side: services/desktop-ui/2099900132260118_outbound.py
+  - Writes signals to {HUEY_OUTBOX}/{symbol}.jsonl
+
+  MT4 side: EA expected to poll .jsonl files — no explicit reader found
+  yet
+
+  ---
+  4. CSV File Polling
+
+  Python side: Transport Router
+  (services/transport-router/src/2099900202260118_router.py)
+  - Watches directories: data/calendar-ingestor, data/execution-engine,
+  etc.
+  - MT4 or an EA writes CSV files; Python validates and routes them
+  downstream via HTTP
+
+  ---
+  5. Redis Pub/Sub (Inter-Service Bus)
+
+  Not a direct MT4 channel, but the Python backbone. Key topics:
+
+  ┌───────────────────────────┬─────────────────────────────────┐
+  │           Topic           │             Purpose             │
+  ├───────────────────────────┼─────────────────────────────────┤
+  │ eafix.data.prices         │ Price ticks (from DDE ingestor) │
+  ├───────────────────────────┼─────────────────────────────────┤
+  │ eafix.orders.validated    │ Order intents to execution      │
+  ├───────────────────────────┼─────────────────────────────────┤
+  │ eafix.execution.completed │ Fill reports back from MT4      │
+  └───────────────────────────┴─────────────────────────────────┘
+
+  ---
+  6. TCP Socket (Disabled)
+
+  Configured in 2099900109260118_config.py at localhost:5555 but
+  disabled by default.
+
+  ---
+  Data Contracts
+
+  Defined in mt4/helpers/2299900002260118_contract_parsers.mq4:
+  - PriceTick_v1, Signal_v1, OrderIntent_v1_2, ExecutionReport_v1
+
+  The canonical execution flow is:
+  MT4 DDE → Data Ingestor → Redis → Signal Engine → Execution Engine
+         ↑                                                    ↓
+         └────────────── HTTP REST (port 5001) ───────────────┘
+
+✻ Churned for 2m 14s
+
+❯ find the files associated with this process
+
+  Searched for 6 patterns (ctrl+o to expand)
+
+● Here are all the files associated with the MT4 ↔ Python communication
+  process, organized by channel:
+
+  ---
+  MT4 Side (MQL4)
+
+  File: services/desktop-ui/2299900003260118_ExpiryZones.mq4
+  Role: HTTP client — calls Python REST API on port 5001
+  ────────────────────────────────────────
+  File: mt4/helpers/2299900002260118_contract_parsers.mq4
+  Role: Data contract structs (PriceTick, Signal, OrderIntent,
+    ExecutionReport)
+  ────────────────────────────────────────
+  File: mt4/2299900001260118_ReentryHelpers.mq4
+  Role: Reentry key encoding helpers
+
+  ---
+  HTTP REST API (Python Server)
+
+  File: services/desktop-ui/2099900129260118_expiry_service.py
+  Role: FastAPI server — /expiries, /signals, /health, /spot
+  ────────────────────────────────────────
+  File: services/desktop-ui/2099900128260118_expiry_indicator_service.py
+  Role: FastAPI server — /indicators, /indicators.csv
+
+  ---
+  DDE Price Ingestor
+
+  File: services/data-ingestor/src/2099900111260118_ingestor.py
+  Role: DDE adapter — polls MT4 quotes at 100ms
+  ────────────────────────────────────────
+  File: services/data-ingestor/src/2099900109260118_config.py
+  Role: DDE config (host, poll interval, enable flags)
+  ────────────────────────────────────────
+  File: services/data-ingestor/src/2099900112260118_main.py
+  Role: Entry point
+  ────────────────────────────────────────
+  File: services/data-ingestor/src/2099900113260118_main_enterprise.py
+  Role: Enterprise entry point
+  ────────────────────────────────────────
+  File: services/data-ingestor/src/2099900115260118_models.py
+  Role: PriceTick model
+  ────────────────────────────────────────
+  File: services/data-ingestor/src/2099900116260118_plugin.py
+  Role: Plugin registration
+
+  ---
+  CSV / File Transport
+
+  File: services/transport-router/src/2099900202260118_router.py
+  Role: Routes CSV files to downstream services via HTTP
+  ────────────────────────────────────────
+  File: services/transport-router/src/2099900204260118_watcher.py
+  Role: File system watcher for incoming CSVs
+  ────────────────────────────────────────
+  File: services/transport-router/src/2099900203260118_validator.py
+  Role: CSV integrity validation
+  ────────────────────────────────────────
+  File: services/transport-router/src/2099900197260118_config.py
+  Role: Watched directories config
+  ────────────────────────────────────────
+  File: services/transport-router/src/2099900199260118_main.py
+  Role: Entry point
+
+  ---
+  Outbox (Python → MT4 Signals)
+
+  ┌─────────────────────────────────────────────────┬───────────────┐
+  │                      File                       │     Role      │
+  ├─────────────────────────────────────────────────┼───────────────┤
+  │                                                 │ Writes        │
+  │ services/desktop-ui/2099900132260118_outbound.p │ signals to {s │
+  │ y                                               │ ymbol}.jsonl  │
+  │                                                 │ outbox files  │
+  └─────────────────────────────────────────────────┴───────────────┘
+
+  ---
+  Redis Event Bus
+
+  File: shared/idempotency/patterns/2099900213260118_outbox_pattern.py
+  Role: Reliable Redis pub/sub outbox
+  ────────────────────────────────────────
+  File: shared/idempotency/stores/2099900215260118_redis_store.py
+  Role: Redis store adapter
+
+  ---
+  Config
+
+  ┌──────────────────────────────────────┬───────────────────────────┐
+  │                 File                 │           Role            │
+  ├──────────────────────────────────────┼───────────────────────────┤
+  │ config/1299900021260118_plugins.yaml │ MT4 DDE path, broker API, │
+  │                                      │  execution timeouts       │
+  └──────────────────────────────────────┴───────────────────────────┘

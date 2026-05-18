@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eafix.local/schemas/physical_id_registry.schema.json",
+  "title": "Physical ID Registry Schema",
+  "description": "Schema for parsed rows from physical_id_registry.csv. The CSV itself is expected to have exactly 11 columns.",
+  "type": "array",
+  "items": {
+    "$ref": "#/$defs/row"
+  },
+  "$defs": {
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "object_type",
+        "file_id",
+        "directory_id",
+        "relative_path",
+        "name",
+        "parent_relative_path",
+        "parent_directory_id",
+        "extension",
+        "id_source",
+        "is_excluded",
+        "exists_on_disk"
+      ],
+      "properties": {
+        "object_type": {
+          "type": "string",
+          "enum": [
+            "file",
+            "directory"
+          ]
+        },
+        "file_id": {
+          "type": "string",
+          "pattern": "^$|^1\\d{19}$"
+        },
+        "directory_id": {
+          "type": "string",
+          "pattern": "^$|^2\\d{19}$"
+        },
+        "relative_path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?![\\\\/])(?!.*\\\\)(?!.*//).+[^/]$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^\\\\/]+$"
+        },
+        "parent_relative_path": {
+          "type": "string",
+          "pattern": "^$|^(?![\\\\/])(?!.*\\\\)(?!.*//).+[^/]$"
+        },
+        "parent_directory_id": {
+          "type": "string",
+          "pattern": "^$|^2\\d{19}$"
+        },
+        "extension": {
+          "type": "string",
+          "pattern": "^$|^\\.[^.\\\\/\\s]+$"
+        },
+        "id_source": {
+          "type": "string",
+          "enum": [
+            "COUNTER_STORE",
+            "preserved"
+          ]
+        },
+        "is_excluded": {
+          "type": "boolean"
+        },
+        "exists_on_disk": {
+          "type": "boolean"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "object_type": {
+                "const": "file"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "file_id": {
+                "pattern": "^1\\d{19}$"
+              },
+              "directory_id": {
+                "const": ""
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "object_type": {
+                "const": "directory"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "file_id": {
+                "const": ""
+              },
+              "directory_id": {
+                "pattern": "^2\\d{19}$"
+              },
+              "extension": {
+                "const": ""
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

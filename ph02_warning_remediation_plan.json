@@ -1,0 +1,294 @@
+{
+  "plan_metadata": {
+    "plan_id": "PH-02-WARN-R1",
+    "title": "Phase 2 Warning Remediation Plan",
+    "version": "1.0.0",
+    "created": "2026-05-18",
+    "parent_plan": "decomposition_plan_ph1_ph2.json",
+    "source_warning_report": ".state/evidence/PH-02/STEP-005/packet_validation_report.json",
+    "scope": "Eliminate the 56 Phase 2 packet-generation warnings without weakening stale-file gates or corrupting canonical file-module mappings.",
+    "current_warning_count": 56,
+    "target_warning_count": 0,
+    "governing_rule": "Context packets may add routing metadata and derived file-scope rules, but they must not rewrite canonical ownership semantics from module_catalog.json or file_module_mapping.csv."
+  },
+  "warning_inventory": {
+    "by_code": {
+      "SOURCE-CANDIDATES-FILTERED": 13,
+      "WORK-CELL-SOURCE-CANDIDATES-FILTERED": 43
+    },
+    "root_causes": [
+      {
+        "root_cause_id": "RC-001",
+        "title": "Test files were emitted as Phase 1 source-file candidates",
+        "warning_count": 41,
+        "description": "Several work cells inherited test files in source_files. Phase 2 correctly filtered them because allowed_files/source_files are checked against non-test implementation mappings, while tests belong in test_files.",
+        "affected_modules": [
+          "D1_MARKET_FEED_ADAPTER",
+          "C2_INDICATOR_ENGINE",
+          "S1_SIGNAL_ENGINE",
+          "R1_RISK_EVALUATOR",
+          "R2_ORDER_INTENT_COMPILER",
+          "O1_ORDER_ROUTER",
+          "B1_MT4_ADAPTER_TRANSPORT",
+          "B2_MT4_EA_EXECUTOR",
+          "E1_OUTCOME_BUCKETIZER",
+          "E2_PROXIMITY_EVALUATOR",
+          "E3_MATRIX_LOOKUP",
+          "E4_REENTRY_INTENT_BUILDER"
+        ],
+        "fix_strategy": "Move these paths out of submodule_context_catalog.work_cells[*].source_files and into test_files. Regenerate Phase 2 packets so source_files and allowed_files contain only implementation files, while test_files carries mapped test paths."
+      },
+      {
+        "root_cause_id": "RC-002",
+        "title": "UI implementation files were attached to SHARED_LIBS proxy parent",
+        "warning_count": 15,
+        "description": "UI work cells were parented to SHARED_LIBS only because module_catalog.json has no dedicated UI module. Phase 1 carried UI implementation files in source_files, but file_module_mapping.csv intentionally does not map dashboard-backend, desktop-ui, or gui-gateway files to SHARED_LIBS.",
+        "affected_modules": [
+          "SHARED_LIBS"
+        ],
+        "fix_strategy": "Do not map UI files to SHARED_LIBS. Add explicit UI service-scope metadata to UI work cells and Phase 2 packets. Keep SHARED_LIBS as the canonical parent proxy, but resolve UI allowed files by service binding rather than parent_module_symbol."
+      }
+    ]
+  },
+  "affected_paths": {
+    "test_files_to_move_from_source_files_to_test_files": [
+      "services\\data-ingestor\\tests\\integration\\2099900117260118___init__.py",
+      "services\\data-ingestor\\tests\\unit\\2099900118260118_test_data_ingestor_enterprise.py",
+      "services\\execution-engine\\tests\\2099900145260118_test_execution_engine_plugin.py",
+      "services\\indicator-engine\\tests\\2099900162260118_test_indicator_plugin.py",
+      "services\\reentry-engine\\tests\\2099900171260118_test_integration.py",
+      "services\\reentry-matrix-svc\\tests\\2099900180260118_test_processor.py",
+      "services\\risk-manager\\tests\\2099900184260118_test_risk_manager_plugin.py",
+      "services\\signal-generator\\tests\\2099900186260118_test_signal_generator_plugin.py",
+      "services\\transport-router\\tests\\2099900206260118_test_integration.py"
+    ],
+    "ui_service_files_to_resolve_by_service_scope": [
+      "services\\dashboard-backend\\src\\2099900104260118_advanced_indicators.py",
+      "services\\dashboard-backend\\src\\2099900105260118_dashboard_backend.py",
+      "services\\dashboard-backend\\src\\2099900106260118_main.py",
+      "services\\dashboard-backend\\src\\2099900107260118_plugin.py",
+      "services\\dashboard-backend\\src\\2099900108260118_tkinter_dashboard_gui.py",
+      "services\\desktop-ui\\2099900128260118_expiry_indicator_service.py",
+      "services\\desktop-ui\\2099900129260118_expiry_service.py",
+      "services\\desktop-ui\\2099900130260118_friday_vol_indicator.py",
+      "services\\desktop-ui\\2099900131260118_friday_vol_signal.py",
+      "services\\desktop-ui\\2099900132260118_outbound.py",
+      "services\\desktop-ui\\2099900135260118_tkinter_dashboard_gui.py",
+      "services\\desktop-ui\\dashboard\\2099900136260118_tkinter_dashboard_gui.py",
+      "services\\gui-gateway\\src\\2099900155260118_config.py",
+      "services\\gui-gateway\\src\\2099900156260118_main.py",
+      "services\\gui-gateway\\src\\2099900157260118_models.py",
+      "services\\gui-gateway\\src\\2099900158260118_plugin.py"
+    ]
+  },
+  "artifact_intent_manifest": {
+    "policy": {
+      "no_undeclared_mutations_allowed": true,
+      "authoritative_artifacts_must_not_be_modified": true,
+      "file_module_mapping_csv_must_remain_read_only": true
+    },
+    "records": [
+      {
+        "artifact_intent_id": "P2WR-AINT-001",
+        "planned_relative_path": "submodule_catalog_schema.json",
+        "mutation_type": "edit_existing",
+        "purpose": "Add optional properties used by regenerated catalog entries: file_scope_resolution, service_scope, and candidate_file_classification.",
+        "must_not_change": [
+          "existing required fields",
+          "additionalProperties: false",
+          "context_artifacts schema"
+        ]
+      },
+      {
+        "artifact_intent_id": "P2WR-AINT-002",
+        "planned_relative_path": "submodule_context_catalog.json",
+        "mutation_type": "edit_existing",
+        "purpose": "Increment catalog version to 1.0.2, remove test paths from source_files, add them to test_files, and add UI service-scope metadata for UI work cells.",
+        "must_not_change": [
+          "work_cell_id",
+          "parent_module",
+          "parent_module_symbol",
+          "required_reference_documents",
+          "context_artifact_refs",
+          "forbidden_dependencies",
+          "acceptance_gates"
+        ]
+      },
+      {
+        "artifact_intent_id": "P2WR-AINT-003",
+        "planned_relative_path": "context_packet_schema.json",
+        "mutation_type": "edit_existing",
+        "purpose": "Add optional service_scope and file_scope_resolution fields to module packets and work-cell context packets."
+      },
+      {
+        "artifact_intent_id": "P2WR-AINT-004",
+        "planned_relative_path": "context_packets/",
+        "mutation_type": "overwrite_tree",
+        "purpose": "Regenerate all module context packets and work-cell context files from the remediated catalog and unchanged canonical references."
+      },
+      {
+        "artifact_intent_id": "P2WR-AINT-005",
+        "planned_relative_path": ".state/evidence/PH-02/STEP-005/packet_validation_report.json",
+        "mutation_type": "overwrite",
+        "purpose": "Regenerate packet validation report with warning_count == 0 and all Phase 2 gates PASS."
+      },
+      {
+        "artifact_intent_id": "P2WR-AINT-006",
+        "planned_relative_path": ".state/evidence/PH-02/STEP-006/final_nooverride_report.json",
+        "mutation_type": "overwrite",
+        "purpose": "Confirm CA-001 through CA-009 hashes remain unchanged."
+      },
+      {
+        "artifact_intent_id": "P2WR-AINT-007",
+        "planned_relative_path": ".state/evidence/PH-02/phase_2_summary.json",
+        "mutation_type": "overwrite",
+        "purpose": "Record warning_count == 0, packet counts, and PASS gate statuses."
+      },
+      {
+        "artifact_intent_id": "P2WR-AINT-008",
+        "planned_relative_path": ".state/evidence/PH-02-WARN-R1/remediation_summary.json",
+        "mutation_type": "create_new",
+        "purpose": "Record exact remediation actions, before/after warning counts, and validation gate results."
+      }
+    ]
+  },
+  "step_contracts": {
+    "STEP-WR01": {
+      "purpose": "Baseline current warning report and authoritative artifact hashes.",
+      "inputs": [
+        ".state/evidence/PH-02/STEP-005/packet_validation_report.json",
+        ".state/evidence/PH-01/STEP-001/context_artifact_verification.json"
+      ],
+      "outputs": [
+        ".state/evidence/PH-02-WARN-R1/baseline_warning_inventory.json"
+      ],
+      "acceptance_gates": [
+        "GATE-WR-BASELINE-001"
+      ]
+    },
+    "STEP-WR02": {
+      "purpose": "Classify Phase 1 candidate files into implementation source files, test files, and UI service-scope files.",
+      "inputs": [
+        "submodule_context_catalog.json",
+        "EAFIX_auth_docs/file_module_mapping.csv",
+        "EAFIX_auth_docs/ui_catalog.json"
+      ],
+      "outputs": [
+        ".state/evidence/PH-02-WARN-R1/file_classification_report.json"
+      ],
+      "acceptance_gates": [
+        "GATE-WR-CLASSIFY-001"
+      ]
+    },
+    "STEP-WR03": {
+      "purpose": "Update schema files to permit explicit file-scope metadata while keeping existing required fields stable.",
+      "inputs": [
+        "submodule_catalog_schema.json",
+        "context_packet_schema.json"
+      ],
+      "outputs": [
+        "submodule_catalog_schema.json",
+        "context_packet_schema.json"
+      ],
+      "acceptance_gates": [
+        "GATE-WR-SCHEMA-001"
+      ]
+    },
+    "STEP-WR04": {
+      "purpose": "Remediate submodule_context_catalog.json: move test paths into test_files and add UI service-scope metadata.",
+      "inputs": [
+        "submodule_context_catalog.json",
+        "EAFIX_auth_docs/file_module_mapping.csv"
+      ],
+      "outputs": [
+        "submodule_context_catalog.json"
+      ],
+      "acceptance_gates": [
+        "GATE-WR-CATALOG-001",
+        "GATE-WR-NO-TEST-SOURCES-001",
+        "GATE-WR-UI-SCOPE-001"
+      ]
+    },
+    "STEP-WR05": {
+      "purpose": "Regenerate Phase 2 context packets from the remediated catalog.",
+      "inputs": [
+        "submodule_context_catalog.json",
+        "context_packet_schema.json",
+        "EAFIX_auth_docs/file_module_mapping.csv"
+      ],
+      "outputs": [
+        "context_packets/"
+      ],
+      "acceptance_gates": [
+        "GATE-WR-PACKET-SCHEMA-001",
+        "GATE-WR-PACKET-FILE-SCOPE-001"
+      ]
+    },
+    "STEP-WR06": {
+      "purpose": "Regenerate evidence reports and verify warning_count == 0.",
+      "inputs": [
+        "context_packets/",
+        ".state/evidence/PH-01/STEP-001/context_artifact_verification.json"
+      ],
+      "outputs": [
+        ".state/evidence/PH-02/STEP-005/packet_validation_report.json",
+        ".state/evidence/PH-02/STEP-006/final_nooverride_report.json",
+        ".state/evidence/PH-02/phase_2_summary.json",
+        ".state/evidence/PH-02-WARN-R1/remediation_summary.json"
+      ],
+      "acceptance_gates": [
+        "GATE-WR-ZERO-WARNINGS-001",
+        "GATE-WR-NOOVERRIDE-001",
+        "GATE-WR-SUMMARY-001"
+      ]
+    }
+  },
+  "validation_gates": {
+    "GATE-WR-BASELINE-001": "Baseline report records exactly 56 warnings: 13 SOURCE-CANDIDATES-FILTERED and 43 WORK-CELL-SOURCE-CANDIDATES-FILTERED.",
+    "GATE-WR-CLASSIFY-001": "Every warning path is classified as either mapped test file or UI service-scope file. No unknown path remains.",
+    "GATE-WR-SCHEMA-001": "Both JSON schemas validate as Draft 2020-12 and accept the new optional file-scope metadata fields.",
+    "GATE-WR-CATALOG-001": "submodule_context_catalog.json validates against submodule_catalog_schema.json after remediation.",
+    "GATE-WR-NO-TEST-SOURCES-001": "No work_cell.source_files entry contains '\\\\tests\\\\' or has IsTest == 1 in file_module_mapping.csv.",
+    "GATE-WR-UI-SCOPE-001": "All ui_screen and ui_gateway work cells have file_scope_resolution == service_scope and service_scope includes dashboard-backend, desktop-ui, and gui-gateway.",
+    "GATE-WR-PACKET-SCHEMA-001": "All context_packets/**/*.json validate against context_packet_schema.json.",
+    "GATE-WR-PACKET-FILE-SCOPE-001": "For canonical module packets, allowed_files are subsets of file_module_mapping.csv by CanonicalModules. For UI service-scope packets, allowed_files are subsets of file_module_mapping.csv rows where Service is dashboard-backend, desktop-ui, or gui-gateway.",
+    "GATE-WR-ZERO-WARNINGS-001": "Regenerated packet_validation_report.json has warning_count == 0 and warnings == [].",
+    "GATE-WR-NOOVERRIDE-001": "CA-001 through CA-009 hashes match the Phase 1 baseline.",
+    "GATE-WR-SUMMARY-001": "remediation_summary.json records before_warning_count == 56, after_warning_count == 0, and overall_status == PASS."
+  },
+  "anti_pattern_detection": [
+    {
+      "id": "APD-WR-001",
+      "name": "mapping_pollution",
+      "trigger": "file_module_mapping.csv is edited to map UI files to SHARED_LIBS only to satisfy stale-file checks.",
+      "action": "halt; use UI service-scope metadata instead."
+    },
+    {
+      "id": "APD-WR-002",
+      "name": "test_files_as_sources",
+      "trigger": "Any IsTest == 1 path appears in source_files or allowed_files.",
+      "action": "halt; move it to test_files."
+    },
+    {
+      "id": "APD-WR-003",
+      "name": "warning_suppression_without_resolution",
+      "trigger": "Packet generator suppresses warnings without proving file-scope validity.",
+      "action": "halt; fail GATE-WR-PACKET-FILE-SCOPE-001."
+    },
+    {
+      "id": "APD-WR-004",
+      "name": "authoritative_artifact_modified",
+      "trigger": "Any CA-001 through CA-009 hash differs from the Phase 1 baseline.",
+      "action": "halt; restore the authoritative artifact and restart remediation."
+    }
+  ],
+  "definition_of_done": [
+    "The warning report contains zero warnings.",
+    "All Phase 2 packet JSON artifacts validate against context_packet_schema.json.",
+    "No implementation source packet includes test files in source_files or allowed_files.",
+    "UI work cells retain SHARED_LIBS parent_module but resolve files through explicit service_scope metadata.",
+    "file_module_mapping.csv is unchanged.",
+    "GATE-WR-NOOVERRIDE-001 passes for CA-001 through CA-009."
+  ],
+  "recommended_execution_note": "This plan should be executed before Phase 3. Phase 3 depends on context packet file scopes, so eliminating these warnings avoids ambiguous or incomplete edit boundaries."
+}

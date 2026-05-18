@@ -15,7 +15,7 @@ from shared.plugin_interface import PluginContext
 
 
 def _load_plugin_class():
-    module = importlib.import_module("services.risk-manager.src.plugin")
+    module = importlib.import_module("services.risk_manager.src.plugin")
     return module.RiskManagerPlugin
 
 
@@ -37,27 +37,21 @@ async def test_risk_manager_initialization():
 
 def test_risk_limit_check():
     """Test risk limit validation."""
-    plugin_class = _load_plugin_class()
-    plugin = plugin_class()
-    plugin._daily_loss = 0.0
-    plugin._daily_loss_limit = 1000.0
-    plugin._current_drawdown = 2.0
-    plugin._max_drawdown_pct = 5.0
+    module = importlib.import_module("services.risk_manager.src.plugin")
+    settings = module.Settings()
+    processor = module.RiskProcessor(settings)
 
-    signal = {"confidence": 0.8}
-    assert plugin._check_risk_limits(signal) is True
+    signal = {"symbol": "EURUSD", "confidence": 0.8, "sl_pips": 20.0}
+    assert processor.process_signal(signal)["event_type"] == "OrderIntent"
 
-    plugin._daily_loss = 1100.0
-    assert plugin._check_risk_limits(signal) is False
+    processor._cumulative_loss_today = settings.account_balance
+    assert processor.process_signal(signal)["event_type"] == "RiskRejected"
 
 
 def test_position_sizing():
     """Test position size calculation."""
-    plugin_class = _load_plugin_class()
-    plugin = plugin_class()
-    plugin._max_position_size = 1.0
+    module = importlib.import_module("services.risk_manager.src.plugin")
+    settings = module.Settings()
+    processor = module.RiskProcessor(settings)
 
-    signal = {"confidence": 0.75}
-    size = plugin._calculate_position_size(signal)
-
-    assert size == 0.75
+    assert processor._compute_lot_size(sl_pips=20.0) == 1.0

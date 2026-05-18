@@ -1,0 +1,354 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "context_packet_schema.json",
+  "title": "EAFIX Context Packet Schema",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "packet_type",
+        "module_id",
+        "module_symbol",
+        "module_name",
+        "source_files",
+        "contracts",
+        "test_files",
+        "allowed_files",
+        "forbidden_files",
+        "required_reference_documents",
+        "acceptance_gates",
+        "work_cells",
+        "staleness_policy"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "packet_type": {
+          "enum": [
+            "module_context_packet"
+          ]
+        },
+        "generated_at_utc": {
+          "type": "string"
+        },
+        "module_id": {
+          "type": "string"
+        },
+        "module_symbol": {
+          "type": "string"
+        },
+        "module_name": {
+          "type": "string"
+        },
+        "source_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "contracts": {
+          "type": "object",
+          "required": [
+            "input_contracts",
+            "output_contracts"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "input_contracts": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "output_contracts": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "test_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "allowed_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "forbidden_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "required_reference_documents": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "context_artifact_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "acceptance_gates": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "work_cells": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ui_bindings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "staleness_policy": {
+          "type": "string"
+        },
+        "derivation_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "file_scope_resolution": {
+          "type": "string",
+          "enum": [
+            "canonical_module_mapping",
+            "service_scope"
+          ]
+        },
+        "service_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "candidate_file_classification": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "source_files": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "test_files": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "service_scope_files": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "filtered_from_source_files": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "packet_type",
+        "work_cell_id",
+        "parent_module",
+        "parent_module_symbol",
+        "purpose",
+        "allowed_files",
+        "forbidden_files",
+        "required_reference_documents",
+        "acceptance_gates"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "packet_type": {
+          "enum": [
+            "work_cell_context"
+          ]
+        },
+        "generated_at_utc": {
+          "type": "string"
+        },
+        "work_cell_id": {
+          "type": "string"
+        },
+        "work_cell_type": {
+          "type": "string"
+        },
+        "parent_module": {
+          "type": "string"
+        },
+        "parent_module_symbol": {
+          "type": "string"
+        },
+        "parent_module_name": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "process_step_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "input_contracts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "output_contracts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "test_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "allowed_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "forbidden_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "allowed_dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "forbidden_dependencies": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "required_reference_documents": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "context_artifact_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "acceptance_gates": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "validation_gates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ui_bindings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "derivation_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "file_scope_resolution": {
+          "type": "string",
+          "enum": [
+            "canonical_module_mapping",
+            "service_scope"
+          ]
+        },
+        "service_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "candidate_file_classification": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "source_files": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "test_files": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "service_scope_files": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "filtered_from_source_files": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -15,7 +15,7 @@ from shared.plugin_interface import PluginContext
 
 
 def _load_plugin_class():
-    module = importlib.import_module("services.execution-engine.src.plugin")
+    module = importlib.import_module("services.execution_engine.src.plugin")
     return module.ExecutionEnginePlugin
 
 
@@ -40,6 +40,6 @@ async def test_order_execution():
     await plugin.initialize({}, context)
     order = {"symbol": "EURUSD", "action": "BUY", "position_size": 0.5}
 
-    await plugin._execute_order(order)
+    await plugin._submit_order("ORD-TEST-001", order)
 
     assert plugin._execution_count == 1
