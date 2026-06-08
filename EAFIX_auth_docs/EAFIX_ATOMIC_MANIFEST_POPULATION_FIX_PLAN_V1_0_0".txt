@@ -1,0 +1,929 @@
+The previous plan should be converted into an execution spec, not a prose plan. The AI application needs deterministic task IDs, dependencies, target files, patch rules, validation gates, and stop conditions.
+The governing facts are:
+	•	The atomic manifest schema requires one module packet with required sections like module_identity, process_binding, contracts, file_ownership, dependencies, gates, failure behavior, docs, and staleness policy. It also forbids old permanent work_cells, submodules, work_cell_context, and child_modules fields.  
+	•	The project already treats each module as an atomic context unit with co-located artifacts, a single manifest, and numeric identity direction.  
+	•	The module reference already identifies the key drift issues: symbolic vs numeric IDs, differing module counts, incomplete file mapping, and the need to use the assignment policy instead of guessing file owners.  
+	•		•	The schema supports owned_files, shared_files, unassigned_candidate_files, file_assignment_status, and ownership_derivation, so shared-entrypoint resolution can be represented without corrupting atomic ownership.  
+Use this as the machine-executable plan.
+{
+  "plan_id": "EAFIX_ATOMIC_MANIFEST_POPULATION_FIX_PLAN_V1_0_0",
+  "plan_type": "machine_execution_plan",
+  "status": "ready_for_ai_agent_execution",
+  "execution_mode": "sequential_with_validation_gates",
+  "global_rules": {
+    "do_not_generate_canonical_manifests_until": [
+      "population_map_exists",
+      "file_ownership_policy_exists",
+      "fill_instructions_document_type_patch_applied",
+      "validation_harness_exists",
+      "regression_fixtures_pass"
+    ],
+    "schema_authority": "eafix_unified_atomic_module_schema_v1_0_0.json",
+    "required_document_type": "atomic_module_manifest_schema_instance",
+    "required_packet_type": "atomic_module_manifest",
+    "forbidden_manifest_fields": [
+      "work_cells",
+      "submodules",
+      "work_cell_context",
+      "child_modules"
+    ],
+    "hard_fail_only_for": [
+      "invalid_json",
+      "schema_const_mismatch",
+      "missing_schema_required_structural_field",
+      "invalid_module_identity_when_no_candidate_status_allowed"
+    ],
+    "evidence_gaps_behavior": "emit_status_marker_not_fake_certainty",
+    "file_ownership_rule": "never_duplicate_many_to_many_files_as_owned_files",
+    "path_normalization": "normalize_to_repo_relative_forward_slash_paths"
+  },
+  "source_authority_order": [
+    {
+      "domain": "atomic_manifest_schema",
+      "primary": "eafix_unified_atomic_module_schema_v1_0_0.json"
+    },
+    {
+      "domain": "module_identity_and_purpose",
+      "primary": "module_catalog.json",
+      "fallback": [
+        "EAFIX-Modular — End-to-End Module Map.txt"
+      ]
+    },
+    {
+      "domain": "numeric_module_identity",
+      "primary": "EAFIX-Modular — End-to-End Module Map.txt",
+      "fallback": [
+        "symbol_to_numeric_reconciliation_table"
+      ]
+    },
+    {
+      "domain": "process_binding",
+      "primary": "process_step_catalog.json",
+      "augmentation": [
+        "updated_trading_process_aligned.json"
+      ],
+      "conflict_check": [
+        "module_catalog.json"
+      ]
+    },
+    {
+      "domain": "file_ownership",
+      "primary": "file_module_mapping.csv",
+      "policy": "eafix_file_ownership_resolution_policy_v1_0_0.json",
+      "fallback": [
+        "2026012120420004_MODULE_ASSIGNMENT_POLICY.yaml",
+        "eafix_module_files_ai_reference.json"
+      ]
+    },
+    {
+      "domain": "communication_channels",
+      "primary": "communication_channels.json",
+      "fallback": [
+        "MT4_Python communication channels.txt"
+      ]
+    },
+    {
+      "domain": "mt4_platform_constraints",
+      "primary": "mt4 authoritative reference for ai.json"
+    },
+    {
+      "domain": "ui_constraints",
+      "primary": "ui_catalog.json"
+    },
+    {
+      "domain": "migration_traceability",
+      "primary": "atonic to canonical crosswalk.csv",
+      "fallback": [
+        "Q-R_atonic to canonical crosswalk.txt",
+        "EAFIX_ATONIC_ End-to-End Trading Lifecycle Process.md"
+      ]
+    }
+  ],
+  "artifacts_to_create": [
+    {
+      "path": "eafix_atomic_manifest_population_map_v1_0_0.json",
+      "purpose": "Machine-readable field population rules for every atomic manifest field.",
+      "required": true
+    },
+    {
+      "path": "eafix_file_ownership_resolution_policy_v1_0_0.json",
+      "purpose": "Deterministic policy for owned/shared/candidate/conflicted/generated file classification.",
+      "required": true
+    },
+    {
+      "path": "eafix_atomic_manifest_generation_runbook_v1_0_0.md",
+      "purpose": "Human-readable execution runbook summarizing the machine plan.",
+      "required": true
+    },
+    {
+      "path": "tests/atomic_manifest_population/fixtures/",
+      "purpose": "Regression fixtures for high-risk manifest generation cases.",
+      "required": true
+    },
+    {
+      "path": "tools/validate_atomic_manifest_population.py",
+      "purpose": "Validation harness for schema, source traceability, ownership, applicability, and staleness.",
+      "required": true
+    }
+  ],
+  "artifacts_to_patch": [
+    {
+      "path": "eafix_unified_atomic_module_manifest_ai_fill_instructions_v1_0_0.md",
+      "patches": [
+        {
+          "patch_id": "PATCH_FILL_INSTRUCTIONS_DOCUMENT_TYPE",
+          "find_semantic": "Any instruction that tells the AI to emit document_type unified_atomic_module_manifest.",
+          "replace_with": "document_type MUST equal atomic_module_manifest_schema_instance. packet_type MUST equal atomic_module_manifest. The schema constants are authoritative."
+        },
+        {
+          "patch_id": "PATCH_FILL_INSTRUCTIONS_POPULATION_MAP_REQUIRED",
+          "find_semantic": "Any instruction implying fields may be populated from prose judgment alone.",
+          "replace_with": "Every manifest field MUST be populated through eafix_atomic_manifest_population_map_v1_0_0.json unless explicitly marked manual_review."
+        },
+        {
+          "patch_id": "PATCH_FILL_INSTRUCTIONS_FILE_OWNERSHIP_POLICY_REQUIRED",
+          "find_semantic": "Any instruction allowing simple file lookup as ownership.",
+          "replace_with": "file_ownership MUST be resolved through eafix_file_ownership_resolution_policy_v1_0_0.json. Many-to-many file mappings MUST NOT be duplicated as owned_files."
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "task_id": "T00_FREEZE_CANONICAL_MANIFEST_GENERATION",
+      "priority": "P0",
+      "depends_on": [],
+      "action": "mark_generation_frozen",
+      "targets": [
+        "atomic_module_manifests"
+      ],
+      "implementation": {
+        "required_state": "candidate_only",
+        "allowed_outputs": [
+          "draft",
+          "fixture",
+          "candidate_pending_review"
+        ],
+        "forbidden_outputs": [
+          "canonical"
+        ]
+      },
+      "acceptance_criteria": [
+        "No newly generated manifest is marked canonical before validation harness passes.",
+        "Any existing draft manifest generated before this plan is marked candidate_pending_review."
+      ]
+    },
+    {
+      "task_id": "T01_PATCH_DOCUMENT_TYPE_CONTRADICTION",
+      "priority": "P0",
+      "depends_on": [
+        "T00_FREEZE_CANONICAL_MANIFEST_GENERATION"
+      ],
+      "action": "patch_file",
+      "target_file": "eafix_unified_atomic_module_manifest_ai_fill_instructions_v1_0_0.md",
+      "implementation": {
+        "required_replacements": [
+          {
+            "invalid_value": "unified_atomic_module_manifest",
+            "valid_value": "atomic_module_manifest_schema_instance",
+            "field": "document_type"
+          }
+        ],
+        "required_insertions": [
+          "The schema const for document_type is authoritative.",
+          "The schema const for packet_type is authoritative.",
+          "Generated manifests must fail validation if either const is wrong."
+        ]
+      },
+      "acceptance_criteria": [
+        "No instruction remains that tells AI to emit document_type unified_atomic_module_manifest.",
+        "Fill instructions explicitly require document_type atomic_module_manifest_schema_instance.",
+        "Fill instructions explicitly require packet_type atomic_module_manifest."
+      ]
+    },
+    {
+      "task_id": "T02_CREATE_POPULATION_MAP_SCHEMA",
+      "priority": "P0",
+      "depends_on": [
+        "T01_PATCH_DOCUMENT_TYPE_CONTRADICTION"
+      ],
+      "action": "create_file",
+      "target_file": "eafix_atomic_manifest_population_map_v1_0_0.json",
+      "implementation": {
+        "top_level_required_fields": [
+          "schema_version",
+          "document_type",
+          "map_id",
+          "target_manifest_schema",
+          "source_authority_order",
+          "field_rules",
+          "global_conflict_rules",
+          "missing_behavior_tiers",
+          "regeneration_policies",
+          "validation_profiles"
+        ],
+        "field_rule_required_fields": [
+          "field_path",
+          "field_group",
+          "applies_when",
+          "primary_source",
+          "fallback_sources",
+          "join_key",
+          "cardinality",
+          "extraction_rule",
+          "transform",
+          "validate_against",
+          "conflict_rule",
+          "missing_behavior",
+          "provenance_writeback",
+          "regeneration_policy",
+          "manual_review_trigger"
+        ]
+      },
+      "acceptance_criteria": [
+        "Population map is valid JSON.",
+        "Every field_rule contains all required control fields.",
+        "Population map includes explicit rules for at least the required top-level manifest sections."
+      ]
+    },
+    {
+      "task_id": "T03_SEED_HIGH_VALUE_FIELD_RULES",
+      "priority": "P0",
+      "depends_on": [
+        "T02_CREATE_POPULATION_MAP_SCHEMA"
+      ],
+      "action": "populate_json_array",
+      "target_file": "eafix_atomic_manifest_population_map_v1_0_0.json",
+      "target_json_path": "$.field_rules",
+      "implementation": {
+        "seed_field_paths": [
+          "schema_version",
+          "document_type",
+          "packet_type",
+          "source_authority",
+          "module_identity.module_id",
+          "module_identity.numeric_module_id",
+          "module_identity.canonical_symbol",
+          "module_identity.module_name",
+          "module_identity.identity_status",
+          "module_identity.identity_model",
+          "module_classification.module_kind",
+          "module_classification.domain_group_id",
+          "module_classification.domain_group_name",
+          "module_classification.layer",
+          "module_classification.deployable_scope",
+          "purpose",
+          "plain_language_summary",
+          "process_binding",
+          "contracts.input_contracts",
+          "contracts.output_contracts",
+          "contracts.module_io_policy",
+          "module_scope.scope_in",
+          "module_scope.scope_out",
+          "module_scope.responsibilities",
+          "module_scope.forbidden_responsibilities",
+          "file_ownership",
+          "service_runtime",
+          "communication_channels",
+          "dependencies",
+          "standards_and_gates",
+          "state_and_failure_behavior",
+          "documentation_set",
+          "migration_traceability",
+          "reconciliation_status",
+          "ai_context",
+          "platform_constraints",
+          "observability",
+          "security_and_safety",
+          "staleness_policy"
+        ]
+      },
+      "acceptance_criteria": [
+        "All schema-required top-level fields have population rules.",
+        "Each seeded rule declares applicability, cardinality, missing behavior, and regeneration policy.",
+        "No seeded rule relies on prose-only extraction."
+      ]
+    },
+    {
+      "task_id": "T04_CREATE_FILE_OWNERSHIP_POLICY",
+      "priority": "P0",
+      "depends_on": [
+        "T02_CREATE_POPULATION_MAP_SCHEMA"
+      ],
+      "action": "create_file",
+      "target_file": "eafix_file_ownership_resolution_policy_v1_0_0.json",
+      "implementation": {
+        "top_level_required_fields": [
+          "schema_version",
+          "document_type",
+          "policy_id",
+          "ownership_classes",
+          "resolution_precedence",
+          "many_to_many_rules",
+          "shared_entrypoint_rules",
+          "generated_file_rules",
+          "test_file_rules",
+          "unassigned_file_rules",
+          "manual_override_rules",
+          "writeback_rules",
+          "validation_rules"
+        ],
+        "ownership_classes": [
+          "owned",
+          "shared_entrypoint",
+          "shared_source_needs_refactor",
+          "shared_kernel",
+          "integration_test",
+          "generated_artifact",
+          "candidate",
+          "unassigned",
+          "conflicted",
+          "external"
+        ],
+        "resolution_precedence": [
+          "explicit_manifest_override",
+          "manual_review_override",
+          "file_module_mapping",
+          "nearest_module_manifest",
+          "module_assignment_policy",
+          "path_rule",
+          "unassigned"
+        ]
+      },
+      "acceptance_criteria": [
+        "Policy explicitly forbids duplicating a many-to-many file into owned_files across multiple manifests.",
+        "Policy defines how to write shared files into file_ownership.shared_files.",
+        "Policy defines how to set file_assignment_status for complete, partial, unassigned, conflicted, needs_review, and generated_only cases."
+      ]
+    },
+    {
+      "task_id": "T05_ADD_SHARED_CALENDAR_ENTRYPOINT_RULE",
+      "priority": "P0",
+      "depends_on": [
+        "T04_CREATE_FILE_OWNERSHIP_POLICY"
+      ],
+      "action": "append_policy_rule",
+      "target_file": "eafix_file_ownership_resolution_policy_v1_0_0.json",
+      "implementation": {
+        "rule_id": "OWNERSHIP_RULE_SHARED_CALENDAR_INGESTOR_ENTRYPOINT",
+        "match": {
+          "path": "services/calendar-ingestor/src/2099900093260118_main.py",
+          "canonical_modules_contains_any": [
+            "F3_CLOCK_SCHEDULER",
+            "D2_CALENDAR_SOURCE_ADAPTER",
+            "D3_CALENDAR_NORMALIZER",
+            "F2_EVENT_LOG",
+            "D4_CALENDAR_TRIGGER_BUILDER"
+          ]
+        },
+        "classification": "shared_entrypoint",
+        "manifest_writeback": {
+          "owned_files": "do_not_add",
+          "shared_files": {
+            "path": "services/calendar-ingestor/src/2099900093260118_main.py",
+            "sharing_policy": "needs_refactor",
+            "allowed_modules": [
+              "F3_CLOCK_SCHEDULER",
+              "D2_CALENDAR_SOURCE_ADAPTER",
+              "D3_CALENDAR_NORMALIZER",
+              "F2_EVENT_LOG",
+              "D4_CALENDAR_TRIGGER_BUILDER"
+            ],
+            "reason": "Single service entrypoint spans multiple atomic calendar modules; cannot be treated as exclusive owned file."
+          },
+          "file_assignment_status": "partial",
+          "reconciliation_flags": [
+            "shared_entrypoint",
+            "split_candidate"
+          ]
+        }
+      },
+      "acceptance_criteria": [
+        "calendar-ingestor main.py is never emitted as owned_files in more than one manifest.",
+        "Affected module manifests record the file under shared_files with sharing_policy needs_refactor."
+      ]
+    },
+    {
+      "task_id": "T06_ADD_APPLICABILITY_MATRIX",
+      "priority": "P0",
+      "depends_on": [
+        "T03_SEED_HIGH_VALUE_FIELD_RULES"
+      ],
+      "action": "augment_population_map",
+      "target_file": "eafix_atomic_manifest_population_map_v1_0_0.json",
+      "implementation": {
+        "applicability_dimensions": [
+          "module_kind",
+          "deployable_scope",
+          "canonical_symbol",
+          "domain_group_id",
+          "phase_id",
+          "platform",
+          "communication_channel_presence",
+          "trading_safety_level"
+        ],
+        "rules": [
+          {
+            "field_group": "communication_channels",
+            "applies_when_any": {
+              "module_kind": [
+                "INTEGRATION_BRIDGE_MODULE",
+                "INTERFACE_MODULE",
+                "UI_MODULE"
+              ],
+              "deployable_scope": [
+                "python_service",
+                "mql4_ea",
+                "dashboard_backend",
+                "gui_gateway",
+                "redis_bus",
+                "mixed"
+              ]
+            },
+            "if_not_applicable": "emit_empty_object"
+          },
+          {
+            "field_group": "platform_constraints",
+            "applies_when_any": {
+              "deployable_scope": [
+                "mql4_ea",
+                "mql4_indicator_or_script",
+                "python_service",
+                "desktop_ui",
+                "mixed"
+              ],
+              "platform": [
+                "MT4",
+                "MQL4",
+                "Python",
+                "Windows",
+                "Redis",
+                "Postgres"
+              ]
+            },
+            "if_not_applicable": "omit_optional_field"
+          },
+          {
+            "field_group": "security_and_safety",
+            "applies_when_any": {
+              "module_kind": [
+                "RISK_MODULE",
+                "OMS_MODULE",
+                "INTEGRATION_BRIDGE_MODULE",
+                "UI_MODULE"
+              ],
+              "trading_safety_level": [
+                "risk_affecting",
+                "order_affecting",
+                "emergency_stop",
+                "external_execution"
+              ]
+            },
+            "if_not_applicable": "omit_optional_field"
+          }
+        ]
+      },
+      "acceptance_criteria": [
+        "Population rules do not treat conditional fields as globally applicable.",
+        "Each conditional field has explicit if_applicable and if_not_applicable behavior."
+      ]
+    },
+    {
+      "task_id": "T07_DEFINE_PROCESS_BINDING_RULE",
+      "priority": "P0",
+      "depends_on": [
+        "T03_SEED_HIGH_VALUE_FIELD_RULES"
+      ],
+      "action": "replace_population_rule",
+      "target_file": "eafix_atomic_manifest_population_map_v1_0_0.json",
+      "target_field_path": "process_binding",
+      "implementation": {
+        "primary_source": "process_step_catalog.json",
+        "primary_join": "canonical_symbol == steps[].module_symbol",
+        "phase_augmentation_source": "updated_trading_process_aligned.json",
+        "phase_join": "step_number == steps[].step_number",
+        "conflict_check_source": "module_catalog.json",
+        "cardinality": "one_to_one_required_unless_cross_cutting_or_loop",
+        "missing_behavior": {
+          "no_step_found": "fail_for_canonical_pipeline_module",
+          "phase_missing": "emit_phase_id_PHASE_UNKNOWN_AND_mark_needs_review",
+          "conflict_detected": "write_reconciliation_status_known_flags"
+        },
+        "regeneration_policy": "overwrite_from_source"
+      },
+      "acceptance_criteria": [
+        "process_binding is primarily copied from process_step_catalog.json.",
+        "phase_id and phase_name are augmented from updated_trading_process_aligned.json.",
+        "module_catalog.json is used as conflict check, not broad merge source."
+      ]
+    },
+    {
+      "task_id": "T08_DEFINE_TIERED_MISSING_BEHAVIOR",
+      "priority": "P0",
+      "depends_on": [
+        "T03_SEED_HIGH_VALUE_FIELD_RULES"
+      ],
+      "action": "populate_json_object",
+      "target_file": "eafix_atomic_manifest_population_map_v1_0_0.json",
+      "target_json_path": "$.missing_behavior_tiers",
+      "implementation": {
+        "tiers": {
+          "structural_fail": {
+            "applies_to": [
+              "schema_version",
+              "document_type",
+              "packet_type",
+              "module_identity.module_id",
+              "module_identity.canonical_symbol",
+              "module_identity.module_name"
+            ],
+            "behavior": "fail_manifest_generation"
+          },
+          "status_marker": {
+            "applies_to": [
+              "file_ownership",
+              "documentation_set",
+              "reconciliation_status",
+              "migration_traceability"
+            ],
+            "behavior": "emit_needs_review_or_partial_status"
+          },
+          "not_applicable": {
+            "applies_to": [
+              "communication_channels",
+              "platform_constraints",
+              "observability",
+              "security_and_safety"
+            ],
+            "behavior": "omit_optional_or_emit_empty_object_per_field_rule"
+          },
+          "conflict": {
+            "applies_to": [
+              "all_fields"
+            ],
+            "behavior": "use_authority_order_and_write_reconciliation_note"
+          }
+        }
+      },
+      "acceptance_criteria": [
+        "No evidence-dependent field uses fail_manifest_generation as default.",
+        "Only structural identity/schema fields hard-fail by default."
+      ]
+    },
+    {
+      "task_id": "T09_DEFINE_REGENERATION_POLICIES",
+      "priority": "P1",
+      "depends_on": [
+        "T03_SEED_HIGH_VALUE_FIELD_RULES"
+      ],
+      "action": "populate_json_object",
+      "target_file": "eafix_atomic_manifest_population_map_v1_0_0.json",
+      "target_json_path": "$.regeneration_policies",
+      "implementation": {
+        "policies": [
+          "overwrite_from_source",
+          "preserve_manual",
+          "merge_append_unique",
+          "recompute_derived",
+          "manual_review_on_conflict",
+          "clear_if_source_removed",
+          "locked_after_review"
+        ],
+        "field_defaults": {
+          "schema_constants": "overwrite_from_source",
+          "module_identity": "overwrite_from_source",
+          "process_binding": "overwrite_from_source",
+          "contracts": "overwrite_from_source",
+          "file_ownership": "merge_append_unique_preserve_manual",
+          "documentation_set": "recompute_derived",
+          "reconciliation_status": "recompute_derived",
+          "ai_context": "preserve_manual",
+          "notes": "merge_append_unique",
+          "staleness_policy": "recompute_derived"
+        }
+      },
+      "acceptance_criteria": [
+        "Every field_rule references a valid regeneration_policy.",
+        "Manual fields cannot be overwritten without explicit policy."
+      ]
+    },
+    {
+      "task_id": "T10_CREATE_VALIDATION_HARNESS",
+      "priority": "P0",
+      "depends_on": [
+        "T02_CREATE_POPULATION_MAP_SCHEMA",
+        "T04_CREATE_FILE_OWNERSHIP_POLICY",
+        "T06_ADD_APPLICABILITY_MATRIX",
+        "T08_DEFINE_TIERED_MISSING_BEHAVIOR"
+      ],
+      "action": "create_file",
+      "target_file": "tools/validate_atomic_manifest_population.py",
+      "implementation": {
+        "validator_inputs": [
+          "eafix_unified_atomic_module_schema_v1_0_0.json",
+          "eafix_atomic_manifest_population_map_v1_0_0.json",
+          "eafix_file_ownership_resolution_policy_v1_0_0.json",
+          "candidate_manifest_path_or_directory"
+        ],
+        "validation_passes": [
+          "json_parse",
+          "json_schema_validate_manifest",
+          "population_map_rule_coverage",
+          "applicability_validate",
+          "file_ownership_validate",
+          "no_duplicate_owned_files_validate",
+          "source_provenance_validate",
+          "staleness_policy_validate",
+          "regeneration_policy_validate"
+        ],
+        "outputs": [
+          "validation_report.json",
+          "validation_report.md"
+        ]
+      },
+      "acceptance_criteria": [
+        "Validator fails schema-invalid manifests.",
+        "Validator fails manifests with shared many-to-many files duplicated under owned_files.",
+        "Validator warns on incomplete evidence using status markers.",
+        "Validator emits machine-readable report."
+      ]
+    },
+    {
+      "task_id": "T11_CREATE_REGRESSION_FIXTURES",
+      "priority": "P0",
+      "depends_on": [
+        "T10_CREATE_VALIDATION_HARNESS"
+      ],
+      "action": "create_fixture_set",
+      "target_directory": "tests/atomic_manifest_population/fixtures/",
+      "implementation": {
+        "fixtures": [
+          {
+            "fixture_id": "FIXTURE_SHARED_CALENDAR_ENTRYPOINT",
+            "modules": [
+              "F3_CLOCK_SCHEDULER",
+              "D2_CALENDAR_SOURCE_ADAPTER",
+              "D3_CALENDAR_NORMALIZER",
+              "F2_EVENT_LOG",
+              "D4_CALENDAR_TRIGGER_BUILDER"
+            ],
+            "expected": "shared calendar-ingestor main.py appears in shared_files only"
+          },
+          {
+            "fixture_id": "FIXTURE_D2_PROCESS_BINDING",
+            "module": "D2_CALENDAR_SOURCE_ADAPTER",
+            "expected": {
+              "step_code": "S03",
+              "step_number": 3,
+              "responsible": "calendar_service.py::poll_scheduler",
+              "input_contracts": [
+                "CalendarSourceConfig",
+                "ScheduleTick"
+              ],
+              "output_contracts": [
+                "CalendarRaw"
+              ]
+            }
+          },
+          {
+            "fixture_id": "FIXTURE_B1_BRIDGE_CHANNELS",
+            "module": "B1_MT4_ADAPTER_TRANSPORT",
+            "expected": "communication_channels applicable and populated from communication_channels.json"
+          },
+          {
+            "fixture_id": "FIXTURE_C2_COMPUTE_NO_BRIDGE_CHANNELS",
+            "module": "C2_INDICATOR_ENGINE",
+            "expected": "communication_channels empty or not_applicable unless explicit source binding exists"
+          }
+        ]
+      },
+      "acceptance_criteria": [
+        "All fixtures are executable by validation harness.",
+        "Shared-entrypoint fixture fails if ownership is duplicated.",
+        "Process-binding fixture fails if S03 is not sourced from process_step_catalog.json."
+      ]
+    },
+    {
+      "task_id": "T12_CREATE_GENERATION_RUNBOOK",
+      "priority": "P1",
+      "depends_on": [
+        "T10_CREATE_VALIDATION_HARNESS",
+        "T11_CREATE_REGRESSION_FIXTURES"
+      ],
+      "action": "create_file",
+      "target_file": "eafix_atomic_manifest_generation_runbook_v1_0_0.md",
+      "implementation": {
+        "required_sections": [
+          "Purpose",
+          "Inputs",
+          "Authority Order",
+          "Generation Freeze Rules",
+          "Population Map Requirement",
+          "File Ownership Resolution Requirement",
+          "Validation Harness Usage",
+          "Regression Fixture Usage",
+          "Batch Generation Order",
+          "Promotion Criteria",
+          "Failure Handling"
+        ]
+      },
+      "acceptance_criteria": [
+        "Runbook references the population map as mandatory.",
+        "Runbook references the file ownership policy as mandatory.",
+        "Runbook states that canonical promotion requires validation pass."
+      ]
+    },
+    {
+      "task_id": "T13_RUN_VALIDATION_ON_CONTROL_FILES",
+      "priority": "P0",
+      "depends_on": [
+        "T01_PATCH_DOCUMENT_TYPE_CONTRADICTION",
+        "T02_CREATE_POPULATION_MAP_SCHEMA",
+        "T04_CREATE_FILE_OWNERSHIP_POLICY",
+        "T10_CREATE_VALIDATION_HARNESS",
+        "T11_CREATE_REGRESSION_FIXTURES"
+      ],
+      "action": "run_validation",
+      "implementation": {
+        "commands": [
+          "python tools/validate_atomic_manifest_population.py --validate-control-files",
+          "python tools/validate_atomic_manifest_population.py --run-fixtures tests/atomic_manifest_population/fixtures/"
+        ],
+        "required_outputs": [
+          "validation_report.json",
+          "validation_report.md"
+        ]
+      },
+      "acceptance_criteria": [
+        "Control files parse as valid JSON.",
+        "Population map has rule coverage for schema-required fields.",
+        "File ownership policy rejects duplicate owned_files for shared entrypoints.",
+        "Regression fixtures pass."
+      ]
+    },
+    {
+      "task_id": "T14_GENERATE_CANDIDATE_MANIFEST_BATCHES",
+      "priority": "P1",
+      "depends_on": [
+        "T13_RUN_VALIDATION_ON_CONTROL_FILES"
+      ],
+      "action": "generate_candidate_manifests",
+      "implementation": {
+        "batch_order": [
+          {
+            "batch_id": "BATCH_A_INFRA",
+            "modules": [
+              "F1_CONFIG_PREFERENCES",
+              "F3_CLOCK_SCHEDULER",
+              "P1_HEALTH_AGGREGATOR"
+            ]
+          },
+          {
+            "batch_id": "BATCH_B_CALENDAR_SHARED_ENTRYPOINT_STRESS_TEST",
+            "modules": [
+              "D2_CALENDAR_SOURCE_ADAPTER",
+              "D3_CALENDAR_NORMALIZER",
+              "F2_EVENT_LOG",
+              "D4_CALENDAR_TRIGGER_BUILDER"
+            ]
+          },
+          {
+            "batch_id": "BATCH_C_MARKET_COMPUTE",
+            "modules": [
+              "D1_MARKET_FEED_ADAPTER",
+              "C1_BAR_BUILDER",
+              "C2_INDICATOR_ENGINE",
+              "C3_FEATURE_PACKAGER"
+            ]
+          },
+          {
+            "batch_id": "BATCH_D_SIGNAL_RISK_ORDER",
+            "modules": [
+              "S1_SIGNAL_ENGINE",
+              "S2_INTENT_BUILDER",
+              "R1_RISK_EVALUATOR",
+              "R2_ORDER_INTENT_COMPILER",
+              "O1_ORDER_ROUTER"
+            ]
+          },
+          {
+            "batch_id": "BATCH_E_MT4_BRIDGE",
+            "modules": [
+              "B1_MT4_ADAPTER_TRANSPORT",
+              "B2_MT4_EA_EXECUTOR",
+              "B3_EXEC_EVENT_NORMALIZER"
+            ]
+          },
+          {
+            "batch_id": "BATCH_F_REENTRY",
+            "modules": [
+              "E1_OUTCOME_BUCKETIZER",
+              "E2_PROXIMITY_EVALUATOR",
+              "E3_MATRIX_LOOKUP",
+              "E4_REENTRY_INTENT_BUILDER"
+            ]
+          }
+        ],
+        "output_status": "candidate_pending_review"
+      },
+      "acceptance_criteria": [
+        "Each batch validates before the next batch starts.",
+        "No candidate manifest contains forbidden old hierarchy fields.",
+        "No shared file is duplicated as owned_files across multiple manifests.",
+        "All manifests emit source_authority and staleness_policy."
+      ]
+    },
+    {
+      "task_id": "T15_PROMOTE_VALIDATED_MANIFESTS",
+      "priority": "P2",
+      "depends_on": [
+        "T14_GENERATE_CANDIDATE_MANIFEST_BATCHES"
+      ],
+      "action": "promote_if_valid",
+      "implementation": {
+        "promotion_conditions": [
+          "schema_validation_passed",
+          "population_map_coverage_passed",
+          "file_ownership_validation_passed",
+          "source_traceability_present",
+          "staleness_status_not_stale",
+          "no_blocking_reconciliation_flags"
+        ],
+        "allowed_status_transition": {
+          "from": "candidate_pending_review",
+          "to": "canonical"
+        }
+      },
+      "acceptance_criteria": [
+        "Only validated manifests are promoted.",
+        "Manifests with needs_review or conflicted ownership remain candidate_pending_review."
+      ]
+    }
+  ],
+  "blocking_failure_conditions": [
+    {
+      "failure_id": "FAIL_SCHEMA_CONST_MISMATCH",
+      "condition": "document_type or packet_type does not equal schema const",
+      "action": "halt"
+    },
+    {
+      "failure_id": "FAIL_FORBIDDEN_HIERARCHY_FIELD",
+      "condition": "manifest contains work_cells, submodules, work_cell_context, or child_modules",
+      "action": "halt"
+    },
+    {
+      "failure_id": "FAIL_DUPLICATE_OWNED_FILE",
+      "condition": "same repo-relative source file appears as owned_files in more than one manifest",
+      "action": "halt"
+    },
+    {
+      "failure_id": "FAIL_MISSING_POPULATION_RULE",
+      "condition": "manifest field populated without field_rule coverage",
+      "action": "halt"
+    },
+    {
+      "failure_id": "FAIL_INVALID_REQUIRED_IDENTITY",
+      "condition": "module_identity missing or invalid and no candidate identity status is declared",
+      "action": "halt"
+    }
+  ],
+  "non_blocking_review_conditions": [
+    {
+      "condition": "file ownership unresolved",
+      "write_status": "file_ownership.file_assignment_status = needs_review"
+    },
+    {
+      "condition": "documentation incomplete",
+      "write_status": "documentation_set.documentation_completeness = partial"
+    },
+    {
+      "condition": "numeric and symbolic IDs both exist but reconciliation incomplete",
+      "write_status": "reconciliation_status.known_flags += identity_model_hybrid_migration"
+    },
+    {
+      "condition": "field not applicable to module",
+      "write_status": "omit optional field or emit empty object per population rule"
+    }
+  ],
+  "definition_of_done": {
+    "control_layer_done": [
+      "population map exists",
+      "file ownership policy exists",
+      "fill instructions patched",
+      "validation harness exists",
+      "fixtures pass"
+    ],
+    "manifest_generation_ready": [
+      "all P0 tasks complete",
+      "no blocking validation failures",
+      "shared-entrypoint fixture passes"
+    ],
+    "canonical_promotion_ready": [
+      "candidate manifests validate against schema",
+      "source provenance present",
+      "staleness policy present",
+      "no duplicate owned files",
+      "no unresolved blocking reconciliation flags"
+    ]
+  }
+}

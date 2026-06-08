@@ -1,0 +1,1151 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "atomic_module_catalog_vNext",
+  "catalog_id": "eafix.atomic_module_catalog.vNext",
+  "catalog_name": "EAFIX Atomic Module Catalog \u2014 vNext (Locked Pass 1)",
+  "version": "1.0.0",
+  "generated_at_utc": "2026-06-06T13:45:36.917486+00:00",
+  "authority_policy": "generated_from_canonical_sources",
+  "lock_state": "LOCKED_PASS_1",
+  "lock_scope": "34 well-supported atomic modules (Python pipeline + shared kernel + UI/gateway). EA-side Systems A-G deferred to Pass 2.",
+  "module_count": 34,
+  "generated_from_documents": [
+    "module_catalog.json",
+    "updated_trading_process_aligned.json",
+    "process_step_catalog.json",
+    "EAFIX-Modular___End-to-End_Module_Map.txt",
+    "EAFIX_module_reconciliation_worksheet.csv",
+    "ui_catalog.json",
+    "eafix_services_ai_reference_20260510.json",
+    "MT4_Python_communication_channels.txt"
+  ],
+  "lock_decisions": [
+    "26 process-bound canonical modules retained (1:1 with steps S01-S26).",
+    "F1_FLOW_ORCHESTRATOR renamed to F4_FLOW_ORCHESTRATOR to clear PREFIX_COLLISION_F1; layer set cross_cutting.",
+    "R1_RISK_EVALUATOR narrowed to the approval decision; correlation guard promoted to R3_CORRELATION_GUARD (emits RiskGuardResult, consumed by R1).",
+    "KIND_MISMATCH resolved: adopted domain-specific module_kind (COMPUTE/SIGNAL/RISK/OMS/REENTRY) over generic PIPELINE_STAGE_MODULE.",
+    "STALE_CSV_SYMBOL resolved: O2_OMS / O3_PNL_CLASSIFIER recorded as legacy_aliases.",
+    "4 UI/gateway modules promoted (U1-U4); individual tabs/panels remain internal.",
+    "P2_REPORTER promoted from service inventory (absent from prior pipeline catalog).",
+    "SK1_PLUGIN_INTERFACE + SK2_IDEMPOTENCY promoted to shared-kernel; SHARED_LIBS umbrella demoted to domain group; reentry helper folds into E-series; positioning deferred to Pass 2.",
+    "New numeric IDs assigned ...027-...034 (below reserved ...099)."
+  ],
+  "deferred_to_pass_2": [
+    "EA Systems A-G (signal pipeline, bridges, reentry gate/decision, persistence, config/profiles, monitoring/freeze) - pending MT4/Python authority boundary decision.",
+    "R1 position-sizing split vs SHARED_LIBS positioning (SK3_POSITION_SIZING?).",
+    "D3 CAL8 assignment -> possible D5_CAL8_REGISTRY if CAL8 becomes system-wide identity authority.",
+    "event-gateway (bus multiplexer module vs infrastructure).",
+    "compliance-monitor, data-validator (stub services).",
+    "Grafana ops dashboard (observability artifact, likely not a module)."
+  ],
+  "open_reconciliation_note": "reconciliation_flags are carried forward per module (file binding, service binding, submodule docs). Locking fixes module IDENTITY only; file/service binding is resolved when generating each manifest.",
+  "modules": [
+    {
+      "module_id": "50000000000000000001",
+      "numeric_module_id": "50000000000000000001",
+      "canonical_symbol": "F1_CONFIG_PREFERENCES",
+      "module_name": "Configuration Service",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "INFRA_PLATFORM_MODULE",
+      "domain_group_id": "G0",
+      "domain_group_name": "Infrastructure Platform",
+      "phase_id": "PHASE_A",
+      "layer": 1,
+      "process_steps": [
+        "S01"
+      ],
+      "purpose": "Resolve and validate the immutable configuration snapshot for a run.",
+      "input_contracts": [
+        "ConfigSource"
+      ],
+      "output_contracts": [
+        "ResolvedConfig"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "NO_FILES",
+        "SUBMODULE_UNDOC"
+      ]
+    },
+    {
+      "module_id": "50000000000000000002",
+      "numeric_module_id": "50000000000000000002",
+      "canonical_symbol": "F3_CLOCK_SCHEDULER",
+      "module_name": "Clock Scheduler",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "INFRA_PLATFORM_MODULE",
+      "domain_group_id": "G0",
+      "domain_group_name": "Infrastructure Platform",
+      "phase_id": "PHASE_A",
+      "layer": 1,
+      "process_steps": [
+        "S02"
+      ],
+      "purpose": "Emit schedule ticks that drive polling and time-based cadence.",
+      "input_contracts": [
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "ScheduleTick"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "NO_FILES",
+        "SUBMODULE_UNDOC"
+      ]
+    },
+    {
+      "module_id": "50000000000000000003",
+      "numeric_module_id": "50000000000000000003",
+      "canonical_symbol": "D2_CALENDAR_SOURCE_ADAPTER",
+      "module_name": "Calendar Source Adapter",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "INTEGRATION_BRIDGE_MODULE",
+      "domain_group_id": "G1",
+      "domain_group_name": "Data Ingest Layer",
+      "phase_id": "PHASE_B",
+      "layer": 2,
+      "process_steps": [
+        "S03"
+      ],
+      "purpose": "Poll external calendar source(s) and emit raw calendar payloads.",
+      "input_contracts": [
+        "CalendarSourceConfig",
+        "ScheduleTick"
+      ],
+      "output_contracts": [
+        "CalendarRaw"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000004",
+      "numeric_module_id": "50000000000000000004",
+      "canonical_symbol": "D3_CALENDAR_NORMALIZER",
+      "module_name": "Calendar Normalizer",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "INTEGRATION_BRIDGE_MODULE",
+      "domain_group_id": "G1",
+      "domain_group_name": "Data Ingest Layer",
+      "phase_id": "PHASE_B",
+      "layer": 2,
+      "process_steps": [
+        "S04"
+      ],
+      "purpose": "Normalize raw calendar entries to canonical UTC CalendarEvents (dedup, impact enum, CAL8).",
+      "input_contracts": [
+        "CalendarRaw",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "CalendarEvent"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000005",
+      "numeric_module_id": "50000000000000000005",
+      "canonical_symbol": "F2_EVENT_LOG",
+      "module_name": "Event Log",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "INFRA_PLATFORM_MODULE",
+      "domain_group_id": "G0",
+      "domain_group_name": "Infrastructure Platform",
+      "phase_id": "PHASE_B",
+      "layer": 1,
+      "process_steps": [
+        "S05"
+      ],
+      "purpose": "Append-only persistence of the CalendarEvent stream.",
+      "input_contracts": [
+        "CalendarEvent"
+      ],
+      "output_contracts": [
+        "EventStream"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SUBMODULE_UNDOC"
+      ]
+    },
+    {
+      "module_id": "50000000000000000006",
+      "numeric_module_id": "50000000000000000006",
+      "canonical_symbol": "D4_CALENDAR_TRIGGER_BUILDER",
+      "module_name": "Calendar Trigger Builder",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "INTEGRATION_BRIDGE_MODULE",
+      "domain_group_id": "G1",
+      "domain_group_name": "Data Ingest Layer",
+      "phase_id": "PHASE_B",
+      "layer": 2,
+      "process_steps": [
+        "S06"
+      ],
+      "purpose": "Build anticipation triggers (1HR/8HR windows) from calendar events.",
+      "input_contracts": [
+        "CalendarEvent",
+        "ScheduleTick",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "CalendarTrigger"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SUBMODULE_UNDOC",
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000007",
+      "numeric_module_id": "50000000000000000007",
+      "canonical_symbol": "D1_MARKET_FEED_ADAPTER",
+      "module_name": "Market Feed Adapter",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "INTEGRATION_BRIDGE_MODULE",
+      "domain_group_id": "G1",
+      "domain_group_name": "Data Ingest Layer",
+      "phase_id": "PHASE_C",
+      "layer": 2,
+      "process_steps": [
+        "S07"
+      ],
+      "purpose": "Ingest market ticks and emit canonical MarketTick.",
+      "input_contracts": [
+        "RawTick",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "MarketTick"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SUBMODULE_UNDOC",
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000008",
+      "numeric_module_id": "50000000000000000008",
+      "canonical_symbol": "C1_BAR_BUILDER",
+      "module_name": "Bar Builder",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "COMPUTE_MODULE",
+      "domain_group_id": "G2",
+      "domain_group_name": "Compute / Feature Layer",
+      "phase_id": "PHASE_C",
+      "layer": 3,
+      "process_steps": [
+        "S08"
+      ],
+      "purpose": "Aggregate ticks into OHLCV bars across timeframes.",
+      "input_contracts": [
+        "MarketTick",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "Bar"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "NO_FILES",
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000009",
+      "numeric_module_id": "50000000000000000009",
+      "canonical_symbol": "C2_INDICATOR_ENGINE",
+      "module_name": "Indicator Engine",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "COMPUTE_MODULE",
+      "domain_group_id": "G2",
+      "domain_group_name": "Compute / Feature Layer",
+      "phase_id": "PHASE_C",
+      "layer": 3,
+      "process_steps": [
+        "S09"
+      ],
+      "purpose": "Compute indicators from bars and emit an IndicatorSnapshot.",
+      "input_contracts": [
+        "Bar",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "IndicatorSnapshot"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000010",
+      "numeric_module_id": "50000000000000000010",
+      "canonical_symbol": "C3_FEATURE_PACKAGER",
+      "module_name": "Feature Packager",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "COMPUTE_MODULE",
+      "domain_group_id": "G2",
+      "domain_group_name": "Compute / Feature Layer",
+      "phase_id": "PHASE_D",
+      "layer": 3,
+      "process_steps": [
+        "S10"
+      ],
+      "purpose": "Assemble the strategy feature frame from indicators and calendar triggers.",
+      "input_contracts": [
+        "IndicatorSnapshot",
+        "CalendarTrigger",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "FeatureFrame"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "NO_FILES",
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000011",
+      "numeric_module_id": "50000000000000000011",
+      "canonical_symbol": "S1_SIGNAL_ENGINE",
+      "module_name": "Signal Engine",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "SIGNAL_MODULE",
+      "domain_group_id": "G3",
+      "domain_group_name": "Signal & Intent Layer",
+      "phase_id": "PHASE_E",
+      "layer": 3,
+      "process_steps": [
+        "S11"
+      ],
+      "purpose": "Generate a signal (or an explicit suppression) from the feature frame.",
+      "input_contracts": [
+        "FeatureFrame",
+        "PositionSummary",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "Signal",
+        "SignalSuppressed"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000012",
+      "numeric_module_id": "50000000000000000012",
+      "canonical_symbol": "S2_INTENT_BUILDER",
+      "module_name": "Intent Builder",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "SIGNAL_MODULE",
+      "domain_group_id": "G3",
+      "domain_group_name": "Signal & Intent Layer",
+      "phase_id": "PHASE_E",
+      "layer": 3,
+      "process_steps": [
+        "S12"
+      ],
+      "purpose": "Convert a signal into a TradeIntent.",
+      "input_contracts": [
+        "Signal",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "TradeIntent"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "NO_FILES",
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000013",
+      "numeric_module_id": "50000000000000000013",
+      "canonical_symbol": "R1_RISK_EVALUATOR",
+      "module_name": "Risk Evaluator",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "RISK_MODULE",
+      "domain_group_id": "G4",
+      "domain_group_name": "Risk Management",
+      "phase_id": "PHASE_E",
+      "layer": 4,
+      "process_steps": [
+        "S13"
+      ],
+      "purpose": "Evaluate trade intent against risk policy and emit an approve/reject RiskDecision (approval decision only; sizing and correlation-guard moved out).",
+      "input_contracts": [
+        "TradeIntent",
+        "PortfolioState",
+        "RiskPolicy",
+        "RiskGuardResult",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "RiskDecision"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "scope_narrowed (correlation guard split to R3; sizing deferred to second pass)",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SERVICE_UNBOUND",
+        "SCOPE_NARROWED"
+      ]
+    },
+    {
+      "module_id": "50000000000000000027",
+      "numeric_module_id": "50000000000000000027",
+      "canonical_symbol": "R3_CORRELATION_GUARD",
+      "module_name": "Correlation Guard",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "RISK_MODULE",
+      "domain_group_id": "G4",
+      "domain_group_name": "Risk Management",
+      "phase_id": "PHASE_E",
+      "layer": 4,
+      "process_steps": [],
+      "purpose": "Evaluate portfolio correlation/exposure and emit a RiskGuardResult consumed by R1.",
+      "input_contracts": [
+        "TradeIntent",
+        "PortfolioState",
+        "RiskPolicy",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "RiskGuardResult"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [
+        "R1_RISK_EVALUATOR"
+      ],
+      "migration_status": "promoted_from_work_cell (R1_RISK_EVALUATOR)",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": []
+    },
+    {
+      "module_id": "50000000000000000014",
+      "numeric_module_id": "50000000000000000014",
+      "canonical_symbol": "R2_ORDER_INTENT_COMPILER",
+      "module_name": "Order Intent Compiler",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "RISK_MODULE",
+      "domain_group_id": "G4",
+      "domain_group_name": "Risk Management",
+      "phase_id": "PHASE_F",
+      "layer": 4,
+      "process_steps": [
+        "S14"
+      ],
+      "purpose": "Compile an approved RiskDecision into an OrderIntent.",
+      "input_contracts": [
+        "RiskDecision",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "OrderIntent"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SUBMODULE_UNDOC",
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000015",
+      "numeric_module_id": "50000000000000000015",
+      "canonical_symbol": "O1_ORDER_ROUTER",
+      "module_name": "Order Router",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "OMS_MODULE",
+      "domain_group_id": "G5",
+      "domain_group_name": "Order Management & Routing",
+      "phase_id": "PHASE_G",
+      "layer": 4,
+      "process_steps": [
+        "S15"
+      ],
+      "purpose": "Route an OrderIntent to the active broker bridge.",
+      "input_contracts": [
+        "OrderIntent",
+        "BrokerPolicy",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "RoutedOrderIntent"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SUBMODULE_UNDOC",
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000016",
+      "numeric_module_id": "50000000000000000016",
+      "canonical_symbol": "B1_MT4_ADAPTER_TRANSPORT",
+      "module_name": "MT4 Adapter Transport",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "INTEGRATION_BRIDGE_MODULE",
+      "domain_group_id": "G6",
+      "domain_group_name": "MT4 Bridge Layer",
+      "phase_id": "PHASE_G",
+      "layer": 4,
+      "process_steps": [
+        "S16"
+      ],
+      "purpose": "Serialize and transport routed order intents to the MT4 adapter (atomic CSV write+rename, sequence, hash).",
+      "input_contracts": [
+        "RoutedOrderIntent",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "BrokerOrderEnvelope",
+        "AdapterAck"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000017",
+      "numeric_module_id": "50000000000000000017",
+      "canonical_symbol": "B2_MT4_EA_EXECUTOR",
+      "module_name": "MT4 EA Executor",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "INTEGRATION_BRIDGE_MODULE",
+      "domain_group_id": "G6",
+      "domain_group_name": "MT4 Bridge Layer",
+      "phase_id": "PHASE_G",
+      "layer": 4,
+      "process_steps": [
+        "S17"
+      ],
+      "purpose": "EA-side execution of broker orders and emission of execution/health feedback.",
+      "input_contracts": [
+        "BrokerOrderEnvelope"
+      ],
+      "output_contracts": [
+        "BrokerExecEvent",
+        "EAHealth"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SUBMODULE_UNDOC",
+        "SERVICE_UNBOUND",
+        "EA_SECOND_PASS"
+      ]
+    },
+    {
+      "module_id": "50000000000000000018",
+      "numeric_module_id": "50000000000000000018",
+      "canonical_symbol": "B3_EXEC_EVENT_NORMALIZER",
+      "module_name": "Exec Event Normalizer",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "INTEGRATION_BRIDGE_MODULE",
+      "domain_group_id": "G6",
+      "domain_group_name": "MT4 Bridge Layer",
+      "phase_id": "PHASE_H",
+      "layer": 4,
+      "process_steps": [
+        "S18"
+      ],
+      "purpose": "Normalize broker execution events into canonical ExecutionReport/PositionSnapshot.",
+      "input_contracts": [
+        "BrokerExecEvent",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "ExecutionReport",
+        "PositionSnapshot"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "NO_FILES",
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000019",
+      "numeric_module_id": "50000000000000000019",
+      "canonical_symbol": "O2_OMS_STATE_MACHINE",
+      "module_name": "OMS State Machine",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "OMS_MODULE",
+      "domain_group_id": "G5",
+      "domain_group_name": "Order Management & Routing",
+      "phase_id": "PHASE_I",
+      "layer": 4,
+      "process_steps": [
+        "S19"
+      ],
+      "purpose": "Apply execution reports to OMS state and detect trade close.",
+      "input_contracts": [
+        "RoutedOrderIntent",
+        "ExecutionReport",
+        "PositionSnapshot",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "OrderStateChanged",
+        "PositionStateChanged",
+        "TradeClosedRaw"
+      ],
+      "legacy_aliases": [
+        "O2_OMS"
+      ],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000020",
+      "numeric_module_id": "50000000000000000020",
+      "canonical_symbol": "O3_TRADE_CLOSE_CLASSIFIER",
+      "module_name": "Trade Close Classifier",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "OMS_MODULE",
+      "domain_group_id": "G5",
+      "domain_group_name": "Order Management & Routing",
+      "phase_id": "PHASE_I",
+      "layer": 4,
+      "process_steps": [
+        "S20"
+      ],
+      "purpose": "Classify a closed trade and compute canonical PnL/outcome.",
+      "input_contracts": [
+        "TradeClosedRaw",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "TradeClosed"
+      ],
+      "legacy_aliases": [
+        "O3_PNL_CLASSIFIER"
+      ],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SUBMODULE_UNDOC",
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000021",
+      "numeric_module_id": "50000000000000000021",
+      "canonical_symbol": "E1_OUTCOME_BUCKETIZER",
+      "module_name": "Outcome Bucketizer",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "REENTRY_MODULE",
+      "domain_group_id": "G7",
+      "domain_group_name": "Reentry Decision Engine",
+      "phase_id": "PHASE_I",
+      "layer": 4,
+      "process_steps": [
+        "S21"
+      ],
+      "purpose": "Bucketize a closed trade outcome (WIN/LOSS/BE/TIMEOUT tiers).",
+      "input_contracts": [
+        "TradeClosed",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "OutcomeBucket"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SUBMODULE_UNDOC",
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000022",
+      "numeric_module_id": "50000000000000000022",
+      "canonical_symbol": "E2_PROXIMITY_EVALUATOR",
+      "module_name": "Proximity Evaluator",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "REENTRY_MODULE",
+      "domain_group_id": "G7",
+      "domain_group_name": "Reentry Decision Engine",
+      "phase_id": "PHASE_I",
+      "layer": 4,
+      "process_steps": [
+        "S22"
+      ],
+      "purpose": "Compute next-event proximity bucket from calendar + clock.",
+      "input_contracts": [
+        "CalendarEvent",
+        "ClockTick",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "EventProximity"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SUBMODULE_UNDOC",
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000023",
+      "numeric_module_id": "50000000000000000023",
+      "canonical_symbol": "E3_MATRIX_LOOKUP",
+      "module_name": "Matrix Lookup",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "REENTRY_MODULE",
+      "domain_group_id": "G7",
+      "domain_group_name": "Reentry Decision Engine",
+      "phase_id": "PHASE_I",
+      "layer": 4,
+      "process_steps": [
+        "S23"
+      ],
+      "purpose": "Look up the 4D reentry matrix decision (action, multiplier, delay, combination_id).",
+      "input_contracts": [
+        "OutcomeBucket",
+        "EventProximity",
+        "SignalContext",
+        "MatrixProfile",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "MatrixDecision"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000024",
+      "numeric_module_id": "50000000000000000024",
+      "canonical_symbol": "E4_REENTRY_INTENT_BUILDER",
+      "module_name": "Reentry Intent Builder",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "REENTRY_MODULE",
+      "domain_group_id": "G7",
+      "domain_group_name": "Reentry Decision Engine",
+      "phase_id": "PHASE_I",
+      "layer": 4,
+      "process_steps": [
+        "S24"
+      ],
+      "purpose": "Build a reentry TradeIntent (or suppress) under generation/confidence guards.",
+      "input_contracts": [
+        "MatrixDecision",
+        "ReentryChainState",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "TradeIntent",
+        "ReentrySuppressed"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SUBMODULE_UNDOC",
+        "SERVICE_UNBOUND"
+      ]
+    },
+    {
+      "module_id": "50000000000000000025",
+      "numeric_module_id": "50000000000000000025",
+      "canonical_symbol": "F4_FLOW_ORCHESTRATOR",
+      "module_name": "Flow Orchestrator",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "INFRA_PLATFORM_MODULE",
+      "domain_group_id": "G0",
+      "domain_group_name": "Infrastructure Platform",
+      "phase_id": "PHASE_J",
+      "layer": "cross_cutting",
+      "process_steps": [
+        "S25"
+      ],
+      "purpose": "Central flow state machine; routes reentry intents back through the risk->order->route->transport->execute chain.",
+      "input_contracts": [
+        "TradeIntent"
+      ],
+      "output_contracts": [
+        "RoutedOrderIntent",
+        "OutcomeBucket"
+      ],
+      "legacy_aliases": [
+        "F1_FLOW_ORCHESTRATOR"
+      ],
+      "source_parent_modules": [],
+      "migration_status": "renamed_from_F1_FLOW_ORCHESTRATOR (cleared PREFIX_COLLISION_F1)",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "NO_FILES"
+      ]
+    },
+    {
+      "module_id": "50000000000000000026",
+      "numeric_module_id": "50000000000000000026",
+      "canonical_symbol": "P1_HEALTH_AGGREGATOR",
+      "module_name": "Health Aggregator",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "OBSERVABILITY_REPORTING_MODULE",
+      "domain_group_id": "G0",
+      "domain_group_name": "Infrastructure Platform",
+      "phase_id": "PHASE_J",
+      "layer": 1,
+      "process_steps": [
+        "S26"
+      ],
+      "purpose": "Aggregate service/module health and evaluate SLOs into a HealthReport.",
+      "input_contracts": [
+        "AdapterHealth",
+        "ModuleHealth",
+        "ResolvedConfig"
+      ],
+      "output_contracts": [
+        "HealthReport"
+      ],
+      "legacy_aliases": [],
+      "source_parent_modules": [],
+      "migration_status": "not_migrated",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "SUBMODULE_UNDOC"
+      ]
+    },
+    {
+      "module_id": "50000000000000000028",
+      "numeric_module_id": "50000000000000000028",
+      "canonical_symbol": "U1_DASHBOARD_BACKEND",
+      "module_name": "Dashboard Backend",
+      "module_role": "ui_module",
+      "module_kind": "UI_MODULE",
+      "domain_group_id": "G8",
+      "domain_group_name": "UI & Gateway Layer",
+      "phase_id": "PHASE_OBS",
+      "layer": "cross_cutting",
+      "process_steps": [],
+      "purpose": "Aggregate trading/signal/position/calendar/audit data into UI REST + streaming responses.",
+      "input_contracts": [
+        "Signal",
+        "PositionSnapshot",
+        "CalendarEvent",
+        "TradeClosed",
+        "HealthReport"
+      ],
+      "output_contracts": [
+        "DashboardRestResponse",
+        "DashboardStream"
+      ],
+      "legacy_aliases": [
+        "dashboard-backend"
+      ],
+      "source_parent_modules": [],
+      "migration_status": "promoted_ui_module",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "NEW_MODULE",
+        "UI_DATA_MOCK_TO_RECONCILE"
+      ]
+    },
+    {
+      "module_id": "50000000000000000029",
+      "numeric_module_id": "50000000000000000029",
+      "canonical_symbol": "U2_GUI_GATEWAY",
+      "module_name": "GUI Gateway",
+      "module_role": "ui_module",
+      "module_kind": "INTERFACE_MODULE",
+      "domain_group_id": "G8",
+      "domain_group_name": "UI & Gateway Layer",
+      "phase_id": "PHASE_OBS",
+      "layer": "cross_cutting",
+      "process_steps": [],
+      "purpose": "Expose operator API and real-time UI subscriptions (status, dashboard, positions, signals, orders, calendar).",
+      "input_contracts": [
+        "HealthReport",
+        "Signal",
+        "PositionSnapshot",
+        "OrderStateChanged",
+        "CalendarEvent"
+      ],
+      "output_contracts": [
+        "OperatorApiResponse",
+        "OperatorWebSocketStream",
+        "OperatorCommand"
+      ],
+      "legacy_aliases": [
+        "gui-gateway"
+      ],
+      "source_parent_modules": [],
+      "migration_status": "promoted_gateway_module",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "NEW_MODULE"
+      ]
+    },
+    {
+      "module_id": "50000000000000000030",
+      "numeric_module_id": "50000000000000000030",
+      "canonical_symbol": "U3_MT4_EXPIRY_OVERLAY",
+      "module_name": "MT4 Expiry Zones Overlay",
+      "module_role": "ui_module",
+      "module_kind": "UI_MODULE",
+      "domain_group_id": "G8",
+      "domain_group_name": "UI & Gateway Layer",
+      "phase_id": "PHASE_OBS",
+      "layer": "cross_cutting",
+      "process_steps": [],
+      "purpose": "MQL4 overlay that displays expiry zones/indicator summaries served over local HTTP (owns comms channel #1).",
+      "input_contracts": [
+        "ExpiryZonesData",
+        "IndicatorSummary",
+        "SpotData"
+      ],
+      "output_contracts": [
+        "OverlayRender"
+      ],
+      "legacy_aliases": [
+        "ExpiryZones"
+      ],
+      "source_parent_modules": [],
+      "migration_status": "promoted_mql4_indicator_module",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "NEW_MODULE",
+        "OWNS_CHANNEL_HTTP5001"
+      ]
+    },
+    {
+      "module_id": "50000000000000000031",
+      "numeric_module_id": "50000000000000000031",
+      "canonical_symbol": "U4_DESKTOP_OPERATOR",
+      "module_name": "Desktop Operator UI",
+      "module_role": "ui_module",
+      "module_kind": "UI_MODULE",
+      "domain_group_id": "G8",
+      "domain_group_name": "UI & Gateway Layer",
+      "phase_id": "PHASE_OBS",
+      "layer": "cross_cutting",
+      "process_steps": [],
+      "purpose": "Operator desktop UI providing live visibility, history, and safety-intervention controls.",
+      "input_contracts": [
+        "DashboardRestResponse",
+        "OperatorWebSocketStream"
+      ],
+      "output_contracts": [
+        "OperatorCommand"
+      ],
+      "legacy_aliases": [
+        "desktop-ui"
+      ],
+      "source_parent_modules": [],
+      "migration_status": "promoted_ui_module",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "NEW_MODULE",
+        "SAFETY_CONTROLS"
+      ]
+    },
+    {
+      "module_id": "50000000000000000032",
+      "numeric_module_id": "50000000000000000032",
+      "canonical_symbol": "P2_REPORTER",
+      "module_name": "Reporter",
+      "module_role": "atomic_canonical_module",
+      "module_kind": "OBSERVABILITY_REPORTING_MODULE",
+      "domain_group_id": "G0",
+      "domain_group_name": "Infrastructure Platform",
+      "phase_id": "PHASE_OBS",
+      "layer": "cross_cutting",
+      "process_steps": [],
+      "purpose": "Generate and publish reports / weekly KPI exports from trade outcomes and health.",
+      "input_contracts": [
+        "TradeClosed",
+        "OutcomeBucket",
+        "HealthReport"
+      ],
+      "output_contracts": [
+        "KPIReport",
+        "ReportArtifact"
+      ],
+      "legacy_aliases": [
+        "reporter"
+      ],
+      "source_parent_modules": [],
+      "migration_status": "promoted_from_service_inventory",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "NEW_MODULE",
+        "NOT_IN_PRIOR_CATALOG"
+      ]
+    },
+    {
+      "module_id": "50000000000000000033",
+      "numeric_module_id": "50000000000000000033",
+      "canonical_symbol": "SK1_PLUGIN_INTERFACE",
+      "module_name": "Plugin Interface",
+      "module_role": "shared_kernel_module",
+      "module_kind": "SHARED_KERNEL_MODULE",
+      "domain_group_id": "G10",
+      "domain_group_name": "Shared Kernel",
+      "phase_id": "PHASE_XCUT",
+      "layer": "cross_cutting",
+      "process_steps": [],
+      "purpose": "Shared-kernel plugin contract (IPlugin/BasePlugin/PluginMetadata) for all plugin-mode deployables.",
+      "input_contracts": [],
+      "output_contracts": [],
+      "legacy_aliases": [
+        "SHARED_LIBS.plugin_interface"
+      ],
+      "source_parent_modules": [
+        "SHARED_LIBS"
+      ],
+      "migration_status": "shared_kernel_extraction (SHARED_LIBS)",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "NEW_MODULE",
+        "PROMOTED_FROM_SHARED_LIBS"
+      ]
+    },
+    {
+      "module_id": "50000000000000000034",
+      "numeric_module_id": "50000000000000000034",
+      "canonical_symbol": "SK2_IDEMPOTENCY",
+      "module_name": "Idempotency",
+      "module_role": "shared_kernel_module",
+      "module_kind": "SHARED_KERNEL_MODULE",
+      "domain_group_id": "G10",
+      "domain_group_name": "Shared Kernel",
+      "phase_id": "PHASE_XCUT",
+      "layer": "cross_cutting",
+      "process_steps": [],
+      "purpose": "Shared-kernel idempotency primitive (key policy + Redis store + outbox pattern) used across services.",
+      "input_contracts": [],
+      "output_contracts": [],
+      "legacy_aliases": [
+        "SHARED_LIBS.idempotency"
+      ],
+      "source_parent_modules": [
+        "SHARED_LIBS"
+      ],
+      "migration_status": "shared_kernel_extraction (SHARED_LIBS)",
+      "identity_status": "canonical",
+      "review_status": "approved",
+      "reconciliation_flags": [
+        "NEW_MODULE",
+        "PROMOTED_FROM_SHARED_LIBS"
+      ]
+    }
+  ]
+}

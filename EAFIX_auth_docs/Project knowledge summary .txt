@@ -1,0 +1,100 @@
+Let me pull the full reference index from project knowledge to cover everything, including files not currently on the mount.
+
+Let me do targeted searches on the files I haven’t read in full yet — standards registry, capability registry, ui_catalog, mt4 reference, and comms channels.
+
+I now have a complete picture across all files. Here’s the full summary organized by role and authority tier.
+
+Authoritative Canonical Spine
+
+These four are the ground truth. When any file conflicts with them, they win.
+
+module_catalog.json — Defines all 27 canonical modules. Each module has a 20-digit numeric ID (^5\d{19}$), a canonical symbol (e.g. R1_RISK_EVALUATOR), module_kind (4 kinds in use), layer (1–4 or unassigned), process binding to a step number, scope_in/out, dependencies, quality gates, and filesystem hints. Process ID: HUEY_P_EAFIX_END_TO_END v2.0.0. This is the single source of truth for module identity and responsibility.
+
+process_step_catalog.json — Defines all 26 process steps (S01–S26), each bound 1:1 to a module. Contains step code, responsible file, input/output contracts, dependency_step_ids (6xxx namespace, all resolving cleanly), validation rules, and failure behavior. The machine contract for every pipeline handoff.
+
+updated_trading_process_aligned.json — Generated 2026-05-04. Same 26 steps organised into 10 phases (PHASE_A through PHASE_J). Adds validation_contract and failure_contract IDs per step. This is the v2 aligned representation that governs phase grouping; its step codes match the catalog exactly.
+
+communication_channels.json — Defines all 6 MT4↔Python channels with canonical IDs, status, direction, protocol, port, owning module (symbol + numeric ID), data contracts, Redis topics, and implementation file lists. All 6 channels bind to valid catalog modules. Channels: http_rest_primary (port 5001, B2), dde_price_feed (D1), jsonl_outbox (B1), csv_transport (B1), redis_pubsub_bus (B3), tcp_socket_fallback (port 5555, disabled, B1).
+
+Architecture Reference
+
+EAFIX-Modular — End-to-End Module Map.txt — Human-readable architectural map. Organises the 27 modules into 12 groups (G0 Infrastructure through G11 Infra Dependencies) plus EA-side Systems A–G. States service homes for Group 0 only. Uses COMPUTE/SIGNAL/RISK/OMS/REENTRY kind labels that don’t match the catalog’s PIPELINE_STAGE_MODULE taxonomy. Claims “28 canonical modules” — off by one from the actual 27.
+
+eafix_services_ai_reference_20260510.json — Session-derived inventory of 21 Python microservices (name, status: Active/Stub/Utility, purpose). Also records repo context: working directory C:\Users\richg\eafix-modular, GitHub path, local P_techspec folder. Session-derived only — verify against live repo before making destructive changes.
+
+file_module_mapping.csv — Maps 264 implementation files to services and canonical modules. 72% unassigned (192 of 264 rows have no CanonicalModules value). Of the 72 mapped rows, 2 reference stale symbols (O2_OMS and O3_PNL_CLASSIFIER). 8 catalog modules have zero files mapped.
+
+MT4 / Bridge / Platform
+
+mt4_authoritative_reference_for_ai.json — Active governance baseline v2.0.0 for MT4 platform decisions. Documents all native capabilities (DDE, WebRequest, DLL imports, file I/O, order management, etc.), 9+ known limitations (MT4 is end-of-development, no public retail REST API, broker variability, desktop client dependency), and a custom-vs-native decision matrix. Governs any MQL4 or broker integration question; overrides all other sources for platform facts.
+
+MT4_Python_communication_channels.txt — Narrative walkthrough of the same 6 channels with actual file paths, code snippets, and Redis topic tables. Secondary to communication_channels.json for canonical status, but useful for file discovery and explanatory context.
+
+0199900003260118_HUEY_P_EA_ExecutionEngine_8.txt — A sample MQL4 Expert Advisor (moving average crossover). Demonstrates OnInit/OnTick/OnDeinit handler pattern, OrderSend call structure, and input parameter conventions. Lowest authority — explicitly not the canonical EAFIX execution engine (original was unavailable at authoring time).
+
+Operator UI
+
+ui_catalog.json — Canonical spec for the operator-facing UI (v1.0.0). Covers 2 declared UI products: a Desktop Operator UI (Electron/React/TypeScript/Tailwind stack) and a Dashboard Backend (FastAPI, port 8092). Defines all screens, tabs, panels, controls, filters, REST endpoints, WebSocket channels, the safety model (safety levels, admin-gated actions like “Flatten All” and “STOP Imports”), data contracts, implementation file bindings, and acceptance criteria. Single source of truth for anything UI.
+
+Governance & Standards
+
+active_project_standards_registry.json — Mined registry of 62 active rules (Python: 9, PowerShell: 12, MQL4: 14, C++: 8, cross-language: 9, architecture: 6, trading: 4) plus 6 enforcement gates, 4 superseded rules, and 4 open needs-review items. Rules were extracted from legacy standard files and filtered against current direction filters (determinism, idempotency, fail-closed, SSOT, auditability, trading safety, etc.). A rule is only blocking once its enforcement gate exists and writes evidence. Key open items: MQL4 static scanner, filename-vs-registry-ID policy, RiskService boundary, and communication fallback hierarchy.
+
+DOC-PAT-EVERY-REUSABLE-PATTERN-PATTERN-304...yaml — A minimal pattern stub (PAT-EVERY_REUSABLE_PATTERN-005, v1.0.0, status: draft, created 2025-12-02). Intent, inputs, outputs, steps, and validation sections are all empty. Effectively a placeholder template — no active content.
+
+Submodule Documentation
+
+module_checklist.json — Submodule decomposition for 6 of the 27 modules: D2_CALENDAR_SOURCE_ADAPTER, D3_CALENDAR_NORMALIZER, B1_MT4_ADAPTER_TRANSPORT, O2_OMS_STATE_MACHINE, E3_MATRIX_LOOKUP, and R1_RISK_EVALUATOR. Each has 3 submodules; each submodule expects 6 contract documents. Note: R1’s entry uses an inconsistent key format (50000000000000000013_R1_RISK_EVALUATOR) while the other 5 use bare symbols.
+
+AI Routing & Reference Meta-files
+
+eafix_project_knowledge_reference_routing_instructions.json — The master routing index for AI consumption, generated 2026-05-11. Declares 19 reference documents with authority levels, trigger keywords, conflict roles, and companion documents. Defines a 10-rule global conflict hierarchy (canonical JSON > narrative Markdown > PDF > samples). Lists canonical module symbols (27) and step codes (26), which match the catalog exactly. 5 of the 19 declared documents are absent from the project (4 calendar PDFs + the EA .mql4 file, which exists as a renamed .txt).
+
+eafix_module_files_ai_reference.json — Cross-file reference document generated from a prior analysis session. Describes 11 files, consolidates a 28-module reference (from an older catalog version), a 25-module contract boundary reference from a now-absent module_registry.json, and a module count reconciliation table. Reflects a superseded catalog state — the catalog it describes had symbolic-only IDs and 28 records; the current catalog has 27 records with hybrid numeric+symbol IDs.
+
+converted_capability_registry.json — AI-oriented capability registry for the 21 internal services. Each entry has cost model (all are free/internal), best use cases, poor use cases, and a do-not-rebuild directive. Intended to prevent custom code from reinventing something that already exists as a service.
+
+Narrative & Explanatory
+
+Simple_Explanation_of_the_Entire_EAFIX___HUEY_P_System.txt — Plain-language walkthrough of every module using real-world analogies (Amazon warehouse, air traffic control, FedEx tracking, etc.). Covers a 16-step end-to-end flow example, the 5 communication channels, and a module-responsibility table. No authority over canonical catalogs; designed for onboarding and AI context.
+
+EAFIX_ATONIC__End-to-End_Trading_Lifecycle_Process.md — The 71-step / 11-phase atomic operational blueprint. Phases: Economic Calendar Intake, Anticipation & Triggering, Signal Generation, Risk & Portfolio Gating, Python→MT Transport, EA Execution, Result Capture, Outcome Classification, Re-Entry Evaluation, Re-Entry Decision, Re-Entry Execution. Predates the v2 process JSON. Treated as a “reference blueprint” by the routing index — canonical JSON wins on conflict, and no formal 71→26 step crosswalk exists.
+
+PDF References
+
+EAFIX_CALENDAR_DES_RULES.pdf — Authoritative deterministic design rules for the economic calendar subsystem. Governs CAL8 (8-char immutable calendar event identifier), CAL5, RCI identity, single-writer authority, anti-patterns, debounce rules, proximity logic, and event state machine. Wins over all other calendar sources for architectural decisions.
+
+dependency_layers.pdf — Visual diagram of the 5-layer dependency structure for the calendar subsystem: Layer 1 Foundation (CAL8 identity, SQLite registry, weekly downloader), Layer 2 Core Processing (event state machine), Layer 3 Signal Assembly (proximity engine), Layer 4 Consumer (output CSV, MT4 EA, CalendarBridge), Layer 5 Feedback. Visual reference only — use DES rules for enforceable details.
+
+Declared in routing index but ABSENT from project knowledge
+
+These 4 files are flagged exists_in_current_project_files: true in the routing index but are not present. Any task touching the enhanced calendar system is missing its implementation references.
+
+	•	Economic Calendar Subsystem — Technical Analysis & Documentation.pdf
+	•	Economic Calendar Enhancement Plan — Auto-Download & Critical Gap Fixes.pdf
+	•	Enhanced Calendar System — Configuration & Deployment.pdf
+	•	Enhanced Economic Calendar System — Complete Implementation.pdf
+
+Total: 21 files confirmed present, 4 absent (all calendar PDFs). The authoritative spine — module_catalog.json, process_step_catalog.json, updated_trading_process_aligned.json, communication_channels.json — is internally clean and self-consistent. Everything else has varying degrees of drift from it, as documented in the reconciliation worksheet.
+
+——
+
+The extra files outside the active /mnt/data project-knowledge set expand on governance, architecture, inventory and subsystems.  Key points from each are summarised below.
+	•	doc_authority.json – a canonical registry that assigns an authority level to each document.  It records schema and generation metadata, classification (canonical/supporting/legacy), and a human‐readable description explaining why a file is authoritative or superseded.  For example, it lists the process and module catalogs as canonical (level 1), the module map text as a legacy reference, and notes which older documents have been replaced  .
+	•	module_registry.json – defines every module’s purpose, inputs/outputs and implementation obligations.  Each module entry lists its ID, status, owner, steps it implements, required files (entrypoint, tests, schema), and validation rules to ensure output contracts are implemented .  This file serves as a definitive map between logical modules and their code and test locations.
+	•	modules_extracted.json – records the 26 modules automatically extracted from the process document.  It contains a simple list of module IDs along with the source file and extraction timestamp .
+	•	file_registry.csv – the current authoritative file inventory, listing every code, test, and configuration file across services.  Each row includes file IDs, paths, module assignments, process steps and verification timestamps .  It replaces the earlier python_files_inventory.json and allows tools to verify completeness and track stale files.
+	•	python_files_inventory.json – a superseded inventory that lists every Python file’s full path, size and last modified date .  It remains useful as a historical snapshot.
+	•	2026012201111004_extract_modules.py – a script that parses the process document and writes modules_extracted.json.  It loads YAML, collects module IDs and writes them to JSON with metadata .
+	•	ALVT_SYSTEM_DOCUMENTATION.yaml – provides full documentation for the Automation Lifecycle Verification Tooling.  It outlines the system purpose, completion status for phase and layer gates, and describes verification layers such as static integrity and graph connectivity with checks and success criteria  .  It also specifies a contract system for defining automation triggers .
+	•	ECONOMIC_CALENDAR_MVP_SPEC.yaml – defines a minimum viable economic calendar subsystem.  It states that the system ingests a single CSV source (ForexFactory), normalises events, filters by impact, imposes pre/post trade block windows and outputs a per‑symbol allow/block decision.  It includes configuration schema definitions (paths, refresh intervals, impact windows, tracked symbols, fail‑safe policy) and default values  .
+	•	EA_MOD_File accuracy review.pdf – a report analysing the HUEY_P‑EAFIX trading system.  It dissects each module (e.g., F1_CONFIG_PREFERENCES, F3_CLOCK_SCHEDULER, D2_CALENDAR_SOURCE_ADAPTER) by purpose, responsibilities, key functions and dependencies .  It highlights opportunities to simplify design while retaining trading functionality.
+	•	Economic Calendar Enhancement Plan – Auto‑Download & Critical Gap Fixes.pdf – proposes enhancements to automate calendar downloading, add real‑time proximity calculations, complete the MT4 bridge and improve error recovery.  It includes a detailed architecture for a ForexFactory downloader (package layout, scheduler, storage) and Python code for downloading and validating CSVs with retries and rate limiting  .
+	•	Economic Calendar Subsystem – Technical Analysis & Documentation.pdf – provides a production‑ready analysis of the economic calendar subsystem.  It describes key features such as automated imports, event enhancement, real‑time triggers and MT4 integration  .  High‑level diagrams and component descriptions explain the import engine, processing pipeline, event enhancement and trigger engine  .
+	•	Enhanced Calendar System – Configuration & Deployment.pdf – contains a YAML configuration template for the enhanced calendar.  It specifies import scheduling (Sunday noon CST), retry policies, processing chunk sizes, anticipation hours, trigger offsets, parameter sets, database settings, notification channels (email, SMS, webhook), risk limits and portfolio management options  .
+	•	Enhanced Economic Calendar System – Complete Implementation.pdf – a comprehensive Python implementation of the enhanced calendar subsystem.  It imports numerous libraries and defines an OptimizedDatabaseManager to create indexed tables for calendar events, trading signals, performance metrics, error logs and configuration changes  .  The script operationalises downloading, processing, triggering, risk management, notifications and monitoring.
+	•	MODULE CENTRIC REPOSITORY BEST PRACTICES.pdf – an AI‑oriented guide that advocates organising repositories by module rather than file type.  It outlines eight principles for module‑centric architecture (co‑location of code, tests, docs and schemas; ID‑based grouping; incremental migration; deterministic execution) , contrasts this with traditional artifact‑type structures  and specifies a standard directory layout for each module .
+	•	Services Directory Overview.md – summarises patterns in the services/ directory and lists every service with its status (active/stub) and purpose.  It notes the dual‑naming convention, numeric file IDs and plugin architecture .  A table describes services such as calendar‑ingestor, data‑ingestor, dashboard‑backend, event‑gateway, execution‑engine, flow‑monitor, flow‑orchestrator, gui‑gateway, reentry‑engine, reentry‑matrix‑svc, reporter, risk‑manager, telemetry‑daemon, transport‑router and signal‑generator .  It also outlines the key processing flow between services .
+	•	source_grounded_trading_process_spec.md – a draft specification that integrates evidence from source files.  It explains three overlapping realities: (A) a canonical 26‑step process; (B) a partially implemented microservice runtime; and (C) the MT4/HUEY_P bridge and EA .  The document lists confirmed runtime artifacts (specific scripts in various services) and planned or conceptual components .  It highlights mismatches, such as inconsistent event-topic names and differing hybrid‑identifier formats , providing an evidence table linking process steps to files, owners and statuses.
+	•	test_all_modules.py – a scaffold of pytest classes with all tests marked as skipped.  It covers modules such as lock manager, suppression manager, stability checker, audit logger, ID allocator, file renamer, classifier, descriptor extractor, normalizer, backup manager, write policy validator, registry writer service, CAS precondition, event handlers, watcher daemon, loop prevention, reconciler and integration tests across phases .
+These summaries capture the purpose and key contents of each extra document. Together they provide governance rules, architectural guidance, module inventories, subsystem specifications, enhancement plans, complete implementations, best practices and process evidence that complement the existing core knowledge.

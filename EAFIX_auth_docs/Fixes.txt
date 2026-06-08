@@ -1,0 +1,209 @@
+Verified the repoint targets against what’s actually in the bundle. Two notes that shaped the result: there is no canonical MT4 authority JSON present (mt4_authoritative_reference_for_ai.json isn’t in project knowledge), so I’ve left that domain pointing at the canonical name but flagged it availability: "missing" with interim real sources — that way your source_existence_validate pass treats it as a known gap to import, not a silent dangling reference. And the real comms source is the .txt plus module_catalog.json interfaces; there’s no communication_channels.json.
+
+Block 1 — drop-in replacement for source_authority_order
+
+"source_authority_order": [
+  { "domain": "atomic_manifest_schema",
+    "primary": "eafix_unified_atomic_module_schema_v1_0_0.json" },
+
+  { "domain": "module_identity_and_purpose",
+    "primary": "module_catalog.json",
+    "fallback": ["EAFIX-Modular___End-to-End_Module_Map.txt"] },
+
+  { "domain": "numeric_module_identity",
+    "primary": "module_catalog.json",
+    "note": "module_catalog.json carries the canonical 20-digit module_id; module map is corroboration only.",
+    "fallback": ["EAFIX-Modular___End-to-End_Module_Map.txt",
+                 "EAFIX_module_reconciliation_worksheet.csv"] },
+
+  { "domain": "process_binding",
+    "primary": "process_step_catalog.json",
+    "augmentation": ["updated_trading_process_aligned.json"],
+    "conflict_check": ["module_catalog.json"] },
+
+  { "domain": "file_ownership",
+    "primary": "file_module_mapping.csv",
+    "policy": "eafix_file_ownership_resolution_policy_v1_0_0.json",
+    "fallback": ["eafix_module_files_ai_reference.json"],
+    "note": "Assignment-policy logic is folded into the resolution-policy artifact; the standalone MODULE_ASSIGNMENT_POLICY.yaml is not present." },
+
+  { "domain": "communication_channels",
+    "primary": "MT4_Python_communication_channels.txt",
+    "augmentation": ["module_catalog.json"],
+    "note": "No communication_channels.json exists; channel/contract detail lives in module interfaces and the comms .txt." },
+
+  { "domain": "mt4_platform_constraints",
+    "primary": "mt4_authoritative_reference_for_ai.json",
+    "availability": "missing",
+    "interim_sources": ["MT4_Python_communication_channels.txt",
+                        "eafix_unified_atomic_module_manifest_ai_fill_instructions_v1_0_0.md#8.24"],
+    "note": "Canonical MT4 authority not yet imported into project knowledge; flag via source_existence_validate and populate platform_constraints from interim_sources with reconciliation_status.known_flags += mt4_authority_pending." },
+
+  { "domain": "ui_constraints",
+    "primary": "ui_catalog.json" },
+
+  { "domain": "migration_traceability",
+    "primary": "atonic_to_canonical_crosswalk.csv",
+    "fallback": ["Q-R_atonic_to_canonical_crosswalk.txt",
+                 "EAFIX_module_reconciliation_worksheet.csv",
+                 "EAFIX_ATONIC__End-to-End_Trading_Lifecycle_Process.md"] }
+]
+
+
+Block 2 — drop-in dag_patch (apply over the existing tasks / blocking_failure_conditions)
+
+Rather than re-emit 16 unchanged tasks, this patch object names exactly what changes. Apply dependency_overrides first, then replace_tasks, then insert_tasks, then validation_pass_additions.
+
+"dag_patch": {
+  "patch_id": "EAFIX_DAG_FIX_V1_0_1",
+
+  "dependency_overrides": {
+    "T10_CREATE_VALIDATION_HARNESS": [
+      "T02_CREATE_POPULATION_MAP_SCHEMA",
+      "T04_CREATE_FILE_OWNERSHIP_POLICY",
+      "T05_ADD_SHARED_CALENDAR_ENTRYPOINT_RULE",
+      "T06_ADD_APPLICABILITY_MATRIX",
+      "T07_DEFINE_PROCESS_BINDING_RULE",
+      "T08_DEFINE_TIERED_MISSING_BEHAVIOR",
+      "T09_DEFINE_REGENERATION_POLICIES"
+    ],
+    "T13_RUN_VALIDATION_ON_CONTROL_FILES": [
+      "T01_PATCH_DOCUMENT_TYPE_CONTRADICTION",
+      "T02_CREATE_POPULATION_MAP_SCHEMA",
+      "T04_CREATE_FILE_OWNERSHIP_POLICY",
+      "T05_ADD_SHARED_CALENDAR_ENTRYPOINT_RULE",
+      "T06_ADD_APPLICABILITY_MATRIX",
+      "T07_DEFINE_PROCESS_BINDING_RULE",
+      "T08_DEFINE_TIERED_MISSING_BEHAVIOR",
+      "T09_DEFINE_REGENERATION_POLICIES",
+      "T10_CREATE_VALIDATION_HARNESS",
+      "T11_CREATE_REGRESSION_FIXTURES"
+    ],
+    "T15_PROMOTE_VALIDATED_MANIFESTS": ["T15A_FULL_CORPUS_OWNERSHIP_SWEEP"]
+  },
+
+  "replace_tasks": {
+    "T05_ADD_SHARED_CALENDAR_ENTRYPOINT_RULE": {
+      "task_id": "T05_ADD_SHARED_CALENDAR_ENTRYPOINT_RULE",
+      "priority": "P0",
+      "depends_on": ["T04_CREATE_FILE_OWNERSHIP_POLICY"],
+      "action": "append_policy_rule",
+      "target_file": "eafix_file_ownership_resolution_policy_v1_0_0.json",
+      "implementation": {
+        "rule_id": "OWNERSHIP_RULE_SHARED_CALENDAR_INGESTOR_ENTRYPOINT",
+        "match": {
+          "path": "services/calendar-ingestor/src/2099900093260118_main.py",
+          "canonical_modules_contains_any": [
+            "D2_CALENDAR_SOURCE_ADAPTER",
+            "D3_CALENDAR_NORMALIZER",
+            "F2_EVENT_LOG",
+            "D4_CALENDAR_TRIGGER_BUILDER"
+          ]
+        },
+        "classification": "shared_entrypoint",
+        "manifest_writeback": {
+          "owned_files": "do_not_add",
+          "shared_files": {
+            "path": "services/calendar-ingestor/src/2099900093260118_main.py",
+            "sharing_policy": "needs_refactor",
+            "allowed_modules": [
+              "D2_CALENDAR_SOURCE_ADAPTER",
+              "D3_CALENDAR_NORMALIZER",
+              "F2_EVENT_LOG",
+              "D4_CALENDAR_TRIGGER_BUILDER"
+            ],
+            "reason": "Single service entrypoint spans four atomic calendar modules per file_module_mapping.csv; cannot be exclusive owned file."
+          },
+          "file_assignment_status": "partial",
+          "reconciliation_flags": ["shared_entrypoint", "split_candidate"]
+        },
+        "source_grounding": "Owner set taken verbatim from file_module_mapping.csv CanonicalModules; F3_CLOCK_SCHEDULER is excluded (it owns scheduler.py at step S02, not this file)."
+      },
+      "acceptance_criteria": [
+        "calendar-ingestor main.py is never emitted as owned_files in any manifest.",
+        "Exactly the four CSV-listed modules record it under shared_files with sharing_policy needs_refactor.",
+        "No module absent from the CSV row is added to allowed_modules."
+      ]
+    },
+
+    "T11_CREATE_REGRESSION_FIXTURES_SHARED_FIXTURE": {
+      "applies_to": "tests/atomic_manifest_population/fixtures/",
+      "fixture_id": "FIXTURE_SHARED_CALENDAR_ENTRYPOINT",
+      "modules": [
+        "D2_CALENDAR_SOURCE_ADAPTER",
+        "D3_CALENDAR_NORMALIZER",
+        "F2_EVENT_LOG",
+        "D4_CALENDAR_TRIGGER_BUILDER"
+      ],
+      "expected": "shared calendar-ingestor main.py appears in shared_files only, across exactly these four modules; fixture fails if F3_CLOCK_SCHEDULER appears or if any module lists it under owned_files."
+    },
+
+    "T15_PROMOTE_VALIDATED_MANIFESTS_depends_on_note": {
+      "task_id": "T15_PROMOTE_VALIDATED_MANIFESTS",
+      "change": "depends_on now [T15A_FULL_CORPUS_OWNERSHIP_SWEEP]; add promotion_condition 'corpus_ownership_sweep_passed'."
+    }
+  },
+
+  "insert_tasks": [
+    {
+      "task_id": "T14B_WRITE_PROVENANCE_AND_STALENESS",
+      "priority": "P0",
+      "depends_on": ["T14_GENERATE_CANDIDATE_MANIFEST_BATCHES"],
+      "action": "populate_manifest_provenance",
+      "implementation": {
+        "writes_per_manifest": {
+          "source_authority.required_reference_documents": "resolved real paths actually consulted",
+          "source_authority.generated_from_documents": "same set",
+          "staleness_policy.last_generated_from": "same set",
+          "staleness_policy.source_hashes": "sha256 of each consulted source, pattern ^[a-fA-F0-9]{64}$",
+          "staleness_policy.staleness_status": "fresh"
+        },
+        "rationale": "Without this, T15 promotion_condition staleness_status_not_stale is unsatisfiable (defaults to unknown)."
+      },
+      "acceptance_criteria": [
+        "Every candidate manifest has non-empty last_generated_from and a sha256 per source.",
+        "staleness_status is set to fresh at generation time.",
+        "Provenance lists only sources that exist (or are flagged availability=missing in source_authority_order)."
+      ]
+    },
+    {
+      "task_id": "T15A_FULL_CORPUS_OWNERSHIP_SWEEP",
+      "priority": "P0",
+      "depends_on": ["T14_GENERATE_CANDIDATE_MANIFEST_BATCHES", "T14B_WRITE_PROVENANCE_AND_STALENESS"],
+      "action": "run_validation",
+      "implementation": {
+        "commands": [
+          "python tools/validate_atomic_manifest_population.py --corpus <all_candidate_manifests_dir>"
+        ],
+        "required_passes": [
+          "corpus_duplicate_owned_file_validate",
+          "shared_file_consistency_validate",
+          "source_existence_validate"
+        ],
+        "rationale": "Per-batch validation in T14 cannot detect a file owned in BATCH_B and again in BATCH_C; FAIL_DUPLICATE_OWNED_FILE is corpus-global and must run once over the whole set."
+      },
+      "acceptance_criteria": [
+        "No repo-relative source file appears under owned_files in more than one manifest across the entire corpus.",
+        "Every shared_file's allowed_modules set is identical in all manifests that list it.",
+        "Sweep emits validation_report.json and halts promotion on any duplicate."
+      ]
+    }
+  ],
+
+  "validation_pass_additions": {
+    "T10_CREATE_VALIDATION_HARNESS.validation_passes_append": [
+      "source_existence_validate",
+      "per_field_pattern_validate",
+      "corpus_duplicate_owned_file_validate",
+      "shared_file_consistency_validate"
+    ],
+    "notes": [
+      "source_existence_validate: every primary/fallback in source_authority_order resolves to a real file, except entries explicitly marked availability=missing.",
+      "per_field_pattern_validate: identity/contract fields are checked against the schema $defs regexes (module_id ^5\\d{19}$, step_code, symbol, contractName) at extraction, not only at whole-manifest validation.",
+      "no_duplicate_owned_files_validate must treat empty owned_files [] as valid (a module whose only file is a shared entrypoint)."
+    ]
+  }
+}
+
+
+Apply order: dependency_overrides → replace_tasks → insert_tasks → validation_pass_additions. After this, the do_not_generate_canonical_manifests_until gate and FAIL_DUPLICATE_OWNED_FILE become enforceable rather than aspirational, and the MT4 gap is visible instead of silent. The one thing still on you outside this patch: import the real MT4 authority JSON (or rename the entry to whatever you actually have) so that domain stops reporting availability: "missing".
