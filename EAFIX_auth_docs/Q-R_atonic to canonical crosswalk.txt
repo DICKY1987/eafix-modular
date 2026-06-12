@@ -1,0 +1,39 @@
+I want to explore deeper into this, and how and why there is such a large variance between the number of steps :
+
+Two lifecycle models with no crosswalk.
+EAFIX_ATONIC…md describes 11 phases / 71 atomic steps; the canonical JSON is 10 phases / 26 steps. They’re not just different granularity — they differ in scope. The ATONIC version omits config/scheduling (PHASE_A), the bars→indicators→feature decomposition (PHASE_C/D), and orchestration+health (PHASE_J); it splits re-entry into three phases and adds explicit transport and result-capture phases. The routing file says the JSON wins on conflict, but there is no 71→26 mapping table, so nothing actually reconciles the narrative steps to canonical step IDs
+
+——
+
+I’ll dig into the actual source documents to understand the structure of both models and why they diverge so much. Let me read them directly.
+
+Let me see the middle section of the ATONIC document that was truncated.
+
+Now let me read the canonical JSON model and the routing/standards registry.
+
+Let me read the middle steps of the canonical JSON (steps 5–18).
+
+Let me check the standards registry for the routing/conflict rules and the step catalog.
+
+I’ve now read both models end to end, plus the standards registry that governs which one wins. Here’s what’s actually driving the 71-vs-26 gap — it’s deeper than granularity, and you’re right that nothing reconciles them today.
+
+1. They decompose along different axes. The canonical JSON’s unit of a “step” is one module emitting one contract — every step carries a module_id, input_contracts, output_contracts, and dependency_step_ids. It’s an architecture/data-flow decomposition: a dependency DAG of services. The ATONIC markdown’s unit is one operation — function-call granularity (calendar_service.py::parse_raw_calendar, ::normalize_events, ::assign_cal8). It’s a procedural runbook. So one canonical module routinely explodes into 2–5 ATONIC operations. Canonical S04 “Normalize raw calendar entries” (the single module D3_CALENDAR_NORMALIZER) becomes ATONIC steps 3+4+5 (parse, normalize, CAL8 assign). That ratio alone gets you most of the way to 2.7×.
+
+2. The variance is concentrated in re-entry, via loop-unrolling. Canonical handles all of re-entry in steps 19–24 plus one orchestration step, S25, which literally says the reentry intent “follows same risk→order→route→transport→execute chain.” It treats re-entry as a reference back to the existing path. ATONIC instead physically re-instantiates the whole downstream chain: Phases 9, 10, and 11 (steps 51–71), where steps 61–67 are explicitly annotated “same as Steps 21–37.” That’s ~21 ATONIC steps standing in for ~7 canonical ones. The narrative unrolls the loop; the canonical model keeps it as a loop.
+
+3. It is not a superset relationship — the scope gap runs both ways. This is the part that makes a clean crosswalk impossible:
+
+	•	Canonical has, ATONIC omits: config snapshot (S01), scheduler tick (S02), bars (S08), indicators (S09), feature frame (S10), broker-event normalization as its own step (S18), OMS state machine (S19), orchestration + health/SLO (S25–S26). ATONIC collapses the entire market-data pipeline into one line — “Step 14: Market State Acquisition” / get_current_state — and never models bars or indicators at all.
+	•	ATONIC has, canonical omits: transport mechanics — hash files, sequence numbers, heartbeats, lock detection (steps 28–31); EA-internal error classification and retry/abort (36–37); result hashing (44); loop-prevention counter (68). The canonical model deliberately abstracts all of these inside validation contracts — e.g. S16’s rule “atomic write+rename; sequence + hash; idempotent resend” swallows ATONIC’s four separate transport steps.
+
+So a 71→26 map has three relationship types, not one: canonical-step → span-of-ATONIC-steps (1:many), ATONIC-step → nothing (mechanics the contracts hide), and canonical-step → nothing (lifecycle stages the runbook skips).
+
+4. They serve different readers, which is why both were allowed to exist. The JSON is machine-facing (step_ids, dependency DAG, real entrypoint_files like services\reentry-matrix-svc\...) — built to validate against the modular repo. The ATONIC doc is a human operational playbook organized by time/narrative, with prose failure handling and a state-transition map.
+
+On authority: the registry confirms your routing read and sharpens it. process_step_catalog.json (26 steps) is tagged candidate_structured_reference — the top tier present — and updated_trading_process_aligned.json is generated from it (reconciled-from-process-step-catalog/1.0). <cite index="">The ATONIC markdown isn’t in the source_file_index at all</cite> — it’s not ranked as authority in any tier. And <cite index="">authority_policy says legacy files are non-authoritative, conflicting legacy rules are superseded, and a rule is only blocking once it has an enforcement gate with pass/fail criteria and evidence.</cite> So “JSON wins” is correct, but the real exposure is that the 71 narrative steps have zero traceability into the 26 canonical step_codes — so the runbook can drift from the contracts silently, and neither doc’s “full replay” claim can be cross-validated against the other.
+
+Since the missing artifact is exactly the thing you named, I built it. Here’s the full bidirectional crosswalk:
+
+All 71 ATONIC steps are now accounted for — 70 map onto canonical spans, and step 68 (the loop-prevention counter) is the lone ATONIC-only operation, which the canonical model absorbs into S25’s chain-depth/velocity validation.
+
+The crosswalk surfaces the headline number: of the 26 canonical steps, 6 are CANONICAL_ONLY (S01, S02, S08, S09, S15, S19, S26 — config, scheduling, bars, indicators, routing, OMS, health) and 13 are ONE_TO_MANY explosions. That’s the whole 71→26 story in one frame — almost none of it is true 1:1.

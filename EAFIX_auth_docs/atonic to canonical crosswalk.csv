@@ -1,0 +1,28 @@
+canonical_step_code,canonical_name,canonical_module_id,canonical_phase,atonic_steps,atonic_phase,relationship,notes
+S01,Resolve configuration snapshot,F1_CONFIG_PREFERENCES,PHASE_A,,,CANONICAL_ONLY,ATONIC has no config-resolution step; config assumed implicit
+S02,Emit schedule tick,F3_CLOCK_SCHEDULER,PHASE_A,,,CANONICAL_ONLY,Scheduling cadence is implicit inside ATONIC Step 2 poll_scheduler but not modeled as a step
+S03,Poll calendar source(s),D2_CALENDAR_SOURCE_ADAPTER,PHASE_B,1;2,PHASE 1,ONE_TO_MANY,ATONIC splits into source discovery (1) + polling (2)
+S04,Normalize raw calendar entries,D3_CALENDAR_NORMALIZER,PHASE_B,3;4;5,PHASE 1,ONE_TO_MANY,ATONIC splits into parse (3) + normalize (4) + CAL8 assignment (5)
+S05,Persist calendar events (append-only),F2_EVENT_LOG,PHASE_B,6;7;8,PHASE 1,ONE_TO_MANY,ATONIC splits into DB registry (6) + CSV artifact (7) + signal emission (8)
+S06,Build anticipation triggers,D4_CALENDAR_TRIGGER_BUILDER,PHASE_B,9;10;11;12;13,PHASE 2,ONE_TO_MANY,ATONIC entire Phase 2: window calc + symbol impact + TTL + suppression + context signal
+S07,Ingest market ticks,D1_MARKET_FEED_ADAPTER,PHASE_C,14,PHASE 3,PARTIAL,ATONIC collapses feed ingest into single Step 14 Market State Acquisition
+S08,Aggregate ticks into bars,C1_BAR_BUILDER,PHASE_C,,,CANONICAL_ONLY,ATONIC never models bar construction
+S09,Compute indicators,C2_INDICATOR_ENGINE,PHASE_C,,,CANONICAL_ONLY,ATONIC never models indicator computation
+S10,Assemble strategy feature frame,C3_FEATURE_PACKAGER,PHASE_D,15,PHASE 3,PARTIAL,Loosely maps to ATONIC Step 15 Hybrid Context Construction
+S11,Generate signal (or suppression),S1_SIGNAL_ENGINE,PHASE_E,16;17;18;19;20,PHASE 3,ONE_TO_MANY,ATONIC splits into direction + signal create + schema val + dedup + registry append
+S12,Convert signal to trade intent,S2_INTENT_BUILDER,PHASE_E,,,PARTIAL,ATONIC has no distinct intent abstraction; folded into signal object
+S13,Evaluate risk and size,R1_RISK_EVALUATOR,PHASE_E,21;22;23;24;25,PHASE 4,ONE_TO_MANY,ATONIC splits into per-symbol + portfolio + circuit-breaker + idempotency + authorization
+S14,Compile order intent,R2_ORDER_INTENT_COMPILER,PHASE_F,26,PHASE 5,PARTIAL,ATONIC has no order-intent abstraction; jumps to CSV row construction (26)
+S15,Route order to broker,O1_ORDER_ROUTER,PHASE_G,,,CANONICAL_ONLY,ATONIC has no distinct routing step; folded into transport
+S16,Serialize and send to MT4 adapter,B1_MT4_ADAPTER_TRANSPORT,PHASE_G,27;28;29;30;31,PHASE 5,ONE_TO_MANY,ATONIC splits into CSV append + hash + sequence + heartbeat + lock detection
+S17,EA executes broker order,B2_MT4_EA_EXECUTOR,PHASE_G,32;33;34;35;36;37,PHASE 6,ONE_TO_MANY,ATONIC splits into preflight + validate + place + confirm + classify + retry/abort
+S18,Normalize broker events to canonical reports,B3_EXEC_EVENT_NORMALIZER,PHASE_H,38;39;42;43;44;45,PHASE 7,ONE_TO_MANY,ATONIC splits result capture: monitor + close-detect + row build + append + hash + Python poll
+S19,Apply execution reports to OMS state,O2_OMS_STATE_MACHINE,PHASE_I,,,CANONICAL_ONLY,ATONIC has no OMS state machine; close handled event-driven in EA
+S20,Classify trade close and compute canonical PnL,O3_TRADE_CLOSE_CLASSIFIER,PHASE_I,40;41;46;47;48;49;50,PHASE 7-8,ONE_TO_MANY,ATONIC splits PnL + duration + parse + WIN/LOSS + quality + integrity + registry
+S21,Bucketize outcome,E1_OUTCOME_BUCKETIZER,PHASE_I,47;50,PHASE 8,ONE_TO_MANY,Overlaps S20; ATONIC outcome classification (47) + outcome registry (50)
+S22,Compute event proximity,E2_PROXIMITY_EVALUATOR,PHASE_I,53,PHASE 9,PARTIAL,Loosely maps to ATONIC Step 53 Calendar Context Re-Validation
+S23,Lookup matrix decision,E3_MATRIX_LOOKUP,PHASE_I,52;54;55,PHASE 9,ONE_TO_MANY,ATONIC param resolution (52) + risk overlay (54) + cooldown/reentry decision (55)
+S24,Build reentry trade intent (or suppress),E4_REENTRY_INTENT_BUILDER,PHASE_I,51;56;57;58;59;60,PHASE 9-10,ONE_TO_MANY,ATONIC context reconstruct + decision record + registry + cooldown + signal gen + ledger
+S25,Loop: reentry follows same chain,F1_FLOW_ORCHESTRATOR,PHASE_J,61;62;63;64;65;66;67;69;70;71,PHASE 11,ONE_TO_MANY,Canonical keeps reentry as loop reference; ATONIC unrolls entire chain re-execution
+S26,Health aggregation + SLO evaluation,P1_HEALTH_AGGREGATOR,PHASE_J,,,CANONICAL_ONLY,ATONIC has no health/SLO aggregation step
+,,,,,Step 68,ATONIC_ONLY,Loop-prevention counter; canonical folds into S25 validation (chain depth/velocity)
