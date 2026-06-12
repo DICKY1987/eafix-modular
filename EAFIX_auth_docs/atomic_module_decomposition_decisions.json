@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "atomic_module_decomposition_decisions",
+  "title": "EAFIX Atomic Module Decomposition — Candidate Inventory + Dispositions",
+  "generated_at_utc": "2026-06-06T04:25:10.478405Z",
+  "authority_policy": "generated_from_canonical_sources",
+  "method": "Seed from 26 process-bound canonical modules; extract candidates from submodules/key-functions, EA systems A-G, UI products, shared libs, and the service inventory; score atomicity (0-...",
+  "generated_from_documents": [
+    "module_catalog.json",
+    "updated_trading_process_aligned.json",
+    "process_step_catalog.json",
+    "EAFIX-Modular___End-to-End_Module_Map.txt",
+    "EAFIX_module_reconciliation_worksheet.csv",
+    "ui_catalog.json",
+    "eafix_services_ai_reference_20260510.json",
+    "atonic_to_canonical_crosswalk.csv",
+    "MT4_Python_communication_channels.txt"
+  ],
+  "disposition_counts": {
+    "CONVERT_TO_DOMAIN_GROUP": 1,
+    "DOMAIN_GROUP_ONLY": 1,
+    "KEEP_CANONICAL": 24,
+    "KEEP_CANONICAL_BUT_SPLIT": 1,
+    "KEEP_CANONICAL_RENAME": 1,
+    "MERGE_INTO_PARENT": 1,
+    "MOVE_TO_SHARED_KERNEL": 2,
+    "NEEDS_REVIEW": 12,
+    "PROMOTE_GATEWAY_MODULE": 1,
+    "PROMOTE_MQL4_INDICATOR_MODULE": 1,
+    "PROMOTE_SERVICE_MODULE": 1,
+    "PROMOTE_UI_MODULE": 2,
+    "PROMOTE_WORK_CELL": 1
+  },
+  "candidates": [
+    {
+      "candidate_id": "CANDIDATE-F1_CONFIG_PREFERENCES",
+      "candidate_name": "Configuration Service",
+      "origin_type": "canonical_module",
+      "source_parent": null,
+      "decision": "KEEP_CANONICAL",
+      "target_module_symbol": "F1_CONFIG_PREFERENCES",
+      "atomicity_score": 9,
+      "rationale": "1:1 process step (S01) with single declared input/output contract; numeric ID present; corroborated by catalog, aligned-process phases, and reconciliation worksheet.",
+      "source_evidence": [
+        "module_catalog.json",
+        "updated_trading_process_aligned.json",
+        "process_step_catalog.json"
+      ],
+      "review_flags": []
+    }
+  ]
+}
