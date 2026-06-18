@@ -1,0 +1,99 @@
+{
+    "python.defaultInterpreterPath": "./venv/Scripts/python.exe",
+    "python.terminal.activateEnvironment": true,
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": [
+        "tests",
+        "-v",
+        "--tb=short"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.linting.enabled": true,
+    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Args": [
+        "--max-line-length=120",
+        "--ignore=E203,W503"
+    ],
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": [
+        "--line-length=120"
+    ],
+    "python.sortImports.args": [
+        "--profile=black"
+    ],
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    },
+    "files.associations": {
+        "*.mqh": "c",
+        "*.mq4": "c",
+        "*.ps1": "powershell"
+    },
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true,
+        "**/node_modules": true,
+        "**/.pytest_cache": true,
+        "**/*.egg-info": true
+    },
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true,
+        "**/__pycache__": true,
+        "**/*.pyc": true
+    },
+    "codex.enterpriseMode": true,
+    "codex.recoverySystem.enabled": true,
+    "codex.selfHealing.enabled": true,
+    "codex.predictiveFailure.enabled": true,
+    "codex.guardianIntegration.enabled": true,
+    "codex.implementation.phase": "1",
+    "codex.implementation.targetCompletion": 99,
+    "codex.implementation.features": {
+        "automatedRecovery": true,
+        "selfHealingServices": true,
+        "predictiveFailure": true,
+        "guardianEnhancement": true,
+        "crossLanguageBridge": true,
+        "enterpriseWorkflow": true
+    },
+    "terminal.integrated.env.windows": {
+        "CODEX_IMPLEMENTATION_ACTIVE": "true",
+        "RECOVERY_SYSTEM_ENABLED": "true",
+        "PYTHONPATH": "${workspaceFolder}/src;${workspaceFolder};${workspaceFolder}/eafix-modular"
+    },
+    "workbench.colorCustomizations": {
+        "statusBar.background": "#1B5E20",
+        "statusBar.foreground": "#FFFFFF",
+        "statusBarItem.hoverBackground": "#2E7D32"
+    },
+    "statusBar.customItems": [
+        {
+            "text": "🚀 Codex Implementation Active",
+            "tooltip": "Enterprise improvements in progress - Phase 1 Recovery Integration",
+            "command": "workbench.action.tasks.runTask",
+            "arguments": "Codex: Full System Health Check"
+        },
+        {
+            "text": "99% Target",
+            "tooltip": "Platform completion target: 98% → 99%",
+            "command": "workbench.action.tasks.runTask",
+            "arguments": "Codex: Validate Implementation Phase 1"
+        }
+    ],
+    "workbench.startupEditor": "none",
+    "explorer.confirmDragAndDrop": false,
+    "explorer.confirmDelete": false,
+    "git.confirmSync": false,
+    "git.autofetch": true,
+    "git.enableCommitSigning": false,
+    "extensions.ignoreRecommendations": false,
+    "workbench.settings.useSplitJSON": true,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "breadcrumbs.enabled": true,
+    "outline.showVariables": false,
+    "problems.showCurrentInStatus": true
+}

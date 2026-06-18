@@ -1,0 +1,118 @@
+capabilities:
+  scm.commit:
+    policy:
+      order: [git_cli]
+      fallback_on: [error, timeout]
+      open_source_first: true
+      require: { os: any, license: any }
+
+  scm.pr.create:
+    policy:
+      order: [gh_cli]
+      fallback_on: [rate_limit, error]
+      require: { license: [mit, apache-2.0, bsd] }
+
+  scm.pr.merge:
+    policy:
+      order: [gh_cli]
+      fallback_on: [rate_limit, error]
+      require: { auth: true }
+
+  container.build:
+    policy:
+      order: [docker_cli, buildah, kaniko]
+      fallback_on: [rate_limit, error, health_check_fail]
+      open_source_first: true
+      require: { os: any, license: any }
+
+  container.push:
+    policy:
+      order: [docker_cli]
+      fallback_on: [error, timeout]
+      require: { auth: true }
+
+  vuln.scan:
+    policy:
+      order: [trivy, grype]
+      fallback_on: [error, timeout, rate_limit]
+      open_source_first: true
+      cost_ceiling_usd: 0.0
+
+  sast.scan:
+    policy:
+      order: [semgrep]
+      fallback_on: [rate_limit, error]
+      cost_ceiling_usd: 0.0
+
+  sbom.generate:
+    policy:
+      order: [trivy]
+      fallback_on: [error, timeout]
+      open_source_first: true
+
+  k8s.apply:
+    policy:
+      order: [kubectl]
+      fallback_on: [error, timeout]
+      require: { os: any }
+
+  k8s.deploy:
+    policy:
+      order: [kubectl, helm]
+      fallback_on: [error, timeout]
+      prefer_managed: false
+
+  code.generation:
+    policy:
+      order: [gemini_cli, claude_code, ollama_local]
+      fallback_on: [rate_limit, cost_limit, error]
+      cost_ceiling_usd: 1.0
+      prefer_free_tier: true
+
+  code.review:
+    policy:
+      order: [claude_code, ollama_local]
+      fallback_on: [rate_limit, cost_limit, error]
+      cost_ceiling_usd: 2.0
+
+  code.refactor:
+    policy:
+      order: [claude_code, ollama_local]
+      fallback_on: [rate_limit, cost_limit, error]
+      cost_ceiling_usd: 1.5
+
+  test.python:
+    policy:
+      order: [pytest]
+      fallback_on: [error]
+      open_source_first: true
+
+  test.javascript:
+    policy:
+      order: [jest]
+      fallback_on: [error]
+      open_source_first: true
+
+  build.python:
+    policy:
+      order: [python_build]
+      fallback_on: [error]
+      open_source_first: true
+
+  build.javascript:
+    policy:
+      order: [npm_build]
+      fallback_on: [error]
+      open_source_first: true
+
+  package.python:
+    policy:
+      order: [python_build]
+      fallback_on: [error]
+      open_source_first: true
+
+  package.javascript:
+    policy:
+      order: [npm_build]
+      fallback_on: [error]
+      open_source_first: true
