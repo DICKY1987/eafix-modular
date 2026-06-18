@@ -1,0 +1,273 @@
+What 
+module_governance_glossary.json
+should include
+It should define governance vocabulary, not module details. Its job is to make terms deterministic for AI agents before they create MCRs, catalogs, crosswalks, manifests, or validators.
+The attached artifact list shows the glossary would sit above artifacts like module_identity_policy.json, module_change_request.schema.json, lifecycle enums, crosswalks, and validators.  
+Required top-level sections
+{
+  "schema_version": "1.0.0",
+  "document_type": "module_governance_glossary",
+  "status": "canonical",
+  "governance_scope": {},
+  "authority_rules": {},
+  "terms": [],
+  "relationships": [],
+  "forbidden_interpretations": [],
+  "ai_usage_rules": [],
+  "versioning_policy": {}
+}
+Required fields per term
+Each glossary term should use this structure:
+{
+  "term": "canonical_module",
+  "display_name": "Canonical Module",
+  "category": "module_identity",
+  "definition": "An approved module identity locked in the current catalog for the active pass.",
+  "applies_to_artifacts": [
+    "atomic_module_catalog.current.json",
+    "module_system_index.json",
+    "atomic_module_crosswalk.current.json",
+    "atomic_module_manifests/"
+  ],
+  "must_not_mean": [
+    "implemented module",
+    "fully documented module",
+    "manifest-ready module"
+  ],
+  "related_terms": [
+    "module_id",
+    "canonical_symbol",
+    "lifecycle_status",
+    "manifest_ready"
+  ],
+  "governance_rule": "A canonical module may still lack file bindings, runtime bindings, or complete manifests.",
+  "example": {
+    "correct": "R1_RISK_EVALUATOR is canonical but may still require downstream file or manifest reconciliation.",
+    "incorrect": "Canonical means implementation is complete."
+  }
+}
+Terms that must be included
+Module identity terms
+Include:
+	•	module
+	•	atomic_module
+	•	module_id
+	•	numeric_module_id
+	•	canonical_symbol
+	•	module_name
+	•	legacy_alias
+	•	deprecated_alias
+	•	supersedes
+	•	superseded_by
+	•	identity_status
+	•	identity_model
+	•	module_lifecycle_status
+Change governance terms
+Include:
+	•	module_change_request
+	•	mcr
+	•	change_type
+	•	decision
+	•	decision_notes
+	•	source_evidence
+	•	impact_checklist
+	•	risk_level
+	•	accepted_change
+	•	rejected_change
+	•	deferred_change
+Catalog/pass terms
+Include:
+	•	catalog_pass
+	•	active_pass
+	•	current_catalog
+	•	historical_catalog
+	•	current_state_index
+	•	module_change_log
+	•	decomposition_decision
+	•	module_crosswalk
+Migration terms
+Include:
+	•	split_module
+	•	merge_modules
+	•	rename_symbol
+	•	retire_module
+	•	promote_work_cell
+	•	promote_submodule
+	•	demote_to_internal
+	•	move_to_shared_kernel
+	•	change_contract
+	•	change_owner_files
+	•	change_runtime_boundary
+Manifest terms
+Include:
+	•	atomic_manifest
+	•	manifest_ready
+	•	stale_manifest
+	•	manifest_generation
+	•	manifest_patch
+	•	manifest_regeneration
+	•	manifest_source_authority
+File/service ownership terms
+Include:
+	•	file_owner
+	•	owning_module
+	•	primary_owner
+	•	secondary_owner
+	•	shared_file
+	•	service_binding
+	•	runtime_binding
+	•	communication_channel_owner
+Contract terms
+Include:
+	•	contract
+	•	input_contract
+	•	output_contract
+	•	contract_version
+	•	contract_registry
+	•	producer_module
+	•	consumer_module
+	•	breaking_contract_change
+Reconciliation terms
+Include:
+	•	reconciliation_flag
+	•	reconciliation_queue
+	•	NO_FILES
+	•	SERVICE_UNBOUND
+	•	SUBMODULE_UNDOC
+	•	EA_SECOND_PASS
+	•	NEW_MODULE
+	•	SCOPE_NARROWED
+	•	SAFETY_CONTROLS
+Creation method
+Create it in this order:
+	1.	Define metadata
+	•	schema version
+	•	document type
+	•	status
+	•	created date
+	•	authority scope
+	2.	Define authority rules
+	•	glossary defines terms only
+	•	does not override module catalog
+	•	does not override process catalog
+	•	does not override MT4 authority
+	•	does not override UI catalog
+	3.	Add core terms first
+	•	module
+	•	atomic module
+	•	module ID
+	•	canonical symbol
+	•	lifecycle status
+	•	catalog pass
+	•	MCR
+	•	crosswalk
+	•	manifest
+	4.	Add forbidden meanings Example:
+{
+  "term": "canonical",
+  "forbidden_meaning": "implemented",
+  "reason": "A module can be canonical before source files, runtime bindings, or manifests are complete."
+}
+	1.	Add relationship rules Example:
+{
+  "relationship": "module_id_to_canonical_symbol",
+  "rule": "module_id is permanent; canonical_symbol is human-readable and may change through an accepted MCR."
+}
+	1.	Add AI usage rules Example:
+{
+  "rule_id": "GLOSSARY-AI-001",
+  "rule": "When generating governance artifacts, use glossary definitions exactly and do not invent alternate meanings."
+}
+Minimal starter file
+{
+  "schema_version": "1.0.0",
+  "document_type": "module_governance_glossary",
+  "status": "canonical",
+  "governance_scope": {
+    "purpose": "Define controlled vocabulary for the EAFIX atomic module governance system.",
+    "applies_to": [
+      "module_identity_policy.json",
+      "module_change_request.schema.json",
+      "module_change_type_enum.json",
+      "module_lifecycle_status_enum.json",
+      "module_system_index.json",
+      "atomic_module_crosswalk.current.json",
+      "manifest_generation_policy.json",
+      "module_governance_validator_spec.json"
+    ],
+    "does_not_override": [
+      "module_catalog.json",
+      "process_step_catalog.json",
+      "updated_trading_process_aligned.json",
+      "ui_catalog.json",
+      "mt4 authoritative reference for ai.json",
+      "communication_channels.json"
+    ]
+  },
+  "terms": [
+    {
+      "term": "module_id",
+      "category": "module_identity",
+      "definition": "Permanent opaque numeric identifier assigned to a module identity.",
+      "must_not_mean": [
+        "process order",
+        "runtime layer",
+        "semantic category"
+      ],
+      "governance_rule": "Module IDs are never reused, even after retirement."
+    },
+    {
+      "term": "canonical_symbol",
+      "category": "module_identity",
+      "definition": "Human-readable module symbol using the approved prefix and capability-name pattern.",
+      "must_not_mean": [
+        "permanent identity",
+        "numeric module ID"
+      ],
+      "governance_rule": "Canonical symbols may change only through an accepted Module Change Request."
+    },
+    {
+      "term": "canonical",
+      "category": "lifecycle_status",
+      "definition": "A module identity locked in the current approved catalog.",
+      "must_not_mean": [
+        "implemented",
+        "manifest_ready",
+        "file_bound"
+      ],
+      "governance_rule": "Canonical identity does not prove implementation completeness."
+    },
+    {
+      "term": "module_change_request",
+      "category": "change_governance",
+      "definition": "A formal proposed architecture modification reviewed before catalog, crosswalk, manifest, or contract changes are made.",
+      "must_not_mean": [
+        "direct catalog edit",
+        "informal note"
+      ],
+      "governance_rule": "Architecture changes must enter through an MCR before modifying current-state artifacts."
+    }
+  ],
+  "forbidden_interpretations": [
+    {
+      "term": "canonical",
+      "forbidden_meaning": "implemented",
+      "reason": "A canonical module may still have NO_FILES, SERVICE_UNBOUND, or missing manifest evidence."
+    },
+    {
+      "term": "module_id",
+      "forbidden_meaning": "semantic encoding",
+      "reason": "Numeric IDs must remain opaque permanent handles."
+    }
+  ],
+  "ai_usage_rules": [
+    {
+      "rule_id": "GLOSSARY-AI-001",
+      "rule": "Use these definitions exactly when creating or validating module governance artifacts."
+    },
+    {
+      "rule_id": "GLOSSARY-AI-002",
+      "rule": "If a term is missing, add it to the glossary through a governance update instead of inventing a local meaning."
+    }
+  ]
+}

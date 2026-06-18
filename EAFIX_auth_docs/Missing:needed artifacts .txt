@@ -1,0 +1,23 @@
+Missing/needed artifacts 
+
+
+Priority	Artifact	Purpose
+P0	module_system_index.json	Single pointer file telling AI what catalog, schema, pass, manifests, MCR folder, and crosswalk are current.
+P0	/module_change_requests/ folder	Formal proposed-change layer before modifying catalogs.
+P0	module_change_request.schema.json	Enforces allowed MCR fields, statuses, change types, impact checklist, evidence, and decision fields.
+P0	module_change_type_enum.json	Fixed enum for ADD, SPLIT, MERGE, RENAME, RETIRE, CHANGE_CONTRACT, CHANGE_OWNER_FILES, etc.
+P0	module_lifecycle_status_enum.json	Fixed statuses: proposed, candidate, approved, canonical, implemented, manifest_ready, deprecated_alias, retired, superseded.
+P0	module_identity_policy.json	Hard rule: never reuse numeric module IDs; symbols may change; aliases preserved.
+P1	atomic_module_crosswalk.current.json	Tracks rename, split, merge, alias, supersession, and effective pass.
+P1	module_change_log.pass_001.json	Human/AI-readable summary of accepted/rejected changes per pass.
+P1	module_pass_plan.json	Defines Pass 1–7 scope, entry criteria, exit criteria, required files, and outputs.
+P1	reconciliation_queue_index.json	Converts flags like NO_FILES, SERVICE_UNBOUND, EA_SECOND_PASS, NEW_MODULE into work queues.
+P1	module_file_ownership_reconciliation.json	Resolves incomplete file ownership and many-to-many service/file bindings.
+P1	contract_registry.current.json	Central list of canonical contract names, versions, owners, schemas, producers, consumers.
+P2	manifest_generation_policy.json	States manifests are generated/patched only after accepted MCR + catalog/crosswalk update.
+P2	module_governance_validator_spec.json	Rules validators must enforce: no ID reuse, valid enum, current index exists, crosswalk completeness, stale manifest detection.
+P2	Initial MCR files	Start with deferred issues: position sizing split, CAL8 registry, EA-side boundary, event-gateway classification, Grafana classification.
+
+
+
+Add: module_governance_glossary.json

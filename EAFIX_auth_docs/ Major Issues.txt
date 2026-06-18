@@ -1,0 +1,255 @@
+ 
+Major Issues
+1. Lifecycle status and identity status overlap
+This is the largest issue.
+Current glossary:
+identity_status
+contains:
+canonical
+candidate
+deprecated_alias
+retired
+superseded
+while:
+module_lifecycle_status
+contains:
+proposed
+candidate
+approved
+canonical
+implemented
+manifest_ready
+deprecated_alias
+retired
+superseded
+This creates duplication.
+ 
+A validator eventually has to answer:
+Which field owns:
+candidate
+canonical
+retired
+superseded
+Currently the answer is:
+Both
+which is dangerous.
+Recommendation
+Separate identity from lifecycle.
+Identity should only answer:
+active
+deprecated_alias
+retired
+superseded
+Lifecycle should answer:
+proposed
+candidate
+approved
+canonical
+implemented
+manifest_ready
+Then:
+identity_status
+and
+module_lifecycle_status
+become orthogonal.
+Much cleaner.
+ 
+⸻
+ 
+2. “Module exists only when accepted into catalog pass”
+Current definition:
+A module exists only when it has been accepted into a catalog pass...
+Problem:
+ 
+Your governance model explicitly supports:
+proposed
+candidate
+modules.
+ 
+Therefore:
+module
+cannot require catalog acceptance.
+Otherwise candidate modules are not modules.
+Better wording
+A module is a governed architectural unit.
+Canonical modules are accepted into a catalog pass.
+Candidate modules may exist before acceptance.
+ 
+⸻
+ 
+3. Producer Module Rule is too strict
+Current rule:
+Each contract must have exactly one producer_module.
+This may fail later.
+ 
+Examples:
+ExecutionReport
+Heartbeat
+HealthStatus
+FeatureFrame
+could have multiple producers.
+ 
+The glossary is currently locking you into:
+1 producer only
+before you’ve finished decomposition.
+Recommendation
+Replace:
+exactly one producer
+with:
+one or more producers
+unless the contract registry architecture has already been finalized.
+ 
+⸻
+ 
+4. NEW_MODULE definition is probably incorrect
+Current definition:
+NEW_MODULE means
+no prior decomposition decision
+But:
+PROMOTE_WORK_CELL
+PROMOTE_SUBMODULE
+will often become:
+NEW_MODULE
+while having decomposition history.
+Recommendation
+Define NEW_MODULE as:
+new canonical module added during current pass
+rather than:
+no prior decomposition history
+ 
+⸻
+ 
+Moderate Issues
+5. Missing glossary authority hierarchy
+The glossary should explicitly state:
+"authority_level": {
+  "defines": [
+    "terminology",
+    "governance vocabulary"
+  ],
+  "does_not_define": [
+    "module identities",
+    "process definitions",
+    "contracts",
+    "runtime ownership"
+  ]
+}
+Otherwise future agents may start using glossary definitions as authoritative operational data.
+ 
+⸻
+ 
+6. Missing glossary change process
+Ironically the glossary itself lacks governance.
+Need:
+"glossary_change_policy"
+Example:
+New governance term
+→ glossary MCR
+→ glossary update
+→ validator update
+Otherwise terms drift.
+ 
+⸻
+ 
+7. Missing conflict resolution policy
+Need a section defining:
+If glossary definition conflicts with:
+module catalog
+schema
+process catalog
+UI catalog
+MT4 authority
+who wins?
+ 
+I would recommend:
+Schema
+↓
+Catalog
+↓
+Process
+↓
+Glossary
+or similar.
+ 
+⸻
+ 
+Minor Issues
+8. Circular references
+Example:
+move_to_shared_kernel
+related_terms:
+  move_to_shared_kernel
+Self-reference should be removed.  
+ 
+⸻
+ 
+9. Missing term
+I would add:
+canonical_module
+separate from:
+canonical
+because many future prompts will ask:
+Is this a canonical module?
+and that concept should be explicit.
+ 
+⸻
+ 
+10. Missing term
+Add:
+module_boundary
+The entire decomposition project is fundamentally boundary management.
+Surprised it is absent.
+ 
+⸻
+ 
+11. Missing term
+Add:
+authority_source
+The project increasingly relies on:
+catalog
+schema
+routing
+manifest
+crosswalk
+The glossary should define what an authoritative source actually is.
+ 
+⸻
+ 
+Most Important Recommendation
+Before merging, add a new section:
+"validator_targets"
+Example:
+{
+  "validator_targets": {
+    "required_terms": 72,
+    "required_relationships": 7,
+    "required_forbidden_interpretations": 6,
+    "required_ai_usage_rules": 8,
+    "allow_unknown_terms": false
+  }
+}
+This transforms the glossary from:
+documentation
+into:
+enforceable governance metadata
+which is much more aligned with the direction of the atomic module governance system.
+ 
+If I were prioritizing fixes before merge:
+Priority 1
+- Resolve identity_status vs lifecycle_status overlap
+
+Priority 2
+- Add glossary authority hierarchy
+
+Priority 3
+- Add glossary change governance
+
+Priority 4
+- Fix producer_module restriction
+
+Priority 5
+- Add module_boundary and authority_source terms
+
+Priority 6
+- Add validator_targets
+Those six changes would move the glossary from a strong reference artifact to a governance-grade authority artifact.
