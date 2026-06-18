@@ -1,0 +1,2998 @@
+From 8f47af6f0d767bf4242c9fcf452d38edcce770d6 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 18 Jun 2026 05:02:14 +0000
+Subject: [PATCH] Add module_governance_glossary.json (v1.1.1); remove stale
+ bulk-terms working file
+
+Canonical governance vocabulary for the EAFIX atomic module system:
+- 81 terms across 8 categories
+- 7 relationships, 8 forbidden_interpretations, 9 ai_usage_rules
+- Model C: lifecycle_status and manifest_ready as derived projections;
+  identity_status is the sole stored identity-state field
+- authority_hierarchy, conflict_resolution_policy, glossary_change_policy
+- conflict_resolution_policy defers operational-document precedence to doc_authority.json
+- validator_targets (allow_unknown_terms: false) for enforceable validation
+
+Removes 'module governance glossary bulk terms.json' (pre-merge working
+artifact, not an authority source) to prevent agents reading it as a
+competing source.
+---
+ ...module governance glossary bulk terms.json | 1356 --------------
+ .../module_governance_glossary.json           | 1600 +++++++++++++++++
+ 2 files changed, 1600 insertions(+), 1356 deletions(-)
+ delete mode 100644 EAFIX_auth_docs/module governance glossary bulk terms.json
+ create mode 100644 EAFIX_auth_docs/module_governance_glossary.json
+
+diff --git a/EAFIX_auth_docs/module governance glossary bulk terms.json b/EAFIX_auth_docs/module governance glossary bulk terms.json
+deleted file mode 100644
+index b9ad63f..0000000
+--- a/EAFIX_auth_docs/module governance glossary bulk terms.json	
++++ /dev/null
+@@ -1,1356 +0,0 @@
+-{
+-  "_meta": {
+-    "purpose": "Bulk remaining terms for review before merge into module_governance_glossary.json",
+-    "seed_terms_already_defined": [
+-      "module_id",
+-      "canonical_symbol",
+-      "canonical",
+-      "module_change_request"
+-    ],
+-    "grounded_from": [
+-      "eafix_unified_atomic_module_schema_v1_0_0.json",
+-      "Claude_gen_atomic_module_catalog_vNext.json",
+-      "module_system_as_a_versioned_governance_system.txt",
+-      "Explanation__module_governance_glossary_json.txt"
+-    ],
+-    "display_name_policy": "Included on ambiguous or multi-word terms only",
+-    "applies_to_artifacts_policy": "Included where artifact scope is non-obvious",
+-    "example_policy": "Included on terms where correct/incorrect confusion is documented or likely"
+-  },
+-  "terms_by_category": {
+-    "module_identity": [
+-      {
+-        "term": "module",
+-        "category": "module_identity",
+-        "definition": "A named, bounded unit of system responsibility with declared input/output contracts, a permanent numeric ID, a canonical symbol, a lifecycle status, and a single owning service or runtime context.",
+-        "must_not_mean": [
+-          "Python file",
+-          "class",
+-          "function",
+-          "work cell",
+-          "submodule",
+-          "any code unit that has not been accepted into a catalog pass"
+-        ],
+-        "governance_rule": "A module exists only when it has been accepted into a catalog pass with a numeric module ID assigned.",
+-        "related_terms": [
+-          "atomic_module",
+-          "module_id",
+-          "canonical_symbol",
+-          "module_lifecycle_status"
+-        ]
+-      },
+-      {
+-        "term": "atomic_module",
+-        "display_name": "Atomic Module",
+-        "category": "module_identity",
+-        "definition": "A module that is fully decomposed \u2014 it cannot be split further without breaking its single-responsibility boundary. All modules in the canonical catalog are atomic.",
+-        "must_not_mean": [
+-          "small module",
+-          "simple module",
+-          "single-file module"
+-        ],
+-        "governance_rule": "Atomicity is a decomposition decision recorded in atomic_module_decomposition_decisions.json, not inferred from file count or line count.",
+-        "example": {
+-          "correct": "R1_RISK_EVALUATOR is atomic because its responsibility \u2014 evaluating a composite risk decision \u2014 cannot be split without creating a contract across two independently deployable units.",
+-          "incorrect": "A module is atomic because it has only one source file."
+-        }
+-      },
+-      {
+-        "term": "numeric_module_id",
+-        "display_name": "Numeric Module ID",
+-        "category": "module_identity",
+-        "definition": "The 20-digit opaque permanent numeric identifier assigned to a module. Matches the pattern ^5\\d{19}$. Synonymous with module_id in the catalog.",
+-        "must_not_mean": [
+-          "process order",
+-          "layer number",
+-          "semantic category",
+-          "version"
+-        ],
+-        "applies_to_artifacts": [
+-          "atomic_module_catalog.current.json",
+-          "atomic_module_manifests/",
+-          "atomic_module_crosswalk.current.json"
+-        ],
+-        "governance_rule": "The numeric module ID is assigned once at module acceptance and is never reused or renumbered, even if the module is retired or its symbol changes.",
+-        "related_terms": [
+-          "module_id",
+-          "identity_model",
+-          "canonical_symbol"
+-        ]
+-      },
+-      {
+-        "term": "module_name",
+-        "category": "module_identity",
+-        "definition": "A human-readable long-form name for the module, distinct from the canonical symbol. May be updated without an MCR if it does not conflict with catalog authority.",
+-        "must_not_mean": [
+-          "canonical_symbol",
+-          "module_id"
+-        ],
+-        "governance_rule": "module_name is informational. canonical_symbol is the governance-controlled identifier.",
+-        "related_terms": [
+-          "canonical_symbol",
+-          "module_id"
+-        ]
+-      },
+-      {
+-        "term": "legacy_alias",
+-        "display_name": "Legacy Alias",
+-        "category": "module_identity",
+-        "definition": "A prior canonical symbol that has been replaced by a new symbol through an accepted MCR. Retained in the catalog for traceability and to prevent orphaned references.",
+-        "must_not_mean": [
+-          "current symbol",
+-          "active symbol",
+-          "duplicate module"
+-        ],
+-        "applies_to_artifacts": [
+-          "atomic_module_catalog.current.json",
+-          "atomic_module_crosswalk.current.json"
+-        ],
+-        "governance_rule": "Legacy aliases are never removed from the catalog. They are tagged with identity_status: deprecated_alias and must map to the current canonical symbol.",
+-        "example": {
+-          "correct": "F1_FLOW_ORCHESTRATOR is a legacy alias of F4_FLOW_ORCHESTRATOR, retained after a RENAME_SYMBOL MCR resolved a PREFIX_COLLISION_F1 flag.",
+-          "incorrect": "F1_FLOW_ORCHESTRATOR was deleted when the module was renamed."
+-        },
+-        "related_terms": [
+-          "canonical_symbol",
+-          "deprecated_alias",
+-          "supersedes",
+-          "superseded_by"
+-        ]
+-      },
+-      {
+-        "term": "deprecated_alias",
+-        "display_name": "Deprecated Alias",
+-        "category": "module_identity",
+-        "definition": "An identity_status value indicating a module entry exists only to preserve traceability for a prior symbol that is no longer active. The entry is not a live module.",
+-        "must_not_mean": [
+-          "retired_module",
+-          "deleted_module"
+-        ],
+-        "governance_rule": "deprecated_alias entries must carry a superseded_by reference pointing to the current canonical module.",
+-        "related_terms": [
+-          "legacy_alias",
+-          "identity_status",
+-          "superseded_by"
+-        ]
+-      },
+-      {
+-        "term": "supersedes",
+-        "category": "module_identity",
+-        "definition": "An array field on a module record listing the numeric IDs or symbols of prior modules that this module replaces. Populated when a new module is created through SPLIT_MODULE, MERGE_MODULES, or RENAME_SYMBOL.",
+-        "must_not_mean": [
+-          "imports",
+-          "depends_on",
+-          "calls"
+-        ],
+-        "governance_rule": "supersedes must reference the numeric module IDs of the prior modules, not their symbols, to survive future renames.",
+-        "related_terms": [
+-          "superseded_by",
+-          "legacy_alias",
+-          "identity_status"
+-        ]
+-      },
+-      {
+-        "term": "superseded_by",
+-        "category": "module_identity",
+-        "definition": "An array field on a retired or deprecated module record listing the numeric IDs or symbols of the modules that now carry its responsibilities.",
+-        "must_not_mean": [
+-          "consumed_by",
+-          "depends_on"
+-        ],
+-        "governance_rule": "A module with identity_status: retired or superseded must have a non-empty superseded_by array unless it was fully dissolved with no successor.",
+-        "related_terms": [
+-          "supersedes",
+-          "identity_status",
+-          "legacy_alias"
+-        ]
+-      },
+-      {
+-        "term": "identity_status",
+-        "display_name": "Identity Status",
+-        "category": "module_identity",
+-        "definition": "The governance lifecycle state of a module identity record. Allowed values: canonical, candidate, deprecated_alias, retired, superseded.",
+-        "must_not_mean": [
+-          "implementation status",
+-          "manifest status",
+-          "service binding status"
+-        ],
+-        "governance_rule": "identity_status is the stored schema field for module identity state, with enum canonical, candidate, deprecated_alias, retired, superseded. It does not indicate implementation completeness; lifecycle maturity is derived separately via module_lifecycle_status. A module may be canonical while carrying NO_FILES or SERVICE_UNBOUND flags.",
+-        "example": {
+-          "correct": "identity_status: canonical means the module is locked in the current catalog pass. It may still have reconciliation_flags: [NO_FILES].",
+-          "incorrect": "identity_status: canonical means the module is implemented and ready to ship."
+-        },
+-        "related_terms": [
+-          "module_lifecycle_status",
+-          "canonical",
+-          "reconciliation_flag",
+-          "identity_model"
+-        ]
+-      },
+-      {
+-        "term": "identity_model",
+-        "display_name": "Identity Model",
+-        "category": "module_identity",
+-        "definition": "Describes how the module's identity was assigned. Allowed values: numeric_20_digit, candidate_numeric_pending, legacy_symbolic, hybrid_migration.",
+-        "must_not_mean": [
+-          "module_kind",
+-          "module_role"
+-        ],
+-        "governance_rule": "All Pass 1 canonical modules must use numeric_20_digit. candidate_numeric_pending is only valid for proposed modules not yet accepted into a catalog pass.",
+-        "related_terms": [
+-          "numeric_module_id",
+-          "identity_status",
+-          "catalog_pass"
+-        ]
+-      },
+-      {
+-        "term": "module_lifecycle_status",
+-        "display_name": "Module Lifecycle Status",
+-        "category": "module_identity",
+-        "definition": "A derived governance projection describing how far a module has progressed. It is computed from identity_status, review_status where available, reconciliation flags, manifest existence, and manifest staleness_status. It is not a stored schema field unless a future accepted MCR adds it.",
+-        "must_not_mean": [
+-          "stored schema field",
+-          "replacement for identity_status",
+-          "manual status value"
+-        ],
+-        "governance_rule": "module_lifecycle_status must be computed, not hand-authored. identity_status remains the stored schema field.",
+-        "derivation": [
+-          {
+-            "stage": "proposed",
+-            "rule": "Exists only in an MCR and has no catalog entry."
+-          },
+-          {
+-            "stage": "candidate",
+-            "rule": "identity_status == candidate."
+-          },
+-          {
+-            "stage": "approved",
+-            "rule": "identity_status == candidate and review_status == approved, where review_status exists."
+-          },
+-          {
+-            "stage": "canonical",
+-            "rule": "identity_status == canonical."
+-          },
+-          {
+-            "stage": "implemented",
+-            "rule": "identity_status == canonical and reconciliation_flags do not include NO_FILES or SERVICE_UNBOUND."
+-          },
+-          {
+-            "stage": "manifest_ready",
+-            "rule": "implemented and manifest file exists and staleness_status == fresh."
+-          }
+-        ],
+-        "related_terms": [
+-          "identity_status",
+-          "review_status",
+-          "reconciliation_flag",
+-          "manifest_ready",
+-          "staleness_status"
+-        ]
+-      }
+-    ],
+-    "change_governance": [
+-      {
+-        "term": "mcr",
+-        "display_name": "MCR (Module Change Request)",
+-        "category": "change_governance",
+-        "definition": "Abbreviation for module_change_request. The formal unit of proposed architecture modification in the EAFIX governance system.",
+-        "must_not_mean": [
+-          "informal note",
+-          "catalog edit",
+-          "PR comment"
+-        ],
+-        "governance_rule": "MCR and module_change_request are synonymous. Use mcr_id as the unique identifier in file names and cross-references.",
+-        "related_terms": [
+-          "module_change_request",
+-          "change_type",
+-          "decision"
+-        ]
+-      },
+-      {
+-        "term": "change_type",
+-        "display_name": "Change Type",
+-        "category": "change_governance",
+-        "definition": "A fixed enum value on an MCR describing the class of architecture modification being proposed. Allowed values: ADD_MODULE, SPLIT_MODULE, MERGE_MODULES, NARROW_SCOPE, EXPAND_SCOPE, RENAME_SYMBOL, RETIRE_MODULE, PROMOTE_WORK_CELL, PROMOTE_SUBMODULE, DEMOTE_TO_INTERNAL, MOVE_TO_SHARED_KERNEL, CHANGE_CONTRACT, CHANGE_OWNER_FILES, CHANGE_RUNTIME_BOUNDARY.",
+-        "must_not_mean": [
+-          "free-form description",
+-          "git commit type"
+-        ],
+-        "governance_rule": "change_type must be drawn from module_change_type_enum.json. Free-form strings are rejected by the validator.",
+-        "related_terms": [
+-          "module_change_request",
+-          "module_change_type_enum"
+-        ]
+-      },
+-      {
+-        "term": "decision",
+-        "category": "change_governance",
+-        "definition": "The resolution applied to an MCR after review. Allowed values: accepted, rejected, deferred.",
+-        "must_not_mean": [
+-          "architectural decision in general",
+-          "DES decision"
+-        ],
+-        "governance_rule": "A decision of accepted is required before the catalog, crosswalk, or any manifest may be modified in response to the MCR.",
+-        "related_terms": [
+-          "accepted_change",
+-          "rejected_change",
+-          "deferred_change",
+-          "module_change_request"
+-        ]
+-      },
+-      {
+-        "term": "decision_notes",
+-        "display_name": "Decision Notes",
+-        "category": "change_governance",
+-        "definition": "An array of human-readable strings on an MCR recording the rationale for the decision, conditions attached to acceptance, or reasons for deferral or rejection.",
+-        "must_not_mean": [
+-          "definition",
+-          "spec"
+-        ],
+-        "governance_rule": "decision_notes are required when decision is rejected or deferred. Optional but recommended when accepted.",
+-        "related_terms": [
+-          "decision",
+-          "module_change_request"
+-        ]
+-      },
+-      {
+-        "term": "source_evidence",
+-        "display_name": "Source Evidence",
+-        "category": "change_governance",
+-        "definition": "An array of artifact file names or document references cited in an MCR to justify the proposed change. Must reference files that actually exist in the project.",
+-        "must_not_mean": [
+-          "inferred evidence",
+-          "verbal description only"
+-        ],
+-        "governance_rule": "source_evidence entries must be grounded in verified file presence. Claude must not populate this field with invented or assumed file names.",
+-        "related_terms": [
+-          "module_change_request",
+-          "decomposition_decision"
+-        ]
+-      },
+-      {
+-        "term": "impact_checklist",
+-        "display_name": "Impact Checklist",
+-        "category": "change_governance",
+-        "definition": "A structured set of impact questions on an MCR covering identity, contracts, process, runtime, files, tests, docs, UI, MT4, and risk domains. Every MCR must include a completed checklist.",
+-        "must_not_mean": [
+-          "optional notes section"
+-        ],
+-        "governance_rule": "An MCR without a completed impact_checklist is considered incomplete and must not be accepted.",
+-        "related_terms": [
+-          "module_change_request",
+-          "risk_level"
+-        ]
+-      },
+-      {
+-        "term": "risk_level",
+-        "display_name": "Risk Level",
+-        "category": "change_governance",
+-        "definition": "A classification on an MCR indicating the potential blast radius of the proposed change. Typical values: low, medium, high, critical.",
+-        "must_not_mean": [
+-          "trading risk",
+-          "financial risk exposure"
+-        ],
+-        "governance_rule": "risk_level: high is required for any change affecting contracts, runtime boundaries, MT4 EA behavior, or order routing logic.",
+-        "related_terms": [
+-          "impact_checklist",
+-          "module_change_request"
+-        ]
+-      },
+-      {
+-        "term": "accepted_change",
+-        "display_name": "Accepted Change",
+-        "category": "change_governance",
+-        "definition": "An MCR with decision: accepted. Triggers downstream updates to the catalog, crosswalk, decomposition decisions, and affected manifests.",
+-        "must_not_mean": [
+-          "implemented change",
+-          "deployed change"
+-        ],
+-        "governance_rule": "Accepted does not mean deployed. Accepted means the architecture decision is approved for catalog reflection.",
+-        "related_terms": [
+-          "decision",
+-          "module_change_request",
+-          "catalog_pass"
+-        ]
+-      },
+-      {
+-        "term": "rejected_change",
+-        "display_name": "Rejected Change",
+-        "category": "change_governance",
+-        "definition": "An MCR with decision: rejected. The proposed architecture modification will not be applied. The MCR is retained for historical record.",
+-        "must_not_mean": [
+-          "deleted MCR"
+-        ],
+-        "governance_rule": "Rejected MCRs must not be deleted. They are archived with decision_notes explaining the rejection.",
+-        "related_terms": [
+-          "decision",
+-          "module_change_request",
+-          "deferred_change"
+-        ]
+-      },
+-      {
+-        "term": "deferred_change",
+-        "display_name": "Deferred Change",
+-        "category": "change_governance",
+-        "definition": "An MCR with decision: deferred. The proposed modification is not rejected but is postponed to a future catalog pass, typically because prerequisite decisions are unresolved.",
+-        "must_not_mean": [
+-          "rejected_change",
+-          "inactive MCR"
+-        ],
+-        "governance_rule": "Deferred MCRs must specify the target pass or prerequisite condition in decision_notes.",
+-        "example": {
+-          "correct": "MCR-2026-0003 is deferred to Pass 2 because the MT4/Python authority boundary must be resolved before EA-side modules can be defined.",
+-          "incorrect": "Deferred means rejected."
+-        },
+-        "related_terms": [
+-          "decision",
+-          "catalog_pass",
+-          "module_change_request"
+-        ]
+-      }
+-    ],
+-    "catalog_pass": [
+-      {
+-        "term": "catalog_pass",
+-        "display_name": "Catalog Pass",
+-        "category": "catalog_pass",
+-        "definition": "A versioned iteration of the module decomposition process producing a locked catalog snapshot, a change log, a crosswalk update, and a set of decomposition decisions. Passes are numbered sequentially: PASS_1, PASS_2, etc.",
+-        "must_not_mean": [
+-          "deployment release",
+-          "sprint",
+-          "git branch"
+-        ],
+-        "governance_rule": "Each catalog pass produces its own versioned artifacts. Only one pass is current at any time, as declared in module_system_index.json.",
+-        "related_terms": [
+-          "active_pass",
+-          "current_catalog",
+-          "module_change_log"
+-        ]
+-      },
+-      {
+-        "term": "active_pass",
+-        "display_name": "Active Pass",
+-        "category": "catalog_pass",
+-        "definition": "The catalog pass currently in progress or most recently completed. Declared in module_system_index.json under the active_pass field.",
+-        "must_not_mean": [
+-          "all passes",
+-          "any historical pass"
+-        ],
+-        "governance_rule": "AI agents must read active_pass from module_system_index.json before generating or patching any governance artifact. Never assume pass state from file timestamps.",
+-        "related_terms": [
+-          "catalog_pass",
+-          "module_system_index",
+-          "current_catalog"
+-        ]
+-      },
+-      {
+-        "term": "current_catalog",
+-        "display_name": "Current Catalog",
+-        "category": "catalog_pass",
+-        "definition": "The single catalog file designated as authoritative for the active pass. Referenced by module_system_index.json as current_catalog. Typically named atomic_module_catalog.current.json or atomic_module_catalog.pass_00N.json.",
+-        "must_not_mean": [
+-          "any catalog file",
+-          "the latest file by timestamp"
+-        ],
+-        "governance_rule": "Only the file named in module_system_index.json:current_catalog is authoritative. All other catalog files are historical.",
+-        "related_terms": [
+-          "module_system_index",
+-          "catalog_pass",
+-          "active_pass"
+-        ]
+-      },
+-      {
+-        "term": "historical_catalog",
+-        "display_name": "Historical Catalog",
+-        "category": "catalog_pass",
+-        "definition": "A catalog file from a prior pass, retained for traceability but no longer authoritative. Listed in module_system_index.json under historical_catalogs.",
+-        "must_not_mean": [
+-          "deleted file",
+-          "invalid file"
+-        ],
+-        "governance_rule": "Historical catalogs must not be edited. They are read-only pass snapshots.",
+-        "related_terms": [
+-          "current_catalog",
+-          "catalog_pass",
+-          "module_system_index"
+-        ]
+-      },
+-      {
+-        "term": "current_state_index",
+-        "display_name": "Current State Index",
+-        "category": "catalog_pass",
+-        "definition": "Synonym for module_system_index.json. The single pointer file declaring which catalog, schema, decomposition decisions, manifest directory, MCR directory, crosswalk, and pass are current.",
+-        "must_not_mean": [
+-          "process_step_catalog.json",
+-          "any other index"
+-        ],
+-        "governance_rule": "All AI-generated governance artifacts must resolve their source authority by reading the current_state_index first.",
+-        "related_terms": [
+-          "module_system_index",
+-          "current_catalog",
+-          "active_pass"
+-        ]
+-      },
+-      {
+-        "term": "module_change_log",
+-        "display_name": "Module Change Log",
+-        "category": "catalog_pass",
+-        "definition": "A per-pass human/AI-readable summary of accepted and rejected MCRs, produced at the close of a catalog pass. Named module_change_log.pass_00N.json.",
+-        "must_not_mean": [
+-          "git log",
+-          "commit history",
+-          "informal notes"
+-        ],
+-        "governance_rule": "The change log is generated from accepted and rejected MCR records, not authored freehand.",
+-        "related_terms": [
+-          "catalog_pass",
+-          "accepted_change",
+-          "rejected_change",
+-          "module_change_request"
+-        ]
+-      },
+-      {
+-        "term": "decomposition_decision",
+-        "display_name": "Decomposition Decision",
+-        "category": "catalog_pass",
+-        "definition": "A record in atomic_module_decomposition_decisions.json capturing why a candidate was kept as a module, split, merged, promoted, deferred, or rejected during a decomposition pass.",
+-        "must_not_mean": [
+-          "MCR",
+-          "informal rationale comment"
+-        ],
+-        "governance_rule": "Decomposition decisions are the authoritative history of why the catalog is shaped the way it is. They must be updated whenever an MCR is accepted.",
+-        "related_terms": [
+-          "catalog_pass",
+-          "module_change_request",
+-          "atomic_module_decomposition_decisions"
+-        ]
+-      },
+-      {
+-        "term": "module_crosswalk",
+-        "display_name": "Module Crosswalk",
+-        "category": "catalog_pass",
+-        "definition": "A structured file recording all renames, splits, merges, aliases, supersessions, and effective passes for module identities. Allows any prior symbol to be traced to its current canonical module.",
+-        "must_not_mean": [
+-          "ATONIC-to-canonical crosswalk",
+-          "process step mapping"
+-        ],
+-        "applies_to_artifacts": [
+-          "atomic_module_crosswalk.current.json",
+-          "atomic_module_crosswalk.pass_00N.json"
+-        ],
+-        "governance_rule": "Every accepted MCR with a change_type of RENAME_SYMBOL, SPLIT_MODULE, MERGE_MODULES, or RETIRE_MODULE must produce a crosswalk entry.",
+-        "related_terms": [
+-          "legacy_alias",
+-          "supersedes",
+-          "catalog_pass",
+-          "accepted_change"
+-        ]
+-      }
+-    ],
+-    "migration": [
+-      {
+-        "term": "split_module",
+-        "display_name": "Split Module",
+-        "category": "migration",
+-        "definition": "A change_type value (SPLIT_MODULE) where one module is decomposed into two or more distinct modules, each with its own numeric ID and canonical symbol. The source module may be retired or have its scope narrowed.",
+-        "must_not_mean": [
+-          "refactoring code within a module"
+-        ],
+-        "governance_rule": "A split requires an accepted MCR before the catalog reflects the new modules. The source module's numeric ID is never reused.",
+-        "example": {
+-          "correct": "Splitting position sizing from R1_RISK_EVALUATOR creates a new module R4_POSITION_SIZER with a new numeric ID. R1 retains its ID with narrowed scope.",
+-          "incorrect": "Moving a function to a new file constitutes a split_module."
+-        },
+-        "related_terms": [
+-          "change_type",
+-          "promote_work_cell",
+-          "narrow_scope"
+-        ]
+-      },
+-      {
+-        "term": "merge_modules",
+-        "display_name": "Merge Modules",
+-        "category": "migration",
+-        "definition": "A change_type value (MERGE_MODULES) where two or more modules collapse into a single surviving module. Non-surviving modules are retired with superseded_by references.",
+-        "must_not_mean": [
+-          "combining files without catalog change"
+-        ],
+-        "governance_rule": "The surviving module retains its numeric ID. Retired modules' IDs are preserved as historical records.",
+-        "related_terms": [
+-          "change_type",
+-          "retire_module",
+-          "superseded_by"
+-        ]
+-      },
+-      {
+-        "term": "rename_symbol",
+-        "display_name": "Rename Symbol",
+-        "category": "migration",
+-        "definition": "A change_type value (RENAME_SYMBOL) where the canonical symbol of a module changes while the numeric module ID remains the same. The prior symbol becomes a legacy alias.",
+-        "must_not_mean": [
+-          "redefining the module's purpose",
+-          "changing the numeric ID"
+-        ],
+-        "governance_rule": "RENAME_SYMBOL requires an accepted MCR. The old symbol must be recorded as a legacy_alias in the catalog and a crosswalk entry must be produced.",
+-        "example": {
+-          "correct": "F1_FLOW_ORCHESTRATOR \u2192 F4_FLOW_ORCHESTRATOR is a RENAME_SYMBOL. The numeric ID 50000000000000000025 is unchanged.",
+-          "incorrect": "Editing the canonical_symbol field in the catalog directly without an MCR."
+-        },
+-        "related_terms": [
+-          "legacy_alias",
+-          "module_crosswalk",
+-          "change_type"
+-        ]
+-      },
+-      {
+-        "term": "retire_module",
+-        "display_name": "Retire Module",
+-        "category": "migration",
+-        "definition": "A change_type value (RETIRE_MODULE) marking a module as no longer active. The numeric ID and symbol are preserved in the catalog with identity_status: retired.",
+-        "must_not_mean": [
+-          "deleting a module from the catalog"
+-        ],
+-        "governance_rule": "Retired module IDs are never reused. The catalog entry remains with identity_status: retired and a non-empty superseded_by array where applicable.",
+-        "related_terms": [
+-          "identity_status",
+-          "module_lifecycle_status",
+-          "superseded_by"
+-        ]
+-      },
+-      {
+-        "term": "promote_work_cell",
+-        "display_name": "Promote Work Cell",
+-        "category": "migration",
+-        "definition": "A change_type value (PROMOTE_WORK_CELL) elevating a former work cell \u2014 a bounded sub-unit within a module \u2014 to full module status, assigning it a new numeric ID and canonical symbol.",
+-        "must_not_mean": [
+-          "creating a completely new module with no prior existence"
+-        ],
+-        "governance_rule": "The promoted module's migration_status is set to promoted_from_work_cell. The source module entry records the promotion in its decomposition decision.",
+-        "related_terms": [
+-          "promote_submodule",
+-          "migration_status",
+-          "change_type"
+-        ]
+-      },
+-      {
+-        "term": "promote_submodule",
+-        "display_name": "Promote Submodule",
+-        "category": "migration",
+-        "definition": "A change_type value (PROMOTE_SUBMODULE) elevating a documented submodule to full module status with its own numeric ID and canonical symbol.",
+-        "must_not_mean": [
+-          "promote_work_cell"
+-        ],
+-        "governance_rule": "Submodule promotion requires prior SUBMODULE_UNDOC flag resolution: the submodule must be documented before it can be evaluated for promotion.",
+-        "related_terms": [
+-          "promote_work_cell",
+-          "migration_status",
+-          "SUBMODULE_UNDOC"
+-        ]
+-      },
+-      {
+-        "term": "demote_to_internal",
+-        "display_name": "Demote to Internal",
+-        "category": "migration",
+-        "definition": "A change_type value (DEMOTE_TO_INTERNAL) reducing a module or submodule to an internal function of another module, removing its independent catalog entry.",
+-        "must_not_mean": [
+-          "retire_module"
+-        ],
+-        "governance_rule": "DEMOTE_TO_INTERNAL requires an accepted MCR. The absorbing module must update its file ownership and contract records.",
+-        "related_terms": [
+-          "retire_module",
+-          "change_type",
+-          "split_module"
+-        ]
+-      },
+-      {
+-        "term": "move_to_shared_kernel",
+-        "display_name": "Move to Shared Kernel",
+-        "category": "migration",
+-        "definition": "A change_type value (MOVE_TO_SHARED_KERNEL) reclassifying logic as domain-neutral and relocating it to the shared kernel domain (SK prefix), creating or updating an SK-prefixed module.",
+-        "must_not_mean": [
+-          "making code available to all modules without governance"
+-        ],
+-        "governance_rule": "Shared kernel modules must contain only stable, domain-neutral primitives. Domain-specific logic may not be moved to the shared kernel.",
+-        "related_terms": [
+-          "change_type",
+-          "shared_file",
+-          "move_to_shared_kernel"
+-        ]
+-      },
+-      {
+-        "term": "change_contract",
+-        "display_name": "Change Contract",
+-        "category": "migration",
+-        "definition": "A change_type value (CHANGE_CONTRACT) indicating that input or output contracts of a module are being added, modified, versioned, or removed.",
+-        "must_not_mean": [
+-          "renaming a contract field informally"
+-        ],
+-        "governance_rule": "CHANGE_CONTRACT requires an MCR. If the change is incompatible with prior consumers, it constitutes a breaking_contract_change and requires consumer modules to be updated.",
+-        "related_terms": [
+-          "contract",
+-          "breaking_contract_change",
+-          "input_contract",
+-          "output_contract"
+-        ]
+-      },
+-      {
+-        "term": "change_owner_files",
+-        "display_name": "Change Owner Files",
+-        "category": "migration",
+-        "definition": "A change_type value (CHANGE_OWNER_FILES) indicating that source file ownership is being transferred between modules.",
+-        "must_not_mean": [
+-          "moving files in the filesystem without catalog update"
+-        ],
+-        "governance_rule": "File ownership changes require an accepted CHANGE_OWNER_FILES MCR before file_module_mapping.csv and affected manifests are updated.",
+-        "related_terms": [
+-          "file_owner",
+-          "primary_owner",
+-          "file_module_mapping",
+-          "change_type"
+-        ]
+-      },
+-      {
+-        "term": "change_runtime_boundary",
+-        "display_name": "Change Runtime Boundary",
+-        "category": "migration",
+-        "definition": "A change_type value (CHANGE_RUNTIME_BOUNDARY) indicating that the owning service, MQL4 component, port, or communication channel of a module is changing.",
+-        "must_not_mean": [
+-          "changing code without altering which runtime context owns it"
+-        ],
+-        "governance_rule": "CHANGE_RUNTIME_BOUNDARY is high-risk by default when it affects MT4 EA behavior, WebRequest boundaries, or order routing.",
+-        "related_terms": [
+-          "service_binding",
+-          "runtime_binding",
+-          "communication_channel_owner",
+-          "change_type"
+-        ]
+-      }
+-    ],
+-    "manifest": [
+-      {
+-        "term": "atomic_manifest",
+-        "display_name": "Atomic Manifest",
+-        "category": "manifest",
+-        "definition": "A fully populated JSON file conforming to eafix_unified_atomic_module_schema_v1_0_0.json, describing a single canonical module's identity, classification, contracts, file ownership, runtime, channels, gates, failure behavior, and staleness state.",
+-        "must_not_mean": [
+-          "module_catalog entry",
+-          "module summary document"
+-        ],
+-        "applies_to_artifacts": [
+-          "atomic_module_manifests/<module_id>__<canonical_symbol>.manifest.json"
+-        ],
+-        "governance_rule": "Manifests are generated or patched downstream of accepted MCRs and catalog updates. They are never used as the authoritative source for architecture decisions.",
+-        "related_terms": [
+-          "manifest_ready",
+-          "stale_manifest",
+-          "manifest_generation",
+-          "module_lifecycle_status"
+-        ]
+-      },
+-      {
+-        "term": "manifest_ready",
+-        "display_name": "Manifest Ready",
+-        "category": "manifest",
+-        "definition": "A derived lifecycle stage (not a stored status) indicating a module is implemented and has a valid, non-stale atomic manifest. Computed as: canonical + implemented + manifest exists + staleness_status: fresh.",
+-        "must_not_mean": [
+-          "stored status field",
+-          "canonical",
+-          "implemented",
+-          "deployed"
+-        ],
+-        "governance_rule": "manifest_ready is computed, never hand-authored. It requires: (1) identity_status: canonical, (2) no NO_FILES/SERVICE_UNBOUND flags, (3) an existing manifest file, (4) staleness_status: fresh. All four conditions must hold simultaneously.",
+-        "example": {
+-          "correct": "R3_CORRELATION_GUARD is canonical but not manifest_ready because its manifest has not yet been generated.",
+-          "incorrect": "All canonical modules are manifest_ready."
+-        },
+-        "related_terms": [
+-          "atomic_manifest",
+-          "stale_manifest",
+-          "module_lifecycle_status"
+-        ]
+-      },
+-      {
+-        "term": "stale_manifest",
+-        "display_name": "Stale Manifest",
+-        "category": "manifest",
+-        "definition": "An atomic manifest whose source hashes no longer match the current state of the authoritative source documents it was generated from. Stale manifests have staleness_status: stale and must be regenerated before use.",
+-        "must_not_mean": [
+-          "outdated module",
+-          "deprecated module"
+-        ],
+-        "governance_rule": "A stale manifest does not invalidate canonical identity. It means the manifest document needs regeneration, not that the module is no longer canonical.",
+-        "related_terms": [
+-          "manifest_ready",
+-          "atomic_manifest",
+-          "staleness_policy",
+-          "manifest_regeneration"
+-        ]
+-      },
+-      {
+-        "term": "manifest_generation",
+-        "display_name": "Manifest Generation",
+-        "category": "manifest",
+-        "definition": "The process of producing a new atomic manifest for a module for the first time, drawing from the current catalog, schema, file mapping, service reference, and process step catalog.",
+-        "must_not_mean": [
+-          "manifest_patch",
+-          "manifest_regeneration"
+-        ],
+-        "governance_rule": "Manifest generation must occur after: MCR accepted \u2192 catalog updated \u2192 crosswalk updated. It must not precede those steps.",
+-        "related_terms": [
+-          "manifest_patch",
+-          "manifest_regeneration",
+-          "manifest_source_authority"
+-        ]
+-      },
+-      {
+-        "term": "manifest_patch",
+-        "display_name": "Manifest Patch",
+-        "category": "manifest",
+-        "definition": "A targeted update to an existing atomic manifest that changes specific fields without full regeneration. Used when a narrow accepted MCR affects only a subset of manifest sections.",
+-        "must_not_mean": [
+-          "manifest_regeneration",
+-          "direct edit without MCR basis"
+-        ],
+-        "governance_rule": "Manifest patches must be grounded in an accepted MCR. Free-form edits to manifest files without an MCR basis are prohibited.",
+-        "related_terms": [
+-          "manifest_generation",
+-          "manifest_regeneration",
+-          "accepted_change"
+-        ]
+-      },
+-      {
+-        "term": "manifest_regeneration",
+-        "display_name": "Manifest Regeneration",
+-        "category": "manifest",
+-        "definition": "The process of fully replacing a stale manifest with a freshly generated version from current authoritative sources.",
+-        "must_not_mean": [
+-          "manifest_patch"
+-        ],
+-        "governance_rule": "Regeneration is triggered when staleness_status: stale and the source documents have changed in ways that cannot be safely patched.",
+-        "related_terms": [
+-          "stale_manifest",
+-          "manifest_generation",
+-          "staleness_policy"
+-        ]
+-      },
+-      {
+-        "term": "manifest_source_authority",
+-        "display_name": "Manifest Source Authority",
+-        "category": "manifest",
+-        "definition": "The ordered list of authoritative source documents used to populate a manifest. Declared in the manifest's source_authority section. Conflict resolution follows the conflict_resolution_order.",
+-        "must_not_mean": [
+-          "any document referenced in the manifest"
+-        ],
+-        "governance_rule": "manifest_source_authority entries must reference files that exist and are verified. Inferred or assumed source documents must be marked as candidate, not authority.",
+-        "related_terms": [
+-          "atomic_manifest",
+-          "source_authority",
+-          "conflict_resolution_order"
+-        ]
+-      }
+-    ],
+-    "file_service_ownership": [
+-      {
+-        "term": "file_owner",
+-        "display_name": "File Owner",
+-        "category": "file_service_ownership",
+-        "definition": "The canonical module designated as the primary authority for a source file. A file may have at most one primary_owner and zero or more secondary_owners.",
+-        "must_not_mean": [
+-          "any module that imports the file",
+-          "any module in the same directory"
+-        ],
+-        "governance_rule": "File ownership is many-to-many in practice (shared_files exist), but primary ownership must be singular. Ambiguous ownership is tracked as a reconciliation flag until resolved.",
+-        "related_terms": [
+-          "owning_module",
+-          "primary_owner",
+-          "secondary_owner",
+-          "shared_file"
+-        ]
+-      },
+-      {
+-        "term": "owning_module",
+-        "display_name": "Owning Module",
+-        "category": "file_service_ownership",
+-        "definition": "The canonical module that holds primary ownership of a file or set of files. Synonym for file_owner in the context of a specific file's ownership record.",
+-        "must_not_mean": [
+-          "any module with read access to the file"
+-        ],
+-        "governance_rule": "Owning module is declared in file_module_mapping.csv and reflected in the module's manifest under file_ownership.owned_files.",
+-        "related_terms": [
+-          "file_owner",
+-          "primary_owner",
+-          "file_module_mapping"
+-        ]
+-      },
+-      {
+-        "term": "primary_owner",
+-        "display_name": "Primary Owner",
+-        "category": "file_service_ownership",
+-        "definition": "The single canonical module with write authority over a file. Only the primary owner may modify the file's contract, structure, or purpose without an MCR.",
+-        "must_not_mean": [
+-          "co-owner",
+-          "shared owner"
+-        ],
+-        "governance_rule": "Every owned file must have exactly one primary_owner. Files without a resolvable primary owner are flagged NO_FILES or require a CHANGE_OWNER_FILES MCR.",
+-        "related_terms": [
+-          "file_owner",
+-          "secondary_owner",
+-          "shared_file"
+-        ]
+-      },
+-      {
+-        "term": "secondary_owner",
+-        "display_name": "Secondary Owner",
+-        "category": "file_service_ownership",
+-        "definition": "A canonical module with read or append access to a file primarily owned by another module. Secondary ownership is declared explicitly and does not grant write authority.",
+-        "must_not_mean": [
+-          "primary_owner",
+-          "consumer of a contract"
+-        ],
+-        "governance_rule": "Secondary ownership must be declared in the manifest and file mapping. It may not be inferred from import patterns.",
+-        "related_terms": [
+-          "primary_owner",
+-          "shared_file",
+-          "file_owner"
+-        ]
+-      },
+-      {
+-        "term": "shared_file",
+-        "display_name": "Shared File",
+-        "category": "file_service_ownership",
+-        "definition": "A file used by more than one module, governed by a declared sharing_policy. Allowed sharing policies: read_only, append_only, schema_only, shared_kernel, generated_artifact, needs_refactor.",
+-        "must_not_mean": [
+-          "file without an owner",
+-          "file anyone may modify"
+-        ],
+-        "governance_rule": "Shared files must have a declared sharing_policy and an allowed_modules list. Undeclared sharing is treated as a reconciliation finding.",
+-        "related_terms": [
+-          "file_owner",
+-          "primary_owner",
+-          "sharing_policy"
+-        ]
+-      },
+-      {
+-        "term": "service_binding",
+-        "display_name": "Service Binding",
+-        "category": "file_service_ownership",
+-        "definition": "A declared association between a canonical module and the Python microservice, MQL4 EA, UI process, or infrastructure component that hosts it at runtime. Recorded in the manifest under service_runtime.service_home.",
+-        "must_not_mean": [
+-          "inferred service association",
+-          "file co-location"
+-        ],
+-        "governance_rule": "Unverified service bindings must be marked candidate_service_home, not service_home. SERVICE_UNBOUND is the reconciliation flag for modules lacking any declared binding.",
+-        "example": {
+-          "correct": "S1_SIGNAL_ENGINE has service_binding: signal_engine_service (port 5003, python_service).",
+-          "incorrect": "A module is service-bound because its files are in the same folder as a service entrypoint."
+-        },
+-        "related_terms": [
+-          "runtime_binding",
+-          "SERVICE_UNBOUND",
+-          "communication_channel_owner"
+-        ]
+-      },
+-      {
+-        "term": "runtime_binding",
+-        "display_name": "Runtime Binding",
+-        "category": "file_service_ownership",
+-        "definition": "The full set of runtime context associations for a module: service_home, runtime_kind, language, port, host, and deployment_unit. A superset of service_binding.",
+-        "must_not_mean": [
+-          "service_binding alone"
+-        ],
+-        "governance_rule": "A module is considered runtime-bound only when all required runtime_binding fields are declared and verified. Partial binding is flagged SERVICE_UNBOUND.",
+-        "related_terms": [
+-          "service_binding",
+-          "SERVICE_UNBOUND",
+-          "manifest_ready"
+-        ]
+-      },
+-      {
+-        "term": "communication_channel_owner",
+-        "display_name": "Communication Channel Owner",
+-        "category": "file_service_ownership",
+-        "definition": "The canonical module declared as the authority for a named communication channel (HTTP endpoint, Redis topic, file drop path, socket, DDE channel). Recorded in the manifest under communication_channels.owned_channels.",
+-        "must_not_mean": [
+-          "any module that uses the channel"
+-        ],
+-        "governance_rule": "Each communication channel must have at most one owning module. OWNS_CHANNEL_HTTP5001 is a reconciliation flag indicating channel ownership requires verification.",
+-        "related_terms": [
+-          "service_binding",
+-          "runtime_binding",
+-          "OWNS_CHANNEL_HTTP5001"
+-        ]
+-      }
+-    ],
+-    "contract": [
+-      {
+-        "term": "contract",
+-        "category": "contract",
+-        "definition": "A named, versioned data structure passed between modules at a declared boundary. Contracts are the only sanctioned mechanism for inter-module data exchange.",
+-        "must_not_mean": [
+-          "function signature",
+-          "Python class",
+-          "informal agreement"
+-        ],
+-        "governance_rule": "Modules may only ingest data from declared output contracts of their dependencies. Private cross-module access is forbidden by module_io_policy.",
+-        "related_terms": [
+-          "input_contract",
+-          "output_contract",
+-          "contract_version",
+-          "producer_module",
+-          "consumer_module"
+-        ]
+-      },
+-      {
+-        "term": "input_contract",
+-        "display_name": "Input Contract",
+-        "category": "contract",
+-        "definition": "A named contract that a module declares as required or optional input. The module may only consume this data if the producing module declares the same name as an output_contract.",
+-        "must_not_mean": [
+-          "any data a module reads",
+-          "environment variable",
+-          "config value"
+-        ],
+-        "governance_rule": "Input contracts must be declared in the manifest and matched against a producing module's output_contract in the contract_registry.",
+-        "related_terms": [
+-          "output_contract",
+-          "producer_module",
+-          "contract"
+-        ]
+-      },
+-      {
+-        "term": "output_contract",
+-        "display_name": "Output Contract",
+-        "category": "contract",
+-        "definition": "A named contract that a module declares as a produced output, available for consumption by other modules that declare it as an input_contract.",
+-        "must_not_mean": [
+-          "return value of a function",
+-          "log output"
+-        ],
+-        "governance_rule": "Output contracts must be named using noun-based naming (e.g., RiskDecision, FeatureFrame) not verb-based naming (e.g., RunRisk, SendThing).",
+-        "related_terms": [
+-          "input_contract",
+-          "consumer_module",
+-          "contract"
+-        ]
+-      },
+-      {
+-        "term": "contract_version",
+-        "display_name": "Contract Version",
+-        "category": "contract",
+-        "definition": "A versioned suffix (e.g., _v1, _v2) appended to a contract name only when the schema changes incompatibly. Format: ContractName_vN.",
+-        "must_not_mean": [
+-          "schema_version of a governance file",
+-          "module version"
+-        ],
+-        "governance_rule": "Contract versioning is required only on incompatible schema changes. Compatible changes do not increment the version. Use CHANGE_CONTRACT MCR when versioning is needed.",
+-        "related_terms": [
+-          "contract",
+-          "breaking_contract_change",
+-          "change_contract"
+-        ]
+-      },
+-      {
+-        "term": "contract_registry",
+-        "display_name": "Contract Registry",
+-        "category": "contract",
+-        "definition": "The central authoritative list of canonical contract names, versions, schemas, producers, and consumers. Stored in contract_registry.current.json.",
+-        "must_not_mean": [
+-          "module catalog",
+-          "manifest"
+-        ],
+-        "governance_rule": "All contracts referenced in manifests must have a corresponding entry in contract_registry.current.json. Undeclared contracts are reconciliation findings.",
+-        "related_terms": [
+-          "contract",
+-          "producer_module",
+-          "consumer_module",
+-          "input_contract",
+-          "output_contract"
+-        ]
+-      },
+-      {
+-        "term": "producer_module",
+-        "display_name": "Producer Module",
+-        "category": "contract",
+-        "definition": "The canonical module that declares a contract as an output and is responsible for producing data conforming to that contract's schema.",
+-        "must_not_mean": [
+-          "any module that creates data",
+-          "service that writes files"
+-        ],
+-        "governance_rule": "Each contract must have exactly one producer_module declared in the contract_registry. Multiple producers for the same contract name are a governance conflict.",
+-        "related_terms": [
+-          "consumer_module",
+-          "output_contract",
+-          "contract_registry"
+-        ]
+-      },
+-      {
+-        "term": "consumer_module",
+-        "display_name": "Consumer Module",
+-        "category": "contract",
+-        "definition": "A canonical module that declares a contract as an input and depends on the producer_module to supply conforming data.",
+-        "must_not_mean": [
+-          "any module that reads the data informally"
+-        ],
+-        "governance_rule": "Consumer modules must be listed in the contract_registry entry for the contract they consume. Undeclared consumption is a governance violation.",
+-        "related_terms": [
+-          "producer_module",
+-          "input_contract",
+-          "contract_registry"
+-        ]
+-      },
+-      {
+-        "term": "breaking_contract_change",
+-        "display_name": "Breaking Contract Change",
+-        "category": "contract",
+-        "definition": "A contract schema modification that is incompatible with prior consumers \u2014 e.g., removing a required field, changing a field type, or renaming the contract. Requires a CHANGE_CONTRACT MCR and contract version increment.",
+-        "must_not_mean": [
+-          "any contract change",
+-          "adding an optional field"
+-        ],
+-        "governance_rule": "Breaking contract changes must list all affected consumer_modules in the MCR impact_checklist. All consumers must update before the change is considered fully accepted.",
+-        "related_terms": [
+-          "contract_version",
+-          "change_contract",
+-          "consumer_module",
+-          "CHANGE_CONTRACT"
+-        ]
+-      }
+-    ],
+-    "reconciliation": [
+-      {
+-        "term": "reconciliation_flag",
+-        "display_name": "Reconciliation Flag",
+-        "category": "reconciliation",
+-        "definition": "A named marker on a module catalog entry or manifest indicating an unresolved governance finding that requires future work. Flags are work queue items, not defects that block canonical status.",
+-        "must_not_mean": [
+-          "error",
+-          "build failure",
+-          "blocking defect"
+-        ],
+-        "governance_rule": "Reconciliation flags do not prevent a module from being canonical. They feed reconciliation_queue_index.json as categorized work queues for future passes.",
+-        "example": {
+-          "correct": "F1_CONFIG_PREFERENCES carries NO_FILES and SUBMODULE_UNDOC flags. It remains canonical. These flags are queue items for Pass 6.",
+-          "incorrect": "A module with reconciliation flags cannot be canonical."
+-        },
+-        "related_terms": [
+-          "reconciliation_queue",
+-          "NO_FILES",
+-          "SERVICE_UNBOUND",
+-          "identity_status"
+-        ]
+-      },
+-      {
+-        "term": "reconciliation_queue",
+-        "display_name": "Reconciliation Queue",
+-        "category": "reconciliation",
+-        "definition": "A categorized work queue derived from reconciliation flags across the catalog. Managed in reconciliation_queue_index.json. Each flag type maps to a specific resolution activity.",
+-        "must_not_mean": [
+-          "bug tracker",
+-          "sprint backlog"
+-        ],
+-        "governance_rule": "The reconciliation queue is an authoritative governance artifact. Items are resolved through accepted MCRs or dedicated reconciliation passes, not informal edits.",
+-        "related_terms": [
+-          "reconciliation_flag",
+-          "reconciliation_queue_index"
+-        ]
+-      },
+-      {
+-        "term": "NO_FILES",
+-        "category": "reconciliation",
+-        "definition": "A reconciliation flag indicating a canonical module has no verified source file ownership recorded in file_module_mapping.csv. The module identity is valid; file binding is unresolved.",
+-        "must_not_mean": [
+-          "module does not exist",
+-          "module has no code"
+-        ],
+-        "governance_rule": "NO_FILES is resolved during the file ownership reconciliation pass (Pass 6). It does not block canonical status.",
+-        "related_terms": [
+-          "reconciliation_flag",
+-          "file_owner",
+-          "file_module_mapping",
+-          "SERVICE_UNBOUND"
+-        ]
+-      },
+-      {
+-        "term": "SERVICE_UNBOUND",
+-        "category": "reconciliation",
+-        "definition": "A reconciliation flag indicating a canonical module has no verified service_home or runtime_binding declared in its manifest or catalog entry.",
+-        "must_not_mean": [
+-          "module is not deployed",
+-          "module is broken"
+-        ],
+-        "governance_rule": "SERVICE_UNBOUND is resolved by declaring a verified service_home in the manifest, confirmed against eafix_services_ai_reference.json. Inferred bindings must be marked candidate.",
+-        "related_terms": [
+-          "service_binding",
+-          "runtime_binding",
+-          "reconciliation_flag",
+-          "NO_FILES"
+-        ]
+-      },
+-      {
+-        "term": "SUBMODULE_UNDOC",
+-        "category": "reconciliation",
+-        "definition": "A reconciliation flag indicating a module has known submodules or work cells from prior documentation that have not yet been formally dispositioned (promoted, demoted, or retired).",
+-        "must_not_mean": [
+-          "the module is poorly documented overall"
+-        ],
+-        "governance_rule": "SUBMODULE_UNDOC is resolved by creating a decomposition decision for each undocumented submodule and, where appropriate, filing a PROMOTE_SUBMODULE or DEMOTE_TO_INTERNAL MCR.",
+-        "related_terms": [
+-          "promote_submodule",
+-          "decomposition_decision",
+-          "reconciliation_flag"
+-        ]
+-      },
+-      {
+-        "term": "EA_SECOND_PASS",
+-        "category": "reconciliation",
+-        "definition": "A reconciliation flag indicating the module has responsibilities or boundary questions touching the MT4 EA side that cannot be resolved until the MT4/Python authority boundary is established in Pass 2.",
+-        "must_not_mean": [
+-          "the module is an EA module",
+-          "the module is deferred entirely"
+-        ],
+-        "governance_rule": "EA_SECOND_PASS is a deferral marker, not a defect. Affected modules remain canonical. Resolution requires Pass 2 scope completion.",
+-        "related_terms": [
+-          "reconciliation_flag",
+-          "catalog_pass",
+-          "CHANGE_RUNTIME_BOUNDARY"
+-        ]
+-      },
+-      {
+-        "term": "NEW_MODULE",
+-        "category": "reconciliation",
+-        "definition": "A reconciliation flag on a module added during the current pass that has no prior catalog history, no prior decomposition decision, and requires first-time manifest generation and validation evidence.",
+-        "must_not_mean": [
+-          "module added through a split or promotion"
+-        ],
+-        "governance_rule": "NEW_MODULE flag is cleared after: a decomposition decision is recorded, a manifest is generated, and initial file/service binding evidence is established.",
+-        "related_terms": [
+-          "reconciliation_flag",
+-          "manifest_generation",
+-          "decomposition_decision"
+-        ]
+-      },
+-      {
+-        "term": "SCOPE_NARROWED",
+-        "category": "reconciliation",
+-        "definition": "A reconciliation flag indicating a module's responsibilities were reduced during the current pass (e.g., because a work cell was promoted or a split occurred). The module's contracts and process bindings may need updating.",
+-        "must_not_mean": [
+-          "module was deleted",
+-          "module was demoted"
+-        ],
+-        "governance_rule": "SCOPE_NARROWED is resolved by reviewing and updating the module's output_contracts and process_binding to reflect the reduced scope.",
+-        "related_terms": [
+-          "reconciliation_flag",
+-          "split_module",
+-          "change_contract"
+-        ]
+-      },
+-      {
+-        "term": "SAFETY_CONTROLS",
+-        "category": "reconciliation",
+-        "definition": "A reconciliation flag indicating a module has safety-critical responsibilities (e.g., circuit breakers, emergency stop, disabled-state enforcement) that require explicit validation evidence before manifest_ready status is granted.",
+-        "must_not_mean": [
+-          "module is unsafe",
+-          "module has a safety bug"
+-        ],
+-        "governance_rule": "SAFETY_CONTROLS flag is cleared only after safety gate validation is documented and linked in the manifest's standards_and_gates section.",
+-        "related_terms": [
+-          "reconciliation_flag",
+-          "manifest_ready",
+-          "standards_and_gates"
+-        ]
+-      }
+-    ]
+-  },
+-  "additional_relationships": [
+-    {
+-      "relationship": "identity_status_to_derived_lifecycle_status",
+-      "rule": "identity_status is the stored schema field for module identity state. module_lifecycle_status is a computed projection derived from identity_status plus review, reconciliation, manifest existence, and staleness evidence. Lifecycle status must not be stored unless a future accepted schema MCR adds it."
+-    },
+-    {
+-      "relationship": "numeric_module_id_to_canonical_symbol",
+-      "rule": "numeric_module_id is permanent and opaque. canonical_symbol is human-readable and may change via RENAME_SYMBOL MCR. The numeric ID is the durable cross-reference key."
+-    },
+-    {
+-      "relationship": "mcr_to_catalog_update",
+-      "rule": "No catalog, crosswalk, or manifest may be modified in response to an architecture change unless an MCR with decision: accepted exists for that change."
+-    },
+-    {
+-      "relationship": "manifest_to_catalog",
+-      "rule": "Manifests are downstream of the catalog. The catalog is never updated based on manifest content. Information flows catalog \u2192 manifest, not manifest \u2192 catalog."
+-    },
+-    {
+-      "relationship": "reconciliation_flag_to_identity_status",
+-      "rule": "Reconciliation flags do not affect identity_status. A module with NO_FILES and SERVICE_UNBOUND flags remains identity_status: canonical."
+-    },
+-    {
+-      "relationship": "file_ownership_to_service_binding",
+-      "rule": "File ownership (which module owns which files) is separate from service binding (which runtime hosts the module). A module can have resolved file ownership with unresolved service binding and vice versa."
+-    },
+-    {
+-      "relationship": "producer_module_to_consumer_module",
+-      "rule": "The contract_registry is the authority for producer/consumer relationships. Manifests reference it. The contract_registry must be updated before manifest bindings for a new contract are considered authoritative."
+-    }
+-  ],
+-  "additional_forbidden_interpretations": [
+-    {
+-      "term": "manifest_ready",
+-      "forbidden_meaning": "canonical",
+-      "reason": "manifest_ready is a higher lifecycle stage than canonical. A canonical module may lack a manifest entirely."
+-    },
+-    {
+-      "term": "reconciliation_flag",
+-      "forbidden_meaning": "blocking defect",
+-      "reason": "Reconciliation flags are work queue items. They do not block canonical status or prevent the module from being referenced in other governance artifacts."
+-    },
+-    {
+-      "term": "service_binding",
+-      "forbidden_meaning": "inferred from file co-location",
+-      "reason": "Service bindings must be explicitly declared and verified. Co-location of files in a service directory is not evidence of binding."
+-    },
+-    {
+-      "term": "active_pass",
+-      "forbidden_meaning": "determinable from file timestamps",
+-      "reason": "The active pass is declared in module_system_index.json only. File timestamps are not authoritative for pass state."
+-    },
+-    {
+-      "term": "contract",
+-      "forbidden_meaning": "any data exchanged between modules",
+-      "reason": "Only named, declared contracts in the contract_registry are governance contracts. Undeclared data exchange is a governance finding, not a contract."
+-    },
+-    {
+-      "term": "legacy_alias",
+-      "forbidden_meaning": "deleted or invalid symbol",
+-      "reason": "Legacy aliases are retained in the catalog for traceability. They are tagged deprecated_alias but must remain resolvable to their current canonical module."
+-    }
+-  ],
+-  "additional_ai_usage_rules": [
+-    {
+-      "rule_id": "GLOSSARY-AI-003",
+-      "rule": "Never infer identity_status, lifecycle_status, or reconciliation_flag values from prose descriptions. Always read from the current catalog file declared in module_system_index.json."
+-    },
+-    {
+-      "rule_id": "GLOSSARY-AI-004",
+-      "rule": "When generating an MCR, change_type must be drawn from the module_change_type_enum.json allowed values. Do not invent change type strings."
+-    },
+-    {
+-      "rule_id": "GLOSSARY-AI-005",
+-      "rule": "Do not mark a service_binding as authoritative unless it is verified against eafix_services_ai_reference.json. Inferred bindings must use the candidate_service_home field."
+-    },
+-    {
+-      "rule_id": "GLOSSARY-AI-006",
+-      "rule": "Do not resolve a reconciliation_flag by editing the catalog entry alone. Each flag type has a defined resolution path (MCR, decomposition decision, manifest update, or pass-level gate). Use the correct path."
+-    },
+-    {
+-      "rule_id": "GLOSSARY-AI-007",
+-      "rule": "When populating source_evidence in an MCR, only reference files whose existence has been confirmed in the project file inventory. Do not reference assumed or inferred files."
+-    },
+-    {
+-      "rule_id": "GLOSSARY-AI-008",
+-      "rule": "Do not treat historical_catalog files as authoritative. Only the file referenced in module_system_index.json:current_catalog is authoritative."
+-    },
+-    {
+-      "rule_id": "GLOSSARY-AI-009",
+-      "rule": "Never store or hand-author module_lifecycle_status or manifest_ready. Compute them from identity_status, review_status, reconciliation_flags, manifest existence, and staleness_status using the derivation rules in the glossary. identity_status is the only stored module identity state field."
+-    }
+-  ]
+-}
+\ No newline at end of file
+diff --git a/EAFIX_auth_docs/module_governance_glossary.json b/EAFIX_auth_docs/module_governance_glossary.json
+new file mode 100644
+index 0000000..e4a198c
+--- /dev/null
++++ b/EAFIX_auth_docs/module_governance_glossary.json
+@@ -0,0 +1,1600 @@
++{
++  "schema_version": "1.1.1",
++  "document_type": "module_governance_glossary",
++  "status": "canonical",
++  "created_utc": "2026-06-17T00:00:00Z",
++  "governance_scope": {
++    "purpose": "Define controlled vocabulary for the EAFIX atomic module governance system.",
++    "applies_to": [
++      "module_identity_policy.json",
++      "module_change_request.schema.json",
++      "module_change_type_enum.json",
++      "module_lifecycle_status_enum.json",
++      "module_system_index.json",
++      "atomic_module_crosswalk.current.json",
++      "manifest_generation_policy.json",
++      "module_governance_validator_spec.json"
++    ],
++    "does_not_override": [
++      "module_catalog.json",
++      "process_step_catalog.json",
++      "updated_trading_process_aligned.json",
++      "ui_catalog.json",
++      "mt4 authoritative reference for ai.json",
++      "communication_channels.json"
++    ]
++  },
++  "authority_hierarchy": {
++    "defines": [
++      "terminology",
++      "governance vocabulary",
++      "controlled term meanings",
++      "forbidden interpretations"
++    ],
++    "does_not_define": [
++      "module identities",
++      "process step definitions",
++      "contract schemas",
++      "runtime ownership",
++      "MT4 API facts",
++      "UI definitions"
++    ],
++    "authority_statement": "The glossary is the authority for what governance terms mean. It is never the authority for operational data values. Agents must resolve operational facts from the designated authority_source for each fact class, not from glossary examples."
++  },
++  "conflict_resolution_policy": {
++    "description": "When a governance term's usage conflicts across documents, resolve in this order. The glossary governs meaning; it does not override operational authority sources for data values.",
++    "resolution_order": [
++      {
++        "rank": 1,
++        "source": "eafix_unified_atomic_module_schema_v1_0_0.json",
++        "authority_for": "field existence, field types, enum values, structural validity"
++      },
++      {
++        "rank": 2,
++        "source": "current_catalog (per module_system_index.json)",
++        "authority_for": "which modules exist, their identities, statuses, and classifications"
++      },
++      {
++        "rank": 3,
++        "source": "process_step_catalog.json",
++        "authority_for": "process step definitions and ordering"
++      },
++      {
++        "rank": 4,
++        "source": "active_project_standards_registry.json",
++        "authority_for": "cross-artifact routing and which file wins for a given concern"
++      },
++      {
++        "rank": 5,
++        "source": "module_governance_glossary.json",
++        "authority_for": "term meanings and forbidden interpretations only"
++      }
++    ],
++    "rule": "Schema wins on structure. Catalog wins on identity and status. The glossary wins only on what words mean. The glossary never overrides a value that an operational authority source defines.",
++    "operational_document_authority": "For ranking the authority of operational documents themselves (which file is the source of truth for a data value), defer to doc_authority.json (authority_level: lower number wins). This glossary's resolution_order governs term meaning only; doc_authority.json governs operational-data precedence."
++  },
++  "glossary_change_policy": {
++    "description": "The glossary is itself a governed artifact. Terms may not be added, removed, or redefined informally.",
++    "change_process": [
++      "A new or changed governance term is proposed via a glossary MCR (change_type: ADD_TERM, REDEFINE_TERM, RETIRE_TERM, or ADD_FORBIDDEN_INTERPRETATION).",
++      "The MCR is reviewed and reaches decision: accepted, rejected, or deferred.",
++      "On accepted, the glossary is updated and schema_version is incremented per versioning_policy.",
++      "The module_governance_validator_spec is updated if the change affects validator_targets counts.",
++      "Affected downstream artifacts are re-validated against the new term set."
++    ],
++    "rule": "If a term is missing, file a glossary MCR. Do not invent a local meaning (reaffirms GLOSSARY-AI-002).",
++    "versioning_policy": {
++      "scheme": "semver",
++      "patch": "Clarify wording without changing a term's meaning or enum.",
++      "minor": "Add new terms, relationships, forbidden interpretations, or AI usage rules without breaking existing meanings.",
++      "major": "Redefine or retire an existing term, or change a derivation rule in a way that alters validator behavior."
++    }
++  },
++  "terms": [
++    {
++      "term": "module_id",
++      "category": "module_identity",
++      "definition": "Permanent opaque numeric identifier assigned to a module identity.",
++      "must_not_mean": [
++        "process order",
++        "runtime layer",
++        "semantic category"
++      ],
++      "governance_rule": "Module IDs are never reused, even after retirement."
++    },
++    {
++      "term": "canonical_symbol",
++      "category": "module_identity",
++      "definition": "Human-readable module symbol using the approved prefix and capability-name pattern.",
++      "must_not_mean": [
++        "permanent identity",
++        "numeric module ID"
++      ],
++      "governance_rule": "Canonical symbols may change only through an accepted Module Change Request."
++    },
++    {
++      "term": "canonical",
++      "category": "module_identity",
++      "definition": "A module identity locked in the current approved catalog.",
++      "must_not_mean": [
++        "implemented",
++        "manifest_ready",
++        "file_bound"
++      ],
++      "governance_rule": "Canonical identity does not prove implementation completeness.",
++      "related_terms": [
++        "canonical_module",
++        "identity_status",
++        "module_lifecycle_status"
++      ]
++    },
++    {
++      "term": "module_change_request",
++      "category": "change_governance",
++      "definition": "A formal proposed architecture modification reviewed before catalog, crosswalk, manifest, or contract changes are made.",
++      "must_not_mean": [
++        "direct catalog edit",
++        "informal note"
++      ],
++      "governance_rule": "Architecture changes must enter through an MCR before modifying current-state artifacts."
++    },
++    {
++      "term": "module",
++      "category": "module_identity",
++      "definition": "A governed architectural unit with a declared responsibility boundary, input/output contracts, an identity (numeric ID and canonical symbol), and an owning service or runtime context. Canonical modules are those accepted into a catalog pass; candidate modules may exist before acceptance.",
++      "must_not_mean": [
++        "Python file",
++        "class",
++        "function",
++        "work cell",
++        "submodule",
++        "any code unit with no governed identity"
++      ],
++      "governance_rule": "A module is governed from the moment it has a candidate identity. Acceptance into a catalog pass elevates it to canonical; it does not bring it into existence.",
++      "related_terms": [
++        "atomic_module",
++        "module_id",
++        "canonical_symbol",
++        "module_lifecycle_status"
++      ]
++    },
++    {
++      "term": "atomic_module",
++      "display_name": "Atomic Module",
++      "category": "module_identity",
++      "definition": "A module that is fully decomposed \u2014 it cannot be split further without breaking its single-responsibility boundary. All modules in the canonical catalog are atomic.",
++      "must_not_mean": [
++        "small module",
++        "simple module",
++        "single-file module"
++      ],
++      "governance_rule": "Atomicity is a decomposition decision recorded in atomic_module_decomposition_decisions.json, not inferred from file count or line count.",
++      "example": {
++        "correct": "R1_RISK_EVALUATOR is atomic because its responsibility \u2014 evaluating a composite risk decision \u2014 cannot be split without creating a contract across two independently deployable units.",
++        "incorrect": "A module is atomic because it has only one source file."
++      }
++    },
++    {
++      "term": "numeric_module_id",
++      "display_name": "Numeric Module ID",
++      "category": "module_identity",
++      "definition": "The 20-digit opaque permanent numeric identifier assigned to a module. Matches the pattern ^5\\d{19}$. Synonymous with module_id in the catalog.",
++      "must_not_mean": [
++        "process order",
++        "layer number",
++        "semantic category",
++        "version"
++      ],
++      "applies_to_artifacts": [
++        "atomic_module_catalog.current.json",
++        "atomic_module_manifests/",
++        "atomic_module_crosswalk.current.json"
++      ],
++      "governance_rule": "The numeric module ID is assigned once at module acceptance and is never reused or renumbered, even if the module is retired or its symbol changes.",
++      "related_terms": [
++        "module_id",
++        "identity_model",
++        "canonical_symbol"
++      ]
++    },
++    {
++      "term": "module_name",
++      "category": "module_identity",
++      "definition": "A human-readable long-form name for the module, distinct from the canonical symbol. May be updated without an MCR if it does not conflict with catalog authority.",
++      "must_not_mean": [
++        "canonical_symbol",
++        "module_id"
++      ],
++      "governance_rule": "module_name is informational. canonical_symbol is the governance-controlled identifier.",
++      "related_terms": [
++        "canonical_symbol",
++        "module_id"
++      ]
++    },
++    {
++      "term": "legacy_alias",
++      "display_name": "Legacy Alias",
++      "category": "module_identity",
++      "definition": "A prior canonical symbol that has been replaced by a new symbol through an accepted MCR. Retained in the catalog for traceability and to prevent orphaned references.",
++      "must_not_mean": [
++        "current symbol",
++        "active symbol",
++        "duplicate module"
++      ],
++      "applies_to_artifacts": [
++        "atomic_module_catalog.current.json",
++        "atomic_module_crosswalk.current.json"
++      ],
++      "governance_rule": "Legacy aliases are never removed from the catalog. They are tagged with identity_status: deprecated_alias and must map to the current canonical symbol.",
++      "example": {
++        "correct": "F1_FLOW_ORCHESTRATOR is a legacy alias of F4_FLOW_ORCHESTRATOR, retained after a RENAME_SYMBOL MCR resolved a PREFIX_COLLISION_F1 flag.",
++        "incorrect": "F1_FLOW_ORCHESTRATOR was deleted when the module was renamed."
++      },
++      "related_terms": [
++        "canonical_symbol",
++        "deprecated_alias",
++        "supersedes",
++        "superseded_by"
++      ]
++    },
++    {
++      "term": "deprecated_alias",
++      "display_name": "Deprecated Alias",
++      "category": "module_identity",
++      "definition": "An identity_status value indicating a module entry exists only to preserve traceability for a prior symbol that is no longer active. The entry is not a live module.",
++      "must_not_mean": [
++        "retired_module",
++        "deleted_module"
++      ],
++      "governance_rule": "deprecated_alias entries must carry a superseded_by reference pointing to the current canonical module.",
++      "related_terms": [
++        "legacy_alias",
++        "identity_status",
++        "superseded_by"
++      ]
++    },
++    {
++      "term": "supersedes",
++      "category": "module_identity",
++      "definition": "An array field on a module record listing the numeric IDs or symbols of prior modules that this module replaces. Populated when a new module is created through SPLIT_MODULE, MERGE_MODULES, or RENAME_SYMBOL.",
++      "must_not_mean": [
++        "imports",
++        "depends_on",
++        "calls"
++      ],
++      "governance_rule": "supersedes must reference the numeric module IDs of the prior modules, not their symbols, to survive future renames.",
++      "related_terms": [
++        "superseded_by",
++        "legacy_alias",
++        "identity_status"
++      ]
++    },
++    {
++      "term": "superseded_by",
++      "category": "module_identity",
++      "definition": "An array field on a retired or deprecated module record listing the numeric IDs or symbols of the modules that now carry its responsibilities.",
++      "must_not_mean": [
++        "consumed_by",
++        "depends_on"
++      ],
++      "governance_rule": "A module with identity_status: retired or superseded must have a non-empty superseded_by array unless it was fully dissolved with no successor.",
++      "related_terms": [
++        "supersedes",
++        "identity_status",
++        "legacy_alias"
++      ]
++    },
++    {
++      "term": "identity_status",
++      "display_name": "Identity Status",
++      "category": "module_identity",
++      "definition": "The governance lifecycle state of a module identity record. Allowed values: canonical, candidate, deprecated_alias, retired, superseded.",
++      "must_not_mean": [
++        "implementation status",
++        "manifest status",
++        "service binding status"
++      ],
++      "governance_rule": "identity_status is the stored schema field for module identity state, with enum canonical, candidate, deprecated_alias, retired, superseded. It does not indicate implementation completeness; lifecycle maturity is derived separately via module_lifecycle_status. A module may be canonical while carrying NO_FILES or SERVICE_UNBOUND flags.",
++      "example": {
++        "correct": "identity_status: canonical means the module is locked in the current catalog pass. It may still have reconciliation_flags: [NO_FILES].",
++        "incorrect": "identity_status: canonical means the module is implemented and ready to ship."
++      },
++      "related_terms": [
++        "module_lifecycle_status",
++        "canonical",
++        "reconciliation_flag",
++        "identity_model"
++      ]
++    },
++    {
++      "term": "identity_model",
++      "display_name": "Identity Model",
++      "category": "module_identity",
++      "definition": "Describes how the module's identity was assigned. Allowed values: numeric_20_digit, candidate_numeric_pending, legacy_symbolic, hybrid_migration.",
++      "must_not_mean": [
++        "module_kind",
++        "module_role"
++      ],
++      "governance_rule": "All Pass 1 canonical modules must use numeric_20_digit. candidate_numeric_pending is only valid for proposed modules not yet accepted into a catalog pass.",
++      "related_terms": [
++        "numeric_module_id",
++        "identity_status",
++        "catalog_pass"
++      ]
++    },
++    {
++      "term": "module_lifecycle_status",
++      "display_name": "Module Lifecycle Status",
++      "category": "module_identity",
++      "definition": "A derived governance projection describing how far a module has progressed. It is computed from identity_status, review_status where available, reconciliation flags, manifest existence, and manifest staleness_status. It is not a stored schema field unless a future accepted MCR adds it.",
++      "must_not_mean": [
++        "stored schema field",
++        "replacement for identity_status",
++        "manual status value"
++      ],
++      "governance_rule": "module_lifecycle_status must be computed, not hand-authored. identity_status remains the stored schema field.",
++      "derivation": [
++        {
++          "stage": "proposed",
++          "rule": "Exists only in an MCR and has no catalog entry."
++        },
++        {
++          "stage": "candidate",
++          "rule": "identity_status == candidate."
++        },
++        {
++          "stage": "approved",
++          "rule": "identity_status == candidate and review_status == approved, where review_status exists."
++        },
++        {
++          "stage": "canonical",
++          "rule": "identity_status == canonical."
++        },
++        {
++          "stage": "implemented",
++          "rule": "identity_status == canonical and reconciliation_flags do not include NO_FILES or SERVICE_UNBOUND."
++        },
++        {
++          "stage": "manifest_ready",
++          "rule": "implemented and manifest file exists and staleness_status == fresh."
++        }
++      ],
++      "related_terms": [
++        "identity_status",
++        "review_status",
++        "reconciliation_flag",
++        "manifest_ready",
++        "staleness_status"
++      ]
++    },
++    {
++      "term": "canonical_module",
++      "display_name": "Canonical Module",
++      "category": "module_identity",
++      "definition": "A module whose identity is locked in the current catalog pass with identity_status: canonical. Distinct from the adjective canonical: this is the concrete subject of governance queries like 'is this a canonical module?'",
++      "must_not_mean": [
++        "implemented module",
++        "manifest-ready module",
++        "candidate module"
++      ],
++      "applies_to_artifacts": [
++        "atomic_module_catalog.current.json",
++        "module_system_index.json",
++        "atomic_module_crosswalk.current.json",
++        "atomic_module_manifests/"
++      ],
++      "governance_rule": "A module is canonical if and only if it appears in the current_catalog with identity_status: canonical. Canonical status does not imply implementation, file binding, or a generated manifest.",
++      "example": {
++        "correct": "R3_CORRELATION_GUARD is a canonical_module locked in the current pass; it may still carry reconciliation flags.",
++        "incorrect": "A canonical_module is one that has been fully implemented and shipped."
++      },
++      "related_terms": [
++        "canonical",
++        "identity_status",
++        "module_lifecycle_status",
++        "current_catalog"
++      ]
++    },
++    {
++      "term": "module_boundary",
++      "display_name": "Module Boundary",
++      "category": "module_identity",
++      "definition": "The declared edge of a module's responsibility: what it owns (files, contracts, channels, runtime), what it accepts as input contracts, and what it produces as output contracts. The entire decomposition effort is the management of these boundaries.",
++      "must_not_mean": [
++        "directory boundary",
++        "file boundary",
++        "package boundary"
++      ],
++      "governance_rule": "A module boundary is crossed only through declared contracts. Private cross-module access violates the boundary regardless of physical code proximity. Boundary changes require an MCR (SPLIT_MODULE, MERGE_MODULES, NARROW_SCOPE, EXPAND_SCOPE, CHANGE_CONTRACT, or CHANGE_RUNTIME_BOUNDARY).",
++      "example": {
++        "correct": "Splitting correlation logic from R1_RISK_EVALUATOR into R3_CORRELATION_GUARD is a module_boundary change requiring a SPLIT_MODULE MCR.",
++        "incorrect": "Two modules sharing a folder means they share a boundary."
++      },
++      "related_terms": [
++        "atomic_module",
++        "contract",
++        "split_module",
++        "module_io_policy"
++      ]
++    },
++    {
++      "term": "authority_source",
++      "display_name": "Authority Source",
++      "category": "module_identity",
++      "definition": "A file or document designated as the single authoritative origin for a specific class of fact (identities, contracts, process steps, runtime ownership, MT4 facts, UI definitions). Authority sources are ranked by the conflict resolution policy.",
++      "must_not_mean": [
++        "any referenced document",
++        "any file that mentions a fact",
++        "the glossary itself for operational data"
++      ],
++      "applies_to_artifacts": [
++        "module_system_index.json",
++        "active_project_standards_registry.json",
++        "eafix_unified_atomic_module_schema_v1_0_0.json",
++        "module_catalog.json"
++      ],
++      "governance_rule": "Each class of fact has exactly one authority source. When documents conflict, the conflict_resolution_policy ranking decides which wins. The glossary defines terminology only and is never an authority source for operational data.",
++      "related_terms": [
++        "manifest_source_authority",
++        "current_catalog",
++        "module_system_index"
++      ]
++    },
++    {
++      "term": "mcr",
++      "display_name": "MCR (Module Change Request)",
++      "category": "change_governance",
++      "definition": "Abbreviation for module_change_request. The formal unit of proposed architecture modification in the EAFIX governance system.",
++      "must_not_mean": [
++        "informal note",
++        "catalog edit",
++        "PR comment"
++      ],
++      "governance_rule": "MCR and module_change_request are synonymous. Use mcr_id as the unique identifier in file names and cross-references.",
++      "related_terms": [
++        "module_change_request",
++        "change_type",
++        "decision"
++      ]
++    },
++    {
++      "term": "change_type",
++      "display_name": "Change Type",
++      "category": "change_governance",
++      "definition": "A fixed enum value on an MCR describing the class of architecture modification being proposed. Allowed values: ADD_MODULE, SPLIT_MODULE, MERGE_MODULES, NARROW_SCOPE, EXPAND_SCOPE, RENAME_SYMBOL, RETIRE_MODULE, PROMOTE_WORK_CELL, PROMOTE_SUBMODULE, DEMOTE_TO_INTERNAL, MOVE_TO_SHARED_KERNEL, CHANGE_CONTRACT, CHANGE_OWNER_FILES, CHANGE_RUNTIME_BOUNDARY.",
++      "must_not_mean": [
++        "free-form description",
++        "git commit type"
++      ],
++      "governance_rule": "change_type must be drawn from module_change_type_enum.json. Free-form strings are rejected by the validator.",
++      "related_terms": [
++        "module_change_request",
++        "module_change_type_enum"
++      ]
++    },
++    {
++      "term": "decision",
++      "category": "change_governance",
++      "definition": "The resolution applied to an MCR after review. Allowed values: accepted, rejected, deferred.",
++      "must_not_mean": [
++        "architectural decision in general",
++        "DES decision"
++      ],
++      "governance_rule": "A decision of accepted is required before the catalog, crosswalk, or any manifest may be modified in response to the MCR.",
++      "related_terms": [
++        "accepted_change",
++        "rejected_change",
++        "deferred_change",
++        "module_change_request"
++      ]
++    },
++    {
++      "term": "decision_notes",
++      "display_name": "Decision Notes",
++      "category": "change_governance",
++      "definition": "An array of human-readable strings on an MCR recording the rationale for the decision, conditions attached to acceptance, or reasons for deferral or rejection.",
++      "must_not_mean": [
++        "definition",
++        "spec"
++      ],
++      "governance_rule": "decision_notes are required when decision is rejected or deferred. Optional but recommended when accepted.",
++      "related_terms": [
++        "decision",
++        "module_change_request"
++      ]
++    },
++    {
++      "term": "source_evidence",
++      "display_name": "Source Evidence",
++      "category": "change_governance",
++      "definition": "An array of artifact file names or document references cited in an MCR to justify the proposed change. Must reference files that actually exist in the project.",
++      "must_not_mean": [
++        "inferred evidence",
++        "verbal description only"
++      ],
++      "governance_rule": "source_evidence entries must be grounded in verified file presence. Claude must not populate this field with invented or assumed file names.",
++      "related_terms": [
++        "module_change_request",
++        "decomposition_decision"
++      ]
++    },
++    {
++      "term": "impact_checklist",
++      "display_name": "Impact Checklist",
++      "category": "change_governance",
++      "definition": "A structured set of impact questions on an MCR covering identity, contracts, process, runtime, files, tests, docs, UI, MT4, and risk domains. Every MCR must include a completed checklist.",
++      "must_not_mean": [
++        "optional notes section"
++      ],
++      "governance_rule": "An MCR without a completed impact_checklist is considered incomplete and must not be accepted.",
++      "related_terms": [
++        "module_change_request",
++        "risk_level"
++      ]
++    },
++    {
++      "term": "risk_level",
++      "display_name": "Risk Level",
++      "category": "change_governance",
++      "definition": "A classification on an MCR indicating the potential blast radius of the proposed change. Typical values: low, medium, high, critical.",
++      "must_not_mean": [
++        "trading risk",
++        "financial risk exposure"
++      ],
++      "governance_rule": "risk_level: high is required for any change affecting contracts, runtime boundaries, MT4 EA behavior, or order routing logic.",
++      "related_terms": [
++        "impact_checklist",
++        "module_change_request"
++      ]
++    },
++    {
++      "term": "accepted_change",
++      "display_name": "Accepted Change",
++      "category": "change_governance",
++      "definition": "An MCR with decision: accepted. Triggers downstream updates to the catalog, crosswalk, decomposition decisions, and affected manifests.",
++      "must_not_mean": [
++        "implemented change",
++        "deployed change"
++      ],
++      "governance_rule": "Accepted does not mean deployed. Accepted means the architecture decision is approved for catalog reflection.",
++      "related_terms": [
++        "decision",
++        "module_change_request",
++        "catalog_pass"
++      ]
++    },
++    {
++      "term": "rejected_change",
++      "display_name": "Rejected Change",
++      "category": "change_governance",
++      "definition": "An MCR with decision: rejected. The proposed architecture modification will not be applied. The MCR is retained for historical record.",
++      "must_not_mean": [
++        "deleted MCR"
++      ],
++      "governance_rule": "Rejected MCRs must not be deleted. They are archived with decision_notes explaining the rejection.",
++      "related_terms": [
++        "decision",
++        "module_change_request",
++        "deferred_change"
++      ]
++    },
++    {
++      "term": "deferred_change",
++      "display_name": "Deferred Change",
++      "category": "change_governance",
++      "definition": "An MCR with decision: deferred. The proposed modification is not rejected but is postponed to a future catalog pass, typically because prerequisite decisions are unresolved.",
++      "must_not_mean": [
++        "rejected_change",
++        "inactive MCR"
++      ],
++      "governance_rule": "Deferred MCRs must specify the target pass or prerequisite condition in decision_notes.",
++      "example": {
++        "correct": "MCR-2026-0003 is deferred to Pass 2 because the MT4/Python authority boundary must be resolved before EA-side modules can be defined.",
++        "incorrect": "Deferred means rejected."
++      },
++      "related_terms": [
++        "decision",
++        "catalog_pass",
++        "module_change_request"
++      ]
++    },
++    {
++      "term": "catalog_pass",
++      "display_name": "Catalog Pass",
++      "category": "catalog_pass",
++      "definition": "A versioned iteration of the module decomposition process producing a locked catalog snapshot, a change log, a crosswalk update, and a set of decomposition decisions. Passes are numbered sequentially: PASS_1, PASS_2, etc.",
++      "must_not_mean": [
++        "deployment release",
++        "sprint",
++        "git branch"
++      ],
++      "governance_rule": "Each catalog pass produces its own versioned artifacts. Only one pass is current at any time, as declared in module_system_index.json.",
++      "related_terms": [
++        "active_pass",
++        "current_catalog",
++        "module_change_log"
++      ]
++    },
++    {
++      "term": "active_pass",
++      "display_name": "Active Pass",
++      "category": "catalog_pass",
++      "definition": "The catalog pass currently in progress or most recently completed. Declared in module_system_index.json under the active_pass field.",
++      "must_not_mean": [
++        "all passes",
++        "any historical pass"
++      ],
++      "governance_rule": "AI agents must read active_pass from module_system_index.json before generating or patching any governance artifact. Never assume pass state from file timestamps.",
++      "related_terms": [
++        "catalog_pass",
++        "module_system_index",
++        "current_catalog"
++      ]
++    },
++    {
++      "term": "current_catalog",
++      "display_name": "Current Catalog",
++      "category": "catalog_pass",
++      "definition": "The single catalog file designated as authoritative for the active pass. Referenced by module_system_index.json as current_catalog. Typically named atomic_module_catalog.current.json or atomic_module_catalog.pass_00N.json.",
++      "must_not_mean": [
++        "any catalog file",
++        "the latest file by timestamp"
++      ],
++      "governance_rule": "Only the file named in module_system_index.json:current_catalog is authoritative. All other catalog files are historical.",
++      "related_terms": [
++        "module_system_index",
++        "catalog_pass",
++        "active_pass"
++      ]
++    },
++    {
++      "term": "historical_catalog",
++      "display_name": "Historical Catalog",
++      "category": "catalog_pass",
++      "definition": "A catalog file from a prior pass, retained for traceability but no longer authoritative. Listed in module_system_index.json under historical_catalogs.",
++      "must_not_mean": [
++        "deleted file",
++        "invalid file"
++      ],
++      "governance_rule": "Historical catalogs must not be edited. They are read-only pass snapshots.",
++      "related_terms": [
++        "current_catalog",
++        "catalog_pass",
++        "module_system_index"
++      ]
++    },
++    {
++      "term": "current_state_index",
++      "display_name": "Current State Index",
++      "category": "catalog_pass",
++      "definition": "Synonym for module_system_index.json. The single pointer file declaring which catalog, schema, decomposition decisions, manifest directory, MCR directory, crosswalk, and pass are current.",
++      "must_not_mean": [
++        "process_step_catalog.json",
++        "any other index"
++      ],
++      "governance_rule": "All AI-generated governance artifacts must resolve their source authority by reading the current_state_index first.",
++      "related_terms": [
++        "module_system_index",
++        "current_catalog",
++        "active_pass"
++      ]
++    },
++    {
++      "term": "module_change_log",
++      "display_name": "Module Change Log",
++      "category": "catalog_pass",
++      "definition": "A per-pass human/AI-readable summary of accepted and rejected MCRs, produced at the close of a catalog pass. Named module_change_log.pass_00N.json.",
++      "must_not_mean": [
++        "git log",
++        "commit history",
++        "informal notes"
++      ],
++      "governance_rule": "The change log is generated from accepted and rejected MCR records, not authored freehand.",
++      "related_terms": [
++        "catalog_pass",
++        "accepted_change",
++        "rejected_change",
++        "module_change_request"
++      ]
++    },
++    {
++      "term": "decomposition_decision",
++      "display_name": "Decomposition Decision",
++      "category": "catalog_pass",
++      "definition": "A record in atomic_module_decomposition_decisions.json capturing why a candidate was kept as a module, split, merged, promoted, deferred, or rejected during a decomposition pass.",
++      "must_not_mean": [
++        "MCR",
++        "informal rationale comment"
++      ],
++      "governance_rule": "Decomposition decisions are the authoritative history of why the catalog is shaped the way it is. They must be updated whenever an MCR is accepted.",
++      "related_terms": [
++        "catalog_pass",
++        "module_change_request",
++        "atomic_module_decomposition_decisions"
++      ]
++    },
++    {
++      "term": "module_crosswalk",
++      "display_name": "Module Crosswalk",
++      "category": "catalog_pass",
++      "definition": "A structured file recording all renames, splits, merges, aliases, supersessions, and effective passes for module identities. Allows any prior symbol to be traced to its current canonical module.",
++      "must_not_mean": [
++        "ATONIC-to-canonical crosswalk",
++        "process step mapping"
++      ],
++      "applies_to_artifacts": [
++        "atomic_module_crosswalk.current.json",
++        "atomic_module_crosswalk.pass_00N.json"
++      ],
++      "governance_rule": "Every accepted MCR with a change_type of RENAME_SYMBOL, SPLIT_MODULE, MERGE_MODULES, or RETIRE_MODULE must produce a crosswalk entry.",
++      "related_terms": [
++        "legacy_alias",
++        "supersedes",
++        "catalog_pass",
++        "accepted_change"
++      ]
++    },
++    {
++      "term": "split_module",
++      "display_name": "Split Module",
++      "category": "migration",
++      "definition": "A change_type value (SPLIT_MODULE) where one module is decomposed into two or more distinct modules, each with its own numeric ID and canonical symbol. The source module may be retired or have its scope narrowed.",
++      "must_not_mean": [
++        "refactoring code within a module"
++      ],
++      "governance_rule": "A split requires an accepted MCR before the catalog reflects the new modules. The source module's numeric ID is never reused.",
++      "example": {
++        "correct": "Splitting position sizing from R1_RISK_EVALUATOR creates a new module R4_POSITION_SIZER with a new numeric ID. R1 retains its ID with narrowed scope.",
++        "incorrect": "Moving a function to a new file constitutes a split_module."
++      },
++      "related_terms": [
++        "change_type",
++        "promote_work_cell",
++        "narrow_scope"
++      ]
++    },
++    {
++      "term": "merge_modules",
++      "display_name": "Merge Modules",
++      "category": "migration",
++      "definition": "A change_type value (MERGE_MODULES) where two or more modules collapse into a single surviving module. Non-surviving modules are retired with superseded_by references.",
++      "must_not_mean": [
++        "combining files without catalog change"
++      ],
++      "governance_rule": "The surviving module retains its numeric ID. Retired modules' IDs are preserved as historical records.",
++      "related_terms": [
++        "change_type",
++        "retire_module",
++        "superseded_by"
++      ]
++    },
++    {
++      "term": "rename_symbol",
++      "display_name": "Rename Symbol",
++      "category": "migration",
++      "definition": "A change_type value (RENAME_SYMBOL) where the canonical symbol of a module changes while the numeric module ID remains the same. The prior symbol becomes a legacy alias.",
++      "must_not_mean": [
++        "redefining the module's purpose",
++        "changing the numeric ID"
++      ],
++      "governance_rule": "RENAME_SYMBOL requires an accepted MCR. The old symbol must be recorded as a legacy_alias in the catalog and a crosswalk entry must be produced.",
++      "example": {
++        "correct": "F1_FLOW_ORCHESTRATOR \u2192 F4_FLOW_ORCHESTRATOR is a RENAME_SYMBOL. The numeric ID 50000000000000000025 is unchanged.",
++        "incorrect": "Editing the canonical_symbol field in the catalog directly without an MCR."
++      },
++      "related_terms": [
++        "legacy_alias",
++        "module_crosswalk",
++        "change_type"
++      ]
++    },
++    {
++      "term": "retire_module",
++      "display_name": "Retire Module",
++      "category": "migration",
++      "definition": "A change_type value (RETIRE_MODULE) marking a module as no longer active. The numeric ID and symbol are preserved in the catalog with identity_status: retired.",
++      "must_not_mean": [
++        "deleting a module from the catalog"
++      ],
++      "governance_rule": "Retired module IDs are never reused. The catalog entry remains with identity_status: retired and a non-empty superseded_by array where applicable.",
++      "related_terms": [
++        "identity_status",
++        "module_lifecycle_status",
++        "superseded_by"
++      ]
++    },
++    {
++      "term": "promote_work_cell",
++      "display_name": "Promote Work Cell",
++      "category": "migration",
++      "definition": "A change_type value (PROMOTE_WORK_CELL) elevating a former work cell \u2014 a bounded sub-unit within a module \u2014 to full module status, assigning it a new numeric ID and canonical symbol.",
++      "must_not_mean": [
++        "creating a completely new module with no prior existence"
++      ],
++      "governance_rule": "The promoted module's migration_status is set to promoted_from_work_cell. The source module entry records the promotion in its decomposition decision.",
++      "related_terms": [
++        "promote_submodule",
++        "migration_status",
++        "change_type"
++      ]
++    },
++    {
++      "term": "promote_submodule",
++      "display_name": "Promote Submodule",
++      "category": "migration",
++      "definition": "A change_type value (PROMOTE_SUBMODULE) elevating a documented submodule to full module status with its own numeric ID and canonical symbol.",
++      "must_not_mean": [
++        "promote_work_cell"
++      ],
++      "governance_rule": "Submodule promotion requires prior SUBMODULE_UNDOC flag resolution: the submodule must be documented before it can be evaluated for promotion.",
++      "related_terms": [
++        "promote_work_cell",
++        "migration_status",
++        "SUBMODULE_UNDOC"
++      ]
++    },
++    {
++      "term": "demote_to_internal",
++      "display_name": "Demote to Internal",
++      "category": "migration",
++      "definition": "A change_type value (DEMOTE_TO_INTERNAL) reducing a module or submodule to an internal function of another module, removing its independent catalog entry.",
++      "must_not_mean": [
++        "retire_module"
++      ],
++      "governance_rule": "DEMOTE_TO_INTERNAL requires an accepted MCR. The absorbing module must update its file ownership and contract records.",
++      "related_terms": [
++        "retire_module",
++        "change_type",
++        "split_module"
++      ]
++    },
++    {
++      "term": "move_to_shared_kernel",
++      "display_name": "Move to Shared Kernel",
++      "category": "migration",
++      "definition": "A change_type value (MOVE_TO_SHARED_KERNEL) reclassifying logic as domain-neutral and relocating it to the shared kernel domain (SK prefix), creating or updating an SK-prefixed module.",
++      "must_not_mean": [
++        "making code available to all modules without governance"
++      ],
++      "governance_rule": "Shared kernel modules must contain only stable, domain-neutral primitives. Domain-specific logic may not be moved to the shared kernel.",
++      "related_terms": [
++        "change_type",
++        "shared_file"
++      ]
++    },
++    {
++      "term": "change_contract",
++      "display_name": "Change Contract",
++      "category": "migration",
++      "definition": "A change_type value (CHANGE_CONTRACT) indicating that input or output contracts of a module are being added, modified, versioned, or removed.",
++      "must_not_mean": [
++        "renaming a contract field informally"
++      ],
++      "governance_rule": "CHANGE_CONTRACT requires an MCR. If the change is incompatible with prior consumers, it constitutes a breaking_contract_change and requires consumer modules to be updated.",
++      "related_terms": [
++        "contract",
++        "breaking_contract_change",
++        "input_contract",
++        "output_contract"
++      ]
++    },
++    {
++      "term": "change_owner_files",
++      "display_name": "Change Owner Files",
++      "category": "migration",
++      "definition": "A change_type value (CHANGE_OWNER_FILES) indicating that source file ownership is being transferred between modules.",
++      "must_not_mean": [
++        "moving files in the filesystem without catalog update"
++      ],
++      "governance_rule": "File ownership changes require an accepted CHANGE_OWNER_FILES MCR before file_module_mapping.csv and affected manifests are updated.",
++      "related_terms": [
++        "file_owner",
++        "primary_owner",
++        "file_module_mapping",
++        "change_type"
++      ]
++    },
++    {
++      "term": "change_runtime_boundary",
++      "display_name": "Change Runtime Boundary",
++      "category": "migration",
++      "definition": "A change_type value (CHANGE_RUNTIME_BOUNDARY) indicating that the owning service, MQL4 component, port, or communication channel of a module is changing.",
++      "must_not_mean": [
++        "changing code without altering which runtime context owns it"
++      ],
++      "governance_rule": "CHANGE_RUNTIME_BOUNDARY is high-risk by default when it affects MT4 EA behavior, WebRequest boundaries, or order routing.",
++      "related_terms": [
++        "service_binding",
++        "runtime_binding",
++        "communication_channel_owner",
++        "change_type"
++      ]
++    },
++    {
++      "term": "atomic_manifest",
++      "display_name": "Atomic Manifest",
++      "category": "manifest",
++      "definition": "A fully populated JSON file conforming to eafix_unified_atomic_module_schema_v1_0_0.json, describing a single canonical module's identity, classification, contracts, file ownership, runtime, channels, gates, failure behavior, and staleness state.",
++      "must_not_mean": [
++        "module_catalog entry",
++        "module summary document"
++      ],
++      "applies_to_artifacts": [
++        "atomic_module_manifests/<module_id>__<canonical_symbol>.manifest.json"
++      ],
++      "governance_rule": "Manifests are generated or patched downstream of accepted MCRs and catalog updates. They are never used as the authoritative source for architecture decisions.",
++      "related_terms": [
++        "manifest_ready",
++        "stale_manifest",
++        "manifest_generation",
++        "module_lifecycle_status"
++      ]
++    },
++    {
++      "term": "manifest_ready",
++      "display_name": "Manifest Ready",
++      "category": "manifest",
++      "definition": "A derived lifecycle stage (not a stored status) indicating a module is implemented and has a valid, non-stale atomic manifest. Computed as: canonical + implemented + manifest exists + staleness_status: fresh.",
++      "must_not_mean": [
++        "stored status field",
++        "canonical",
++        "implemented",
++        "deployed"
++      ],
++      "governance_rule": "manifest_ready is computed, never hand-authored. It requires: (1) identity_status: canonical, (2) no NO_FILES/SERVICE_UNBOUND flags, (3) an existing manifest file, (4) staleness_status: fresh. All four conditions must hold simultaneously.",
++      "example": {
++        "correct": "R3_CORRELATION_GUARD is canonical but not manifest_ready because its manifest has not yet been generated.",
++        "incorrect": "All canonical modules are manifest_ready."
++      },
++      "related_terms": [
++        "atomic_manifest",
++        "stale_manifest",
++        "module_lifecycle_status"
++      ]
++    },
++    {
++      "term": "stale_manifest",
++      "display_name": "Stale Manifest",
++      "category": "manifest",
++      "definition": "An atomic manifest whose source hashes no longer match the current state of the authoritative source documents it was generated from. Stale manifests have staleness_status: stale and must be regenerated before use.",
++      "must_not_mean": [
++        "outdated module",
++        "deprecated module"
++      ],
++      "governance_rule": "A stale manifest does not invalidate canonical identity. It means the manifest document needs regeneration, not that the module is no longer canonical.",
++      "related_terms": [
++        "manifest_ready",
++        "atomic_manifest",
++        "staleness_policy",
++        "manifest_regeneration"
++      ]
++    },
++    {
++      "term": "manifest_generation",
++      "display_name": "Manifest Generation",
++      "category": "manifest",
++      "definition": "The process of producing a new atomic manifest for a module for the first time, drawing from the current catalog, schema, file mapping, service reference, and process step catalog.",
++      "must_not_mean": [
++        "manifest_patch",
++        "manifest_regeneration"
++      ],
++      "governance_rule": "Manifest generation must occur after: MCR accepted \u2192 catalog updated \u2192 crosswalk updated. It must not precede those steps.",
++      "related_terms": [
++        "manifest_patch",
++        "manifest_regeneration",
++        "manifest_source_authority"
++      ]
++    },
++    {
++      "term": "manifest_patch",
++      "display_name": "Manifest Patch",
++      "category": "manifest",
++      "definition": "A targeted update to an existing atomic manifest that changes specific fields without full regeneration. Used when a narrow accepted MCR affects only a subset of manifest sections.",
++      "must_not_mean": [
++        "manifest_regeneration",
++        "direct edit without MCR basis"
++      ],
++      "governance_rule": "Manifest patches must be grounded in an accepted MCR. Free-form edits to manifest files without an MCR basis are prohibited.",
++      "related_terms": [
++        "manifest_generation",
++        "manifest_regeneration",
++        "accepted_change"
++      ]
++    },
++    {
++      "term": "manifest_regeneration",
++      "display_name": "Manifest Regeneration",
++      "category": "manifest",
++      "definition": "The process of fully replacing a stale manifest with a freshly generated version from current authoritative sources.",
++      "must_not_mean": [
++        "manifest_patch"
++      ],
++      "governance_rule": "Regeneration is triggered when staleness_status: stale and the source documents have changed in ways that cannot be safely patched.",
++      "related_terms": [
++        "stale_manifest",
++        "manifest_generation",
++        "staleness_policy"
++      ]
++    },
++    {
++      "term": "manifest_source_authority",
++      "display_name": "Manifest Source Authority",
++      "category": "manifest",
++      "definition": "The ordered list of authoritative source documents used to populate a manifest. Declared in the manifest's source_authority section. Conflict resolution follows the conflict_resolution_order.",
++      "must_not_mean": [
++        "any document referenced in the manifest"
++      ],
++      "governance_rule": "manifest_source_authority entries must reference files that exist and are verified. Inferred or assumed source documents must be marked as candidate, not authority.",
++      "related_terms": [
++        "atomic_manifest",
++        "source_authority",
++        "conflict_resolution_order"
++      ]
++    },
++    {
++      "term": "file_owner",
++      "display_name": "File Owner",
++      "category": "file_service_ownership",
++      "definition": "The canonical module designated as the primary authority for a source file. A file may have at most one primary_owner and zero or more secondary_owners.",
++      "must_not_mean": [
++        "any module that imports the file",
++        "any module in the same directory"
++      ],
++      "governance_rule": "File ownership is many-to-many in practice (shared_files exist), but primary ownership must be singular. Ambiguous ownership is tracked as a reconciliation flag until resolved.",
++      "related_terms": [
++        "owning_module",
++        "primary_owner",
++        "secondary_owner",
++        "shared_file"
++      ]
++    },
++    {
++      "term": "owning_module",
++      "display_name": "Owning Module",
++      "category": "file_service_ownership",
++      "definition": "The canonical module that holds primary ownership of a file or set of files. Synonym for file_owner in the context of a specific file's ownership record.",
++      "must_not_mean": [
++        "any module with read access to the file"
++      ],
++      "governance_rule": "Owning module is declared in file_module_mapping.csv and reflected in the module's manifest under file_ownership.owned_files.",
++      "related_terms": [
++        "file_owner",
++        "primary_owner",
++        "file_module_mapping"
++      ]
++    },
++    {
++      "term": "primary_owner",
++      "display_name": "Primary Owner",
++      "category": "file_service_ownership",
++      "definition": "The single canonical module with write authority over a file. Only the primary owner may modify the file's contract, structure, or purpose without an MCR.",
++      "must_not_mean": [
++        "co-owner",
++        "shared owner"
++      ],
++      "governance_rule": "Every owned file must have exactly one primary_owner. Files without a resolvable primary owner are flagged NO_FILES or require a CHANGE_OWNER_FILES MCR.",
++      "related_terms": [
++        "file_owner",
++        "secondary_owner",
++        "shared_file"
++      ]
++    },
++    {
++      "term": "secondary_owner",
++      "display_name": "Secondary Owner",
++      "category": "file_service_ownership",
++      "definition": "A canonical module with read or append access to a file primarily owned by another module. Secondary ownership is declared explicitly and does not grant write authority.",
++      "must_not_mean": [
++        "primary_owner",
++        "consumer of a contract"
++      ],
++      "governance_rule": "Secondary ownership must be declared in the manifest and file mapping. It may not be inferred from import patterns.",
++      "related_terms": [
++        "primary_owner",
++        "shared_file",
++        "file_owner"
++      ]
++    },
++    {
++      "term": "shared_file",
++      "display_name": "Shared File",
++      "category": "file_service_ownership",
++      "definition": "A file used by more than one module, governed by a declared sharing_policy. Allowed sharing policies: read_only, append_only, schema_only, shared_kernel, generated_artifact, needs_refactor.",
++      "must_not_mean": [
++        "file without an owner",
++        "file anyone may modify"
++      ],
++      "governance_rule": "Shared files must have a declared sharing_policy and an allowed_modules list. Undeclared sharing is treated as a reconciliation finding.",
++      "related_terms": [
++        "file_owner",
++        "primary_owner",
++        "sharing_policy"
++      ]
++    },
++    {
++      "term": "service_binding",
++      "display_name": "Service Binding",
++      "category": "file_service_ownership",
++      "definition": "A declared association between a canonical module and the Python microservice, MQL4 EA, UI process, or infrastructure component that hosts it at runtime. Recorded in the manifest under service_runtime.service_home.",
++      "must_not_mean": [
++        "inferred service association",
++        "file co-location"
++      ],
++      "governance_rule": "Unverified service bindings must be marked candidate_service_home, not service_home. SERVICE_UNBOUND is the reconciliation flag for modules lacking any declared binding.",
++      "example": {
++        "correct": "S1_SIGNAL_ENGINE has service_binding: signal_engine_service (port 5003, python_service).",
++        "incorrect": "A module is service-bound because its files are in the same folder as a service entrypoint."
++      },
++      "related_terms": [
++        "runtime_binding",
++        "SERVICE_UNBOUND",
++        "communication_channel_owner"
++      ]
++    },
++    {
++      "term": "runtime_binding",
++      "display_name": "Runtime Binding",
++      "category": "file_service_ownership",
++      "definition": "The full set of runtime context associations for a module: service_home, runtime_kind, language, port, host, and deployment_unit. A superset of service_binding.",
++      "must_not_mean": [
++        "service_binding alone"
++      ],
++      "governance_rule": "A module is considered runtime-bound only when all required runtime_binding fields are declared and verified. Partial binding is flagged SERVICE_UNBOUND.",
++      "related_terms": [
++        "service_binding",
++        "SERVICE_UNBOUND",
++        "manifest_ready"
++      ]
++    },
++    {
++      "term": "communication_channel_owner",
++      "display_name": "Communication Channel Owner",
++      "category": "file_service_ownership",
++      "definition": "The canonical module declared as the authority for a named communication channel (HTTP endpoint, Redis topic, file drop path, socket, DDE channel). Recorded in the manifest under communication_channels.owned_channels.",
++      "must_not_mean": [
++        "any module that uses the channel"
++      ],
++      "governance_rule": "Each communication channel must have at most one owning module. OWNS_CHANNEL_HTTP5001 is a reconciliation flag indicating channel ownership requires verification.",
++      "related_terms": [
++        "service_binding",
++        "runtime_binding",
++        "OWNS_CHANNEL_HTTP5001"
++      ]
++    },
++    {
++      "term": "contract",
++      "category": "contract",
++      "definition": "A named, versioned data structure passed between modules at a declared boundary. Contracts are the only sanctioned mechanism for inter-module data exchange.",
++      "must_not_mean": [
++        "function signature",
++        "Python class",
++        "informal agreement"
++      ],
++      "governance_rule": "Modules may only ingest data from declared output contracts of their dependencies. Private cross-module access is forbidden by module_io_policy.",
++      "related_terms": [
++        "input_contract",
++        "output_contract",
++        "contract_version",
++        "producer_module",
++        "consumer_module"
++      ]
++    },
++    {
++      "term": "input_contract",
++      "display_name": "Input Contract",
++      "category": "contract",
++      "definition": "A named contract that a module declares as required or optional input. The module may only consume this data if the producing module declares the same name as an output_contract.",
++      "must_not_mean": [
++        "any data a module reads",
++        "environment variable",
++        "config value"
++      ],
++      "governance_rule": "Input contracts must be declared in the manifest and matched against a producing module's output_contract in the contract_registry.",
++      "related_terms": [
++        "output_contract",
++        "producer_module",
++        "contract"
++      ]
++    },
++    {
++      "term": "output_contract",
++      "display_name": "Output Contract",
++      "category": "contract",
++      "definition": "A named contract that a module declares as a produced output, available for consumption by other modules that declare it as an input_contract.",
++      "must_not_mean": [
++        "return value of a function",
++        "log output"
++      ],
++      "governance_rule": "Output contracts must be named using noun-based naming (e.g., RiskDecision, FeatureFrame) not verb-based naming (e.g., RunRisk, SendThing).",
++      "related_terms": [
++        "input_contract",
++        "consumer_module",
++        "contract"
++      ]
++    },
++    {
++      "term": "contract_version",
++      "display_name": "Contract Version",
++      "category": "contract",
++      "definition": "A versioned suffix (e.g., _v1, _v2) appended to a contract name only when the schema changes incompatibly. Format: ContractName_vN.",
++      "must_not_mean": [
++        "schema_version of a governance file",
++        "module version"
++      ],
++      "governance_rule": "Contract versioning is required only on incompatible schema changes. Compatible changes do not increment the version. Use CHANGE_CONTRACT MCR when versioning is needed.",
++      "related_terms": [
++        "contract",
++        "breaking_contract_change",
++        "change_contract"
++      ]
++    },
++    {
++      "term": "contract_registry",
++      "display_name": "Contract Registry",
++      "category": "contract",
++      "definition": "The central authoritative list of canonical contract names, versions, schemas, producers, and consumers. Stored in contract_registry.current.json.",
++      "must_not_mean": [
++        "module catalog",
++        "manifest"
++      ],
++      "governance_rule": "All contracts referenced in manifests must have a corresponding entry in contract_registry.current.json. Undeclared contracts are reconciliation findings.",
++      "related_terms": [
++        "contract",
++        "producer_module",
++        "consumer_module",
++        "input_contract",
++        "output_contract"
++      ]
++    },
++    {
++      "term": "producer_module",
++      "display_name": "Producer Module",
++      "category": "contract",
++      "definition": "The canonical module responsible for producing data conforming to a contract it declares as output. Each contract has exactly one primary producer and zero or more explicitly declared co-producers.",
++      "must_not_mean": [
++        "any module that creates data",
++        "service that writes files",
++        "undeclared emitter"
++      ],
++      "governance_rule": "Each contract must have exactly one primary_producer_module declared in the contract_registry. Additional producers are permitted only as explicitly declared co_producer_modules, governed the same way as secondary file owners. An undeclared producer is a governance violation, not a co-producer.",
++      "related_terms": [
++        "primary_producer",
++        "co_producer",
++        "consumer_module",
++        "output_contract",
++        "contract_registry"
++      ]
++    },
++    {
++      "term": "consumer_module",
++      "display_name": "Consumer Module",
++      "category": "contract",
++      "definition": "A canonical module that declares a contract as an input and depends on the producer_module to supply conforming data.",
++      "must_not_mean": [
++        "any module that reads the data informally"
++      ],
++      "governance_rule": "Consumer modules must be listed in the contract_registry entry for the contract they consume. Undeclared consumption is a governance violation.",
++      "related_terms": [
++        "producer_module",
++        "input_contract",
++        "contract_registry"
++      ]
++    },
++    {
++      "term": "breaking_contract_change",
++      "display_name": "Breaking Contract Change",
++      "category": "contract",
++      "definition": "A contract schema modification that is incompatible with prior consumers \u2014 e.g., removing a required field, changing a field type, or renaming the contract. Requires a CHANGE_CONTRACT MCR and contract version increment.",
++      "must_not_mean": [
++        "any contract change",
++        "adding an optional field"
++      ],
++      "governance_rule": "Breaking contract changes are authored only by the primary_producer via a CHANGE_CONTRACT MCR, must list all affected consumer_modules and co_producer_modules in the impact_checklist, and require a contract version increment. All consumers must update before the change is fully accepted.",
++      "related_terms": [
++        "contract_version",
++        "change_contract",
++        "consumer_module",
++        "primary_producer",
++        "co_producer"
++      ]
++    },
++    {
++      "term": "primary_producer",
++      "display_name": "Primary Producer",
++      "category": "contract",
++      "definition": "The single canonical module with authority over a contract's schema and the canonical source of data conforming to it. Analogous to primary_owner for files.",
++      "must_not_mean": [
++        "co_producer",
++        "any emitter of similarly-shaped data"
++      ],
++      "governance_rule": "Every contract must have exactly one primary_producer. Only the primary_producer may change the contract schema, and only through a CHANGE_CONTRACT MCR.",
++      "related_terms": [
++        "producer_module",
++        "co_producer",
++        "breaking_contract_change",
++        "contract_registry"
++      ]
++    },
++    {
++      "term": "co_producer",
++      "display_name": "Co-Producer",
++      "category": "contract",
++      "definition": "A canonical module, other than the primary_producer, explicitly declared in the contract_registry as also emitting data conforming to a contract. Analogous to secondary_owner for files.",
++      "must_not_mean": [
++        "primary_producer",
++        "undeclared producer",
++        "consumer_module"
++      ],
++      "governance_rule": "Co-producers must be explicitly listed in the contract_registry entry. A co-producer may emit conforming data but may not alter the contract schema; schema authority remains with the primary_producer.",
++      "example": {
++        "correct": "Heartbeat may have S1_SIGNAL_ENGINE as primary_producer with several services declared as co_producers in the contract_registry.",
++        "incorrect": "Any service emitting a heartbeat-shaped message is automatically a co_producer without declaration."
++      },
++      "related_terms": [
++        "primary_producer",
++        "producer_module",
++        "contract_registry"
++      ]
++    },
++    {
++      "term": "reconciliation_flag",
++      "display_name": "Reconciliation Flag",
++      "category": "reconciliation",
++      "definition": "A named marker on a module catalog entry or manifest indicating an unresolved governance finding that requires future work. Flags are work queue items, not defects that block canonical status.",
++      "must_not_mean": [
++        "error",
++        "build failure",
++        "blocking defect"
++      ],
++      "governance_rule": "Reconciliation flags do not prevent a module from being canonical. They feed reconciliation_queue_index.json as categorized work queues for future passes.",
++      "example": {
++        "correct": "F1_CONFIG_PREFERENCES carries NO_FILES and SUBMODULE_UNDOC flags. It remains canonical. These flags are queue items for Pass 6.",
++        "incorrect": "A module with reconciliation flags cannot be canonical."
++      },
++      "related_terms": [
++        "reconciliation_queue",
++        "NO_FILES",
++        "SERVICE_UNBOUND",
++        "identity_status"
++      ]
++    },
++    {
++      "term": "reconciliation_queue",
++      "display_name": "Reconciliation Queue",
++      "category": "reconciliation",
++      "definition": "A categorized work queue derived from reconciliation flags across the catalog. Managed in reconciliation_queue_index.json. Each flag type maps to a specific resolution activity.",
++      "must_not_mean": [
++        "bug tracker",
++        "sprint backlog"
++      ],
++      "governance_rule": "The reconciliation queue is an authoritative governance artifact. Items are resolved through accepted MCRs or dedicated reconciliation passes, not informal edits.",
++      "related_terms": [
++        "reconciliation_flag",
++        "reconciliation_queue_index"
++      ]
++    },
++    {
++      "term": "NO_FILES",
++      "category": "reconciliation",
++      "definition": "A reconciliation flag indicating a canonical module has no verified source file ownership recorded in file_module_mapping.csv. The module identity is valid; file binding is unresolved.",
++      "must_not_mean": [
++        "module does not exist",
++        "module has no code"
++      ],
++      "governance_rule": "NO_FILES is resolved during the file ownership reconciliation pass (Pass 6). It does not block canonical status.",
++      "related_terms": [
++        "reconciliation_flag",
++        "file_owner",
++        "file_module_mapping",
++        "SERVICE_UNBOUND"
++      ]
++    },
++    {
++      "term": "SERVICE_UNBOUND",
++      "category": "reconciliation",
++      "definition": "A reconciliation flag indicating a canonical module has no verified service_home or runtime_binding declared in its manifest or catalog entry.",
++      "must_not_mean": [
++        "module is not deployed",
++        "module is broken"
++      ],
++      "governance_rule": "SERVICE_UNBOUND is resolved by declaring a verified service_home in the manifest, confirmed against eafix_services_ai_reference.json. Inferred bindings must be marked candidate.",
++      "related_terms": [
++        "service_binding",
++        "runtime_binding",
++        "reconciliation_flag",
++        "NO_FILES"
++      ]
++    },
++    {
++      "term": "SUBMODULE_UNDOC",
++      "category": "reconciliation",
++      "definition": "A reconciliation flag indicating a module has known submodules or work cells from prior documentation that have not yet been formally dispositioned (promoted, demoted, or retired).",
++      "must_not_mean": [
++        "the module is poorly documented overall"
++      ],
++      "governance_rule": "SUBMODULE_UNDOC is resolved by creating a decomposition decision for each undocumented submodule and, where appropriate, filing a PROMOTE_SUBMODULE or DEMOTE_TO_INTERNAL MCR.",
++      "related_terms": [
++        "promote_submodule",
++        "decomposition_decision",
++        "reconciliation_flag"
++      ]
++    },
++    {
++      "term": "EA_SECOND_PASS",
++      "category": "reconciliation",
++      "definition": "A reconciliation flag indicating the module has responsibilities or boundary questions touching the MT4 EA side that cannot be resolved until the MT4/Python authority boundary is established in Pass 2.",
++      "must_not_mean": [
++        "the module is an EA module",
++        "the module is deferred entirely"
++      ],
++      "governance_rule": "EA_SECOND_PASS is a deferral marker, not a defect. Affected modules remain canonical. Resolution requires Pass 2 scope completion.",
++      "related_terms": [
++        "reconciliation_flag",
++        "catalog_pass",
++        "CHANGE_RUNTIME_BOUNDARY"
++      ]
++    },
++    {
++      "term": "NEW_MODULE",
++      "category": "reconciliation",
++      "definition": "A reconciliation flag on a module added during the current pass that has no prior catalog history, no prior decomposition decision, and requires first-time manifest generation and validation evidence.",
++      "must_not_mean": [
++        "module added through a split or promotion"
++      ],
++      "governance_rule": "NEW_MODULE flag is cleared after: a decomposition decision is recorded, a manifest is generated, and initial file/service binding evidence is established.",
++      "related_terms": [
++        "reconciliation_flag",
++        "manifest_generation",
++        "decomposition_decision"
++      ]
++    },
++    {
++      "term": "SCOPE_NARROWED",
++      "category": "reconciliation",
++      "definition": "A reconciliation flag indicating a module's responsibilities were reduced during the current pass (e.g., because a work cell was promoted or a split occurred). The module's contracts and process bindings may need updating.",
++      "must_not_mean": [
++        "module was deleted",
++        "module was demoted"
++      ],
++      "governance_rule": "SCOPE_NARROWED is resolved by reviewing and updating the module's output_contracts and process_binding to reflect the reduced scope.",
++      "related_terms": [
++        "reconciliation_flag",
++        "split_module",
++        "change_contract"
++      ]
++    },
++    {
++      "term": "SAFETY_CONTROLS",
++      "category": "reconciliation",
++      "definition": "A reconciliation flag indicating a module has safety-critical responsibilities (e.g., circuit breakers, emergency stop, disabled-state enforcement) that require explicit validation evidence before manifest_ready status is granted.",
++      "must_not_mean": [
++        "module is unsafe",
++        "module has a safety bug"
++      ],
++      "governance_rule": "SAFETY_CONTROLS flag is cleared only after safety gate validation is documented and linked in the manifest's standards_and_gates section.",
++      "related_terms": [
++        "reconciliation_flag",
++        "manifest_ready",
++        "standards_and_gates"
++      ]
++    }
++  ],
++  "relationships": [
++    {
++      "relationship": "identity_status_to_derived_lifecycle_status",
++      "rule": "identity_status is the stored schema field for module identity state. module_lifecycle_status is a computed projection derived from identity_status plus review, reconciliation, manifest existence, and staleness evidence. Lifecycle status must not be stored unless a future accepted schema MCR adds it."
++    },
++    {
++      "relationship": "numeric_module_id_to_canonical_symbol",
++      "rule": "numeric_module_id is permanent and opaque. canonical_symbol is human-readable and may change via RENAME_SYMBOL MCR. The numeric ID is the durable cross-reference key."
++    },
++    {
++      "relationship": "mcr_to_catalog_update",
++      "rule": "No catalog, crosswalk, or manifest may be modified in response to an architecture change unless an MCR with decision: accepted exists for that change."
++    },
++    {
++      "relationship": "manifest_to_catalog",
++      "rule": "Manifests are downstream of the catalog. The catalog is never updated based on manifest content. Information flows catalog \u2192 manifest, not manifest \u2192 catalog."
++    },
++    {
++      "relationship": "reconciliation_flag_to_identity_status",
++      "rule": "Reconciliation flags do not affect identity_status. A module with NO_FILES and SERVICE_UNBOUND flags remains identity_status: canonical."
++    },
++    {
++      "relationship": "file_ownership_to_service_binding",
++      "rule": "File ownership (which module owns which files) is separate from service binding (which runtime hosts the module). A module can have resolved file ownership with unresolved service binding and vice versa."
++    },
++    {
++      "relationship": "producer_module_to_consumer_module",
++      "rule": "The contract_registry is the authority for producer/consumer relationships. Manifests reference it. The contract_registry must be updated before manifest bindings for a new contract are considered authoritative."
++    }
++  ],
++  "forbidden_interpretations": [
++    {
++      "term": "canonical",
++      "forbidden_meaning": "implemented",
++      "reason": "A canonical module may still have NO_FILES, SERVICE_UNBOUND, or missing manifest evidence."
++    },
++    {
++      "term": "module_id",
++      "forbidden_meaning": "semantic encoding",
++      "reason": "Numeric IDs must remain opaque permanent handles."
++    },
++    {
++      "term": "manifest_ready",
++      "forbidden_meaning": "canonical",
++      "reason": "manifest_ready is a higher lifecycle stage than canonical. A canonical module may lack a manifest entirely."
++    },
++    {
++      "term": "reconciliation_flag",
++      "forbidden_meaning": "blocking defect",
++      "reason": "Reconciliation flags are work queue items. They do not block canonical status or prevent the module from being referenced in other governance artifacts."
++    },
++    {
++      "term": "service_binding",
++      "forbidden_meaning": "inferred from file co-location",
++      "reason": "Service bindings must be explicitly declared and verified. Co-location of files in a service directory is not evidence of binding."
++    },
++    {
++      "term": "active_pass",
++      "forbidden_meaning": "determinable from file timestamps",
++      "reason": "The active pass is declared in module_system_index.json only. File timestamps are not authoritative for pass state."
++    },
++    {
++      "term": "contract",
++      "forbidden_meaning": "any data exchanged between modules",
++      "reason": "Only named, declared contracts in the contract_registry are governance contracts. Undeclared data exchange is a governance finding, not a contract."
++    },
++    {
++      "term": "legacy_alias",
++      "forbidden_meaning": "deleted or invalid symbol",
++      "reason": "Legacy aliases are retained in the catalog for traceability. They are tagged deprecated_alias but must remain resolvable to their current canonical module."
++    }
++  ],
++  "ai_usage_rules": [
++    {
++      "rule_id": "GLOSSARY-AI-001",
++      "rule": "Use these definitions exactly when creating or validating module governance artifacts."
++    },
++    {
++      "rule_id": "GLOSSARY-AI-002",
++      "rule": "If a term is missing, add it to the glossary through a governance update instead of inventing a local meaning."
++    },
++    {
++      "rule_id": "GLOSSARY-AI-003",
++      "rule": "Never infer identity_status, lifecycle_status, or reconciliation_flag values from prose descriptions. Always read from the current catalog file declared in module_system_index.json."
++    },
++    {
++      "rule_id": "GLOSSARY-AI-004",
++      "rule": "When generating an MCR, change_type must be drawn from the module_change_type_enum.json allowed values. Do not invent change type strings."
++    },
++    {
++      "rule_id": "GLOSSARY-AI-005",
++      "rule": "Do not mark a service_binding as authoritative unless it is verified against eafix_services_ai_reference.json. Inferred bindings must use the candidate_service_home field."
++    },
++    {
++      "rule_id": "GLOSSARY-AI-006",
++      "rule": "Do not resolve a reconciliation_flag by editing the catalog entry alone. Each flag type has a defined resolution path (MCR, decomposition decision, manifest update, or pass-level gate). Use the correct path."
++    },
++    {
++      "rule_id": "GLOSSARY-AI-007",
++      "rule": "When populating source_evidence in an MCR, only reference files whose existence has been confirmed in the project file inventory. Do not reference assumed or inferred files."
++    },
++    {
++      "rule_id": "GLOSSARY-AI-008",
++      "rule": "Do not treat historical_catalog files as authoritative. Only the file referenced in module_system_index.json:current_catalog is authoritative."
++    },
++    {
++      "rule_id": "GLOSSARY-AI-009",
++      "rule": "Never store or hand-author module_lifecycle_status or manifest_ready. Compute them from identity_status, review_status, reconciliation_flags, manifest existence, and staleness_status using the derivation rules in the glossary. identity_status is the only stored module identity state field."
++    }
++  ],
++  "validator_targets": {
++    "required_terms": 81,
++    "required_relationships": 7,
++    "required_forbidden_interpretations": 8,
++    "required_ai_usage_rules": 9,
++    "allow_unknown_terms": false,
++    "enforcement": "A validator must reject any governance artifact that uses a module-governance term absent from this glossary, and must verify the glossary itself contains at least the required counts above."
++  }
++}
+\ No newline at end of file
+-- 
+2.43.0
+
