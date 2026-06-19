@@ -1,0 +1,434 @@
+Core idea
+Treat the new module system as a versioned governance system, not a one-time cleanup.
+The current atomic_module_catalog_vNext is only LOCKED_PASS_1; it locks 34 well-supported module identities, while explicitly deferring EA-side systems, position sizing, CAL8 registry, event-gateway, stub services, and Grafana classification to Pass 2. It also states that file/service binding is still resolved later during individual manifest generation.  
+So the project needs a controlled modification process that assumes:
+Modules will be added.
+Some modules will split.
+Some will merge.
+Some will be renamed.
+Some will be retired.
+Contracts will change.
+File ownership will move.
+The mistake would be treating the Pass 1 catalog as final architecture.
+ 
+⸻
+ 
+1. Use three layers of module records
+Do not put every type of module change directly into the main catalog. Use three different records.
+Layer	File / artifact	Purpose
+Current state	atomic_module_catalog_vNext.json	The currently approved flat module list
+Decision history	atomic_module_decomposition_decisions.json	Why something was kept, split, promoted, deferred, merged, or rejected
+Change proposals	new module_change_requests/ folder	Proposed future changes before they are accepted
+The decomposition file already performs the decision-history role: it records candidates, origin type, disposition, score, rationale, evidence, and review flags.  
+The missing piece is a formal Module Change Request layer.
+ 
+⸻
+ 
+2. Add a Module Change Request system
+Create one file per proposed architecture modification:
+/module_change_requests/
+  MCR-2026-0001-split-r1-position-sizing.json
+  MCR-2026-0002-promote-cal8-registry.json
+  MCR-2026-0003-ea-reentry-gate-boundary.json
+Use MCR for Module Change Request.
+ 
+Each MCR should answer:
+{
+  "mcr_id": "MCR-2026-0001",
+  "title": "Split position sizing from R1_RISK_EVALUATOR",
+  "change_type": "SPLIT_MODULE",
+  "status": "proposed",
+  "affected_modules": ["R1_RISK_EVALUATOR"],
+  "proposed_modules_added": ["R4_POSITION_SIZER"],
+  "proposed_modules_removed": [],
+  "proposed_aliases": [],
+  "reason": "Position sizing has distinct rules, evidence, tests, and output contract.",
+  "source_evidence": [
+    "atomic_module_decomposition_decisions.json",
+    "Claude_gen_atomic module catalog vNext.json",
+    "module_catalog.json",
+    "process_step_catalog.json"
+  ],
+  "contract_changes": {
+    "new_contracts": ["PositionSizeDecision"],
+    "changed_contracts": ["RiskDecision"],
+    "removed_contracts": []
+  },
+  "file_mapping_impact": "needs_review",
+  "process_impact": "R1 remains approval gate; new R4 feeds R1",
+  "risk_level": "high",
+  "decision": "pending",
+  "decision_notes": []
+}
+This prevents casual edits to the module list. Every architecture change becomes reviewable and traceable.
+ 
+⸻
+ 
+3. Define allowed module change types
+Use a fixed enum. Do not allow free-form change types.
+Change type	Meaning
+ADD_MODULE	Add a new atomic module
+SPLIT_MODULE	One module becomes two or more modules
+MERGE_MODULES	Multiple modules collapse into one
+NARROW_SCOPE	Existing module keeps identity but loses responsibilities
+EXPAND_SCOPE	Existing module gains responsibility
+RENAME_SYMBOL	Symbol changes, numeric ID remains
+RETIRE_MODULE	Module stops being active but ID remains historical
+PROMOTE_WORK_CELL	Former work cell becomes module
+PROMOTE_SUBMODULE	Former submodule becomes module
+DEMOTE_TO_INTERNAL	Former module/submodule becomes internal function
+MOVE_TO_SHARED_KERNEL	Logic becomes shared-kernel module
+CHANGE_CONTRACT	Input/output contracts change
+CHANGE_OWNER_FILES	Source files move between modules
+CHANGE_RUNTIME_BOUNDARY	Runtime/service/channel ownership changes
+This matches the current schema direction. The manifest schema already supports migration states like promoted_from_work_cell, promoted_from_submodule, merged_from_multiple_work_cells, renamed_from_legacy_alias, shared_kernel_extraction, and deprecated_alias.  
+ 
+⸻
+ 
+4. Never reuse module IDs
+This should be a hard rule.
+Numeric module IDs are permanent.
+Canonical symbols may change.
+Names may change.
+Purpose may change within limits.
+IDs are never reused.
+If a module is retired:
+{
+  "module_id": "50000000000000000013",
+  "canonical_symbol": "R1_RISK_EVALUATOR",
+  "identity_status": "retired",
+  "superseded_by": ["50000000000000000035"],
+  "legacy_aliases": ["R1_RISK_EVALUATOR"]
+}
+The schema already treats canonical module identity as a first-class object with module_id, numeric_module_id, canonical_symbol, legacy_aliases, supersedes, superseded_by, identity_status, and identity_model.  
+This prevents future AI confusion.
+ 
+⸻
+ 
+5. Separate numeric ID from semantic meaning
+Use the numeric ID as an opaque permanent handle.
+Use the symbol for human meaning.
+Good:
+50000000000000000027 = permanent ID
+R3_CORRELATION_GUARD = human-readable symbol
+Bad:
+Trying to make the numeric ID encode layer, phase, group, runtime, and order.
+Why: the architecture will keep changing. If numeric IDs encode too much meaning, every refactor creates pressure to renumber. Renumbering breaks history.
+The current catalog already assigned new IDs ...027 through ...034 after Pass 1 additions, while the domain meaning lives in symbols like R3_CORRELATION_GUARD, U1_DASHBOARD_BACKEND, and SK2_IDEMPOTENCY.  
+That is the right direction.
+ 
+⸻
+ 
+6. Recommended module symbol pattern
+Use this pattern:
+<DOMAIN_PREFIX><ORDINAL>_<CAPABILITY_NAME>
+Examples:
+F1_CONFIG_PREFERENCES
+D2_CALENDAR_SOURCE_ADAPTER
+C2_INDICATOR_ENGINE
+S1_SIGNAL_ENGINE
+R3_CORRELATION_GUARD
+U2_GUI_GATEWAY
+SK2_IDEMPOTENCY
+Prefix meanings
+Prefix	Domain
+F	Foundation / infrastructure / orchestration
+D	Data ingest / external data normalization
+C	Compute / bars / indicators / feature packaging
+S	Signal and intent
+R	Risk and order-intent compilation
+O	Order management / OMS state
+B	Broker / MT4 bridge
+E	Reentry engine
+P	Platform observability / health / reporting
+U	UI / gateway / operator-facing surfaces
+SK	Shared kernel
+EA	EA-side MQL4 internal modules, if promoted in Pass 2
+GOV	Governance/documentation tooling, if later treated as modules
+Capability-name rules
+Use nouns, not verbs:
+Good:
+R3_CORRELATION_GUARD
+D5_CAL8_REGISTRY
+EA2_REENTRY_GATE
+SK3_POSITION_SIZING
+U3_MT4_EXPIRY_OVERLAY
+Avoid vague names:
+R3_RISK_HELPER
+D5_CALENDAR_THING
+EA2_MANAGER
+SK3_UTILS
+ 
+⸻
+ 
+7. Ordinal rules
+The ordinal should be stable inside the prefix, not necessarily process order.
+Recommended policy:
+Case	Rule
+Existing module keeps same meaning	Keep ordinal
+Existing module renamed for collision	New symbol, old symbol becomes alias
+New module split from existing module	Use next open ordinal in same prefix
+Module retired	Do not reuse ordinal
+Module merged	Keep surviving module’s ordinal; retired module becomes alias/superseded
+Candidate not approved yet	Use CANDIDATE-..., not a real ordinal
+Example:
+R1_RISK_EVALUATOR        // existing approval decision
+R2_ORDER_INTENT_COMPILER // existing order-intent compiler
+R3_CORRELATION_GUARD     // promoted work cell
+R4_POSITION_SIZER        // possible future split
+For Pass 2 EA-side modules:
+EA1_BRIDGE_RECEIVER
+EA2_REENTRY_GATE
+EA3_EXECUTION_FEEDBACK
+EA4_PROFILE_ROTATOR
+EA5_FREEZE_MONITOR
+But do not create these until the MT4/Python authority boundary is resolved.
+ 
+⸻
+ 
+8. Use status levels, not deletion
+Every module should have a lifecycle status.
+Status	Meaning
+proposed	Mentioned in MCR, not accepted
+candidate	Has enough evidence to evaluate
+approved	Accepted into next catalog pass
+canonical	Locked in current catalog
+implemented	Has source/runtime/files bound
+manifest_ready	Has valid atomic manifest
+deprecated_alias	Old symbol retained for traceability
+retired	No longer active, but ID remains reserved
+superseded	Replaced by another module
+Important distinction:
+canonical ≠ implemented
+approved ≠ fully documented
+locked identity ≠ complete file binding
+Your current catalog explicitly says reconciliation flags are carried forward and that file/service binding is resolved during manifest generation, not by the identity lock itself.  
+ 
+⸻
+ 
+9. Add a module change impact checklist
+Every MCR should force a checklist.
+Impact area	Required question
+Identity	Does this add, rename, retire, or supersede a module?
+Contracts	Are input/output contracts added, changed, removed, or versioned?
+Process	Does this change a process step, phase, dependency, or handoff?
+Runtime	Does a service, port, MQL4 component, UI product, or channel owner change?
+Files	Does file ownership change?
+Tests	Are validators, schemas, or evidence paths affected?
+Docs	Which manifests, catalogs, crosswalks, and references must update?
+UI	Does the operator see new controls, fields, alerts, or disabled states?
+MT4	Does this change EA behavior, WebRequest, DDE, CSV, socket, DLL, or OrderSend boundaries?
+Risk	Does this affect sizing, exposure, circuit breakers, order routing, execution, or emergency stop?
+This is where the routing file matters: module architecture work should consult module catalog, process catalog, module map, file mapping, and service references; UI work adds the UI catalog; MT4 work adds the MT4 authority reference and communication channels.
+ 
+⸻
+ 
+10. Add a catalog pass system
+Keep using “Pass” terminology. It is useful.
+Recommended structure:
+Pass 1: Python pipeline + UI/gateway + shared kernel identity lock
+Pass 2: EA-side MQL4 decomposition and MT4/Python authority boundary
+Pass 3: Risk sizing / position sizing / correlation refinement
+Pass 4: Calendar identity layer: CAL8 registry decision
+Pass 5: Service inventory reconciliation: event-gateway, data-validator, compliance-monitor
+Pass 6: File ownership lock and manifest generation
+Pass 7: Validator/generator enforcement
+Each pass produces:
+atomic_module_catalog_vNext_pass<N>.json
+atomic_module_decomposition_decisions_pass<N>.json
+module_change_log_pass<N>.json
+module_crosswalk_pass<N>.json
+Only one file should be marked current:
+atomic_module_catalog.current.json
+This avoids “which version should AI use?” problems.
+ 
+⸻
+ 
+11. Add a current-state index
+Create:
+module_system_index.json
+Purpose: tell AI which files are current and which are historical.
+ 
+Example:
+{
+  "current_catalog": "atomic_module_catalog_vNext_pass1.json",
+  "current_schema": "eafix_unified_atomic_module_schema_v1_0_0.json",
+  "current_decomposition_decisions": "atomic_module_decomposition_decisions_pass1.json",
+  "current_manifest_directory": "atomic_module_manifests/",
+  "current_change_request_directory": "module_change_requests/",
+  "historical_catalogs": [],
+  "deprecated_files": [],
+  "active_pass": "PASS_1",
+  "next_pass_focus": [
+    "EA Systems A-G",
+    "position sizing split",
+    "CAL8 registry decision",
+    "event-gateway classification"
+  ]
+}
+This would reduce AI context confusion more than almost any other file.
+ 
+⸻
+ 
+12. Maintain a module crosswalk
+Every rename, split, merge, and retirement needs a crosswalk.
+{
+  "from": {
+    "symbol": "F1_FLOW_ORCHESTRATOR",
+    "status": "legacy_alias"
+  },
+  "to": {
+    "symbol": "F4_FLOW_ORCHESTRATOR",
+    "module_id": "50000000000000000025"
+  },
+  "change_type": "RENAME_SYMBOL",
+  "reason": "Cleared PREFIX_COLLISION_F1",
+  "effective_pass": "PASS_1"
+}
+The Pass 1 catalog already handles this pattern by recording F1_FLOW_ORCHESTRATOR as a legacy alias of F4_FLOW_ORCHESTRATOR and by recording stale symbols such as O2_OMS and O3_PNL_CLASSIFIER as legacy aliases.  
+ 
+⸻
+ 
+13. Keep manifests downstream of catalog decisions
+Do not hand-edit manifests as architecture changes happen.
+The flow should be:
+MCR accepted
+  → decomposition decisions updated
+  → flat module catalog updated
+  → crosswalk updated
+  → affected manifests regenerated or patched
+  → validators run
+  → stale manifests marked
+The manifest schema already requires sections for authority, identity, classification, process binding, contracts, file ownership, runtime, channels, gates, failure behavior, documentation, migration traceability, reconciliation status, AI context, platform constraints, and staleness policy.  
+That means manifests should be generated from approved sources, not used as the place where architecture arguments happen.
+ 
+⸻
+ 
+14. Use reconciliation flags as work queues
+The current catalog carries flags like:
+NO_FILES
+SERVICE_UNBOUND
+SUBMODULE_UNDOC
+SCOPE_NARROWED
+EA_SECOND_PASS
+NEW_MODULE
+SAFETY_CONTROLS
+OWNS_CHANNEL_HTTP5001
+Do not treat these as defects only. Treat them as migration work queues.
+ 
+Example queues:
+Queue	Meaning
+NO_FILES	Needs source ownership discovery
+SERVICE_UNBOUND	Needs service/runtime binding
+SUBMODULE_UNDOC	Old submodule docs need disposition
+EA_SECOND_PASS	Needs MT4/Python boundary review
+NEW_MODULE	Needs first manifest and validation evidence
+SCOPE_NARROWED	Needs contract/process update check
+SAFETY_CONTROLS	Needs safety/disabled-state validation
+OWNS_CHANNEL_HTTP5001	Needs communication-channel binding
+This lets you manage migration as a backlog, not as an unstructured cleanup.
+ 
+⸻
+ 
+15. Naming convention for files
+Recommended file names:
+Catalogs
+atomic_module_catalog.pass_001.json
+atomic_module_catalog.pass_002.json
+atomic_module_catalog.current.json
+Decision logs
+atomic_module_decomposition_decisions.pass_001.json
+atomic_module_decomposition_decisions.pass_002.json
+Change requests
+MCR-2026-0001-split-r1-position-sizing.json
+MCR-2026-0002-promote-d5-cal8-registry.json
+Crosswalks
+atomic_module_crosswalk.pass_001.json
+atomic_module_crosswalk.current.json
+Manifests
+atomic_module_manifests/
+  50000000000000000013__R1_RISK_EVALUATOR.manifest.json
+  50000000000000000027__R3_CORRELATION_GUARD.manifest.json
+Use double underscore between ID and symbol. It makes parsing easier:
+<module_id>__<canonical_symbol>.manifest.json
+ 
+⸻
+ 
+16. Naming convention for contracts
+Use contract names that describe data, not actions.
+Good:
+RiskDecision
+RiskGuardResult
+BrokerOrderEnvelope
+ExecutionReport
+CalendarTrigger
+FeatureFrame
+OperatorCommand
+Bad:
+RunRisk
+DoTrade
+SendThing
+HandleSignal
+If versioning is needed:
+RiskDecision_v1
+RiskDecision_v2
+OrderIntent_v1_2
+ExecutionReport_v1
+Use versioned names only when the schema actually changes incompatibly.
+ 
+⸻
+ 
+17. Naming convention for phases and groups
+Keep phases process-oriented:
+PHASE_A_CONFIG_SCHEDULING
+PHASE_B_CALENDAR_INTAKE_TRIGGERS
+PHASE_C_MARKET_DATA_INDICATORS
+PHASE_E_SIGNAL_INTENT_RISK
+PHASE_G_ORDER_ROUTING_MT4_EXECUTION
+PHASE_OBS_UI_REPORTING
+PHASE_XCUT_SHARED_KERNEL
+Keep groups domain-oriented:
+G0_INFRASTRUCTURE_PLATFORM
+G1_DATA_INGEST
+G2_COMPUTE_FEATURE
+G3_SIGNAL_INTENT
+G4_RISK
+G5_OMS
+G6_MT4_BRIDGE
+G7_REENTRY
+G8_UI_GATEWAY
+G10_SHARED_KERNEL
+The catalog already uses domain group IDs/names, phases, layers, process steps, purposes, input contracts, output contracts, aliases, migration status, review status, and reconciliation flags per module.  
+ 
+⸻
+ 
+18. My recommended operating model
+Use this workflow:
+1. Identify issue or architecture refinement
+2. Create Module Change Request
+3. Score atomicity / impact
+4. Decide: add, split, merge, rename, retire, defer
+5. Update decomposition decisions
+6. Update flat module catalog
+7. Update crosswalk
+8. Regenerate affected manifests
+9. Run validators
+10. Update current-state index
+11. Preserve old IDs and aliases
+This gives you controlled evolution without freezing the project too early.
+ 
+⸻
+ 
+The main principle
+Do not try to prevent change. Make change traceable.
+The correct system is not:
+final module catalog forever
+It is:
+current locked catalog
++ proposed changes
++ decision log
++ crosswalk
++ generated manifests
++ validators
++ stale-status tracking
+That structure lets the architecture keep evolving while still giving AI a stable, deterministic source of truth.
