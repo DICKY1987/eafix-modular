@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/live_update.json",
+  "title": "Live Update Event",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "event": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "payload": { "type": "object" }
+  },
+  "required": ["event", "timestamp"]
+}
