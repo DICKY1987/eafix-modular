@@ -3,14 +3,14 @@
   "document_type": "module_lifecycle_governance",
   "generated_at": "2026-06-21T14:30:00Z",
   "status": "canonical",
-  "purpose": "Define governance rules for the complete lifecycle of EAFIX atomic modules — from creation through retirement. Recovered from EAFIX_auth_docs/Mod_refactor_plan.txt (deleted in commit 0f2c238).",
+  "purpose": "Define governance rules for the complete lifecycle of EAFIX atomic modules -- from creation through retirement. Recovered from EAFIX_auth_docs/Mod_refactor_plan.txt (deleted in commit 0f2c238).",
   "authority_note": "This file governs lifecycle rules only. It does not override module_catalog.json for identity data. Module identities are defined in module_catalog.json exclusively.",
   "source_evidence": [
     "EAFIX_auth_docs/Mod_refactor_plan.txt (git history: commit 13431e8)",
     "EAFIX_auth_docs/Y_module governance glossary.json",
     "EAFIX_auth_docs/eafix_unified_atomic_module_schema_v1_0_0.json"
   ],
-  "core_principle": "Treat the module system as a versioned governance system, not a one-time cleanup. The catalog is never treated as final architecture — modules will be added, split, merged, renamed, and retired. The mistake is treating any catalog pass as frozen.",
+  "core_principle": "Treat the module system as a versioned governance system, not a one-time cleanup. The catalog is never treated as final architecture -- modules will be added, split, merged, renamed, and retired. The mistake is treating any catalog pass as frozen.",
   "lifecycle_status_definitions": [
     {
       "status": "proposed",
@@ -40,7 +40,7 @@
     {
       "status": "manifest_ready",
       "meaning": "Has a valid, non-stale atomic manifest conforming to eafix_unified_atomic_module_schema_v1_0_0.json.",
-      "governance_rule": "A manifest is downstream of the catalog. Never edit a manifest to resolve architecture questions — those go through MCR first."
+      "governance_rule": "A manifest is downstream of the catalog. Never edit a manifest to resolve architecture questions -- those go through MCR first."
     },
     {
       "status": "deprecated_alias",
@@ -205,8 +205,8 @@
   "catalog_pass_governance": {
     "description": "The module catalog evolves through versioned passes. Each pass produces a locked catalog snapshot.",
     "pass_sequence": [
-      "Pass 1 — Initial canonical identification of well-supported modules",
-      "Pass 2 — EA-side systems, position sizing, CAL8 registry, event-gateway, stub services, Grafana classification"
+      "Pass 1 -- Initial canonical identification of well-supported modules",
+      "Pass 2 -- EA-side systems, position sizing, CAL8 registry, event-gateway, stub services, Grafana classification"
     ],
     "pass_flow": [
       "1. Draft MCR",
@@ -256,7 +256,7 @@
     ]
   },
   "manifest_governance": {
-    "rule": "Manifests are downstream of catalog decisions. Never hand-edit a manifest to resolve architecture arguments — those go through MCR first.",
-    "flow": "MCR accepted → decomposition decisions updated → flat module catalog updated → crosswalk updated → affected manifests regenerated or patched → validators run → stale manifests marked"
+    "rule": "Manifests are downstream of catalog decisions. Never hand-edit a manifest to resolve architecture arguments -- those go through MCR first.",
+    "flow": "MCR accepted -> decomposition decisions updated -> flat module catalog updated -> crosswalk updated -> affected manifests regenerated or patched -> validators run -> stale manifests marked"
   }
 }
