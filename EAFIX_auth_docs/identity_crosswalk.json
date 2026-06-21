@@ -1,0 +1,275 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "identity_crosswalk",
+  "generated_at": "2026-06-21T14:30:00Z",
+  "purpose": "Map historical module identities to canonical identities. Exists only for migration and reference resolution. This file is NOT an authority source \u2014 module_catalog.json is the sole identity authority.",
+  "authority_note": "The crosswalk must never become an authority source. It exists only for migration and reference resolution. Per Principle 3, module_catalog.json is the primary module identity authority.",
+  "source_files": [
+    "EAFIX_auth_docs/module_catalog.json",
+    "EA-REG/identifier_map.json",
+    "EAFIX_auth_docs/doc_authority.json"
+  ],
+  "known_alias_resolutions": [
+    {
+      "legacy_symbol": "O2_OMS",
+      "resolves_to": "O2_OMS_STATE_MACHINE",
+      "canonical_module_id": "50000000000000000019",
+      "change_type": "RENAME_SYMBOL",
+      "evidence": "identifier_map.json description, module_catalog.json legacy_aliases field",
+      "effective_pass": "PASS_1"
+    },
+    {
+      "legacy_symbol": "O3_PNL_CLASSIFIER",
+      "resolves_to": "O3_TRADE_CLOSE_CLASSIFIER",
+      "canonical_module_id": "50000000000000000020",
+      "change_type": "RENAME_SYMBOL",
+      "evidence": "identifier_map.json description, module_catalog.json legacy_aliases field",
+      "effective_pass": "PASS_1"
+    }
+  ],
+  "pending_collision_notes": [
+    {
+      "issue": "F1_PREFIX_COLLISION",
+      "affected_symbols": [
+        "F1_CONFIG_PREFERENCES",
+        "F1_FLOW_ORCHESTRATOR"
+      ],
+      "affected_ids": [
+        "50000000000000000001",
+        "50000000000000000025"
+      ],
+      "description": "Two modules share the F1 prefix. Mod_refactor_plan.txt documents F4_FLOW_ORCHESTRATOR as the intended rename target for F1_FLOW_ORCHESTRATOR via a future RENAME_SYMBOL MCR. Not yet applied.",
+      "status": "pending_mcr"
+    }
+  ],
+  "entries": [
+    {
+      "canonical_symbol": "F1_CONFIG_PREFERENCES",
+      "canonical_module_id": "50000000000000000001",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "F3_CLOCK_SCHEDULER",
+      "canonical_module_id": "50000000000000000002",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "D2_CALENDAR_SOURCE_ADAPTER",
+      "canonical_module_id": "50000000000000000003",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "D3_CALENDAR_NORMALIZER",
+      "canonical_module_id": "50000000000000000004",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "F2_EVENT_LOG",
+      "canonical_module_id": "50000000000000000005",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "D4_CALENDAR_TRIGGER_BUILDER",
+      "canonical_module_id": "50000000000000000006",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "D1_MARKET_FEED_ADAPTER",
+      "canonical_module_id": "50000000000000000007",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "C1_BAR_BUILDER",
+      "canonical_module_id": "50000000000000000008",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "C2_INDICATOR_ENGINE",
+      "canonical_module_id": "50000000000000000009",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "C3_FEATURE_PACKAGER",
+      "canonical_module_id": "50000000000000000010",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "S1_SIGNAL_ENGINE",
+      "canonical_module_id": "50000000000000000011",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "S2_INTENT_BUILDER",
+      "canonical_module_id": "50000000000000000012",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "R1_RISK_EVALUATOR",
+      "canonical_module_id": "50000000000000000013",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "R2_ORDER_INTENT_COMPILER",
+      "canonical_module_id": "50000000000000000014",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "O1_ORDER_ROUTER",
+      "canonical_module_id": "50000000000000000015",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "B1_MT4_ADAPTER_TRANSPORT",
+      "canonical_module_id": "50000000000000000016",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "B2_MT4_EA_EXECUTOR",
+      "canonical_module_id": "50000000000000000017",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "B3_EXEC_EVENT_NORMALIZER",
+      "canonical_module_id": "50000000000000000018",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "O2_OMS_STATE_MACHINE",
+      "canonical_module_id": "50000000000000000019",
+      "aliases": [
+        "O2_OMS"
+      ],
+      "legacy_symbols": [
+        "O2_OMS"
+      ],
+      "deprecated_symbols": [
+        "O2_OMS"
+      ],
+      "notes": "Prior symbol(s) ['O2_OMS'] recorded in module_catalog.json legacy_aliases. Replaced via RENAME_SYMBOL change."
+    },
+    {
+      "canonical_symbol": "O3_TRADE_CLOSE_CLASSIFIER",
+      "canonical_module_id": "50000000000000000020",
+      "aliases": [
+        "O3_PNL_CLASSIFIER"
+      ],
+      "legacy_symbols": [
+        "O3_PNL_CLASSIFIER"
+      ],
+      "deprecated_symbols": [
+        "O3_PNL_CLASSIFIER"
+      ],
+      "notes": "Prior symbol(s) ['O3_PNL_CLASSIFIER'] recorded in module_catalog.json legacy_aliases. Replaced via RENAME_SYMBOL change."
+    },
+    {
+      "canonical_symbol": "E1_OUTCOME_BUCKETIZER",
+      "canonical_module_id": "50000000000000000021",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "E2_PROXIMITY_EVALUATOR",
+      "canonical_module_id": "50000000000000000022",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "E3_MATRIX_LOOKUP",
+      "canonical_module_id": "50000000000000000023",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "E4_REENTRY_INTENT_BUILDER",
+      "canonical_module_id": "50000000000000000024",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "F1_FLOW_ORCHESTRATOR",
+      "canonical_module_id": "50000000000000000025",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": "F1 prefix collision: both F1_CONFIG_PREFERENCES (id 50000000000000000001) and F1_FLOW_ORCHESTRATOR (id 50000000000000000025) use the F1 prefix. Mod_refactor_plan.txt section 12 documents F4_FLOW_ORCHESTRATOR as the intended rename target via RENAME_SYMBOL MCR. Not yet applied in current catalog pass."
+    },
+    {
+      "canonical_symbol": "P1_HEALTH_AGGREGATOR",
+      "canonical_module_id": "50000000000000000026",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    },
+    {
+      "canonical_symbol": "SHARED_LIBS",
+      "canonical_module_id": "50000000000000000099",
+      "aliases": [],
+      "legacy_symbols": [],
+      "deprecated_symbols": [],
+      "notes": ""
+    }
+  ]
+}
