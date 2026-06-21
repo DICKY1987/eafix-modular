@@ -34,7 +34,7 @@
         "does_not_override list",
         "ai usage rules"
       ],
-      "analysis": "This file contained schema_version 1.0.0 of the glossary — the initial seed version with only 4 terms (module_id, canonical_symbol, canonical, module_change_request). It is the earliest ancestor of the current Y_module governance glossary.json (v1.1.1). The 4 seed terms are fully covered in the current glossary. This was a working draft that preceded the bulk terms merge.",
+      "analysis": "This file contained schema_version 1.0.0 of the glossary -- the initial seed version with only 4 terms (module_id, canonical_symbol, canonical, module_change_request). It is the earliest ancestor of the current Y_module governance glossary.json (v1.1.1). The 4 seed terms are fully covered in the current glossary. This was a working draft that preceded the bulk terms merge.",
       "recommended_action": "discard",
       "disposition": "All 4 seed terms preserved in EAFIX_auth_docs/Y_module governance glossary.json",
       "evidence": "schema_version 1.0.0 precedes current 1.1.1; all terms are strict subset of current canonical glossary"
@@ -72,7 +72,7 @@
         "routing instructions",
         "authority routing rules"
       ],
-      "analysis": "This file was a copy of the canonical routing instructions file. The canonical version exists at the repository root as eafix_project_knowledge_reference_routing_instructions.json. The EAFIX_auth_docs copy was a duplicate that could create competing routing authority — its deletion was correct per Principle 1 (no parallel authority systems).",
+      "analysis": "This file was a copy of the canonical routing instructions file. The canonical version exists at the repository root as eafix_project_knowledge_reference_routing_instructions.json. The EAFIX_auth_docs copy was a duplicate that could create competing routing authority -- its deletion was correct per Principle 1 (no parallel authority systems).",
       "recommended_action": "discard",
       "disposition": "Canonical version exists at repository root: eafix_project_knowledge_reference_routing_instructions.json",
       "evidence": "Repository memory: canonical routing file is eafix_project_knowledge_reference_routing_instructions.json at repository root"
@@ -83,7 +83,10 @@
       "file_name": "EAFIX_auth_docs/module governance glossary bulk terms.json",
       "status": "present_working_artifact",
       "contains_unique_information": false,
-      "information_categories": ["glossary bulk terms", "terms by category"],
+      "information_categories": [
+        "glossary bulk terms",
+        "terms by category"
+      ],
       "analysis": "72 terms across 8 categories. All terms are a strict subset of the 81 terms in Y_module governance glossary.json. This is the pre-merge working file referenced in the Schema_module_governance_glossary.txt commit history. Per the U_module governance glossary.txt commit note: 'module governance glossary bulk terms.json (pre-merge working artifact, not an authority source)'.",
       "recommended_action": "archive",
       "disposition": "Content preserved in Y_module governance glossary.json; file retained as historical working artifact"
@@ -92,7 +95,11 @@
       "file_name": "EAFIX_auth_docs/x_module governance glossary bulk terms.json",
       "status": "present_working_artifact",
       "contains_unique_information": false,
-      "information_categories": ["glossary bulk terms extended", "validator targets", "authority hierarchy"],
+      "information_categories": [
+        "glossary bulk terms extended",
+        "validator targets",
+        "authority hierarchy"
+      ],
       "analysis": "77 terms plus authority_hierarchy, conflict_resolution_policy, glossary_change_policy, and validator_targets. All 77 terms are a strict subset of the 81 terms in Y_module governance glossary.json. This appears to be an intermediate working version between the bulk terms and the final v1.1.0 glossary.",
       "recommended_action": "archive",
       "disposition": "Content preserved in Y_module governance glossary.json; file retained as historical working artifact"
@@ -101,7 +108,10 @@
       "file_name": "EAFIX_auth_docs/U_module governance glossary.txt",
       "status": "present_patch_record",
       "contains_unique_information": false,
-      "information_categories": ["git patch record", "glossary version history"],
+      "information_categories": [
+        "git patch record",
+        "glossary version history"
+      ],
       "analysis": "Contains a git-format patch file documenting the transition from bulk terms to the canonical glossary. Serves as a migration record rather than an active governance document.",
       "recommended_action": "archive",
       "disposition": "Retained as migration history record"
@@ -114,9 +124,9 @@
     "files_merged_to_new_governance_docs": 1,
     "files_archived": 3,
     "governance_gaps_identified": [
-      "No module_lifecycle_governance.json existed — rules from Mod_refactor_plan.txt were not in any registered authority file",
-      "No module_naming_governance.json existed — naming conventions from Mod_refactor_plan.txt were not in any registered authority file",
-      "No identity_crosswalk.json existed — alias history was partially captured in identifier_map.json description but not as a structured crosswalk",
+      "No module_lifecycle_governance.json existed -- rules from Mod_refactor_plan.txt were not in any registered authority file",
+      "No module_naming_governance.json existed -- naming conventions from Mod_refactor_plan.txt were not in any registered authority file",
+      "No identity_crosswalk.json existed -- alias history was partially captured in identifier_map.json description but not as a structured crosswalk",
       "doc_authority.json was missing entries for the glossary, lifecycle governance, naming governance, and identity crosswalk files"
     ]
   }

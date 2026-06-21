@@ -4,7 +4,6 @@
   "generated_at": "2026-06-21T14:30:00Z",
   "purpose": "Validate governance integrity after the governance recovery exercise. Covers identity validation, glossary validation, routing validation, and lifecycle governance validation.",
   "overall_status": "PASS_WITH_PENDING_ITEMS",
-
   "identity_validation": {
     "status": "PASS_WITH_PENDING_ITEMS",
     "checks": [
@@ -52,7 +51,7 @@
         "description": "Single identity authority source",
         "status": "PASS",
         "result": "module_catalog.json is the sole module identity authority. No parallel identity registries exist (Principle 1 satisfied). The identity_crosswalk.json is correctly classified as migration_reference authority_level 3, not an identity authority.",
-        "evidence": "updated_doc_authority.json authority_level 1 for module identity: module_catalog.json only."
+        "evidence": "doc_authority.json authority_level 1 for module identity: module_catalog.json only."
       },
       {
         "check_id": "ID-006",
@@ -64,7 +63,6 @@
       }
     ]
   },
-
   "glossary_validation": {
     "status": "PASS",
     "checks": [
@@ -93,8 +91,8 @@
         "check_id": "GLOSS-004",
         "description": "Glossary registered in doc_authority",
         "status": "PASS",
-        "result": "Y_module governance glossary.json is registered in updated_doc_authority.json as classification: canonical, authority_level: 1.",
-        "evidence": "updated_doc_authority.json entries list."
+        "result": "Y_module governance glossary.json is registered in doc_authority.json as classification: canonical, authority_level: 1.",
+        "evidence": "doc_authority.json entries list."
       },
       {
         "check_id": "GLOSS-005",
@@ -106,7 +104,6 @@
       }
     ]
   },
-
   "routing_validation": {
     "status": "PASS",
     "checks": [
@@ -128,12 +125,11 @@
         "check_id": "ROUTE-003",
         "description": "Routing file registered in doc_authority",
         "status": "PASS",
-        "result": "eafix_project_knowledge_reference_routing_instructions.json is registered in updated_doc_authority.json as classification: canonical, authority_level: 1.",
-        "evidence": "updated_doc_authority.json entries list."
+        "result": "eafix_project_knowledge_reference_routing_instructions.json is registered in doc_authority.json as classification: canonical, authority_level: 1.",
+        "evidence": "doc_authority.json entries list."
       }
     ]
   },
-
   "governance_files_validation": {
     "status": "PASS",
     "checks": [
@@ -155,8 +151,8 @@
         "check_id": "GOV-003",
         "description": "All governance files registered in doc_authority",
         "status": "PASS",
-        "result": "All 8 new governance files are registered in updated_doc_authority.json: routing instructions, canonical glossary, lifecycle governance, naming governance, identity crosswalk, recovery inventory, glossary reconciliation report, and this validation report.",
-        "evidence": "updated_doc_authority.json: 24 total entries (16 original + 8 new)."
+        "result": "All 8 new governance files are registered in doc_authority.json: routing instructions, canonical glossary, lifecycle governance, naming governance, identity crosswalk, recovery inventory, glossary reconciliation report, and this validation report.",
+        "evidence": "doc_authority.json: 24 total entries (16 original + 8 new)."
       },
       {
         "check_id": "GOV-004",
@@ -174,7 +170,6 @@
       }
     ]
   },
-
   "success_criteria_evaluation": {
     "criteria": [
       {
@@ -215,7 +210,7 @@
       {
         "criterion": "All governance files are registered",
         "status": "MET",
-        "evidence": "updated_doc_authority.json: 24 entries including all new governance files."
+        "evidence": "doc_authority.json: 24 entries including all new governance files."
       },
       {
         "criterion": "Validation report shows no unresolved identity conflicts",
@@ -224,7 +219,6 @@
       }
     ]
   },
-
   "pending_items": [
     {
       "item_id": "PENDING-001",

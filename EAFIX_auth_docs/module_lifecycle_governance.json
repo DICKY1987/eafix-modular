@@ -10,9 +10,7 @@
     "EAFIX_auth_docs/Y_module governance glossary.json",
     "EAFIX_auth_docs/eafix_unified_atomic_module_schema_v1_0_0.json"
   ],
-
   "core_principle": "Treat the module system as a versioned governance system, not a one-time cleanup. The catalog is never treated as final architecture — modules will be added, split, merged, renamed, and retired. The mistake is treating any catalog pass as frozen.",
-
   "lifecycle_status_definitions": [
     {
       "status": "proposed",
@@ -60,7 +58,6 @@
       "governance_rule": "Superseded modules keep their entry and record superseded_by pointing to the successor numeric IDs."
     }
   ],
-
   "id_permanence_rules": {
     "rule": "Numeric module IDs are permanent and are never reused, even after retirement.",
     "details": [
@@ -76,11 +73,14 @@
       "module_id": "50000000000000000013",
       "canonical_symbol": "R1_RISK_EVALUATOR",
       "identity_status": "retired",
-      "superseded_by": ["50000000000000000035"],
-      "legacy_aliases": ["R1_RISK_EVALUATOR"]
+      "superseded_by": [
+        "50000000000000000035"
+      ],
+      "legacy_aliases": [
+        "R1_RISK_EVALUATOR"
+      ]
     }
   },
-
   "change_request_system": {
     "description": "All architecture modifications must enter through a formal Module Change Request (MCR) before any catalog, crosswalk, manifest, or contract changes are made.",
     "mcr_id_format": "MCR-YYYY-NNNN",
@@ -104,9 +104,14 @@
       "decision",
       "decision_notes"
     ],
-    "mcr_status_values": ["proposed", "under_review", "accepted", "rejected", "deferred"]
+    "mcr_status_values": [
+      "proposed",
+      "under_review",
+      "accepted",
+      "rejected",
+      "deferred"
+    ]
   },
-
   "change_type_enum": [
     {
       "value": "ADD_MODULE",
@@ -177,7 +182,6 @@
       "meaning": "Mark a glossary term as obsolete (glossary MCR)."
     }
   ],
-
   "three_layer_architecture": {
     "description": "Module records are maintained in three distinct layers to prevent casual edits to the module list.",
     "layers": [
@@ -198,7 +202,6 @@
       }
     ]
   },
-
   "catalog_pass_governance": {
     "description": "The module catalog evolves through versioned passes. Each pass produces a locked catalog snapshot.",
     "pass_sequence": [
@@ -219,7 +222,6 @@
     ],
     "single_current_catalog": "Only one file is marked as the current catalog at any time, referenced by module_system_index.json. This avoids 'which version should AI use?' problems."
   },
-
   "reconciliation_flag_governance": {
     "description": "Reconciliation flags are treated as migration work queues, not merely defects.",
     "queues": [
@@ -253,7 +255,6 @@
       }
     ]
   },
-
   "manifest_governance": {
     "rule": "Manifests are downstream of catalog decisions. Never hand-edit a manifest to resolve architecture arguments — those go through MCR first.",
     "flow": "MCR accepted → decomposition decisions updated → flat module catalog updated → crosswalk updated → affected manifests regenerated or patched → validators run → stale manifests marked"

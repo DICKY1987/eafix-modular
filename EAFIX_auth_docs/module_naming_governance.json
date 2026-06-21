@@ -10,7 +10,6 @@
     "EAFIX_auth_docs/Y_module governance glossary.json",
     "EAFIX_auth_docs/module_catalog.json (current active symbols as examples)"
   ],
-
   "module_symbol_pattern": {
     "pattern": "<DOMAIN_PREFIX><ORDINAL>_<CAPABILITY_NAME>",
     "description": "All canonical module symbols follow this structure.",
@@ -26,67 +25,109 @@
       "B1_MT4_ADAPTER_TRANSPORT"
     ]
   },
-
   "domain_prefix_table": [
     {
       "prefix": "F",
       "domain": "Foundation / infrastructure / orchestration",
-      "examples": ["F1_CONFIG_PREFERENCES", "F2_EVENT_LOG", "F3_CLOCK_SCHEDULER"]
+      "examples": [
+        "F1_CONFIG_PREFERENCES",
+        "F2_EVENT_LOG",
+        "F3_CLOCK_SCHEDULER"
+      ]
     },
     {
       "prefix": "D",
       "domain": "Data ingest / external data normalization",
-      "examples": ["D1_MARKET_FEED_ADAPTER", "D2_CALENDAR_SOURCE_ADAPTER", "D3_CALENDAR_NORMALIZER", "D4_CALENDAR_TRIGGER_BUILDER"]
+      "examples": [
+        "D1_MARKET_FEED_ADAPTER",
+        "D2_CALENDAR_SOURCE_ADAPTER",
+        "D3_CALENDAR_NORMALIZER",
+        "D4_CALENDAR_TRIGGER_BUILDER"
+      ]
     },
     {
       "prefix": "C",
       "domain": "Compute / bars / indicators / feature packaging",
-      "examples": ["C1_BAR_BUILDER", "C2_INDICATOR_ENGINE", "C3_FEATURE_PACKAGER"]
+      "examples": [
+        "C1_BAR_BUILDER",
+        "C2_INDICATOR_ENGINE",
+        "C3_FEATURE_PACKAGER"
+      ]
     },
     {
       "prefix": "S",
       "domain": "Signal and intent",
-      "examples": ["S1_SIGNAL_ENGINE", "S2_INTENT_BUILDER"]
+      "examples": [
+        "S1_SIGNAL_ENGINE",
+        "S2_INTENT_BUILDER"
+      ]
     },
     {
       "prefix": "R",
       "domain": "Risk and order-intent compilation",
-      "examples": ["R1_RISK_EVALUATOR", "R2_ORDER_INTENT_COMPILER"]
+      "examples": [
+        "R1_RISK_EVALUATOR",
+        "R2_ORDER_INTENT_COMPILER"
+      ]
     },
     {
       "prefix": "O",
       "domain": "Order management / OMS state",
-      "examples": ["O1_ORDER_ROUTER", "O2_OMS_STATE_MACHINE", "O3_TRADE_CLOSE_CLASSIFIER"]
+      "examples": [
+        "O1_ORDER_ROUTER",
+        "O2_OMS_STATE_MACHINE",
+        "O3_TRADE_CLOSE_CLASSIFIER"
+      ]
     },
     {
       "prefix": "B",
       "domain": "Broker / MT4 bridge",
-      "examples": ["B1_MT4_ADAPTER_TRANSPORT", "B2_MT4_EA_EXECUTOR", "B3_EXEC_EVENT_NORMALIZER"]
+      "examples": [
+        "B1_MT4_ADAPTER_TRANSPORT",
+        "B2_MT4_EA_EXECUTOR",
+        "B3_EXEC_EVENT_NORMALIZER"
+      ]
     },
     {
       "prefix": "E",
       "domain": "Reentry engine",
-      "examples": ["E1_OUTCOME_BUCKETIZER", "E2_PROXIMITY_EVALUATOR", "E3_MATRIX_LOOKUP", "E4_REENTRY_INTENT_BUILDER"]
+      "examples": [
+        "E1_OUTCOME_BUCKETIZER",
+        "E2_PROXIMITY_EVALUATOR",
+        "E3_MATRIX_LOOKUP",
+        "E4_REENTRY_INTENT_BUILDER"
+      ]
     },
     {
       "prefix": "P",
       "domain": "Platform observability / health / reporting",
-      "examples": ["P1_HEALTH_AGGREGATOR"]
+      "examples": [
+        "P1_HEALTH_AGGREGATOR"
+      ]
     },
     {
       "prefix": "U",
       "domain": "UI / gateway / operator-facing surfaces",
-      "examples": ["U1_DASHBOARD_BACKEND", "U2_GUI_GATEWAY"]
+      "examples": [
+        "U1_DASHBOARD_BACKEND",
+        "U2_GUI_GATEWAY"
+      ]
     },
     {
       "prefix": "SK",
       "domain": "Shared kernel",
-      "examples": ["SK2_IDEMPOTENCY", "SHARED_LIBS"]
+      "examples": [
+        "SK2_IDEMPOTENCY",
+        "SHARED_LIBS"
+      ]
     },
     {
       "prefix": "EA",
       "domain": "EA-side MQL4 internal modules (Pass 2 only, pending MT4/Python boundary resolution)",
-      "examples": ["EA1_BRIDGE_RECEIVER", "EA2_REENTRY_GATE"],
+      "examples": [
+        "EA1_BRIDGE_RECEIVER",
+        "EA2_REENTRY_GATE"
+      ],
       "governance_rule": "Do not create EA-prefix modules until the MT4/Python authority boundary is resolved."
     },
     {
@@ -96,7 +137,6 @@
       "governance_rule": "Reserved. Not yet in use."
     }
   ],
-
   "ordinal_rules": {
     "description": "The ordinal number is stable within a prefix domain. It does not encode process order.",
     "rules": [
@@ -132,7 +172,6 @@
       "R4_POSITION_SIZER (possible future split from R1)"
     ]
   },
-
   "capability_name_rules": {
     "description": "The CAPABILITY_NAME part of the symbol must be a noun phrase describing what the module produces or owns, not what it does.",
     "good_examples": [
@@ -156,7 +195,6 @@
       "All characters uppercase."
     ]
   },
-
   "file_naming_conventions": {
     "catalogs": {
       "pattern": "atomic_module_catalog.pass_{NNN}.json",
@@ -199,7 +237,6 @@
       ]
     }
   },
-
   "contract_naming_rules": {
     "description": "Contract names describe the data structure being passed, not the action being performed.",
     "good_examples": [
@@ -225,7 +262,6 @@
       "ExecutionReport_v1"
     ]
   },
-
   "numeric_id_rules": {
     "description": "Numeric module IDs are opaque permanent handles. They must not encode semantic meaning.",
     "rules": [
@@ -239,7 +275,6 @@
       "bad": "Making the ID encode that a module is in layer 3 or phase R"
     }
   },
-
   "collision_avoidance_rules": {
     "description": "Two modules must never share a prefix+ordinal combination.",
     "known_collision": {
