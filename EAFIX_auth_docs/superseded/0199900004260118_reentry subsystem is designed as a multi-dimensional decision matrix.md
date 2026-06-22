@@ -1,3 +1,10 @@
+---
+status: superseded
+superseded_by: EAFIX_auth_docs/0110000073260118_06_reentry_subsystem.md
+reason: Legacy brainstorm transcript superseded by the concise re-entry subsystem specification.
+active_authority: false
+---
+
 reentry subsystem is designed as a multi-dimensional decision matrix.md
 44.16 KB •1,016 lines
 Formatting may be inconsistent from source

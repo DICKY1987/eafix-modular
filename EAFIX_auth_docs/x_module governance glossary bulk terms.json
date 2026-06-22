@@ -15,7 +15,9 @@
     ],
     "display_name_policy": "Included on ambiguous or multi-word terms only",
     "applies_to_artifacts_policy": "Included where artifact scope is non-obvious",
-    "example_policy": "Included on terms where correct/incorrect confusion is documented or likely"
+    "example_policy": "Included on terms where correct/incorrect confusion is documented or likely",
+    "status": "supporting_reference",
+    "authority_note": "Active supporting bulk glossary terms source; supersedes module governance glossary bulk terms.json."
   },
   "terms_by_category": {
     "module_identity": [
@@ -43,7 +45,7 @@
         "term": "atomic_module",
         "display_name": "Atomic Module",
         "category": "module_identity",
-        "definition": "A module that is fully decomposed \u2014 it cannot be split further without breaking its single-responsibility boundary. All modules in the canonical catalog are atomic.",
+        "definition": "A module that is fully decomposed — it cannot be split further without breaking its single-responsibility boundary. All modules in the canonical catalog are atomic.",
         "must_not_mean": [
           "small module",
           "simple module",
@@ -51,7 +53,7 @@
         ],
         "governance_rule": "Atomicity is a decomposition decision recorded in atomic_module_decomposition_decisions.json, not inferred from file count or line count.",
         "example": {
-          "correct": "R1_RISK_EVALUATOR is atomic because its responsibility \u2014 evaluating a composite risk decision \u2014 cannot be split without creating a contract across two independently deployable units.",
+          "correct": "R1_RISK_EVALUATOR is atomic because its responsibility — evaluating a composite risk decision — cannot be split without creating a contract across two independently deployable units.",
           "incorrect": "A module is atomic because it has only one source file."
         }
       },
@@ -666,7 +668,7 @@
         ],
         "governance_rule": "RENAME_SYMBOL requires an accepted MCR. The old symbol must be recorded as a legacy_alias in the catalog and a crosswalk entry must be produced.",
         "example": {
-          "correct": "F1_FLOW_ORCHESTRATOR \u2192 F4_FLOW_ORCHESTRATOR is a RENAME_SYMBOL. The numeric ID 50000000000000000025 is unchanged.",
+          "correct": "F1_FLOW_ORCHESTRATOR → F4_FLOW_ORCHESTRATOR is a RENAME_SYMBOL. The numeric ID 50000000000000000025 is unchanged.",
           "incorrect": "Editing the canonical_symbol field in the catalog directly without an MCR."
         },
         "related_terms": [
@@ -694,7 +696,7 @@
         "term": "promote_work_cell",
         "display_name": "Promote Work Cell",
         "category": "migration",
-        "definition": "A change_type value (PROMOTE_WORK_CELL) elevating a former work cell \u2014 a bounded sub-unit within a module \u2014 to full module status, assigning it a new numeric ID and canonical symbol.",
+        "definition": "A change_type value (PROMOTE_WORK_CELL) elevating a former work cell — a bounded sub-unit within a module — to full module status, assigning it a new numeric ID and canonical symbol.",
         "must_not_mean": [
           "creating a completely new module with no prior existence"
         ],
@@ -867,7 +869,7 @@
           "manifest_patch",
           "manifest_regeneration"
         ],
-        "governance_rule": "Manifest generation must occur after: MCR accepted \u2192 catalog updated \u2192 crosswalk updated. It must not precede those steps.",
+        "governance_rule": "Manifest generation must occur after: MCR accepted → catalog updated → crosswalk updated. It must not precede those steps.",
         "related_terms": [
           "manifest_patch",
           "manifest_regeneration",
@@ -1177,7 +1179,7 @@
         "term": "breaking_contract_change",
         "display_name": "Breaking Contract Change",
         "category": "contract",
-        "definition": "A contract schema modification that is incompatible with prior consumers \u2014 e.g., removing a required field, changing a field type, or renaming the contract. Requires a CHANGE_CONTRACT MCR and contract version increment.",
+        "definition": "A contract schema modification that is incompatible with prior consumers — e.g., removing a required field, changing a field type, or renaming the contract. Requires a CHANGE_CONTRACT MCR and contract version increment.",
         "must_not_mean": [
           "any contract change",
           "adding an optional field"
@@ -1390,7 +1392,7 @@
     },
     {
       "relationship": "manifest_to_catalog",
-      "rule": "Manifests are downstream of the catalog. The catalog is never updated based on manifest content. Information flows catalog \u2192 manifest, not manifest \u2192 catalog."
+      "rule": "Manifests are downstream of the catalog. The catalog is never updated based on manifest content. Information flows catalog → manifest, not manifest → catalog."
     },
     {
       "relationship": "reconciliation_flag_to_identity_status",
