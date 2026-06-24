@@ -1,0 +1,361 @@
+taskspec_version: '1.0'
+name: Phase_Plan.integrated — Executable Agent Brief
+source_doc: Phase_Plan.integrated.md
+global_policies:
+  single_writer_ai: true
+  path_allowlist:
+  - src/
+  - app/
+  - tests/
+  - contracts/
+  - deploy/
+  - docs/
+  coverage_min: 0.85
+  denylist_patterns:
+  - eval(
+  - os.system(
+  - DROP TABLE
+  - shell=True in untrusted context
+  commit_message_convention: conventional_commits
+  pr_requirements:
+  - lint
+  - typecheck
+  - unit
+  - contract-tests
+  - compliance-gates
+phases:
+- id: phase0
+  title: Project Baseline & Branch Protection
+  goals:
+  - Lock in a safe baseline and guardrails
+  acceptance:
+  - Default branch protected; PRs required
+  - '`task up` or `make up` starts compose stack'
+  actions:
+  - type: git
+    cmd: git checkout -b rel/v0.1.0-hardening
+  - type: github
+    op: protect_default_branch
+    rules:
+    - require_pr
+    - linear_history
+    - status_checks
+  - type: files
+    write:
+    - path: Taskfile.yml
+      template: taskfile_minimal
+    - path: Makefile
+      template: makefile_minimal
+- id: phase1
+  title: Repo Hygiene & Legal
+  goals:
+  - Formalize licensing, contribution, ownership, and support paths
+  acceptance:
+  - LICENSE recognized by GitHub
+  - Issue templates active
+  - CODEOWNERS routes PRs
+  actions:
+  - type: files
+    write:
+    - path: LICENSE
+      template: mit_license
+    - path: .github/CODEOWNERS
+      template: codeowners_min
+    - path: .github/SECURITY.md
+      template: security_min
+    - path: .github/ISSUE_TEMPLATE/bug_report.md
+      template: issue_bug
+    - path: .github/ISSUE_TEMPLATE/feature_request.md
+      template: issue_feature
+    - path: docs/README.md
+      template: docs_readme
+- id: phase2
+  title: Canonical Contracts & Codegen
+  goals:
+  - JSON Schemas as single source of truth for all cross-system contracts
+  - Prevent Python↔MQL4 drift
+  acceptance:
+  - Schema change fails tests until models regenerated
+  - Python & MQL4 round-trip tests pass
+  actions:
+  - type: mkdirs
+    paths:
+    - contracts/events/
+    - P_tests/contracts/
+    - P_mql4/helpers/
+  - type: files
+    write:
+    - path: contracts/events/PriceTick@1.0.json
+      template: schema_price_tick
+    - path: contracts/events/IndicatorVector@1.1.json
+      template: schema_indicator_vector
+    - path: contracts/events/Signal@1.0.json
+      template: schema_signal
+    - path: contracts/events/OrderIntent@1.2.json
+      template: schema_order_intent
+    - path: contracts/events/ExecutionReport@1.0.json
+      template: schema_execution_report
+    - path: contracts/events/CalendarEvent@1.0.json
+      template: schema_calendar_event
+    - path: contracts/events/ReentryDecision@1.0.json
+      template: schema_reentry_decision
+  - type: codegen
+    tool: pydantic_v2
+    from: contracts/events/*.json
+    to: src/**/models/
+  - type: files
+    write:
+    - path: P_mql4/helpers/contract_parsers.mq4
+      template: mql4_contract_parsers
+  - type: tests
+    suite: roundtrip
+    paths:
+    - P_tests/contracts/
+- id: phase2a
+  title: P_ Folder Content Integration
+  goals:
+  - Integrate P_* content and remove duplication
+  acceptance:
+  - No dangling imports; CI passes on migration PR
+  actions:
+  - type: audit
+    paths:
+    - P_*
+  - type: migrate
+    map:
+    - from: P_INDICATOR_REENTRY
+      to: shared/reentry/
+    - from: P_positioning_ratio_index
+      to: src/eafix/positioning/
+    - from: P_GUI
+      to: gui-gateway/
+  - type: update_imports
+    strategy: project_wide_replace
+  - type: tests
+    suite: smoke
+    paths:
+    - shared/reentry/
+    - src/eafix/positioning/
+- id: phase3
+  title: CI/CD Foundations
+  goals:
+  - CI as source of truth for gates and artifacts
+  acceptance:
+  - PRs blocked on lint/type/tests
+  - Tag builds signed & SBOMed
+  actions:
+  - type: files
+    write:
+    - path: .pre-commit-config.yaml
+      template: precommit_full
+    - path: .github/workflows/ci.yml
+      template: ci_matrix
+    - path: .github/workflows/build-publish.yml
+      template: build_publish_sbom_cosign
+    - path: .github/workflows/release.yml
+      template: release_notes
+  - type: branch_protection
+    require_checks:
+    - lint
+    - typecheck
+    - unit
+    - contract
+- id: phase4
+  title: Security Baseline
+  goals:
+  - Reduce supply-chain & secret risks
+  acceptance:
+  - Non-root containers; digest pins; CodeQL enabled
+  actions:
+  - type: actions_enable
+    features:
+    - codeql
+    - dependabot
+    - secret_scanning
+    - scorecards
+  - type: docker_hardening
+    policy:
+      user: nonroot
+      readonly_fs: true
+      drop_caps: true
+  - type: compose_pin_digests
+    policy:
+      forbid_latest: true
+- id: phase5
+  title: Observability & SLOs
+  goals:
+  - Make SLOs executable per service
+  acceptance:
+  - /metrics exposes KPIs; dashboards render; test alert fires
+  actions:
+  - type: libs
+    write:
+    - logging_json
+    - metrics_prometheus
+    - otel_tracing_http
+  - type: dashboards
+    stack: grafana
+    panels:
+    - latency_p50_p95
+    - err_rate
+    - req_sec
+    - fills
+    - slippage
+    - reentries
+- id: phase5a
+  title: Compliance Monitoring, Auto-Remediation & Recovery
+  goals:
+  - Live compliance posture + PR gating
+  - Emergency recovery runbooks
+  acceptance:
+  - Violation triggers alert & CI failure
+  - Rollback tabletop passes
+  actions:
+  - type: service
+    name: compliance-svc
+    rules_out: policy/compliance_rules.json
+  - type: ci_gate
+    rules_in: policy/compliance_rules.json
+  - type: runbook
+    path: docs/runbooks/emergency_recovery.md
+- id: phase6
+  title: Release v0.1.0
+  goals:
+  - First rollback-able, signed, SBOMed release
+  acceptance:
+  - GitHub Release with digests + SBOMs + signatures
+  actions:
+  - type: version_bump
+    semver: minor
+  - type: tag
+    pattern: v0.1.0
+  - type: release_notes
+    attach:
+    - SBOMs
+    - image_digests
+- id: phase7
+  title: Kubernetes/Helm Production Path
+  goals:
+  - Codify prod deployment artifacts
+  acceptance:
+  - helm lint/template pass; dry-run OK
+  actions:
+  - type: helm_scaffold
+    paths:
+    - deploy/k8s/helm/
+  - type: netpol
+    policy: allowlist_between_services
+  - type: ext_secrets
+    provider: ESO or Vault
+- id: phase7a
+  title: Legacy Bridge & Cross-Language Standards
+  goals:
+  - Production-grade bridge Python↔MQL4↔PowerShell; unify SQL standards
+  acceptance:
+  - Round-trip tests (Py↔MQL4) pass; PS module smoke tests pass
+  actions:
+  - type: bridge_contracts
+    align_with: contracts/events
+  - type: files
+    write:
+    - path: P_mql4/helpers/reentry_key_build_parse.mq4
+      template: mql4_reentry_helpers
+  - type: ps_module
+    name: TradingOps
+    ops:
+    - Get-Health
+    - Invoke-Action
+  - type: sql_standards
+    db: PostgreSQL
+    migrations: guidelines_from_sqlite
+- id: phase8
+  title: Idempotency & Exactly-Once Semantics
+  goals:
+  - Stop duplicate orders; handle network flaps safely
+  acceptance:
+  - Replay shows no duplicate orders; chaos tests recover cleanly
+  actions:
+  - type: persistence
+    keys:
+    - account
+    - symbol
+    - strategy
+    - nonce
+  - type: consumers
+    idempotent: true
+  - type: queues
+    bounded: true
+    cb_backoff: true
+- id: phase9
+  title: Contract & Scenario Testing
+  goals:
+  - Harden correctness of calendar/re-entry/indicator pipelines
+  acceptance:
+  - Scenario packs pass deterministically; invariants hold
+  actions:
+  - type: tests
+    suite: scenarios
+    fixtures: P_tests/fixtures/
+  - type: tests
+    suite: property
+    lib: hypothesis
+- id: phase10
+  title: Runbooks & On-Call
+  goals:
+  - Repeatable ops with low cognitive load
+  acceptance:
+  - On-call resolves 3 simulated incidents using docs
+  actions:
+  - type: runbooks
+    paths:
+    - docs/runbooks/<service>.md
+  - type: issue_templates
+    paths:
+    - .github/ISSUE_TEMPLATE/incident.md
+    - .github/ISSUE_TEMPLATE/postmortem.md
+  - type: link
+    from: docs/runbooks/emergency_recovery.md
+    to: release_notes
+- id: phase11
+  title: Developer Experience
+  goals:
+  - Reduce friction; standardize flows
+  acceptance:
+  - New contributor can run the stack and PR in <30 minutes
+  actions:
+  - type: devcontainer
+    python:
+    - '3.11'
+    - '3.12'
+    poetry: true
+    precommit: true
+  - type: task_targets
+    extend:
+    - up
+    - test
+    - lint
+    - build
+    - sbom
+    - release:dry
+  - type: pr_automation
+    features:
+    - autolabeler
+    - pr_title_lint
+    - conventional_commits
+- id: phase12
+  title: Governance & Roadmap
+  goals:
+  - Keep improvements sustainable
+  acceptance:
+  - Roadmap + board populated for next 2 sprints
+  actions:
+  - type: docs
+    path: docs/roadmap.md
+  - type: codeowners
+    require_reviewers: true
+  - type: project_board
+    lanes:
+    - security
+    - observability
+    - contracts
+    - releases
