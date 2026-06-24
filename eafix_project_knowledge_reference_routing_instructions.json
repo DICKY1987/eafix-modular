@@ -20,7 +20,12 @@
     "coding_task_extension": "For any code-writing, code-review, debugging, refactoring, or file-location task, also reference DOC_FILE_MODULE_MAPPING and DOC_SERVICES_AI_REFERENCE unless the task is explicitly outside the repository.",
     "mt4_extension": "For any MT4, MQL4, EA, broker, OrderSend, WebRequest, DDE, DLL, Strategy Tester, native data, terminal UI, or platform capability task, always reference DOC_MT4_AUTHORITATIVE_REF first.",
     "calendar_extension": "For any economic calendar, CAL8, CAL5, RCI, ForexFactory, anticipation, proximity, event state, debounce, calendar CSV, file_seq, or checksum task, always reference DOC_CAL_DES_RULES before implementation references.",
-    "ui_extension": "For any operator-facing dashboard, GUI, screen, panel, control, REST API, WebSocket, safety state, admin-gated action, or UI-visible field task, always reference DOC_UI_CATALOG."
+    "ui_extension": "For any operator-facing dashboard, GUI, screen, panel, control, REST API, WebSocket, safety state, admin-gated action, or UI-visible field task, always reference DOC_UI_CATALOG.",
+    "default_excluded_paths": [
+      "EAFIX_auth_docs/90_cleanup_tasks_pr_notes_and_working_artifacts",
+      "EAFIX_auth_docs/99_archive_superseded_do_not_route"
+    ],
+    "default_excluded_paths_override": "Only include excluded paths when the user explicitly requests cleanup history or archived/superseded material."
   },
   "global_conflict_resolution": [
     {
@@ -66,7 +71,7 @@
   ],
   "reference_documents": {
     "DOC_MODULE_CATALOG": {
-      "path": "module_catalog.json",
+      "path": "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
       "format": "json",
       "document_type": "module_catalog",
       "authority_level": "canonical",
@@ -128,7 +133,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_PROCESS_STEP_CATALOG": {
-      "path": "process_step_catalog.json",
+      "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
       "format": "json",
       "document_type": "process_step_catalog",
       "authority_level": "canonical",
@@ -210,7 +215,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_ALIGNED_PROCESS": {
-      "path": "updated_trading_process_aligned.json",
+      "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
       "format": "json",
       "document_type": "aligned_process_contract",
       "authority_level": "canonical",
@@ -270,7 +275,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_MODULE_MAP": {
-      "path": "EAFIX-Modular — End-to-End Module Map.txt",
+      "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/EAFIX-Modular — End-to-End Module Map.txt",
       "format": "text",
       "document_type": "human_readable_module_map",
       "authority_level": "reference",
@@ -338,7 +343,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_FILE_MODULE_MAPPING": {
-      "path": "file_module_mapping.csv",
+      "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv",
       "format": "csv",
       "document_type": "file_to_module_mapping",
       "authority_level": "reference",
@@ -392,7 +397,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_SERVICES_AI_REFERENCE": {
-      "path": "eafix_services_ai_reference_20260510.json",
+      "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_services_ai_reference_20260510.json",
       "format": "json",
       "document_type": "ai_session_reference",
       "authority_level": "reference",
@@ -446,7 +451,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_CAPABILITY_REGISTRY": {
-      "path": "converted_capability_registry.json",
+      "path": "EAFIX_auth_docs/01_canonical_registries/converted_capability_registry.json",
       "format": "json",
       "document_type": "capability_registry",
       "authority_level": "reference",
@@ -501,7 +506,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_COMM_CHANNELS": {
-      "path": "communication_channels.json",
+      "path": "EAFIX_auth_docs/01_canonical_registries/communication_channels.json",
       "format": "json",
       "document_type": "communication_channels",
       "authority_level": "canonical",
@@ -574,7 +579,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_MT4_PY_CHANNELS_TXT": {
-      "path": "MT4_Python communication channels.txt",
+      "path": "EAFIX_auth_docs/04_mt4_bridge_and_execution/MT4_Python communication channels.txt",
       "format": "text",
       "document_type": "communication_channel_analysis",
       "authority_level": "reference",
@@ -625,7 +630,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_MT4_AUTHORITATIVE_REF": {
-      "path": "mt4 authoritative reference for ai.json",
+      "path": "EAFIX_auth_docs/01_canonical_registries/mt4 authoritative reference for ai.json",
       "format": "json",
       "document_type": "authoritative_platform_reference",
       "authority_level": "active_governance_baseline",
@@ -706,7 +711,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_EA_EXECUTION_ENGINE_SAMPLE": {
-      "path": "HUEY_P_EA_ExecutionEngine_8.mql4",
+      "path": "EAFIX_auth_docs/04_mt4_bridge_and_execution/HUEY_P_EA_ExecutionEngine_8.mql4",
       "format": "mql4",
       "document_type": "implementation_sample",
       "authority_level": "low_reference",
@@ -757,7 +762,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_UI_CATALOG": {
-      "path": "ui_catalog.json",
+      "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
       "format": "json",
       "document_type": "canonical_ui_catalog",
       "authority_level": "canonical",
@@ -840,7 +845,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_ATOMIC_LIFECYCLE_MD": {
-      "path": "EAFIX_ATONIC_ End-to-End Trading Lifecycle Process.md",
+      "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/EAFIX_ATONIC_ End-to-End Trading Lifecycle Process.md",
       "format": "markdown",
       "document_type": "atomic_lifecycle_blueprint",
       "authority_level": "reference",
@@ -906,7 +911,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_CAL_DES_RULES": {
-      "path": "EAFIX CALENDAR DES RULES.pdf",
+      "path": "EAFIX_auth_docs/05_calendar_system/EAFIX CALENDAR DES RULES.pdf",
       "extracted_text_path": "pdf_text/EAFIX CALENDAR DES RULES.txt",
       "format": "pdf",
       "document_type": "deterministic_execution_rules",
@@ -973,7 +978,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_ECON_CAL_TECH_ANALYSIS": {
-      "path": "Economic Calendar Subsystem - Technical Analysis & Documentation.pdf",
+      "path": "EAFIX_auth_docs/05_calendar_system/Economic Calendar Subsystem - Technical Analysis & Documentation.pdf",
       "extracted_text_path": "pdf_text/Economic Calendar Subsystem - Technical Analysis & Documentation.txt",
       "format": "pdf",
       "document_type": "technical_analysis_and_documentation",
@@ -1033,7 +1038,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_ECON_CAL_ENHANCEMENT_PLAN": {
-      "path": "Economic Calendar Enhancement Plan - Auto-Download & Critical Gap Fixes.pdf",
+      "path": "EAFIX_auth_docs/05_calendar_system/Economic Calendar Enhancement Plan - Auto-Download & Critical Gap Fixes.pdf",
       "extracted_text_path": "pdf_text/Economic Calendar Enhancement Plan - Auto-Download & Critical Gap Fixes.txt",
       "format": "pdf",
       "document_type": "implementation_plan",
@@ -1095,7 +1100,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_CAL_CONFIG_DEPLOYMENT": {
-      "path": "Enhanced Calendar System - Configuration & Deployment.pdf",
+      "path": "EAFIX_auth_docs/05_calendar_system/Enhanced Calendar System - Configuration & Deployment.pdf",
       "extracted_text_path": "pdf_text/Enhanced Calendar System - Configuration & Deployment.txt",
       "format": "pdf",
       "document_type": "configuration_and_deployment_reference",
@@ -1160,7 +1165,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_ENHANCED_CAL_IMPL": {
-      "path": "Enhanced Economic Calendar System - Complete Implementation.pdf",
+      "path": "EAFIX_auth_docs/05_calendar_system/Enhanced Economic Calendar System - Complete Implementation.pdf",
       "extracted_text_path": "pdf_text/Enhanced Economic Calendar System - Complete Implementation.txt",
       "format": "pdf",
       "document_type": "complete_implementation_reference",
@@ -1217,7 +1222,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_DEPENDENCY_LAYERS": {
-      "path": "dependency layers.pdf",
+      "path": "EAFIX_auth_docs/05_calendar_system/dependency layers.pdf",
       "extracted_text_path": "pdf_text/dependency layers.txt",
       "format": "pdf/svg_text",
       "document_type": "dependency_layer_diagram",
