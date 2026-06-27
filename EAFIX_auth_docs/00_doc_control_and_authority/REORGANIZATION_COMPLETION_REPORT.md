@@ -206,7 +206,7 @@ Post-fix readiness rerun completed on **2026-06-27** after syncing this PR branc
 | Stale-path scans rerun after latest fix | ✅ Yes | No invalid flat-path routing drift found; missing-file router entries remain nulled with `stale_path_was` preserved. |
 | JSON parse validation | ✅ Pass | All required JSON files parsed successfully. |
 | Schema validation (`ci/2099900010260118_validate_schemas.py`) | ✅ Pass | `11/11` schemas validated successfully. |
-| GitHub Actions for latest head commit | ⚠️ Not found | No workflow runs were found for the latest checked head commit. |
+| GitHub Actions for latest head commit | ✅ Found | Workflow runs were found for the latest head commit (`82cce8ae314aece0798b18ffbdc4511292b1ca49`); runs completed with failing conclusions in this environment. |
 | Poetry checks (`pytest`, `flake8`, `mypy`) | ⚠️ Not available | `poetry unavailable in runner: poetry: command not found`. |
 
 No runtime/trading code was modified. This PR remains non-destructive documentation/routing work only.
