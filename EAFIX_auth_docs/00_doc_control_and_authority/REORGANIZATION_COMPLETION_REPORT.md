@@ -1,7 +1,7 @@
 # EAFIX_auth_docs Reorganization — Completion Report
 
-**Branch:** `copilot/create-subfolder-structure-eafix-auth-docs`
-**Completed:** 2026-06-26
+**Branch:** `copilot/copilotcreate-subfolder-structure-eafix-auth-docs`
+**Completed:** 2026-06-27
 **Report scope:** Path drift correction, routing guardrails, archive manifest completeness, glossary canonicalization, and validation reporting.
 
 ---
@@ -197,7 +197,15 @@ These commands do not apply to this task anyway, as this task only modifies docu
 
 ## 9. Branch Readiness
 
-**Ready for review.** No runtime/trading code was modified. All documentation path references are now consistent. The branch can be merged after reviewer confirmation of:
+Post-fix readiness rerun completed on **2026-06-27** after syncing this PR branch with the latest `master` (`git merge origin/master`).
 
-1. The missing-file entries (`VALIDATION_GATES.md`, `ALIGNMENT_VALIDATION_REPORT.md`) are acceptable as documented with `path_status: missing_from_disk`.
-2. The `Y_module governance glossary.json` archival is confirmed correct (SHA256 match was verified programmatically).
+| Check | Status | Notes |
+|---|---|---|
+| Branch synced with latest `master` | ✅ Yes | Merge commit created on this branch before rerunning validation. |
+| Stale-path scans rerun after latest fix | ✅ Yes | No invalid flat-path routing drift found; missing-file router entries remain nulled with `stale_path_was` preserved. |
+| JSON parse validation | ✅ Pass | All required JSON files parsed successfully. |
+| Schema validation (`ci/2099900010260118_validate_schemas.py`) | ✅ Pass | `11/11` schemas validated successfully. |
+| GitHub Actions for latest head commit | ⚠️ Not found | No workflow runs were found for latest head commit `400749ce402d738c475e6b585087ef8e498c95cc`. |
+| Poetry checks (`pytest`, `flake8`, `mypy`) | ⚠️ Not available | `poetry unavailable in runner: poetry: command not found`. |
+
+No runtime/trading code was modified. This PR remains non-destructive documentation/routing work only.
