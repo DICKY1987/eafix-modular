@@ -69,8 +69,8 @@ Both cleanup/archive folders now have explicit AI routing exclusion notices:
 | `EAFIX_auth_docs/solution_spec.json` | `EA-REG/solution_spec.json` |
 | `EAFIX_auth_docs/MIGRATION_COMPLETION_SUMMARY.md` | `EA-REG/superseded/MIGRATION_COMPLETION_SUMMARY.md` |
 | `EAFIX_auth_docs/SOLUTION_FILE_MANIFEST.md` | `EA-REG/superseded/SOLUTION_FILE_MANIFEST.md` |
-| `EAFIX_auth_docs/VALIDATION_GATES.md` | Marked `path_status: missing_from_disk` |
-| `EAFIX_auth_docs/ALIGNMENT_VALIDATION_REPORT.md` | Marked `path_status: missing_from_disk` |
+| `EAFIX_auth_docs/VALIDATION_GATES.md` | `repo_path_hint` set to `null`; `stale_path_was: "EA-REG/VALIDATION_GATES.md"`; `path_status: missing_from_disk` |
+| `EAFIX_auth_docs/ALIGNMENT_VALIDATION_REPORT.md` | `repo_path_hint` set to `null`; `stale_path_was: "EA-REG/ALIGNMENT_VALIDATION_REPORT.md"`; `path_status: missing_from_disk` |
 
 ---
 
@@ -89,6 +89,12 @@ Both cleanup/archive folders now have explicit AI routing exclusion notices:
 ### Scan: Stale EA-REG paths in `doc_authority.json` for EAFIX_auth_docs files
 
 **Result: FIXED** — All canonical EAFIX_auth_docs files that were erroneously pointing to `EA-REG/` have been corrected.
+
+### Scan: Flat `EAFIX_auth_docs/<file>` paths (no subfolder) in summary router
+
+**Command:** `grep -o '"repo_path_hint": "EAFIX_auth_docs/[^/"][^"]*"' eafix_project_knowledge_summary_router.json`
+
+**Result: FIXED (post-review pass)** — Two stale flat hints (`EAFIX_auth_docs/VALIDATION_GATES.md`, `EAFIX_auth_docs/ALIGNMENT_VALIDATION_REPORT.md`) were not corrected in the initial pass. Both are now set to `repo_path_hint: null` with `stale_path_was` recorded. No flat hints remain.
 
 ### Scan: Archive manifest vs folder completeness
 
@@ -173,7 +179,7 @@ These commands do not apply to this task anyway, as this task only modifies docu
 - `EAFIX_auth_docs/99_archive_superseded_do_not_route/archive_manifest.json` — 1 new entry for Y_ glossary
 - `EAFIX_auth_docs/90_cleanup_tasks_pr_notes_and_working_artifacts/README.md` — routing guardrail updated
 - `EAFIX_auth_docs/99_archive_superseded_do_not_route/README.md` — routing guardrail updated
-- `EAFIX_auth_docs/12_ai_summary_routers_and_reference_guides/eafix_project_knowledge_summary_router.json` — 6 stale repo_path_hints corrected
+- `EAFIX_auth_docs/12_ai_summary_routers_and_reference_guides/eafix_project_knowledge_summary_router.json` — 8 stale repo_path_hints corrected (6 in initial pass + 2 flat hints for missing-from-disk files fixed in post-review pass)
 - `EAFIX_auth_docs/00_doc_control_and_authority/REORGANIZATION_COMPLETION_REPORT.md` — this file (created)
 
 ---
