@@ -3,8 +3,8 @@
   "document_type": "atomic_module_manifest_schema_instance",
   "packet_type": "atomic_module_manifest",
   "manifest_version": "1.0.0",
-  "generated_at_utc": "2026-06-27T01:31:08.313663+00:00",
-  "last_updated_utc": "2026-06-27T01:31:08.313663+00:00",
+  "generated_at_utc": "2026-06-27T01:34:31.435377+00:00",
+  "last_updated_utc": "2026-06-27T01:34:31.435377+00:00",
   "source_authority": {
     "authority_policy": "generated_from_canonical_sources",
     "required_reference_documents": [
@@ -80,8 +80,8 @@
     "module_kind": "REENTRY_MODULE",
     "domain_group_id": "G7",
     "domain_group_name": "Reentry",
-    "phase_id": "PHASE_UNKNOWN",
-    "layer": 24,
+    "phase_id": "PHASE_I",
+    "layer": 4,
     "deployable_scope": "python_service",
     "tags": [
       "vNext"
@@ -92,8 +92,8 @@
   "process_binding": {
     "process_id": "HUEY_P_EAFIX_END_TO_END",
     "process_version": "2.0.0",
-    "phase_id": "PHASE_UNKNOWN",
-    "phase_name": "needs_review",
+    "phase_id": "PHASE_I",
+    "phase_name": "OMS -> TRADE CLOSE -> REENTRY DECISION",
     "step_id": "60000000000000000024",
     "step_number": 24,
     "step_code": "S24",
@@ -368,57 +368,93 @@
     "shared_files": [
       {
         "path": "services/reentry-engine/src/2099900163260118_config.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "E1_OUTCOME_BUCKETIZER",
+          "E2_PROXIMITY_EVALUATOR",
+          "E4_REENTRY_INTENT_BUILDER"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/reentry-engine/src/2099900164260118_decision_client.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "E1_OUTCOME_BUCKETIZER",
+          "E2_PROXIMITY_EVALUATOR",
+          "E4_REENTRY_INTENT_BUILDER"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/reentry-engine/src/2099900165260118_health.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "E1_OUTCOME_BUCKETIZER",
+          "E2_PROXIMITY_EVALUATOR",
+          "E4_REENTRY_INTENT_BUILDER"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/reentry-engine/src/2099900166260118_main.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "E1_OUTCOME_BUCKETIZER",
+          "E2_PROXIMITY_EVALUATOR",
+          "E4_REENTRY_INTENT_BUILDER"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/reentry-engine/src/2099900167260118_metrics.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "E1_OUTCOME_BUCKETIZER",
+          "E2_PROXIMITY_EVALUATOR",
+          "E4_REENTRY_INTENT_BUILDER"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/reentry-engine/src/2099900168260118_plugin.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "E1_OUTCOME_BUCKETIZER",
+          "E2_PROXIMITY_EVALUATOR",
+          "E4_REENTRY_INTENT_BUILDER"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/reentry-engine/src/2099900169260118_processor.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "E1_OUTCOME_BUCKETIZER",
+          "E2_PROXIMITY_EVALUATOR",
+          "E4_REENTRY_INTENT_BUILDER"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/reentry-engine/src/2099900170260118___init__.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "E1_OUTCOME_BUCKETIZER",
+          "E2_PROXIMITY_EVALUATOR",
+          "E4_REENTRY_INTENT_BUILDER"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/reentry-engine/tests/2099900171260118_test_integration.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "E1_OUTCOME_BUCKETIZER",
+          "E2_PROXIMITY_EVALUATOR",
+          "E4_REENTRY_INTENT_BUILDER"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       }
     ],
     "file_assignment_status": "partial",
@@ -564,7 +600,7 @@
     "layer_unassigned": false,
     "prefix_collision": false,
     "reconciliation_notes": [],
-    "last_reconciled_utc": "2026-06-27T01:31:08.313663+00:00"
+    "last_reconciled_utc": "2026-06-27T01:34:31.435377+00:00"
   },
   "staleness_policy": {
     "regenerate_if_changed": [

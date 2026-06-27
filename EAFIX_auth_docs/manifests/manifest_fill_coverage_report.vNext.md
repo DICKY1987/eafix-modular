@@ -6,7 +6,7 @@
 - **thin_modules**: 0
 - **modules_with_no_files**: 15
 - **modules_with_shared_service_files**: 13
-- **modules_with_runtime_ports**: 17
+- **modules_with_runtime_ports**: 16
 - **modules_with_ui_bindings**: 4
 - **modules_with_mt4_constraints**: 4
 - **modules_with_unresolved_dependencies**: 0
@@ -31,7 +31,7 @@
 | 50000000000000000014 | R2_ORDER_INTENT_COMPILER | filled | filled | filled | filled | filled | filled | partial | filled | not_applicable | not_applicable | not_applicable | filled | generated | 0 |
 | 50000000000000000015 | O1_ORDER_ROUTER | filled | filled | filled | filled | filled | filled | partial | missing | not_applicable | not_applicable | not_applicable | filled | generated | 0 |
 | 50000000000000000016 | B1_MT4_ADAPTER_TRANSPORT | filled | filled | filled | filled | filled | filled | partial | missing | filled | not_applicable | filled | filled | generated | 0 |
-| 50000000000000000017 | B2_MT4_EA_EXECUTOR | filled | filled | filled | filled | filled | filled | partial | filled | filled | not_applicable | filled | filled | generated | 0 |
+| 50000000000000000017 | B2_MT4_EA_EXECUTOR | filled | filled | filled | filled | filled | filled | partial | missing | filled | not_applicable | filled | filled | generated | 0 |
 | 50000000000000000018 | B3_EXEC_EVENT_NORMALIZER | filled | filled | filled | filled | filled | filled | unassigned | missing | filled | not_applicable | not_applicable | filled | generated | 1 |
 | 50000000000000000019 | O2_OMS_STATE_MACHINE | filled | filled | filled | filled | filled | filled | partial | missing | not_applicable | not_applicable | not_applicable | filled | generated | 0 |
 | 50000000000000000020 | O3_TRADE_CLOSE_CLASSIFIER | filled | filled | filled | filled | filled | filled | partial | missing | not_applicable | not_applicable | not_applicable | filled | generated | 0 |

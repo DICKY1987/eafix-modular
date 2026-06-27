@@ -3,7 +3,7 @@
 ## Acceptance
 - **schema_valid_34_of_34**: PASS
 - **bundle_count_valid**: PASS
-- **has_no_validation_issues**: PASS
+- **has_no_validation_issues**: FAIL
 
 ## Section Results
 - **schema_validation**
@@ -16,3 +16,4 @@
 - **ui_validation**: issues=0
 - **mt4_validation**: issues=0
 - **thin_module_validation**: issues=0
+- **governance_validation**: issues=1

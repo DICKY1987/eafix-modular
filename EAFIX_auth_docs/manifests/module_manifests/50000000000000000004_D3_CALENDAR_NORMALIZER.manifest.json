@@ -3,8 +3,8 @@
   "document_type": "atomic_module_manifest_schema_instance",
   "packet_type": "atomic_module_manifest",
   "manifest_version": "1.0.0",
-  "generated_at_utc": "2026-06-27T01:31:08.313663+00:00",
-  "last_updated_utc": "2026-06-27T01:31:08.313663+00:00",
+  "generated_at_utc": "2026-06-27T01:34:31.435377+00:00",
+  "last_updated_utc": "2026-06-27T01:34:31.435377+00:00",
   "source_authority": {
     "authority_policy": "generated_from_canonical_sources",
     "required_reference_documents": [
@@ -80,8 +80,8 @@
     "module_kind": "INTEGRATION_BRIDGE_MODULE",
     "domain_group_id": "G1",
     "domain_group_name": "Data Ingest",
-    "phase_id": "PHASE_UNKNOWN",
-    "layer": 4,
+    "phase_id": "PHASE_B",
+    "layer": 2,
     "deployable_scope": "python_service",
     "tags": [
       "vNext"
@@ -92,8 +92,8 @@
   "process_binding": {
     "process_id": "HUEY_P_EAFIX_END_TO_END",
     "process_version": "2.0.0",
-    "phase_id": "PHASE_UNKNOWN",
-    "phase_name": "needs_review",
+    "phase_id": "PHASE_B",
+    "phase_name": "ECONOMIC CALENDAR INTAKE -> TRIGGERS",
     "step_id": "60000000000000000004",
     "step_number": 4,
     "step_code": "S04",
@@ -387,69 +387,124 @@
     "shared_files": [
       {
         "path": "services/calendar-ingestor/src/2099900089260118_config.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "D2_CALENDAR_SOURCE_ADAPTER",
+          "D3_CALENDAR_NORMALIZER",
+          "D4_CALENDAR_TRIGGER_BUILDER",
+          "F2_EVENT_LOG"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/calendar-ingestor/src/2099900090260118_ff_auto_downloader.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "D2_CALENDAR_SOURCE_ADAPTER",
+          "D3_CALENDAR_NORMALIZER",
+          "D4_CALENDAR_TRIGGER_BUILDER",
+          "F2_EVENT_LOG"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/calendar-ingestor/src/2099900091260118_health.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "D2_CALENDAR_SOURCE_ADAPTER",
+          "D3_CALENDAR_NORMALIZER",
+          "D4_CALENDAR_TRIGGER_BUILDER",
+          "F2_EVENT_LOG"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/calendar-ingestor/src/2099900092260118_ingestor.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "D2_CALENDAR_SOURCE_ADAPTER",
+          "D3_CALENDAR_NORMALIZER",
+          "D4_CALENDAR_TRIGGER_BUILDER",
+          "F2_EVENT_LOG"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/calendar-ingestor/src/2099900093260118_main.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "D2_CALENDAR_SOURCE_ADAPTER",
+          "D3_CALENDAR_NORMALIZER",
+          "D4_CALENDAR_TRIGGER_BUILDER",
+          "F2_EVENT_LOG"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/calendar-ingestor/src/2099900094260118_metrics.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "D2_CALENDAR_SOURCE_ADAPTER",
+          "D3_CALENDAR_NORMALIZER",
+          "D4_CALENDAR_TRIGGER_BUILDER",
+          "F2_EVENT_LOG"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/calendar-ingestor/src/2099900095260118_plugin.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "D2_CALENDAR_SOURCE_ADAPTER",
+          "D3_CALENDAR_NORMALIZER",
+          "D4_CALENDAR_TRIGGER_BUILDER",
+          "F2_EVENT_LOG"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/calendar-ingestor/src/2099900096260118_python_calendar_system.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "D2_CALENDAR_SOURCE_ADAPTER",
+          "D3_CALENDAR_NORMALIZER",
+          "D4_CALENDAR_TRIGGER_BUILDER",
+          "F2_EVENT_LOG"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/calendar-ingestor/src/2099900097260118_python_calendar_system_patched.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "D2_CALENDAR_SOURCE_ADAPTER",
+          "D3_CALENDAR_NORMALIZER",
+          "D4_CALENDAR_TRIGGER_BUILDER",
+          "F2_EVENT_LOG"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/calendar-ingestor/src/2099900098260118___init__.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "D2_CALENDAR_SOURCE_ADAPTER",
+          "D3_CALENDAR_NORMALIZER",
+          "D4_CALENDAR_TRIGGER_BUILDER",
+          "F2_EVENT_LOG"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/calendar-ingestor/tests/2099900099260118_test_ingestor.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "D2_CALENDAR_SOURCE_ADAPTER",
+          "D3_CALENDAR_NORMALIZER",
+          "D4_CALENDAR_TRIGGER_BUILDER",
+          "F2_EVENT_LOG"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       }
     ],
     "file_assignment_status": "partial",
@@ -595,7 +650,7 @@
     "layer_unassigned": false,
     "prefix_collision": false,
     "reconciliation_notes": [],
-    "last_reconciled_utc": "2026-06-27T01:31:08.313663+00:00"
+    "last_reconciled_utc": "2026-06-27T01:34:31.435377+00:00"
   },
   "staleness_policy": {
     "regenerate_if_changed": [

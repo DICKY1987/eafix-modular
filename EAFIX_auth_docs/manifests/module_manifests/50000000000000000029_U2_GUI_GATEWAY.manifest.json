@@ -3,8 +3,8 @@
   "document_type": "atomic_module_manifest_schema_instance",
   "packet_type": "atomic_module_manifest",
   "manifest_version": "1.0.0",
-  "generated_at_utc": "2026-06-27T01:31:08.313663+00:00",
-  "last_updated_utc": "2026-06-27T01:31:08.313663+00:00",
+  "generated_at_utc": "2026-06-27T01:34:31.435377+00:00",
+  "last_updated_utc": "2026-06-27T01:34:31.435377+00:00",
   "source_authority": {
     "authority_policy": "generated_from_canonical_sources",
     "required_reference_documents": [
@@ -83,14 +83,14 @@
     "domain_group_id": "G8",
     "domain_group_name": "UI Gateway",
     "phase_id": "PHASE_NOT_APPLICABLE",
-    "layer": 29,
+    "layer": 5,
     "deployable_scope": "gui_gateway",
     "tags": [
       "vNext"
     ]
   },
-  "purpose": "GUI Gateway responsibility needs_review",
-  "plain_language_summary": "GUI Gateway (U2_GUI_GATEWAY) in vNext atomic module set.",
+  "purpose": "Expose operator API and real-time UI subscriptions for system status, dashboard summaries, positions, signals, orders, calendar events, and alerts.",
+  "plain_language_summary": "Expose operator API and real-time UI subscriptions for system status, dashboard summaries, positions, signals, orders, calendar events, and alerts.",
   "process_binding": {
     "process_id": "HUEY_P_EAFIX_END_TO_END",
     "process_version": "2.0.0",
@@ -113,7 +113,67 @@
   "contracts": {
     "input_contracts": [
       {
-        "name": "needs_review",
+        "name": "UI_API_GUI_CALENDAR_EVENTS_Request",
+        "direction": "input",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_GUI_DASHBOARD_Request",
+        "direction": "input",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_GUI_LIVE_SIGNALS_Request",
+        "direction": "input",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_GUI_ORDER_HISTORY_Request",
+        "direction": "input",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_GUI_POSITIONS_Request",
+        "direction": "input",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_GUI_SYSTEM_STATUS_Request",
+        "direction": "input",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_WS_GUI_GATEWAY_Subscribe",
         "direction": "input",
         "description": "",
         "required": true,
@@ -125,7 +185,67 @@
     ],
     "output_contracts": [
       {
-        "name": "needs_review",
+        "name": "UI_API_GUI_CALENDAR_EVENTS_Response",
+        "direction": "output",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_GUI_DASHBOARD_Response",
+        "direction": "output",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_GUI_LIVE_SIGNALS_Response",
+        "direction": "output",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_GUI_ORDER_HISTORY_Response",
+        "direction": "output",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_GUI_POSITIONS_Response",
+        "direction": "output",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_GUI_SYSTEM_STATUS_Response",
+        "direction": "output",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_WS_GUI_GATEWAY_Event",
         "direction": "output",
         "description": "",
         "required": true,
@@ -153,13 +273,25 @@
   },
   "module_scope": {
     "scope_in": [
-      "needs_review"
+      "UI_API_GUI_CALENDAR_EVENTS_Request",
+      "UI_API_GUI_DASHBOARD_Request",
+      "UI_API_GUI_LIVE_SIGNALS_Request",
+      "UI_API_GUI_ORDER_HISTORY_Request",
+      "UI_API_GUI_POSITIONS_Request",
+      "UI_API_GUI_SYSTEM_STATUS_Request",
+      "UI_WS_GUI_GATEWAY_Subscribe"
     ],
     "scope_out": [
-      "needs_review"
+      "UI_API_GUI_CALENDAR_EVENTS_Response",
+      "UI_API_GUI_DASHBOARD_Response",
+      "UI_API_GUI_LIVE_SIGNALS_Response",
+      "UI_API_GUI_ORDER_HISTORY_Response",
+      "UI_API_GUI_POSITIONS_Response",
+      "UI_API_GUI_SYSTEM_STATUS_Response",
+      "UI_WS_GUI_GATEWAY_Event"
     ],
     "responsibilities": [
-      "needs_review"
+      "Expose operator API and real-time UI subscriptions for system status, dashboard summaries, positions, signals, orders, calendar events, and alerts."
     ],
     "forbidden_responsibilities": [
       "cross_module_private_state_access"
@@ -171,7 +303,7 @@
     "atomicity_statement": "U2_GUI_GATEWAY is represented as a single atomic manifest record."
   },
   "file_ownership": {
-    "module_root": null,
+    "module_root": "services/gui-gateway",
     "manifest_path": null,
     "owned_files": [],
     "source_files": [],
@@ -192,7 +324,7 @@
     "ownership_derivation": "unknown"
   },
   "service_runtime": {
-    "service_home": null,
+    "service_home": "services/gui-gateway",
     "candidate_service_home": null,
     "runtime_kind": "gui_gateway",
     "language": "python",
@@ -297,7 +429,7 @@
     "state_machine_ref": null
   },
   "reconciliation_status": {
-    "service_binding_status": "needs_review",
+    "service_binding_status": "bound",
     "submodule_doc_status": "deprecated",
     "mapped_file_count": 0,
     "owned_channel_ids": [],
@@ -308,14 +440,14 @@
     ],
     "stale_symbol_tokens": [],
     "kind_mismatch": false,
-    "layer_unassigned": false,
+    "layer_unassigned": true,
     "prefix_collision": false,
     "reconciliation_notes": [
       "file_ownership:unassigned",
       "process_binding:not_applicable",
       "thin_module:ui_module"
     ],
-    "last_reconciled_utc": "2026-06-27T01:31:08.313663+00:00"
+    "last_reconciled_utc": "2026-06-27T01:34:31.435377+00:00"
   },
   "staleness_policy": {
     "regenerate_if_changed": [

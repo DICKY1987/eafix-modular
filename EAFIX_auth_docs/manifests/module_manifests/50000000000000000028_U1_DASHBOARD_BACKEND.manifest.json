@@ -3,8 +3,8 @@
   "document_type": "atomic_module_manifest_schema_instance",
   "packet_type": "atomic_module_manifest",
   "manifest_version": "1.0.0",
-  "generated_at_utc": "2026-06-27T01:31:08.313663+00:00",
-  "last_updated_utc": "2026-06-27T01:31:08.313663+00:00",
+  "generated_at_utc": "2026-06-27T01:34:31.435377+00:00",
+  "last_updated_utc": "2026-06-27T01:34:31.435377+00:00",
   "source_authority": {
     "authority_policy": "generated_from_canonical_sources",
     "required_reference_documents": [
@@ -83,14 +83,14 @@
     "domain_group_id": "G8",
     "domain_group_name": "UI Gateway",
     "phase_id": "PHASE_NOT_APPLICABLE",
-    "layer": 28,
+    "layer": 5,
     "deployable_scope": "dashboard_backend",
     "tags": [
       "vNext"
     ]
   },
-  "purpose": "Dashboard Backend responsibility needs_review",
-  "plain_language_summary": "Dashboard Backend (U1_DASHBOARD_BACKEND) in vNext atomic module set.",
+  "purpose": "Aggregate trading, market, signal, position, calendar, metric, and audit data into UI-friendly REST and streaming responses.",
+  "plain_language_summary": "Aggregate trading, market, signal, position, calendar, metric, and audit data into UI-friendly REST and streaming responses.",
   "process_binding": {
     "process_id": "HUEY_P_EAFIX_END_TO_END",
     "process_version": "2.0.0",
@@ -113,7 +113,87 @@
   "contracts": {
     "input_contracts": [
       {
-        "name": "needs_review",
+        "name": "UI_API_DASHBOARD_AUDIT_Request",
+        "direction": "input",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_DASHBOARD_CALENDAR_Request",
+        "direction": "input",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_DASHBOARD_INDICATOR_CONFIG_Request",
+        "direction": "input",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_DASHBOARD_METRICS_Request",
+        "direction": "input",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_DASHBOARD_POSITIONS_Request",
+        "direction": "input",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_DASHBOARD_SIGNALS_Request",
+        "direction": "input",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_DASHBOARD_SIGNAL_DETAIL_Request",
+        "direction": "input",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_DASHBOARD_TRADES_Request",
+        "direction": "input",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_WS_DASHBOARD_BACKEND_Subscribe",
         "direction": "input",
         "description": "",
         "required": true,
@@ -125,7 +205,87 @@
     ],
     "output_contracts": [
       {
-        "name": "needs_review",
+        "name": "UI_API_DASHBOARD_AUDIT_Response",
+        "direction": "output",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_DASHBOARD_CALENDAR_Response",
+        "direction": "output",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_DASHBOARD_INDICATOR_CONFIG_Response",
+        "direction": "output",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_DASHBOARD_METRICS_Response",
+        "direction": "output",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_DASHBOARD_POSITIONS_Response",
+        "direction": "output",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_DASHBOARD_SIGNALS_Response",
+        "direction": "output",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_DASHBOARD_SIGNAL_DETAIL_Response",
+        "direction": "output",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_API_DASHBOARD_TRADES_Response",
+        "direction": "output",
+        "description": "",
+        "required": true,
+        "schema_ref": null,
+        "version": null,
+        "produced_by_module": null,
+        "consumed_by_modules": []
+      },
+      {
+        "name": "UI_WS_DASHBOARD_BACKEND_Event",
         "direction": "output",
         "description": "",
         "required": true,
@@ -153,13 +313,29 @@
   },
   "module_scope": {
     "scope_in": [
-      "needs_review"
+      "UI_API_DASHBOARD_AUDIT_Request",
+      "UI_API_DASHBOARD_CALENDAR_Request",
+      "UI_API_DASHBOARD_INDICATOR_CONFIG_Request",
+      "UI_API_DASHBOARD_METRICS_Request",
+      "UI_API_DASHBOARD_POSITIONS_Request",
+      "UI_API_DASHBOARD_SIGNALS_Request",
+      "UI_API_DASHBOARD_SIGNAL_DETAIL_Request",
+      "UI_API_DASHBOARD_TRADES_Request",
+      "UI_WS_DASHBOARD_BACKEND_Subscribe"
     ],
     "scope_out": [
-      "needs_review"
+      "UI_API_DASHBOARD_AUDIT_Response",
+      "UI_API_DASHBOARD_CALENDAR_Response",
+      "UI_API_DASHBOARD_INDICATOR_CONFIG_Response",
+      "UI_API_DASHBOARD_METRICS_Response",
+      "UI_API_DASHBOARD_POSITIONS_Response",
+      "UI_API_DASHBOARD_SIGNALS_Response",
+      "UI_API_DASHBOARD_SIGNAL_DETAIL_Response",
+      "UI_API_DASHBOARD_TRADES_Response",
+      "UI_WS_DASHBOARD_BACKEND_Event"
     ],
     "responsibilities": [
-      "needs_review"
+      "Aggregate trading, market, signal, position, calendar, metric, and audit data into UI-friendly REST and streaming responses."
     ],
     "forbidden_responsibilities": [
       "cross_module_private_state_access"
@@ -171,7 +347,7 @@
     "atomicity_statement": "U1_DASHBOARD_BACKEND is represented as a single atomic manifest record."
   },
   "file_ownership": {
-    "module_root": null,
+    "module_root": "services/dashboard-backend",
     "manifest_path": null,
     "owned_files": [],
     "source_files": [],
@@ -192,7 +368,7 @@
     "ownership_derivation": "unknown"
   },
   "service_runtime": {
-    "service_home": null,
+    "service_home": "services/dashboard-backend",
     "candidate_service_home": null,
     "runtime_kind": "dashboard_backend",
     "language": "python",
@@ -297,7 +473,7 @@
     "state_machine_ref": null
   },
   "reconciliation_status": {
-    "service_binding_status": "needs_review",
+    "service_binding_status": "bound",
     "submodule_doc_status": "deprecated",
     "mapped_file_count": 0,
     "owned_channel_ids": [],
@@ -308,14 +484,14 @@
     ],
     "stale_symbol_tokens": [],
     "kind_mismatch": false,
-    "layer_unassigned": false,
+    "layer_unassigned": true,
     "prefix_collision": false,
     "reconciliation_notes": [
       "file_ownership:unassigned",
       "process_binding:not_applicable",
       "thin_module:ui_module"
     ],
-    "last_reconciled_utc": "2026-06-27T01:31:08.313663+00:00"
+    "last_reconciled_utc": "2026-06-27T01:34:31.435377+00:00"
   },
   "staleness_policy": {
     "regenerate_if_changed": [

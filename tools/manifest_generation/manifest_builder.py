@@ -284,102 +284,134 @@ def _platform_constraints(symbol: str) -> dict[str, Any] | None:
     }
 
 
-    def _normalized_path(path: str) -> str:
-        return str(path).replace("\\", "/")
+def _normalized_path(path: str) -> str:
+    return str(path).replace("\\", "/")
 
 
-    def _layer_from_authority(symbol: str, enriched: dict[str, Any] | None) -> tuple[int, bool]:
-        if enriched:
-            raw_layer = enriched.get("layer")
-            if isinstance(raw_layer, int):
-                return raw_layer, False
-            if isinstance(raw_layer, str) and raw_layer.strip().isdigit():
-                return int(raw_layer.strip()), False
+def _to_contract_identifier(raw: str, default: str) -> str:
+    text = re.sub(r"[^A-Za-z0-9_]", "_", str(raw or "").strip())
+    text = re.sub(r"_+", "_", text).strip("_")
+    if not text:
+        text = default
+    if not re.match(r"^[A-Za-z]", text):
+        text = f"C_{text}"
+    return text
 
-        pre = _prefix(symbol)
-        fallback = {
-            "F": 1,
-            "P": 1,
-            "D": 2,
-            "C": 3,
-            "S": 3,
-            "R": 4,
-            "O": 4,
-            "B": 4,
-            "E": 4,
-            "U": 5,
-            "SK": 6,
+
+def _layer_from_authority(symbol: str, enriched: dict[str, Any] | None) -> tuple[int, bool]:
+    if enriched:
+        raw_layer = enriched.get("layer")
+        if isinstance(raw_layer, int):
+            return raw_layer, False
+        if isinstance(raw_layer, str) and raw_layer.strip().isdigit():
+            return int(raw_layer.strip()), False
+
+    pre = _prefix(symbol)
+    fallback = {
+        "F": 1,
+        "P": 1,
+        "D": 2,
+        "C": 3,
+        "S": 3,
+        "R": 4,
+        "O": 4,
+        "B": 4,
+        "E": 4,
+        "U": 5,
+        "SK": 6,
+    }
+    return fallback.get(pre, 1), True
+
+
+def _ui_enrichment(symbol: str, ui_index: dict[str, Any]) -> dict[str, Any] | None:
+    if symbol not in ui_index:
+        return None
+    bundle = ui_index[symbol]
+    product = bundle.get("product", {})
+    if not isinstance(product, dict):
+        return None
+
+    rest_apis = bundle.get("rest_apis", [])
+    ws_contracts = bundle.get("websocket_contracts", [])
+    observed_paths = [_normalized_path(p) for p in product.get("observed_implementation_paths", [])]
+    binding_paths = [
+        _normalized_path(b.get("path"))
+        for b in bundle.get("implementation_bindings", [])
+        if isinstance(b, dict) and b.get("path")
+    ]
+    implementation_paths = sorted(set(observed_paths + binding_paths))
+
+    service_name = str(bundle.get("service_name") or "")
+    purpose = str(product.get("purpose", "")).strip()
+    product_id = str(product.get("product_id", "")).strip() or None
+    product_name = str(product.get("name", "")).strip() or symbol
+    port = product.get("declared_port") if isinstance(product.get("declared_port"), int) else None
+
+    module_root = None
+    if implementation_paths:
+        split = implementation_paths[0].split("/", 3)
+        if len(split) >= 2:
+            module_root = "/".join(split[:2])
+
+    rest_inputs = sorted(
+        {
+            _to_contract_identifier(f"{api.get('api_id', 'REST')}_Request", "REST_Request")
+            for api in rest_apis
+            if api.get("path")
         }
-        return fallback.get(pre, 1), True
-
-
-    def _ui_enrichment(symbol: str, ui_index: dict[str, Any]) -> dict[str, Any] | None:
-        if symbol not in ui_index:
-            return None
-        bundle = ui_index[symbol]
-        product = bundle.get("product", {})
-        if not isinstance(product, dict):
-            return None
-
-        rest_apis = bundle.get("rest_apis", [])
-        ws_contracts = bundle.get("websocket_contracts", [])
-        observed_paths = [_normalized_path(p) for p in product.get("observed_implementation_paths", [])]
-        binding_paths = [
-            _normalized_path(b.get("path"))
-            for b in bundle.get("implementation_bindings", [])
-            if isinstance(b, dict) and b.get("path")
-        ]
-        implementation_paths = sorted(set(observed_paths + binding_paths))
-
-        service_name = str(bundle.get("service_name") or "")
-        purpose = str(product.get("purpose", "")).strip()
-        product_id = str(product.get("product_id", "")).strip() or None
-        product_name = str(product.get("name", "")).strip() or symbol
-        port = product.get("declared_port") if isinstance(product.get("declared_port"), int) else None
-
-        module_root = None
-        if implementation_paths:
-            split = implementation_paths[0].split("/", 3)
-            if len(split) >= 2:
-                module_root = "/".join(split[:2])
-
-        rest_inputs = sorted({f"{api.get('method', 'GET')} {api.get('path', '').strip()}" for api in rest_apis if api.get("path")})
-        rest_outputs = sorted({str(api.get("api_id", api.get("path", "RESTResponse"))).strip() for api in rest_apis if api.get("path")})
-        ws_outputs = sorted({str(ws.get("websocket_id", "WebSocketEvent")).strip() for ws in ws_contracts})
-        ws_inputs = sorted({f"WS_SUBSCRIBE:{ws.get('url')}" for ws in ws_contracts if ws.get("url")})
-
-        scope_in = sorted(set(rest_inputs + ws_inputs)) or [f"{product_name} client requests"]
-        scope_out = sorted(set(rest_outputs + ws_outputs)) or [f"{product_name} responses"]
-        responsibilities = [purpose] if purpose else [f"Deliver {product_name} UX contracts"]
-
-        binding_refs = []
-        for binding in bundle.get("implementation_bindings", []):
-            if isinstance(binding, dict):
-                binding_id = str(binding.get("binding_id", "")).strip()
-                if binding_id:
-                    binding_refs.append(binding_id)
-
-        return {
-            "purpose": purpose,
-            "plain_summary": purpose or f"{product_name} UI module.",
-            "service_name": service_name or None,
-            "product_id": product_id,
-            "product_name": product_name,
-            "declared_port": port,
-            "module_root": module_root,
-            "implementation_paths": implementation_paths,
-            "scope_in": scope_in,
-            "scope_out": scope_out,
-            "responsibilities": responsibilities,
-            "input_contracts": scope_in,
-            "output_contracts": scope_out,
-            "rest_apis": rest_apis,
-            "websocket_contracts": ws_contracts,
-            "binding_refs": sorted(set(binding_refs)),
+    )
+    rest_outputs = sorted(
+        {
+            _to_contract_identifier(f"{api.get('api_id', 'REST')}_Response", "REST_Response")
+            for api in rest_apis
+            if api.get("path")
         }
+    )
+    ws_outputs = sorted(
+        {
+            _to_contract_identifier(f"{ws.get('websocket_id', 'WebSocket')}_Event", "WebSocket_Event")
+            for ws in ws_contracts
+        }
+    )
+    ws_inputs = sorted(
+        {
+            _to_contract_identifier(f"{ws.get('websocket_id', 'WebSocket')}_Subscribe", "WebSocket_Subscribe")
+            for ws in ws_contracts
+        }
+    )
+
+    scope_in = sorted(set(rest_inputs + ws_inputs)) or [_to_contract_identifier(f"{product_name}_ClientRequest", "UI_ClientRequest")]
+    scope_out = sorted(set(rest_outputs + ws_outputs)) or [_to_contract_identifier(f"{product_name}_Response", "UI_Response")]
+    responsibilities = [purpose] if purpose else [f"Deliver {product_name} UX contracts"]
+
+    binding_refs = []
+    for binding in bundle.get("implementation_bindings", []):
+        if isinstance(binding, dict):
+            binding_id = str(binding.get("binding_id", "")).strip()
+            if binding_id:
+                binding_refs.append(binding_id)
+
+    return {
+        "purpose": purpose,
+        "plain_summary": purpose or f"{product_name} UI module.",
+        "service_name": service_name or None,
+        "product_id": product_id,
+        "product_name": product_name,
+        "declared_port": port,
+        "module_root": module_root,
+        "implementation_paths": implementation_paths,
+        "scope_in": scope_in,
+        "scope_out": scope_out,
+        "responsibilities": responsibilities,
+        "input_contracts": scope_in,
+        "output_contracts": scope_out,
+        "rest_apis": rest_apis,
+        "websocket_contracts": ws_contracts,
+        "binding_refs": sorted(set(binding_refs)),
+    }
 
 
-    def build_manifests(
+def build_manifests(
     reconciled_modules: list[dict[str, Any]],
     sources: dict[str, Any],
     normalized: dict[str, Any],
@@ -570,7 +602,7 @@ def _platform_constraints(symbol: str) -> dict[str, Any] | None:
                 "shared_files": [
                     {
                         "path": p,
-                        "sharing_policy": "shared_service_file",
+                        "sharing_policy": "needs_refactor",
                         "allowed_modules": sorted(
                             {
                                 m
@@ -579,7 +611,7 @@ def _platform_constraints(symbol: str) -> dict[str, Any] | None:
                                 for m in row.get("canonical_modules", [])
                             }
                         ),
-                        "reason": "Shared service evidence from file_module_mapping.csv",
+                        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel.",
                     }
                     for p in sorted(file_map["shared_service_files"])
                 ],
@@ -728,13 +760,6 @@ def _platform_constraints(symbol: str) -> dict[str, Any] | None:
                     "lookup_keys": [symbol, product.get("product_id", "")],
                 },
             }
-            if ui:
-                manifest["ai_context"]["ui_product_binding"] = {
-                    "product_id": ui.get("product_id"),
-                    "product_name": ui.get("product_name"),
-                    "implementation_paths": ui.get("implementation_paths", []),
-                    "binding_ids": ui.get("binding_refs", []),
-                }
         if module.get("legacy_aliases_applied"):
             manifest["migration_traceability"] = {
                 "migration_status": "renamed_from_legacy_alias",

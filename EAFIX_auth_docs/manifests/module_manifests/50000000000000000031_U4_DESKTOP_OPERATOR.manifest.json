@@ -3,8 +3,8 @@
   "document_type": "atomic_module_manifest_schema_instance",
   "packet_type": "atomic_module_manifest",
   "manifest_version": "1.0.0",
-  "generated_at_utc": "2026-06-27T01:31:08.313663+00:00",
-  "last_updated_utc": "2026-06-27T01:31:08.313663+00:00",
+  "generated_at_utc": "2026-06-27T01:34:31.435377+00:00",
+  "last_updated_utc": "2026-06-27T01:34:31.435377+00:00",
   "source_authority": {
     "authority_policy": "generated_from_canonical_sources",
     "required_reference_documents": [
@@ -83,14 +83,14 @@
     "domain_group_id": "G8",
     "domain_group_name": "UI Gateway",
     "phase_id": "PHASE_NOT_APPLICABLE",
-    "layer": 31,
+    "layer": 5,
     "deployable_scope": "desktop_ui",
     "tags": [
       "vNext"
     ]
   },
-  "purpose": "Desktop Operator UI responsibility needs_review",
-  "plain_language_summary": "Desktop Operator UI (U4_DESKTOP_OPERATOR) in vNext atomic module set.",
+  "purpose": "Provide live trading visibility, signal review, configuration, safety intervention, history, analytics, diagnostics, and reentry controls.",
+  "plain_language_summary": "Provide live trading visibility, signal review, configuration, safety intervention, history, analytics, diagnostics, and reentry controls.",
   "process_binding": {
     "process_id": "HUEY_P_EAFIX_END_TO_END",
     "process_version": "2.0.0",
@@ -113,7 +113,7 @@
   "contracts": {
     "input_contracts": [
       {
-        "name": "needs_review",
+        "name": "Desktop_Operator_UI_ClientRequest",
         "direction": "input",
         "description": "",
         "required": true,
@@ -125,7 +125,7 @@
     ],
     "output_contracts": [
       {
-        "name": "needs_review",
+        "name": "Desktop_Operator_UI_Response",
         "direction": "output",
         "description": "",
         "required": true,
@@ -153,13 +153,13 @@
   },
   "module_scope": {
     "scope_in": [
-      "needs_review"
+      "Desktop_Operator_UI_ClientRequest"
     ],
     "scope_out": [
-      "needs_review"
+      "Desktop_Operator_UI_Response"
     ],
     "responsibilities": [
-      "needs_review"
+      "Provide live trading visibility, signal review, configuration, safety intervention, history, analytics, diagnostics, and reentry controls."
     ],
     "forbidden_responsibilities": [
       "cross_module_private_state_access"
@@ -171,7 +171,7 @@
     "atomicity_statement": "U4_DESKTOP_OPERATOR is represented as a single atomic manifest record."
   },
   "file_ownership": {
-    "module_root": null,
+    "module_root": "services/dashboard-backend",
     "manifest_path": null,
     "owned_files": [],
     "source_files": [],
@@ -192,7 +192,7 @@
     "ownership_derivation": "unknown"
   },
   "service_runtime": {
-    "service_home": null,
+    "service_home": "services/dashboard-backend",
     "candidate_service_home": null,
     "runtime_kind": "python_service",
     "language": "python",
@@ -297,7 +297,7 @@
     "state_machine_ref": null
   },
   "reconciliation_status": {
-    "service_binding_status": "needs_review",
+    "service_binding_status": "bound",
     "submodule_doc_status": "deprecated",
     "mapped_file_count": 0,
     "owned_channel_ids": [],
@@ -308,14 +308,14 @@
     ],
     "stale_symbol_tokens": [],
     "kind_mismatch": false,
-    "layer_unassigned": false,
+    "layer_unassigned": true,
     "prefix_collision": false,
     "reconciliation_notes": [
       "file_ownership:unassigned",
       "process_binding:not_applicable",
       "thin_module:ui_module"
     ],
-    "last_reconciled_utc": "2026-06-27T01:31:08.313663+00:00"
+    "last_reconciled_utc": "2026-06-27T01:34:31.435377+00:00"
   },
   "staleness_policy": {
     "regenerate_if_changed": [

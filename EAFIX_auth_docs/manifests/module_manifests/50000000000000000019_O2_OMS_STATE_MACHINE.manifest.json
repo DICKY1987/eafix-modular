@@ -3,8 +3,8 @@
   "document_type": "atomic_module_manifest_schema_instance",
   "packet_type": "atomic_module_manifest",
   "manifest_version": "1.0.0",
-  "generated_at_utc": "2026-06-27T01:31:08.313663+00:00",
-  "last_updated_utc": "2026-06-27T01:31:08.313663+00:00",
+  "generated_at_utc": "2026-06-27T01:34:31.435377+00:00",
+  "last_updated_utc": "2026-06-27T01:34:31.435377+00:00",
   "source_authority": {
     "authority_policy": "generated_from_canonical_sources",
     "required_reference_documents": [
@@ -82,8 +82,8 @@
     "module_kind": "OMS_MODULE",
     "domain_group_id": "G5",
     "domain_group_name": "Order Management",
-    "phase_id": "PHASE_UNKNOWN",
-    "layer": 19,
+    "phase_id": "PHASE_I",
+    "layer": 4,
     "deployable_scope": "python_service",
     "tags": [
       "vNext"
@@ -94,8 +94,8 @@
   "process_binding": {
     "process_id": "HUEY_P_EAFIX_END_TO_END",
     "process_version": "2.0.0",
-    "phase_id": "PHASE_UNKNOWN",
-    "phase_name": "needs_review",
+    "phase_id": "PHASE_I",
+    "phase_name": "OMS -> TRADE CLOSE -> REENTRY DECISION",
     "step_id": "60000000000000000019",
     "step_number": 19,
     "step_code": "S19",
@@ -284,15 +284,23 @@
     "shared_files": [
       {
         "path": "services/execution-engine/src/2099900144260118_plugin.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "B2_MT4_EA_EXECUTOR",
+          "O2_OMS_STATE_MACHINE",
+          "O3_TRADE_CLOSE_CLASSIFIER"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
         "path": "services/execution-engine/tests/2099900145260118_test_execution_engine_plugin.py",
-        "sharing_policy": "shared_kernel",
-        "allowed_modules": [],
-        "reason": ""
+        "sharing_policy": "needs_refactor",
+        "allowed_modules": [
+          "B2_MT4_EA_EXECUTOR",
+          "O2_OMS_STATE_MACHINE",
+          "O3_TRADE_CLOSE_CLASSIFIER"
+        ],
+        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       }
     ],
     "file_assignment_status": "partial",
@@ -451,7 +459,7 @@
     "layer_unassigned": false,
     "prefix_collision": false,
     "reconciliation_notes": [],
-    "last_reconciled_utc": "2026-06-27T01:31:08.313663+00:00"
+    "last_reconciled_utc": "2026-06-27T01:34:31.435377+00:00"
   },
   "staleness_policy": {
     "regenerate_if_changed": [
