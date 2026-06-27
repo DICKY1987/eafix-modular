@@ -28,6 +28,7 @@ REQUIRED_SOURCE_FILES: dict[str, str] = {
     "mt4_authoritative": "EAFIX_auth_docs/mt4 authoritative reference for ai.json",
     "capability_registry": "EAFIX_auth_docs/converted_capability_registry.json",
     "dependency_layers_pdf": "EAFIX_auth_docs/dependency layers.pdf",
+    "dependency_layers_parsed": "EAFIX_auth_docs/dependency_layers_parsed.json",
 }
 
 
@@ -49,6 +50,7 @@ AUTHORITY_ROLES: dict[str, str] = {
     "mt4_authoritative": "mt4_platform_constraints_authority",
     "capability_registry": "capability_reuse",
     "dependency_layers_pdf": "dependency_graph_evidence",
+    "dependency_layers_parsed": "dependency_graph_parsed",
 }
 
 
@@ -125,3 +127,22 @@ def run_authority_preflight(repo_root: Path) -> dict[str, Any]:
         "conflict_resolution_order": conflict_resolution_order,
         "unresolved_authority_conflicts": unresolved_conflicts,
     }
+
+
+def load_dependency_layers(repo_root: Path) -> "tuple[bool, dict[str, Any]]":
+    """Load pre-parsed dependency layer data extracted from dependency layers.pdf.
+
+    Returns (parsed, data) where parsed is True when the JSON sidecar exists and
+    contains a valid layer list, and data holds the full parsed content.
+    """
+    json_path = repo_root / REQUIRED_SOURCE_FILES["dependency_layers_parsed"]
+    if not json_path.exists():
+        return False, {}
+    try:
+        data = load_json(json_path)
+        layers = data.get("layers", [])
+        if isinstance(layers, list) and len(layers) > 0:
+            return True, data
+    except Exception:
+        pass
+    return False, {}

@@ -29,7 +29,7 @@ from .report_writer import (
     write_generation_report,
 )
 from .schema_loader import build_schema_field_map, load_schema
-from .source_loaders import REQUIRED_SOURCE_FILES, load_csv, load_json, load_text, run_authority_preflight
+from .source_loaders import REQUIRED_SOURCE_FILES, load_csv, load_dependency_layers, load_json, load_text, run_authority_preflight
 from .validators import run_validation_suite, write_validation_outputs
 
 
@@ -156,13 +156,17 @@ def main() -> int:
     _write_json(output_root / "eafix_module_manifests_bundle.vNext.schema_valid.json", bundle)
     _write_json(output_root / "manifest_unresolved_items.json", unresolved_items)
 
+    dependency_layers_parsed, dependency_layers_data = load_dependency_layers(repo_root)
+    if dependency_layers_parsed:
+        _write_json(staging_root / "dependency_layers_parsed.json", dependency_layers_data)
+
     validation = run_validation_suite(
         manifests,
         schema,
         expected_symbols={m["canonical_symbol"] for m in module_universe["modules"]},
         mapping_rows_total=file_mapping_index["rows_total"],
         ui_catalog=raw["ui_catalog"],
-        dependency_layers_parsed=False,
+        dependency_layers_parsed=dependency_layers_parsed,
     )
     write_validation_outputs(
         validation,
