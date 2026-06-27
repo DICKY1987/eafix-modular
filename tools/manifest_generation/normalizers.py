@@ -35,7 +35,6 @@ KNOWN_PORTS = {
     "F4_FLOW_ORCHESTRATOR": 8088,
     "U1_DASHBOARD_BACKEND": 8092,
     "U2_GUI_GATEWAY": 8091,
-    "B2_MT4_EA_EXECUTOR": 5001,
 }
 
 
@@ -138,17 +137,32 @@ def build_process_step_index(process_step_catalog: dict[str, Any], aligned_proce
             by_id[module_id] = step
         by_step_id[str(step.get("process_step_id"))] = step
 
+    phase_name_by_id: dict[str, str] = {}
+    for phase in aligned_process.get("phases", []):
+        phase_id = str(phase.get("phase_id", "")).strip()
+        phase_name = str(phase.get("phase_name", "")).strip()
+        if phase_id and phase_name:
+            phase_name_by_id[phase_id] = phase_name
+
     aligned_by_symbol: dict[str, Any] = {}
+    phase_binding_by_symbol: dict[str, Any] = {}
     for step in aligned_process.get("steps", []):
         symbol = normalize_symbol(step.get("module_id", ""))
         if symbol:
             aligned_by_symbol[symbol] = step
+            phase_id = str(step.get("phase_id", "")).strip()
+            phase_binding_by_symbol[symbol] = {
+                "phase_id": phase_id or "PHASE_UNKNOWN",
+                "phase_name": phase_name_by_id.get(phase_id, "needs_review"),
+            }
 
     return {
         "by_symbol": by_symbol,
         "by_module_id": by_id,
         "by_step_id": by_step_id,
         "aligned_by_symbol": aligned_by_symbol,
+        "phase_name_by_id": phase_name_by_id,
+        "phase_binding_by_symbol": phase_binding_by_symbol,
     }
 
 
@@ -220,17 +234,59 @@ def build_communication_channel_index(communication_channels: dict[str, Any]) ->
 
 def build_ui_product_index(ui_catalog: dict[str, Any]) -> dict[str, Any]:
     index: dict[str, Any] = {}
+    by_service_rest: dict[str, list[dict[str, Any]]] = {}
+    for api in ui_catalog.get("rest_apis", []):
+        service = str(api.get("service", "")).lower().strip()
+        if service:
+            by_service_rest.setdefault(service, []).append(api)
+
+    by_service_ws: dict[str, list[dict[str, Any]]] = {}
+    for ws in ui_catalog.get("websocket_contracts", []):
+        service = str(ws.get("service", "")).lower().strip()
+        if service:
+            by_service_ws.setdefault(service, []).append(ws)
+
+    implementation_bindings: list[dict[str, Any]] = [
+        binding for binding in ui_catalog.get("implementation_bindings", []) if isinstance(binding, dict)
+    ]
+
+    product_by_id: dict[str, dict[str, Any]] = {}
+    for product in ui_catalog.get("ui_products", []):
+        if isinstance(product, dict):
+            product_id = str(product.get("product_id", "")).strip()
+            if product_id:
+                product_by_id[product_id] = product
+
+    def _bindings_for_product(product_id: str) -> list[dict[str, Any]]:
+        matches = []
+        for binding in implementation_bindings:
+            binds_to = binding.get("binds_to", [])
+            if isinstance(binds_to, list) and product_id in binds_to:
+                matches.append(binding)
+        return matches
+
+    def _bundle(product: dict[str, Any]) -> dict[str, Any]:
+        service_name = str(product.get("service_name", "")).lower().strip()
+        product_id = str(product.get("product_id", "")).strip()
+        return {
+            "product": product,
+            "service_name": service_name or None,
+            "rest_apis": by_service_rest.get(service_name, []),
+            "websocket_contracts": by_service_ws.get(service_name, []),
+            "implementation_bindings": _bindings_for_product(product_id),
+        }
+
     for product in ui_catalog.get("ui_products", []):
         name = str(product.get("name", "")).lower()
         service_name = str(product.get("service_name", "")).lower()
         if "dashboard backend" in name or service_name == "dashboard-backend":
-            index["U1_DASHBOARD_BACKEND"] = product
+            index["U1_DASHBOARD_BACKEND"] = _bundle(product)
         elif "gui gateway" in name or service_name == "gui-gateway":
-            index["U2_GUI_GATEWAY"] = product
+            index["U2_GUI_GATEWAY"] = _bundle(product)
         elif "overlay" in name:
-            index["U3_MT4_EXPIRY_OVERLAY"] = product
+            index["U3_MT4_EXPIRY_OVERLAY"] = _bundle(product)
         elif "desktop operator" in name:
-            index["U4_DESKTOP_OPERATOR"] = product
+            index["U4_DESKTOP_OPERATOR"] = _bundle(product)
     return index
 
 

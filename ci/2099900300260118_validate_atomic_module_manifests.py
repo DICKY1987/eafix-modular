@@ -32,6 +32,7 @@ def main() -> int:
         "ui_validation_passed": len(report["ui_validation"]["issues"]) == 0,
         "mt4_validation_passed": len(report["mt4_validation"]["issues"]) == 0,
         "thin_module_validation_passed": len(report["thin_module_validation"]["issues"]) == 0,
+        "governance_validation_passed": len(report["governance_validation"]["issues"]) == 0,
     }
     failed = [name for name, passed in checks.items() if not passed]
     for name, passed in checks.items():

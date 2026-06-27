@@ -161,6 +161,8 @@ def main() -> int:
         schema,
         expected_symbols={m["canonical_symbol"] for m in module_universe["modules"]},
         mapping_rows_total=file_mapping_index["rows_total"],
+        ui_catalog=raw["ui_catalog"],
+        dependency_layers_parsed=False,
     )
     write_validation_outputs(
         validation,

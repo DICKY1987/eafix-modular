@@ -114,14 +114,26 @@ def _contract_refs(names: list[str], direction: str) -> list[dict[str, Any]]:
 
 
 def _build_process_binding(module: dict[str, Any], process_idx: dict[str, Any]) -> tuple[dict[str, Any], bool]:
-    step = process_idx["by_symbol"].get(module["canonical_symbol"])
+    symbol = module["canonical_symbol"]
+    step = process_idx["by_symbol"].get(symbol)
     if step:
+        aligned_phase = process_idx.get("phase_binding_by_symbol", {}).get(symbol, {})
+        phase_id = (
+            str(aligned_phase.get("phase_id", "")).strip()
+            or str(step.get("phase_id", "")).strip()
+            or "PHASE_UNKNOWN"
+        )
+        phase_name = (
+            str(aligned_phase.get("phase_name", "")).strip()
+            or process_idx.get("phase_name_by_id", {}).get(phase_id, "")
+            or "needs_review"
+        )
         return (
             {
                 "process_id": "HUEY_P_EAFIX_END_TO_END",
                 "process_version": "2.0.0",
-                "phase_id": "PHASE_UNKNOWN",
-                "phase_name": "needs_review",
+                "phase_id": phase_id,
+                "phase_name": phase_name,
                 "step_id": step.get("process_step_id"),
                 "step_number": int(step.get("step_number", 0)),
                 "step_code": step.get("step_code"),
@@ -183,6 +195,8 @@ def _service_runtime(symbol: str, ports_by_symbol: dict[str, int], file_map_for_
         if len(top) >= 2:
             home = "/".join(top[:2])
     port = ports_by_symbol.get(symbol)
+    if runtime_kind == "mql4_ea":
+        port = None
 
     return {
         "service_home": home,
@@ -192,7 +206,7 @@ def _service_runtime(symbol: str, ports_by_symbol: dict[str, int], file_map_for_
         "microservice_port": port,
         "host": "localhost" if port else None,
         "deployment_unit": scope,
-        "runtime_status": "active" if port else "unknown",
+        "runtime_status": "active" if port else ("active" if runtime_kind == "mql4_ea" else "unknown"),
         "startup_entrypoints": [],
         "health_endpoint": f"http://localhost:{port}/healthz" if port else None,
         "metrics_endpoint": f"http://localhost:{port}/metrics" if port else None,
@@ -270,7 +284,102 @@ def _platform_constraints(symbol: str) -> dict[str, Any] | None:
     }
 
 
-def build_manifests(
+    def _normalized_path(path: str) -> str:
+        return str(path).replace("\\", "/")
+
+
+    def _layer_from_authority(symbol: str, enriched: dict[str, Any] | None) -> tuple[int, bool]:
+        if enriched:
+            raw_layer = enriched.get("layer")
+            if isinstance(raw_layer, int):
+                return raw_layer, False
+            if isinstance(raw_layer, str) and raw_layer.strip().isdigit():
+                return int(raw_layer.strip()), False
+
+        pre = _prefix(symbol)
+        fallback = {
+            "F": 1,
+            "P": 1,
+            "D": 2,
+            "C": 3,
+            "S": 3,
+            "R": 4,
+            "O": 4,
+            "B": 4,
+            "E": 4,
+            "U": 5,
+            "SK": 6,
+        }
+        return fallback.get(pre, 1), True
+
+
+    def _ui_enrichment(symbol: str, ui_index: dict[str, Any]) -> dict[str, Any] | None:
+        if symbol not in ui_index:
+            return None
+        bundle = ui_index[symbol]
+        product = bundle.get("product", {})
+        if not isinstance(product, dict):
+            return None
+
+        rest_apis = bundle.get("rest_apis", [])
+        ws_contracts = bundle.get("websocket_contracts", [])
+        observed_paths = [_normalized_path(p) for p in product.get("observed_implementation_paths", [])]
+        binding_paths = [
+            _normalized_path(b.get("path"))
+            for b in bundle.get("implementation_bindings", [])
+            if isinstance(b, dict) and b.get("path")
+        ]
+        implementation_paths = sorted(set(observed_paths + binding_paths))
+
+        service_name = str(bundle.get("service_name") or "")
+        purpose = str(product.get("purpose", "")).strip()
+        product_id = str(product.get("product_id", "")).strip() or None
+        product_name = str(product.get("name", "")).strip() or symbol
+        port = product.get("declared_port") if isinstance(product.get("declared_port"), int) else None
+
+        module_root = None
+        if implementation_paths:
+            split = implementation_paths[0].split("/", 3)
+            if len(split) >= 2:
+                module_root = "/".join(split[:2])
+
+        rest_inputs = sorted({f"{api.get('method', 'GET')} {api.get('path', '').strip()}" for api in rest_apis if api.get("path")})
+        rest_outputs = sorted({str(api.get("api_id", api.get("path", "RESTResponse"))).strip() for api in rest_apis if api.get("path")})
+        ws_outputs = sorted({str(ws.get("websocket_id", "WebSocketEvent")).strip() for ws in ws_contracts})
+        ws_inputs = sorted({f"WS_SUBSCRIBE:{ws.get('url')}" for ws in ws_contracts if ws.get("url")})
+
+        scope_in = sorted(set(rest_inputs + ws_inputs)) or [f"{product_name} client requests"]
+        scope_out = sorted(set(rest_outputs + ws_outputs)) or [f"{product_name} responses"]
+        responsibilities = [purpose] if purpose else [f"Deliver {product_name} UX contracts"]
+
+        binding_refs = []
+        for binding in bundle.get("implementation_bindings", []):
+            if isinstance(binding, dict):
+                binding_id = str(binding.get("binding_id", "")).strip()
+                if binding_id:
+                    binding_refs.append(binding_id)
+
+        return {
+            "purpose": purpose,
+            "plain_summary": purpose or f"{product_name} UI module.",
+            "service_name": service_name or None,
+            "product_id": product_id,
+            "product_name": product_name,
+            "declared_port": port,
+            "module_root": module_root,
+            "implementation_paths": implementation_paths,
+            "scope_in": scope_in,
+            "scope_out": scope_out,
+            "responsibilities": responsibilities,
+            "input_contracts": scope_in,
+            "output_contracts": scope_out,
+            "rest_apis": rest_apis,
+            "websocket_contracts": ws_contracts,
+            "binding_refs": sorted(set(binding_refs)),
+        }
+
+
+    def build_manifests(
     reconciled_modules: list[dict[str, Any]],
     sources: dict[str, Any],
     normalized: dict[str, Any],
@@ -294,6 +403,22 @@ def build_manifests(
         runtime = _service_runtime(symbol, normalized["service_runtime_index"]["ports_by_symbol"], file_map)
         comm = _build_communication_channels(symbol, normalized["communication_channel_index"])
         scope_in, scope_out, responsibilities = _scope_arrays(enriched)
+        ui = _ui_enrichment(symbol, normalized["ui_product_index"])
+        layer, layer_fallback_used = _layer_from_authority(symbol, enriched)
+
+        if ui:
+            scope_in = ui["scope_in"]
+            scope_out = ui["scope_out"]
+            responsibilities = ui["responsibilities"]
+            if not runtime.get("service_home"):
+                runtime["service_home"] = ui["module_root"]
+            if isinstance(ui.get("declared_port"), int):
+                runtime["microservice_port"] = runtime["microservice_port"] or ui["declared_port"]
+                if runtime["microservice_port"]:
+                    runtime["host"] = "localhost"
+                    runtime["health_endpoint"] = f"http://localhost:{runtime['microservice_port']}/healthz"
+                    runtime["metrics_endpoint"] = f"http://localhost:{runtime['microservice_port']}/metrics"
+                    runtime["runtime_status"] = "active"
 
         unresolved = list(module["reconciliation"].get("unresolved_items", []))
         if is_not_applicable_process:
@@ -307,6 +432,9 @@ def build_manifests(
 
         input_contract_names = process_step.get("input_contracts") or []
         output_contract_names = process_step.get("output_contracts") or []
+        if ui:
+            input_contract_names = ui["input_contracts"]
+            output_contract_names = ui["output_contracts"]
         if symbol == "R3_CORRELATION_GUARD" and "RiskGuardResult" not in output_contract_names:
             output_contract_names = [*output_contract_names, "RiskGuardResult"]
         if symbol == "R1_RISK_EVALUATOR" and "RiskGuardResult" not in input_contract_names:
@@ -377,17 +505,19 @@ def build_manifests(
                 "domain_group_id": _domain_group(symbol)[0],
                 "domain_group_name": _domain_group(symbol)[1],
                 "phase_id": process_binding.get("phase_id"),
-                "layer": int(str(module["module_id"])[-2:]) if str(module["module_id"])[-2:].isdigit() else 1,
+                "layer": layer,
                 "deployable_scope": _deployable_scope(symbol),
                 "tags": ["vNext"],
             },
             "purpose": str(
-                (enriched or {}).get("purpose")
+                (ui or {}).get("purpose")
+                or (enriched or {}).get("purpose")
                 or module.get("purpose")
                 or f"{module['module_name']} responsibility needs_review"
             ),
             "plain_language_summary": str(
-                (enriched or {}).get("purpose")
+                (ui or {}).get("plain_summary")
+                or (enriched or {}).get("purpose")
                 or f"{module['module_name']} ({symbol}) in vNext atomic module set."
             ),
             "process_binding": process_binding,
@@ -440,9 +570,16 @@ def build_manifests(
                 "shared_files": [
                     {
                         "path": p,
-                        "sharing_policy": "shared_kernel",
-                        "allowed_modules": [],
-                        "reason": "",
+                        "sharing_policy": "shared_service_file",
+                        "allowed_modules": sorted(
+                            {
+                                m
+                                for row in file_map["file_role_index"]
+                                if row.get("path") == p
+                                for m in row.get("canonical_modules", [])
+                            }
+                        ),
+                        "reason": "Shared service evidence from file_module_mapping.csv",
                     }
                     for p in sorted(file_map["shared_service_files"])
                 ],
@@ -540,7 +677,7 @@ def build_manifests(
                 "known_flags": sorted(set(["THIN_MODULE"] if thin_reason else []) | set([u.split(":", 1)[0].upper() for u in unresolved])),
                 "stale_symbol_tokens": module.get("legacy_aliases_applied", []),
                 "kind_mismatch": False,
-                "layer_unassigned": False,
+                "layer_unassigned": layer_fallback_used,
                 "prefix_collision": False,
                 "reconciliation_notes": sorted(set(unresolved)),
                 "last_reconciled_utc": now,
@@ -577,7 +714,7 @@ def build_manifests(
         if platform:
             manifest["platform_constraints"] = platform
         if symbol in normalized["ui_product_index"]:
-            product = normalized["ui_product_index"][symbol]
+            product = normalized["ui_product_index"][symbol].get("product", {})
             manifest["ai_context"] = {
                 "context_priority": "canonical",
                 "plain_language_summary": f"UI catalog mapping for {product.get('product_id')}",
@@ -591,6 +728,13 @@ def build_manifests(
                     "lookup_keys": [symbol, product.get("product_id", "")],
                 },
             }
+            if ui:
+                manifest["ai_context"]["ui_product_binding"] = {
+                    "product_id": ui.get("product_id"),
+                    "product_name": ui.get("product_name"),
+                    "implementation_paths": ui.get("implementation_paths", []),
+                    "binding_ids": ui.get("binding_refs", []),
+                }
         if module.get("legacy_aliases_applied"):
             manifest["migration_traceability"] = {
                 "migration_status": "renamed_from_legacy_alias",
