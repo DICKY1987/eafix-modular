@@ -195,9 +195,50 @@ These commands do not apply to this task anyway, as this task only modifies docu
 
 ---
 
-## 9. Branch Readiness
+## 9. Branch Readiness (Initial Pass)
 
-**Ready for review.** No runtime/trading code was modified. All documentation path references are now consistent. The branch can be merged after reviewer confirmation of:
+Initial readiness was recorded before a later master sync and final validation rerun.
 
-1. The missing-file entries (`VALIDATION_GATES.md`, `ALIGNMENT_VALIDATION_REPORT.md`) are acceptable as documented with `path_status: missing_from_disk`.
-2. The `Y_module governance glossary.json` archival is confirmed correct (SHA256 match was verified programmatically).
+---
+
+## 10. Post-sync Final Verification (2026-06-27)
+
+### 10.1 Sync status with latest `master`
+
+- **Branch synced with latest `master`:** ✅ Yes (merged `origin/master` into this branch)
+- **Conflict resolution required:** ❌ No conflicts occurred
+- **Post-review fixes preserved:** ✅ Yes (`VALIDATION_GATES.md` and `ALIGNMENT_VALIDATION_REPORT.md` remained `path: null` / `repo_path_hint: null` with `stale_path_was` set to `EA-REG/...`)
+
+### 10.2 Stale-path/routing checks after latest fix
+
+- **Scan A (root routing flat paths):** ✅ Pass (no invalid flat-path matches)
+- **Scan B (`doc_authority.json` flat paths):** ✅ Pass on strict flat-path check (no `EAFIX_auth_docs/<file>` root-only paths remain)
+- **Scan C (summary router flat paths):** ✅ Pass on strict flat-path check after final fix
+  - Final fix in this pass: `DOC-PAT-EVERY-REUSABLE-PATTERN-PATTERN-304__every_reusable_pattern.pattern.yaml` now uses `repo_path_hint: null` with `stale_path_was` preserved.
+- **Scan D (missing-file null-path markers):** ✅ Pass (`VALIDATION_GATES.md` and `ALIGNMENT_VALIDATION_REPORT.md` entries present with expected null and stale markers)
+- **Scan E (archive/cleanup exclusions):** ✅ Pass (routing exclusions and README guardrails present)
+
+### 10.3 Validation rerun results
+
+- **JSON parse validation:** ✅ Passed
+- **Schema validation (`python3 ci/2099900010260118_validate_schemas.py`):** ✅ Passed (11/11 schemas valid)
+
+### 10.4 Python tooling availability
+
+- **`poetry run pytest`:** not available (`poetry: command not found`)
+- **`poetry run flake8`:** not available (`poetry: command not found`)
+- **`poetry run mypy`:** not available (`poetry: command not found`)
+
+### 10.5 GitHub Actions status
+
+- **Latest local head commit had workflow runs:** ❌ No workflow run found yet for the latest local head commit at verification time.
+
+---
+
+## 11. Current Merge Readiness
+
+**Ready for review** after this final sync + rerun pass, with the same manual follow-ups:
+
+1. `VALIDATION_GATES.md` is still missing from disk and needs recovery/regeneration decision.
+2. `ALIGNMENT_VALIDATION_REPORT.md` is still missing from disk and can be regenerated with `EA-REG/validate_three_artifact_alignment.py`.
+3. Content consolidation remains intentionally out of scope.
