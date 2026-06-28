@@ -5,9 +5,29 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
+
+# Timestamp-only fields that are non-deterministic by design and should not
+# be treated as semantic drift when checking committed vs regenerated manifests.
+_TIMESTAMP_FIELD_PATTERN = re.compile(
+    r'"(?:generated_at_utc|last_updated_utc|last_reconciled_utc)"\s*:\s*"[^"]*"'
+)
+
+
+def _has_semantic_drift(diff_stdout: str) -> bool:
+    """Return True if the diff contains non-timestamp changes."""
+    for line in diff_stdout.splitlines():
+        if not line.startswith(("+", "-")):
+            continue
+        if line.startswith(("+++", "---")):
+            continue
+        if _TIMESTAMP_FIELD_PATTERN.search(line):
+            continue
+        return True
+    return False
 
 
 def main() -> int:
@@ -18,15 +38,19 @@ def main() -> int:
         print("Manifest generation failed", file=sys.stderr)
         return completed.returncode
 
-    # Drift detection: fail if generated files differ from committed files.
+    # Drift detection: fail if generated files differ from committed files
+    # in ways other than timestamp fields (generated_at_utc, last_updated_utc,
+    # last_reconciled_utc are non-deterministic by design and are excluded).
     drift = subprocess.run(
-        ["git", "diff", "--exit-code", "--", "EAFIX_auth_docs/manifests"],
+        ["git", "diff", "--", "EAFIX_auth_docs/manifests"],
         cwd=repo_root,
+        capture_output=True,
+        text=True,
         check=False,
     )
-    if drift.returncode != 0:
+    if _has_semantic_drift(drift.stdout):
         print(
-            "FAIL: Generated manifest files differ from committed files. "
+            "FAIL: Generated manifest files differ semantically from committed files. "
             "Run `python -m tools.manifest_generation.generate_manifests --repo-root .` "
             "and commit the updated artifacts.",
             file=sys.stderr,
