@@ -3,8 +3,8 @@
   "document_type": "atomic_module_manifest_schema_instance",
   "packet_type": "atomic_module_manifest",
   "manifest_version": "1.0.0",
-  "generated_at_utc": "2026-06-27T01:34:31.435377+00:00",
-  "last_updated_utc": "2026-06-27T01:34:31.435377+00:00",
+  "generated_at_utc": "2026-06-28T04:54:30.010811+00:00",
+  "last_updated_utc": "2026-06-28T04:54:30.010811+00:00",
   "source_authority": {
     "authority_policy": "generated_from_canonical_sources",
     "required_reference_documents": [
@@ -171,7 +171,7 @@
     "atomicity_statement": "U4_DESKTOP_OPERATOR is represented as a single atomic manifest record."
   },
   "file_ownership": {
-    "module_root": "services/dashboard-backend",
+    "module_root": "services/desktop-ui",
     "manifest_path": null,
     "owned_files": [],
     "source_files": [],
@@ -192,8 +192,8 @@
     "ownership_derivation": "unknown"
   },
   "service_runtime": {
-    "service_home": "services/dashboard-backend",
-    "candidate_service_home": null,
+    "service_home": "services/desktop-ui",
+    "candidate_service_home": "services/dashboard-backend",
     "runtime_kind": "python_service",
     "language": "python",
     "microservice_port": null,
@@ -315,7 +315,7 @@
       "process_binding:not_applicable",
       "thin_module:ui_module"
     ],
-    "last_reconciled_utc": "2026-06-27T01:34:31.435377+00:00"
+    "last_reconciled_utc": "2026-06-28T04:54:30.010811+00:00"
   },
   "staleness_policy": {
     "regenerate_if_changed": [
@@ -353,7 +353,7 @@
       "capability_registry:EAFIX_auth_docs/converted_capability_registry.json": "2e4631bb9b8fff95a5f1f23e9943dafc064b3895bf24ef4182247ed812691ca4",
       "dependency_layers_pdf:EAFIX_auth_docs/dependency layers.pdf": "4ed5933311738f0c76710beae7a8db74af30dfeb96580210daf585292768b058"
     },
-    "staleness_check_command": "python tools/manifest_generation/generate_manifests.py --validate-only",
+    "staleness_check_command": "python -m tools.manifest_generation.generate_manifests --repo-root . --validate-only",
     "staleness_status": "fresh"
   },
   "notes": [

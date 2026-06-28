@@ -18,6 +18,21 @@ def main() -> int:
         print("Manifest generation failed", file=sys.stderr)
         return completed.returncode
 
+    # Drift detection: fail if generated files differ from committed files.
+    drift = subprocess.run(
+        ["git", "diff", "--exit-code", "--", "EAFIX_auth_docs/manifests"],
+        cwd=repo_root,
+        check=False,
+    )
+    if drift.returncode != 0:
+        print(
+            "FAIL: Generated manifest files differ from committed files. "
+            "Run `python -m tools.manifest_generation.generate_manifests --repo-root .` "
+            "and commit the updated artifacts.",
+            file=sys.stderr,
+        )
+        return 1
+
     report_path = repo_root / "EAFIX_auth_docs" / "manifests" / "manifest_validation_report.json"
     report = json.loads(report_path.read_text(encoding="utf-8"))
 

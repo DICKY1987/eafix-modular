@@ -3,7 +3,7 @@
 ## Summary
 - **total_manifests**: 34
 - **schema_valid_manifests**: 34
-- **thin_modules**: 0
+- **thin_modules**: 9
 - **modules_with_no_files**: 15
 - **modules_with_shared_service_files**: 13
 - **modules_with_runtime_ports**: 16
@@ -41,11 +41,11 @@
 | 50000000000000000024 | E4_REENTRY_INTENT_BUILDER | filled | filled | filled | filled | filled | filled | partial | filled | not_applicable | not_applicable | not_applicable | filled | generated | 0 |
 | 50000000000000000025 | F4_FLOW_ORCHESTRATOR | filled | filled | filled | filled | filled | filled | unassigned | filled | not_applicable | not_applicable | not_applicable | filled | generated | 2 |
 | 50000000000000000026 | P1_HEALTH_AGGREGATOR | filled | filled | filled | filled | filled | filled | complete | missing | not_applicable | not_applicable | not_applicable | filled | generated | 0 |
-| 50000000000000000027 | R3_CORRELATION_GUARD | filled | filled | filled | filled | filled | missing | unassigned | missing | not_applicable | not_applicable | not_applicable | filled | generated | 3 |
-| 50000000000000000028 | U1_DASHBOARD_BACKEND | filled | filled | filled | filled | filled | missing | unassigned | filled | not_applicable | filled | not_applicable | filled | generated | 3 |
-| 50000000000000000029 | U2_GUI_GATEWAY | filled | filled | filled | filled | filled | missing | unassigned | filled | not_applicable | filled | not_applicable | filled | generated | 3 |
-| 50000000000000000030 | U3_MT4_EXPIRY_OVERLAY | filled | filled | filled | filled | filled | missing | unassigned | missing | not_applicable | filled | filled | filled | generated | 3 |
-| 50000000000000000031 | U4_DESKTOP_OPERATOR | filled | filled | filled | filled | filled | missing | unassigned | missing | not_applicable | filled | filled | filled | generated | 3 |
-| 50000000000000000032 | P2_REPORTER | filled | filled | filled | filled | filled | missing | unassigned | missing | not_applicable | not_applicable | not_applicable | filled | generated | 3 |
-| 50000000000000000033 | SK1_PLUGIN_INTERFACE | filled | filled | filled | filled | filled | missing | unassigned | missing | not_applicable | not_applicable | not_applicable | filled | generated | 3 |
-| 50000000000000000034 | SK2_IDEMPOTENCY | filled | filled | filled | filled | filled | missing | unassigned | missing | not_applicable | not_applicable | not_applicable | filled | generated | 3 |
+| 50000000000000000027 | R3_CORRELATION_GUARD | filled | filled | filled | not_applicable | filled | missing | unassigned | missing | not_applicable | not_applicable | not_applicable | filled | generated | 3 |
+| 50000000000000000028 | U1_DASHBOARD_BACKEND | filled | filled | filled | not_applicable | filled | missing | unassigned | filled | not_applicable | filled | not_applicable | filled | generated | 3 |
+| 50000000000000000029 | U2_GUI_GATEWAY | filled | filled | filled | not_applicable | filled | missing | unassigned | filled | not_applicable | filled | not_applicable | filled | generated | 3 |
+| 50000000000000000030 | U3_MT4_EXPIRY_OVERLAY | filled | filled | filled | not_applicable | filled | missing | unassigned | missing | not_applicable | filled | filled | filled | generated | 3 |
+| 50000000000000000031 | U4_DESKTOP_OPERATOR | filled | filled | filled | not_applicable | filled | missing | unassigned | missing | not_applicable | filled | filled | filled | generated | 3 |
+| 50000000000000000032 | P2_REPORTER | filled | filled | filled | not_applicable | filled | missing | unassigned | missing | not_applicable | not_applicable | not_applicable | filled | generated | 3 |
+| 50000000000000000033 | SK1_PLUGIN_INTERFACE | filled | filled | filled | not_applicable | filled | missing | unassigned | missing | not_applicable | not_applicable | not_applicable | filled | generated | 3 |
+| 50000000000000000034 | SK2_IDEMPOTENCY | filled | filled | filled | not_applicable | filled | missing | unassigned | missing | not_applicable | not_applicable | not_applicable | filled | generated | 3 |

@@ -30,15 +30,20 @@ EXPECTED_PORTS = {
 }
 
 
+def _safe_identity(manifest: dict[str, Any]) -> dict[str, Any]:
+    return manifest.get("module_identity") or {}
+
+
 def _schema_validate_manifests(manifests: list[dict[str, Any]], schema: dict[str, Any]) -> dict[str, Any]:
     validator = Draft202012Validator(schema)
     errors = []
     for manifest in manifests:
+        identity = _safe_identity(manifest)
         for err in validator.iter_errors(manifest):
             errors.append(
                 {
-                    "module_id": manifest["module_identity"]["module_id"],
-                    "canonical_symbol": manifest["module_identity"]["canonical_symbol"],
+                    "module_id": identity.get("module_id", "UNKNOWN"),
+                    "canonical_symbol": identity.get("canonical_symbol", "UNKNOWN"),
                     "path": list(err.path),
                     "message": err.message,
                 }
@@ -52,8 +57,8 @@ def _schema_validate_manifests(manifests: list[dict[str, Any]], schema: dict[str
 
 
 def _identity_validation(manifests: list[dict[str, Any]], expected_symbols: set[str]) -> dict[str, Any]:
-    ids = [m["module_identity"]["module_id"] for m in manifests]
-    symbols = [m["module_identity"]["canonical_symbol"] for m in manifests]
+    ids = [_safe_identity(m).get("module_id", "UNKNOWN") for m in manifests]
+    symbols = [_safe_identity(m).get("canonical_symbol", "UNKNOWN") for m in manifests]
     stale_primary = [s for s in symbols if s in {"O2_OMS", "O3_PNL_CLASSIFIER", "F1_FLOW_ORCHESTRATOR", "SHARED_LIBS"}]
     return {
         "unique_module_ids": len(set(ids)),
@@ -71,7 +76,7 @@ def _identity_validation(manifests: list[dict[str, Any]], expected_symbols: set[
 def _dependency_validation(manifests: list[dict[str, Any]], id_set: set[str]) -> dict[str, Any]:
     issues = []
     for manifest in manifests:
-        symbol = manifest["module_identity"]["canonical_symbol"]
+        symbol = _safe_identity(manifest).get("canonical_symbol", "UNKNOWN")
         for dep in manifest.get("dependencies", []):
             target_id = str(dep.get("target_id", ""))
             if "{" in target_id or "}" in target_id:
@@ -86,17 +91,18 @@ def _dependency_validation(manifests: list[dict[str, Any]], id_set: set[str]) ->
 def _contract_validation(manifests: list[dict[str, Any]]) -> dict[str, Any]:
     issues = []
     for manifest in manifests:
-        symbol = manifest["module_identity"]["canonical_symbol"]
+        symbol = _safe_identity(manifest).get("canonical_symbol", "UNKNOWN")
+        contracts = manifest.get("contracts") or {}
         for field in ["input_contracts", "output_contracts"]:
-            for ref in manifest["contracts"].get(field, []):
+            for ref in contracts.get(field, []):
                 if not isinstance(ref, dict):
                     issues.append({"symbol": symbol, "issue": f"{field}_non_object"})
         if symbol == "R3_CORRELATION_GUARD":
-            names = [x["name"] for x in manifest["contracts"]["output_contracts"] if isinstance(x, dict)]
+            names = [x.get("name") for x in contracts.get("output_contracts", []) if isinstance(x, dict)]
             if "RiskGuardResult" not in names:
                 issues.append({"symbol": symbol, "issue": "missing_RiskGuardResult_output"})
         if symbol == "R1_RISK_EVALUATOR":
-            names = [x["name"] for x in manifest["contracts"]["input_contracts"] if isinstance(x, dict)]
+            names = [x.get("name") for x in contracts.get("input_contracts", []) if isinstance(x, dict)]
             if "RiskGuardResult" not in names:
                 issues.append({"symbol": symbol, "issue": "missing_RiskGuardResult_input"})
     return {"issues": issues}
@@ -105,7 +111,7 @@ def _contract_validation(manifests: list[dict[str, Any]]) -> dict[str, Any]:
 def _runtime_validation(manifests: list[dict[str, Any]]) -> dict[str, Any]:
     issues = []
     for manifest in manifests:
-        symbol = manifest["module_identity"]["canonical_symbol"]
+        symbol = _safe_identity(manifest).get("canonical_symbol", "UNKNOWN")
         expected = EXPECTED_PORTS.get(symbol)
         if expected is None:
             continue
@@ -126,7 +132,7 @@ def _file_ownership_validation(manifests: list[dict[str, Any]], mapping_rows_tot
         all_role_rows += len(role_index)
         for row in role_index:
             if "is_test" not in row:
-                issues.append({"symbol": manifest["module_identity"]["canonical_symbol"], "issue": "missing_is_test"})
+                issues.append({"symbol": _safe_identity(manifest).get("canonical_symbol", "UNKNOWN"), "issue": "missing_is_test"})
     return {
         "issues": issues,
         "mapped_row_count_in_manifests": all_role_rows,
@@ -137,7 +143,7 @@ def _file_ownership_validation(manifests: list[dict[str, Any]], mapping_rows_tot
 def _ui_validation(manifests: list[dict[str, Any]]) -> dict[str, Any]:
     issues = []
     for symbol in ["U1_DASHBOARD_BACKEND", "U2_GUI_GATEWAY", "U3_MT4_EXPIRY_OVERLAY", "U4_DESKTOP_OPERATOR"]:
-        match = next((m for m in manifests if m["module_identity"]["canonical_symbol"] == symbol), None)
+        match = next((m for m in manifests if _safe_identity(m).get("canonical_symbol") == symbol), None)
         if not match:
             issues.append({"symbol": symbol, "issue": "missing_ui_manifest"})
             continue
@@ -174,8 +180,9 @@ def _governance_validation(
 
     layer_suffix_matches = 0
     for manifest in manifests:
-        symbol = manifest["module_identity"]["canonical_symbol"]
-        module_id = str(manifest["module_identity"]["module_id"])
+        identity = _safe_identity(manifest)
+        symbol = identity.get("canonical_symbol", "UNKNOWN")
+        module_id = str(identity.get("module_id", ""))
         layer = manifest.get("module_classification", {}).get("layer")
         process_binding = manifest.get("process_binding", {})
 
@@ -198,7 +205,7 @@ def _governance_validation(
 
     ui_products = _ui_catalog_product_map(ui_catalog)
     for symbol, product in ui_products.items():
-        manifest = next((m for m in manifests if m["module_identity"]["canonical_symbol"] == symbol), None)
+        manifest = next((m for m in manifests if _safe_identity(m).get("canonical_symbol") == symbol), None)
         if not manifest:
             continue
         if product.get("purpose") and "needs_review" in str(manifest.get("purpose", "")):
@@ -213,14 +220,14 @@ def _governance_validation(
         if any("needs_review" in str(v) for v in scope.get("scope_in", []) + scope.get("scope_out", []) + scope.get("responsibilities", [])):
             issues.append({"symbol": symbol, "issue": "ui_scope_or_responsibility_needs_review"})
 
-        contracts = manifest.get("contracts", {})
+        contracts = manifest.get("contracts") or {}
         if symbol in {"U1_DASHBOARD_BACKEND", "U2_GUI_GATEWAY"}:
             inputs = [str(c.get("name")) for c in contracts.get("input_contracts", []) if isinstance(c, dict)]
             outputs = [str(c.get("name")) for c in contracts.get("output_contracts", []) if isinstance(c, dict)]
             if any(name == "needs_review" for name in inputs + outputs):
                 issues.append({"symbol": symbol, "issue": "ui_contracts_needs_review"})
 
-    b2 = next((m for m in manifests if m["module_identity"]["canonical_symbol"] == "B2_MT4_EA_EXECUTOR"), None)
+    b2 = next((m for m in manifests if _safe_identity(m).get("canonical_symbol") == "B2_MT4_EA_EXECUTOR"), None)
     if b2:
         runtime = b2.get("service_runtime", {})
         if runtime.get("runtime_kind") == "mql4_ea" and runtime.get("microservice_port") == 5001:
@@ -235,7 +242,7 @@ def _governance_validation(
 def _mt4_validation(manifests: list[dict[str, Any]]) -> dict[str, Any]:
     issues = []
     for symbol in ["B2_MT4_EA_EXECUTOR", "U4_DESKTOP_OPERATOR"]:
-        m = next((x for x in manifests if x["module_identity"]["canonical_symbol"] == symbol), None)
+        m = next((x for x in manifests if _safe_identity(x).get("canonical_symbol") == symbol), None)
         if not m:
             issues.append({"symbol": symbol, "issue": "missing_manifest"})
             continue
@@ -258,7 +265,7 @@ def _thin_module_validation(manifests: list[dict[str, Any]]) -> dict[str, Any]:
     }
     issues = []
     for symbol in required:
-        m = next((x for x in manifests if x["module_identity"]["canonical_symbol"] == symbol), None)
+        m = next((x for x in manifests if _safe_identity(x).get("canonical_symbol") == symbol), None)
         if not m:
             issues.append({"symbol": symbol, "issue": "missing_thin_module"})
             continue
@@ -276,8 +283,8 @@ def run_validation_suite(
     ui_catalog: dict[str, Any],
     dependency_layers_parsed: bool,
 ) -> dict[str, Any]:
-    id_set = {m["module_identity"]["module_id"] for m in manifests}
-    symbol_set = {m["module_identity"]["canonical_symbol"] for m in manifests}
+    id_set = {_safe_identity(m).get("module_id", "UNKNOWN") for m in manifests}
+    symbol_set = {_safe_identity(m).get("canonical_symbol", "UNKNOWN") for m in manifests}
     schema_result = _schema_validate_manifests(manifests, schema)
     dependency_result = _dependency_validation(manifests, id_set)
     report = {

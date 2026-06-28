@@ -348,10 +348,19 @@ def _ui_enrichment(symbol: str, ui_index: dict[str, Any]) -> dict[str, Any] | No
     port = product.get("declared_port") if isinstance(product.get("declared_port"), int) else None
 
     module_root = None
+    candidate_root = None
     if implementation_paths:
-        split = implementation_paths[0].split("/", 3)
+        # For desktop applications, prefer desktop-ui paths over backend service paths
+        desktop_paths = [p for p in implementation_paths if "/desktop-ui/" in p or p.startswith("services/desktop-ui")]
+        backend_paths = [p for p in implementation_paths if "/dashboard-backend/" in p or p.startswith("services/dashboard-backend")]
+        primary_paths = desktop_paths or implementation_paths
+        split = primary_paths[0].split("/", 3)
         if len(split) >= 2:
             module_root = "/".join(split[:2])
+        if desktop_paths and backend_paths:
+            bsplit = backend_paths[0].split("/", 3)
+            if len(bsplit) >= 2:
+                candidate_root = "/".join(bsplit[:2])
 
     rest_inputs = sorted(
         {
@@ -399,6 +408,7 @@ def _ui_enrichment(symbol: str, ui_index: dict[str, Any]) -> dict[str, Any] | No
         "product_name": product_name,
         "declared_port": port,
         "module_root": module_root,
+        "candidate_module_root": candidate_root,
         "implementation_paths": implementation_paths,
         "scope_in": scope_in,
         "scope_out": scope_out,
@@ -444,6 +454,12 @@ def build_manifests(
             responsibilities = ui["responsibilities"]
             if not runtime.get("service_home"):
                 runtime["service_home"] = ui["module_root"]
+            elif symbol == "U4_DESKTOP_OPERATOR" and ui.get("module_root"):
+                # U4 is a mixed desktop runtime: prefer desktop-ui as primary service_home
+                runtime["candidate_service_home"] = runtime["service_home"]
+                runtime["service_home"] = ui["module_root"]
+            if ui.get("candidate_module_root") and not runtime.get("candidate_service_home"):
+                runtime["candidate_service_home"] = ui["candidate_module_root"]
             if isinstance(ui.get("declared_port"), int):
                 runtime["microservice_port"] = runtime["microservice_port"] or ui["declared_port"]
                 if runtime["microservice_port"]:
@@ -732,7 +748,7 @@ def build_manifests(
                     "EAFIX_auth_docs/ui_catalog.json",
                 ],
                 "source_hashes": source_hashes,
-                "staleness_check_command": "python tools/manifest_generation/generate_manifests.py --validate-only",
+                "staleness_check_command": "python -m tools.manifest_generation.generate_manifests --repo-root . --validate-only",
                 "staleness_status": "fresh",
             },
             "notes": [
