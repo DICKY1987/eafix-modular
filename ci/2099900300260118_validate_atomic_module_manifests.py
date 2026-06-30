@@ -5,10 +5,15 @@
 from __future__ import annotations
 
 import json
+<<<<<<< HEAD
+=======
+import re
+>>>>>>> origin/copilot/regenerate-34-module-manifests
 import subprocess
 import sys
 from pathlib import Path
 
+<<<<<<< HEAD
 # Timestamp-only fields that differ across runs without semantic change.
 _VOLATILE_KEYS = {"generated_at_utc", "last_updated_utc", "last_reconciled_utc"}
 
@@ -42,6 +47,26 @@ def _has_semantic_drift(path: Path, repo_root: Path) -> bool:
     except (json.JSONDecodeError, OSError):
         return True
     return committed != current
+=======
+# Timestamp-only fields that are non-deterministic by design and should not
+# be treated as semantic drift when checking committed vs regenerated manifests.
+_TIMESTAMP_FIELD_PATTERN = re.compile(
+    r'"(?:generated_at_utc|last_updated_utc|last_reconciled_utc)"\s*:\s*"[^"]*"'
+)
+
+
+def _has_semantic_drift(diff_stdout: str) -> bool:
+    """Return True if the diff contains non-timestamp changes."""
+    for line in diff_stdout.splitlines():
+        if not line.startswith(("+", "-")):
+            continue
+        if line.startswith(("+++", "---")):
+            continue
+        if _TIMESTAMP_FIELD_PATTERN.search(line):
+            continue
+        return True
+    return False
+>>>>>>> origin/copilot/regenerate-34-module-manifests
 
 
 def main() -> int:
@@ -52,6 +77,7 @@ def main() -> int:
         print("Manifest generation failed", file=sys.stderr)
         return completed.returncode
 
+<<<<<<< HEAD
     # --- Drift detection -------------------------------------------------
     manifests_dir = repo_root / "EAFIX_auth_docs" / "manifests"
     drift_paths = [
@@ -67,11 +93,31 @@ def main() -> int:
             "Stale committed manifests detected.  Re-run: "
             "python -m tools.manifest_generation.generate_manifests --repo-root . "
             "and commit the updated EAFIX_auth_docs/manifests outputs.",
+=======
+    # Drift detection: fail if generated files differ from committed files
+    # in ways other than timestamp fields (generated_at_utc, last_updated_utc,
+    # last_reconciled_utc are non-deterministic by design and are excluded).
+    drift = subprocess.run(
+        ["git", "diff", "--", "EAFIX_auth_docs/manifests"],
+        cwd=repo_root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if _has_semantic_drift(drift.stdout):
+        print(
+            "FAIL: Generated manifest files differ semantically from committed files. "
+            "Run `python -m tools.manifest_generation.generate_manifests --repo-root .` "
+            "and commit the updated artifacts.",
+>>>>>>> origin/copilot/regenerate-34-module-manifests
             file=sys.stderr,
         )
         return 1
 
+<<<<<<< HEAD
     # --- Quality gates ---------------------------------------------------
+=======
+>>>>>>> origin/copilot/regenerate-34-module-manifests
     report_path = repo_root / "EAFIX_auth_docs" / "manifests" / "manifest_validation_report.json"
     report = json.loads(report_path.read_text(encoding="utf-8"))
 

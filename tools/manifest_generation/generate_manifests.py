@@ -29,7 +29,11 @@ from .report_writer import (
     write_generation_report,
 )
 from .schema_loader import build_schema_field_map, load_schema
+<<<<<<< HEAD
 from .source_loaders import REQUIRED_SOURCE_FILES, load_csv, load_dependency_layers, load_json, load_text, run_authority_preflight
+=======
+from .source_loaders import REQUIRED_SOURCE_FILES, load_csv, load_json, load_text, run_authority_preflight
+>>>>>>> origin/copilot/regenerate-34-module-manifests
 from .validators import run_validation_suite, write_validation_outputs
 
 
@@ -38,6 +42,7 @@ def _write_json(path: Path, payload: Any) -> None:
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
+<<<<<<< HEAD
 def _repo_relative(path: Path, repo_root: Path) -> str:
     try:
         return str(path.relative_to(repo_root))
@@ -45,6 +50,8 @@ def _repo_relative(path: Path, repo_root: Path) -> str:
         return str(path)
 
 
+=======
+>>>>>>> origin/copilot/regenerate-34-module-manifests
 def _source_hash_map(snapshot: dict[str, Any]) -> dict[str, str]:
     return {
         f"{key}:{meta['relative_path']}": meta["sha256"]
@@ -163,9 +170,36 @@ def main() -> int:
     _write_json(output_root / "eafix_module_manifests_bundle.vNext.schema_valid.json", bundle)
     _write_json(output_root / "manifest_unresolved_items.json", unresolved_items)
 
+<<<<<<< HEAD
     dependency_layers_parsed, dependency_layers_data = load_dependency_layers(repo_root)
     if dependency_layers_parsed:
         _write_json(staging_root / "dependency_layers_parsed.json", dependency_layers_data)
+=======
+    # Emit deferred staging artifact for dependency layers PDF.
+    # The PDF exists but is binary/unstructured; dependency layer relationships
+    # are modeled via the vNext module catalog and process step index instead.
+    dep_layers_pdf_path = repo_root / "EAFIX_auth_docs" / "dependency layers.pdf"
+    dep_layers_staging = {
+        "source_file": "EAFIX_auth_docs/dependency layers.pdf",
+        "parse_status": "deferred",
+        "parse_reason": (
+            "Binary PDF cannot be parsed programmatically. "
+            "Dependency layer relationships are derived from "
+            "Claude_gen_atomic_module_catalog_vNext.json (layer field) and "
+            "process_step_catalog.json (step ordering). "
+            "This staging record acknowledges the PDF as a governance source "
+            "and explicitly defers structured extraction."
+        ),
+        "sha256": authority_snapshot["source_files"].get("dependency_layers_pdf", {}).get("sha256"),
+        "governance_note": (
+            "dependency_layers_pdf_acknowledged_as_deferred: "
+            "zero unresolved dependency issues reflects catalog-derived authority, "
+            "not absence of PDF evidence."
+        ),
+    }
+    _write_json(output_root / "dependency_layers_staging.json", dep_layers_staging)
+    dependency_layers_parsed = dep_layers_pdf_path.exists()
+>>>>>>> origin/copilot/regenerate-34-module-manifests
 
     validation = run_validation_suite(
         manifests,
@@ -192,11 +226,20 @@ def main() -> int:
     write_generation_report(
         manifest_count=len(manifests),
         output_paths=[
+<<<<<<< HEAD
             _repo_relative(output_root / "eafix_module_manifests_bundle.vNext.schema_valid.json", repo_root),
             _repo_relative(output_root / "manifest_validation_report.json", repo_root),
             _repo_relative(output_root / "manifest_fill_coverage_report.vNext.json", repo_root),
             _repo_relative(output_root / "manifest_unresolved_items.json", repo_root),
             _repo_relative(output_root / "manifest_source_authority_snapshot.json", repo_root),
+=======
+            str(output_root / "eafix_module_manifests_bundle.vNext.schema_valid.json"),
+            str(output_root / "manifest_validation_report.json"),
+            str(output_root / "manifest_fill_coverage_report.vNext.json"),
+            str(output_root / "manifest_unresolved_items.json"),
+            str(output_root / "manifest_source_authority_snapshot.json"),
+            str(output_root / "dependency_layers_staging.json"),
+>>>>>>> origin/copilot/regenerate-34-module-manifests
         ],
         unresolved_items=unresolved_items,
         json_path=output_root / "manifest_generation_report.json",

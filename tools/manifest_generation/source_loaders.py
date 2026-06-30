@@ -28,7 +28,10 @@ REQUIRED_SOURCE_FILES: dict[str, str] = {
     "mt4_authoritative": "EAFIX_auth_docs/mt4 authoritative reference for ai.json",
     "capability_registry": "EAFIX_auth_docs/converted_capability_registry.json",
     "dependency_layers_pdf": "EAFIX_auth_docs/dependency layers.pdf",
+<<<<<<< HEAD
     "dependency_layers_parsed": "EAFIX_auth_docs/dependency_layers_parsed.json",
+=======
+>>>>>>> origin/copilot/regenerate-34-module-manifests
 }
 
 
@@ -50,7 +53,10 @@ AUTHORITY_ROLES: dict[str, str] = {
     "mt4_authoritative": "mt4_platform_constraints_authority",
     "capability_registry": "capability_reuse",
     "dependency_layers_pdf": "dependency_graph_evidence",
+<<<<<<< HEAD
     "dependency_layers_parsed": "dependency_graph_parsed",
+=======
+>>>>>>> origin/copilot/regenerate-34-module-manifests
 }
 
 
@@ -126,6 +132,7 @@ def run_authority_preflight(repo_root: Path) -> dict[str, Any]:
         "conflict_resolution_order": conflict_resolution_order,
         "unresolved_authority_conflicts": unresolved_conflicts,
     }
+<<<<<<< HEAD
 
 
 def load_dependency_layers(repo_root: Path) -> "tuple[bool, dict[str, Any]]":
@@ -145,3 +152,5 @@ def load_dependency_layers(repo_root: Path) -> "tuple[bool, dict[str, Any]]":
     except Exception:
         pass
     return False, {}
+=======
+>>>>>>> origin/copilot/regenerate-34-module-manifests

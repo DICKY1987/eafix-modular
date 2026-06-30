@@ -30,24 +30,38 @@ EXPECTED_PORTS = {
 }
 
 
+<<<<<<< HEAD
 def _safe_identity(manifest: dict[str, Any]) -> tuple[str, str]:
     """Return (module_id, canonical_symbol) safely, falling back to 'unknown'."""
     identity = manifest.get("module_identity") if isinstance(manifest, dict) else {}
     if not isinstance(identity, dict):
         identity = {}
     return str(identity.get("module_id", "unknown")), str(identity.get("canonical_symbol", "unknown"))
+=======
+def _safe_identity(manifest: dict[str, Any]) -> dict[str, Any]:
+    return manifest.get("module_identity") or {}
+>>>>>>> origin/copilot/regenerate-34-module-manifests
 
 
 def _schema_validate_manifests(manifests: list[dict[str, Any]], schema: dict[str, Any]) -> dict[str, Any]:
     validator = Draft202012Validator(schema)
     errors = []
     for manifest in manifests:
+<<<<<<< HEAD
         mid, sym = _safe_identity(manifest)
         for err in validator.iter_errors(manifest):
             errors.append(
                 {
                     "module_id": mid,
                     "canonical_symbol": sym,
+=======
+        identity = _safe_identity(manifest)
+        for err in validator.iter_errors(manifest):
+            errors.append(
+                {
+                    "module_id": identity.get("module_id", "UNKNOWN"),
+                    "canonical_symbol": identity.get("canonical_symbol", "UNKNOWN"),
+>>>>>>> origin/copilot/regenerate-34-module-manifests
                     "path": list(err.path),
                     "message": err.message,
                 }
@@ -61,8 +75,13 @@ def _schema_validate_manifests(manifests: list[dict[str, Any]], schema: dict[str
 
 
 def _identity_validation(manifests: list[dict[str, Any]], expected_symbols: set[str]) -> dict[str, Any]:
+<<<<<<< HEAD
     ids = [_safe_identity(m)[0] for m in manifests]
     symbols = [_safe_identity(m)[1] for m in manifests]
+=======
+    ids = [_safe_identity(m).get("module_id", "UNKNOWN") for m in manifests]
+    symbols = [_safe_identity(m).get("canonical_symbol", "UNKNOWN") for m in manifests]
+>>>>>>> origin/copilot/regenerate-34-module-manifests
     stale_primary = [s for s in symbols if s in {"O2_OMS", "O3_PNL_CLASSIFIER", "F1_FLOW_ORCHESTRATOR", "SHARED_LIBS"}]
     return {
         "unique_module_ids": len(set(ids)),
@@ -80,7 +99,11 @@ def _identity_validation(manifests: list[dict[str, Any]], expected_symbols: set[
 def _dependency_validation(manifests: list[dict[str, Any]], id_set: set[str]) -> dict[str, Any]:
     issues = []
     for manifest in manifests:
+<<<<<<< HEAD
         _, symbol = _safe_identity(manifest)
+=======
+        symbol = _safe_identity(manifest).get("canonical_symbol", "UNKNOWN")
+>>>>>>> origin/copilot/regenerate-34-module-manifests
         for dep in manifest.get("dependencies", []):
             target_id = str(dep.get("target_id", ""))
             if "{" in target_id or "}" in target_id:
@@ -95,8 +118,13 @@ def _dependency_validation(manifests: list[dict[str, Any]], id_set: set[str]) ->
 def _contract_validation(manifests: list[dict[str, Any]]) -> dict[str, Any]:
     issues = []
     for manifest in manifests:
+<<<<<<< HEAD
         _, symbol = _safe_identity(manifest)
         contracts = manifest.get("contracts") if isinstance(manifest.get("contracts"), dict) else {}
+=======
+        symbol = _safe_identity(manifest).get("canonical_symbol", "UNKNOWN")
+        contracts = manifest.get("contracts") or {}
+>>>>>>> origin/copilot/regenerate-34-module-manifests
         for field in ["input_contracts", "output_contracts"]:
             for ref in contracts.get(field, []):
                 if not isinstance(ref, dict):
@@ -115,7 +143,11 @@ def _contract_validation(manifests: list[dict[str, Any]]) -> dict[str, Any]:
 def _runtime_validation(manifests: list[dict[str, Any]]) -> dict[str, Any]:
     issues = []
     for manifest in manifests:
+<<<<<<< HEAD
         _, symbol = _safe_identity(manifest)
+=======
+        symbol = _safe_identity(manifest).get("canonical_symbol", "UNKNOWN")
+>>>>>>> origin/copilot/regenerate-34-module-manifests
         expected = EXPECTED_PORTS.get(symbol)
         if expected is None:
             continue
@@ -132,12 +164,19 @@ def _file_ownership_validation(manifests: list[dict[str, Any]], mapping_rows_tot
     issues = []
     all_role_rows = 0
     for manifest in manifests:
+<<<<<<< HEAD
         _, symbol = _safe_identity(manifest)
+=======
+>>>>>>> origin/copilot/regenerate-34-module-manifests
         role_index = manifest.get("file_ownership", {}).get("file_role_index", [])
         all_role_rows += len(role_index)
         for row in role_index:
             if "is_test" not in row:
+<<<<<<< HEAD
                 issues.append({"symbol": symbol, "issue": "missing_is_test"})
+=======
+                issues.append({"symbol": _safe_identity(manifest).get("canonical_symbol", "UNKNOWN"), "issue": "missing_is_test"})
+>>>>>>> origin/copilot/regenerate-34-module-manifests
     return {
         "issues": issues,
         "mapped_row_count_in_manifests": all_role_rows,
@@ -148,7 +187,11 @@ def _file_ownership_validation(manifests: list[dict[str, Any]], mapping_rows_tot
 def _ui_validation(manifests: list[dict[str, Any]]) -> dict[str, Any]:
     issues = []
     for symbol in ["U1_DASHBOARD_BACKEND", "U2_GUI_GATEWAY", "U3_MT4_EXPIRY_OVERLAY", "U4_DESKTOP_OPERATOR"]:
+<<<<<<< HEAD
         match = next((m for m in manifests if _safe_identity(m)[1] == symbol), None)
+=======
+        match = next((m for m in manifests if _safe_identity(m).get("canonical_symbol") == symbol), None)
+>>>>>>> origin/copilot/regenerate-34-module-manifests
         if not match:
             issues.append({"symbol": symbol, "issue": "missing_ui_manifest"})
             continue
@@ -185,7 +228,13 @@ def _governance_validation(
 
     layer_suffix_matches = 0
     for manifest in manifests:
+<<<<<<< HEAD
         module_id, symbol = _safe_identity(manifest)
+=======
+        identity = _safe_identity(manifest)
+        symbol = identity.get("canonical_symbol", "UNKNOWN")
+        module_id = str(identity.get("module_id", ""))
+>>>>>>> origin/copilot/regenerate-34-module-manifests
         layer = manifest.get("module_classification", {}).get("layer")
         process_binding = manifest.get("process_binding", {})
 
@@ -208,7 +257,11 @@ def _governance_validation(
 
     ui_products = _ui_catalog_product_map(ui_catalog)
     for symbol, product in ui_products.items():
+<<<<<<< HEAD
         manifest = next((m for m in manifests if _safe_identity(m)[1] == symbol), None)
+=======
+        manifest = next((m for m in manifests if _safe_identity(m).get("canonical_symbol") == symbol), None)
+>>>>>>> origin/copilot/regenerate-34-module-manifests
         if not manifest:
             continue
         if product.get("purpose") and "needs_review" in str(manifest.get("purpose", "")):
@@ -223,14 +276,22 @@ def _governance_validation(
         if any("needs_review" in str(v) for v in scope.get("scope_in", []) + scope.get("scope_out", []) + scope.get("responsibilities", [])):
             issues.append({"symbol": symbol, "issue": "ui_scope_or_responsibility_needs_review"})
 
+<<<<<<< HEAD
         contracts = manifest.get("contracts") if isinstance(manifest.get("contracts"), dict) else {}
+=======
+        contracts = manifest.get("contracts") or {}
+>>>>>>> origin/copilot/regenerate-34-module-manifests
         if symbol in {"U1_DASHBOARD_BACKEND", "U2_GUI_GATEWAY"}:
             inputs = [str(c.get("name")) for c in contracts.get("input_contracts", []) if isinstance(c, dict)]
             outputs = [str(c.get("name")) for c in contracts.get("output_contracts", []) if isinstance(c, dict)]
             if any(name == "needs_review" for name in inputs + outputs):
                 issues.append({"symbol": symbol, "issue": "ui_contracts_needs_review"})
 
+<<<<<<< HEAD
     b2 = next((m for m in manifests if _safe_identity(m)[1] == "B2_MT4_EA_EXECUTOR"), None)
+=======
+    b2 = next((m for m in manifests if _safe_identity(m).get("canonical_symbol") == "B2_MT4_EA_EXECUTOR"), None)
+>>>>>>> origin/copilot/regenerate-34-module-manifests
     if b2:
         runtime = b2.get("service_runtime", {})
         if runtime.get("runtime_kind") == "mql4_ea" and runtime.get("microservice_port") == 5001:
@@ -245,7 +306,11 @@ def _governance_validation(
 def _mt4_validation(manifests: list[dict[str, Any]]) -> dict[str, Any]:
     issues = []
     for symbol in ["B2_MT4_EA_EXECUTOR", "U4_DESKTOP_OPERATOR"]:
+<<<<<<< HEAD
         m = next((x for x in manifests if _safe_identity(x)[1] == symbol), None)
+=======
+        m = next((x for x in manifests if _safe_identity(x).get("canonical_symbol") == symbol), None)
+>>>>>>> origin/copilot/regenerate-34-module-manifests
         if not m:
             issues.append({"symbol": symbol, "issue": "missing_manifest"})
             continue
@@ -268,7 +333,11 @@ def _thin_module_validation(manifests: list[dict[str, Any]]) -> dict[str, Any]:
     }
     issues = []
     for symbol in required:
+<<<<<<< HEAD
         m = next((x for x in manifests if _safe_identity(x)[1] == symbol), None)
+=======
+        m = next((x for x in manifests if _safe_identity(x).get("canonical_symbol") == symbol), None)
+>>>>>>> origin/copilot/regenerate-34-module-manifests
         if not m:
             issues.append({"symbol": symbol, "issue": "missing_thin_module"})
             continue
@@ -286,8 +355,13 @@ def run_validation_suite(
     ui_catalog: dict[str, Any],
     dependency_layers_parsed: bool,
 ) -> dict[str, Any]:
+<<<<<<< HEAD
     id_set = {_safe_identity(m)[0] for m in manifests}
     symbol_set = {_safe_identity(m)[1] for m in manifests}
+=======
+    id_set = {_safe_identity(m).get("module_id", "UNKNOWN") for m in manifests}
+    symbol_set = {_safe_identity(m).get("canonical_symbol", "UNKNOWN") for m in manifests}
+>>>>>>> origin/copilot/regenerate-34-module-manifests
     schema_result = _schema_validate_manifests(manifests, schema)
     dependency_result = _dependency_validation(manifests, id_set)
     report = {
