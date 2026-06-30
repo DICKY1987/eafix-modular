@@ -40,7 +40,7 @@ def build_coverage_report(manifests: list[dict[str, Any]], unresolved_items: lis
         file_ownership = manifest.get("file_ownership", {})
         deps = manifest.get("dependencies", [])
         runtime = manifest.get("service_runtime", {})
-        if "thin_module:" in manifest.get("reconciliation_status", {}).get("reconciliation_notes", ""):
+        if any(str(n).startswith("thin_module:") for n in manifest.get("reconciliation_status", {}).get("reconciliation_notes", [])):
             counts["thin_modules"] += 1
         if not file_ownership.get("owned_files") and not file_ownership.get("shared_files"):
             counts["modules_with_no_files"] += 1
@@ -61,7 +61,7 @@ def build_coverage_report(manifests: list[dict[str, Any]], unresolved_items: lis
             "identity": _status_filled(manifest.get("module_identity")),
             "classification": _status_filled(manifest.get("module_classification")),
             "purpose": _status_filled(manifest.get("purpose")),
-            "process_binding": "not_applicable" if manifest.get("process_binding", {}).get("step_code") == "N/A" else _status_filled(manifest.get("process_binding")),
+            "process_binding": "not_applicable" if manifest.get("process_binding", {}).get("phase_id") == "PHASE_NOT_APPLICABLE" else _status_filled(manifest.get("process_binding")),
             "contracts": _status_filled(manifest.get("contracts")),
             "dependencies": _status_filled(manifest.get("dependencies")),
             "file_ownership": manifest.get("file_ownership", {}).get("file_assignment_status", "unknown"),

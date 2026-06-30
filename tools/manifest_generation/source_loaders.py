@@ -88,7 +88,6 @@ def run_authority_preflight(repo_root: Path) -> dict[str, Any]:
         if not exists:
             missing.append(relative)
         files[key] = {
-            "path": str(abs_path),
             "relative_path": relative,
             "exists": exists,
             "sha256": sha256_file(abs_path) if exists else None,

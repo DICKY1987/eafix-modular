@@ -187,6 +187,8 @@ def _service_runtime(symbol: str, ports_by_symbol: dict[str, int], file_map_for_
     if scope == "shared_kernel":
         runtime_kind = "shared_kernel"
         language = "python"
+    if scope == "desktop_ui":
+        runtime_kind, language = RUNTIME_KIND_BY_PREFIX.get(symbol.split("_", 1)[0], ("desktop_ui", "mixed"))
 
     owned = file_map_for_symbol.get("owned_files", [])
     home = None
@@ -732,7 +734,7 @@ def build_manifests(
                     "EAFIX_auth_docs/ui_catalog.json",
                 ],
                 "source_hashes": source_hashes,
-                "staleness_check_command": "python tools/manifest_generation/generate_manifests.py --validate-only",
+                "staleness_check_command": "python -m tools.manifest_generation.generate_manifests --repo-root . --validate-only",
                 "staleness_status": "fresh",
             },
             "notes": [

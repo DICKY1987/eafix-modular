@@ -38,6 +38,13 @@ def _write_json(path: Path, payload: Any) -> None:
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
+def _repo_relative(path: Path, repo_root: Path) -> str:
+    try:
+        return str(path.relative_to(repo_root))
+    except ValueError:
+        return str(path)
+
+
 def _source_hash_map(snapshot: dict[str, Any]) -> dict[str, str]:
     return {
         f"{key}:{meta['relative_path']}": meta["sha256"]
@@ -185,11 +192,11 @@ def main() -> int:
     write_generation_report(
         manifest_count=len(manifests),
         output_paths=[
-            str(output_root / "eafix_module_manifests_bundle.vNext.schema_valid.json"),
-            str(output_root / "manifest_validation_report.json"),
-            str(output_root / "manifest_fill_coverage_report.vNext.json"),
-            str(output_root / "manifest_unresolved_items.json"),
-            str(output_root / "manifest_source_authority_snapshot.json"),
+            _repo_relative(output_root / "eafix_module_manifests_bundle.vNext.schema_valid.json", repo_root),
+            _repo_relative(output_root / "manifest_validation_report.json", repo_root),
+            _repo_relative(output_root / "manifest_fill_coverage_report.vNext.json", repo_root),
+            _repo_relative(output_root / "manifest_unresolved_items.json", repo_root),
+            _repo_relative(output_root / "manifest_source_authority_snapshot.json", repo_root),
         ],
         unresolved_items=unresolved_items,
         json_path=output_root / "manifest_generation_report.json",
