@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLI Multi-Rapid Enterprise Orchestration Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #2c3e50;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .status-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+        }
+        
+        .status-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .metric:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-label {
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+        
+        .metric-value {
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        
+        .execution-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .progress-container {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .events-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .event {
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            background: #f8f9fa;
+        }
+        
+        .event-time {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .event-message {
+            margin-top: 5px;
+            color: #2c3e50;
+        }
+        
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .connection-status.connected {
+            background: #27ae60;
+        }
+        
+        .connection-status.disconnected {
+            background: #e74c3c;
+        }
+        
+        .integration-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .integration-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .integration-badge.enabled {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .integration-badge.disabled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div id="connectionStatus" class="connection-status disconnected">Disconnected</div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🚀 CLI Multi-Rapid Enterprise Platform</h1>
+            <p>Real-time workflow orchestration with enterprise integrations</p>
+        </div>
+        
+        <div id="integrationBadges" class="integration-badges">
+            <!-- Integration status badges will be populated here -->
+        </div>
+        
+        <div class="status-grid">
+            <div class="status-card">
+                <h3>📊 System Status</h3>
+                <div id="systemMetrics">
+                    <div class="metric">
+                        <span class="metric-label">WebSocket Connections</span>
+                        <span class="metric-value" id="wsConnections">0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Active Workflows</span>
+                        <span class="metric-value" id="activeWorkflows">0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Events Today</span>
+                        <span class="metric-value" id="eventsToday">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-card">
+                <h3>🔧 Integration Status</h3>
+                <div id="integrationMetrics">
+                    <div class="metric">
+                        <span class="metric-label">JIRA</span>
+                        <span class="metric-value" id="jiraStatus">Disconnected</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Slack</span>
+                        <span class="metric-value" id="slackStatus">Disconnected</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">GitHub</span>
+                        <span class="metric-value" id="githubStatus">Disconnected</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="execution-section">
+            <h3>🎯 Execute Workflow</h3>
+            <form id="executionForm">
+                <div class="form-group">
+                    <label for="taskDescription">Task Description</label>
+                    <textarea id="taskDescription" rows="3" placeholder="Describe the workflow task you want to execute..."></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="userId">User ID (Optional)</label>
+                        <input type="text" id="userId" placeholder="user@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="maxCost">Max Cost ($)</label>
+                        <input type="number" id="maxCost" step="0.01" placeholder="1.00">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="jiraProject">JIRA Project (Optional)</label>
+                        <input type="text" id="jiraProject" placeholder="PROJ">
+                    </div>
+                    <div class="form-group">
+                        <label for="slackChannel">Slack Channel (Optional)</label>
+                        <input type="text" id="slackChannel" placeholder="#workflows">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="githubRepo">GitHub Repository (Optional)</label>
+                    <input type="text" id="githubRepo" placeholder="owner/repository">
+                </div>
+                
+                <button type="submit" class="btn" id="executeBtn">🚀 Execute Workflow</button>
+            </form>
+        </div>
+        
+        <div id="progressContainer" class="progress-container">
+            <h3>📈 Workflow Progress</h3>
+            <div id="progressInfo">
+                <div class="metric">
+                    <span class="metric-label">Current Phase</span>
+                    <span class="metric-value" id="currentPhase">-</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Progress</span>
+                    <span class="metric-value" id="progressPercent">0%</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Status</span>
+                <span class="metric-value" id="workflowStatus">Starting...</span>
+            </div>
+        </div>
+        
+        <div class="events-container">
+            <h3>📋 Real-time Events</h3>
+            <div id="eventsList">
+                <div class="event">
+                    <div class="event-time">Ready to connect</div>
+                    <div class="event-message">Waiting for WebSocket connection...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        class WorkflowDashboard {
+            constructor() {
+                this.ws = null;
+                this.currentWorkflowId = null;
+                this.apiBase = window.location.origin;
+                this.init();
+            }
+            
+            init() {
+                this.connectWebSocket();
+                this.loadStatus();
+                this.setupEventHandlers();
+                setInterval(() => this.loadStatus(), 30000); // Update every 30 seconds
+            }
+            
+            connectWebSocket() {
+                const wsUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`;
+                this.ws = new WebSocket(wsUrl);
+                
+                this.ws.onopen = () => {
+                    this.updateConnectionStatus(true);
+                    this.addEvent('WebSocket connected', 'Connected to real-time updates');
+                };
+                
+                this.ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    this.handleWebSocketMessage(data);
+                };
+                
+                this.ws.onclose = () => {
+                    this.updateConnectionStatus(false);
+                    this.addEvent('WebSocket disconnected', 'Connection lost, attempting to reconnect...');
+                    setTimeout(() => this.connectWebSocket(), 5000);
+                };
+                
+                this.ws.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    this.addEvent('WebSocket error', 'Connection error occurred');
+                };
+            }
+            
+            async loadStatus() {
+                try {
+                    // Load WebSocket stats
+                    const wsStats = await fetch(`${this.apiBase}/ws/stats`);
+                    const wsData = await wsStats.json();
+                    
+                    document.getElementById('wsConnections').textContent = wsData.total_connections || 0;
+                    document.getElementById('activeWorkflows').textContent = wsData.active_workflows || 0;
+                    
+                    // Load integration status
+                    const integrationStatus = await fetch(`${this.apiBase}/integrations/status`);
+                    const integrationData = await integrationStatus.json();
+                    
+                    this.updateIntegrationStatus(integrationData);
+                    
+                } catch (error) {
+                    console.error('Error loading status:', error);
+                }
+            }
+            
+            updateIntegrationStatus(data) {
+                const integrations = data.integrations || {};
+                
+                // Update status indicators
+                document.getElementById('jiraStatus').textContent = integrations.jira?.connected ? 'Connected' : 'Disconnected';
+                document.getElementById('slackStatus').textContent = integrations.slack?.connected ? 'Connected' : 'Disconnected';
+                document.getElementById('githubStatus').textContent = integrations.github?.connected ? 'Connected' : 'Disconnected';
+                
+                // Update integration badges
+                const badgesContainer = document.getElementById('integrationBadges');
+                badgesContainer.innerHTML = '';
+                
+                Object.entries(integrations).forEach(([name, info]) => {
+                    const badge = document.createElement('div');
+                    badge.className = `integration-badge ${info.enabled ? 'enabled' : 'disabled'}`;
+                    badge.textContent = `${name.toUpperCase()} ${info.enabled ? '✓' : '✗'}`;
+                    badgesContainer.appendChild(badge);
+                });
+            }
+            
+            setupEventHandlers() {
+                document.getElementById('executionForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await this.executeWorkflow();
+                });
+            }
+            
+            async executeWorkflow() {
+                const form = document.getElementById('executionForm');
+                const formData = new FormData(form);
+                
+                const request = {
+                    description: document.getElementById('taskDescription').value,
+                    user_id: document.getElementById('userId').value || null,
+                    max_cost: parseFloat(document.getElementById('maxCost').value) || null,
+                    jira_project: document.getElementById('jiraProject').value || null,
+                    slack_channel: document.getElementById('slackChannel').value || null,
+                    github_repo: document.getElementById('githubRepo').value || null
+                };
+                
+                if (!request.description.trim()) {
+                    alert('Please enter a task description');
+                    return;
+                }
+                
+                try {
+                    document.getElementById('executeBtn').disabled = true;
+                    document.getElementById('executeBtn').textContent = '🔄 Starting...';
+                    
+                    const response = await fetch(`${this.apiBase}/execute-task-realtime`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(request)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const result = await response.json();
+                    this.currentWorkflowId = result.execution_id;
+                    
+                    // Show progress container
+                    document.getElementById('progressContainer').style.display = 'block';
+                    document.getElementById('workflowStatus').textContent = 'Workflow started successfully';
+                    
+                    this.addEvent('Workflow Started', `Execution ID: ${result.execution_id}`);
+                    
+                } catch (error) {
+                    console.error('Error executing workflow:', error);
+                    this.addEvent('Execution Error', error.message);
+                    alert(`Error: ${error.message}`);
+                } finally {
+                    document.getElementById('executeBtn').disabled = false;
+                    document.getElementById('executeBtn').textContent = '🚀 Execute Workflow';
+                }
+            }
+            
+            handleWebSocketMessage(data) {
+                const { type, workflow_id, timestamp, data: eventData } = data;
+                
+                if (workflow_id === this.currentWorkflowId || workflow_id === 'system') {
+                    switch (type) {
+                        case 'workflow.progress':
+                            this.updateProgress(eventData);
+                            break;
+                        case 'workflow.completed':
+                            this.handleWorkflowCompleted(eventData);
+                            break;
+                        case 'workflow.failed':
+                            this.handleWorkflowFailed(eventData);
+                            break;
+                        case 'notification':
+                            this.addEvent('Notification', eventData.message);
+                            break;
+                        default:
+                            this.addEvent(type, JSON.stringify(eventData, null, 2));
+                    }
+                }
+                
+                this.addEvent(type, this.formatEventMessage(eventData));
+            }
+            
+            updateProgress(data) {
+                const { overall_progress, current_phase, completed_tasks, remaining_tasks } = data;
+                
+                if (overall_progress !== undefined) {
+                    document.getElementById('progressPercent').textContent = `${overall_progress}%`;
+                    document.getElementById('progressFill').style.width = `${overall_progress}%`;
+                }
+                
+                if (current_phase) {
+                    document.getElementById('currentPhase').textContent = current_phase;
+                }
+                
+                const status = `${completed_tasks || 0} completed, ${remaining_tasks || 0} remaining`;
+                document.getElementById('workflowStatus').textContent = status;
+            }
+            
+            handleWorkflowCompleted(data) {
+                document.getElementById('workflowStatus').textContent = '✅ Completed Successfully';
+                document.getElementById('progressPercent').textContent = '100%';
+                document.getElementById('progressFill').style.width = '100%';
+                this.addEvent('Workflow Completed', `Duration: ${data.duration || 'Unknown'}`);
+            }
+            
+            handleWorkflowFailed(data) {
+                document.getElementById('workflowStatus').textContent = '❌ Failed';
+                this.addEvent('Workflow Failed', data.error_message || 'Unknown error');
+            }
+            
+            formatEventMessage(data) {
+                if (typeof data === 'object') {
+                    return Object.entries(data).slice(0, 3).map(([k, v]) => `${k}: ${v}`).join(', ');
+                }
+                return String(data);
+            }
+            
+            addEvent(title, message) {
+                const eventsList = document.getElementById('eventsList');
+                const event = document.createElement('div');
+                event.className = 'event';
+                
+                const time = new Date().toLocaleTimeString();
+                event.innerHTML = `
+                    <div class="event-time">${time} - ${title}</div>
+                    <div class="event-message">${message}</div>
+                `;
+                
+                eventsList.insertBefore(event, eventsList.firstChild);
+                
+                // Keep only last 50 events
+                while (eventsList.children.length > 50) {
+                    eventsList.removeChild(eventsList.lastChild);
+                }
+            }
+            
+            updateConnectionStatus(connected) {
+                const status = document.getElementById('connectionStatus');
+                status.className = `connection-status ${connected ? 'connected' : 'disconnected'}`;
+                status.textContent = connected ? 'Connected' : 'Disconnected';
+            }
+        }
+        
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new WorkflowDashboard();
+        });
+    </script>
+</body>
+</html>

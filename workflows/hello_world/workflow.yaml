@@ -1,0 +1,15 @@
+version: '1.0'
+name: hello_world
+description: Minimal demo workflow to validate local and CI execution.
+
+steps:
+  - id: validate
+    run: pwsh -NoProfile -File workflows/hello_world/steps/00_validate_inputs.ps1
+  - id: run
+    run: pwsh -NoProfile -File workflows/hello_world/steps/10_run_task.ps1
+  - id: publish
+    run: pwsh -NoProfile -File workflows/hello_world/steps/90_publish_artifacts.ps1
+
+artifacts:
+  - path: artifacts/hello_world
+    when: always

@@ -1,0 +1,659 @@
+{
+"schema_id": "apf.phased_repo_plan.v1",
+"schema_version": "1.0.0",
+"meta": {
+"generated_at": "2025-09-13T18:00:00Z",
+"source_summary": "Plan derived from the conversation about replacing VS Code’s terminal with a Python GUI using a real PTY/ConPTY backend, adding signal controls, safe argv handling, minimal VT100 support, a headless parity test harness, hardened quick-actions, and operator polish for the repo DICKY1987/cli_multi_rapid_DEV.",
+"assumptions": [
+"Default branch is main.",
+"Python 3.10+ is available on developer and CI machines.",
+"Windows uses ConPTY via pywinpty; POSIX uses pty/ptyprocess.",
+"Headless GUI test server binds to localhost and a fixed port.",
+"CI will run on ubuntu-latest and windows-latest GitHub-hosted runners.",
+"Lint/format tools are acceptable: ruff and black."
+],
+"uncertainties": [
+"Exact default branch name may differ (main vs master).",
+"File/module names for the terminal widget may vary (cli_gui_terminal.py vs pty_terminal_runner.py).",
+"Quick Actions data model may require fields beyond command_preview.",
+"Windows Ctrl-C semantics may require GenerateConsoleCtrlEvent instead of writing 0x03.",
+"Ports for headless server and parity harness (e.g., 45454/45455) may differ in the repo.",
+"Requirements file name may be requirements.txt or pyproject.toml."
+],
+"confidence_0_1": 0.78
+},
+"repo": {
+"url": "https://github.com/DICKY1987/cli_multi_rapid_DEV
+",
+"default_branch": "main"
+},
+"phases": [
+{
+"id": "phase_pty_backend_swap",
+"name": "Replace pipes with real PTY/ConPTY and wire resize",
+"objective": "Ensure GUI sessions run in a real TTY with correct colors, interactive prompts, isatty=True, and responsive resizing.",
+"entry_conditions": [
+"Repo cloned locally and branch created from main.",
+"Python environment activated."
+],
+"exit_criteria": [
+"Child shells/apps report isatty()==True.",
+"Resize reflects in TUIs (e.g., top, vim) without redraw artifacts.",
+"Exit codes propagate to the GUI status line."
+],
+"dependencies": [],
+"tasks": [
+{
+"id": "task_update_dependencies",
+"action": "update_dependency",
+"paths": [
+"requirements.txt",
+"pyproject.toml"
+],
+"instructions": "Add cross-platform TTY dependencies. Prefer pyproject.toml; if absent, use requirements.txt. Include: ptyprocess (POSIX), pywinpty (Windows), psutil (optional for process mgmt).",
+"commands": [
+"python -m pip install --upgrade pip",
+"python -m pip install ptyprocess",
+"python -m pip install pywinpty; exit 0"
+],
+"commit_message": "chore(deps): add ptyprocess/pywinpty for real TTY backend",
+"tests": [
+{
+"type": "static_analysis",
+"command": "python - <<'PY'\nimport importlib, sys\nmods=['pty','os','select']\nmissing=[m for m in mods if not importlib.util.find_spec(m)]\nprint('OK' if not missing else f'MISSING:{missing}')\nPY",
+"expected_pass": true
+}
+],
+"rollback": {
+"strategy": "revert_dependency",
+"steps": [
+"git checkout -- requirements.txt pyproject.toml",
+"pip uninstall -y pywinpty ptyprocess"
+]
+},
+"est_duration_min": 5,
+"risk": "low"
+},
+{
+"id": "task_refactor_spawn_to_pty",
+"action": "refactor",
+"paths": [
+"cli_gui_terminal.py",
+"pty_terminal_runner.py"
+],
+"instructions": "Refactor the spawn path to use pty (POSIX) or ConPTY (Windows) with stdin/stdout wired to the GUI. Preserve exit-code propagation and isatty=True in the child.",
+"commands": [],
+"commit_message": "refactor(pty): unify POSIX pty and Windows ConPTY spawn path",
+"tests": [
+{
+"type": "integration",
+"command": "python - <<'PY'\nimport sys, os\nprint('isatty?', os.isatty(1))\nPY",
+"expected_pass": true
+}
+],
+"rollback": {
+"strategy": "git_revert",
+"steps": [
+"git restore -SW cli_gui_terminal.py pty_terminal_runner.py"
+]
+},
+"est_duration_min": 20,
+"risk": "medium",
+"depends_on": [
+"task_update_dependencies"
+]
+},
+{
+"id": "task_wire_resize_to_pty",
+"action": "modify_file",
+"paths": [
+"cli_gui_terminal.py",
+"pty_terminal_runner.py"
+],
+"instructions": "Hook GUI resizeEvent to compute cols×rows from font metrics and call resize_pty(cols, rows). Verify TUIs redraw correctly.",
+"commands": [],
+"commit_message": "fix(gui): wire resizeEvent to PTY window size (cols×rows)",
+"tests": [
+{
+"type": "e2e",
+"command": "python gui_test_server.py & sleep 2 && python parity_test_harness.py --case resize && pkill -f gui_test_server.py || true",
+"expected_pass": true
+}
+],
+"rollback": {
+"strategy": "partial_revert",
+"steps": [
+"git checkout -- cli_gui_terminal.py pty_terminal_runner.py"
+]
+},
+"est_duration_min": 15,
+"risk": "medium",
+"depends_on": [
+"task_refactor_spawn_to_pty"
+]
+}
+]
+},
+{
+"id": "phase_signal_palette_argv",
+"name": "Signal palette and safe argv handling",
+"objective": "Add Ctrl-C/EOF/kill controls and robust quoting using shlex to prevent shell=True glitches.",
+"entry_conditions": [
+"Real PTY spawn path in place."
+],
+"exit_criteria": [
+"Quoted args pass intact to child processes.",
+"Signal buttons deliver expected behavior on POSIX; best-effort on Windows."
+],
+"dependencies": [
+"phase_pty_backend_swap"
+],
+"tasks": [
+{
+"id": "task_use_shlex_split",
+"action": "modify_file",
+"paths": [
+"cli_gui_terminal.py"
+],
+"instructions": "Replace naive .split() with shlex.split(posix = sys.platform != 'win32'). Maintain argv list through spawn; avoid shell=True by default.",
+"commands": [],
+"commit_message": "fix(argv): switch to shlex.split and pass argv list to spawn",
+"tests": [
+{
+"type": "unit",
+"command": "python - <<'PY'\nimport shlex, sys\ncmd='python -c "print(1+2)"'\nargv=shlex.split(cmd, posix = sys.platform!='win32')\nprint(argv[-1].startswith('"') or 'print' in argv[-1])\nPY",
+"expected_pass": true
+}
+],
+"rollback": {
+"strategy": "restore_previous",
+"steps": [
+"git checkout -- cli_gui_terminal.py"
+]
+},
+"est_duration_min": 8,
+"risk": "low"
+},
+{
+"id": "task_signal_buttons",
+"action": "modify_file",
+"paths": [
+"cli_gui_terminal.py",
+"pty_terminal_runner.py"
+],
+"instructions": "Implement Ctrl-C, EOF (Ctrl-D/Ctrl-Z), and Kill buttons. On POSIX send SIGINT/SIGHUP/SIGTERM; on Windows attempt 0x03 or GenerateConsoleCtrlEvent if supported.",
+"commands": [],
+"commit_message": "feat(signals): add Ctrl-C/EOF/Kill controls with cross-platform fallbacks",
+"tests": [
+{
+"type": "integration",
+"command": "python gui_test_server.py & sleep 2 && python parity_test_harness.py --case ctrl_c && pkill -f gui_test_server.py || true",
+"expected_pass": true
+}
+],
+"rollback": {
+"strategy": "feature_flag_disable",
+"steps": [
+"Guard buttons behind a config toggle and default to off if issues arise."
+]
+},
+"est_duration_min": 25,
+"risk": "medium",
+"depends_on": [
+"task_use_shlex_split"
+]
+}
+]
+},
+{
+"id": "phase_ansi_min_vt100",
+"name": "Minimum viable VT100/ANSI handling",
+"objective": "Implement CR overwrite, backspace, and CSI K erase-to-EOL for correct line rendering.",
+"entry_conditions": [
+"TTY output reaches GUI widget."
+],
+"exit_criteria": [
+"CR-based progress bars render correctly.",
+"Backspace edits render as expected.",
+"CSI K clears to EOL without residual text."
+],
+"dependencies": [
+"phase_pty_backend_swap"
+],
+"tasks": [
+{
+"id": "task_ansi_cr_bs_csi_k",
+"action": "modify_file",
+"paths": [
+"cli_gui_terminal.py"
+],
+"instructions": "Extend display layer to handle carriage return (\r) overwrite, backspace (\b), and CSI K (ESC [ n K) with n in {0,1,2}.",
+"commands": [],
+"commit_message": "feat(ansi): support CR, backspace, and CSI K in terminal renderer",
+"tests": [
+{
+"type": "e2e",
+"command": "python gui_test_server.py & sleep 2 && python parity_test_harness.py --case ansi_min && pkill -f gui_test_server.py || true",
+"expected_pass": true
+}
+],
+"rollback": {
+"strategy": "config_toggle",
+"steps": [
+"Add config flag to disable custom ANSI handling and fall back to raw text."
+]
+},
+"est_duration_min": 30,
+"risk": "medium"
+}
+]
+},
+{
+"id": "phase_true_parity_harness",
+"name": "Headless GUI parity test harness",
+"objective": "Drive the GUI PTY headlessly, assert signals/ANSI/exit codes, and save raw PTY captures to artifacts.",
+"entry_conditions": [
+"Headless GUI server runnable.",
+"Basic ANSI and signal handling implemented."
+],
+"exit_criteria": [
+"Parity harness asserts isatty==True, CR/backspace/CSI K behaviors, exit codes, and signal handling.",
+"Raw PTY session logs stored under artifacts/ with timestamps."
+],
+"dependencies": [
+"phase_signal_palette_argv",
+"phase_ansi_min_vt100"
+],
+"tasks": [
+{
+"id": "task_adjust_headless_server",
+"action": "modify_file",
+"paths": [
+"gui_test_server.py"
+],
+"instructions": "Expose HTTP/WebSocket endpoints to spawn PTY sessions and stream raw bytes. Add option to save captures to artifacts/.",
+"commands": [],
+"commit_message": "feat(test-server): expose PTY endpoints and artifact capture for parity tests",
+"tests": [
+{
+"type": "integration",
+"command": "python gui_test_server.py --check-only",
+"expected_pass": true
+}
+],
+"rollback": {
+"strategy": "revert_endpoints",
+"steps": [
+"git checkout -- gui_test_server.py"
+]
+},
+"est_duration_min": 20,
+"risk": "low"
+},
+{
+"id": "task_parity_harness_assertions",
+"action": "modify_file",
+"paths": [
+"parity_test_harness.py"
+],
+"instructions": "Drive headless server, execute cases: resize, ansi_min, ctrl_c, exit_codes, unicode. Save raw PTY logs and summaries.",
+"commands": [],
+"commit_message": "test(parity): add e2e cases (resize, ansi_min, ctrl_c, exit_codes, unicode) with PTY captures",
+"tests": [
+{
+"type": "e2e",
+"command": "python gui_test_server.py & sleep 2 && python parity_test_harness.py --all && pkill -f gui_test_server.py || true",
+"expected_pass": true
+}
+],
+"rollback": {
+"strategy": "skip_cases",
+"steps": [
+"Introduce --skip flags in the harness to bypass failing cases temporarily."
+]
+},
+"est_duration_min": 25,
+"risk": "medium",
+"depends_on": [
+"task_adjust_headless_server"
+]
+},
+{
+"id": "task_configure_ci_actions",
+"action": "configure_ci",
+"paths": [
+".github/workflows/ci.yml"
+],
+"instructions": "Add GitHub Actions to run lint, format check, unit, and parity harness on ubuntu-latest and windows-latest.",
+"commands": [],
+"commit_message": "chore(ci): add cross-platform lint, unit, and parity harness workflow",
+"tests": [
+{
+"type": "lint",
+"command": "ruff .",
+"expected_pass": true
+},
+{
+"type": "format",
+"command": "black --check .",
+"expected_pass": true
+}
+],
+"rollback": {
+"strategy": "disable_ci",
+"steps": [
+"git rm -f .github/workflows/ci.yml"
+]
+},
+"est_duration_min": 10,
+"risk": "low",
+"depends_on": [
+"task_parity_harness_assertions"
+]
+}
+]
+},
+{
+"id": "phase_harden_quick_actions",
+"name": "Harden Quick Actions pipeline",
+"objective": "Always show an exact argv command preview pre-run; avoid hidden flags and shell quoting issues.",
+"entry_conditions": [
+"shlex-based argv parsing adopted."
+],
+"exit_criteria": [
+"Quick Actions render exact argv preview strings.",
+"No hidden flags are injected at runtime."
+],
+"dependencies": [
+"phase_signal_palette_argv"
+],
+"tasks": [
+{
+"id": "task_extend_quick_actions_schema",
+"action": "modify_file",
+"paths": [
+"quick_actions.json",
+"plugin_manager.py"
+],
+"instructions": "Add command_preview to each action; render it in the GUI before execution; require user confirmation.",
+"commands": [],
+"commit_message": "feat(quick-actions): add explicit command_preview with confirm-before-run",
+"tests": [
+{
+"type": "unit",
+"command": "python - <<'PY'\nimport json\nqa=json.load(open('quick_actions.json'))\nprint(all('command_preview' in x for x in qa.get('actions', [])))\nPY",
+"expected_pass": true
+}
+],
+"rollback": {
+"strategy": "schema_fallback",
+"steps": [
+"If preview breaks, hide UI element but continue storing preview in logs."
+]
+},
+"est_duration_min": 12,
+"risk": "low"
+}
+]
+},
+{
+"id": "phase_operator_polish",
+"name": "Operator ergonomics and status surfaces",
+"objective": "Expose 'Open in system terminal here' and add status strip (cwd/shell/venv/rows×cols).",
+"entry_conditions": [
+"Core PTY features stable."
+],
+"exit_criteria": [
+"Context actions open native terminal in current cwd.",
+"Status strip shows live shell and terminal geometry."
+],
+"dependencies": [
+"phase_pty_backend_swap"
+],
+"tasks": [
+{
+"id": "task_open_system_terminal",
+"action": "modify_file",
+"paths": [
+"cli_gui_terminal.py"
+],
+"instructions": "Add a context/menu action that opens the OS terminal at the current session cwd (Windows: wt.exe or powershell; macOS: open -a Terminal; Linux: x-terminal-emulator).",
+"commands": [],
+"commit_message": "feat(operator): add 'Open in system terminal here' action",
+"tests": [
+{
+"type": "integration",
+"command": "python - <<'PY'\nprint('SKIP in CI: requires desktop; ensure code path is reachable.')\nPY",
+"expected_pass": true
+}
+],
+"rollback": {
+"strategy": "feature_flag_disable",
+"steps": [
+"Hide the menu item behind a config flag if desktop integration fails."
+]
+},
+"est_duration_min": 10,
+"risk": "low"
+},
+{
+"id": "task_status_strip",
+"action": "modify_file",
+"paths": [
+"cli_gui_terminal.py"
+],
+"instructions": "Add a non-intrusive status strip showing cwd, active shell, venv name, and rows×cols from PTY.",
+"commands": [],
+"commit_message": "feat(ui): add status strip with cwd/shell/venv/rows×cols",
+"tests": [
+{
+"type": "unit",
+"command": "python - <<'PY'\nprint('OK: placeholder status strip test')\nPY",
+"expected_pass": true
+}
+],
+"rollback": {
+"strategy": "css_toggle",
+"steps": [
+"Hide the status strip via stylesheet/config if it crowds the UI."
+]
+},
+"est_duration_min": 12,
+"risk": "low"
+}
+]
+},
+{
+"id": "phase_docs_ci_quality",
+"name": "Docs, lint/format, and release prep",
+"objective": "Document workflows, enforce lint/format, and ensure contributors can run tests locally and in CI.",
+"entry_conditions": [
+"Core features implemented and harness passing locally."
+],
+"exit_criteria": [
+"README and Operator Guide updated.",
+"Lint/format checks pass locally and in CI."
+],
+"dependencies": [
+"phase_true_parity_harness",
+"phase_operator_polish",
+"phase_harden_quick_actions"
+],
+"tasks": [
+{
+"id": "task_update_docs",
+"action": "modify_file",
+"paths": [
+"README.md",
+"Operator_Guide.md"
+],
+"instructions": "Add quick start, port configuration, headless test usage, and troubleshooting (Windows Ctrl-C caveat).",
+"commands": [],
+"commit_message": "docs(guide): update README and Operator Guide with PTY, signals, and parity harness usage",
+"tests": [
+{
+"type": "static_analysis",
+"command": "python - <<'PY'\nprint('Docs present:', all(import('os').path.exists(p) for p in ['README.md','Operator_Guide.md']))\nPY",
+"expected_pass": true
+}
+],
+"rollback": {
+"strategy": "restore_docs",
+"steps": [
+"git checkout -- README.md Operator_Guide.md"
+]
+},
+"est_duration_min": 15,
+"risk": "low"
+},
+{
+"id": "task_add_ruff_black",
+"action": "create_file",
+"paths": [
+"pyproject.toml"
+],
+"instructions": "Configure ruff and black; add minimal config. If pyproject exists, merge sections.",
+"commands": [],
+"commit_message": "chore(style): configure ruff and black in pyproject.toml",
+"tests": [
+{
+"type": "lint",
+"command": "ruff .",
+"expected_pass": true
+},
+{
+"type": "format",
+"command": "black --check .",
+"expected_pass": true
+}
+],
+"rollback": {
+"strategy": "revert_file",
+"steps": [
+"git checkout -- pyproject.toml"
+]
+},
+"est_duration_min": 8,
+"risk": "low"
+},
+{
+"id": "task_version_tag_prep",
+"action": "run_command",
+"paths": [],
+"instructions": "Prepare release notes and create a signed tag after CI passes.",
+"commands": [
+"git log --oneline --decorate --no-merges -n 50 > CHANGELOG.pending.md",
+"git tag -s v0.1.0 -m "Initial PTY-backed GUI terminal with parity harness""
+],
+"commit_message": "chore(release): prepare v0.1.0 tag and pending changelog",
+"tests": [
+{
+"type": "static_analysis",
+"command": "test -f CHANGELOG.pending.md && echo OK || echo FAIL",
+"expected_pass": true
+}
+],
+"rollback": {
+"strategy": "delete_tag",
+"steps": [
+"git tag -d v0.1.0 || true"
+]
+},
+"est_duration_min": 5,Incomplete or Missing Implementations
+
+  Phase 4: GDW Library Gaps
+
+  1. Missing runners for most GDWs: Only git.commit_push.main and build.container.sign     
+  have complete runner implementations
+    - security.scan.trivy/v1.0.0/runners/ - MISSING
+    - k8s.deploy.rolling/v1.0.0/runners/ - MISSING
+    - version.bump.semver/v1.0.0/runners/ - MISSING
+  2. Missing test suites: Only git.commit_push.main has tests directory
+    - No tests/fixtures/ for security.scan.trivy, k8s.deploy.rolling,
+  version.bump.semver
+    - No golden test outputs for most GDWs
+    - No parity tests across runners
+  3. Incomplete GDW metadata:
+    - Missing CHANGELOG.md files for 3 GDWs
+    - Missing README.md files for 3 GDWs
+
+  Phase 5: Chain Composition Gaps
+
+  4. Missing chain examples: No example chain definition files found
+    - No examples/dev-to-prod.yaml or similar demo chains
+    - No sample chain specifications for users to reference
+
+  Phase 6: Production Readiness Gaps
+
+  5. Documentation incomplete:
+    - Main CLAUDE.md not updated with comprehensive GDW documentation
+    - Only basic docs/GDW_AUTHORING.md exists
+    - Missing troubleshooting guides and best practices
+  6. Testing infrastructure issues:
+    - nox -s gdw_tests fails due to semgrep Windows compatibility
+    - Missing performance benchmarking implementation
+    - No chaos/load testing for concurrent GDW execution
+  7. Production monitoring gaps:
+    - GDW metrics not integrated into config/docker-compose.yml
+    - No Grafana dashboard definitions for GDW monitoring
+    - Missing alerting rules for GDW failures
+  8. Catalog/discovery issues:
+    - cli-multi-rapid gdw list returns empty array (catalog not properly loaded)
+    - GDW discovery mechanism not fully functional
+
+  🔧 Specific Fixes Needed
+
+  High Priority
+
+  1. Complete GDW runner implementations for security.scan.trivy, k8s.deploy.rolling,      
+  version.bump.semver
+  2. Fix GDW catalog loading - gdw list should show available workflows
+  3. Create example chain definitions (dev-to-prod.yaml, simple-ci.yaml)
+  4. Update main CLAUDE.md with comprehensive GDW documentation
+
+  Medium Priority
+
+  5. Add comprehensive test suites for all GDWs with fixtures and golden outputs
+  6. Integrate GDW metrics into Prometheus/Grafana monitoring stack
+  7. Fix Windows testing compatibility (remove semgrep dependency or make optional)        
+
+  Low Priority
+
+  8. Add missing metadata files (CHANGELOG.md, README.md for incomplete GDWs)
+  9. Create troubleshooting documentation
+  10. Implement performance benchmarking and load testing
+
+  Summary
+
+  The GDW framework implementation is ~85% complete with solid foundations but needs       
+  finishing touches on the pre-built library, example chains, documentation, and
+  production monitoring to be fully production-ready as specified in the original
+  requirements.
+"risk": "low"
+}
+]
+}
+],
+"conversion_guidance": {
+"compatible_with": [
+"apf.step_list.v1",
+"github.actions.workflow.v1",
+"ops.change_request.v1"
+],
+"mapping_notes": "Each phase maps to an epic; each task maps to an issue or GitHub Action step. Tasks with action=configure_ci/create_file/modify_file can be converted to PRs with file diffs. run_command tasks convert to GitHub Actions run steps.",
+"jq_examples": [
+".phases[] | {phase_id: .id, tasks: [.tasks[] | {id, action, paths, commit_message}] }",
+"{tasks: [ .phases[].tasks[] | {id, action, cmd: (.commands // [])} ]}"
+]
+},
+"validation": {
+"status": "needs_review",
+"errors": [
+"Confirm default branch name before running automated PRs.",
+"Verify actual file paths for terminal widget and headless server.",
+"Decide and document the exact ports used by gui_test_server and parity harness.",
+"Select and pin dependency versions in requirements.txt or pyproject.toml.",
+"Windows Ctrl-C behavior may require GenerateConsoleCtrlEvent and a console process group."
+]
+}
+}

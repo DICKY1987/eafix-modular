@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eafix-trading-system"
+version = "1.0.0"
+description = "EAFIX Trading System - Python & MT4 trading platform with Guardian protection"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    { name = "EAFIX Trading System", email = "trading@eafix.com" },
+]
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Topic :: Office/Business :: Financial :: Investment",
+]
+
+[project.urls]
+Homepage = "https://github.com/DICKY1987/eafix-modular"
+Repository = "https://github.com/DICKY1987/eafix-modular"
+
+[project.scripts]
+eafix = "eafix.apps.cli.main:main"
+
+[project.optional-dependencies]
+yaml = ["PyYAML>=6.0"]
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == '__main__':",
+]

@@ -1,0 +1,70 @@
+name: CI
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    paths-ignore:
+      - ".ai/tmp/**"
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install tooling
+        run: |
+          pip install pre-commit pytest ruff mypy gitleaks
+      - name: Pre-commit checks
+        run: pre-commit run -a
+      - name: Run tests
+        run: pytest -q
+  hello_world:
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - uses: actions/checkout@v5
+      - name: Run hello world workflow
+        shell: pwsh
+        run: |
+          pwsh -NoProfile -File scripts/run_workflow.ps1 -Name CI
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: hello-world-artifacts
+          path: artifacts/hello_world
+  cost_reports:
+    runs-on: ubuntu-latest
+    needs: hello_world
+    steps:
+      - uses: actions/checkout@v5
+      - name: Emit sample token metrics (if missing)
+        shell: pwsh
+        run: |
+          if (-not (Test-Path 'artifacts/tokens.json')) {
+            pwsh -NoProfile -File scripts/emit_tokens.ps1 -Out artifacts/tokens.json
+          }
+      - name: Generate cost reports
+        shell: pwsh
+        run: |
+          pwsh -NoProfile -File scripts/report_costs.ps1 -OutDir artifacts/cost
+      - name: Upload cost artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cost-reports
+          path: artifacts/cost
+      - name: PR summary
+        if: ${{ github.event_name == 'pull_request' }}
+        shell: pwsh
+        run: |
+          $p = 'artifacts/cost/cost_report.json'
+          if (Test-Path $p) {
+            $o = Get-Content -Raw -Path $p | ConvertFrom-Json
+            "## Cost Summary`n`n- Total: `$${0}`n- Input tokens: {1}`n- Output tokens: {2}" -f $o.total_cost, $o.effective_input_tokens, $o.output_tokens | Out-File -Encoding utf8 $env:GITHUB_STEP_SUMMARY
+          } else {
+            "No cost report found." | Out-File -Encoding utf8 $env:GITHUB_STEP_SUMMARY
+          }

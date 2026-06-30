@@ -1,0 +1,17 @@
+version: 1
+name: Enhanced WebSocket Events
+description: Event catalog for real-time updates and notifications
+events:
+  - key: workflow.update
+    description: Emitted when workflow status changes
+    payload:
+      $ref: ../schemas/live_update.json
+  - key: notification.new
+    description: A new notification is available
+    payload:
+      type: object
+      properties:
+        message: { type: string }
+        level: { type: string, enum: [info, warning, error] }
+        time: { type: string, format: date-time }
+      required: [message, level, time]
