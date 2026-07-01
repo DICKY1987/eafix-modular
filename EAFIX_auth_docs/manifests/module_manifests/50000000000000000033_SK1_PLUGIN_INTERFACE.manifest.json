@@ -2,44 +2,36 @@
   "schema_version": "1.0.0",
   "document_type": "atomic_module_manifest_schema_instance",
   "packet_type": "atomic_module_manifest",
-  "manifest_version": "1.0.0",
+  "manifest_version": "1.1.0",
   "generated_at_utc": "2026-06-28T04:59:44.127147+00:00",
-  "last_updated_utc": "2026-06-28T04:59:44.127147+00:00",
+  "last_updated_utc": "2026-07-01T23:30:00Z",
   "source_authority": {
     "authority_policy": "generated_from_canonical_sources",
     "required_reference_documents": [
-      "eafix_project_knowledge_reference_routing_instructions.json",
-      "EAFIX_auth_docs/Claude_gen_atomic_module_catalog_vNext.json",
-      "EAFIX_auth_docs/eafix_unified_atomic_module_schema_v1_0_0.json",
-      "EAFIX_auth_docs/eafix_unified_atomic_module_manifest_ai_fill_instructions_v1_0_0.md",
-      "EAFIX_auth_docs/eafix module manifests bundle.json",
-      "EAFIX_auth_docs/module_catalog.json",
-      "EAFIX_auth_docs/process_step_catalog.json",
-      "EAFIX_auth_docs/updated_trading_process_aligned.json",
-      "EAFIX_auth_docs/file_module_mapping.csv",
-      "EAFIX_auth_docs/eafix_services_ai_reference_20260510.json",
-      "EAFIX_auth_docs/EAFIX-Modular \u2014 End-to-End Module Map.txt",
-      "EAFIX_auth_docs/communication_channels.json",
-      "EAFIX_auth_docs/MT4_Python communication channels.txt",
-      "EAFIX_auth_docs/ui_catalog.json",
-      "EAFIX_auth_docs/mt4 authoritative reference for ai.json",
-      "EAFIX_auth_docs/converted_capability_registry.json",
-      "EAFIX_auth_docs/dependency layers.pdf"
+      "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json",
+      "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+      "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+      "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+      "EAFIX_auth_docs/01_canonical_registries/communication_channels.json",
+      "EAFIX_auth_docs/01_canonical_registries/module_registry.json",
+      "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+      "EAFIX_auth_docs/01_canonical_registries/mt4 authoritative reference for ai.json",
+      "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv"
     ],
     "companion_documents": [
       "EAFIX_auth_docs/eafix module manifests bundle.json",
       "EAFIX_auth_docs/EAFIX module reconciliation worksheet.md"
     ],
     "conflict_resolution_order": [
-      "eafix_project_knowledge_reference_routing_instructions.json",
-      "EAFIX_auth_docs/Claude_gen_atomic_module_catalog_vNext.json",
-      "EAFIX_auth_docs/module_catalog.json",
-      "EAFIX_auth_docs/process_step_catalog.json",
-      "EAFIX_auth_docs/updated_trading_process_aligned.json",
-      "EAFIX_auth_docs/communication_channels.json",
-      "EAFIX_auth_docs/ui_catalog.json",
-      "EAFIX_auth_docs/mt4 authoritative reference for ai.json",
-      "EAFIX_auth_docs/file_module_mapping.csv"
+      "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json",
+      "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+      "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+      "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+      "EAFIX_auth_docs/01_canonical_registries/communication_channels.json",
+      "EAFIX_auth_docs/01_canonical_registries/module_registry.json",
+      "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+      "EAFIX_auth_docs/01_canonical_registries/mt4 authoritative reference for ai.json",
+      "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv"
     ],
     "generated_from_documents": [
       "eafix_project_knowledge_reference_routing_instructions.json",
@@ -52,7 +44,7 @@
       "EAFIX_auth_docs/updated_trading_process_aligned.json",
       "EAFIX_auth_docs/file_module_mapping.csv",
       "EAFIX_auth_docs/eafix_services_ai_reference_20260510.json",
-      "EAFIX_auth_docs/EAFIX-Modular \u2014 End-to-End Module Map.txt",
+      "EAFIX_auth_docs/EAFIX-Modular — End-to-End Module Map.txt",
       "EAFIX_auth_docs/communication_channels.json",
       "EAFIX_auth_docs/MT4_Python communication channels.txt",
       "EAFIX_auth_docs/ui_catalog.json",
@@ -174,7 +166,7 @@
   },
   "file_ownership": {
     "module_root": null,
-    "manifest_path": null,
+    "manifest_path": "EAFIX_auth_docs/manifests/module_manifests/50000000000000000033_SK1_PLUGIN_INTERFACE.manifest.json",
     "owned_files": [],
     "source_files": [],
     "test_files": [],
@@ -191,20 +183,20 @@
     "shared_files": [],
     "file_assignment_status": "unassigned",
     "file_assignment_policy_ref": "module_assignment_policy",
-    "ownership_derivation": "unknown"
+    "ownership_derivation": "file_module_mapping"
   },
   "service_runtime": {
     "service_home": null,
     "candidate_service_home": null,
     "runtime_kind": "shared_kernel",
-    "language": "python",
+    "language": "unknown",
     "microservice_port": null,
     "host": null,
     "deployment_unit": "shared_kernel",
-    "runtime_status": "unknown",
-    "startup_entrypoints": [],
     "health_endpoint": null,
     "metrics_endpoint": null,
+    "runtime_status": "unknown",
+    "startup_entrypoints": [],
     "external_systems": [],
     "operator_settings_required": []
   },
@@ -299,88 +291,83 @@
     "state_machine_ref": null
   },
   "reconciliation_status": {
-    "service_binding_status": "needs_review",
+    "service_binding_status": "unbound",
     "submodule_doc_status": "deprecated",
     "mapped_file_count": 0,
     "owned_channel_ids": [],
-    "known_flags": [
-      "FILE_OWNERSHIP",
-      "PROCESS_BINDING",
-      "THIN_MODULE"
-    ],
-    "stale_symbol_tokens": [
-      "SHARED_LIBS.plugin_interface"
-    ],
+    "known_flags": [],
+    "stale_symbol_tokens": [],
     "kind_mismatch": false,
-    "layer_unassigned": true,
+    "layer_unassigned": false,
     "prefix_collision": false,
     "reconciliation_notes": [
       "file_ownership:unassigned",
       "process_binding:not_applicable",
       "thin_module:promoted_from_shared_libs"
     ],
-    "last_reconciled_utc": "2026-06-28T04:59:44.127147+00:00"
+    "last_reconciled_utc": "2026-07-01T23:30:00Z"
   },
   "staleness_policy": {
     "regenerate_if_changed": [
-      "EAFIX_auth_docs/Claude_gen_atomic_module_catalog_vNext.json",
-      "EAFIX_auth_docs/module_catalog.json",
-      "EAFIX_auth_docs/process_step_catalog.json",
-      "EAFIX_auth_docs/updated_trading_process_aligned.json",
-      "EAFIX_auth_docs/file_module_mapping.csv"
+      "EAFIX_auth_docs/00_doc_control_and_authority/active_project_standards_registry.json",
+      "EAFIX_auth_docs/01_canonical_registries/communication_channels.json",
+      "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+      "EAFIX_auth_docs/01_canonical_registries/module_registry.json",
+      "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+      "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+      "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/EAFIX module reconciliation worksheet.csv",
+      "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/atonic to canonical crosswalk.csv",
+      "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_services_ai_reference_20260510.json",
+      "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv"
     ],
     "last_generated_from": [
-      "EAFIX_auth_docs/Claude_gen_atomic_module_catalog_vNext.json",
-      "EAFIX_auth_docs/module_catalog.json",
-      "EAFIX_auth_docs/process_step_catalog.json",
-      "EAFIX_auth_docs/updated_trading_process_aligned.json",
-      "EAFIX_auth_docs/file_module_mapping.csv",
-      "EAFIX_auth_docs/communication_channels.json",
-      "EAFIX_auth_docs/ui_catalog.json"
+      "EAFIX_auth_docs/00_doc_control_and_authority/active_project_standards_registry.json",
+      "EAFIX_auth_docs/01_canonical_registries/communication_channels.json",
+      "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+      "EAFIX_auth_docs/01_canonical_registries/module_registry.json",
+      "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+      "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+      "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/EAFIX module reconciliation worksheet.csv",
+      "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/atonic to canonical crosswalk.csv",
+      "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_services_ai_reference_20260510.json",
+      "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv"
     ],
     "source_hashes": {
-      "routing_authority:eafix_project_knowledge_reference_routing_instructions.json": "e01e8e504661674fbac376b98b5d51c67ae42071011b85a31667542c4a9e5386",
-      "module_universe_vnext:EAFIX_auth_docs/Claude_gen_atomic_module_catalog_vNext.json": "476e5e65b903f263791d2188817e591b5fbdcec02e16749155747f4d331ca47c",
-      "manifest_schema:EAFIX_auth_docs/eafix_unified_atomic_module_schema_v1_0_0.json": "6c88f94dcc92f5c2f66d1858bb7e3e3477216f66a3a3286399cafa55d8305cff",
-      "fill_doctrine:EAFIX_auth_docs/eafix_unified_atomic_module_manifest_ai_fill_instructions_v1_0_0.md": "1608e704b309c253af0fe11e28fef8ed31f9001893868ebcc07488cc289dcc81",
-      "existing_draft_bundle:EAFIX_auth_docs/eafix module manifests bundle.json": "84b24cc2d3a1c417e3021352c8ca8a29f8226c1a5a499d4f3d8540b36cdf4260",
-      "module_catalog_enrichment:EAFIX_auth_docs/module_catalog.json": "1cdd67b6a0485f65d4c9f9617984a7c54e1f1a397e946a87beb04c15cc066288",
-      "process_step_catalog:EAFIX_auth_docs/process_step_catalog.json": "3695f03160d6827ad889724d32923b175112706d4c163ad52eb382a82443b9f5",
-      "aligned_process:EAFIX_auth_docs/updated_trading_process_aligned.json": "f794a0814e2699ac633e7ec1d4c9a1c0a8d5dccec3f466989c5264b577c77097",
-      "file_mapping:EAFIX_auth_docs/file_module_mapping.csv": "7441ba8a0e25db2f8a28b58d96ea462208bd0959e8c99db9e33488c45a1e2b7d",
-      "service_runtime:EAFIX_auth_docs/eafix_services_ai_reference_20260510.json": "b99c1011451b699c3eb4368567c973df1af25e15deea931130eb629f058bcd1c",
-      "module_map:EAFIX_auth_docs/EAFIX-Modular \u2014 End-to-End Module Map.txt": "518fd9cc1999378165f80c55083618e9e0b05a9094e9fb419b31bc14107d04b8",
-      "communication_channels:EAFIX_auth_docs/communication_channels.json": "b65fc3ff84b7f89cd5eab499842e86a97dc99e0d4d26f839dd983948161ded14",
-      "mt4_python_channels:EAFIX_auth_docs/MT4_Python communication channels.txt": "c9e40a3208a49b8a068e396b77b1b020411ddcd81ec1bd90177e0160ead8691e",
-      "ui_catalog:EAFIX_auth_docs/ui_catalog.json": "6114655ad63cd6d25d5ea06b90c089cd4ce2bb8a30ec7dba605563ce2c9be074",
-      "mt4_authoritative:EAFIX_auth_docs/mt4 authoritative reference for ai.json": "195b93c2d6ece47dc336a183cb1312f3d183069cefdbecf0b7d50ba6536f2296",
-      "capability_registry:EAFIX_auth_docs/converted_capability_registry.json": "2e4631bb9b8fff95a5f1f23e9943dafc064b3895bf24ef4182247ed812691ca4",
-      "dependency_layers_pdf:EAFIX_auth_docs/dependency layers.pdf": "4ed5933311738f0c76710beae7a8db74af30dfeb96580210daf585292768b058"
+      "EAFIX_auth_docs/00_doc_control_and_authority/active_project_standards_registry.json": "bcd61d78a657c2a6df14b4fd3af3733cee79e3b77b5c99bb6709f40e0068fb83",
+      "EAFIX_auth_docs/01_canonical_registries/communication_channels.json": "b65fc3ff84b7f89cd5eab499842e86a97dc99e0d4d26f839dd983948161ded14",
+      "EAFIX_auth_docs/01_canonical_registries/module_catalog.json": "1cdd67b6a0485f65d4c9f9617984a7c54e1f1a397e946a87beb04c15cc066288",
+      "EAFIX_auth_docs/01_canonical_registries/module_registry.json": "768d92546751ca8e02c837f6b7a2c0f448ef25874ca82356b400efb7f1a99065",
+      "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json": "3695f03160d6827ad889724d32923b175112706d4c163ad52eb382a82443b9f5",
+      "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json": "f794a0814e2699ac633e7ec1d4c9a1c0a8d5dccec3f466989c5264b577c77097",
+      "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/EAFIX module reconciliation worksheet.csv": "fcb54428a2f330dd1815e2fffa2be50885e411e678a4e186e6efa65b25215a24",
+      "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/atonic to canonical crosswalk.csv": "bf24ed1a3709e249566a9ebb981a7d766d5672590e67bb5d5bd1e281ea1139cf",
+      "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_services_ai_reference_20260510.json": "b99c1011451b699c3eb4368567c973df1af25e15deea931130eb629f058bcd1c",
+      "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv": "7441ba8a0e25db2f8a28b58d96ea462208bd0959e8c99db9e33488c45a1e2b7d"
     },
-    "staleness_check_command": "python -m tools.manifest_generation.generate_manifests --repo-root . --validate-only",
-    "staleness_status": "fresh"
+    "staleness_status": "fresh",
+    "staleness_check_command": "python -m tools.manifest_generation.generate_manifests --repo-root . --validate-only"
   },
   "notes": [
-    "Schema-first regenerated manifest from normalized staging tables."
+    "Schema-first regenerated manifest from normalized staging tables.",
+    "upstream_modules: no dependency steps in updated_trading_process_aligned.json",
+    "downstream_modules: no inbound references in updated_trading_process_aligned.json"
   ],
   "migration_traceability": {
-    "migration_status": "renamed_from_legacy_alias",
-    "source_parent_modules": [],
-    "promoted_from_work_cells": [],
-    "promoted_from_submodules": [],
-    "source_atonic_steps": [],
+    "migration_status": "not_migrated",
     "source_canonical_steps": [],
-    "deprecated_identifiers": [
-      "SHARED_LIBS.plugin_interface"
-    ],
-    "replacement_modules": [
-      "SK1_PLUGIN_INTERFACE"
-    ],
+    "source_atonic_steps": [],
     "crosswalk_refs": [
-      "build/staging/alias_crosswalk.json"
-    ],
-    "migration_notes": [
-      "legacy aliases reconciled to canonical symbol"
+      "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/atonic to canonical crosswalk.csv"
+    ]
+  },
+  "ai_context": {
+    "plain_language_summary": "Plugin Interface (SK1_PLUGIN_INTERFACE) Plugin Interface responsibility needs_review.",
+    "context_priority": "generated",
+    "forbidden_assumptions": [
+      "Do not assume socket transport is enabled.",
+      "Do not assume MT4 can run without the desktop terminal open.",
+      "Do not assume risk approval implies order routing.",
+      "Do not assume a module can read another module's database table directly."
     ]
   }
 }
