@@ -68,6 +68,34 @@ def _to_relative_repo_path(raw: str) -> str:
     return re.sub(r"^[A-Za-z]:/", "", path).lstrip("/")
 
 
+def _infer_modules_for_unmapped_row(service: str | None, rel_path: str) -> list[str]:
+    service_key = (service or "").strip().lower()
+    lower_path = rel_path.lower()
+
+    service_map = {
+        "dashboard-backend": ["U1_DASHBOARD_BACKEND"],
+        "gui-gateway": ["U2_GUI_GATEWAY"],
+        "event-gateway": ["B3_EXEC_EVENT_NORMALIZER"],
+        "reporter": ["P2_REPORTER"],
+    }
+    if service_key in service_map:
+        return service_map[service_key]
+
+    if service_key == "desktop-ui":
+        if "expiry" in lower_path:
+            return ["U3_MT4_EXPIRY_OVERLAY"]
+        return ["U4_DESKTOP_OPERATOR"]
+
+    if lower_path.startswith("shared/idempotency/"):
+        return ["SK2_IDEMPOTENCY"]
+    if lower_path.startswith("shared/") and ("plugin_interface" in lower_path or "plugin_registry" in lower_path):
+        return ["SK1_PLUGIN_INTERFACE"]
+    if lower_path.startswith("shared/reentry/") or lower_path.startswith("shared/positioning/"):
+        return ["R3_CORRELATION_GUARD"]
+
+    return []
+
+
 def build_module_universe(vnext_catalog: dict[str, Any], draft_bundle: dict[str, Any]) -> dict[str, Any]:
     modules = vnext_catalog.get("modules", [])
     unresolved: list[str] = []
@@ -177,8 +205,10 @@ def build_file_mapping_index(rows: list[dict[str, str]]) -> dict[str, Any]:
         is_test = str(row.get("IsTest", "0")).strip() in {"1", "true", "True"}
         modules = [normalize_symbol(m.strip()) for m in modules_cell.split(",") if m.strip()]
         if not modules:
-            unmapped_count += 1
-            continue
+            modules = _infer_modules_for_unmapped_row(service, rel_path)
+            if not modules:
+                unmapped_count += 1
+                continue
         ownership = "owned" if len(modules) == 1 else "shared"
         for module in modules:
             target = by_module.setdefault(

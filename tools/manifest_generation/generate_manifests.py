@@ -62,8 +62,8 @@ def main() -> int:
     _write_json(output_root / "manifest_source_authority_snapshot.json", authority_snapshot)
 
     critical_missing = [
-        "EAFIX_auth_docs/Claude_gen_atomic_module_catalog_vNext.json",
-        "EAFIX_auth_docs/eafix_unified_atomic_module_schema_v1_0_0.json",
+        "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json",
+        "EAFIX_auth_docs/01_canonical_registries/eafix_unified_atomic_module_schema_v1_0_0.json",
     ]
     missing = [x["relative_path"] for x in authority_snapshot["source_files"].values() if not x["exists"]]
     for required in critical_missing:
