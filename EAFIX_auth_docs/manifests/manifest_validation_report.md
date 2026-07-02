@@ -1,42 +1,19 @@
 # Manifest Validation Report
 
-Generated: 2026-07-01T23:30:00Z  
-Task: MANIFEST-POP-PASS2-V1  
-Valid: 34/34
+## Acceptance
+- **schema_valid_34_of_34**: PASS
+- **bundle_count_valid**: PASS
+- **has_no_validation_issues**: PASS
 
-| Manifest | Valid | Errors |
-|----------|-------|--------|
-| F1_CONFIG_PREFERENCES | ✓ |  |
-| F3_CLOCK_SCHEDULER | ✓ |  |
-| D2_CALENDAR_SOURCE_ADAPTER | ✓ |  |
-| D3_CALENDAR_NORMALIZER | ✓ |  |
-| F2_EVENT_LOG | ✓ |  |
-| D4_CALENDAR_TRIGGER_BUILDER | ✓ |  |
-| D1_MARKET_FEED_ADAPTER | ✓ |  |
-| C1_BAR_BUILDER | ✓ |  |
-| C2_INDICATOR_ENGINE | ✓ |  |
-| C3_FEATURE_PACKAGER | ✓ |  |
-| S1_SIGNAL_ENGINE | ✓ |  |
-| S2_INTENT_BUILDER | ✓ |  |
-| R1_RISK_EVALUATOR | ✓ |  |
-| R2_ORDER_INTENT_COMPILER | ✓ |  |
-| O1_ORDER_ROUTER | ✓ |  |
-| B1_MT4_ADAPTER_TRANSPORT | ✓ |  |
-| B2_MT4_EA_EXECUTOR | ✓ |  |
-| B3_EXEC_EVENT_NORMALIZER | ✓ |  |
-| O2_OMS_STATE_MACHINE | ✓ |  |
-| O3_TRADE_CLOSE_CLASSIFIER | ✓ |  |
-| E1_OUTCOME_BUCKETIZER | ✓ |  |
-| E2_PROXIMITY_EVALUATOR | ✓ |  |
-| E3_MATRIX_LOOKUP | ✓ |  |
-| E4_REENTRY_INTENT_BUILDER | ✓ |  |
-| F4_FLOW_ORCHESTRATOR | ✓ |  |
-| P1_HEALTH_AGGREGATOR | ✓ |  |
-| R3_CORRELATION_GUARD | ✓ |  |
-| U1_DASHBOARD_BACKEND | ✓ |  |
-| U2_GUI_GATEWAY | ✓ |  |
-| U3_MT4_EXPIRY_OVERLAY | ✓ |  |
-| U4_DESKTOP_OPERATOR | ✓ |  |
-| P2_REPORTER | ✓ |  |
-| SK1_PLUGIN_INTERFACE | ✓ |  |
-| SK2_IDEMPOTENCY | ✓ |  |
+## Section Results
+- **schema_validation**
+- **bundle_validation**
+- **identity_validation**
+- **dependency_validation**: issues=0
+- **contract_validation**: issues=0
+- **runtime_validation**: issues=0
+- **file_ownership_validation**: issues=0
+- **ui_validation**: issues=0
+- **mt4_validation**: issues=0
+- **thin_module_validation**: issues=0
+- **governance_validation**: issues=0

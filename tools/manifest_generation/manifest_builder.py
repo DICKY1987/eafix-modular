@@ -44,6 +44,15 @@ DEPLOYABLE_BY_PREFIX = {
     "B2": "mql4_ea",
 }
 
+FILE_OWNERSHIP_FALLBACKS: dict[str, list[str]] = {
+    "F1_CONFIG_PREFERENCES": ["F2_EVENT_LOG", "D2_CALENDAR_SOURCE_ADAPTER"],
+    "F3_CLOCK_SCHEDULER": ["D2_CALENDAR_SOURCE_ADAPTER", "D4_CALENDAR_TRIGGER_BUILDER"],
+    "C1_BAR_BUILDER": ["C2_INDICATOR_ENGINE"],
+    "C3_FEATURE_PACKAGER": ["C2_INDICATOR_ENGINE"],
+    "S2_INTENT_BUILDER": ["S1_SIGNAL_ENGINE"],
+    "F4_FLOW_ORCHESTRATOR": ["P1_HEALTH_AGGREGATOR"],
+}
+
 
 def _prefix(symbol: str) -> str:
     if symbol.startswith("SK"):
@@ -421,6 +430,41 @@ def _ui_enrichment(symbol: str, ui_index: dict[str, Any]) -> dict[str, Any] | No
     }
 
 
+def _borrow_file_map_from_peers(symbol: str, normalized: dict[str, Any]) -> dict[str, Any]:
+    template = {"owned_files": [], "shared_service_files": [], "candidate_owned_files": [], "file_role_index": []}
+    peers = FILE_OWNERSHIP_FALLBACKS.get(symbol, [])
+    if not peers:
+        return template
+    by_module = normalized["file_mapping_index"]["by_module"]
+    merged_paths: set[str] = set()
+    merged_rows: list[dict[str, Any]] = []
+    for peer in peers:
+        peer_map = by_module.get(peer)
+        if not peer_map:
+            continue
+        for path in peer_map.get("owned_files", []):
+            merged_paths.add(path)
+        for path in peer_map.get("shared_service_files", []):
+            merged_paths.add(path)
+        for row in peer_map.get("file_role_index", []):
+            merged_rows.append(
+                {
+                    **row,
+                    "ownership": "shared",
+                    "canonical_modules": sorted(set([symbol, *row.get("canonical_modules", [])])),
+                    "notes": "borrowed_from_peer_module",
+                }
+            )
+    if not merged_paths:
+        return template
+    return {
+        "owned_files": [],
+        "shared_service_files": sorted(merged_paths),
+        "candidate_owned_files": [],
+        "file_role_index": merged_rows,
+    }
+
+
 def build_manifests(
     reconciled_modules: list[dict[str, Any]],
     sources: dict[str, Any],
@@ -441,6 +485,10 @@ def build_manifests(
             symbol,
             {"owned_files": [], "shared_service_files": [], "candidate_owned_files": [], "file_role_index": []},
         )
+        if not file_map["owned_files"] and not file_map["shared_service_files"]:
+            borrowed = _borrow_file_map_from_peers(symbol, normalized)
+            if borrowed["shared_service_files"]:
+                file_map = borrowed
         deps = normalized["dependency_candidate_index"]["by_symbol"].get(symbol, [])
         runtime = _service_runtime(symbol, normalized["service_runtime_index"]["ports_by_symbol"], file_map)
         comm = _build_communication_channels(symbol, normalized["communication_channel_index"])
@@ -517,19 +565,19 @@ def build_manifests(
                 "authority_policy": "generated_from_canonical_sources",
                 "required_reference_documents": [meta["relative_path"] for meta in sources.values()],
                 "companion_documents": [
-                    "EAFIX_auth_docs/eafix module manifests bundle.json",
-                    "EAFIX_auth_docs/EAFIX module reconciliation worksheet.md",
+                    "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+                    "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/EAFIX module reconciliation worksheet.md",
                 ],
                 "conflict_resolution_order": [
                     "eafix_project_knowledge_reference_routing_instructions.json",
-                    "EAFIX_auth_docs/Claude_gen_atomic_module_catalog_vNext.json",
-                    "EAFIX_auth_docs/module_catalog.json",
-                    "EAFIX_auth_docs/process_step_catalog.json",
-                    "EAFIX_auth_docs/updated_trading_process_aligned.json",
-                    "EAFIX_auth_docs/communication_channels.json",
-                    "EAFIX_auth_docs/ui_catalog.json",
-                    "EAFIX_auth_docs/mt4 authoritative reference for ai.json",
-                    "EAFIX_auth_docs/file_module_mapping.csv",
+                    "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json",
+                    "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+                    "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+                    "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+                    "EAFIX_auth_docs/01_canonical_registries/communication_channels.json",
+                    "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+                    "EAFIX_auth_docs/01_canonical_registries/mt4 authoritative reference for ai.json",
+                    "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv",
                 ],
                 "generated_from_documents": [meta["relative_path"] for meta in sources.values()],
                 "authority_notes": module["reconciliation"]["unresolved_items"],
@@ -732,20 +780,20 @@ def build_manifests(
             },
             "staleness_policy": {
                 "regenerate_if_changed": [
-                    "EAFIX_auth_docs/Claude_gen_atomic_module_catalog_vNext.json",
-                    "EAFIX_auth_docs/module_catalog.json",
-                    "EAFIX_auth_docs/process_step_catalog.json",
-                    "EAFIX_auth_docs/updated_trading_process_aligned.json",
-                    "EAFIX_auth_docs/file_module_mapping.csv",
+                "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json",
+                "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+                "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+                "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+                "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv",
                 ],
                 "last_generated_from": [
-                    "EAFIX_auth_docs/Claude_gen_atomic_module_catalog_vNext.json",
-                    "EAFIX_auth_docs/module_catalog.json",
-                    "EAFIX_auth_docs/process_step_catalog.json",
-                    "EAFIX_auth_docs/updated_trading_process_aligned.json",
-                    "EAFIX_auth_docs/file_module_mapping.csv",
-                    "EAFIX_auth_docs/communication_channels.json",
-                    "EAFIX_auth_docs/ui_catalog.json",
+                "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json",
+                "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+                "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+                "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+                "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv",
+                "EAFIX_auth_docs/01_canonical_registries/communication_channels.json",
+                "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
                 ],
                 "source_hashes": source_hashes,
                 "staleness_check_command": "python -m tools.manifest_generation.generate_manifests --repo-root . --validate-only",

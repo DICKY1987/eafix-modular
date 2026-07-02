@@ -12,22 +12,22 @@ from typing import Any
 
 REQUIRED_SOURCE_FILES: dict[str, str] = {
     "routing_authority": "eafix_project_knowledge_reference_routing_instructions.json",
-    "module_universe_vnext": "EAFIX_auth_docs/Claude_gen_atomic_module_catalog_vNext.json",
-    "manifest_schema": "EAFIX_auth_docs/eafix_unified_atomic_module_schema_v1_0_0.json",
-    "fill_doctrine": "EAFIX_auth_docs/eafix_unified_atomic_module_manifest_ai_fill_instructions_v1_0_0.md",
-    "existing_draft_bundle": "EAFIX_auth_docs/eafix module manifests bundle.json",
-    "module_catalog_enrichment": "EAFIX_auth_docs/module_catalog.json",
-    "process_step_catalog": "EAFIX_auth_docs/process_step_catalog.json",
-    "aligned_process": "EAFIX_auth_docs/updated_trading_process_aligned.json",
-    "file_mapping": "EAFIX_auth_docs/file_module_mapping.csv",
-    "service_runtime": "EAFIX_auth_docs/eafix_services_ai_reference_20260510.json",
-    "module_map": "EAFIX_auth_docs/EAFIX-Modular — End-to-End Module Map.txt",
-    "communication_channels": "EAFIX_auth_docs/communication_channels.json",
+    "module_universe_vnext": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json",
+    "manifest_schema": "EAFIX_auth_docs/01_canonical_registries/eafix_unified_atomic_module_schema_v1_0_0.json",
+    "fill_doctrine": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix_unified_atomic_module_manifest_ai_fill_instructions_v1_0_0.md",
+    "existing_draft_bundle": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+    "module_catalog_enrichment": "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+    "process_step_catalog": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+    "aligned_process": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+    "file_mapping": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv",
+    "service_runtime": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_services_ai_reference_20260510.json",
+    "module_map": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/EAFIX-Modular — End-to-End Module Map.txt",
+    "communication_channels": "EAFIX_auth_docs/01_canonical_registries/communication_channels.json",
     "mt4_python_channels": "EAFIX_auth_docs/MT4_Python communication channels.txt",
-    "ui_catalog": "EAFIX_auth_docs/ui_catalog.json",
-    "mt4_authoritative": "EAFIX_auth_docs/mt4 authoritative reference for ai.json",
-    "capability_registry": "EAFIX_auth_docs/converted_capability_registry.json",
-    "dependency_layers_pdf": "EAFIX_auth_docs/dependency layers.pdf",
+    "ui_catalog": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+    "mt4_authoritative": "EAFIX_auth_docs/01_canonical_registries/mt4 authoritative reference for ai.json",
+    "capability_registry": "EAFIX_auth_docs/01_canonical_registries/converted_capability_registry.json",
+    "dependency_layers_pdf": "EAFIX_auth_docs/dependency_layers_parsed.json",
 }
 
 
@@ -119,8 +119,8 @@ def run_authority_preflight(repo_root: Path) -> dict[str, Any]:
 
     return {
         "source_files": files,
-        "module_universe_source": "EAFIX_auth_docs/Claude_gen_atomic_module_catalog_vNext.json",
-        "schema_source": "EAFIX_auth_docs/eafix_unified_atomic_module_schema_v1_0_0.json",
+        "module_universe_source": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json",
+        "schema_source": "EAFIX_auth_docs/01_canonical_registries/eafix_unified_atomic_module_schema_v1_0_0.json",
         "conflict_resolution_order": conflict_resolution_order,
         "unresolved_authority_conflicts": unresolved_conflicts,
     }
