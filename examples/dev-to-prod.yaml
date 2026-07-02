@@ -1,0 +1,19 @@
+steps:
+  - workflow: git.commit_push.main
+    inputs:
+      repo: .
+      branch: main
+      commit_message: "chore: pre-deploy checks"
+      push_mode: pr
+  - workflow: build.container.sign
+    inputs:
+      dockerfile: Dockerfile
+      context: .
+      image_tag: myapp:dev
+  - workflow: security.scan.trivy
+    inputs:
+      target: .
+  - workflow: kube.deploy.rolling
+    inputs:
+      manifests: deploy/
+

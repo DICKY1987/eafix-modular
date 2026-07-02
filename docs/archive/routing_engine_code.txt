@@ -1,0 +1,514 @@
+# scripts/intelligent-router.ps1
+# Intelligent Tool Routing Engine
+
+class IntelligentRouter {
+    [hashtable]$Config
+    [hashtable]$QuotaTracker
+    [hashtable]$HistoryData
+    [string]$CurrentTime
+    
+    IntelligentRouter([hashtable]$config) {
+        $this.Config = $config
+        $this.QuotaTracker = $this.LoadQuotaData()
+        $this.HistoryData = $this.LoadHistoryData()
+        $this.CurrentTime = Get-Date -Format "HH:mm"
+    }
+    
+    # Main routing decision method
+    [hashtable] RouteToOptimalTool([string[]]$files, [string]$prompt, [hashtable]$context) {
+        $decision = @{
+            selectedTool = $null
+            reasoning = @()
+            confidence = 0.0
+            factors = @{}
+            fallbackChain = @()
+            estimatedCost = 0.0
+            estimatedDuration = "0m"
+        }
+        
+        try {
+            # Step 1: Analyze input characteristics
+            $analysis = $this.AnalyzeInput($files, $prompt, $context)
+            $decision.factors = $analysis
+            
+            # Step 2: Check hard constraints (safety first)
+            $violations = $this.CheckHardConstraints($files, $context)
+            if ($violations.Count -gt 0) {
+                $decision.selectedTool = "vscode_editor"
+                $decision.reasoning += "HARD_BLOCK violations detected: $($violations -join ', ')"
+                $decision.confidence = 1.0
+                return $decision
+            }
+            
+            # Step 3: Calculate complexity score
+            $complexity = $this.CalculateComplexityScore($analysis)
+            $decision.factors.complexityScore = $complexity
+            
+            # Step 4: Evaluate tool candidates
+            $candidates = $this.EvaluateToolCandidates($complexity, $analysis)
+            
+            # Step 5: Apply intelligent selection logic
+            $selected = $this.SelectOptimalTool($candidates, $analysis)
+            
+            $decision.selectedTool = $selected.tool
+            $decision.reasoning = $selected.reasoning
+            $decision.confidence = $selected.confidence
+            $decision.fallbackChain = $selected.fallbackChain
+            $decision.estimatedCost = $selected.estimatedCost
+            $decision.estimatedDuration = $selected.estimatedDuration
+            
+        } catch {
+            # Emergency fallback
+            $decision.selectedTool = "vscode_editor"
+            $decision.reasoning += "ERROR: $($_.Exception.Message) - routing to safe fallback"
+            $decision.confidence = 0.5
+        }
+        
+        # Log decision for learning
+        $this.LogRoutingDecision($decision, $files, $prompt)
+        
+        return $decision
+    }
+    
+    # Analyze input characteristics
+    [hashtable] AnalyzeInput([string[]]$files, [string]$prompt, [hashtable]$context) {
+        $analysis = @{
+            fileCount = $files.Count
+            totalLines = 0
+            avgLinesPerFile = 0
+            fileTypes = @{}
+            promptComplexity = $null
+            gitState = $null
+            pathsAnalysis = @{}
+        }
+        
+        # File analysis
+        foreach ($file in $files) {
+            if (Test-Path $file) {
+                $lines = (Get-Content $file -ErrorAction SilentlyContinue).Count
+                $analysis.totalLines += $lines
+                
+                $ext = [System.IO.Path]::GetExtension($file)
+                if (-not $analysis.fileTypes.ContainsKey($ext)) {
+                    $analysis.fileTypes[$ext] = 0
+                }
+                $analysis.fileTypes[$ext]++
+            }
+        }
+        
+        if ($files.Count -gt 0) {
+            $analysis.avgLinesPerFile = [math]::Round($analysis.totalLines / $files.Count)
+        }
+        
+        # Prompt complexity analysis
+        $analysis.promptComplexity = $this.AnalyzePromptComplexity($prompt)
+        
+        # Git state analysis
+        $analysis.gitState = $this.AnalyzeGitState()
+        
+        # Path analysis
+        $analysis.pathsAnalysis = $this.AnalyzePaths($files)
+        
+        return $analysis
+    }
+    
+    # Calculate overall complexity score (0-100)
+    [int] CalculateComplexityScore([hashtable]$analysis) {
+        $score = 0
+        
+        # File count factor (0-30 points)
+        $fileCountScore = [math]::Min(30, $analysis.fileCount * 3)
+        $score += $fileCountScore
+        
+        # Total lines factor (0-25 points)  
+        $linesScore = [math]::Min(25, $analysis.totalLines / 100)
+        $score += $linesScore
+        
+        # Average file size factor (0-20 points)
+        $avgSizeScore = [math]::Min(20, $analysis.avgLinesPerFile / 50)
+        $score += $avgSizeScore
+        
+        # Prompt complexity factor (0-25 points)
+        $promptScore = switch ($analysis.promptComplexity.level) {
+            "simple" { 5 }
+            "moderate" { 15 }
+            "complex" { 25 }
+            default { 10 }
+        }
+        $score += $promptScore
+        
+        return [math]::Min(100, $score)
+    }
+    
+    # Evaluate all possible tool candidates
+    [hashtable[]] EvaluateToolCandidates([int]$complexity, [hashtable]$analysis) {
+        $candidates = @()
+        
+        # Aider Local candidate
+        $aiderScore = $this.ScoreToolForTask("aider_local", $complexity, $analysis)
+        $candidates += @{
+            tool = "aider_local"
+            score = $aiderScore.score
+            reasoning = $aiderScore.reasoning
+            available = $aiderScore.available
+            cost = 0.0
+            duration = $this.EstimateDuration("aider_local", $analysis)
+        }
+        
+        # Claude Code candidate
+        $claudeScore = $this.ScoreToolForTask("claude_code", $complexity, $analysis)
+        $candidates += @{
+            tool = "claude_code"
+            score = $claudeScore.score
+            reasoning = $claudeScore.reasoning
+            available = $claudeScore.available
+            cost = $this.EstimateCost("claude_code", $analysis)
+            duration = $this.EstimateDuration("claude_code", $analysis)
+        }
+        
+        # VS Code Editor candidate (always available as fallback)
+        $editorScore = $this.ScoreToolForTask("vscode_editor", $complexity, $analysis)
+        $candidates += @{
+            tool = "vscode_editor"
+            score = $editorScore.score
+            reasoning = $editorScore.reasoning
+            available = $true
+            cost = 0.0
+            duration = "15m-60m (manual)"
+        }
+        
+        return $candidates
+    }
+    
+    # Score how well a tool fits the current task
+    [hashtable] ScoreToolForTask([string]$tool, [int]$complexity, [hashtable]$analysis) {
+        $result = @{
+            score = 0
+            reasoning = @()
+            available = $true
+        }
+        
+        switch ($tool) {
+            "aider_local" {
+                # Aider excels at simple to moderate tasks
+                if ($complexity -le 40) {
+                    $result.score = 90 - ($complexity * 0.5)  # 90 for simple, 70 for moderate
+                    $result.reasoning += "Optimal for simple-moderate complexity ($complexity)"
+                } elseif ($complexity -le 70) {
+                    $result.score = 60 - ($complexity * 0.3)  # 60-39 for high complexity
+                    $result.reasoning += "Suboptimal for high complexity ($complexity)"
+                } else {
+                    $result.score = 20
+                    $result.reasoning += "Poor fit for very high complexity ($complexity)"
+                }
+                
+                # File count bonus/penalty
+                if ($analysis.fileCount -le 5) {
+                    $result.score += 10
+                    $result.reasoning += "Bonus: small file count ($($analysis.fileCount))"
+                } elseif ($analysis.fileCount -gt 10) {
+                    $result.score -= 20
+                    $result.reasoning += "Penalty: large file count ($($analysis.fileCount))"
+                }
+                
+                # Always available
+                $result.available = $true
+            }
+            
+            "claude_code" {
+                # Claude excels at moderate to complex tasks
+                if ($complexity -ge 50) {
+                    $result.score = 70 + ($complexity * 0.3)  # 85-100 for complex
+                    $result.reasoning += "Excellent for high complexity ($complexity)"
+                } elseif ($complexity -ge 30) {
+                    $result.score = 60 + ($complexity * 0.2)  # 66-70 for moderate
+                    $result.reasoning += "Good for moderate complexity ($complexity)"
+                } else {
+                    $result.score = 40
+                    $result.reasoning += "Overkill for simple tasks ($complexity)"
+                }
+                
+                # Large file set bonus
+                if ($analysis.fileCount -gt 5) {
+                    $result.score += 15
+                    $result.reasoning += "Bonus: handles large file sets well ($($analysis.fileCount))"
+                }
+                
+                # Check availability (quota)
+                $quotaUsage = $this.GetQuotaUsage("claude_code")
+                if ($quotaUsage -gt 0.8) {
+                    $result.available = $false
+                    $result.reasoning += "UNAVAILABLE: quota >80% ($([math]::Round($quotaUsage * 100))%)"
+                } elseif ($quotaUsage -gt 0.6) {
+                    $result.score -= 20
+                    $result.reasoning += "Penalty: quota getting high ($([math]::Round($quotaUsage * 100))%)"
+                }
+            }
+            
+            "vscode_editor" {
+                # Editor is universal fallback but manual
+                $result.score = 50  # Always medium score
+                $result.reasoning += "Universal fallback - always works"
+                
+                # Bonus for constraint violations (already checked elsewhere)
+                # Penalty for being manual
+                $result.score -= 30
+                $result.reasoning += "Penalty: requires manual intervention"
+                
+                $result.available = $true
+            }
+        }
+        
+        return $result
+    }
+    
+    # Select the optimal tool from candidates
+    [hashtable] SelectOptimalTool([hashtable[]]$candidates, [hashtable]$analysis) {
+        $decision = @{
+            tool = "vscode_editor"  # Safe default
+            reasoning = @()
+            confidence = 0.0
+            fallbackChain = @()
+            estimatedCost = 0.0
+            estimatedDuration = "unknown"
+        }
+        
+        # Filter to available candidates
+        $available = $candidates | Where-Object { $_.available }
+        
+        if ($available.Count -eq 0) {
+            $decision.reasoning += "No tools available - using fallback editor"
+            $decision.confidence = 0.3
+            return $decision
+        }
+        
+        # Sort by score (descending)
+        $sorted = $available | Sort-Object { $_.score } -Descending
+        
+        $best = $sorted[0]
+        $decision.tool = $best.tool
+        $decision.reasoning = $best.reasoning
+        $decision.estimatedCost = $best.cost
+        $decision.estimatedDuration = $best.duration
+        
+        # Calculate confidence based on score gap
+        if ($sorted.Count -gt 1) {
+            $scoreGap = $best.score - $sorted[1].score
+            $decision.confidence = [math]::Min(1.0, ($best.score / 100) + ($scoreGap / 200))
+        } else {
+            $decision.confidence = $best.score / 100
+        }
+        
+        # Build fallback chain
+        $decision.fallbackChain = $sorted | ForEach-Object { $_.tool }
+        
+        # Add context-specific reasoning
+        $decision.reasoning += $this.GenerateContextualReasoning($best, $analysis)
+        
+        return $decision
+    }
+    
+    # Generate human-readable reasoning
+    [string[]] GenerateContextualReasoning([hashtable]$selected, [hashtable]$analysis) {
+        $reasoning = @()
+        
+        # Time-based context
+        $hour = [int](Get-Date -Format "HH")
+        if ($hour -ge 9 -and $hour -le 17) {
+            $reasoning += "Peak hours: optimizing for productivity"
+        } else {
+            $reasoning += "Off hours: more liberal tool usage"
+        }
+        
+        # File characteristics
+        if ($analysis.fileCount -eq 1) {
+            $reasoning += "Single file edit: streamlined approach"
+        } elseif ($analysis.fileCount -le 5) {
+            $reasoning += "Small changeset: efficient automation possible"
+        } else {
+            $reasoning += "Large changeset: requires sophisticated handling"
+        }
+        
+        # Complexity context
+        $complexity = $this.CalculateComplexityScore($analysis)
+        if ($complexity -lt 30) {
+            $reasoning += "Low complexity: fast local tools preferred"
+        } elseif ($complexity -lt 60) {
+            $reasoning += "Moderate complexity: balanced approach"
+        } else {
+            $reasoning += "High complexity: advanced reasoning required"
+        }
+        
+        return $reasoning
+    }
+    
+    # Estimate cost for paid tools
+    [double] EstimateCost([string]$tool, [hashtable]$analysis) {
+        switch ($tool) {
+            "claude_code" {
+                # Base cost per request + complexity multiplier
+                $baseCost = 0.15
+                $complexityMultiplier = 1 + ($analysis.totalLines / 2000)
+                return [math]::Round($baseCost * $complexityMultiplier, 2)
+            }
+            default {
+                return 0.0
+            }
+        }
+    }
+    
+    # Estimate duration based on tool and task
+    [string] EstimateDuration([string]$tool, [hashtable]$analysis) {
+        switch ($tool) {
+            "aider_local" {
+                $baseSeconds = 30 + ($analysis.totalLines * 0.05)
+                $minutes = [math]::Ceiling($baseSeconds / 60)
+                return "${minutes}m"
+            }
+            "claude_code" {
+                $baseSeconds = 60 + ($analysis.totalLines * 0.08)
+                $minutes = [math]::Ceiling($baseSeconds / 60)
+                return "${minutes}m"
+            }
+            "vscode_editor" {
+                return "15m-60m (manual)"
+            }
+            default {
+                return "unknown"
+            }
+        }
+    }
+    
+    # Supporting analysis methods
+    [hashtable] AnalyzePromptComplexity([string]$prompt) {
+        $complexKeywords = @("architecture", "redesign", "refactor", "optimize", "performance", "security")
+        $moderateKeywords = @("implement", "add", "feature", "integration", "API", "database")
+        $simpleKeywords = @("fix", "update", "format", "rename", "comment", "log")
+        
+        $complexCount = ($complexKeywords | Where-Object { $prompt -match $_ }).Count
+        $moderateCount = ($moderateKeywords | Where-Object { $prompt -match $_ }).Count
+        $simpleCount = ($simpleKeywords | Where-Object { $prompt -match $_ }).Count
+        
+        $level = if ($complexCount -gt 0) { "complex" }
+                elseif ($moderateCount -gt 0) { "moderate" }
+                elseif ($simpleCount -gt 0) { "simple" }
+                else { "unknown" }
+        
+        return @{
+            level = $level
+            complexKeywords = $complexCount
+            moderateKeywords = $moderateCount
+            simpleKeywords = $simpleCount
+            length = $prompt.Length
+        }
+    }
+    
+    [hashtable] AnalyzeGitState() {
+        $status = git status --porcelain 2>$null
+        $branch = git branch --show-current 2>$null
+        
+        return @{
+            isClean = -not $status
+            currentBranch = $branch
+            hasUncommitted = [bool]$status
+            fileCount = if ($status) { $status.Count } else { 0 }
+        }
+    }
+    
+    [string[]] CheckHardConstraints([string[]]$files, [hashtable]$context) {
+        $violations = @()
+        
+        # Git must be clean
+        if (-not $this.AnalyzeGitState().isClean) {
+            $violations += "git.worktree_dirty"
+        }
+        
+        # Path allowlist check
+        $allowedPaths = @("src/**/*.py", "tests/**/*.py", "lib/**/*.py", "*.py")
+        $excludedPaths = @("migrations/**", "venv/**", ".venv/**")
+        
+        foreach ($file in $files) {
+            $allowed = $false
+            foreach ($pattern in $allowedPaths) {
+                if ($file -like $pattern) { $allowed = $true; break }
+            }
+            if ($allowed) {
+                foreach ($pattern in $excludedPaths) {
+                    if ($file -like $pattern) { $allowed = $false; break }
+                }
+            }
+            if (-not $allowed) {
+                $violations += "path.not_allowed:$file"
+                break
+            }
+        }
+        
+        # File count limit
+        if ($files.Count -gt 15) {
+            $violations += "files.too_many:$($files.Count)"
+        }
+        
+        return $violations
+    }
+    
+    [double] GetQuotaUsage([string]$service) {
+        if (-not $this.QuotaTracker.services.$service) { return 0.0 }
+        
+        $usage = $this.QuotaTracker.services.$service.current ?? 0
+        $limit = $this.QuotaTracker.services.$service.limit ?? 100
+        
+        return $usage / $limit
+    }
+    
+    [hashtable] LoadQuotaData() {
+        $quotaPath = ".ai/quota-tracker.json"
+        if (Test-Path $quotaPath) {
+            return Get-Content $quotaPath | ConvertFrom-Json -AsHashtable
+        }
+        return @{ services = @{} }
+    }
+    
+    [hashtable] LoadHistoryData() {
+        $historyPath = ".ai/routing-history.json"
+        if (Test-Path $historyPath) {
+            return Get-Content $historyPath | ConvertFrom-Json -AsHashtable
+        }
+        return @{ decisions = @() }
+    }
+    
+    [void] LogRoutingDecision([hashtable]$decision, [string[]]$files, [string]$prompt) {
+        $logEntry = @{
+            timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+            tool = $decision.selectedTool
+            confidence = $decision.confidence
+            fileCount = $files.Count
+            promptLength = $prompt.Length
+            reasoning = $decision.reasoning
+            factors = $decision.factors
+        }
+        
+        # Append to history (implement proper logging as needed)
+        Write-Host "🔄 Routing Decision: $($decision.selectedTool) (confidence: $($decision.confidence))" -ForegroundColor Blue
+    }
+}
+
+# Usage example
+function Test-IntelligentRouting {
+    $config = @{ routing = @{ default_tool = "aider_local" } }
+    $router = [IntelligentRouter]::new($config)
+    
+    # Test case 1: Simple edit
+    $decision1 = $router.RouteToOptimalTool(@("src/utils.py"), "fix typo in docstring", @{})
+    Write-Host "Simple edit → $($decision1.selectedTool): $($decision1.reasoning -join '; ')"
+    
+    # Test case 2: Complex refactor
+    $decision2 = $router.RouteToOptimalTool(@("src/auth.py", "src/models.py", "src/api.py"), "implement OAuth2 with refresh tokens", @{})
+    Write-Host "Complex refactor → $($decision2.selectedTool): $($decision2.reasoning -join '; ')"
+    
+    # Test case 3: Large changeset
+    $manyFiles = 1..12 | ForEach-Object { "src/module$_.py" }
+    $decision3 = $router.RouteToOptimalTool($manyFiles, "update all modules for new API", @{})
+    Write-Host "Large changeset → $($decision3.selectedTool): $($decision3.reasoning -join '; ')"
+}
+
+# Test-IntelligentRouting

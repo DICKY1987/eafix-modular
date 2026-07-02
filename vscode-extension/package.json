@@ -1,0 +1,183 @@
+{
+  "name": "cli-multi-rapid-cockpit",
+  "displayName": "CLI Multi-Rapid Workflow Cockpit",
+  "description": "Real-time dashboard for phases, files changed, logs, cost, and controls (cancel/retry/budget bump)",
+  "version": "0.1.0",
+  "publisher": "cli-multi-rapid",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other",
+    "Debuggers",
+    "Extension Packs"
+  ],
+  "keywords": [
+    "workflow",
+    "orchestration",
+    "ai",
+    "automation",
+    "dashboard",
+    "real-time",
+    "enterprise"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "cliMultiRapid.openCockpit",
+        "title": "Open Workflow Cockpit",
+        "category": "CLI Multi-Rapid"
+      },
+      {
+        "command": "cliMultiRapid.startWorkflow",
+        "title": "Start Workflow",
+        "category": "CLI Multi-Rapid"
+      },
+      {
+        "command": "cliMultiRapid.cancelWorkflow",
+        "title": "Cancel Current Workflow", 
+        "category": "CLI Multi-Rapid"
+      },
+      {
+        "command": "cliMultiRapid.retryPhase",
+        "title": "Retry Failed Phase",
+        "category": "CLI Multi-Rapid"
+      },
+      {
+        "command": "cliMultiRapid.increaseBudget",
+        "title": "Increase Budget",
+        "category": "CLI Multi-Rapid"
+      },
+      {
+        "command": "cliMultiRapid.viewLogs",
+        "title": "View Logs",
+        "category": "CLI Multi-Rapid"
+      },
+      {
+        "command": "cliMultiRapid.exportReport",
+        "title": "Export Workflow Report",
+        "category": "CLI Multi-Rapid"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "cliMultiRapidWorkflows",
+          "name": "CLI Multi-Rapid Workflows",
+          "when": "true"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "cli-multi-rapid",
+          "title": "CLI Multi-Rapid",
+          "icon": "$(gear)"
+        }
+      ]
+    },
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "cliMultiRapid.openCockpit"
+        },
+        {
+          "command": "cliMultiRapid.startWorkflow"
+        },
+        {
+          "command": "cliMultiRapid.cancelWorkflow",
+          "when": "cliMultiRapid.workflowActive"
+        },
+        {
+          "command": "cliMultiRapid.retryPhase",
+          "when": "cliMultiRapid.hasFailedPhases"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "cliMultiRapid.startWorkflow",
+          "when": "editorHasSelection",
+          "group": "cli-multi-rapid"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "CLI Multi-Rapid",
+      "properties": {
+        "cliMultiRapid.serverUrl": {
+          "type": "string",
+          "default": "http://localhost:8000",
+          "description": "URL of the CLI Multi-Rapid orchestration server"
+        },
+        "cliMultiRapid.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key for authentication (optional)"
+        },
+        "cliMultiRapid.autoRefresh": {
+          "type": "boolean", 
+          "default": true,
+          "description": "Automatically refresh workflow status"
+        },
+        "cliMultiRapid.refreshInterval": {
+          "type": "number",
+          "default": 2000,
+          "description": "Refresh interval in milliseconds"
+        },
+        "cliMultiRapid.showCostAlerts": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show cost alerts and warnings"
+        },
+        "cliMultiRapid.maxBudgetPerWorkflow": {
+          "type": "number",
+          "default": 10.0,
+          "description": "Maximum budget per workflow in USD"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "16.x",
+    "@types/ws": "^8.5.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "@vscode/test-electron": "^2.2.0",
+    "eslint": "^8.28.0",
+    "typescript": "^4.9.4",
+    "vsce": "^2.15.0"
+  },
+  "dependencies": {
+    "ws": "^8.11.0",
+    "axios": "^1.2.0"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "icon": "media/icon.png",
+  "galleryBanner": {
+    "color": "#1e1e1e",
+    "theme": "dark"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cli-multi-rapid/vscode-extension"
+  },
+  "bugs": {
+    "url": "https://github.com/cli-multi-rapid/vscode-extension/issues"
+  },
+  "homepage": "https://github.com/cli-multi-rapid/vscode-extension#readme",
+  "license": "MIT"
+}

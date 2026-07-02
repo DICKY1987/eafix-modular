@@ -1,0 +1,83 @@
+version: '1.0'
+name: Multi-Stream Workflow Mapping
+description: Logical grouping of phases into conflict-free parallel streams (A–E)
+
+streams:
+  - id: stream-a
+    label: Stream A
+    name: Foundation & Infrastructure
+    owner: Claude
+    scope:
+      paths:
+        - .pre-commit-config.yaml
+        - .github/**
+        - README.md
+        - Makefile
+    phases:
+      - phase0   # Project Baseline & Branch Protection
+      - phase1   # Repo Hygiene & Legal (quality/tooling)
+      - phase3   # CI/CD Foundations
+
+  - id: stream-b
+    label: Stream B
+    name: Schema & Validation
+    owner: Codex
+    scope:
+      paths:
+        - contracts/schemas/**
+        - scripts/validate_*.py
+        - tests/**
+        - samples/**
+    phases:
+      - phase2    # Canonical Contracts & Codegen
+      - phase2a   # P_ Folder Content Integration (optional)
+      - phase9    # Contract & Scenario Testing
+
+  - id: stream-c
+    label: Stream C
+    name: Orchestration & Policies
+    owner: Claude
+    scope:
+      paths:
+        - workflows/**
+        - policy/**
+        - prompts/**
+        - scripts/run_*.py
+    phases:
+      - phase4   # Security Baseline
+      - phase5a  # Compliance Monitoring, Auto-Remediation & Recovery
+      - phase8   # Idempotency & Exactly-Once Semantics
+
+  - id: stream-d
+    label: Stream D
+    name: Services & Docker
+    owner: Codex
+    scope:
+      paths:
+        - compose.*
+        - services/**
+        - .vscode/**
+        - deploy/**
+    phases:
+      - phase5  # Observability & SLOs
+      - phase6  # Release v0.1.0
+      - phase7  # Kubernetes/Helm Production Path
+
+  - id: stream-e
+    label: Stream E
+    name: Documentation & Enablement
+    owner: Claude
+    scope:
+      paths:
+        - docs/**
+        - runbooks/**
+    phases:
+      - phase10  # Runbooks & On-Call
+      - phase11  # Developer Experience
+      - phase12  # Governance & Roadmap
+
+execution_order:
+  - parallel: [stream-a, stream-b]
+  - parallel: [stream-c, stream-d]
+  - sequential: [stream-e]
+

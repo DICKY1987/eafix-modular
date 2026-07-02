@@ -1,0 +1,47 @@
+name: agentic-validators
+on:
+  pull_request:
+    branches: [ main ]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Set up venv and install tools
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          pip install -U pip
+          pip install ruff mypy bandit radon pytest coverage hypothesis semgrep pip-audit PyYAML gitleaks pip-licenses
+      - name: SAST (semgrep)
+        run: . .venv/bin/activate && semgrep --config=auto .
+      - name: SAST (bandit)
+        run: . .venv/bin/activate && bandit -q -r src
+      - name: SCA (pip-audit)
+        run: . .venv/bin/activate && pip-audit
+      - name: License gate (allowlist)
+        run: |
+          . .venv/bin/activate
+          python - <<'PY'
+          import json, subprocess, sys
+          allow = {"MIT", "Apache-2.0"}
+          # Include all BSD variants
+          def ok(lic: str) -> bool:
+            return lic in allow or lic.startswith("BSD")
+          out = subprocess.check_output([sys.executable, '-m', 'piplicenses', '--format', 'json'])
+          pkgs = json.loads(out)
+          bad = [p for p in pkgs if not ok(p.get('License',''))]
+          if bad:
+            print("Disallowed licenses detected:")
+            for p in bad:
+              print(f"- {p.get('Name')} ({p.get('License')})")
+            sys.exit(1)
+          PY
+      - name: Format + Lint
+        run: . .venv/bin/activate && ruff format . && ruff check --fix .
+      - name: Tests with coverage >=85%
+        run: . .venv/bin/activate && pytest --cov=src --cov-fail-under=85 -q
+

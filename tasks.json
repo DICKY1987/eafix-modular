@@ -1,0 +1,142 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Job: UI (Aider)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-File",
+        ".ai/scripts/orchestrate.ps1",
+        "-Name",
+        "ui-refactor",
+        "-Tool",
+        "aider_local",
+        "-Branch",
+        "feat/ui-aider",
+        "-Worktree",
+        "../wt-aider",
+        "-Tests",
+        "pnpm -w apps/ui test"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Job: API (Claude Code)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-File",
+        ".ai/scripts/orchestrate.ps1",
+        "-Name",
+        "api-hardening",
+        "-Tool",
+        "claude_code",
+        "-Branch",
+        "fix/api-cline",
+        "-Worktree",
+        "../wt-cline",
+        "-Tests",
+        "pytest -q"
+      ]
+    },
+    {
+      "label": "Job: Core (Claude Code)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-File",
+        ".ai/scripts/orchestrate.ps1",
+        "-Name",
+        "core-refactor",
+        "-Tool",
+        "claude_code",
+        "-Branch",
+        "refactor/core-claude",
+        "-Worktree",
+        "../wt-claude",
+        "-Tests",
+        "pytest -q"
+      ]
+    },
+    {
+      "label": "Job: Triage (Auto Fixer)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-File",
+        ".ai/scripts/orchestrate.ps1",
+        "-Name",
+        "triage-py",
+        "-Tool",
+        "auto_fixer",
+        "-Branch",
+        "chore/triage-fixes",
+        "-Worktree",
+        "../wt-triage",
+        "-Tests",
+        "pytest -q"
+      ]
+    },
+    {
+      "label": "Triage: Diagnose\u2192Route\u2192Fix (VS Code)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-File",
+        ".ai/scripts/orchestrate.ps1",
+        "-Command",
+        "start-triage",
+        "-Files",
+        "src/**/*.py",
+        "-Prompt",
+        "Stabilize types and imports"
+      ]
+    },
+    {
+      "label": "Free-Tier: init lanes",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-File",
+        "orchestrator.ps1",
+        "-Command",
+        "init"
+      ]
+    },
+    {
+      "label": "Free-Tier: status",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-File",
+        "orchestrator.ps1",
+        "-Command",
+        "status"
+      ]
+    },
+    {
+      "label": "Free-Tier: start ai_coding lane (open in VS Code)",
+      "type": "shell",
+      "command": "pwsh",
+      "args": [
+        "-File",
+        "orchestrator.ps1",
+        "-Command",
+        "start-lane",
+        "-Lane",
+        "ai_coding"
+      ]
+    },
+    {
+      "label": "Start all jobs (parallel)",
+      "dependsOn": [
+        "Job: UI (Aider)",
+        "Job: API (Claude Code)",
+        "Job: Core (Claude Code)",
+        "Job: Triage (Auto Fixer)"
+      ],
+      "dependsOrder": "parallel"
+    }
+  ]
+}

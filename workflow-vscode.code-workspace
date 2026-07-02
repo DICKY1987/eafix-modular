@@ -1,0 +1,175 @@
+{
+  "folders": [
+    {
+      "name": "🚀 CLI Multi-Rapid Workflow System",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "terminal.integrated.defaultProfile.windows": "CLI Multi-Rapid",
+    "workbench.startupEditor": "none",
+    "window.title": "🚀 CLI Multi-Rapid Workflow System - Active Session",
+    "codex.workflowMode": true,
+    "codex.autoLaunch": true,
+    "terminal.integrated.env.windows": {
+      "WORKFLOW_SESSION": "active",
+      "CLI_MULTI_RAPID_MODE": "workflow",
+      "PYTHONPATH": "${workspaceFolder}/src;${workspaceFolder};${workspaceFolder}/eafix-modular"
+    },
+    "workbench.colorCustomizations": {
+      "statusBar.background": "#0066cc",
+      "statusBar.foreground": "#ffffff",
+      "titleBar.activeBackground": "#004499",
+      "titleBar.activeForeground": "#ffffff"
+    },
+    "statusBar.customItems": [
+      {
+        "text": "🚀 Workflow System Active",
+        "tooltip": "CLI Multi-Rapid Workflow System - Ready for stream execution",
+        "command": "workbench.action.tasks.runTask",
+        "arguments": "📋 CLI: List All Streams"
+      },
+      {
+        "text": "Stream Operations",
+        "tooltip": "Execute workflow streams",
+        "command": "workbench.action.tasks.runTask", 
+        "arguments": "🏗️ CLI: Run Stream A (Foundation)"
+      }
+    ],
+    "workbench.activityBar.visible": true,
+    "workbench.statusBar.visible": true,
+    "editor.minimap.enabled": false,
+    "breadcrumbs.enabled": true,
+    "files.autoSave": "afterDelay",
+    "terminal.integrated.profiles.windows": {
+      "CLI Multi-Rapid": {
+        "path": "C:\\Windows\\System32\\cmd.exe",
+        "args": [
+          "/k",
+          "cd", "/d", "${workspaceFolder}",
+          "&&", "echo", "🚀 CLI Multi-Rapid Workflow System Ready!",
+          "&&", "echo", "Available Commands:",
+          "&&", "echo", "  • cli-multi-rapid phase stream list",
+          "&&", "echo", "  • cli-multi-rapid phase stream run stream-a --dry",
+          "&&", "echo", "  • cli-multi-rapid workflow-status",
+          "&&", "echo", "  • cli-multi-rapid compliance check",
+          "&&", "echo", ""
+        ]
+      },
+      "PowerShell Workflow": {
+        "source": "PowerShell",
+        "args": [
+          "-NoProfile",
+          "-Command",
+          "cd '${workspaceFolder}'; Write-Host '🚀 PowerShell Workflow Terminal Ready!' -ForegroundColor Green; Write-Host 'Use: .\\Launch-Workflow-VSCode.ps1 for additional instances' -ForegroundColor Cyan"
+        ]
+      }
+    }
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "🚀 Initialize Workflow System",
+        "type": "shell",
+        "command": "echo 🚀 Initializing CLI Multi-Rapid Workflow System... && cli-multi-rapid --help && echo ✅ System Ready!",
+        "group": "build",
+        "presentation": {
+          "panel": "new",
+          "showReuseMessage": false,
+          "clear": true
+        },
+        "runOptions": {
+          "runOn": "folderOpen"
+        }
+      },
+      {
+        "label": "📋 List All Workflow Streams",
+        "type": "shell", 
+        "command": "cli-multi-rapid phase stream list",
+        "group": "build",
+        "presentation": {
+          "panel": "new",
+          "showReuseMessage": false,
+          "clear": true
+        }
+      },
+      {
+        "label": "🏗️ Execute Stream A (Foundation)",
+        "type": "shell",
+        "command": "cli-multi-rapid phase stream run stream-a --dry",
+        "group": "build",
+        "presentation": {
+          "panel": "new",
+          "showReuseMessage": false,
+          "clear": true
+        }
+      },
+      {
+        "label": "🏗️ Execute Stream B (Integration)",
+        "type": "shell",
+        "command": "cli-multi-rapid phase stream run stream-b --dry",
+        "group": "build",
+        "presentation": {
+          "panel": "new",
+          "showReuseMessage": false,
+          "clear": true
+        }
+      },
+      {
+        "label": "📊 Show System Status",
+        "type": "shell",
+        "command": "cli-multi-rapid workflow-status",
+        "group": "test",
+        "presentation": {
+          "panel": "new",
+          "showReuseMessage": false,
+          "clear": true
+        }
+      },
+      {
+        "label": "✅ Compliance Check",
+        "type": "shell",
+        "command": "cli-multi-rapid compliance check",
+        "group": "test",
+        "presentation": {
+          "panel": "new",
+          "showReuseMessage": false,
+          "clear": true
+        }
+      }
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "🚀 Launch Workflow System",
+        "type": "python",
+        "request": "launch",
+        "program": "src/cli_multi_rapid/cli.py",
+        "args": ["--help"],
+        "console": "integratedTerminal",
+        "cwd": "${workspaceFolder}"
+      },
+      {
+        "name": "📋 Debug Stream Execution",
+        "type": "python", 
+        "request": "launch",
+        "program": "src/cli_multi_rapid/cli.py",
+        "args": ["phase", "stream", "run", "stream-a", "--dry", "--verbose"],
+        "console": "integratedTerminal",
+        "cwd": "${workspaceFolder}"
+      }
+    ]
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-python.python",
+      "ms-python.vscode-pylance",
+      "ms-vscode.powershell",
+      "ms-vscode.vscode-json",
+      "ryanluker.vscode-coverage-gutters"
+    ]
+  }
+}

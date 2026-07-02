@@ -1,28 +1,91 @@
-.pytest_cache/
-__pycache__/
-*.py[cod]
-
 # Local tool state
 .aider.tags.cache.v4/
 .claude/settings.local.json
 .dir_id
 
-# Python packaging/build outputs
-*.egg-info/
-build/
-dist/
-.eggs/
-.venv/
-venv/
-env/
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 
-# Test and coverage outputs
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Pyinstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
 .coverage
 coverage.xml
+.pytest_cache/
 htmlcov/
 .mypy_cache/
 .ruff_cache/
 
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+!.vscode/tasks.json
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Temporary files
+*.swp
+*.bak
+*.tmp
+!*.patch
+!*.diff
+
+# Logs
+*.log
+
 # Generated scan/log outputs
 scan_output/
-*.log
+
+# Agentic artifacts
+.ai/
+.ai/*.jsonl
+
+# Node
+node_modules/
+
+# Dotenv
+.env
+.env.*
+
+# VS Code backups
+.vscode.backup-*/
+.worktrees/
