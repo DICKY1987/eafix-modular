@@ -27,7 +27,7 @@ REQUIRED_SOURCE_FILES: dict[str, str] = {
     "ui_catalog": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
     "mt4_authoritative": "EAFIX_auth_docs/01_canonical_registries/mt4 authoritative reference for ai.json",
     "capability_registry": "EAFIX_auth_docs/01_canonical_registries/converted_capability_registry.json",
-    "dependency_layers_pdf": "EAFIX_auth_docs/dependency layers.pdf",
+    "dependency_layers_pdf": "EAFIX_auth_docs/dependency_layers_parsed.json",
 }
 
 
