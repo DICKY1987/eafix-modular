@@ -197,7 +197,7 @@ These commands do not apply to this task anyway, as this task only modifies docu
 
 ## 9. Branch Readiness (Initial Pass)
 
-Initial readiness was recorded before a later master sync and final validation rerun.
+Initial readiness was recorded as ready for review before a later master sync and final validation rerun; see Section 11 for the current readiness state.
 
 ---
 
