@@ -1,0 +1,91 @@
+openapi: 3.1.0
+info:
+  title: CLI Multi Rapid Orchestrator (Enhanced)
+  version: 0.2.0
+  description: |
+    Enhanced API with real-time WebSocket endpoints, workflow templates,
+    context analysis, NLP task submission, and enterprise integrations.
+servers:
+  - url: https://localhost:8080/api
+    description: Local development
+paths:
+  /ws/updates:
+    get:
+      summary: WebSocket upgrade for live workflow updates
+      description: Upgrade this HTTP request to a WebSocket connection for real-time updates.
+      responses:
+        '101':
+          description: Switching Protocols (WebSocket)
+        '400':
+          description: Bad request
+  /ws/notifications:
+    get:
+      summary: WebSocket upgrade for notifications
+      description: Upgrade to a WebSocket stream of user/system notifications.
+      responses:
+        '101': { description: Switching Protocols (WebSocket) }
+        '400': { description: Bad request }
+  /templates:
+    get:
+      summary: List workflow templates
+      responses:
+        '200':
+          description: A list of templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: ../schemas/workflow_template.json
+  /context/analyze:
+    post:
+      summary: Analyze project context
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ../schemas/context_analysis.json
+      responses:
+        '200':
+          description: Context analysis results
+          content:
+            application/json:
+              schema:
+                $ref: ../schemas/context_analysis.json
+  /tasks/natural:
+    post:
+      summary: Submit a natural language task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                context:
+                  $ref: ../schemas/context_analysis.json
+              required: [text]
+      responses:
+        '202': { description: Accepted for processing }
+  /integrations/{service}:
+    get:
+      summary: Integration status
+      parameters:
+        - in: path
+          name: service
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Integration status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  service: { type: string }
+                  status: { type: string, enum: [ok, degraded, error] }
+components: {}

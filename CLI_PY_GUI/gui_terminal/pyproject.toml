@@ -1,0 +1,227 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cli-multi-rapid-gui-terminal"
+version = "1.0.0"
+description = "Enterprise-grade GUI terminal with PTY support and platform integration"
+authors = [
+    {name = "CLI Multi-Rapid Team", email = "support@cli-multi-rapid.com"}
+]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Shells",
+    "Topic :: Terminals",
+    "Topic :: Software Development :: Tools",
+]
+keywords = ["terminal", "pty", "gui", "enterprise", "cli"]
+
+dependencies = [
+    "PyQt6>=6.5.0",
+    "pywinpty>=2.0.0; platform_system == 'Windows'",
+    "ptyprocess>=0.7.0; platform_system != 'Windows'",
+    "psutil>=5.9.0",
+    "websockets>=11.0.0",
+    "requests>=2.31.0",
+    "aiohttp>=3.8.0",
+    "pydantic>=2.0.0",
+    "pyyaml>=6.0.0",
+    "redis>=4.5.0",
+    "cryptography>=41.0.0",
+    "structlog>=23.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-qt>=4.2.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.11.0",
+    "black>=23.7.0",
+    "ruff>=0.0.280",
+    "mypy>=1.5.0",
+    "isort>=5.12.0",
+    "pre-commit>=3.3.0",
+    "tox>=4.0.0",
+    "factory-boy>=3.3.0",
+    "responses>=0.23.0",
+    "freezegun>=1.2.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/cli-multi-rapid/gui-terminal"
+Repository = "https://github.com/cli-multi-rapid/gui-terminal.git"
+Documentation = "https://docs.cli-multi-rapid.com/gui-terminal"
+Issues = "https://github.com/cli-multi-rapid/gui-terminal/issues"
+
+[project.scripts]
+gui-terminal = "gui_terminal.main:main"
+
+[project.gui-scripts]
+gui-terminal-gui = "gui_terminal.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["gui_terminal*"]
+
+[tool.setuptools.package-data]
+"gui_terminal.config" = ["*.yaml", "*.json"]
+"gui_terminal.ui" = ["*.ui", "*.qrc"]
+
+# Black configuration
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+# Ruff configuration
+[tool.ruff]
+line-length = 100
+target-version = "py38"
+src = ["src"]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+    "ARG", # flake8-unused-arguments
+    "SIM", # flake8-simplify
+    "TCH", # flake8-type-checking
+]
+ignore = [
+    "B008", # Do not perform function calls in argument defaults
+    "B904", # Allow raising without from inside except
+    "C901", # Too complex
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*" = ["ARG", "SIM"]
+"__init__.py" = ["F401"]
+
+# isort configuration
+[tool.isort]
+profile = "black"
+line_length = 100
+src_paths = ["src", "tests"]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.8"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "PyQt5.*",
+    "PyQt6.*",
+    "winpty.*",
+    "ptyprocess.*",
+    "websockets.*",
+]
+ignore_missing_imports = true
+
+# Pytest configuration
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+    "--cov=src/gui_terminal",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "security: marks tests as security tests",
+    "ui: marks tests as UI tests",
+    "expensive: marks tests that consume resources or make external calls",
+]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["src"]
+branch = true
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__main__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+ignore_errors = true
+
+[tool.coverage.html]
+directory = "htmlcov"

@@ -1,0 +1,34 @@
+name: Cleanup Merged Branches
+
+on:
+  schedule:
+    - cron: "0 2 * * 0"  # weekly
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cleanup merged branches
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const { data: branches } = await github.repos.listBranches({ owner, repo, protected: false });
+            for (const b of branches) {
+              if (b.name === 'main') continue;
+              const q = `repo:${owner}/${repo} is:pr head:${b.name} is:merged`;
+              const { data } = await github.search.issuesAndPullRequests({ q });
+              if (data.total_count > 0) {
+                try {
+                  await github.git.deleteRef({ owner, repo, ref: `heads/${b.name}` });
+                  core.info(`Deleted ${b.name}`);
+                } catch (e) {
+                  core.warning(`Could not delete ${b.name}: ${e}`);
+                }
+              }
+            }
