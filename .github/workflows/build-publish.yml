@@ -13,7 +13,7 @@ jobs:
       - run: pip install -U pip build cyclonedx-bom
       - run: python -m build
       - run: cyclonedx-bom -o sbom.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: artifacts
           path: |
