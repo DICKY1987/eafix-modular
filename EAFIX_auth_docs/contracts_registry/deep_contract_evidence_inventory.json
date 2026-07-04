@@ -1,0 +1,4933 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "document_type": "deep_contract_evidence_inventory",
+  "schema_version": "1.0.0",
+  "generated_at_utc": "2026-07-04T00:00:00Z",
+  "repo": "DICKY1987/eafix-modular",
+  "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+  "branch": "claude/eafix-deep-repository-search",
+  "scope": {
+    "description": "Repository-wide evidence inventory for the 34 atomic-module manifests. Classifies every contract name referenced in the manifest bundle, process step catalog, UI catalog, communication channels, and services source, using authoritative registries in EAFIX_auth_docs/01_canonical_registries plus contracts/events, contracts/models, tests, and services.",
+    "output_authority": "This inventory does NOT modify manifests, schemas, or code. It only reports evidence.",
+    "manifest_module_count": 34
+  },
+  "authority_sources_consulted": [
+    {
+      "key": "routing_authority",
+      "path": "eafix_project_knowledge_reference_routing_instructions.json",
+      "role": "routing_and_conflict_policy"
+    },
+    {
+      "key": "manifest_schema",
+      "path": "EAFIX_auth_docs/01_canonical_registries/eafix_unified_atomic_module_schema_v1_0_0.json",
+      "role": "schema_source"
+    },
+    {
+      "key": "module_universe_vnext",
+      "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json",
+      "role": "module_universe_source"
+    },
+    {
+      "key": "existing_draft_bundle",
+      "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+      "role": "defect_evidence_and_fallback_universe"
+    },
+    {
+      "key": "module_catalog_enrichment",
+      "path": "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+      "role": "module_enrichment"
+    },
+    {
+      "key": "process_step_catalog",
+      "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+      "role": "process_contracts_primary"
+    },
+    {
+      "key": "aligned_process",
+      "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+      "role": "process_contracts_validation_failure"
+    },
+    {
+      "key": "communication_channels",
+      "path": "EAFIX_auth_docs/01_canonical_registries/communication_channels.json",
+      "role": "transport_channel_evidence"
+    },
+    {
+      "key": "ui_catalog",
+      "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+      "role": "ui_authority"
+    },
+    {
+      "key": "mt4_authoritative",
+      "path": "EAFIX_auth_docs/01_canonical_registries/mt4 authoritative reference for ai.json",
+      "role": "mt4_platform_constraints_authority"
+    },
+    {
+      "key": "capability_registry",
+      "path": "EAFIX_auth_docs/01_canonical_registries/converted_capability_registry.json",
+      "role": "capability_reuse"
+    },
+    {
+      "key": "file_mapping",
+      "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv",
+      "role": "file_ownership_evidence"
+    },
+    {
+      "key": "service_runtime",
+      "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_services_ai_reference_20260510.json",
+      "role": "runtime_evidence"
+    },
+    {
+      "key": "module_files_ai_ref",
+      "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+      "role": "file_ownership_narrative_evidence"
+    },
+    {
+      "key": "dependency_layers_pdf",
+      "path": "EAFIX_auth_docs/dependency_layers_parsed.json",
+      "role": "dependency_graph_evidence"
+    },
+    {
+      "key": "contracts_events_dir",
+      "path": "contracts/events/",
+      "role": "canonical_event_schemas_json"
+    },
+    {
+      "key": "contracts_models_dir",
+      "path": "contracts/models/",
+      "role": "runtime_pydantic_models"
+    },
+    {
+      "key": "validation_utility",
+      "path": "contracts/2099900015260118_validate_json_schemas.py",
+      "role": "schema_validation_ci_utility"
+    },
+    {
+      "key": "tests_contracts_dir",
+      "path": "tests/contracts/",
+      "role": "contract_conformance_tests"
+    }
+  ],
+  "modules_in_bundle": [
+    {
+      "module_id": "50000000000000000001",
+      "canonical_symbol": "F1_CONFIG_PREFERENCES"
+    },
+    {
+      "module_id": "50000000000000000002",
+      "canonical_symbol": "F3_CLOCK_SCHEDULER"
+    },
+    {
+      "module_id": "50000000000000000003",
+      "canonical_symbol": "D2_CALENDAR_SOURCE_ADAPTER"
+    },
+    {
+      "module_id": "50000000000000000004",
+      "canonical_symbol": "D3_CALENDAR_NORMALIZER"
+    },
+    {
+      "module_id": "50000000000000000005",
+      "canonical_symbol": "F2_EVENT_LOG"
+    },
+    {
+      "module_id": "50000000000000000006",
+      "canonical_symbol": "D4_CALENDAR_TRIGGER_BUILDER"
+    },
+    {
+      "module_id": "50000000000000000007",
+      "canonical_symbol": "D1_MARKET_FEED_ADAPTER"
+    },
+    {
+      "module_id": "50000000000000000008",
+      "canonical_symbol": "C1_BAR_BUILDER"
+    },
+    {
+      "module_id": "50000000000000000009",
+      "canonical_symbol": "C2_INDICATOR_ENGINE"
+    },
+    {
+      "module_id": "50000000000000000010",
+      "canonical_symbol": "C3_FEATURE_PACKAGER"
+    },
+    {
+      "module_id": "50000000000000000011",
+      "canonical_symbol": "S1_SIGNAL_ENGINE"
+    },
+    {
+      "module_id": "50000000000000000012",
+      "canonical_symbol": "S2_INTENT_BUILDER"
+    },
+    {
+      "module_id": "50000000000000000013",
+      "canonical_symbol": "R1_RISK_EVALUATOR"
+    },
+    {
+      "module_id": "50000000000000000014",
+      "canonical_symbol": "R2_ORDER_INTENT_COMPILER"
+    },
+    {
+      "module_id": "50000000000000000015",
+      "canonical_symbol": "O1_ORDER_ROUTER"
+    },
+    {
+      "module_id": "50000000000000000016",
+      "canonical_symbol": "B1_MT4_ADAPTER_TRANSPORT"
+    },
+    {
+      "module_id": "50000000000000000017",
+      "canonical_symbol": "B2_MT4_EA_EXECUTOR"
+    },
+    {
+      "module_id": "50000000000000000018",
+      "canonical_symbol": "B3_EXEC_EVENT_NORMALIZER"
+    },
+    {
+      "module_id": "50000000000000000019",
+      "canonical_symbol": "O2_OMS_STATE_MACHINE"
+    },
+    {
+      "module_id": "50000000000000000020",
+      "canonical_symbol": "O3_TRADE_CLOSE_CLASSIFIER"
+    },
+    {
+      "module_id": "50000000000000000021",
+      "canonical_symbol": "E1_OUTCOME_BUCKETIZER"
+    },
+    {
+      "module_id": "50000000000000000022",
+      "canonical_symbol": "E2_PROXIMITY_EVALUATOR"
+    },
+    {
+      "module_id": "50000000000000000023",
+      "canonical_symbol": "E3_MATRIX_LOOKUP"
+    },
+    {
+      "module_id": "50000000000000000024",
+      "canonical_symbol": "E4_REENTRY_INTENT_BUILDER"
+    },
+    {
+      "module_id": "50000000000000000025",
+      "canonical_symbol": "F4_FLOW_ORCHESTRATOR"
+    },
+    {
+      "module_id": "50000000000000000026",
+      "canonical_symbol": "P1_HEALTH_AGGREGATOR"
+    },
+    {
+      "module_id": "50000000000000000027",
+      "canonical_symbol": "R3_CORRELATION_GUARD"
+    },
+    {
+      "module_id": "50000000000000000028",
+      "canonical_symbol": "U1_DASHBOARD_BACKEND"
+    },
+    {
+      "module_id": "50000000000000000029",
+      "canonical_symbol": "U2_GUI_GATEWAY"
+    },
+    {
+      "module_id": "50000000000000000030",
+      "canonical_symbol": "U3_MT4_EXPIRY_OVERLAY"
+    },
+    {
+      "module_id": "50000000000000000031",
+      "canonical_symbol": "U4_DESKTOP_OPERATOR"
+    },
+    {
+      "module_id": "50000000000000000032",
+      "canonical_symbol": "P2_REPORTER"
+    },
+    {
+      "module_id": "50000000000000000033",
+      "canonical_symbol": "SK1_PLUGIN_INTERFACE"
+    },
+    {
+      "module_id": "50000000000000000034",
+      "canonical_symbol": "SK2_IDEMPOTENCY"
+    }
+  ],
+  "status_taxonomy": {
+    "already_schema_defined": "A JSON Schema exists under contracts/events for this contract",
+    "model_defined_no_schema": "A Pydantic model exists under contracts/models but no JSON schema in contracts/events",
+    "ui_catalog_defined": "Contract is declared authoritatively in ui_catalog.json (screens/APIs/websockets/data_contracts)",
+    "test_defined_only": "Contract appears only in test fixtures/tests",
+    "source_defined_only": "Contract is defined only in service source code (adapter/service inline models)",
+    "underivable": "Contract is referenced but no authoritative fields exist anywhere",
+    "placeholder_error": "Not a real contract; a narrative token was mistakenly promoted to contract_type",
+    "conflict": "Same-name definitions disagree across authorities"
+  },
+  "contract_inventory": [
+    {
+      "contract_name": "PriceTick",
+      "aliases_found": [
+        "PriceTick_v1",
+        "MarketTick (bundle alias)"
+      ],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "Not directly listed under this name in bundle output_contracts; MarketTick used instead"
+        }
+      ],
+      "status": "already_schema_defined",
+      "schema_evidence": [
+        {
+          "path": "contracts/events/1199900007260118_PriceTick@1.0.json",
+          "line_start": 1,
+          "line_end": 44,
+          "evidence_type": "json_schema",
+          "note": "Draft-07 schema, required=[timestamp,symbol,bid,ask], version=1.0"
+        }
+      ],
+      "model_evidence": [
+        {
+          "path": "contracts/models/2099900017260118_event_models.py",
+          "line_start": 26,
+          "line_end": 38,
+          "evidence_type": "pydantic_model",
+          "note": "class PriceTick(BaseModel) — matches schema"
+        }
+      ],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/communication_channels.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "channel_binding",
+          "note": "Referenced as data_contract PriceTick_v1 in communication channels"
+        }
+      ],
+      "test_evidence": [
+        {
+          "path": "contracts/2099900015260118_validate_json_schemas.py",
+          "line_start": 1,
+          "line_end": 267,
+          "evidence_type": "validator_utility",
+          "note": "Draft202012Validator validates all contracts/events schemas via ci"
+        }
+      ],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S07 emits MarketTick which is transport realization of PriceTick from D1"
+        }
+      ],
+      "candidate_producer_modules": [
+        "D1_MARKET_FEED_ADAPTER"
+      ],
+      "candidate_consumer_modules": [
+        "C1_BAR_BUILDER"
+      ],
+      "field_candidates": [
+        "timestamp",
+        "symbol",
+        "bid",
+        "ask",
+        "volume"
+      ],
+      "example_candidates": [],
+      "acceptance_test_candidates": [
+        "schema validation via validate_json_schemas.py"
+      ],
+      "conflicts": [],
+      "recommendation": "Use canonical schema PriceTick@1.0 as source of truth; treat MarketTick in bundle as alias/rename per step catalog."
+    },
+    {
+      "contract_name": "OrderIntent",
+      "aliases_found": [
+        "OrderIntent_v1_2"
+      ],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "produced by R2_ORDER_INTENT_COMPILER (module 14), consumed by O1_ORDER_ROUTER (module 15)"
+        }
+      ],
+      "status": "conflict",
+      "schema_evidence": [
+        {
+          "path": "contracts/events/1199900006260118_OrderIntent@1.2.json",
+          "line_start": 1,
+          "line_end": 89,
+          "evidence_type": "json_schema",
+          "note": "version 1.2 with side enum=[BUY,SELL], time_in_force=[IOC,FOK,GTC,DAY]"
+        }
+      ],
+      "model_evidence": [
+        {
+          "path": "contracts/models/2099900017260118_event_models.py",
+          "line_start": 81,
+          "line_end": 101,
+          "evidence_type": "pydantic_model",
+          "note": "class OrderIntent uses OrderSide enum values LONG/SHORT (line 75-78)"
+        }
+      ],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/communication_channels.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "channel_binding",
+          "note": "OrderIntent_v1_2 referenced in trading command channel"
+        }
+      ],
+      "test_evidence": [
+        {
+          "path": "tests/contracts/fixtures/1199900034260118_orders_in_valid.json",
+          "line_start": 1,
+          "line_end": 1,
+          "evidence_type": "test_fixture",
+          "note": "orders_in fixtures used by validator"
+        }
+      ],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S14 emits OrderIntent via R2_ORDER_INTENT_COMPILER"
+        }
+      ],
+      "candidate_producer_modules": [
+        "R2_ORDER_INTENT_COMPILER"
+      ],
+      "candidate_consumer_modules": [
+        "O1_ORDER_ROUTER"
+      ],
+      "field_candidates": [
+        "id",
+        "signal_id",
+        "timestamp/approved_timestamp",
+        "symbol",
+        "side",
+        "quantity",
+        "stop_loss",
+        "take_profit",
+        "time_in_force"
+      ],
+      "example_candidates": [],
+      "acceptance_test_candidates": [
+        "JSON schema validation",
+        "Pydantic round-trip"
+      ],
+      "conflicts": [
+        {
+          "conflict_type": "side_enum_mismatch",
+          "description": "OrderIntent JSON schema uses BUY/SELL while Pydantic OrderIntent model uses OrderSide=LONG/SHORT",
+          "sources": [
+            {
+              "path": "contracts/events/1199900006260118_OrderIntent@1.2.json",
+              "line_start": 26,
+              "line_end": 33,
+              "evidence_type": "json_schema",
+              "note": "side enum [BUY,SELL]"
+            },
+            {
+              "path": "contracts/models/2099900017260118_event_models.py",
+              "line_start": 75,
+              "line_end": 88,
+              "evidence_type": "pydantic_model",
+              "note": "OrderSide=LONG/SHORT applied to OrderIntent.side"
+            }
+          ]
+        }
+      ],
+      "recommendation": "Resolve BUY/SELL vs LONG/SHORT before schema_ref is written to manifests. JSON schema is authoritative per source_priority order."
+    },
+    {
+      "contract_name": "Signal",
+      "aliases_found": [
+        "Signal_v1"
+      ],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "produced by S1_SIGNAL_ENGINE, consumed by S2_INTENT_BUILDER, U1_DASHBOARD_BACKEND, U2_GUI_GATEWAY"
+        }
+      ],
+      "status": "already_schema_defined",
+      "schema_evidence": [
+        {
+          "path": "contracts/events/1199900009260118_Signal@1.0.json",
+          "line_start": 1,
+          "line_end": 200,
+          "evidence_type": "json_schema",
+          "note": "Signal event schema v1.0"
+        }
+      ],
+      "model_evidence": [
+        {
+          "path": "contracts/models/2099900017260118_event_models.py",
+          "line_start": 56,
+          "line_end": 72,
+          "evidence_type": "pydantic_model",
+          "note": "class Signal(BaseModel) with confidence bounds"
+        }
+      ],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/communication_channels.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "channel_binding",
+          "note": "Signal_v1 referenced in trading signal channel"
+        }
+      ],
+      "test_evidence": [
+        {
+          "path": "contracts/2099900015260118_validate_json_schemas.py",
+          "line_start": 1,
+          "line_end": 267,
+          "evidence_type": "validator_utility",
+          "note": "JSON Schema draft-202012 validation"
+        }
+      ],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1426,
+          "line_end": 1443,
+          "evidence_type": "ui_data_contract",
+          "note": "UI-DATA-SIGNAL contract for dashboard"
+        }
+      ],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S11 emits Signal via S1_SIGNAL_ENGINE"
+        }
+      ],
+      "candidate_producer_modules": [
+        "S1_SIGNAL_ENGINE"
+      ],
+      "candidate_consumer_modules": [
+        "S2_INTENT_BUILDER",
+        "U1_DASHBOARD_BACKEND",
+        "U2_GUI_GATEWAY"
+      ],
+      "field_candidates": [
+        "id",
+        "timestamp",
+        "symbol",
+        "side",
+        "confidence",
+        "explanation",
+        "source_indicators",
+        "expiry"
+      ],
+      "example_candidates": [],
+      "acceptance_test_candidates": [
+        "schema validation",
+        "Pydantic conformance",
+        "UI signal feed rendering"
+      ],
+      "conflicts": [],
+      "recommendation": "Adopt Signal@1.0 as schema_ref; UI-DATA-SIGNAL is a downstream projection."
+    },
+    {
+      "contract_name": "ExecutionReport",
+      "aliases_found": [
+        "ExecutionReport_v1"
+      ],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "produced by B3_EXEC_EVENT_NORMALIZER, consumed by O2_OMS_STATE_MACHINE"
+        }
+      ],
+      "status": "already_schema_defined",
+      "schema_evidence": [
+        {
+          "path": "contracts/events/1199900004260118_ExecutionReport@1.0.json",
+          "line_start": 1,
+          "line_end": 200,
+          "evidence_type": "json_schema",
+          "note": "ExecutionReport schema v1.0"
+        }
+      ],
+      "model_evidence": [
+        {
+          "path": "contracts/models/2099900017260118_event_models.py",
+          "line_start": 115,
+          "line_end": 132,
+          "evidence_type": "pydantic_model",
+          "note": "class ExecutionReport with ExecutionStatus enum"
+        }
+      ],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/communication_channels.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "channel_binding",
+          "note": "ExecutionReport_v1 referenced in execution channel"
+        }
+      ],
+      "test_evidence": [
+        {
+          "path": "contracts/2099900015260118_validate_json_schemas.py",
+          "line_start": 1,
+          "line_end": 267,
+          "evidence_type": "validator_utility",
+          "note": "schema validation utility"
+        }
+      ],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1460,
+          "line_end": 1476,
+          "evidence_type": "ui_data_contract",
+          "note": "UI-DATA-EXECUTION-REPORT"
+        }
+      ],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S18 emits ExecutionReport via B3_EXEC_EVENT_NORMALIZER"
+        }
+      ],
+      "candidate_producer_modules": [
+        "B3_EXEC_EVENT_NORMALIZER"
+      ],
+      "candidate_consumer_modules": [
+        "O2_OMS_STATE_MACHINE"
+      ],
+      "field_candidates": [
+        "order_intent_id",
+        "broker_order_id",
+        "timestamp",
+        "status",
+        "filled_quantity",
+        "filled_price",
+        "commission",
+        "error_message"
+      ],
+      "example_candidates": [],
+      "acceptance_test_candidates": [
+        "schema validation",
+        "state-machine transition coverage"
+      ],
+      "conflicts": [],
+      "recommendation": "Adopt ExecutionReport@1.0 as schema_ref."
+    },
+    {
+      "contract_name": "IndicatorVector",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "Not directly used; IndicatorSnapshot is the manifest-referenced projection"
+        }
+      ],
+      "status": "already_schema_defined",
+      "schema_evidence": [
+        {
+          "path": "contracts/events/1199900005260118_IndicatorVector@1.1.json",
+          "line_start": 1,
+          "line_end": 100,
+          "evidence_type": "json_schema",
+          "note": "IndicatorVector schema v1.1"
+        }
+      ],
+      "model_evidence": [
+        {
+          "path": "contracts/models/2099900017260118_event_models.py",
+          "line_start": 41,
+          "line_end": 53,
+          "evidence_type": "pydantic_model",
+          "note": "class IndicatorVector for indicator outputs"
+        }
+      ],
+      "source_code_evidence": [
+        {
+          "path": "services/desktop-ui/2099900128260118_expiry_indicator_service.py",
+          "line_start": 46,
+          "line_end": 100,
+          "evidence_type": "pydantic_source_model",
+          "note": "IndicatorSnapshot class in expiry_indicator_service; overlaps with IndicatorVector semantics"
+        }
+      ],
+      "test_evidence": [
+        {
+          "path": "contracts/2099900015260118_validate_json_schemas.py",
+          "line_start": 1,
+          "line_end": 267,
+          "evidence_type": "validator_utility",
+          "note": "schema validation utility"
+        }
+      ],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S09 emits IndicatorSnapshot; IndicatorVector is the wire-level payload"
+        }
+      ],
+      "candidate_producer_modules": [
+        "C2_INDICATOR_ENGINE"
+      ],
+      "candidate_consumer_modules": [
+        "C3_FEATURE_PACKAGER"
+      ],
+      "field_candidates": [
+        "timestamp",
+        "symbol",
+        "indicator_id",
+        "values",
+        "metadata"
+      ],
+      "example_candidates": [],
+      "acceptance_test_candidates": [
+        "schema validation"
+      ],
+      "conflicts": [
+        {
+          "conflict_type": "naming_divergence",
+          "description": "Bundle/process step use 'IndicatorSnapshot'; canonical schema is 'IndicatorVector'",
+          "sources": [
+            {
+              "path": "contracts/events/1199900005260118_IndicatorVector@1.1.json",
+              "line_start": 1,
+              "line_end": 20,
+              "evidence_type": "json_schema",
+              "note": "schema name IndicatorVector"
+            },
+            {
+              "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+              "line_start": null,
+              "line_end": null,
+              "evidence_type": "process_step",
+              "note": "step S09 output_contract=IndicatorSnapshot"
+            }
+          ]
+        }
+      ],
+      "recommendation": "Rename or alias to reconcile. Recommend keeping IndicatorSnapshot as manifest contract_name with schema_ref pointing to IndicatorVector@1.1 until authoritative rename is chosen."
+    },
+    {
+      "contract_name": "CalendarEvent",
+      "aliases_found": [
+        "CalendarEvent_v1"
+      ],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "produced by D3_CALENDAR_NORMALIZER; consumed by multiple modules"
+        }
+      ],
+      "status": "conflict",
+      "schema_evidence": [
+        {
+          "path": "contracts/events/1199900003260118_CalendarEvent@1.0.json",
+          "line_start": 1,
+          "line_end": 200,
+          "evidence_type": "json_schema",
+          "note": "CalendarEvent schema v1.0 with impact enum LOW/MEDIUM/HIGH"
+        }
+      ],
+      "model_evidence": [
+        {
+          "path": "contracts/models/2099900017260118_event_models.py",
+          "line_start": 142,
+          "line_end": 158,
+          "evidence_type": "pydantic_model",
+          "note": "class CalendarEvent with CalendarImpact=LOW/MEDIUM/HIGH"
+        }
+      ],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 94,
+          "line_end": 104,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI CalendarEvent variant for dashboard rendering"
+        }
+      ],
+      "test_evidence": [
+        {
+          "path": "contracts/2099900015260118_validate_json_schemas.py",
+          "line_start": 1,
+          "line_end": 267,
+          "evidence_type": "validator_utility",
+          "note": "validator utility"
+        }
+      ],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1476,
+          "line_end": 1494,
+          "evidence_type": "ui_data_contract",
+          "note": "UI-DATA-CALENDAR-EVENT"
+        }
+      ],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S04 emits CalendarEvent"
+        }
+      ],
+      "candidate_producer_modules": [
+        "D3_CALENDAR_NORMALIZER"
+      ],
+      "candidate_consumer_modules": [
+        "F2_EVENT_LOG",
+        "D4_CALENDAR_TRIGGER_BUILDER",
+        "E2_PROXIMITY_EVALUATOR",
+        "U1_DASHBOARD_BACKEND",
+        "U2_GUI_GATEWAY"
+      ],
+      "field_candidates": [
+        "id",
+        "timestamp",
+        "currency",
+        "title",
+        "impact",
+        "actual",
+        "forecast",
+        "previous",
+        "source"
+      ],
+      "example_candidates": [],
+      "acceptance_test_candidates": [
+        "schema validation",
+        "impact enum coverage"
+      ],
+      "conflicts": [
+        {
+          "conflict_type": "impact_enum_variation",
+          "description": "Some CSV/JSON payloads use MED; canonical schema uses MEDIUM",
+          "sources": [
+            {
+              "path": "contracts/events/1199900003260118_CalendarEvent@1.0.json",
+              "line_start": 1,
+              "line_end": 200,
+              "evidence_type": "json_schema",
+              "note": "impact enum LOW/MEDIUM/HIGH"
+            },
+            {
+              "path": "contracts/models/2099900017260118_event_models.py",
+              "line_start": 135,
+              "line_end": 140,
+              "evidence_type": "pydantic_model",
+              "note": "CalendarImpact=LOW/MEDIUM/HIGH"
+            },
+            {
+              "path": "contracts/models/2099900016260118_csv_models.py",
+              "line_start": 57,
+              "line_end": 58,
+              "evidence_type": "pydantic_csv_model",
+              "note": "ActiveCalendarSignal.impact_level=LOW/MEDIUM/HIGH"
+            }
+          ]
+        },
+        {
+          "conflict_type": "gui_variant",
+          "description": "GUI gateway defines a separate CalendarEvent with different fields for dashboard consumption",
+          "sources": [
+            {
+              "path": "services/gui-gateway/src/2099900157260118_models.py",
+              "line_start": 94,
+              "line_end": 104,
+              "evidence_type": "pydantic_source_model",
+              "note": "gui-gateway CalendarEvent variant"
+            }
+          ]
+        }
+      ],
+      "recommendation": "Adopt CalendarEvent@1.0 as authoritative; treat GUI gateway model as an outward projection, not a rival contract."
+    },
+    {
+      "contract_name": "ReentryDecision",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "conflict",
+      "schema_evidence": [
+        {
+          "path": "contracts/events/1199900008260118_ReentryDecision@1.0.json",
+          "line_start": 1,
+          "line_end": 200,
+          "evidence_type": "json_schema",
+          "note": "ReentryDecision event schema v1.0"
+        }
+      ],
+      "model_evidence": [
+        {
+          "path": "contracts/models/2099900017260118_event_models.py",
+          "line_start": 162,
+          "line_end": 177,
+          "evidence_type": "pydantic_model",
+          "note": "event_models.ReentryDecision (matrix outcome)"
+        },
+        {
+          "path": "contracts/models/2099900016260118_csv_models.py",
+          "line_start": 86,
+          "line_end": 132,
+          "evidence_type": "pydantic_csv_model",
+          "note": "csv_models.ReentryDecision (row-level, different fields)"
+        }
+      ],
+      "source_code_evidence": [],
+      "test_evidence": [
+        {
+          "path": "tests/contracts/fixtures/1099900003260118_reentry_decisions_valid.csv",
+          "line_start": 1,
+          "line_end": 1,
+          "evidence_type": "test_fixture",
+          "note": "reentry_decisions_valid.csv"
+        }
+      ],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "Reentry decision is downstream of MatrixDecision, not the same shape"
+        }
+      ],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [
+        "schema validation",
+        "csv row conformance"
+      ],
+      "conflicts": [
+        {
+          "conflict_type": "dual_definition",
+          "description": "event_models.ReentryDecision and csv_models.ReentryDecision have divergent fields (event: reentry_key/generation/should_reenter/matrix_outcome; csv: trade_id/hybrid_id/outcome_class/duration_class/reentry_action)",
+          "sources": [
+            {
+              "path": "contracts/models/2099900017260118_event_models.py",
+              "line_start": 162,
+              "line_end": 177,
+              "evidence_type": "pydantic_model",
+              "note": "event model"
+            },
+            {
+              "path": "contracts/models/2099900016260118_csv_models.py",
+              "line_start": 86,
+              "line_end": 132,
+              "evidence_type": "pydantic_csv_model",
+              "note": "csv model"
+            }
+          ]
+        }
+      ],
+      "recommendation": "Split into two named contracts (e.g., ReentryDecisionEvent vs ReentryDecisionRow) or explicitly document that CSV is persistence layer of the event."
+    },
+    {
+      "contract_name": "ConfigSource",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['F1_CONFIG_PREFERENCES'] consumers=[]"
+        }
+      ],
+      "status": "underivable",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for ConfigSource"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "consumed by F1 config service; input for module 01"
+        }
+      ],
+      "candidate_producer_modules": [
+        "F1_CONFIG_PREFERENCES"
+      ],
+      "candidate_consumer_modules": [],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "No authoritative fields exist; the manifest generator cannot populate schema_ref. Requires new JSON schema + Pydantic model authored under contracts/events and contracts/models before manifest can be completed."
+    },
+    {
+      "contract_name": "ResolvedConfig",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['F1_CONFIG_PREFERENCES'] consumers=['F3_CLOCK_SCHEDULER', 'D3_CALENDAR_NORMALIZER', 'D4_CALENDAR_TRIGGER_BUILDER', 'D1_MARKET_FEED_ADAPTER', 'C1_BAR_BUILDER', 'C2_INDICATOR_ENGINE', 'C3_FEATURE_PACKAGER', 'S1_SIGNAL_ENGINE', 'S2_INTENT_BUILDER', 'R1_RISK_EVALUATOR', 'R3_CORRELATION_GUARD', 'R2_ORDER_INTENT_COMPILER', 'O1_ORDER_ROUTER', 'B1_MT4_ADAPTER_TRANSPORT', 'B3_EXEC_EVENT_NORMALIZER', 'O2_OMS_STATE_MACHINE', 'O3_TRADE_CLOSE_CLASSIFIER', 'E1_OUTCOME_BUCKETIZER', 'E2_PROXIMITY_EVALUATOR', 'E3_MATRIX_LOOKUP', 'E4_REENTRY_INTENT_BUILDER', 'P1_HEALTH_AGGREGATOR']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for ResolvedConfig"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "immutable snapshot of resolved config; consumed by nearly every module"
+        }
+      ],
+      "candidate_producer_modules": [
+        "F1_CONFIG_PREFERENCES"
+      ],
+      "candidate_consumer_modules": [
+        "F3_CLOCK_SCHEDULER",
+        "D3_CALENDAR_NORMALIZER",
+        "D4_CALENDAR_TRIGGER_BUILDER",
+        "D1_MARKET_FEED_ADAPTER",
+        "C1_BAR_BUILDER",
+        "C2_INDICATOR_ENGINE",
+        "C3_FEATURE_PACKAGER",
+        "S1_SIGNAL_ENGINE",
+        "S2_INTENT_BUILDER",
+        "R1_RISK_EVALUATOR",
+        "R3_CORRELATION_GUARD",
+        "R2_ORDER_INTENT_COMPILER",
+        "O1_ORDER_ROUTER",
+        "B1_MT4_ADAPTER_TRANSPORT",
+        "B3_EXEC_EVENT_NORMALIZER",
+        "O2_OMS_STATE_MACHINE",
+        "O3_TRADE_CLOSE_CLASSIFIER",
+        "E1_OUTCOME_BUCKETIZER",
+        "E2_PROXIMITY_EVALUATOR",
+        "E3_MATRIX_LOOKUP",
+        "E4_REENTRY_INTENT_BUILDER",
+        "P1_HEALTH_AGGREGATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "ScheduleTick",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['F3_CLOCK_SCHEDULER'] consumers=['D2_CALENDAR_SOURCE_ADAPTER', 'D4_CALENDAR_TRIGGER_BUILDER']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for ScheduleTick"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S02 emits ScheduleTick"
+        }
+      ],
+      "candidate_producer_modules": [
+        "F3_CLOCK_SCHEDULER"
+      ],
+      "candidate_consumer_modules": [
+        "D2_CALENDAR_SOURCE_ADAPTER",
+        "D4_CALENDAR_TRIGGER_BUILDER"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "CalendarSourceConfig",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=[] consumers=['D2_CALENDAR_SOURCE_ADAPTER']"
+        }
+      ],
+      "status": "underivable",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for CalendarSourceConfig"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "input configuration for calendar source adapter"
+        }
+      ],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [
+        "D2_CALENDAR_SOURCE_ADAPTER"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "No authoritative fields exist; the manifest generator cannot populate schema_ref. Requires new JSON schema + Pydantic model authored under contracts/events and contracts/models before manifest can be completed."
+    },
+    {
+      "contract_name": "CalendarRaw",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['D2_CALENDAR_SOURCE_ADAPTER'] consumers=['D3_CALENDAR_NORMALIZER']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for CalendarRaw"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S03 emits CalendarRaw (unprocessed events)"
+        }
+      ],
+      "candidate_producer_modules": [
+        "D2_CALENDAR_SOURCE_ADAPTER"
+      ],
+      "candidate_consumer_modules": [
+        "D3_CALENDAR_NORMALIZER"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "CalendarTrigger",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['D4_CALENDAR_TRIGGER_BUILDER'] consumers=['C3_FEATURE_PACKAGER']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for CalendarTrigger"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S06 emits CalendarTrigger"
+        }
+      ],
+      "candidate_producer_modules": [
+        "D4_CALENDAR_TRIGGER_BUILDER"
+      ],
+      "candidate_consumer_modules": [
+        "C3_FEATURE_PACKAGER"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "EventStream",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['F2_EVENT_LOG'] consumers=[]"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for EventStream"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S05 emits EventStream (bus subscription output)"
+        }
+      ],
+      "candidate_producer_modules": [
+        "F2_EVENT_LOG"
+      ],
+      "candidate_consumer_modules": [],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "RawTick",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=[] consumers=['D1_MARKET_FEED_ADAPTER']"
+        }
+      ],
+      "status": "underivable",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for RawTick"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "input tick data from adapter"
+        }
+      ],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [
+        "D1_MARKET_FEED_ADAPTER"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "No authoritative fields exist; the manifest generator cannot populate schema_ref. Requires new JSON schema + Pydantic model authored under contracts/events and contracts/models before manifest can be completed."
+    },
+    {
+      "contract_name": "MarketTick",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['D1_MARKET_FEED_ADAPTER'] consumers=['C1_BAR_BUILDER']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for MarketTick"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S07 normalized tick; realized by PriceTick@1.0"
+        }
+      ],
+      "candidate_producer_modules": [
+        "D1_MARKET_FEED_ADAPTER"
+      ],
+      "candidate_consumer_modules": [
+        "C1_BAR_BUILDER"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "Bar",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['C1_BAR_BUILDER'] consumers=['C2_INDICATOR_ENGINE']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for Bar"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S08 emits Bar OHLC"
+        }
+      ],
+      "candidate_producer_modules": [
+        "C1_BAR_BUILDER"
+      ],
+      "candidate_consumer_modules": [
+        "C2_INDICATOR_ENGINE"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "IndicatorSnapshot",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['C2_INDICATOR_ENGINE'] consumers=['C3_FEATURE_PACKAGER']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for IndicatorSnapshot"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S09; corresponds to IndicatorVector@1.1"
+        }
+      ],
+      "candidate_producer_modules": [
+        "C2_INDICATOR_ENGINE"
+      ],
+      "candidate_consumer_modules": [
+        "C3_FEATURE_PACKAGER"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "FeatureFrame",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['C3_FEATURE_PACKAGER'] consumers=['S1_SIGNAL_ENGINE']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for FeatureFrame"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S10 emits FeatureFrame"
+        }
+      ],
+      "candidate_producer_modules": [
+        "C3_FEATURE_PACKAGER"
+      ],
+      "candidate_consumer_modules": [
+        "S1_SIGNAL_ENGINE"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "PositionSummary",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=[] consumers=['S1_SIGNAL_ENGINE']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for PositionSummary"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "consumed by signal engine; gui-gateway has its own PositionSummary model"
+        }
+      ],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [
+        "S1_SIGNAL_ENGINE"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "SignalSuppressed",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['S1_SIGNAL_ENGINE'] consumers=[]"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for SignalSuppressed"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S11 alt output when signal is suppressed"
+        }
+      ],
+      "candidate_producer_modules": [
+        "S1_SIGNAL_ENGINE"
+      ],
+      "candidate_consumer_modules": [],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "TradeIntent",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['S2_INTENT_BUILDER', 'E4_REENTRY_INTENT_BUILDER'] consumers=['R1_RISK_EVALUATOR', 'R3_CORRELATION_GUARD', 'F4_FLOW_ORCHESTRATOR']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for TradeIntent"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S12 emits TradeIntent"
+        }
+      ],
+      "candidate_producer_modules": [
+        "S2_INTENT_BUILDER",
+        "E4_REENTRY_INTENT_BUILDER"
+      ],
+      "candidate_consumer_modules": [
+        "R1_RISK_EVALUATOR",
+        "R3_CORRELATION_GUARD",
+        "F4_FLOW_ORCHESTRATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "PortfolioState",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=[] consumers=['R1_RISK_EVALUATOR', 'R3_CORRELATION_GUARD']"
+        }
+      ],
+      "status": "underivable",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for PortfolioState"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "risk consumer input"
+        }
+      ],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [
+        "R1_RISK_EVALUATOR",
+        "R3_CORRELATION_GUARD"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "No authoritative fields exist; the manifest generator cannot populate schema_ref. Requires new JSON schema + Pydantic model authored under contracts/events and contracts/models before manifest can be completed."
+    },
+    {
+      "contract_name": "RiskPolicy",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=[] consumers=['R1_RISK_EVALUATOR', 'R3_CORRELATION_GUARD']"
+        }
+      ],
+      "status": "underivable",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for RiskPolicy"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "policy input"
+        }
+      ],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [
+        "R1_RISK_EVALUATOR",
+        "R3_CORRELATION_GUARD"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "No authoritative fields exist; the manifest generator cannot populate schema_ref. Requires new JSON schema + Pydantic model authored under contracts/events and contracts/models before manifest can be completed."
+    },
+    {
+      "contract_name": "RiskGuardResult",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['R3_CORRELATION_GUARD'] consumers=['R1_RISK_EVALUATOR']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for RiskGuardResult"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S27 correlation-guard output"
+        }
+      ],
+      "candidate_producer_modules": [
+        "R3_CORRELATION_GUARD"
+      ],
+      "candidate_consumer_modules": [
+        "R1_RISK_EVALUATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "RiskDecision",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['R1_RISK_EVALUATOR'] consumers=['R2_ORDER_INTENT_COMPILER']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for RiskDecision"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S13 emits RiskDecision"
+        }
+      ],
+      "candidate_producer_modules": [
+        "R1_RISK_EVALUATOR"
+      ],
+      "candidate_consumer_modules": [
+        "R2_ORDER_INTENT_COMPILER"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "BrokerPolicy",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=[] consumers=['O1_ORDER_ROUTER']"
+        }
+      ],
+      "status": "underivable",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for BrokerPolicy"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "routing policy input"
+        }
+      ],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [
+        "O1_ORDER_ROUTER"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "No authoritative fields exist; the manifest generator cannot populate schema_ref. Requires new JSON schema + Pydantic model authored under contracts/events and contracts/models before manifest can be completed."
+    },
+    {
+      "contract_name": "RoutedOrderIntent",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['O1_ORDER_ROUTER', 'F4_FLOW_ORCHESTRATOR'] consumers=['B1_MT4_ADAPTER_TRANSPORT', 'O2_OMS_STATE_MACHINE']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for RoutedOrderIntent"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S15 emits RoutedOrderIntent"
+        }
+      ],
+      "candidate_producer_modules": [
+        "O1_ORDER_ROUTER",
+        "F4_FLOW_ORCHESTRATOR"
+      ],
+      "candidate_consumer_modules": [
+        "B1_MT4_ADAPTER_TRANSPORT",
+        "O2_OMS_STATE_MACHINE"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "BrokerOrderEnvelope",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['B1_MT4_ADAPTER_TRANSPORT'] consumers=['B2_MT4_EA_EXECUTOR']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for BrokerOrderEnvelope"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S16 emits BrokerOrderEnvelope"
+        }
+      ],
+      "candidate_producer_modules": [
+        "B1_MT4_ADAPTER_TRANSPORT"
+      ],
+      "candidate_consumer_modules": [
+        "B2_MT4_EA_EXECUTOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "AdapterAck",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['B1_MT4_ADAPTER_TRANSPORT'] consumers=[]"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for AdapterAck"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "acknowledgement from broker adapter"
+        }
+      ],
+      "candidate_producer_modules": [
+        "B1_MT4_ADAPTER_TRANSPORT"
+      ],
+      "candidate_consumer_modules": [],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "BrokerExecEvent",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['B2_MT4_EA_EXECUTOR'] consumers=['B3_EXEC_EVENT_NORMALIZER']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for BrokerExecEvent"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S17 broker execution event"
+        }
+      ],
+      "candidate_producer_modules": [
+        "B2_MT4_EA_EXECUTOR"
+      ],
+      "candidate_consumer_modules": [
+        "B3_EXEC_EVENT_NORMALIZER"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "EAHealth",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['B2_MT4_EA_EXECUTOR'] consumers=[]"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for EAHealth"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "EA health heartbeat from MT4"
+        }
+      ],
+      "candidate_producer_modules": [
+        "B2_MT4_EA_EXECUTOR"
+      ],
+      "candidate_consumer_modules": [],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "PositionSnapshot",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['B3_EXEC_EVENT_NORMALIZER'] consumers=['O2_OMS_STATE_MACHINE', 'U1_DASHBOARD_BACKEND', 'U2_GUI_GATEWAY']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for PositionSnapshot"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S18 emits PositionSnapshot"
+        }
+      ],
+      "candidate_producer_modules": [
+        "B3_EXEC_EVENT_NORMALIZER"
+      ],
+      "candidate_consumer_modules": [
+        "O2_OMS_STATE_MACHINE",
+        "U1_DASHBOARD_BACKEND",
+        "U2_GUI_GATEWAY"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "OrderStateChanged",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['O2_OMS_STATE_MACHINE'] consumers=['U2_GUI_GATEWAY']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for OrderStateChanged"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "OMS state transition"
+        }
+      ],
+      "candidate_producer_modules": [
+        "O2_OMS_STATE_MACHINE"
+      ],
+      "candidate_consumer_modules": [
+        "U2_GUI_GATEWAY"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "PositionStateChanged",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['O2_OMS_STATE_MACHINE'] consumers=[]"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for PositionStateChanged"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "OMS position update"
+        }
+      ],
+      "candidate_producer_modules": [
+        "O2_OMS_STATE_MACHINE"
+      ],
+      "candidate_consumer_modules": [],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "TradeClosedRaw",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['O2_OMS_STATE_MACHINE'] consumers=['O3_TRADE_CLOSE_CLASSIFIER']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for TradeClosedRaw"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "raw close event"
+        }
+      ],
+      "candidate_producer_modules": [
+        "O2_OMS_STATE_MACHINE"
+      ],
+      "candidate_consumer_modules": [
+        "O3_TRADE_CLOSE_CLASSIFIER"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "TradeClosed",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['O3_TRADE_CLOSE_CLASSIFIER'] consumers=['E1_OUTCOME_BUCKETIZER', 'U1_DASHBOARD_BACKEND', 'P2_REPORTER']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for TradeClosed"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S20 classified trade close"
+        }
+      ],
+      "candidate_producer_modules": [
+        "O3_TRADE_CLOSE_CLASSIFIER"
+      ],
+      "candidate_consumer_modules": [
+        "E1_OUTCOME_BUCKETIZER",
+        "U1_DASHBOARD_BACKEND",
+        "P2_REPORTER"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "OutcomeBucket",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['E1_OUTCOME_BUCKETIZER', 'F4_FLOW_ORCHESTRATOR'] consumers=['E3_MATRIX_LOOKUP', 'P2_REPORTER']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for OutcomeBucket"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S21 outcome classification"
+        }
+      ],
+      "candidate_producer_modules": [
+        "E1_OUTCOME_BUCKETIZER",
+        "F4_FLOW_ORCHESTRATOR"
+      ],
+      "candidate_consumer_modules": [
+        "E3_MATRIX_LOOKUP",
+        "P2_REPORTER"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "ClockTick",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=[] consumers=['E2_PROXIMITY_EVALUATOR']"
+        }
+      ],
+      "status": "underivable",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for ClockTick"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "clock tick input"
+        }
+      ],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [
+        "E2_PROXIMITY_EVALUATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "No authoritative fields exist; the manifest generator cannot populate schema_ref. Requires new JSON schema + Pydantic model authored under contracts/events and contracts/models before manifest can be completed."
+    },
+    {
+      "contract_name": "EventProximity",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['E2_PROXIMITY_EVALUATOR'] consumers=['E3_MATRIX_LOOKUP']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for EventProximity"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S22 emits event proximity"
+        }
+      ],
+      "candidate_producer_modules": [
+        "E2_PROXIMITY_EVALUATOR"
+      ],
+      "candidate_consumer_modules": [
+        "E3_MATRIX_LOOKUP"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "SignalContext",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=[] consumers=['E3_MATRIX_LOOKUP']"
+        }
+      ],
+      "status": "underivable",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for SignalContext"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "context input for matrix lookup"
+        }
+      ],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [
+        "E3_MATRIX_LOOKUP"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "No authoritative fields exist; the manifest generator cannot populate schema_ref. Requires new JSON schema + Pydantic model authored under contracts/events and contracts/models before manifest can be completed."
+    },
+    {
+      "contract_name": "MatrixProfile",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=[] consumers=['E3_MATRIX_LOOKUP']"
+        }
+      ],
+      "status": "underivable",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for MatrixProfile"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "matrix profile input"
+        }
+      ],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [
+        "E3_MATRIX_LOOKUP"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "No authoritative fields exist; the manifest generator cannot populate schema_ref. Requires new JSON schema + Pydantic model authored under contracts/events and contracts/models before manifest can be completed."
+    },
+    {
+      "contract_name": "MatrixDecision",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['E3_MATRIX_LOOKUP'] consumers=['E4_REENTRY_INTENT_BUILDER']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for MatrixDecision"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S23 emits MatrixDecision"
+        }
+      ],
+      "candidate_producer_modules": [
+        "E3_MATRIX_LOOKUP"
+      ],
+      "candidate_consumer_modules": [
+        "E4_REENTRY_INTENT_BUILDER"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "ReentryChainState",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=[] consumers=['E4_REENTRY_INTENT_BUILDER']"
+        }
+      ],
+      "status": "underivable",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for ReentryChainState"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "reentry-chain state input"
+        }
+      ],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [
+        "E4_REENTRY_INTENT_BUILDER"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "No authoritative fields exist; the manifest generator cannot populate schema_ref. Requires new JSON schema + Pydantic model authored under contracts/events and contracts/models before manifest can be completed."
+    },
+    {
+      "contract_name": "ReentrySuppressed",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['E4_REENTRY_INTENT_BUILDER'] consumers=[]"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for ReentrySuppressed"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S24 alt output when reentry suppressed"
+        }
+      ],
+      "candidate_producer_modules": [
+        "E4_REENTRY_INTENT_BUILDER"
+      ],
+      "candidate_consumer_modules": [],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "AdapterHealth",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=[] consumers=['P1_HEALTH_AGGREGATOR']"
+        }
+      ],
+      "status": "underivable",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for AdapterHealth"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "health aggregator input"
+        }
+      ],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [
+        "P1_HEALTH_AGGREGATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "No authoritative fields exist; the manifest generator cannot populate schema_ref. Requires new JSON schema + Pydantic model authored under contracts/events and contracts/models before manifest can be completed."
+    },
+    {
+      "contract_name": "ModuleHealth",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=[] consumers=['P1_HEALTH_AGGREGATOR']"
+        }
+      ],
+      "status": "underivable",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for ModuleHealth"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "health aggregator input"
+        }
+      ],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [
+        "P1_HEALTH_AGGREGATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "No authoritative fields exist; the manifest generator cannot populate schema_ref. Requires new JSON schema + Pydantic model authored under contracts/events and contracts/models before manifest can be completed."
+    },
+    {
+      "contract_name": "HealthReport",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['P1_HEALTH_AGGREGATOR'] consumers=['U1_DASHBOARD_BACKEND', 'U2_GUI_GATEWAY', 'P2_REPORTER']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for HealthReport"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "S26 emits HealthReport"
+        }
+      ],
+      "candidate_producer_modules": [
+        "P1_HEALTH_AGGREGATOR"
+      ],
+      "candidate_consumer_modules": [
+        "U1_DASHBOARD_BACKEND",
+        "U2_GUI_GATEWAY",
+        "P2_REPORTER"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "KPIReport",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['P2_REPORTER'] consumers=[]"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for KPIReport"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "P2 output"
+        }
+      ],
+      "candidate_producer_modules": [
+        "P2_REPORTER"
+      ],
+      "candidate_consumer_modules": [],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "ReportArtifact",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['P2_REPORTER'] consumers=[]"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for ReportArtifact"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "P2 artifact"
+        }
+      ],
+      "candidate_producer_modules": [
+        "P2_REPORTER"
+      ],
+      "candidate_consumer_modules": [],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "DashboardRestResponse",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['U1_DASHBOARD_BACKEND'] consumers=['U4_DESKTOP_OPERATOR']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for DashboardRestResponse"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "ui_catalog",
+          "note": "UI-family surface defined in ui_catalog.json"
+        }
+      ],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "dashboard REST payload"
+        }
+      ],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "DashboardStream",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['U1_DASHBOARD_BACKEND'] consumers=[]"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for DashboardStream"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "ui_catalog",
+          "note": "UI-family surface defined in ui_catalog.json"
+        }
+      ],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "dashboard websocket stream"
+        }
+      ],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND"
+      ],
+      "candidate_consumer_modules": [],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "OperatorApiResponse",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['U2_GUI_GATEWAY'] consumers=[]"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for OperatorApiResponse"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "ui_catalog",
+          "note": "UI-family surface defined in ui_catalog.json"
+        }
+      ],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "operator API payload"
+        }
+      ],
+      "candidate_producer_modules": [
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "OperatorCommand",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['U2_GUI_GATEWAY', 'U4_DESKTOP_OPERATOR'] consumers=[]"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for OperatorCommand"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "ui_catalog",
+          "note": "UI-family surface defined in ui_catalog.json"
+        }
+      ],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "operator command command"
+        }
+      ],
+      "candidate_producer_modules": [
+        "U2_GUI_GATEWAY",
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "candidate_consumer_modules": [],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "OperatorWebSocketStream",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['U2_GUI_GATEWAY'] consumers=['U4_DESKTOP_OPERATOR']"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for OperatorWebSocketStream"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "ui_catalog",
+          "note": "UI-family surface defined in ui_catalog.json"
+        }
+      ],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "operator ws stream"
+        }
+      ],
+      "candidate_producer_modules": [
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "ExpiryZonesData",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=[] consumers=['U3_MT4_EXPIRY_OVERLAY']"
+        }
+      ],
+      "status": "underivable",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for ExpiryZonesData"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "expiry zones data input"
+        }
+      ],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [
+        "U3_MT4_EXPIRY_OVERLAY"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "No authoritative fields exist; the manifest generator cannot populate schema_ref. Requires new JSON schema + Pydantic model authored under contracts/events and contracts/models before manifest can be completed."
+    },
+    {
+      "contract_name": "IndicatorSummary",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=[] consumers=['U3_MT4_EXPIRY_OVERLAY']"
+        }
+      ],
+      "status": "underivable",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for IndicatorSummary"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "indicator summary input"
+        }
+      ],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [
+        "U3_MT4_EXPIRY_OVERLAY"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "No authoritative fields exist; the manifest generator cannot populate schema_ref. Requires new JSON schema + Pydantic model authored under contracts/events and contracts/models before manifest can be completed."
+    },
+    {
+      "contract_name": "SpotData",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=[] consumers=['U3_MT4_EXPIRY_OVERLAY']"
+        }
+      ],
+      "status": "underivable",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for SpotData"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "spot data input"
+        }
+      ],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [
+        "U3_MT4_EXPIRY_OVERLAY"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "No authoritative fields exist; the manifest generator cannot populate schema_ref. Requires new JSON schema + Pydantic model authored under contracts/events and contracts/models before manifest can be completed."
+    },
+    {
+      "contract_name": "OverlayRender",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "declared in manifest_bundle contracts for producers=['U3_MT4_EXPIRY_OVERLAY'] consumers=[]"
+        }
+      ],
+      "status": "source_defined_only",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "file_ownership_narrative",
+          "note": "referenced in file_ownership narrative for OverlayRender"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "ui_catalog",
+          "note": "UI-family surface defined in ui_catalog.json"
+        }
+      ],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "overlay render output"
+        }
+      ],
+      "candidate_producer_modules": [
+        "U3_MT4_EXPIRY_OVERLAY"
+      ],
+      "candidate_consumer_modules": [],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Add a JSON schema under contracts/events/ so schema_ref can be resolved. Use fields already implied by process_step_catalog input/output narratives as starting point."
+    },
+    {
+      "contract_name": "Either",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+          "line_start": 1946,
+          "line_end": 1959,
+          "evidence_type": "file_ownership_narrative",
+          "note": "'contract_type: Either' entries found in eafix_module_files_ai_reference.json"
+        }
+      ],
+      "status": "placeholder_error",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "'Either (a) new RoutedOrderIntent executed... or (b) suppression/cooldown state update' narrative promoted mistakenly to contract_type field"
+        }
+      ],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Remove any 'Either' contract_type occurrences from generator inputs. Not a contract; it is a narrative disjunction."
+    },
+    {
+      "contract_name": "UI-DATA-SIGNAL",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1426,
+          "line_end": 1443,
+          "evidence_type": "ui_catalog",
+          "note": "signal projection for UI"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND",
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-DATA-POSITION-SNAPSHOT",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1443,
+          "line_end": 1460,
+          "evidence_type": "ui_catalog",
+          "note": "position snapshot projection"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND",
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-DATA-EXECUTION-REPORT",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1460,
+          "line_end": 1476,
+          "evidence_type": "ui_catalog",
+          "note": "execution report projection"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND",
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-DATA-CALENDAR-EVENT",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1476,
+          "line_end": 1494,
+          "evidence_type": "ui_catalog",
+          "note": "calendar event projection"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND",
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-DATA-HEALTH-REPORT",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1494,
+          "line_end": 1507,
+          "evidence_type": "ui_catalog",
+          "note": "health report projection"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND",
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-DATA-MATRIX-DECISION",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1507,
+          "line_end": 1523,
+          "evidence_type": "ui_catalog",
+          "note": "matrix decision projection"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND",
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-DATA-ALERT-EVENT",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1523,
+          "line_end": 1541,
+          "evidence_type": "ui_catalog",
+          "note": "alert event projection"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND",
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-DATA-OUTCOME-BUCKET",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1541,
+          "line_end": 1556,
+          "evidence_type": "ui_catalog",
+          "note": "outcome bucket projection"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND",
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-API-DASHBOARD-SIGNALS",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1556,
+          "line_end": 1567,
+          "evidence_type": "ui_catalog",
+          "note": "dashboard signals REST endpoint"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-API-DASHBOARD-SIGNAL-DETAIL",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1567,
+          "line_end": 1577,
+          "evidence_type": "ui_catalog",
+          "note": "signal detail REST endpoint"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-API-DASHBOARD-POSITIONS",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1577,
+          "line_end": 1588,
+          "evidence_type": "ui_catalog",
+          "note": "positions REST endpoint"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-API-DASHBOARD-TRADES",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1588,
+          "line_end": 1599,
+          "evidence_type": "ui_catalog",
+          "note": "trades REST endpoint"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-API-DASHBOARD-CALENDAR",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1599,
+          "line_end": 1610,
+          "evidence_type": "ui_catalog",
+          "note": "calendar REST endpoint"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-API-DASHBOARD-METRICS",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1610,
+          "line_end": 1621,
+          "evidence_type": "ui_catalog",
+          "note": "metrics REST endpoint"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-API-DASHBOARD-INDICATOR-CONFIG",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1621,
+          "line_end": 1631,
+          "evidence_type": "ui_catalog",
+          "note": "indicator config REST endpoint"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-API-DASHBOARD-AUDIT",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1631,
+          "line_end": 1642,
+          "evidence_type": "ui_catalog",
+          "note": "audit REST endpoint"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-API-GUI-SYSTEM-STATUS",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1642,
+          "line_end": 1653,
+          "evidence_type": "ui_catalog",
+          "note": "gui system status"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-API-GUI-DASHBOARD",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1653,
+          "line_end": 1665,
+          "evidence_type": "ui_catalog",
+          "note": "gui dashboard"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-API-GUI-POSITIONS",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1665,
+          "line_end": 1677,
+          "evidence_type": "ui_catalog",
+          "note": "gui positions"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-API-GUI-LIVE-SIGNALS",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1677,
+          "line_end": 1689,
+          "evidence_type": "ui_catalog",
+          "note": "gui live signals"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-API-GUI-ORDER-HISTORY",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1689,
+          "line_end": 1700,
+          "evidence_type": "ui_catalog",
+          "note": "gui order history"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-API-GUI-CALENDAR-EVENTS",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1700,
+          "line_end": 1713,
+          "evidence_type": "ui_catalog",
+          "note": "gui calendar events"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-WS-GUI-GATEWAY",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1713,
+          "line_end": 1734,
+          "evidence_type": "ui_catalog",
+          "note": "gui-gateway websocket"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-WS-DASHBOARD-BACKEND",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1734,
+          "line_end": 1749,
+          "evidence_type": "ui_catalog",
+          "note": "dashboard-backend websocket"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-WS-SIGNALS",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1749,
+          "line_end": 1758,
+          "evidence_type": "ui_catalog",
+          "note": "signals ws channel"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND",
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-WS-POSITIONS",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1758,
+          "line_end": 1767,
+          "evidence_type": "ui_catalog",
+          "note": "positions ws channel"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND",
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "UI-WS-ALERTS",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "ui_catalog_defined",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 1,
+          "line_end": 153,
+          "evidence_type": "pydantic_source_model",
+          "note": "GUI Gateway response models render these surfaces"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "line_start": 1767,
+          "line_end": 1780,
+          "evidence_type": "ui_catalog",
+          "note": "alerts ws channel"
+        }
+      ],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "U1_DASHBOARD_BACKEND",
+        "U2_GUI_GATEWAY"
+      ],
+      "candidate_consumer_modules": [
+        "U4_DESKTOP_OPERATOR"
+      ],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "UI catalog is authoritative for external surfaces. Manifest generator should reference ui_catalog contract_id and mark schema_ref='(UI surface, not event schema)'."
+    },
+    {
+      "contract_name": "HybridId",
+      "aliases_found": [
+        "hybrid_id"
+      ],
+      "manifest_occurrences": [],
+      "status": "model_defined_no_schema",
+      "schema_evidence": [],
+      "model_evidence": [
+        {
+          "path": "contracts/models/2099900018260118_json_models.py",
+          "line_start": 206,
+          "line_end": 276,
+          "evidence_type": "pydantic_model",
+          "note": "class HybridId with compose/parse methods"
+        }
+      ],
+      "source_code_evidence": [],
+      "test_evidence": [
+        {
+          "path": "tests/contracts/fixtures/1199900032260118_hybrid_id_valid.json",
+          "line_start": 1,
+          "line_end": 1,
+          "evidence_type": "test_fixture",
+          "note": "hybrid_id_valid.json fixture used by validator"
+        }
+      ],
+      "ui_catalog_evidence": [],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "E4_REENTRY_INTENT_BUILDER"
+      ],
+      "candidate_consumer_modules": [
+        "O1_ORDER_ROUTER"
+      ],
+      "field_candidates": [
+        "outcome",
+        "duration",
+        "proximity",
+        "calendar",
+        "direction",
+        "generation",
+        "suffix"
+      ],
+      "example_candidates": [],
+      "acceptance_test_candidates": [
+        "parse/compose round-trip"
+      ],
+      "conflicts": [],
+      "recommendation": "Author a JSON schema (contracts/events/HybridId@1.0.json) mirroring the pydantic model so schema_ref becomes populable."
+    },
+    {
+      "contract_name": "OrderIn",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "model_defined_no_schema",
+      "schema_evidence": [],
+      "model_evidence": [
+        {
+          "path": "contracts/models/2099900018260118_json_models.py",
+          "line_start": 145,
+          "line_end": 171,
+          "evidence_type": "pydantic_model",
+          "note": "class OrderIn: EA->Python order status update"
+        }
+      ],
+      "source_code_evidence": [],
+      "test_evidence": [
+        {
+          "path": "tests/contracts/fixtures/1199900034260118_orders_in_valid.json",
+          "line_start": 1,
+          "line_end": 1,
+          "evidence_type": "test_fixture",
+          "note": "orders_in fixture"
+        }
+      ],
+      "ui_catalog_evidence": [],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "B2_MT4_EA_EXECUTOR"
+      ],
+      "candidate_consumer_modules": [
+        "B3_EXEC_EVENT_NORMALIZER"
+      ],
+      "field_candidates": [
+        "ts_utc",
+        "reentry_key",
+        "ticket",
+        "status",
+        "fill_price",
+        "sl_hit",
+        "tp_hit",
+        "close_reason"
+      ],
+      "example_candidates": [],
+      "acceptance_test_candidates": [
+        "JSON schema conformance"
+      ],
+      "conflicts": [],
+      "recommendation": "Author OrderIn@1.0 JSON schema; wire schema_ref for MT4 bridge modules."
+    },
+    {
+      "contract_name": "OrderOut",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "model_defined_no_schema",
+      "schema_evidence": [],
+      "model_evidence": [
+        {
+          "path": "contracts/models/2099900018260118_json_models.py",
+          "line_start": 174,
+          "line_end": 203,
+          "evidence_type": "pydantic_model",
+          "note": "class OrderOut: Python->EA order request"
+        }
+      ],
+      "source_code_evidence": [],
+      "test_evidence": [
+        {
+          "path": "tests/contracts/fixtures/1199900035260118_orders_out_valid.json",
+          "line_start": 1,
+          "line_end": 1,
+          "evidence_type": "test_fixture",
+          "note": "orders_out fixture"
+        }
+      ],
+      "ui_catalog_evidence": [],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "O1_ORDER_ROUTER"
+      ],
+      "candidate_consumer_modules": [
+        "B1_MT4_ADAPTER_TRANSPORT"
+      ],
+      "field_candidates": [
+        "ts_utc",
+        "reentry_key",
+        "symbol",
+        "side",
+        "lot",
+        "sl_pips",
+        "tp_pips",
+        "comment_prefix",
+        "comment_suffix",
+        "comment"
+      ],
+      "example_candidates": [],
+      "acceptance_test_candidates": [
+        "JSON schema conformance"
+      ],
+      "conflicts": [],
+      "recommendation": "Author OrderOut@1.0 JSON schema."
+    },
+    {
+      "contract_name": "IndicatorRecord",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "model_defined_no_schema",
+      "schema_evidence": [],
+      "model_evidence": [
+        {
+          "path": "contracts/models/2099900018260118_json_models.py",
+          "line_start": 100,
+          "line_end": 120,
+          "evidence_type": "pydantic_model",
+          "note": "IndicatorRecord: full indicator spec"
+        }
+      ],
+      "source_code_evidence": [],
+      "test_evidence": [
+        {
+          "path": "tests/contracts/fixtures/1199900033260118_indicator_record_valid.json",
+          "line_start": 1,
+          "line_end": 1,
+          "evidence_type": "test_fixture",
+          "note": "indicator_record fixture"
+        }
+      ],
+      "ui_catalog_evidence": [],
+      "process_evidence": [],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [
+        "C2_INDICATOR_ENGINE"
+      ],
+      "field_candidates": [
+        "IndicatorID",
+        "Concept",
+        "Indicator_Computation",
+        "Signal_Logic",
+        "OutputType",
+        "Thresholds",
+        "Inputs",
+        "Notes"
+      ],
+      "example_candidates": [],
+      "acceptance_test_candidates": [
+        "JSON schema conformance"
+      ],
+      "conflicts": [],
+      "recommendation": "Author IndicatorRecord@1.0 JSON schema so C2_INDICATOR_ENGINE input contract is grounded."
+    },
+    {
+      "contract_name": "ActiveCalendarSignal",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "model_defined_no_schema",
+      "schema_evidence": [],
+      "model_evidence": [
+        {
+          "path": "contracts/models/2099900016260118_csv_models.py",
+          "line_start": 52,
+          "line_end": 84,
+          "evidence_type": "pydantic_csv_model",
+          "note": "CSV row model for active calendar signals"
+        }
+      ],
+      "source_code_evidence": [],
+      "test_evidence": [
+        {
+          "path": "tests/contracts/fixtures/1099900002260118_active_calendar_signals_valid.csv",
+          "line_start": 1,
+          "line_end": 1,
+          "evidence_type": "test_fixture",
+          "note": "active_calendar_signals fixture"
+        }
+      ],
+      "ui_catalog_evidence": [],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "D4_CALENDAR_TRIGGER_BUILDER"
+      ],
+      "candidate_consumer_modules": [],
+      "field_candidates": [
+        "calendar_id",
+        "symbol",
+        "impact_level",
+        "proximity_state",
+        "anticipation_event",
+        "direction_bias",
+        "confidence_score",
+        "file_seq",
+        "checksum_sha256",
+        "timestamp"
+      ],
+      "example_candidates": [],
+      "acceptance_test_candidates": [
+        "CSV row validation with checksum"
+      ],
+      "conflicts": [],
+      "recommendation": "Treat as CSV-persistence contract; document within manifest as row-level artifact, not event."
+    },
+    {
+      "contract_name": "TradeResult",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "model_defined_no_schema",
+      "schema_evidence": [],
+      "model_evidence": [
+        {
+          "path": "contracts/models/2099900016260118_csv_models.py",
+          "line_start": 135,
+          "line_end": 172,
+          "evidence_type": "pydantic_csv_model",
+          "note": "CSV row model for completed trades"
+        }
+      ],
+      "source_code_evidence": [],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [],
+      "candidate_producer_modules": [
+        "O3_TRADE_CLOSE_CLASSIFIER"
+      ],
+      "candidate_consumer_modules": [
+        "P2_REPORTER"
+      ],
+      "field_candidates": [
+        "trade_id",
+        "symbol",
+        "direction",
+        "lot_size",
+        "open_price",
+        "close_price",
+        "open_time",
+        "close_time",
+        "duration_minutes",
+        "profit_loss",
+        "profit_loss_pips",
+        "stop_loss",
+        "take_profit",
+        "close_reason",
+        "commission",
+        "swap",
+        "magic_number",
+        "comment"
+      ],
+      "example_candidates": [],
+      "acceptance_test_candidates": [
+        "CSV row validation with checksum"
+      ],
+      "conflicts": [],
+      "recommendation": "Persistence contract; align with TradeClosed event schema (once authored)."
+    },
+    {
+      "contract_name": "HealthMetric",
+      "aliases_found": [],
+      "manifest_occurrences": [],
+      "status": "model_defined_no_schema",
+      "schema_evidence": [],
+      "model_evidence": [
+        {
+          "path": "contracts/models/2099900016260118_csv_models.py",
+          "line_start": 174,
+          "line_end": 200,
+          "evidence_type": "pydantic_csv_model",
+          "note": "CSV row model for system health metrics"
+        }
+      ],
+      "source_code_evidence": [
+        {
+          "path": "services/gui-gateway/src/2099900157260118_models.py",
+          "line_start": 21,
+          "line_end": 47,
+          "evidence_type": "pydantic_source_model",
+          "note": "gui-gateway ServiceHealth/SystemMetrics"
+        }
+      ],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "process_step",
+          "note": "Feeds HealthReport via P1_HEALTH_AGGREGATOR"
+        }
+      ],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [
+        "P1_HEALTH_AGGREGATOR"
+      ],
+      "field_candidates": [
+        "service_name",
+        "metric_name",
+        "metric_value",
+        "metric_unit",
+        "health_status",
+        "cpu_usage_percent",
+        "memory_usage_percent",
+        "disk_usage_percent",
+        "active_connections",
+        "messages_processed",
+        "error_count",
+        "uptime_seconds"
+      ],
+      "example_candidates": [],
+      "acceptance_test_candidates": [
+        "CSV row validation"
+      ],
+      "conflicts": [],
+      "recommendation": "Persistence contract for health data; align with HealthReport event schema (once authored)."
+    },
+    {
+      "contract_name": "needs_review",
+      "aliases_found": [],
+      "manifest_occurrences": [
+        {
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "line_start": null,
+          "line_end": null,
+          "evidence_type": "manifest_ref",
+          "note": "Placeholder token in bundle/routing for values requiring reviewer attention; not a contract."
+        }
+      ],
+      "status": "placeholder_error",
+      "schema_evidence": [],
+      "model_evidence": [],
+      "source_code_evidence": [],
+      "test_evidence": [],
+      "ui_catalog_evidence": [],
+      "process_evidence": [],
+      "candidate_producer_modules": [],
+      "candidate_consumer_modules": [],
+      "field_candidates": [],
+      "example_candidates": [],
+      "acceptance_test_candidates": [],
+      "conflicts": [],
+      "recommendation": "Filter out from contract fields at generator input."
+    }
+  ],
+  "summary_counts": {
+    "already_schema_defined": 4,
+    "conflict": 3,
+    "underivable": 15,
+    "source_defined_only": 37,
+    "placeholder_error": 2,
+    "ui_catalog_defined": 27,
+    "model_defined_no_schema": 7
+  },
+  "total_contracts": 95
+}
