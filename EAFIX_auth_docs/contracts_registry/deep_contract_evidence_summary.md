@@ -36,7 +36,7 @@ Under `contracts/events/`:
 - `1199900008260118_ReentryDecision@1.0.json`
 - `1199900009260118_Signal@1.0.json`
 
-All are Draft-07 JSON schemas and are validated at CI-time via `contracts/2099900015260118_validate_json_schemas.py:1-267` using `Draft202012Validator`. Corresponding Pydantic models live in `contracts/models/2099900017260118_event_models.py:26-177` (event models), `2099900016260118_csv_models.py:52-200` (CSV models) and `2099900018260118_json_models.py:100-276` (JSON models with `IndicatorRecord`, `OrderIn`, `OrderOut`, `HybridId`).
+All are Draft-07 JSON schemas. They are validated at CI-time by `.github/workflows/1299900007260118_ci.yml:223-242`, which loads each file in `contracts/events/` and calls `jsonschema.Draft7Validator.check_schema`. The separate `contracts/2099900015260118_validate_json_schemas.py:1-267` utility uses `Draft202012Validator` but targets schemas under `contracts/schemas/json/`, not `contracts/events/`. Corresponding Pydantic models live in `contracts/models/2099900017260118_event_models.py:26-177` (event models), `contracts/models/2099900016260118_csv_models.py:52-200` (CSV models) and `contracts/models/2099900018260118_json_models.py:100-276` (JSON models with `IndicatorRecord`, `OrderIn`, `OrderOut`, `HybridId`).
 
 ## Confirmed Naming/Value Conflicts
 

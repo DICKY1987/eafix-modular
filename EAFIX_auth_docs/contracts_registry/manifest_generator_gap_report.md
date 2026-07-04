@@ -34,7 +34,7 @@ File: `tools/manifest_generation/source_loaders.py:13-31`
 
 The `REQUIRED_SOURCE_FILES` dict enumerates 17 authoritative documents (routing, module universe, schema, fill doctrine, catalogs, communication channels, UI catalog, MT4 reference, capability registry, dependency layers PDF, file mapping, service runtime, module map). **It does not include the `contracts/events/*.json` directory or the `contracts/models/*.py` directory.**
 
-Consequence: the preflight cannot compute `sha256_file()` for schema files nor discover their existence, so `schema_source` in the emitted preflight is a directory pointer (`EAFIX_auth_docs/01_canonical_registries/eafix_unified_atomic_module_schema_v1_0_0.json:123`) — the *manifest* schema — not the *event contract* schemas.
+Consequence: the preflight cannot compute `sha256_file()` for schema files nor discover their existence, so `schema_source` in the emitted preflight (see `EAFIX_auth_docs/manifests/authority_snapshot.json`) points at the *manifest* schema (`EAFIX_auth_docs/01_canonical_registries/eafix_unified_atomic_module_schema_v1_0_0.json`) — not the *event contract* schemas. The value is written by `tools/manifest_generation/source_loaders.py:123`.
 
 ### Gap 2 — `_contract_refs()` hardcodes empty fields
 

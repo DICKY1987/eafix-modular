@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json-schema.org/draft-07/schema#",
+  "schema_ref": "https://json-schema.org/draft-07/schema#",
   "document_type": "deep_contract_evidence_inventory",
   "schema_version": "1.0.0",
   "generated_at_utc": "2026-07-04T00:00:00Z",
@@ -306,7 +306,7 @@
           "line_start": 1,
           "line_end": 267,
           "evidence_type": "validator_utility",
-          "note": "Draft202012Validator validates all contracts/events schemas via ci"
+          "note": "Draft202012Validator validates schemas in contracts/schemas/json/ (not contracts/events/); CI validates contracts/events/*.json separately via jsonschema.Draft7Validator.check_schema in .github/workflows/1299900007260118_ci.yml:223-242"
         }
       ],
       "ui_catalog_evidence": [],
