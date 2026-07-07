@@ -1,0 +1,262 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "module_lifecycle_governance",
+  "generated_at": "2026-06-21T14:30:00Z",
+  "status": "canonical",
+  "purpose": "Define governance rules for the complete lifecycle of EAFIX atomic modules -- from creation through retirement. Recovered from EAFIX_auth_docs/Mod_refactor_plan.txt (deleted in commit 0f2c238).",
+  "authority_note": "This file governs lifecycle rules only. It does not override module_catalog.json for identity data. Module identities are defined in module_catalog.json exclusively.",
+  "source_evidence": [
+    "EAFIX_auth_docs/Mod_refactor_plan.txt (git history: commit 13431e8)",
+    "EAFIX_auth_docs/Y_module governance glossary.json",
+    "EAFIX_auth_docs/eafix_unified_atomic_module_schema_v1_0_0.json"
+  ],
+  "core_principle": "Treat the module system as a versioned governance system, not a one-time cleanup. The catalog is never treated as final architecture -- modules will be added, split, merged, renamed, and retired. The mistake is treating any catalog pass as frozen.",
+  "lifecycle_status_definitions": [
+    {
+      "status": "proposed",
+      "meaning": "Mentioned in an MCR; not yet accepted into any catalog pass.",
+      "governance_rule": "A proposed module has no numeric ID. Use CANDIDATE-<name> notation, not a real ordinal."
+    },
+    {
+      "status": "candidate",
+      "meaning": "Has enough evidence to evaluate for promotion to canonical.",
+      "governance_rule": "Candidates are tracked in atomic_module_decomposition_decisions.json."
+    },
+    {
+      "status": "approved",
+      "meaning": "Accepted into the next catalog pass but not yet locked.",
+      "governance_rule": "Approved modules receive a numeric_module_id and canonical_symbol."
+    },
+    {
+      "status": "canonical",
+      "meaning": "Locked in the current catalog pass. This is the normal active state.",
+      "governance_rule": "A canonical module identity may only change through an accepted MCR."
+    },
+    {
+      "status": "implemented",
+      "meaning": "Has verified source files, service binding, and runtime binding.",
+      "governance_rule": "Implementation status is tracked via reconciliation flags (NO_FILES, SERVICE_UNBOUND, etc.)."
+    },
+    {
+      "status": "manifest_ready",
+      "meaning": "Has a valid, non-stale atomic manifest conforming to eafix_unified_atomic_module_schema_v1_0_0.json.",
+      "governance_rule": "A manifest is downstream of the catalog. Never edit a manifest to resolve architecture questions -- those go through MCR first."
+    },
+    {
+      "status": "deprecated_alias",
+      "meaning": "Old symbol retained for traceability. The module entry exists only to preserve historical resolution.",
+      "governance_rule": "Deprecated aliases are recorded in legacy_aliases field of the surviving module's catalog entry."
+    },
+    {
+      "status": "retired",
+      "meaning": "No longer active. The numeric ID and symbol are permanently reserved.",
+      "governance_rule": "Retired modules keep their entry in the catalog with identity_status: retired and a superseded_by reference."
+    },
+    {
+      "status": "superseded",
+      "meaning": "Replaced by one or more successor modules.",
+      "governance_rule": "Superseded modules keep their entry and record superseded_by pointing to the successor numeric IDs."
+    }
+  ],
+  "id_permanence_rules": {
+    "rule": "Numeric module IDs are permanent and are never reused, even after retirement.",
+    "details": [
+      "A module_id (20-digit numeric matching ^5\\d{19}$) is assigned once and never reassigned.",
+      "Canonical symbols may change through an accepted RENAME_SYMBOL MCR.",
+      "Module names may change within limits.",
+      "Module purpose may evolve within limits.",
+      "When a module is retired: identity_status is set to 'retired'; superseded_by lists the successor numeric IDs; legacy_aliases retains the prior symbol for traceability.",
+      "If a module is split: retiring module records superseded_by pointing to the two new modules; new modules each get a new numeric_module_id.",
+      "If modules merge: surviving module's ID is kept; retired modules become deprecated_alias entries in the surviving module's legacy_aliases."
+    ],
+    "example_retired": {
+      "module_id": "50000000000000000013",
+      "canonical_symbol": "R1_RISK_EVALUATOR",
+      "identity_status": "retired",
+      "superseded_by": [
+        "50000000000000000035"
+      ],
+      "legacy_aliases": [
+        "R1_RISK_EVALUATOR"
+      ]
+    }
+  },
+  "change_request_system": {
+    "description": "All architecture modifications must enter through a formal Module Change Request (MCR) before any catalog, crosswalk, manifest, or contract changes are made.",
+    "mcr_id_format": "MCR-YYYY-NNNN",
+    "mcr_directory": "module_change_requests/",
+    "mcr_file_format": "MCR-{YYYY}-{NNNN}-{description}.json",
+    "required_mcr_fields": [
+      "mcr_id",
+      "title",
+      "change_type",
+      "status",
+      "affected_modules",
+      "proposed_modules_added",
+      "proposed_modules_removed",
+      "proposed_aliases",
+      "reason",
+      "source_evidence",
+      "contract_changes",
+      "file_mapping_impact",
+      "process_impact",
+      "risk_level",
+      "decision",
+      "decision_notes"
+    ],
+    "mcr_status_values": [
+      "proposed",
+      "under_review",
+      "accepted",
+      "rejected",
+      "deferred"
+    ]
+  },
+  "change_type_enum": [
+    {
+      "value": "ADD_MODULE",
+      "meaning": "Add a new atomic module with a new numeric ID and canonical symbol."
+    },
+    {
+      "value": "SPLIT_MODULE",
+      "meaning": "One module becomes two or more modules. Retiring module records superseded_by."
+    },
+    {
+      "value": "MERGE_MODULES",
+      "meaning": "Multiple modules collapse into one surviving module. Retired modules become deprecated_alias entries."
+    },
+    {
+      "value": "NARROW_SCOPE",
+      "meaning": "Existing module keeps its identity but loses responsibilities to another module."
+    },
+    {
+      "value": "EXPAND_SCOPE",
+      "meaning": "Existing module gains responsibility from another module or new area."
+    },
+    {
+      "value": "RENAME_SYMBOL",
+      "meaning": "Symbol changes; numeric ID remains the same. Old symbol becomes a legacy_alias."
+    },
+    {
+      "value": "RETIRE_MODULE",
+      "meaning": "Module stops being active. ID and symbol remain reserved. Entry stays in catalog with status: retired."
+    },
+    {
+      "value": "PROMOTE_WORK_CELL",
+      "meaning": "A former work cell (bounded sub-unit within a module) becomes a full atomic module."
+    },
+    {
+      "value": "PROMOTE_SUBMODULE",
+      "meaning": "A documented submodule becomes a full atomic module."
+    },
+    {
+      "value": "DEMOTE_TO_INTERNAL",
+      "meaning": "A module or submodule is reduced to an internal function of a parent module."
+    },
+    {
+      "value": "MOVE_TO_SHARED_KERNEL",
+      "meaning": "Logic is reclassified as domain-neutral and relocated to a SK-prefix shared kernel module."
+    },
+    {
+      "value": "CHANGE_CONTRACT",
+      "meaning": "Input or output contracts of a module are being modified."
+    },
+    {
+      "value": "CHANGE_OWNER_FILES",
+      "meaning": "Source file ownership is transferred between modules."
+    },
+    {
+      "value": "CHANGE_RUNTIME_BOUNDARY",
+      "meaning": "The owning service, MQL4 component, port, or communication channel of a module changes."
+    },
+    {
+      "value": "ADD_TERM",
+      "meaning": "Add a new term to the governance glossary (glossary MCR)."
+    },
+    {
+      "value": "REDEFINE_TERM",
+      "meaning": "Change the definition of an existing glossary term (glossary MCR)."
+    },
+    {
+      "value": "RETIRE_TERM",
+      "meaning": "Mark a glossary term as obsolete (glossary MCR)."
+    }
+  ],
+  "three_layer_architecture": {
+    "description": "Module records are maintained in three distinct layers to prevent casual edits to the module list.",
+    "layers": [
+      {
+        "layer": "current_state",
+        "file": "EAFIX_auth_docs/module_catalog.json",
+        "purpose": "The currently approved flat module list. Single source of truth for module identity."
+      },
+      {
+        "layer": "decision_history",
+        "file": "EAFIX_auth_docs/atomic_module_decomposition_decisions.json",
+        "purpose": "Records why each module was kept, split, promoted, deferred, merged, or rejected."
+      },
+      {
+        "layer": "change_proposals",
+        "file": "module_change_requests/",
+        "purpose": "Proposed future changes before they are accepted into the catalog. One file per MCR."
+      }
+    ]
+  },
+  "catalog_pass_governance": {
+    "description": "The module catalog evolves through versioned passes. Each pass produces a locked catalog snapshot.",
+    "pass_sequence": [
+      "Pass 1 -- Initial canonical identification of well-supported modules",
+      "Pass 2 -- EA-side systems, position sizing, CAL8 registry, event-gateway, stub services, Grafana classification"
+    ],
+    "pass_flow": [
+      "1. Draft MCR",
+      "2. Review MCR",
+      "3. Accept or reject MCR",
+      "4. Update decomposition decisions",
+      "5. Update flat module catalog",
+      "6. Update crosswalk",
+      "7. Regenerate affected manifests",
+      "8. Run validators",
+      "9. Update current-state index",
+      "10. Preserve old IDs and aliases"
+    ],
+    "single_current_catalog": "Only one file is marked as the current catalog at any time, referenced by module_system_index.json. This avoids 'which version should AI use?' problems."
+  },
+  "reconciliation_flag_governance": {
+    "description": "Reconciliation flags are treated as migration work queues, not merely defects.",
+    "queues": [
+      {
+        "flag": "NO_FILES",
+        "queue_meaning": "Needs source ownership discovery"
+      },
+      {
+        "flag": "SERVICE_UNBOUND",
+        "queue_meaning": "Needs service/runtime binding"
+      },
+      {
+        "flag": "SUBMODULE_UNDOC",
+        "queue_meaning": "Old submodule docs need disposition"
+      },
+      {
+        "flag": "EA_SECOND_PASS",
+        "queue_meaning": "Needs MT4/Python boundary review"
+      },
+      {
+        "flag": "NEW_MODULE",
+        "queue_meaning": "Needs first manifest and validation evidence"
+      },
+      {
+        "flag": "SCOPE_NARROWED",
+        "queue_meaning": "Needs contract/process update check"
+      },
+      {
+        "flag": "SAFETY_CONTROLS",
+        "queue_meaning": "Needs safety/disabled-state validation"
+      }
+    ]
+  },
+  "manifest_governance": {
+    "rule": "Manifests are downstream of catalog decisions. Never hand-edit a manifest to resolve architecture arguments -- those go through MCR first.",
+    "flow": "MCR accepted -> decomposition decisions updated -> flat module catalog updated -> crosswalk updated -> affected manifests regenerated or patched -> validators run -> stale manifests marked"
+  }
+}
