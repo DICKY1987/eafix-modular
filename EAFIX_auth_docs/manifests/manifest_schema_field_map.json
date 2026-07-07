@@ -1,0 +1,6444 @@
+{
+  "schema_id": "https://eafix.local/schemas/atomic_module_manifest.schema.v1.0.0.json",
+  "schema_version_const": "1.0.0",
+  "required_top_level_fields": [
+    "schema_version",
+    "document_type",
+    "packet_type",
+    "module_identity",
+    "module_classification",
+    "purpose",
+    "process_binding",
+    "contracts",
+    "module_scope",
+    "file_ownership",
+    "dependencies",
+    "standards_and_gates",
+    "state_and_failure_behavior",
+    "documentation_set",
+    "staleness_policy"
+  ],
+  "top_level_fields": {
+    "schema_version": {
+      "type": null,
+      "nullable": false,
+      "const": "1.0.0"
+    },
+    "document_type": {
+      "type": null,
+      "nullable": false,
+      "const": "atomic_module_manifest_schema_instance"
+    },
+    "packet_type": {
+      "type": null,
+      "nullable": false,
+      "const": "atomic_module_manifest"
+    },
+    "manifest_version": {
+      "type": "string",
+      "nullable": false
+    },
+    "generated_at_utc": {
+      "type": "string",
+      "nullable": false
+    },
+    "last_updated_utc": {
+      "type": "string",
+      "nullable": false
+    },
+    "source_authority": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "authority_policy",
+        "required_reference_documents",
+        "conflict_resolution_order"
+      ],
+      "properties": {
+        "authority_policy": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "canonical_json_wins",
+            "active_governance_baseline_wins",
+            "generated_from_canonical_sources",
+            "candidate_pending_review"
+          ]
+        },
+        "required_reference_documents": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "companion_documents": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "conflict_resolution_order": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "generated_from_documents": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "authority_notes": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        }
+      },
+      "additional_properties": false
+    },
+    "module_identity": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "module_id",
+        "canonical_symbol",
+        "module_name",
+        "identity_status"
+      ],
+      "properties": {
+        "module_id": {
+          "type": null,
+          "nullable": false
+        },
+        "numeric_module_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "candidate_module_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "canonical_symbol": {
+          "type": "string",
+          "nullable": false
+        },
+        "module_name": {
+          "type": "string",
+          "nullable": false
+        },
+        "legacy_aliases": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "supersedes": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "superseded_by": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "identity_status": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "canonical",
+            "candidate",
+            "deprecated_alias",
+            "retired",
+            "superseded"
+          ]
+        },
+        "identity_model": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "numeric_20_digit",
+            "candidate_numeric_pending",
+            "legacy_symbolic",
+            "hybrid_migration"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "nullable": false
+        },
+        "status": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "canonical",
+            "active",
+            "planned",
+            "experimental",
+            "deprecated",
+            "archived",
+            "candidate",
+            "retired"
+          ]
+        }
+      },
+      "additional_properties": false
+    },
+    "module_classification": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "module_role",
+        "module_kind",
+        "domain_group_id",
+        "domain_group_name",
+        "layer",
+        "deployable_scope"
+      ],
+      "properties": {
+        "module_role": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "atomic_canonical_module",
+            "domain_group_alias",
+            "shared_kernel_module",
+            "ui_module",
+            "external_adapter_module",
+            "deprecated_alias",
+            "governance_metadata_module"
+          ]
+        },
+        "module_kind": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "PIPELINE_STAGE_MODULE",
+            "FEATURE_SERVICE_MODULE",
+            "INTEGRATION_BRIDGE_MODULE",
+            "INTERFACE_MODULE",
+            "REGISTRY_METADATA_MODULE",
+            "INFRA_PLATFORM_MODULE",
+            "OBSERVABILITY_REPORTING_MODULE",
+            "GOVERNANCE_KNOWLEDGE_MODULE",
+            "SANDBOX_EXPERIMENTAL_MODULE",
+            "ARCHIVE_LEGACY_BUCKET",
+            "RISK_MODULE",
+            "OMS_MODULE",
+            "REENTRY_MODULE",
+            "SIGNAL_MODULE",
+            "COMPUTE_MODULE",
+            "UI_MODULE",
+            "SHARED_KERNEL_MODULE",
+            "EXTERNAL_INFRASTRUCTURE_MODULE"
+          ]
+        },
+        "domain_group_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "domain_group_name": {
+          "type": "string",
+          "nullable": false
+        },
+        "phase_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "layer": {
+          "type": null,
+          "nullable": false
+        },
+        "deployable_scope": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "python_service",
+            "mql4_ea",
+            "mql4_indicator_or_script",
+            "desktop_ui",
+            "dashboard_backend",
+            "gui_gateway",
+            "shared_kernel",
+            "external_infrastructure",
+            "database",
+            "redis_bus",
+            "documentation_only",
+            "mixed"
+          ]
+        },
+        "mvp_classification": {
+          "type": "object",
+          "nullable": false,
+          "required": [],
+          "properties": {
+            "essential_for_mvp": {
+              "type": "boolean",
+              "nullable": false
+            },
+            "defer_reason": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "nullable": true
+            },
+            "consolidation_candidate": {
+              "type": "boolean",
+              "nullable": false
+            },
+            "suggested_target_module_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "nullable": true
+            }
+          },
+          "additional_properties": false
+        },
+        "tags": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        }
+      },
+      "additional_properties": false
+    },
+    "purpose": {
+      "type": "string",
+      "nullable": false
+    },
+    "plain_language_summary": {
+      "type": "string",
+      "nullable": false
+    },
+    "process_binding": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "process_id",
+        "process_version",
+        "phase_id",
+        "step_code",
+        "step_number",
+        "step_name",
+        "responsible"
+      ],
+      "properties": {
+        "process_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "process_version": {
+          "type": "string",
+          "nullable": false
+        },
+        "phase_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "phase_name": {
+          "type": "string",
+          "nullable": false
+        },
+        "step_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "step_number": {
+          "type": "integer",
+          "nullable": false
+        },
+        "step_code": {
+          "type": "string",
+          "nullable": false
+        },
+        "step_name": {
+          "type": "string",
+          "nullable": false
+        },
+        "process_order": {
+          "type": "integer",
+          "nullable": false
+        },
+        "dependency_step_ids": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "upstream_modules": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "downstream_modules": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "responsible": {
+          "type": "string",
+          "nullable": false
+        },
+        "entrypoint_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "output_description": {
+          "type": "string",
+          "nullable": false
+        },
+        "loop_behavior": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "process_binding_source": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "process_step_catalog",
+            "updated_trading_process_aligned",
+            "module_catalog",
+            "manual_atomic_split",
+            "migration_candidate"
+          ]
+        }
+      },
+      "additional_properties": false
+    },
+    "contracts": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "input_contracts",
+        "output_contracts",
+        "module_io_policy"
+      ],
+      "properties": {
+        "input_contracts": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "name",
+              "direction"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "nullable": false
+              },
+              "version": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "direction": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "input",
+                  "output",
+                  "input_output"
+                ]
+              },
+              "description": {
+                "type": "string",
+                "nullable": false
+              },
+              "schema_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "required": {
+                "type": "boolean",
+                "nullable": false
+              },
+              "produced_by_module": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "consumed_by_modules": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "output_contracts": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "name",
+              "direction"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "nullable": false
+              },
+              "version": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "direction": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "input",
+                  "output",
+                  "input_output"
+                ]
+              },
+              "description": {
+                "type": "string",
+                "nullable": false
+              },
+              "schema_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "required": {
+                "type": "boolean",
+                "nullable": false
+              },
+              "produced_by_module": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "consumed_by_modules": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "contract_schema_refs": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "contract_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "output_description": {
+          "type": "string",
+          "nullable": false
+        },
+        "module_io_policy": {
+          "type": "object",
+          "nullable": false,
+          "required": [
+            "may_ingest_only_declared_outputs",
+            "private_cross_module_access_allowed",
+            "shared_kernel_access_policy"
+          ],
+          "properties": {
+            "may_ingest_only_declared_outputs": {
+              "type": "boolean",
+              "nullable": false,
+              "const": true
+            },
+            "private_cross_module_access_allowed": {
+              "type": "boolean",
+              "nullable": false,
+              "const": false
+            },
+            "allowed_external_inputs": {
+              "type": "array",
+              "nullable": false,
+              "items": {
+                "type": "string",
+                "nullable": false
+              },
+              "minItems": null
+            },
+            "shared_kernel_access_policy": {
+              "type": "string",
+              "nullable": false,
+              "enum": [
+                "stable_domain_neutral_primitives_only",
+                "none",
+                "explicit_allowlist_required"
+              ]
+            },
+            "forbidden_ingestion_sources": {
+              "type": "array",
+              "nullable": false,
+              "items": {
+                "type": "string",
+                "nullable": false
+              },
+              "minItems": null
+            }
+          },
+          "additional_properties": false
+        },
+        "contract_version_policy": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "versioned_contracts_required",
+            "version_optional",
+            "external_contracts_only",
+            "not_applicable"
+          ]
+        },
+        "idempotency_key_policy": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "nullable": true
+        },
+        "hash_or_checksum_required": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "hash_policy": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "nullable": true
+        },
+        "schema_validation_required": {
+          "type": "boolean",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "module_scope": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "scope_in",
+        "scope_out",
+        "responsibilities",
+        "forbidden_responsibilities"
+      ],
+      "properties": {
+        "scope_in": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "scope_out": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "responsibilities": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": 1
+        },
+        "forbidden_responsibilities": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "key_functions": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "public_api_surface": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "internal_only_objects": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "shared_kernel_usage": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "atomicity_statement": {
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "file_ownership": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "module_root",
+        "owned_files",
+        "file_assignment_status",
+        "allowed_files",
+        "forbidden_files"
+      ],
+      "properties": {
+        "module_root": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "manifest_path": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "owned_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "source_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "test_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "contract_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "documentation_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "configuration_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "schema_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "generated_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "evidence_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "allowed_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "forbidden_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "file_role_index": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "path",
+              "role",
+              "ownership",
+              "is_test"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "nullable": false
+              },
+              "service": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "role": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "source",
+                  "test",
+                  "entrypoint",
+                  "entrypoint_enterprise",
+                  "config",
+                  "metrics",
+                  "health",
+                  "watcher",
+                  "router",
+                  "validator",
+                  "resolver",
+                  "processor",
+                  "plugin",
+                  "models",
+                  "schema",
+                  "contract",
+                  "documentation",
+                  "package_init",
+                  "cli",
+                  "service",
+                  "generated",
+                  "evidence",
+                  "other"
+                ]
+              },
+              "ownership": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "owned",
+                  "shared",
+                  "generated",
+                  "candidate",
+                  "forbidden",
+                  "external"
+                ]
+              },
+              "is_test": {
+                "type": "boolean",
+                "nullable": false
+              },
+              "canonical_modules": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "notes": {
+                "type": "string",
+                "nullable": false
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "unassigned_candidate_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "shared_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "path",
+              "sharing_policy"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "nullable": false
+              },
+              "sharing_policy": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "read_only",
+                  "append_only",
+                  "schema_only",
+                  "shared_kernel",
+                  "generated_artifact",
+                  "needs_refactor"
+                ]
+              },
+              "allowed_modules": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "reason": {
+                "type": "string",
+                "nullable": false
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "file_assignment_status": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "complete",
+            "partial",
+            "unassigned",
+            "conflicted",
+            "needs_review",
+            "generated_only"
+          ]
+        },
+        "file_assignment_policy_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "ownership_derivation": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "explicit_manifest",
+            "file_module_mapping",
+            "module_assignment_policy",
+            "manual_review",
+            "generated_context_packet",
+            "unknown"
+          ]
+        }
+      },
+      "additional_properties": false
+    },
+    "service_runtime": {
+      "type": "object",
+      "nullable": false,
+      "required": [],
+      "properties": {
+        "service_home": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "candidate_service_home": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "runtime_kind": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "python_service",
+            "mql4_ea",
+            "mql4_indicator_or_script",
+            "desktop_ui",
+            "dashboard_backend",
+            "gui_gateway",
+            "shared_kernel",
+            "external_infrastructure",
+            "database",
+            "redis_bus",
+            "documentation_only",
+            "mixed",
+            "unknown"
+          ]
+        },
+        "language": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "python",
+            "mql4",
+            "typescript",
+            "javascript",
+            "powershell",
+            "sql",
+            "json_yaml_only",
+            "mixed",
+            "unknown"
+          ]
+        },
+        "microservice_port": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "nullable": true
+        },
+        "host": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "deployment_unit": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "runtime_status": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "active",
+            "planned",
+            "disabled",
+            "stub",
+            "deprecated",
+            "external",
+            "unknown"
+          ]
+        },
+        "startup_entrypoints": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "health_endpoint": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "metrics_endpoint": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "external_systems": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "operator_settings_required": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        }
+      },
+      "additional_properties": false
+    },
+    "communication_channels": {
+      "type": "object",
+      "nullable": false,
+      "required": [],
+      "properties": {
+        "owned_channels": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "channel_id",
+              "channel_name",
+              "status",
+              "direction",
+              "protocol",
+              "data_contracts"
+            ],
+            "properties": {
+              "channel_id": {
+                "type": "string",
+                "nullable": false
+              },
+              "channel_name": {
+                "type": "string",
+                "nullable": false
+              },
+              "channel_number": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "status": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "active",
+                  "disabled",
+                  "planned",
+                  "deprecated",
+                  "unknown"
+                ]
+              },
+              "enabled_by_default": {
+                "type": "boolean",
+                "nullable": false
+              },
+              "direction": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "MT4 -> Python",
+                  "Python -> MT4",
+                  "Python <-> MT4",
+                  "Python internal",
+                  "UI -> Python",
+                  "Python -> UI",
+                  "external -> Python",
+                  "Python -> external",
+                  "unknown"
+                ]
+              },
+              "protocol": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "HTTP",
+                  "Windows DDE",
+                  "File system",
+                  "Redis Pub/Sub",
+                  "TCP Socket",
+                  "WebSocket",
+                  "REST",
+                  "SQLite",
+                  "Postgres",
+                  "unknown"
+                ]
+              },
+              "host": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "port": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "routes": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "dde_topic": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "poll_interval_ms": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "outbox_pattern": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "redis_topics": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "object",
+                  "nullable": false,
+                  "required": [
+                    "topic",
+                    "purpose"
+                  ],
+                  "properties": {
+                    "topic": {
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "purpose": {
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "producer_module_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "nullable": true
+                    },
+                    "consumer_module_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "nullable": true
+                    },
+                    "data_contracts": {
+                      "type": "array",
+                      "nullable": false,
+                      "items": {
+                        "type": "string",
+                        "nullable": false
+                      },
+                      "minItems": null
+                    }
+                  },
+                  "additional_properties": false
+                },
+                "minItems": null
+              },
+              "data_contracts": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "python_files": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "mt4_files": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "owning_module_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "owning_module_symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "fallback_rank": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "fallback_to_channel_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "notes": {
+                "type": "string",
+                "nullable": false
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "consumed_channels": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "channel_id",
+              "channel_name",
+              "status",
+              "direction",
+              "protocol",
+              "data_contracts"
+            ],
+            "properties": {
+              "channel_id": {
+                "type": "string",
+                "nullable": false
+              },
+              "channel_name": {
+                "type": "string",
+                "nullable": false
+              },
+              "channel_number": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "status": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "active",
+                  "disabled",
+                  "planned",
+                  "deprecated",
+                  "unknown"
+                ]
+              },
+              "enabled_by_default": {
+                "type": "boolean",
+                "nullable": false
+              },
+              "direction": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "MT4 -> Python",
+                  "Python -> MT4",
+                  "Python <-> MT4",
+                  "Python internal",
+                  "UI -> Python",
+                  "Python -> UI",
+                  "external -> Python",
+                  "Python -> external",
+                  "unknown"
+                ]
+              },
+              "protocol": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "HTTP",
+                  "Windows DDE",
+                  "File system",
+                  "Redis Pub/Sub",
+                  "TCP Socket",
+                  "WebSocket",
+                  "REST",
+                  "SQLite",
+                  "Postgres",
+                  "unknown"
+                ]
+              },
+              "host": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "port": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "routes": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "dde_topic": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "poll_interval_ms": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "outbox_pattern": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "redis_topics": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "object",
+                  "nullable": false,
+                  "required": [
+                    "topic",
+                    "purpose"
+                  ],
+                  "properties": {
+                    "topic": {
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "purpose": {
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "producer_module_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "nullable": true
+                    },
+                    "consumer_module_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "nullable": true
+                    },
+                    "data_contracts": {
+                      "type": "array",
+                      "nullable": false,
+                      "items": {
+                        "type": "string",
+                        "nullable": false
+                      },
+                      "minItems": null
+                    }
+                  },
+                  "additional_properties": false
+                },
+                "minItems": null
+              },
+              "data_contracts": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "python_files": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "mt4_files": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "owning_module_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "owning_module_symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "fallback_rank": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "fallback_to_channel_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "notes": {
+                "type": "string",
+                "nullable": false
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "published_topics": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "topic",
+              "purpose"
+            ],
+            "properties": {
+              "topic": {
+                "type": "string",
+                "nullable": false
+              },
+              "purpose": {
+                "type": "string",
+                "nullable": false
+              },
+              "producer_module_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "consumer_module_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "data_contracts": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "subscribed_topics": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "topic",
+              "purpose"
+            ],
+            "properties": {
+              "topic": {
+                "type": "string",
+                "nullable": false
+              },
+              "purpose": {
+                "type": "string",
+                "nullable": false
+              },
+              "producer_module_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "consumer_module_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "data_contracts": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "fallback_hierarchy": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "primary_channel_id",
+              "fallback_channel_id",
+              "condition"
+            ],
+            "properties": {
+              "primary_channel_id": {
+                "type": "string",
+                "nullable": false
+              },
+              "fallback_channel_id": {
+                "type": "string",
+                "nullable": false
+              },
+              "condition": {
+                "type": "string",
+                "nullable": false
+              },
+              "fail_closed": {
+                "type": "boolean",
+                "nullable": false
+              },
+              "evidence_required": {
+                "type": "boolean",
+                "nullable": false
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "channel_notes": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        }
+      },
+      "additional_properties": false
+    },
+    "dependencies": {
+      "type": "array",
+      "nullable": false,
+      "items": {
+        "type": "object",
+        "nullable": false,
+        "required": [
+          "target_type",
+          "target_id",
+          "relationship",
+          "consumes_output_contracts"
+        ],
+        "properties": {
+          "target_type": {
+            "type": "string",
+            "nullable": false,
+            "enum": [
+              "module",
+              "shared_kernel",
+              "external_system",
+              "communication_channel",
+              "data_contract",
+              "service",
+              "database",
+              "operator_setting"
+            ]
+          },
+          "target_id": {
+            "type": "string",
+            "nullable": false
+          },
+          "target_symbol": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "nullable": true
+          },
+          "relationship": {
+            "type": "string",
+            "nullable": false,
+            "enum": [
+              "consumes_output",
+              "publishes_to",
+              "subscribes_to",
+              "calls",
+              "reads_external_input",
+              "requires",
+              "reads_from",
+              "writes_to",
+              "optional",
+              "observes"
+            ]
+          },
+          "consumes_output_contracts": {
+            "type": "array",
+            "nullable": false,
+            "items": {
+              "type": "string",
+              "nullable": false
+            },
+            "minItems": null
+          },
+          "version_constraint": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "nullable": true
+          },
+          "optional": {
+            "type": "boolean",
+            "nullable": false
+          },
+          "reason": {
+            "type": "string",
+            "nullable": false
+          },
+          "allowed_access_mode": {
+            "type": "string",
+            "nullable": false,
+            "enum": [
+              "declared_output_contract_only",
+              "public_api_only",
+              "read_only_external",
+              "write_only_output",
+              "not_applicable"
+            ]
+          }
+        },
+        "additional_properties": false
+      },
+      "minItems": null
+    },
+    "standards_and_gates": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "applicable_rule_ids",
+        "applicable_gate_ids",
+        "evidence_required",
+        "blocking_gate_policy"
+      ],
+      "properties": {
+        "applicable_rule_ids": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "applicable_gate_ids": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "required_gate_commands": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "required_validators": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "standards_domains": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "evidence_required": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "evidence_paths": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "blocking_gate_policy": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "only_block_when_gate_has_pass_fail_and_evidence",
+            "always_block_on_failure",
+            "advisory_until_gate_exists"
+          ]
+        },
+        "test_coverage_minimum": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "nullable": true
+        },
+        "invariants": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "security_scan_required": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "contract_validation_required": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "source_traceability_required": {
+          "type": "boolean",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "state_and_failure_behavior": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "validation_contract",
+        "failure_contract"
+      ],
+      "properties": {
+        "validation_contract": {
+          "type": "object",
+          "nullable": false,
+          "required": [
+            "validation_id",
+            "rule",
+            "evidence_required"
+          ],
+          "properties": {
+            "validation_id": {
+              "type": "string",
+              "nullable": false
+            },
+            "rule": {
+              "type": "string",
+              "nullable": false
+            },
+            "evidence_required": {
+              "type": "boolean",
+              "nullable": false
+            },
+            "pass_fail_criteria": {
+              "type": "array",
+              "nullable": false,
+              "items": {
+                "type": "string",
+                "nullable": false
+              },
+              "minItems": null
+            }
+          },
+          "additional_properties": false
+        },
+        "failure_contract": {
+          "type": "object",
+          "nullable": false,
+          "required": [
+            "failure_mode_id",
+            "rule",
+            "default_behavior"
+          ],
+          "properties": {
+            "failure_mode_id": {
+              "type": "string",
+              "nullable": false
+            },
+            "rule": {
+              "type": "string",
+              "nullable": false
+            },
+            "default_behavior": {
+              "type": "string",
+              "nullable": false,
+              "enum": [
+                "REJECT",
+                "CONTINUE",
+                "RETRY",
+                "HALT",
+                "SUPPRESS",
+                "QUARANTINE",
+                "USE_LAST_KNOWN_GOOD",
+                "RISK_OFF",
+                "SKIP_CYCLE",
+                "ROLLBACK"
+              ]
+            },
+            "evidence_required": {
+              "type": "boolean",
+              "nullable": false
+            },
+            "operator_alert_required": {
+              "type": "boolean",
+              "nullable": false
+            }
+          },
+          "additional_properties": false
+        },
+        "state_machine_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "state_machine_states": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "retry_policy": {
+          "type": null,
+          "nullable": false
+        },
+        "fallback_policy": {
+          "type": null,
+          "nullable": false
+        },
+        "quarantine_policy": {
+          "type": null,
+          "nullable": false
+        },
+        "idempotency_policy": {
+          "type": null,
+          "nullable": false
+        },
+        "timeout_policy": {
+          "type": null,
+          "nullable": false
+        },
+        "time_standard_policy": {
+          "type": null,
+          "nullable": false
+        },
+        "fail_closed_default": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "risk_off_default": {
+          "type": "boolean",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "documentation_set": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "required_documents",
+        "documentation_completeness"
+      ],
+      "properties": {
+        "required_documents": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "document_name",
+              "required",
+              "status"
+            ],
+            "properties": {
+              "document_name": {
+                "type": "string",
+                "nullable": false
+              },
+              "path": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "required": {
+                "type": "boolean",
+                "nullable": false
+              },
+              "status": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "present",
+                  "missing",
+                  "generated",
+                  "deprecated",
+                  "not_applicable",
+                  "needs_review"
+                ]
+              },
+              "authority_level": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "notes": {
+                "type": "string",
+                "nullable": false
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "documentation_completeness": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "complete",
+            "partial",
+            "missing",
+            "not_applicable",
+            "needs_review"
+          ]
+        },
+        "missing_documents": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "deprecated_submodule_docs": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "former_parent_module",
+              "former_submodule",
+              "disposition"
+            ],
+            "properties": {
+              "former_parent_module": {
+                "type": "string",
+                "nullable": false
+              },
+              "former_submodule": {
+                "type": "string",
+                "nullable": false
+              },
+              "disposition": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "promote_to_atomic_module",
+                  "merge_into_atomic_module",
+                  "retire",
+                  "keep_as_historical_reference",
+                  "needs_review"
+                ]
+              },
+              "replacement_module_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "notes": {
+                "type": "string",
+                "nullable": false
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "plain_language_summary_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "generated_readme_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "verification_matrix_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "implementation_map_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "api_interfaces_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "contracts_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "state_machine_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        }
+      },
+      "additional_properties": false
+    },
+    "migration_traceability": {
+      "type": "object",
+      "nullable": false,
+      "required": [],
+      "properties": {
+        "migration_status": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "new_atomic_module",
+            "split_from_large_module",
+            "promoted_from_work_cell",
+            "promoted_from_submodule",
+            "merged_from_multiple_work_cells",
+            "renamed_from_legacy_alias",
+            "deprecated_alias",
+            "shared_kernel_extraction",
+            "not_migrated",
+            "needs_review"
+          ]
+        },
+        "source_parent_modules": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "promoted_from_work_cells": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "promoted_from_submodules": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "source_atonic_steps": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "source_canonical_steps": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "deprecated_identifiers": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "replacement_modules": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "crosswalk_refs": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "migration_notes": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        }
+      },
+      "additional_properties": false
+    },
+    "reconciliation_status": {
+      "type": "object",
+      "nullable": false,
+      "required": [],
+      "properties": {
+        "service_binding_status": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "bound",
+            "unbound",
+            "candidate",
+            "not_applicable",
+            "needs_review"
+          ]
+        },
+        "submodule_doc_status": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "not_applicable",
+            "deprecated",
+            "present",
+            "missing",
+            "partial",
+            "needs_review"
+          ]
+        },
+        "mapped_file_count": {
+          "type": "integer",
+          "nullable": false
+        },
+        "owned_channel_ids": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "known_flags": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "stale_symbol_tokens": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "kind_mismatch": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "layer_unassigned": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "prefix_collision": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "reconciliation_notes": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "last_reconciled_utc": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        }
+      },
+      "additional_properties": false
+    },
+    "ai_context": {
+      "type": "object",
+      "nullable": false,
+      "required": [],
+      "properties": {
+        "plain_language_summary": {
+          "type": "string",
+          "nullable": false
+        },
+        "ai_usage_guidance": {
+          "type": "object",
+          "nullable": false,
+          "required": [],
+          "properties": {
+            "use_when": {
+              "type": "string",
+              "nullable": false
+            },
+            "do_not_use_when": {
+              "type": "string",
+              "nullable": false
+            },
+            "must_remember": {
+              "type": "array",
+              "nullable": false,
+              "items": {
+                "type": "string",
+                "nullable": false
+              },
+              "minItems": null
+            },
+            "lookup_keys": {
+              "type": "array",
+              "nullable": false,
+              "items": {
+                "type": "string",
+                "nullable": false
+              },
+              "minItems": null
+            }
+          },
+          "additional_properties": false
+        },
+        "safe_edit_boundary": {
+          "type": "string",
+          "nullable": false
+        },
+        "forbidden_assumptions": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "common_failure_patterns": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "context_priority": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "canonical",
+            "generated",
+            "advisory",
+            "historical",
+            "candidate"
+          ]
+        }
+      },
+      "additional_properties": false
+    },
+    "platform_constraints": {
+      "type": "object",
+      "nullable": false,
+      "required": [],
+      "properties": {
+        "platform": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "MT4",
+            "MQL4",
+            "Python",
+            "Windows",
+            "Redis",
+            "Postgres",
+            "Electron",
+            "FastAPI",
+            "None",
+            "Mixed"
+          ]
+        },
+        "native_capability_refs": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "known_limitation_refs": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "required_operator_settings": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "broker_variability": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "custom_vs_native_policy": {
+          "type": "string",
+          "nullable": false
+        },
+        "mt4_terminal_must_be_open": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "web_terminal_supported": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "dll_imports_required": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "webrequest_required": {
+          "type": "boolean",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "observability": {
+      "type": "object",
+      "nullable": false,
+      "required": [],
+      "properties": {
+        "health_signals_emitted": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "metrics_emitted": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "log_events": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "slo_refs": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "audit_events_required": {
+          "type": "boolean",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "security_and_safety": {
+      "type": "object",
+      "nullable": false,
+      "required": [],
+      "properties": {
+        "trading_safety_level": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "none",
+            "read_only",
+            "risk_affecting",
+            "order_affecting",
+            "emergency_stop",
+            "external_execution"
+          ]
+        },
+        "admin_gate_required": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "secrets_allowed": {
+          "type": "boolean",
+          "nullable": false,
+          "const": false
+        },
+        "risk_off_on_unknown_health": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "manual_operator_confirmation_required": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "forbidden_side_effects": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        }
+      },
+      "additional_properties": false
+    },
+    "staleness_policy": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "regenerate_if_changed",
+        "last_generated_from"
+      ],
+      "properties": {
+        "regenerate_if_changed": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "last_generated_from": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "source_hashes": {
+          "type": "object",
+          "nullable": false,
+          "required": [],
+          "properties": {},
+          "additional_properties": {
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{64}$"
+          }
+        },
+        "staleness_check_command": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "staleness_status": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "fresh",
+            "stale",
+            "unknown",
+            "needs_review"
+          ]
+        }
+      },
+      "additional_properties": false
+    },
+    "notes": {
+      "type": "array",
+      "nullable": false,
+      "items": {
+        "type": "string",
+        "nullable": false
+      },
+      "minItems": null
+    }
+  },
+  "definitions": {
+    "nonEmptyString": {
+      "type": "string",
+      "nullable": false
+    },
+    "semver": {
+      "type": "string",
+      "nullable": false
+    },
+    "moduleId": {
+      "type": "string",
+      "nullable": false
+    },
+    "candidateModuleId": {
+      "type": "string",
+      "nullable": false
+    },
+    "symbol": {
+      "type": "string",
+      "nullable": false
+    },
+    "path": {
+      "type": "string",
+      "nullable": false
+    },
+    "documentRef": {
+      "type": "string",
+      "nullable": false
+    },
+    "contractName": {
+      "type": "string",
+      "nullable": false
+    },
+    "ruleId": {
+      "type": "string",
+      "nullable": false
+    },
+    "gateId": {
+      "type": "string",
+      "nullable": false
+    },
+    "sourceAuthority": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "authority_policy",
+        "required_reference_documents",
+        "conflict_resolution_order"
+      ],
+      "properties": {
+        "authority_policy": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "canonical_json_wins",
+            "active_governance_baseline_wins",
+            "generated_from_canonical_sources",
+            "candidate_pending_review"
+          ]
+        },
+        "required_reference_documents": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "companion_documents": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "conflict_resolution_order": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "generated_from_documents": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "authority_notes": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        }
+      },
+      "additional_properties": false
+    },
+    "moduleIdentity": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "module_id",
+        "canonical_symbol",
+        "module_name",
+        "identity_status"
+      ],
+      "properties": {
+        "module_id": {
+          "type": null,
+          "nullable": false
+        },
+        "numeric_module_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "candidate_module_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "canonical_symbol": {
+          "type": "string",
+          "nullable": false
+        },
+        "module_name": {
+          "type": "string",
+          "nullable": false
+        },
+        "legacy_aliases": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "supersedes": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "superseded_by": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "identity_status": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "canonical",
+            "candidate",
+            "deprecated_alias",
+            "retired",
+            "superseded"
+          ]
+        },
+        "identity_model": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "numeric_20_digit",
+            "candidate_numeric_pending",
+            "legacy_symbolic",
+            "hybrid_migration"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "nullable": false
+        },
+        "status": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "canonical",
+            "active",
+            "planned",
+            "experimental",
+            "deprecated",
+            "archived",
+            "candidate",
+            "retired"
+          ]
+        }
+      },
+      "additional_properties": false
+    },
+    "moduleClassification": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "module_role",
+        "module_kind",
+        "domain_group_id",
+        "domain_group_name",
+        "layer",
+        "deployable_scope"
+      ],
+      "properties": {
+        "module_role": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "atomic_canonical_module",
+            "domain_group_alias",
+            "shared_kernel_module",
+            "ui_module",
+            "external_adapter_module",
+            "deprecated_alias",
+            "governance_metadata_module"
+          ]
+        },
+        "module_kind": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "PIPELINE_STAGE_MODULE",
+            "FEATURE_SERVICE_MODULE",
+            "INTEGRATION_BRIDGE_MODULE",
+            "INTERFACE_MODULE",
+            "REGISTRY_METADATA_MODULE",
+            "INFRA_PLATFORM_MODULE",
+            "OBSERVABILITY_REPORTING_MODULE",
+            "GOVERNANCE_KNOWLEDGE_MODULE",
+            "SANDBOX_EXPERIMENTAL_MODULE",
+            "ARCHIVE_LEGACY_BUCKET",
+            "RISK_MODULE",
+            "OMS_MODULE",
+            "REENTRY_MODULE",
+            "SIGNAL_MODULE",
+            "COMPUTE_MODULE",
+            "UI_MODULE",
+            "SHARED_KERNEL_MODULE",
+            "EXTERNAL_INFRASTRUCTURE_MODULE"
+          ]
+        },
+        "domain_group_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "domain_group_name": {
+          "type": "string",
+          "nullable": false
+        },
+        "phase_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "layer": {
+          "type": null,
+          "nullable": false
+        },
+        "deployable_scope": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "python_service",
+            "mql4_ea",
+            "mql4_indicator_or_script",
+            "desktop_ui",
+            "dashboard_backend",
+            "gui_gateway",
+            "shared_kernel",
+            "external_infrastructure",
+            "database",
+            "redis_bus",
+            "documentation_only",
+            "mixed"
+          ]
+        },
+        "mvp_classification": {
+          "type": "object",
+          "nullable": false,
+          "required": [],
+          "properties": {
+            "essential_for_mvp": {
+              "type": "boolean",
+              "nullable": false
+            },
+            "defer_reason": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "nullable": true
+            },
+            "consolidation_candidate": {
+              "type": "boolean",
+              "nullable": false
+            },
+            "suggested_target_module_id": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "nullable": true
+            }
+          },
+          "additional_properties": false
+        },
+        "tags": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        }
+      },
+      "additional_properties": false
+    },
+    "mvpClassification": {
+      "type": "object",
+      "nullable": false,
+      "required": [],
+      "properties": {
+        "essential_for_mvp": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "defer_reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "consolidation_candidate": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "suggested_target_module_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        }
+      },
+      "additional_properties": false
+    },
+    "processBinding": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "process_id",
+        "process_version",
+        "phase_id",
+        "step_code",
+        "step_number",
+        "step_name",
+        "responsible"
+      ],
+      "properties": {
+        "process_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "process_version": {
+          "type": "string",
+          "nullable": false
+        },
+        "phase_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "phase_name": {
+          "type": "string",
+          "nullable": false
+        },
+        "step_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "step_number": {
+          "type": "integer",
+          "nullable": false
+        },
+        "step_code": {
+          "type": "string",
+          "nullable": false
+        },
+        "step_name": {
+          "type": "string",
+          "nullable": false
+        },
+        "process_order": {
+          "type": "integer",
+          "nullable": false
+        },
+        "dependency_step_ids": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "upstream_modules": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "downstream_modules": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "responsible": {
+          "type": "string",
+          "nullable": false
+        },
+        "entrypoint_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "output_description": {
+          "type": "string",
+          "nullable": false
+        },
+        "loop_behavior": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "process_binding_source": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "process_step_catalog",
+            "updated_trading_process_aligned",
+            "module_catalog",
+            "manual_atomic_split",
+            "migration_candidate"
+          ]
+        }
+      },
+      "additional_properties": false
+    },
+    "contracts": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "input_contracts",
+        "output_contracts",
+        "module_io_policy"
+      ],
+      "properties": {
+        "input_contracts": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "name",
+              "direction"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "nullable": false
+              },
+              "version": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "direction": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "input",
+                  "output",
+                  "input_output"
+                ]
+              },
+              "description": {
+                "type": "string",
+                "nullable": false
+              },
+              "schema_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "required": {
+                "type": "boolean",
+                "nullable": false
+              },
+              "produced_by_module": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "consumed_by_modules": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "output_contracts": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "name",
+              "direction"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "nullable": false
+              },
+              "version": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "direction": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "input",
+                  "output",
+                  "input_output"
+                ]
+              },
+              "description": {
+                "type": "string",
+                "nullable": false
+              },
+              "schema_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "required": {
+                "type": "boolean",
+                "nullable": false
+              },
+              "produced_by_module": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "consumed_by_modules": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "contract_schema_refs": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "contract_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "output_description": {
+          "type": "string",
+          "nullable": false
+        },
+        "module_io_policy": {
+          "type": "object",
+          "nullable": false,
+          "required": [
+            "may_ingest_only_declared_outputs",
+            "private_cross_module_access_allowed",
+            "shared_kernel_access_policy"
+          ],
+          "properties": {
+            "may_ingest_only_declared_outputs": {
+              "type": "boolean",
+              "nullable": false,
+              "const": true
+            },
+            "private_cross_module_access_allowed": {
+              "type": "boolean",
+              "nullable": false,
+              "const": false
+            },
+            "allowed_external_inputs": {
+              "type": "array",
+              "nullable": false,
+              "items": {
+                "type": "string",
+                "nullable": false
+              },
+              "minItems": null
+            },
+            "shared_kernel_access_policy": {
+              "type": "string",
+              "nullable": false,
+              "enum": [
+                "stable_domain_neutral_primitives_only",
+                "none",
+                "explicit_allowlist_required"
+              ]
+            },
+            "forbidden_ingestion_sources": {
+              "type": "array",
+              "nullable": false,
+              "items": {
+                "type": "string",
+                "nullable": false
+              },
+              "minItems": null
+            }
+          },
+          "additional_properties": false
+        },
+        "contract_version_policy": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "versioned_contracts_required",
+            "version_optional",
+            "external_contracts_only",
+            "not_applicable"
+          ]
+        },
+        "idempotency_key_policy": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "nullable": true
+        },
+        "hash_or_checksum_required": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "hash_policy": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "nullable": true
+        },
+        "schema_validation_required": {
+          "type": "boolean",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "contractRef": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "name",
+        "direction"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "nullable": false
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "direction": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "input",
+            "output",
+            "input_output"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "nullable": false
+        },
+        "schema_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "required": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "produced_by_module": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "consumed_by_modules": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        }
+      },
+      "additional_properties": false
+    },
+    "moduleIoPolicy": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "may_ingest_only_declared_outputs",
+        "private_cross_module_access_allowed",
+        "shared_kernel_access_policy"
+      ],
+      "properties": {
+        "may_ingest_only_declared_outputs": {
+          "type": "boolean",
+          "nullable": false,
+          "const": true
+        },
+        "private_cross_module_access_allowed": {
+          "type": "boolean",
+          "nullable": false,
+          "const": false
+        },
+        "allowed_external_inputs": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "shared_kernel_access_policy": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "stable_domain_neutral_primitives_only",
+            "none",
+            "explicit_allowlist_required"
+          ]
+        },
+        "forbidden_ingestion_sources": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        }
+      },
+      "additional_properties": false
+    },
+    "moduleScope": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "scope_in",
+        "scope_out",
+        "responsibilities",
+        "forbidden_responsibilities"
+      ],
+      "properties": {
+        "scope_in": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "scope_out": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "responsibilities": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": 1
+        },
+        "forbidden_responsibilities": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "key_functions": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "public_api_surface": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "internal_only_objects": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "shared_kernel_usage": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "atomicity_statement": {
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "fileOwnership": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "module_root",
+        "owned_files",
+        "file_assignment_status",
+        "allowed_files",
+        "forbidden_files"
+      ],
+      "properties": {
+        "module_root": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "manifest_path": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "owned_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "source_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "test_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "contract_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "documentation_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "configuration_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "schema_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "generated_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "evidence_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "allowed_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "forbidden_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "file_role_index": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "path",
+              "role",
+              "ownership",
+              "is_test"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "nullable": false
+              },
+              "service": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "role": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "source",
+                  "test",
+                  "entrypoint",
+                  "entrypoint_enterprise",
+                  "config",
+                  "metrics",
+                  "health",
+                  "watcher",
+                  "router",
+                  "validator",
+                  "resolver",
+                  "processor",
+                  "plugin",
+                  "models",
+                  "schema",
+                  "contract",
+                  "documentation",
+                  "package_init",
+                  "cli",
+                  "service",
+                  "generated",
+                  "evidence",
+                  "other"
+                ]
+              },
+              "ownership": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "owned",
+                  "shared",
+                  "generated",
+                  "candidate",
+                  "forbidden",
+                  "external"
+                ]
+              },
+              "is_test": {
+                "type": "boolean",
+                "nullable": false
+              },
+              "canonical_modules": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "notes": {
+                "type": "string",
+                "nullable": false
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "unassigned_candidate_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "shared_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "path",
+              "sharing_policy"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "nullable": false
+              },
+              "sharing_policy": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "read_only",
+                  "append_only",
+                  "schema_only",
+                  "shared_kernel",
+                  "generated_artifact",
+                  "needs_refactor"
+                ]
+              },
+              "allowed_modules": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "reason": {
+                "type": "string",
+                "nullable": false
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "file_assignment_status": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "complete",
+            "partial",
+            "unassigned",
+            "conflicted",
+            "needs_review",
+            "generated_only"
+          ]
+        },
+        "file_assignment_policy_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "ownership_derivation": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "explicit_manifest",
+            "file_module_mapping",
+            "module_assignment_policy",
+            "manual_review",
+            "generated_context_packet",
+            "unknown"
+          ]
+        }
+      },
+      "additional_properties": false
+    },
+    "fileRoleEntry": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "path",
+        "role",
+        "ownership",
+        "is_test"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "nullable": false
+        },
+        "service": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "role": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "source",
+            "test",
+            "entrypoint",
+            "entrypoint_enterprise",
+            "config",
+            "metrics",
+            "health",
+            "watcher",
+            "router",
+            "validator",
+            "resolver",
+            "processor",
+            "plugin",
+            "models",
+            "schema",
+            "contract",
+            "documentation",
+            "package_init",
+            "cli",
+            "service",
+            "generated",
+            "evidence",
+            "other"
+          ]
+        },
+        "ownership": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "owned",
+            "shared",
+            "generated",
+            "candidate",
+            "forbidden",
+            "external"
+          ]
+        },
+        "is_test": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "canonical_modules": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "notes": {
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "sharedFileEntry": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "path",
+        "sharing_policy"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "nullable": false
+        },
+        "sharing_policy": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "read_only",
+            "append_only",
+            "schema_only",
+            "shared_kernel",
+            "generated_artifact",
+            "needs_refactor"
+          ]
+        },
+        "allowed_modules": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "reason": {
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "serviceRuntime": {
+      "type": "object",
+      "nullable": false,
+      "required": [],
+      "properties": {
+        "service_home": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "candidate_service_home": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "runtime_kind": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "python_service",
+            "mql4_ea",
+            "mql4_indicator_or_script",
+            "desktop_ui",
+            "dashboard_backend",
+            "gui_gateway",
+            "shared_kernel",
+            "external_infrastructure",
+            "database",
+            "redis_bus",
+            "documentation_only",
+            "mixed",
+            "unknown"
+          ]
+        },
+        "language": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "python",
+            "mql4",
+            "typescript",
+            "javascript",
+            "powershell",
+            "sql",
+            "json_yaml_only",
+            "mixed",
+            "unknown"
+          ]
+        },
+        "microservice_port": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "nullable": true
+        },
+        "host": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "deployment_unit": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "runtime_status": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "active",
+            "planned",
+            "disabled",
+            "stub",
+            "deprecated",
+            "external",
+            "unknown"
+          ]
+        },
+        "startup_entrypoints": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "health_endpoint": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "metrics_endpoint": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "external_systems": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "operator_settings_required": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        }
+      },
+      "additional_properties": false
+    },
+    "communicationChannels": {
+      "type": "object",
+      "nullable": false,
+      "required": [],
+      "properties": {
+        "owned_channels": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "channel_id",
+              "channel_name",
+              "status",
+              "direction",
+              "protocol",
+              "data_contracts"
+            ],
+            "properties": {
+              "channel_id": {
+                "type": "string",
+                "nullable": false
+              },
+              "channel_name": {
+                "type": "string",
+                "nullable": false
+              },
+              "channel_number": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "status": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "active",
+                  "disabled",
+                  "planned",
+                  "deprecated",
+                  "unknown"
+                ]
+              },
+              "enabled_by_default": {
+                "type": "boolean",
+                "nullable": false
+              },
+              "direction": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "MT4 -> Python",
+                  "Python -> MT4",
+                  "Python <-> MT4",
+                  "Python internal",
+                  "UI -> Python",
+                  "Python -> UI",
+                  "external -> Python",
+                  "Python -> external",
+                  "unknown"
+                ]
+              },
+              "protocol": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "HTTP",
+                  "Windows DDE",
+                  "File system",
+                  "Redis Pub/Sub",
+                  "TCP Socket",
+                  "WebSocket",
+                  "REST",
+                  "SQLite",
+                  "Postgres",
+                  "unknown"
+                ]
+              },
+              "host": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "port": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "routes": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "dde_topic": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "poll_interval_ms": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "outbox_pattern": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "redis_topics": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "object",
+                  "nullable": false,
+                  "required": [
+                    "topic",
+                    "purpose"
+                  ],
+                  "properties": {
+                    "topic": {
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "purpose": {
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "producer_module_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "nullable": true
+                    },
+                    "consumer_module_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "nullable": true
+                    },
+                    "data_contracts": {
+                      "type": "array",
+                      "nullable": false,
+                      "items": {
+                        "type": "string",
+                        "nullable": false
+                      },
+                      "minItems": null
+                    }
+                  },
+                  "additional_properties": false
+                },
+                "minItems": null
+              },
+              "data_contracts": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "python_files": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "mt4_files": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "owning_module_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "owning_module_symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "fallback_rank": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "fallback_to_channel_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "notes": {
+                "type": "string",
+                "nullable": false
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "consumed_channels": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "channel_id",
+              "channel_name",
+              "status",
+              "direction",
+              "protocol",
+              "data_contracts"
+            ],
+            "properties": {
+              "channel_id": {
+                "type": "string",
+                "nullable": false
+              },
+              "channel_name": {
+                "type": "string",
+                "nullable": false
+              },
+              "channel_number": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "status": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "active",
+                  "disabled",
+                  "planned",
+                  "deprecated",
+                  "unknown"
+                ]
+              },
+              "enabled_by_default": {
+                "type": "boolean",
+                "nullable": false
+              },
+              "direction": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "MT4 -> Python",
+                  "Python -> MT4",
+                  "Python <-> MT4",
+                  "Python internal",
+                  "UI -> Python",
+                  "Python -> UI",
+                  "external -> Python",
+                  "Python -> external",
+                  "unknown"
+                ]
+              },
+              "protocol": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "HTTP",
+                  "Windows DDE",
+                  "File system",
+                  "Redis Pub/Sub",
+                  "TCP Socket",
+                  "WebSocket",
+                  "REST",
+                  "SQLite",
+                  "Postgres",
+                  "unknown"
+                ]
+              },
+              "host": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "port": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "routes": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "dde_topic": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "poll_interval_ms": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "outbox_pattern": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "redis_topics": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "object",
+                  "nullable": false,
+                  "required": [
+                    "topic",
+                    "purpose"
+                  ],
+                  "properties": {
+                    "topic": {
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "purpose": {
+                      "type": "string",
+                      "nullable": false
+                    },
+                    "producer_module_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "nullable": true
+                    },
+                    "consumer_module_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "nullable": true
+                    },
+                    "data_contracts": {
+                      "type": "array",
+                      "nullable": false,
+                      "items": {
+                        "type": "string",
+                        "nullable": false
+                      },
+                      "minItems": null
+                    }
+                  },
+                  "additional_properties": false
+                },
+                "minItems": null
+              },
+              "data_contracts": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "python_files": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "mt4_files": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              },
+              "owning_module_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "owning_module_symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "fallback_rank": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "fallback_to_channel_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "notes": {
+                "type": "string",
+                "nullable": false
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "published_topics": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "topic",
+              "purpose"
+            ],
+            "properties": {
+              "topic": {
+                "type": "string",
+                "nullable": false
+              },
+              "purpose": {
+                "type": "string",
+                "nullable": false
+              },
+              "producer_module_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "consumer_module_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "data_contracts": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "subscribed_topics": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "topic",
+              "purpose"
+            ],
+            "properties": {
+              "topic": {
+                "type": "string",
+                "nullable": false
+              },
+              "purpose": {
+                "type": "string",
+                "nullable": false
+              },
+              "producer_module_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "consumer_module_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "data_contracts": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "fallback_hierarchy": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "primary_channel_id",
+              "fallback_channel_id",
+              "condition"
+            ],
+            "properties": {
+              "primary_channel_id": {
+                "type": "string",
+                "nullable": false
+              },
+              "fallback_channel_id": {
+                "type": "string",
+                "nullable": false
+              },
+              "condition": {
+                "type": "string",
+                "nullable": false
+              },
+              "fail_closed": {
+                "type": "boolean",
+                "nullable": false
+              },
+              "evidence_required": {
+                "type": "boolean",
+                "nullable": false
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "channel_notes": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        }
+      },
+      "additional_properties": false
+    },
+    "channelBinding": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "channel_id",
+        "channel_name",
+        "status",
+        "direction",
+        "protocol",
+        "data_contracts"
+      ],
+      "properties": {
+        "channel_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "channel_name": {
+          "type": "string",
+          "nullable": false
+        },
+        "channel_number": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "nullable": true
+        },
+        "status": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "active",
+            "disabled",
+            "planned",
+            "deprecated",
+            "unknown"
+          ]
+        },
+        "enabled_by_default": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "direction": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "MT4 -> Python",
+            "Python -> MT4",
+            "Python <-> MT4",
+            "Python internal",
+            "UI -> Python",
+            "Python -> UI",
+            "external -> Python",
+            "Python -> external",
+            "unknown"
+          ]
+        },
+        "protocol": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "HTTP",
+            "Windows DDE",
+            "File system",
+            "Redis Pub/Sub",
+            "TCP Socket",
+            "WebSocket",
+            "REST",
+            "SQLite",
+            "Postgres",
+            "unknown"
+          ]
+        },
+        "host": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "port": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "nullable": true
+        },
+        "routes": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "dde_topic": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "poll_interval_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "nullable": true
+        },
+        "outbox_pattern": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "redis_topics": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "topic",
+              "purpose"
+            ],
+            "properties": {
+              "topic": {
+                "type": "string",
+                "nullable": false
+              },
+              "purpose": {
+                "type": "string",
+                "nullable": false
+              },
+              "producer_module_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "consumer_module_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "data_contracts": {
+                "type": "array",
+                "nullable": false,
+                "items": {
+                  "type": "string",
+                  "nullable": false
+                },
+                "minItems": null
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "data_contracts": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "python_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "mt4_files": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "owning_module_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "owning_module_symbol": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "fallback_rank": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "nullable": true
+        },
+        "fallback_to_channel_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "notes": {
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "topicBinding": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "topic",
+        "purpose"
+      ],
+      "properties": {
+        "topic": {
+          "type": "string",
+          "nullable": false
+        },
+        "purpose": {
+          "type": "string",
+          "nullable": false
+        },
+        "producer_module_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "consumer_module_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "data_contracts": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        }
+      },
+      "additional_properties": false
+    },
+    "fallbackLink": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "primary_channel_id",
+        "fallback_channel_id",
+        "condition"
+      ],
+      "properties": {
+        "primary_channel_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "fallback_channel_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "condition": {
+          "type": "string",
+          "nullable": false
+        },
+        "fail_closed": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "evidence_required": {
+          "type": "boolean",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "dependency": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "target_type",
+        "target_id",
+        "relationship",
+        "consumes_output_contracts"
+      ],
+      "properties": {
+        "target_type": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "module",
+            "shared_kernel",
+            "external_system",
+            "communication_channel",
+            "data_contract",
+            "service",
+            "database",
+            "operator_setting"
+          ]
+        },
+        "target_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "target_symbol": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "relationship": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "consumes_output",
+            "publishes_to",
+            "subscribes_to",
+            "calls",
+            "reads_external_input",
+            "requires",
+            "reads_from",
+            "writes_to",
+            "optional",
+            "observes"
+          ]
+        },
+        "consumes_output_contracts": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "version_constraint": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "optional": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "reason": {
+          "type": "string",
+          "nullable": false
+        },
+        "allowed_access_mode": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "declared_output_contract_only",
+            "public_api_only",
+            "read_only_external",
+            "write_only_output",
+            "not_applicable"
+          ]
+        }
+      },
+      "additional_properties": false
+    },
+    "standardsAndGates": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "applicable_rule_ids",
+        "applicable_gate_ids",
+        "evidence_required",
+        "blocking_gate_policy"
+      ],
+      "properties": {
+        "applicable_rule_ids": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "applicable_gate_ids": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "required_gate_commands": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "required_validators": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "standards_domains": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "evidence_required": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "evidence_paths": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "blocking_gate_policy": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "only_block_when_gate_has_pass_fail_and_evidence",
+            "always_block_on_failure",
+            "advisory_until_gate_exists"
+          ]
+        },
+        "test_coverage_minimum": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "nullable": true
+        },
+        "invariants": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "security_scan_required": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "contract_validation_required": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "source_traceability_required": {
+          "type": "boolean",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "stateAndFailureBehavior": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "validation_contract",
+        "failure_contract"
+      ],
+      "properties": {
+        "validation_contract": {
+          "type": "object",
+          "nullable": false,
+          "required": [
+            "validation_id",
+            "rule",
+            "evidence_required"
+          ],
+          "properties": {
+            "validation_id": {
+              "type": "string",
+              "nullable": false
+            },
+            "rule": {
+              "type": "string",
+              "nullable": false
+            },
+            "evidence_required": {
+              "type": "boolean",
+              "nullable": false
+            },
+            "pass_fail_criteria": {
+              "type": "array",
+              "nullable": false,
+              "items": {
+                "type": "string",
+                "nullable": false
+              },
+              "minItems": null
+            }
+          },
+          "additional_properties": false
+        },
+        "failure_contract": {
+          "type": "object",
+          "nullable": false,
+          "required": [
+            "failure_mode_id",
+            "rule",
+            "default_behavior"
+          ],
+          "properties": {
+            "failure_mode_id": {
+              "type": "string",
+              "nullable": false
+            },
+            "rule": {
+              "type": "string",
+              "nullable": false
+            },
+            "default_behavior": {
+              "type": "string",
+              "nullable": false,
+              "enum": [
+                "REJECT",
+                "CONTINUE",
+                "RETRY",
+                "HALT",
+                "SUPPRESS",
+                "QUARANTINE",
+                "USE_LAST_KNOWN_GOOD",
+                "RISK_OFF",
+                "SKIP_CYCLE",
+                "ROLLBACK"
+              ]
+            },
+            "evidence_required": {
+              "type": "boolean",
+              "nullable": false
+            },
+            "operator_alert_required": {
+              "type": "boolean",
+              "nullable": false
+            }
+          },
+          "additional_properties": false
+        },
+        "state_machine_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "state_machine_states": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "retry_policy": {
+          "type": null,
+          "nullable": false
+        },
+        "fallback_policy": {
+          "type": null,
+          "nullable": false
+        },
+        "quarantine_policy": {
+          "type": null,
+          "nullable": false
+        },
+        "idempotency_policy": {
+          "type": null,
+          "nullable": false
+        },
+        "timeout_policy": {
+          "type": null,
+          "nullable": false
+        },
+        "time_standard_policy": {
+          "type": null,
+          "nullable": false
+        },
+        "fail_closed_default": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "risk_off_default": {
+          "type": "boolean",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "validationContract": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "validation_id",
+        "rule",
+        "evidence_required"
+      ],
+      "properties": {
+        "validation_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "rule": {
+          "type": "string",
+          "nullable": false
+        },
+        "evidence_required": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "pass_fail_criteria": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        }
+      },
+      "additional_properties": false
+    },
+    "failureContract": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "failure_mode_id",
+        "rule",
+        "default_behavior"
+      ],
+      "properties": {
+        "failure_mode_id": {
+          "type": "string",
+          "nullable": false
+        },
+        "rule": {
+          "type": "string",
+          "nullable": false
+        },
+        "default_behavior": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "REJECT",
+            "CONTINUE",
+            "RETRY",
+            "HALT",
+            "SUPPRESS",
+            "QUARANTINE",
+            "USE_LAST_KNOWN_GOOD",
+            "RISK_OFF",
+            "SKIP_CYCLE",
+            "ROLLBACK"
+          ]
+        },
+        "evidence_required": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "operator_alert_required": {
+          "type": "boolean",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "policyObjectOrNull": {
+      "type": null,
+      "nullable": false
+    },
+    "documentationSet": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "required_documents",
+        "documentation_completeness"
+      ],
+      "properties": {
+        "required_documents": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "document_name",
+              "required",
+              "status"
+            ],
+            "properties": {
+              "document_name": {
+                "type": "string",
+                "nullable": false
+              },
+              "path": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "required": {
+                "type": "boolean",
+                "nullable": false
+              },
+              "status": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "present",
+                  "missing",
+                  "generated",
+                  "deprecated",
+                  "not_applicable",
+                  "needs_review"
+                ]
+              },
+              "authority_level": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "notes": {
+                "type": "string",
+                "nullable": false
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "documentation_completeness": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "complete",
+            "partial",
+            "missing",
+            "not_applicable",
+            "needs_review"
+          ]
+        },
+        "missing_documents": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "deprecated_submodule_docs": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "object",
+            "nullable": false,
+            "required": [
+              "former_parent_module",
+              "former_submodule",
+              "disposition"
+            ],
+            "properties": {
+              "former_parent_module": {
+                "type": "string",
+                "nullable": false
+              },
+              "former_submodule": {
+                "type": "string",
+                "nullable": false
+              },
+              "disposition": {
+                "type": "string",
+                "nullable": false,
+                "enum": [
+                  "promote_to_atomic_module",
+                  "merge_into_atomic_module",
+                  "retire",
+                  "keep_as_historical_reference",
+                  "needs_review"
+                ]
+              },
+              "replacement_module_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "notes": {
+                "type": "string",
+                "nullable": false
+              }
+            },
+            "additional_properties": false
+          },
+          "minItems": null
+        },
+        "plain_language_summary_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "generated_readme_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "verification_matrix_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "implementation_map_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "api_interfaces_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "contracts_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "state_machine_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        }
+      },
+      "additional_properties": false
+    },
+    "documentStatus": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "document_name",
+        "required",
+        "status"
+      ],
+      "properties": {
+        "document_name": {
+          "type": "string",
+          "nullable": false
+        },
+        "path": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "required": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "status": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "present",
+            "missing",
+            "generated",
+            "deprecated",
+            "not_applicable",
+            "needs_review"
+          ]
+        },
+        "authority_level": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "notes": {
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "deprecatedSubmoduleDoc": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "former_parent_module",
+        "former_submodule",
+        "disposition"
+      ],
+      "properties": {
+        "former_parent_module": {
+          "type": "string",
+          "nullable": false
+        },
+        "former_submodule": {
+          "type": "string",
+          "nullable": false
+        },
+        "disposition": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "promote_to_atomic_module",
+            "merge_into_atomic_module",
+            "retire",
+            "keep_as_historical_reference",
+            "needs_review"
+          ]
+        },
+        "replacement_module_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "notes": {
+          "type": "string",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "migrationTraceability": {
+      "type": "object",
+      "nullable": false,
+      "required": [],
+      "properties": {
+        "migration_status": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "new_atomic_module",
+            "split_from_large_module",
+            "promoted_from_work_cell",
+            "promoted_from_submodule",
+            "merged_from_multiple_work_cells",
+            "renamed_from_legacy_alias",
+            "deprecated_alias",
+            "shared_kernel_extraction",
+            "not_migrated",
+            "needs_review"
+          ]
+        },
+        "source_parent_modules": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "promoted_from_work_cells": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "promoted_from_submodules": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "source_atonic_steps": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "source_canonical_steps": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "deprecated_identifiers": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "replacement_modules": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "crosswalk_refs": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "migration_notes": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        }
+      },
+      "additional_properties": false
+    },
+    "reconciliationStatus": {
+      "type": "object",
+      "nullable": false,
+      "required": [],
+      "properties": {
+        "service_binding_status": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "bound",
+            "unbound",
+            "candidate",
+            "not_applicable",
+            "needs_review"
+          ]
+        },
+        "submodule_doc_status": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "not_applicable",
+            "deprecated",
+            "present",
+            "missing",
+            "partial",
+            "needs_review"
+          ]
+        },
+        "mapped_file_count": {
+          "type": "integer",
+          "nullable": false
+        },
+        "owned_channel_ids": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "known_flags": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "stale_symbol_tokens": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "kind_mismatch": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "layer_unassigned": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "prefix_collision": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "reconciliation_notes": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "last_reconciled_utc": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        }
+      },
+      "additional_properties": false
+    },
+    "aiContext": {
+      "type": "object",
+      "nullable": false,
+      "required": [],
+      "properties": {
+        "plain_language_summary": {
+          "type": "string",
+          "nullable": false
+        },
+        "ai_usage_guidance": {
+          "type": "object",
+          "nullable": false,
+          "required": [],
+          "properties": {
+            "use_when": {
+              "type": "string",
+              "nullable": false
+            },
+            "do_not_use_when": {
+              "type": "string",
+              "nullable": false
+            },
+            "must_remember": {
+              "type": "array",
+              "nullable": false,
+              "items": {
+                "type": "string",
+                "nullable": false
+              },
+              "minItems": null
+            },
+            "lookup_keys": {
+              "type": "array",
+              "nullable": false,
+              "items": {
+                "type": "string",
+                "nullable": false
+              },
+              "minItems": null
+            }
+          },
+          "additional_properties": false
+        },
+        "safe_edit_boundary": {
+          "type": "string",
+          "nullable": false
+        },
+        "forbidden_assumptions": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "common_failure_patterns": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "context_priority": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "canonical",
+            "generated",
+            "advisory",
+            "historical",
+            "candidate"
+          ]
+        }
+      },
+      "additional_properties": false
+    },
+    "platformConstraints": {
+      "type": "object",
+      "nullable": false,
+      "required": [],
+      "properties": {
+        "platform": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "MT4",
+            "MQL4",
+            "Python",
+            "Windows",
+            "Redis",
+            "Postgres",
+            "Electron",
+            "FastAPI",
+            "None",
+            "Mixed"
+          ]
+        },
+        "native_capability_refs": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "known_limitation_refs": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "required_operator_settings": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "broker_variability": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "custom_vs_native_policy": {
+          "type": "string",
+          "nullable": false
+        },
+        "mt4_terminal_must_be_open": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "web_terminal_supported": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "dll_imports_required": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "webrequest_required": {
+          "type": "boolean",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "observability": {
+      "type": "object",
+      "nullable": false,
+      "required": [],
+      "properties": {
+        "health_signals_emitted": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "metrics_emitted": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "log_events": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "slo_refs": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "audit_events_required": {
+          "type": "boolean",
+          "nullable": false
+        }
+      },
+      "additional_properties": false
+    },
+    "securityAndSafety": {
+      "type": "object",
+      "nullable": false,
+      "required": [],
+      "properties": {
+        "trading_safety_level": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "none",
+            "read_only",
+            "risk_affecting",
+            "order_affecting",
+            "emergency_stop",
+            "external_execution"
+          ]
+        },
+        "admin_gate_required": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "secrets_allowed": {
+          "type": "boolean",
+          "nullable": false,
+          "const": false
+        },
+        "risk_off_on_unknown_health": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "manual_operator_confirmation_required": {
+          "type": "boolean",
+          "nullable": false
+        },
+        "forbidden_side_effects": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        }
+      },
+      "additional_properties": false
+    },
+    "stalenessPolicy": {
+      "type": "object",
+      "nullable": false,
+      "required": [
+        "regenerate_if_changed",
+        "last_generated_from"
+      ],
+      "properties": {
+        "regenerate_if_changed": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "last_generated_from": {
+          "type": "array",
+          "nullable": false,
+          "items": {
+            "type": "string",
+            "nullable": false
+          },
+          "minItems": null
+        },
+        "source_hashes": {
+          "type": "object",
+          "nullable": false,
+          "required": [],
+          "properties": {},
+          "additional_properties": {
+            "type": "string",
+            "pattern": "^[a-fA-F0-9]{64}$"
+          }
+        },
+        "staleness_check_command": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "staleness_status": {
+          "type": "string",
+          "nullable": false,
+          "enum": [
+            "fresh",
+            "stale",
+            "unknown",
+            "needs_review"
+          ]
+        }
+      },
+      "additional_properties": false
+    }
+  }
+}

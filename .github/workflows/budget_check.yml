@@ -12,7 +12,7 @@ jobs:
   budget:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Ensure tokens exist
         shell: pwsh
         run: |
@@ -42,7 +42,7 @@ jobs:
           ) -join "`n"
           $summary | Out-File -Encoding utf8 $env:GITHUB_STEP_SUMMARY
       - name: Upload cost artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: budget-check-cost
           path: artifacts/cost

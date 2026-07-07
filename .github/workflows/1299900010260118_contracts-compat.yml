@@ -7,7 +7,7 @@ on:
     paths:
       - 'contracts/**'
   push:
-    branches: [ main ]
+    branches: [ master ]
     paths:
       - 'contracts/**'
 jobs:
@@ -24,5 +24,5 @@ jobs:
         run: python -m pip install jsonschema
       - name: Check schema compatibility
         env:
-          BASE_REF: origin/main
+          BASE_REF: origin/master
         run: python ci/check_schema_compat.py

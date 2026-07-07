@@ -1,0 +1,237 @@
+{
+    "schema_version": "1.0.0",
+    "document_type": "repository_documentation_consolidation_plan",
+    "plan_id": "EAFIX-CALENDAR-DOC-CONSOLIDATION-REVISED-20260621",
+    "title": "Revised Approach for Consolidating Redundant Economic Calendar Documentation",
+    "repository": {
+        "owner": "DICKY1987",
+        "name": "eafix-modular",
+        "branch": "master",
+        "target_directory": "EAFIX_auth_docs"
+    },
+    "purpose": "Consolidate redundant Economic Calendar documentation while preserving canonical sources, retaining useful historical design rationale, and preventing future authority drift.",
+    "routing_and_authority_context": {
+        "routing_file_checked": "eafix_project_knowledge_reference_routing_instructions.json",
+        "matched_routes": [
+            {
+                "route_id": "ROUTE_ECONOMIC_CALENDAR_DETERMINISTIC_RULES",
+                "reason": "The change affects Economic Calendar documentation and calendar identity/design material."
+            },
+            {
+                "route_id": "ROUTE_MODULE_ARCHITECTURE",
+                "reason": "The change affects project knowledge organization and module-oriented documentation hygiene."
+            },
+            {
+                "task_type": "implementation_planning",
+                "reason": "The output is an executable repository change plan."
+            }
+        ],
+        "governing_principles_applied": [
+            "Use canonical/current authority files over historical Markdown when documents conflict.",
+            "Do not delete active authority documents without checking doc_authority.json or equivalent authority registry.",
+            "Treat duplicated but historically useful design notes as superseded/archive material unless the project intentionally relies only on Git history."
+        ],
+        "required_reference_documents_considered": [
+            "DOC_CAL_DES_RULES",
+            "DOC_PROCESS_STEP_CATALOG",
+            "DOC_MODULE_CATALOG",
+            "DOC_FILE_MODULE_MAPPING",
+            "DOC_SERVICES_AI_REFERENCE",
+            "DOC_CAPABILITY_REGISTRY"
+        ],
+        "missing_or_not_fully_verified_references": [
+            {
+                "document": "DOC_CAL_DES_RULES",
+                "status": "not directly available as parsed local source during this rewrite",
+                "impact": "The plan avoids calendar-rule changes and is limited to documentation consolidation, so this is not blocking."
+            }
+        ]
+    },
+    "repository_state_summary": {
+        "current_master_observation": "The four relevant files are still present on master in EAFIX_auth_docs. The patch has not yet been applied to master.",
+        "proposed_change_type": "documentation cleanup with one hard deletion and one recommended archival/supersession move"
+    },
+    "files_under_review": [
+        {
+            "file_id": "FILE_02_CORRUPTED_DUPLICATE",
+            "path": "EAFIX_auth_docs/0199900002260118_economic Calendar Trading System Documentation.md",
+            "role": "corrupted duplicate",
+            "observed_issue": "Title line is corrupted; it begins with 'conomic' instead of 'Economic'.",
+            "recommended_action": "delete",
+            "rationale": "The retained File 07 is the clean uncorrupted copy, and the patch rationale reports no substantive body differences after the title line."
+        },
+        {
+            "file_id": "FILE_07_RETAINED_CANONICAL_COPY",
+            "path": "EAFIX_auth_docs/0199900007260118_Economic Calendar Trading System Documentation.md",
+            "role": "retained clean copy",
+            "recommended_action": "keep",
+            "rationale": "This is the uncorrupted version of the Economic Calendar Trading System Documentation."
+        },
+        {
+            "file_id": "FILE_06_STRATEGY_ID_GENERATION",
+            "path": "EAFIX_auth_docs/0199900006260118_Economic Calendar Strategy ID Generation.md",
+            "role": "standalone historical strategy ID design note",
+            "observed_issue": "Substantive content is already absorbed into the broader Integration Framework document, but the file captures useful design-history context.",
+            "recommended_action": "move_to_superseded_archive",
+            "fallback_action": "delete_if_project_policy_uses_git_history_as_archive",
+            "rationale": "The content appears redundant with File 01, but it contains historical brainstorming and design evolution that may be useful later. Archiving is safer than hard deletion."
+        },
+        {
+            "file_id": "FILE_01_INTEGRATION_FRAMEWORK",
+            "path": "EAFIX_auth_docs/0199900001260118_Economic Calendar Integration Framework.md",
+            "role": "retained broader framework document",
+            "recommended_action": "keep_and_mark_as_superseding_file_06",
+            "rationale": "This file already contains the Strategy ID Generation content and has broader scope. It should be the surviving active reference for that material."
+        }
+    ],
+    "revised_actions": [
+        {
+            "action_id": "A01_DELETE_CORRUPTED_DUPLICATE",
+            "action_type": "delete_file",
+            "target_path": "EAFIX_auth_docs/0199900002260118_economic Calendar Trading System Documentation.md",
+            "required_precheck": [
+                "Confirm retained File 07 exists at EAFIX_auth_docs/0199900007260118_Economic Calendar Trading System Documentation.md.",
+                "Confirm File 02 is not referenced by doc_authority.json or any current authority registry.",
+                "Optional: run a normalized diff against File 07 to confirm only the corrupted title/metadata differ."
+            ],
+            "rationale": "This file is a corrupted duplicate and has no independent authority value.",
+            "expected_result": "Only the clean Economic Calendar Trading System Documentation file remains active."
+        },
+        {
+            "action_id": "A02_ARCHIVE_STRATEGY_ID_FILE",
+            "action_type": "move_file",
+            "source_path": "EAFIX_auth_docs/0199900006260118_Economic Calendar Strategy ID Generation.md",
+            "target_path": "EAFIX_auth_docs/superseded/0199900006260118_Economic Calendar Strategy ID Generation.md",
+            "required_precheck": [
+                "Confirm retained File 01 exists at EAFIX_auth_docs/0199900001260118_Economic Calendar Integration Framework.md.",
+                "Confirm File 06 is not referenced by doc_authority.json or any current authority registry.",
+                "Search File 01 for major File 06 concepts: RCI ID system, 5-digit strategy IDs, country-impact mapping, pset_id mapping, collision handling, Excel formulas, and risk-adaptive parameter logic."
+            ],
+            "rationale": "The standalone Strategy ID file is redundant as an active source, but it is useful historical design material. Archive it instead of deleting it outright.",
+            "expected_result": "The active docs are cleaner, while historical strategy-ID rationale remains recoverable without relying only on Git history."
+        },
+        {
+            "action_id": "A03_ADD_SUPERSESSION_HEADER_TO_ARCHIVED_FILE",
+            "action_type": "edit_file_header",
+            "target_path": "EAFIX_auth_docs/superseded/0199900006260118_Economic Calendar Strategy ID Generation.md",
+            "insert_at": "top_of_file",
+            "header_text": [
+                "---",
+                "status: superseded",
+                "superseded_by: EAFIX_auth_docs/0199900001260118_Economic Calendar Integration Framework.md",
+                "supersession_reason: Content absorbed into broader Economic Calendar Integration Framework; retained for historical design rationale only.",
+                "active_authority: false",
+                "---",
+                ""
+            ],
+            "rationale": "This prevents a future agent from treating the archived file as an active competing authority."
+        },
+        {
+            "action_id": "A04_ADD_SUPERSESSION_NOTE_TO_RETAINED_FRAMEWORK",
+            "action_type": "edit_file_header_or_near_title",
+            "target_path": "EAFIX_auth_docs/0199900001260118_Economic Calendar Integration Framework.md",
+            "recommended_note": "Note: This document supersedes EAFIX_auth_docs/superseded/0199900006260118_Economic Calendar Strategy ID Generation.md for active Strategy ID Generation guidance. The superseded file is retained only as historical design context.",
+            "rationale": "The retained document should explicitly identify itself as the active source for Strategy ID Generation content."
+        },
+        {
+            "action_id": "A05_LEAVE_DISTINCT_CALENDAR_ARTIFACTS_UNCHANGED",
+            "action_type": "no_change",
+            "target_paths": [
+                "EAFIX_auth_docs/EAFIX CALENDAR DES RULES.pdf",
+                "EAFIX_auth_docs/ECONOMIC_CALENDAR_MVP_SPEC.yaml",
+                "EAFIX_auth_docs/0110000071260118_05_calendar_ingest_transform.md",
+                "EAFIX_auth_docs/*Enhanced Calendar System*.pdf"
+            ],
+            "rationale": "These are different document types or different layers of the calendar system and should not be treated as duplicates merely because their names overlap."
+        },
+        {
+            "action_id": "A06_DOC_AUTHORITY_VALIDATION",
+            "action_type": "validate_authority_registry",
+            "target_path": "EAFIX_auth_docs/doc_authority.json",
+            "required_checks": [
+                "Verify no active authority entry points to the deleted File 02 path.",
+                "Verify no active authority entry points to the moved File 06 path.",
+                "If doc_authority.json has an explicit supporting-reference list for calendar docs, optionally add the retained Integration Framework as active supporting reference and mark the archived Strategy ID file as superseded/historical only."
+            ],
+            "rationale": "Authority metadata must not point to deleted or archived files as active sources."
+        }
+    ],
+    "recommended_git_operations": {
+        "preferred_archive_preserving_variant": [
+            "mkdir -p EAFIX_auth_docs/superseded",
+            "git rm \"EAFIX_auth_docs/0199900002260118_economic Calendar Trading System Documentation.md\"",
+            "git mv \"EAFIX_auth_docs/0199900006260118_Economic Calendar Strategy ID Generation.md\" \"EAFIX_auth_docs/superseded/0199900006260118_Economic Calendar Strategy ID Generation.md\"",
+            "# Add supersession header to archived Strategy ID file.",
+            "# Add supersession note to retained Integration Framework file.",
+            "git diff --stat",
+            "git diff -- \"EAFIX_auth_docs\"",
+            "git status --short",
+            "git commit -m \"Consolidate redundant Economic Calendar docs with superseded archive\"",
+            "git push origin master"
+        ],
+        "strict_cleanup_variant_if_git_history_is_sufficient": [
+            "git rm \"EAFIX_auth_docs/0199900002260118_economic Calendar Trading System Documentation.md\"",
+            "git rm \"EAFIX_auth_docs/0199900006260118_Economic Calendar Strategy ID Generation.md\"",
+            "# Add supersession note to retained Integration Framework file if desired.",
+            "git diff --stat",
+            "git diff -- \"EAFIX_auth_docs\"",
+            "git status --short",
+            "git commit -m \"Consolidate redundant Economic Calendar docs\"",
+            "git push origin master"
+        ]
+    },
+    "validation_checklist": [
+        {
+            "check_id": "V01_RETAINED_FILES_EXIST",
+            "description": "Confirm File 07 and File 01 remain present after the change.",
+            "pass_condition": "Both retained files exist in EAFIX_auth_docs."
+        },
+        {
+            "check_id": "V02_DELETED_CORRUPTED_DUPLICATE_REMOVED",
+            "description": "Confirm corrupted File 02 is removed from active docs.",
+            "pass_condition": "No file exists at EAFIX_auth_docs/0199900002260118_economic Calendar Trading System Documentation.md."
+        },
+        {
+            "check_id": "V03_STRATEGY_ID_FILE_NOT_ACTIVE",
+            "description": "Confirm standalone Strategy ID file is no longer an active authority document.",
+            "pass_condition": "File 06 is either moved under EAFIX_auth_docs/superseded/ or deleted under the strict cleanup variant."
+        },
+        {
+            "check_id": "V04_SUPERSESSION_IS_MACHINE_VISIBLE",
+            "description": "Confirm supersession metadata is visible to future AI agents and contributors.",
+            "pass_condition": "Archived Strategy ID file has status: superseded and retained Integration Framework contains a supersession note."
+        },
+        {
+            "check_id": "V05_AUTHORITY_REGISTRY_CLEAN",
+            "description": "Confirm authority registry has no active references to removed or archived files.",
+            "pass_condition": "doc_authority.json does not point active authority entries to the removed File 02 or archived/deleted File 06."
+        },
+        {
+            "check_id": "V06_DISTINCT_ARTIFACTS_UNCHANGED",
+            "description": "Confirm DES Rules PDF, MVP spec YAML, terse ingest/transform spec, and Enhanced Calendar System PDFs remain unchanged.",
+            "pass_condition": "No diff appears for those files."
+        }
+    ],
+    "risk_assessment": {
+        "overall_risk": "low",
+        "main_risks": [
+            {
+                "risk": "Accidentally deleting useful historical Strategy ID design rationale.",
+                "mitigation": "Move File 06 to superseded archive instead of deleting it."
+            },
+            {
+                "risk": "Future agents treat archived content as active authority.",
+                "mitigation": "Add explicit superseded metadata and active_authority: false."
+            },
+            {
+                "risk": "Authority registry drift after path changes.",
+                "mitigation": "Validate doc_authority.json after the move/delete operation."
+            }
+        ]
+    },
+    "final_recommendation": {
+        "decision": "approve_with_modifications",
+        "summary": "Delete the corrupted Trading System Documentation duplicate outright. Move the standalone Strategy ID Generation file to a superseded archive rather than deleting it, because it is redundant as active documentation but useful as historical design context. Keep the Integration Framework as the active Strategy ID source and add a supersession note. Leave distinct calendar artifacts unchanged.",
+        "preferred_commit_message": "Consolidate redundant Economic Calendar docs with superseded archive"
+    }
+}
