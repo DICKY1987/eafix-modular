@@ -1,0 +1,619 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "glossary_reconciliation_report",
+  "generated_at": "2026-06-21T14:30:00Z",
+  "purpose": "Reconcile all governance glossary terms across active and deleted files. Determine authoritative definition and status for each term.",
+  "authority_glossary": "EAFIX_auth_docs/Y_module governance glossary.json",
+  "files_compared": [
+    {
+      "file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "status": "active_canonical",
+      "schema_version": "1.1.1",
+      "term_count": 81
+    },
+    {
+      "file": "EAFIX_auth_docs/module governance glossary.json",
+      "status": "deleted",
+      "schema_version": "1.1.0",
+      "term_count": 81,
+      "note": "Deleted in commit 0f2c238. All 81 terms identical to current canonical glossary. Zero unique terms."
+    },
+    {
+      "file": "EAFIX_auth_docs/Schema_module_governance_glossary.txt",
+      "status": "deleted",
+      "schema_version": "1.0.0",
+      "term_count": 4,
+      "note": "Earliest seed version. 4 terms (module_id, canonical_symbol, canonical, module_change_request) all present in current canonical glossary."
+    },
+    {
+      "file": "EAFIX_auth_docs/module governance glossary bulk terms.json",
+      "status": "present_archived",
+      "term_count": 72,
+      "note": "Pre-merge working file. All 72 terms are strict subset of current canonical 81 terms. No unique terms."
+    },
+    {
+      "file": "EAFIX_auth_docs/x_module governance glossary bulk terms.json",
+      "status": "present_archived",
+      "term_count": 77,
+      "note": "Intermediate working version. All 77 terms are strict subset of current canonical 81 terms. No unique terms."
+    }
+  ],
+  "reconciliation_summary": {
+    "total_unique_terms": 81,
+    "active_terms": 81,
+    "duplicate_terms": 0,
+    "conflict_terms": 0,
+    "obsolete_terms": 0,
+    "terms_recovered_from_deleted_files": 0,
+    "conclusion": "All governance glossary terms exist in the canonical active file. No term loss occurred from the deletions. No conflicts exist. The deleted files were exact subsets or prior versions of the current canonical glossary."
+  },
+  "entries": [
+    {
+      "term": "module_id",
+      "authoritative_definition": "Permanent opaque numeric identifier assigned to a module identity.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "module_identity",
+      "status": "active"
+    },
+    {
+      "term": "canonical_symbol",
+      "authoritative_definition": "Human-readable module symbol using the approved prefix and capability-name pattern.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "module_identity",
+      "status": "active"
+    },
+    {
+      "term": "canonical",
+      "authoritative_definition": "A module identity locked in the current approved catalog.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "module_identity",
+      "status": "active"
+    },
+    {
+      "term": "module_change_request",
+      "authoritative_definition": "A formal proposed architecture modification reviewed before catalog, crosswalk, manifest, or contract changes are made.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "change_governance",
+      "status": "active"
+    },
+    {
+      "term": "module",
+      "authoritative_definition": "A governed architectural unit with a declared responsibility boundary, input/output contracts, an identity (numeric ID and canonical symbol), and an owning service or runtime context. Canonical modules are those accepted into a catalog pass; candidate modules may exist before acceptance.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "module_identity",
+      "status": "active"
+    },
+    {
+      "term": "atomic_module",
+      "authoritative_definition": "A module that is fully decomposed -- it cannot be split further without breaking its single-responsibility boundary. All modules in the canonical catalog are atomic.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "module_identity",
+      "status": "active"
+    },
+    {
+      "term": "numeric_module_id",
+      "authoritative_definition": "The 20-digit opaque permanent numeric identifier assigned to a module. Matches the pattern ^5\\d{19}$. Synonymous with module_id in the catalog.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "module_identity",
+      "status": "active"
+    },
+    {
+      "term": "module_name",
+      "authoritative_definition": "A human-readable long-form name for the module, distinct from the canonical symbol. May be updated without an MCR if it does not conflict with catalog authority.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "module_identity",
+      "status": "active"
+    },
+    {
+      "term": "legacy_alias",
+      "authoritative_definition": "A prior canonical symbol that has been replaced by a new symbol through an accepted MCR. Retained in the catalog for traceability and to prevent orphaned references.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "module_identity",
+      "status": "active"
+    },
+    {
+      "term": "deprecated_alias",
+      "authoritative_definition": "An identity_status value indicating a module entry exists only to preserve traceability for a prior symbol that is no longer active. The entry is not a live module.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "module_identity",
+      "status": "active"
+    },
+    {
+      "term": "supersedes",
+      "authoritative_definition": "An array field on a module record listing the numeric IDs or symbols of prior modules that this module replaces. Populated when a new module is created through SPLIT_MODULE, MERGE_MODULES, or RENAME_SYMBOL.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "module_identity",
+      "status": "active"
+    },
+    {
+      "term": "superseded_by",
+      "authoritative_definition": "An array field on a retired or deprecated module record listing the numeric IDs or symbols of the modules that now carry its responsibilities.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "module_identity",
+      "status": "active"
+    },
+    {
+      "term": "identity_status",
+      "authoritative_definition": "The governance lifecycle state of a module identity record. Allowed values: canonical, candidate, deprecated_alias, retired, superseded.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "module_identity",
+      "status": "active"
+    },
+    {
+      "term": "identity_model",
+      "authoritative_definition": "Describes how the module's identity was assigned. Allowed values: numeric_20_digit, candidate_numeric_pending, legacy_symbolic, hybrid_migration.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "module_identity",
+      "status": "active"
+    },
+    {
+      "term": "module_lifecycle_status",
+      "authoritative_definition": "A derived governance projection describing how far a module has progressed. It is computed from identity_status, review_status where available, reconciliation flags, manifest existence, and manifest staleness_status. It is not a stored schema field unless a future accepted MCR adds it.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "module_identity",
+      "status": "active"
+    },
+    {
+      "term": "canonical_module",
+      "authoritative_definition": "A module whose identity is locked in the current catalog pass with identity_status: canonical. Distinct from the adjective canonical: this is the concrete subject of governance queries like 'is this a canonical module?'",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "module_identity",
+      "status": "active"
+    },
+    {
+      "term": "module_boundary",
+      "authoritative_definition": "The declared edge of a module's responsibility: what it owns (files, contracts, channels, runtime), what it accepts as input contracts, and what it produces as output contracts. The entire decomposition effort is the management of these boundaries.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "module_identity",
+      "status": "active"
+    },
+    {
+      "term": "authority_source",
+      "authoritative_definition": "A file or document designated as the single authoritative origin for a specific class of fact (identities, contracts, process steps, runtime ownership, MT4 facts, UI definitions). Authority sources are ranked by the conflict resolution policy.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "module_identity",
+      "status": "active"
+    },
+    {
+      "term": "mcr",
+      "authoritative_definition": "Abbreviation for module_change_request. The formal unit of proposed architecture modification in the EAFIX governance system.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "change_governance",
+      "status": "active"
+    },
+    {
+      "term": "change_type",
+      "authoritative_definition": "A fixed enum value on an MCR describing the class of architecture modification being proposed. Allowed values: ADD_MODULE, SPLIT_MODULE, MERGE_MODULES, NARROW_SCOPE, EXPAND_SCOPE, RENAME_SYMBOL, RETIRE_MODULE, PROMOTE_WORK_CELL, PROMOTE_SUBMODULE, DEMOTE_TO_INTERNAL, MOVE_TO_SHARED_KERNEL, CHANGE_CONTRACT, CHANGE_OWNER_FILES, CHANGE_RUNTIME_BOUNDARY.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "change_governance",
+      "status": "active"
+    },
+    {
+      "term": "decision",
+      "authoritative_definition": "The resolution applied to an MCR after review. Allowed values: accepted, rejected, deferred.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "change_governance",
+      "status": "active"
+    },
+    {
+      "term": "decision_notes",
+      "authoritative_definition": "An array of human-readable strings on an MCR recording the rationale for the decision, conditions attached to acceptance, or reasons for deferral or rejection.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "change_governance",
+      "status": "active"
+    },
+    {
+      "term": "source_evidence",
+      "authoritative_definition": "An array of artifact file names or document references cited in an MCR to justify the proposed change. Must reference files that actually exist in the project.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "change_governance",
+      "status": "active"
+    },
+    {
+      "term": "impact_checklist",
+      "authoritative_definition": "A structured set of impact questions on an MCR covering identity, contracts, process, runtime, files, tests, docs, UI, MT4, and risk domains. Every MCR must include a completed checklist.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "change_governance",
+      "status": "active"
+    },
+    {
+      "term": "risk_level",
+      "authoritative_definition": "A classification on an MCR indicating the potential blast radius of the proposed change. Typical values: low, medium, high, critical.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "change_governance",
+      "status": "active"
+    },
+    {
+      "term": "accepted_change",
+      "authoritative_definition": "An MCR with decision: accepted. Triggers downstream updates to the catalog, crosswalk, decomposition decisions, and affected manifests.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "change_governance",
+      "status": "active"
+    },
+    {
+      "term": "rejected_change",
+      "authoritative_definition": "An MCR with decision: rejected. The proposed architecture modification will not be applied. The MCR is retained for historical record.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "change_governance",
+      "status": "active"
+    },
+    {
+      "term": "deferred_change",
+      "authoritative_definition": "An MCR with decision: deferred. The proposed modification is not rejected but is postponed to a future catalog pass, typically because prerequisite decisions are unresolved.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "change_governance",
+      "status": "active"
+    },
+    {
+      "term": "catalog_pass",
+      "authoritative_definition": "A versioned iteration of the module decomposition process producing a locked catalog snapshot, a change log, a crosswalk update, and a set of decomposition decisions. Passes are numbered sequentially: PASS_1, PASS_2, etc.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "catalog_pass",
+      "status": "active"
+    },
+    {
+      "term": "active_pass",
+      "authoritative_definition": "The catalog pass currently in progress or most recently completed. Declared in module_system_index.json under the active_pass field.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "catalog_pass",
+      "status": "active"
+    },
+    {
+      "term": "current_catalog",
+      "authoritative_definition": "The single catalog file designated as authoritative for the active pass. Referenced by module_system_index.json as current_catalog. Typically named atomic_module_catalog.current.json or atomic_module_catalog.pass_00N.json.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "catalog_pass",
+      "status": "active"
+    },
+    {
+      "term": "historical_catalog",
+      "authoritative_definition": "A catalog file from a prior pass, retained for traceability but no longer authoritative. Listed in module_system_index.json under historical_catalogs.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "catalog_pass",
+      "status": "active"
+    },
+    {
+      "term": "current_state_index",
+      "authoritative_definition": "Synonym for module_system_index.json. The single pointer file declaring which catalog, schema, decomposition decisions, manifest directory, MCR directory, crosswalk, and pass are current.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "catalog_pass",
+      "status": "active"
+    },
+    {
+      "term": "module_change_log",
+      "authoritative_definition": "A per-pass human/AI-readable summary of accepted and rejected MCRs, produced at the close of a catalog pass. Named module_change_log.pass_00N.json.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "catalog_pass",
+      "status": "active"
+    },
+    {
+      "term": "decomposition_decision",
+      "authoritative_definition": "A record in atomic_module_decomposition_decisions.json capturing why a candidate was kept as a module, split, merged, promoted, deferred, or rejected during a decomposition pass.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "catalog_pass",
+      "status": "active"
+    },
+    {
+      "term": "module_crosswalk",
+      "authoritative_definition": "A structured file recording all renames, splits, merges, aliases, supersessions, and effective passes for module identities. Allows any prior symbol to be traced to its current canonical module.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "catalog_pass",
+      "status": "active"
+    },
+    {
+      "term": "split_module",
+      "authoritative_definition": "A change_type value (SPLIT_MODULE) where one module is decomposed into two or more distinct modules, each with its own numeric ID and canonical symbol. The source module may be retired or have its scope narrowed.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "migration",
+      "status": "active"
+    },
+    {
+      "term": "merge_modules",
+      "authoritative_definition": "A change_type value (MERGE_MODULES) where two or more modules collapse into a single surviving module. Non-surviving modules are retired with superseded_by references.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "migration",
+      "status": "active"
+    },
+    {
+      "term": "rename_symbol",
+      "authoritative_definition": "A change_type value (RENAME_SYMBOL) where the canonical symbol of a module changes while the numeric module ID remains the same. The prior symbol becomes a legacy alias.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "migration",
+      "status": "active"
+    },
+    {
+      "term": "retire_module",
+      "authoritative_definition": "A change_type value (RETIRE_MODULE) marking a module as no longer active. The numeric ID and symbol are preserved in the catalog with identity_status: retired.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "migration",
+      "status": "active"
+    },
+    {
+      "term": "promote_work_cell",
+      "authoritative_definition": "A change_type value (PROMOTE_WORK_CELL) elevating a former work cell -- a bounded sub-unit within a module -- to full module status, assigning it a new numeric ID and canonical symbol.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "migration",
+      "status": "active"
+    },
+    {
+      "term": "promote_submodule",
+      "authoritative_definition": "A change_type value (PROMOTE_SUBMODULE) elevating a documented submodule to full module status with its own numeric ID and canonical symbol.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "migration",
+      "status": "active"
+    },
+    {
+      "term": "demote_to_internal",
+      "authoritative_definition": "A change_type value (DEMOTE_TO_INTERNAL) reducing a module or submodule to an internal function of another module, removing its independent catalog entry.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "migration",
+      "status": "active"
+    },
+    {
+      "term": "move_to_shared_kernel",
+      "authoritative_definition": "A change_type value (MOVE_TO_SHARED_KERNEL) reclassifying logic as domain-neutral and relocating it to the shared kernel domain (SK prefix), creating or updating an SK-prefixed module.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "migration",
+      "status": "active"
+    },
+    {
+      "term": "change_contract",
+      "authoritative_definition": "A change_type value (CHANGE_CONTRACT) indicating that input or output contracts of a module are being added, modified, versioned, or removed.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "migration",
+      "status": "active"
+    },
+    {
+      "term": "change_owner_files",
+      "authoritative_definition": "A change_type value (CHANGE_OWNER_FILES) indicating that source file ownership is being transferred between modules.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "migration",
+      "status": "active"
+    },
+    {
+      "term": "change_runtime_boundary",
+      "authoritative_definition": "A change_type value (CHANGE_RUNTIME_BOUNDARY) indicating that the owning service, MQL4 component, port, or communication channel of a module is changing.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "migration",
+      "status": "active"
+    },
+    {
+      "term": "atomic_manifest",
+      "authoritative_definition": "A fully populated JSON file conforming to eafix_unified_atomic_module_schema_v1_0_0.json, describing a single canonical module's identity, classification, contracts, file ownership, runtime, channels, gates, failure behavior, and staleness state.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "manifest",
+      "status": "active"
+    },
+    {
+      "term": "manifest_ready",
+      "authoritative_definition": "A derived lifecycle stage (not a stored status) indicating a module is implemented and has a valid, non-stale atomic manifest. Computed as: canonical + implemented + manifest exists + staleness_status: fresh.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "manifest",
+      "status": "active"
+    },
+    {
+      "term": "stale_manifest",
+      "authoritative_definition": "An atomic manifest whose source hashes no longer match the current state of the authoritative source documents it was generated from. Stale manifests have staleness_status: stale and must be regenerated before use.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "manifest",
+      "status": "active"
+    },
+    {
+      "term": "manifest_generation",
+      "authoritative_definition": "The process of producing a new atomic manifest for a module for the first time, drawing from the current catalog, schema, file mapping, service reference, and process step catalog.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "manifest",
+      "status": "active"
+    },
+    {
+      "term": "manifest_patch",
+      "authoritative_definition": "A targeted update to an existing atomic manifest that changes specific fields without full regeneration. Used when a narrow accepted MCR affects only a subset of manifest sections.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "manifest",
+      "status": "active"
+    },
+    {
+      "term": "manifest_regeneration",
+      "authoritative_definition": "The process of fully replacing a stale manifest with a freshly generated version from current authoritative sources.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "manifest",
+      "status": "active"
+    },
+    {
+      "term": "manifest_source_authority",
+      "authoritative_definition": "The ordered list of authoritative source documents used to populate a manifest. Declared in the manifest's source_authority section. Conflict resolution follows the conflict_resolution_order.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "manifest",
+      "status": "active"
+    },
+    {
+      "term": "file_owner",
+      "authoritative_definition": "The canonical module designated as the primary authority for a source file. A file may have at most one primary_owner and zero or more secondary_owners.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "file_service_ownership",
+      "status": "active"
+    },
+    {
+      "term": "owning_module",
+      "authoritative_definition": "The canonical module that holds primary ownership of a file or set of files. Synonym for file_owner in the context of a specific file's ownership record.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "file_service_ownership",
+      "status": "active"
+    },
+    {
+      "term": "primary_owner",
+      "authoritative_definition": "The single canonical module with write authority over a file. Only the primary owner may modify the file's contract, structure, or purpose without an MCR.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "file_service_ownership",
+      "status": "active"
+    },
+    {
+      "term": "secondary_owner",
+      "authoritative_definition": "A canonical module with read or append access to a file primarily owned by another module. Secondary ownership is declared explicitly and does not grant write authority.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "file_service_ownership",
+      "status": "active"
+    },
+    {
+      "term": "shared_file",
+      "authoritative_definition": "A file used by more than one module, governed by a declared sharing_policy. Allowed sharing policies: read_only, append_only, schema_only, shared_kernel, generated_artifact, needs_refactor.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "file_service_ownership",
+      "status": "active"
+    },
+    {
+      "term": "service_binding",
+      "authoritative_definition": "A declared association between a canonical module and the Python microservice, MQL4 EA, UI process, or infrastructure component that hosts it at runtime. Recorded in the manifest under service_runtime.service_home.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "file_service_ownership",
+      "status": "active"
+    },
+    {
+      "term": "runtime_binding",
+      "authoritative_definition": "The full set of runtime context associations for a module: service_home, runtime_kind, language, port, host, and deployment_unit. A superset of service_binding.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "file_service_ownership",
+      "status": "active"
+    },
+    {
+      "term": "communication_channel_owner",
+      "authoritative_definition": "The canonical module declared as the authority for a named communication channel (HTTP endpoint, Redis topic, file drop path, socket, DDE channel). Recorded in the manifest under communication_channels.owned_channels.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "file_service_ownership",
+      "status": "active"
+    },
+    {
+      "term": "contract",
+      "authoritative_definition": "A named, versioned data structure passed between modules at a declared boundary. Contracts are the only sanctioned mechanism for inter-module data exchange.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "contract",
+      "status": "active"
+    },
+    {
+      "term": "input_contract",
+      "authoritative_definition": "A named contract that a module declares as required or optional input. The module may only consume this data if the producing module declares the same name as an output_contract.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "contract",
+      "status": "active"
+    },
+    {
+      "term": "output_contract",
+      "authoritative_definition": "A named contract that a module declares as a produced output, available for consumption by other modules that declare it as an input_contract.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "contract",
+      "status": "active"
+    },
+    {
+      "term": "contract_version",
+      "authoritative_definition": "A versioned suffix (e.g., _v1, _v2) appended to a contract name only when the schema changes incompatibly. Format: ContractName_vN.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "contract",
+      "status": "active"
+    },
+    {
+      "term": "contract_registry",
+      "authoritative_definition": "The central authoritative list of canonical contract names, versions, schemas, producers, and consumers. Stored in contract_registry.current.json.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "contract",
+      "status": "active"
+    },
+    {
+      "term": "producer_module",
+      "authoritative_definition": "The canonical module responsible for producing data conforming to a contract it declares as output. Each contract has exactly one primary producer and zero or more explicitly declared co-producers.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "contract",
+      "status": "active"
+    },
+    {
+      "term": "consumer_module",
+      "authoritative_definition": "A canonical module that declares a contract as an input and depends on the producer_module to supply conforming data.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "contract",
+      "status": "active"
+    },
+    {
+      "term": "breaking_contract_change",
+      "authoritative_definition": "A contract schema modification that is incompatible with prior consumers -- e.g., removing a required field, changing a field type, or renaming the contract. Requires a CHANGE_CONTRACT MCR and contract version increment.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "contract",
+      "status": "active"
+    },
+    {
+      "term": "primary_producer",
+      "authoritative_definition": "The single canonical module with authority over a contract's schema and the canonical source of data conforming to it. Analogous to primary_owner for files.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "contract",
+      "status": "active"
+    },
+    {
+      "term": "co_producer",
+      "authoritative_definition": "A canonical module, other than the primary_producer, explicitly declared in the contract_registry as also emitting data conforming to a contract. Analogous to secondary_owner for files.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "contract",
+      "status": "active"
+    },
+    {
+      "term": "reconciliation_flag",
+      "authoritative_definition": "A named marker on a module catalog entry or manifest indicating an unresolved governance finding that requires future work. Flags are work queue items, not defects that block canonical status.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "reconciliation",
+      "status": "active"
+    },
+    {
+      "term": "reconciliation_queue",
+      "authoritative_definition": "A categorized work queue derived from reconciliation flags across the catalog. Managed in reconciliation_queue_index.json. Each flag type maps to a specific resolution activity.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "reconciliation",
+      "status": "active"
+    },
+    {
+      "term": "NO_FILES",
+      "authoritative_definition": "A reconciliation flag indicating a canonical module has no verified source file ownership recorded in file_module_mapping.csv. The module identity is valid; file binding is unresolved.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "reconciliation",
+      "status": "active"
+    },
+    {
+      "term": "SERVICE_UNBOUND",
+      "authoritative_definition": "A reconciliation flag indicating a canonical module has no verified service_home or runtime_binding declared in its manifest or catalog entry.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "reconciliation",
+      "status": "active"
+    },
+    {
+      "term": "SUBMODULE_UNDOC",
+      "authoritative_definition": "A reconciliation flag indicating a module has known submodules or work cells from prior documentation that have not yet been formally dispositioned (promoted, demoted, or retired).",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "reconciliation",
+      "status": "active"
+    },
+    {
+      "term": "EA_SECOND_PASS",
+      "authoritative_definition": "A reconciliation flag indicating the module has responsibilities or boundary questions touching the MT4 EA side that cannot be resolved until the MT4/Python authority boundary is established in Pass 2.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "reconciliation",
+      "status": "active"
+    },
+    {
+      "term": "NEW_MODULE",
+      "authoritative_definition": "A reconciliation flag on a module added during the current pass that has no prior catalog history, no prior decomposition decision, and requires first-time manifest generation and validation evidence.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "reconciliation",
+      "status": "active"
+    },
+    {
+      "term": "SCOPE_NARROWED",
+      "authoritative_definition": "A reconciliation flag indicating a module's responsibilities were reduced during the current pass (e.g., because a work cell was promoted or a split occurred). The module's contracts and process bindings may need updating.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "reconciliation",
+      "status": "active"
+    },
+    {
+      "term": "SAFETY_CONTROLS",
+      "authoritative_definition": "A reconciliation flag indicating a module has safety-critical responsibilities (e.g., circuit breakers, emergency stop, disabled-state enforcement) that require explicit validation evidence before manifest_ready status is granted.",
+      "source_file": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "category": "reconciliation",
+      "status": "active"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "integrations": {
+    "slack": {
+      "enabled": false,
+      "config": {
+        "bot_token": "xoxb-your-bot-token",
+        "signing_secret": "your-signing-secret"
+      },
+      "channels": ["#workflows", "#alerts"],
+      "rate_limit": 60
+    },
+    "jira": {
+      "enabled": false,
+      "config": {
+        "base_url": "https://your-domain.atlassian.net",
+        "username": "your-email@example.com",
+        "api_token": "your-api-token"
+      },
+      "channels": [],
+      "rate_limit": 100
+    },
+    "github": {
+      "enabled": false,
+      "config": {
+        "token": "ghp_your-github-token",
+        "organization": "your-org"
+      },
+      "channels": [],
+      "rate_limit": 1000
+    },
+    "teams": {
+      "enabled": false,
+      "config": {
+        "webhook_url": "https://outlook.office.com/webhook/your-webhook-url"
+      },
+      "channels": [],
+      "rate_limit": 60
+    }
+  }
+}
