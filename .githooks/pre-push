@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "[pre-push] Running merge-safety and license gates..." >&2
+
+# Ensure we have up-to-date main reference
+git fetch --quiet origin main || true
+
+# Block push if current HEAD is behind origin/main
+if ! git merge-base --is-ancestor origin/main HEAD; then
+  echo "ERROR: Your branch is behind origin/main. Please rebase before pushing." >&2
+  exit 1
+fi
+
+# Optional license gate: allow common OSS licenses; run only if pip-licenses is available
+if command -v pip-licenses >/dev/null 2>&1; then
+  ALLOW_RE='^(MIT|BSD.*|Apache-2.0)$'
+  COUNT=$(pip-licenses --format=json | python - <<'PY'
+import json,sys,re
+data=json.load(sys.stdin)
+allow=re.compile(r'^(MIT|BSD.*|Apache-2.0)$')
+bad=[p for p in data if not allow.match(p.get('License',''))]
+print(len(bad))
+PY
+)
+  if [ "${COUNT:-0}" -gt 0 ]; then
+    echo "ERROR: Disallowed licenses detected by pip-licenses. Review dependencies or update allowlist." >&2
+    exit 1
+  fi
+fi
+
+exit 0
+

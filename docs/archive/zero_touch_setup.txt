@@ -1,0 +1,552 @@
+# Zero-Touch Multi-CLI AI Tool Setup
+# Automatically detects, installs, configures, and sets up 4-terminal VS Code environment
+
+[CmdletBinding()]
+param(
+    [switch]$Force,
+    [switch]$SkipAuth,
+    [string]$WorkspaceRoot = (Get-Location).Path
+)
+
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version Latest
+
+# Initialize logging
+$LogFile = Join-Path $WorkspaceRoot ".ai\setup-$(Get-Date -Format 'yyyyMMdd-HHmmss').log"
+New-Item -ItemType Directory -Path (Split-Path $LogFile) -Force -ErrorAction SilentlyContinue | Out-Null
+
+function Write-Log {
+    param([string]$Message, [string]$Level = 'INFO')
+    $timestamp = Get-Date -Format 'HH:mm:ss'
+    $logEntry = "[$timestamp] [$Level] $Message"
+    Write-Host $logEntry -ForegroundColor $(switch($Level){'ERROR'{'Red'}'WARNING'{'Yellow'}'SUCCESS'{'Green'}default{'White'}})
+    Add-Content -Path $LogFile -Value $logEntry -Force -ErrorAction SilentlyContinue
+}
+
+function Test-AdminRequired {
+    $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+    return -not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
+
+function Install-Prerequisites {
+    Write-Log "Installing prerequisites..." 'INFO'
+    
+    # Ensure winget is available
+    if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+        Write-Log "winget not found. Installing..." 'WARNING'
+        # Install winget via Microsoft Store or GitHub
+        try {
+            Invoke-WebRequest -Uri "https://aka.ms/getwinget" -OutFile "$env:TEMP\winget.msixbundle"
+            Add-AppxPackage "$env:TEMP\winget.msixbundle"
+        } catch {
+            throw "Failed to install winget: $($_.Exception.Message)"
+        }
+    }
+    
+    # Install Node.js (required for several CLI tools)
+    if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+        Write-Log "Installing Node.js..." 'INFO'
+        winget install --id OpenJS.NodeJS.LTS --silent --accept-package-agreements --accept-source-agreements
+        $env:PATH += ";$env:ProgramFiles\nodejs"
+    }
+    
+    # Install Python (required for some CLI tools)
+    if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
+        Write-Log "Installing Python..." 'INFO'
+        winget install --id Python.Python.3.11 --silent --accept-package-agreements --accept-source-agreements
+    }
+    
+    # Install Git (required for GitHub CLI)
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+        Write-Log "Installing Git..." 'INFO'
+        winget install --id Git.Git --silent --accept-package-agreements --accept-source-agreements
+        $env:PATH += ";$env:ProgramFiles\Git\cmd"
+    }
+    
+    Write-Log "Prerequisites installed successfully" 'SUCCESS'
+}
+
+function Test-ToolInstalled {
+    param([string]$Command, [string]$TestArgs = '--version')
+    
+    try {
+        $result = & $Command $TestArgs.Split(' ') 2>&1
+        return $LASTEXITCODE -eq 0
+    } catch {
+        return $false
+    }
+}
+
+function Install-GithubCLI {
+    Write-Log "Installing GitHub CLI..." 'INFO'
+    
+    if (Test-ToolInstalled 'gh') {
+        Write-Log "GitHub CLI already installed" 'SUCCESS'
+        return
+    }
+    
+    winget install --id GitHub.cli --silent --accept-package-agreements --accept-source-agreements
+    
+    # Refresh PATH
+    $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PATH", "User")
+    
+    if (-not (Test-ToolInstalled 'gh')) {
+        throw "GitHub CLI installation failed"
+    }
+    
+    # Install Copilot extension
+    Write-Log "Installing GitHub Copilot CLI extension..." 'INFO'
+    try {
+        & gh extension install github/gh-copilot --force
+        Write-Log "GitHub Copilot CLI extension installed" 'SUCCESS'
+    } catch {
+        Write-Log "Failed to install Copilot extension: $($_.Exception.Message)" 'WARNING'
+    }
+}
+
+function Install-ClaudeCode {
+    Write-Log "Installing Claude Code CLI..." 'INFO'
+    
+    if (Test-ToolInstalled 'claude') {
+        Write-Log "Claude Code CLI already installed" 'SUCCESS'
+        return
+    }
+    
+    try {
+        & npm install -g @anthropic-ai/claude-code
+        
+        if (-not (Test-ToolInstalled 'claude')) {
+            throw "Claude Code CLI not available after installation"
+        }
+        
+        Write-Log "Claude Code CLI installed successfully" 'SUCCESS'
+    } catch {
+        Write-Log "Failed to install Claude Code CLI: $($_.Exception.Message)" 'ERROR'
+        throw
+    }
+}
+
+function Install-Aider {
+    Write-Log "Installing Aider..." 'INFO'
+    
+    if (Test-ToolInstalled 'aider') {
+        Write-Log "Aider already installed" 'SUCCESS'
+        return
+    }
+    
+    try {
+        # Install pipx first if not available
+        if (-not (Test-ToolInstalled 'pipx')) {
+            & python -m pip install --user pipx
+            & python -m pipx ensurepath
+        }
+        
+        # Install aider via pipx
+        & pipx install aider-chat
+        
+        # Add pipx bin to PATH
+        $pipxBin = "$env:USERPROFILE\.local\bin"
+        if (Test-Path $pipxBin) {
+            $env:PATH += ";$pipxBin"
+        }
+        
+        if (-not (Test-ToolInstalled 'aider')) {
+            throw "Aider not available after installation"
+        }
+        
+        Write-Log "Aider installed successfully" 'SUCCESS'
+    } catch {
+        Write-Log "Failed to install Aider: $($_.Exception.Message)" 'ERROR'
+        throw
+    }
+}
+
+function Install-OpenAICLI {
+    Write-Log "Installing OpenAI CLI..." 'INFO'
+    
+    if (Test-ToolInstalled 'openai') {
+        Write-Log "OpenAI CLI already installed" 'SUCCESS'
+        return
+    }
+    
+    try {
+        & npm install -g openai
+        
+        if (-not (Test-ToolInstalled 'openai')) {
+            throw "OpenAI CLI not available after installation"
+        }
+        
+        Write-Log "OpenAI CLI installed successfully" 'SUCCESS'
+    } catch {
+        Write-Log "Failed to install OpenAI CLI: $($_.Exception.Message)" 'ERROR'
+        throw
+    }
+}
+
+function Setup-Authentication {
+    if ($SkipAuth) {
+        Write-Log "Skipping authentication setup" 'INFO'
+        return
+    }
+    
+    Write-Log "Setting up authentication for CLI tools..." 'INFO'
+    
+    # GitHub CLI authentication
+    try {
+        $ghStatus = & gh auth status 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            Write-Log "GitHub CLI not authenticated. Starting auth flow..." 'WARNING'
+            Write-Log "Please complete authentication in your browser..." 'INFO'
+            & gh auth login --hostname github.com --web --scopes repo
+        } else {
+            Write-Log "GitHub CLI already authenticated" 'SUCCESS'
+        }
+    } catch {
+        Write-Log "GitHub CLI authentication failed: $($_.Exception.Message)" 'WARNING'
+    }
+    
+    # Claude Code authentication
+    try {
+        # Test if Claude is authenticated by trying a simple command
+        $claudeTest = & claude --version 2>&1
+        if ($LASTEXITCODE -ne 0 -or $claudeTest -match "not authenticated") {
+            Write-Log "Claude Code needs authentication. Please run 'claude' manually after setup." 'WARNING'
+        } else {
+            Write-Log "Claude Code appears to be ready" 'SUCCESS'
+        }
+    } catch {
+        Write-Log "Claude Code authentication check failed" 'WARNING'
+    }
+    
+    Write-Log "Authentication setup completed" 'SUCCESS'
+}
+
+function Create-VSCodeWorkspace {
+    Write-Log "Creating VS Code workspace configuration..." 'INFO'
+    
+    $vscodeDir = Join-Path $WorkspaceRoot ".vscode"
+    New-Item -ItemType Directory -Path $vscodeDir -Force | Out-Null
+    
+    # Create settings.json
+    $settings = @{
+        "task.allowAutomaticTasks" = "on"
+        "terminal.integrated.tabs.enabled" = $true
+        "terminal.integrated.defaultProfile.windows" = "PowerShell"
+        "terminal.integrated.profiles.windows" = @{
+            "PowerShell" = @{
+                "source" = "PowerShell"
+                "args" = @("-NoLogo")
+            }
+        }
+    }
+    
+    $settingsPath = Join-Path $vscodeDir "settings.json"
+    $settings | ConvertTo-Json -Depth 10 | Set-Content -Path $settingsPath -Encoding UTF8
+    
+    # Create tasks.json with auto-starting terminals
+    $tasks = @{
+        "version" = "2.0.0"
+        "tasks" = @(
+            @{
+                "label" = "Launch GitHub Copilot Terminal"
+                "type" = "shell"
+                "command" = "powershell"
+                "args" = @(
+                    "-NoLogo",
+                    "-Command",
+                    "Write-Host 'GitHub Copilot CLI Ready' -ForegroundColor Green; Write-Host 'Usage: gh copilot suggest \"your question\"' -ForegroundColor Cyan; gh auth status; \$host.UI.ReadLine()"
+                )
+                "group" = "build"
+                "presentation" = @{
+                    "echo" = $true
+                    "reveal" = "always"
+                    "focus" = $false
+                    "panel" = "new"
+                    "showReuseMessage" = $true
+                    "clear" = $false
+                    "group" = "ai-tools"
+                }
+                "runOptions" = @{
+                    "runOn" = "folderOpen"
+                }
+            },
+            @{
+                "label" = "Launch Claude Code Terminal"
+                "type" = "shell"
+                "command" = "powershell"
+                "args" = @(
+                    "-NoLogo",
+                    "-Command",
+                    "Write-Host 'Claude Code CLI Ready' -ForegroundColor Blue; Write-Host 'Usage: claude \"your prompt\"' -ForegroundColor Cyan; claude --version; \$host.UI.ReadLine()"
+                )
+                "group" = "build"
+                "presentation" = @{
+                    "echo" = $true
+                    "reveal" = "always"
+                    "focus" = $false
+                    "panel" = "new"
+                    "showReuseMessage" = $true
+                    "clear" = $false
+                    "group" = "ai-tools"
+                }
+                "runOptions" = @{
+                    "runOn" = "folderOpen"
+                }
+            },
+            @{
+                "label" = "Launch Aider Terminal"
+                "type" = "shell"
+                "command" = "powershell"
+                "args" = @(
+                    "-NoLogo",
+                    "-Command",
+                    "Write-Host 'Aider AI Pair Programmer Ready' -ForegroundColor Magenta; Write-Host 'Usage: aider file1.py file2.py' -ForegroundColor Cyan; aider --version; \$host.UI.ReadLine()"
+                )
+                "group" = "build"
+                "presentation" = @{
+                    "echo" = $true
+                    "reveal" = "always"
+                    "focus" = $false
+                    "panel" = "new"
+                    "showReuseMessage" = $true
+                    "clear" = $false
+                    "group" = "ai-tools"
+                }
+                "runOptions" = @{
+                    "runOn" = "folderOpen"
+                }
+            },
+            @{
+                "label" = "Launch OpenAI CLI Terminal"
+                "type" = "shell"
+                "command" = "powershell"
+                "args" = @(
+                    "-NoLogo",
+                    "-Command",
+                    "Write-Host 'OpenAI CLI Ready' -ForegroundColor Yellow; Write-Host 'Set OPENAI_API_KEY environment variable to use' -ForegroundColor Cyan; openai --version; \$host.UI.ReadLine()"
+                )
+                "group" = "build"
+                "presentation" = @{
+                    "echo" = $true
+                    "reveal" = "always"
+                    "focus" = $false
+                    "panel" = "new"
+                    "showReuseMessage" = $true
+                    "clear" = $false
+                    "group" = "ai-tools"
+                }
+                "runOptions" = @{
+                    "runOn" = "folderOpen"
+                }
+            },
+            @{
+                "label" = "Launch All AI Tools"
+                "dependsOrder" = "parallel"
+                "dependsOn" = @(
+                    "Launch GitHub Copilot Terminal",
+                    "Launch Claude Code Terminal", 
+                    "Launch Aider Terminal",
+                    "Launch OpenAI CLI Terminal"
+                )
+                "runOptions" = @{
+                    "runOn" = "folderOpen"
+                }
+            }
+        )
+    }
+    
+    $tasksPath = Join-Path $vscodeDir "tasks.json"
+    $tasks | ConvertTo-Json -Depth 10 | Set-Content -Path $tasksPath -Encoding UTF8
+    
+    Write-Log "VS Code workspace configuration created" 'SUCCESS'
+}
+
+function Create-EnvironmentFile {
+    Write-Log "Creating environment file..." 'INFO'
+    
+    $envPath = Join-Path $WorkspaceRoot ".env"
+    
+    if (-not (Test-Path $envPath) -or $Force) {
+        $envContent = @"
+# AI CLI Tools Environment Configuration
+# Add your API keys here
+
+# OpenAI API Key
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Anthropic API Key (for Claude)
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
+
+# Other optional keys
+GROQ_API_KEY=your_groq_api_key_here
+TOGETHER_API_KEY=your_together_api_key_here
+
+# GitHub token (usually handled by gh CLI)
+# GITHUB_TOKEN=your_github_token_here
+"@
+        
+        Set-Content -Path $envPath -Value $envContent -Encoding UTF8
+        Write-Log "Environment file created at $envPath" 'SUCCESS'
+    } else {
+        Write-Log "Environment file already exists" 'INFO'
+    }
+    
+    # Ensure .env is in .gitignore
+    $gitignorePath = Join-Path $WorkspaceRoot ".gitignore"
+    $gitignoreContent = if (Test-Path $gitignorePath) { Get-Content $gitignorePath } else { @() }
+    
+    if (".env" -notin $gitignoreContent) {
+        Add-Content -Path $gitignorePath -Value ".env" -Encoding UTF8
+        Write-Log "Added .env to .gitignore" 'INFO'
+    }
+}
+
+function Test-AllTools {
+    Write-Log "Testing all CLI tools..." 'INFO'
+    
+    $tools = @(
+        @{ Name = "GitHub CLI"; Command = "gh"; Args = "--version" },
+        @{ Name = "GitHub Copilot"; Command = "gh"; Args = "copilot --version" },
+        @{ Name = "Claude Code"; Command = "claude"; Args = "--version" },
+        @{ Name = "Aider"; Command = "aider"; Args = "--version" },
+        @{ Name = "OpenAI CLI"; Command = "openai"; Args = "--version" }
+    )
+    
+    $allWorking = $true
+    
+    foreach ($tool in $tools) {
+        try {
+            $result = & $tool.Command $tool.Args.Split(' ') 2>&1
+            if ($LASTEXITCODE -eq 0) {
+                Write-Log "$($tool.Name): Working" 'SUCCESS'
+            } else {
+                Write-Log "$($tool.Name): Failed (exit code $LASTEXITCODE)" 'ERROR'
+                $allWorking = $false
+            }
+        } catch {
+            Write-Log "$($tool.Name): Not found or failed" 'ERROR'
+            $allWorking = $false
+        }
+    }
+    
+    return $allWorking
+}
+
+function Create-QuickStart {
+    Write-Log "Creating quick start guide..." 'INFO'
+    
+    $quickStartPath = Join-Path $WorkspaceRoot "AI-TOOLS-QUICKSTART.md"
+    $quickStartContent = @"
+# AI Tools Quick Start Guide
+
+## Setup Complete!
+
+Your workspace is now configured with 4 AI CLI tools, each in its own terminal window.
+
+## Tools Available
+
+### 1. GitHub Copilot CLI
+- **Terminal**: Green header
+- **Usage**: `gh copilot suggest "your question"`
+- **Purpose**: Get coding suggestions and explanations
+
+### 2. Claude Code CLI  
+- **Terminal**: Blue header
+- **Usage**: `claude "your prompt"`
+- **Purpose**: Advanced code analysis and generation
+
+### 3. Aider AI Pair Programmer
+- **Terminal**: Magenta header  
+- **Usage**: `aider file1.py file2.py`
+- **Purpose**: AI-powered code editing and refactoring
+
+### 4. OpenAI CLI
+- **Terminal**: Yellow header
+- **Usage**: `openai api chat.completions.create -m gpt-4 --messages '[{"role":"user","content":"Hello"}]'`
+- **Purpose**: Direct OpenAI API access
+
+## Next Steps
+
+1. **Add API Keys**: Edit `.env` file with your API keys
+2. **Authentication**: Some tools may require additional auth setup
+3. **Start Coding**: Open any file and use the AI tools!
+
+## Tips
+
+- Each terminal is pre-loaded and ready to use
+- Use `Ctrl+` ` (backtick) to open/close terminal panel
+- Switch between terminals using the terminal tabs
+- All tools work together - use the best tool for each task
+
+## Authentication Status
+
+Run these commands to check authentication:
+- `gh auth status` (GitHub)
+- `claude --version` (Claude - may need manual auth)
+- Check `.env` file for API keys
+
+Happy coding with AI assistance!
+"@
+    
+    Set-Content -Path $quickStartPath -Value $quickStartContent -Encoding UTF8
+    Write-Log "Quick start guide created" 'SUCCESS'
+}
+
+# Main execution
+function Main {
+    Write-Log "Starting zero-touch AI CLI tools setup..." 'INFO'
+    Write-Log "Working directory: $WorkspaceRoot" 'INFO'
+    
+    try {
+        # Step 1: Install prerequisites
+        Install-Prerequisites
+        
+        # Step 2: Install each CLI tool
+        Install-GithubCLI
+        Install-ClaudeCode  
+        Install-Aider
+        Install-OpenAICLI
+        
+        # Step 3: Setup authentication
+        Setup-Authentication
+        
+        # Step 4: Create VS Code workspace configuration
+        Create-VSCodeWorkspace
+        
+        # Step 5: Create environment file
+        Create-EnvironmentFile
+        
+        # Step 6: Create quick start guide
+        Create-QuickStart
+        
+        # Step 7: Test all tools
+        $allWorking = Test-AllTools
+        
+        Write-Log "=== SETUP COMPLETE ===" 'SUCCESS'
+        Write-Log "Log file: $LogFile" 'INFO'
+        
+        if ($allWorking) {
+            Write-Log "All tools are working correctly!" 'SUCCESS'
+            Write-Log "Open this folder in VS Code to see the 4 AI terminals" 'INFO'
+        } else {
+            Write-Log "Some tools may need manual configuration" 'WARNING'
+            Write-Log "Check the quick start guide for details" 'INFO'
+        }
+        
+        # Open VS Code if available
+        if (Get-Command code -ErrorAction SilentlyContinue) {
+            Write-Log "Opening VS Code..." 'INFO'
+            & code $WorkspaceRoot
+        } else {
+            Write-Log "VS Code not found. Install VS Code and open this folder manually." 'WARNING'
+        }
+        
+    } catch {
+        Write-Log "Setup failed: $($_.Exception.Message)" 'ERROR'
+        Write-Log "Check log file: $LogFile" 'ERROR'
+        throw
+    }
+}
+
+# Run the main function
+Main

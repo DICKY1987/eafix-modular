@@ -1,0 +1,366 @@
+{
+  "41a78669": {
+    "system": "python",
+    "timestamp": "2025-09-12T09:22:37.615957",
+    "error_type": "ValueError",
+    "error_message": "Test Python error",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Richard Wilks\\cli_multi_rapid_DEV\\test_cross_language_bridge.py\", line 68, in test_bridge_system\n    raise ValueError(\"Test Python error\")\nValueError: Test Python error\n",
+    "severity": "medium",
+    "context": {
+      "test": true
+    }
+  },
+  "a761efca": {
+    "system": "mql4",
+    "timestamp": "2025-09-12T09:22:37.622603",
+    "error_type": "MQL4Error",
+    "error_code": 4051,
+    "error_message": "Invalid function parameter value",
+    "severity": "medium",
+    "context": {
+      "test": true
+    }
+  },
+  "53cce18c": {
+    "system": "powershell",
+    "timestamp": "2025-09-12T09:22:37.622603",
+    "error_type": "PowerShellError",
+    "error_message": "Execution Policy Restricted",
+    "exit_code": 1,
+    "severity": "medium",
+    "context": {
+      "test": true
+    }
+  },
+  "1d7a9470": {
+    "system": "python",
+    "timestamp": "2025-09-12T09:22:42.891321",
+    "error_type": "SyntaxError",
+    "error_message": "invalid syntax (<string>, line 1)",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Richard Wilks\\cli_multi_rapid_DEV\\cross_language_bridge\\communication_bridge.py\", line 113, in execute_python_command\n    result = eval(command) if command.startswith(\"eval:\") else exec(command)\n             ^^^^^^^^^^^^^\n  File \"<string>\", line 1\n    eval:2 + 2\n        ^\nSyntaxError: invalid syntax\n",
+    "severity": "medium",
+    "context": {
+      "command": "eval:2 + 2",
+      "bridge_context": {
+        "test": true
+      }
+    }
+  },
+  "1eb7f76f": {
+    "system": "python",
+    "timestamp": "2025-09-12T09:22:44.284380",
+    "error_type": "SyntaxError",
+    "error_message": "invalid syntax. Perhaps you forgot a comma? (<string>, line 1)",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Richard Wilks\\cli_multi_rapid_DEV\\cross_language_bridge\\communication_bridge.py\", line 113, in execute_python_command\n    result = eval(command) if command.startswith(\"eval:\") else exec(command)\n                                                               ^^^^^^^^^^^^^\n  File \"<string>\", line 1\n    print('Received broadcast: {'test_message': 'Hello from bridge!'}')\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nSyntaxError: invalid syntax. Perhaps you forgot a comma?\n",
+    "severity": "medium",
+    "context": {
+      "command": "print('Received broadcast: {'test_message': 'Hello from bridge!'}')",
+      "bridge_context": {
+        "broadcast": true,
+        "message": {
+          "test_message": "Hello from bridge!"
+        }
+      }
+    }
+  },
+  "11a10949": {
+    "system": "python",
+    "timestamp": "2025-09-12T09:22:50.610763",
+    "error_type": "SyntaxError",
+    "error_message": "invalid syntax. Perhaps you forgot a comma? (<string>, line 1)",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Richard Wilks\\cli_multi_rapid_DEV\\cross_language_bridge\\communication_bridge.py\", line 113, in execute_python_command\n    result = eval(command) if command.startswith(\"eval:\") else exec(command)\n                                                               ^^^^^^^^^^^^^\n  File \"<string>\", line 1\n    print('Received broadcast: {'type': 'validation_test', 'timestamp': 170787.89}')\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nSyntaxError: invalid syntax. Perhaps you forgot a comma?\n",
+    "severity": "medium",
+    "context": {
+      "command": "print('Received broadcast: {'type': 'validation_test', 'timestamp': 170787.89}')",
+      "bridge_context": {
+        "broadcast": true,
+        "message": {
+          "type": "validation_test",
+          "timestamp": 170787.89
+        }
+      }
+    }
+  },
+  "6bff4c4f": {
+    "system": "python",
+    "timestamp": "2025-09-12T09:23:12.723811",
+    "error_type": "ValueError",
+    "error_message": "Test Python error",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Richard Wilks\\cli_multi_rapid_DEV\\test_cross_language_bridge.py\", line 68, in test_bridge_system\n    raise ValueError(\"Test Python error\")\nValueError: Test Python error\n",
+    "severity": "medium",
+    "context": {
+      "test": true
+    }
+  },
+  "2d6c80a4": {
+    "system": "mql4",
+    "timestamp": "2025-09-12T09:23:12.734571",
+    "error_type": "MQL4Error",
+    "error_code": 4051,
+    "error_message": "Invalid function parameter value",
+    "severity": "medium",
+    "context": {
+      "test": true
+    }
+  },
+  "a1ae85b6": {
+    "system": "powershell",
+    "timestamp": "2025-09-12T09:23:12.734571",
+    "error_type": "PowerShellError",
+    "error_message": "Execution Policy Restricted",
+    "exit_code": 1,
+    "severity": "medium",
+    "context": {
+      "test": true
+    }
+  },
+  "76062976": {
+    "system": "python",
+    "timestamp": "2025-09-12T09:23:18.111168",
+    "error_type": "SyntaxError",
+    "error_message": "invalid syntax (<string>, line 1)",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Richard Wilks\\cli_multi_rapid_DEV\\cross_language_bridge\\communication_bridge.py\", line 113, in execute_python_command\n    result = eval(command) if command.startswith(\"eval:\") else exec(command)\n             ^^^^^^^^^^^^^\n  File \"<string>\", line 1\n    eval:2 + 2\n        ^\nSyntaxError: invalid syntax\n",
+    "severity": "medium",
+    "context": {
+      "command": "eval:2 + 2",
+      "bridge_context": {
+        "test": true
+      }
+    }
+  },
+  "67c31684": {
+    "system": "python",
+    "timestamp": "2025-09-12T09:23:19.439226",
+    "error_type": "SyntaxError",
+    "error_message": "invalid syntax. Perhaps you forgot a comma? (<string>, line 1)",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Richard Wilks\\cli_multi_rapid_DEV\\cross_language_bridge\\communication_bridge.py\", line 113, in execute_python_command\n    result = eval(command) if command.startswith(\"eval:\") else exec(command)\n                                                               ^^^^^^^^^^^^^\n  File \"<string>\", line 1\n    print('Received broadcast: {'test_message': 'Hello from bridge!'}')\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nSyntaxError: invalid syntax. Perhaps you forgot a comma?\n",
+    "severity": "medium",
+    "context": {
+      "command": "print('Received broadcast: {'test_message': 'Hello from bridge!'}')",
+      "bridge_context": {
+        "broadcast": true,
+        "message": {
+          "test_message": "Hello from bridge!"
+        }
+      }
+    }
+  },
+  "7dbacdaf": {
+    "system": "python",
+    "timestamp": "2025-09-12T09:23:25.645233",
+    "error_type": "SyntaxError",
+    "error_message": "invalid syntax. Perhaps you forgot a comma? (<string>, line 1)",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Richard Wilks\\cli_multi_rapid_DEV\\cross_language_bridge\\communication_bridge.py\", line 113, in execute_python_command\n    result = eval(command) if command.startswith(\"eval:\") else exec(command)\n                                                               ^^^^^^^^^^^^^\n  File \"<string>\", line 1\n    print('Received broadcast: {'type': 'validation_test', 'timestamp': 170822.906}')\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nSyntaxError: invalid syntax. Perhaps you forgot a comma?\n",
+    "severity": "medium",
+    "context": {
+      "command": "print('Received broadcast: {'type': 'validation_test', 'timestamp': 170822.906}')",
+      "bridge_context": {
+        "broadcast": true,
+        "message": {
+          "type": "validation_test",
+          "timestamp": 170822.906
+        }
+      }
+    }
+  },
+  "37972f5e": {
+    "system": "python",
+    "timestamp": "2025-09-12T09:26:51.000447",
+    "error_type": "SyntaxError",
+    "error_message": "invalid syntax. Perhaps you forgot a comma? (<string>, line 1)",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Richard Wilks\\cli_multi_rapid_DEV\\cross_language_bridge\\communication_bridge.py\", line 113, in execute_python_command\n    result = eval(command) if command.startswith(\"eval:\") else exec(command)\n                                                               ^^^^^^^^^^^^^\n  File \"<string>\", line 1\n    print('Received broadcast: {'type': 'validation_test', 'timestamp': 171028.406}')\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nSyntaxError: invalid syntax. Perhaps you forgot a comma?\n",
+    "severity": "medium",
+    "context": {
+      "command": "print('Received broadcast: {'type': 'validation_test', 'timestamp': 171028.406}')",
+      "bridge_context": {
+        "broadcast": true,
+        "message": {
+          "type": "validation_test",
+          "timestamp": 171028.406
+        }
+      }
+    }
+  },
+  "4510aa97": {
+    "system": "python",
+    "timestamp": "2025-09-12T09:27:18.235293",
+    "error_type": "SyntaxError",
+    "error_message": "invalid syntax. Perhaps you forgot a comma? (<string>, line 1)",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Richard Wilks\\cli_multi_rapid_DEV\\cross_language_bridge\\communication_bridge.py\", line 113, in execute_python_command\n    result = eval(command) if command.startswith(\"eval:\") else exec(command)\n                                                               ^^^^^^^^^^^^^\n  File \"<string>\", line 1\n    print('Received broadcast: {'type': 'validation_test', 'timestamp': 171055.468}')\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nSyntaxError: invalid syntax. Perhaps you forgot a comma?\n",
+    "severity": "medium",
+    "context": {
+      "command": "print('Received broadcast: {'type': 'validation_test', 'timestamp': 171055.468}')",
+      "bridge_context": {
+        "broadcast": true,
+        "message": {
+          "type": "validation_test",
+          "timestamp": 171055.468
+        }
+      }
+    }
+  },
+  "9fcd2674": {
+    "system": "python",
+    "timestamp": "2025-09-12T09:46:03.071570",
+    "error_type": "ValueError",
+    "error_message": "Test Python error",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Richard Wilks\\cli_multi_rapid_DEV\\test_cross_language_bridge.py\", line 68, in test_bridge_system\n    raise ValueError(\"Test Python error\")\nValueError: Test Python error\n",
+    "severity": "medium",
+    "context": {
+      "test": true
+    }
+  },
+  "1996e1da": {
+    "system": "mql4",
+    "timestamp": "2025-09-12T09:46:03.071570",
+    "error_type": "MQL4Error",
+    "error_code": 4051,
+    "error_message": "Invalid function parameter value",
+    "severity": "medium",
+    "context": {
+      "test": true
+    }
+  },
+  "20b7e4ef": {
+    "system": "powershell",
+    "timestamp": "2025-09-12T09:46:03.086446",
+    "error_type": "PowerShellError",
+    "error_message": "Execution Policy Restricted",
+    "exit_code": 1,
+    "severity": "medium",
+    "context": {
+      "test": true
+    }
+  },
+  "00bf0ba1": {
+    "system": "python",
+    "timestamp": "2025-09-12T09:46:08.318177",
+    "error_type": "SyntaxError",
+    "error_message": "invalid syntax (<string>, line 1)",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Richard Wilks\\cli_multi_rapid_DEV\\cross_language_bridge\\communication_bridge.py\", line 113, in execute_python_command\n    result = eval(command) if command.startswith(\"eval:\") else exec(command)\n             ^^^^^^^^^^^^^\n  File \"<string>\", line 1\n    eval:2 + 2\n        ^\nSyntaxError: invalid syntax\n",
+    "severity": "medium",
+    "context": {
+      "command": "eval:2 + 2",
+      "bridge_context": {
+        "test": true
+      }
+    }
+  },
+  "d3a45bb4": {
+    "system": "python",
+    "timestamp": "2025-09-12T09:46:09.686061",
+    "error_type": "SyntaxError",
+    "error_message": "invalid syntax. Perhaps you forgot a comma? (<string>, line 1)",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Richard Wilks\\cli_multi_rapid_DEV\\cross_language_bridge\\communication_bridge.py\", line 113, in execute_python_command\n    result = eval(command) if command.startswith(\"eval:\") else exec(command)\n                                                               ^^^^^^^^^^^^^\n  File \"<string>\", line 1\n    print('Received broadcast: {'test_message': 'Hello from bridge!'}')\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nSyntaxError: invalid syntax. Perhaps you forgot a comma?\n",
+    "severity": "medium",
+    "context": {
+      "command": "print('Received broadcast: {'test_message': 'Hello from bridge!'}')",
+      "bridge_context": {
+        "broadcast": true,
+        "message": {
+          "test_message": "Hello from bridge!"
+        }
+      }
+    }
+  },
+  "f0a5dcbf": {
+    "system": "python",
+    "timestamp": "2025-09-13T05:15:27.873960",
+    "error_type": "SyntaxError",
+    "error_message": "invalid syntax. Perhaps you forgot a comma? (<string>, line 1)",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Richard Wilks\\cli_multi_rapid_DEV\\cross_language_bridge\\communication_bridge.py\", line 113, in execute_python_command\n    result = eval(command) if command.startswith(\"eval:\") else exec(command)\n                                                               ^^^^^^^^^^^^^\n  File \"<string>\", line 1\n    print('Received broadcast: {'type': 'validation_test', 'timestamp': 46679.156}')\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nSyntaxError: invalid syntax. Perhaps you forgot a comma?\n",
+    "severity": "medium",
+    "context": {
+      "command": "print('Received broadcast: {'type': 'validation_test', 'timestamp': 46679.156}')",
+      "bridge_context": {
+        "broadcast": true,
+        "message": {
+          "type": "validation_test",
+          "timestamp": 46679.156
+        }
+      }
+    }
+  },
+  "84905e20": {
+    "system": "python",
+    "timestamp": "2025-09-13T05:15:39.680422",
+    "error_type": "ValueError",
+    "error_message": "Test Python error",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Richard Wilks\\cli_multi_rapid_DEV\\test_cross_language_bridge.py\", line 68, in test_bridge_system\n    raise ValueError(\"Test Python error\")\nValueError: Test Python error\n",
+    "severity": "medium",
+    "context": {
+      "test": true
+    }
+  },
+  "534b6f31": {
+    "system": "mql4",
+    "timestamp": "2025-09-13T05:15:39.680422",
+    "error_type": "MQL4Error",
+    "error_code": 4051,
+    "error_message": "Invalid function parameter value",
+    "severity": "medium",
+    "context": {
+      "test": true
+    }
+  },
+  "34115006": {
+    "system": "powershell",
+    "timestamp": "2025-09-13T05:15:39.680422",
+    "error_type": "PowerShellError",
+    "error_message": "Execution Policy Restricted",
+    "exit_code": 1,
+    "severity": "medium",
+    "context": {
+      "test": true
+    }
+  },
+  "f32d678e": {
+    "system": "python",
+    "timestamp": "2025-09-13T05:15:49.627116",
+    "error_type": "SyntaxError",
+    "error_message": "invalid syntax (<string>, line 1)",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Richard Wilks\\cli_multi_rapid_DEV\\cross_language_bridge\\communication_bridge.py\", line 113, in execute_python_command\n    result = eval(command) if command.startswith(\"eval:\") else exec(command)\n             ^^^^^^^^^^^^^\n  File \"<string>\", line 1\n    eval:2 + 2\n        ^\nSyntaxError: invalid syntax\n",
+    "severity": "medium",
+    "context": {
+      "command": "eval:2 + 2",
+      "bridge_context": {
+        "test": true
+      }
+    }
+  },
+  "29811053": {
+    "system": "python",
+    "timestamp": "2025-09-13T05:15:52.456248",
+    "error_type": "SyntaxError",
+    "error_message": "invalid syntax. Perhaps you forgot a comma? (<string>, line 1)",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Richard Wilks\\cli_multi_rapid_DEV\\cross_language_bridge\\communication_bridge.py\", line 113, in execute_python_command\n    result = eval(command) if command.startswith(\"eval:\") else exec(command)\n                                                               ^^^^^^^^^^^^^\n  File \"<string>\", line 1\n    print('Received broadcast: {'test_message': 'Hello from bridge!'}')\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nSyntaxError: invalid syntax. Perhaps you forgot a comma?\n",
+    "severity": "medium",
+    "context": {
+      "command": "print('Received broadcast: {'test_message': 'Hello from bridge!'}')",
+      "bridge_context": {
+        "broadcast": true,
+        "message": {
+          "test_message": "Hello from bridge!"
+        }
+      }
+    }
+  },
+  "770d597c": {
+    "system": "python",
+    "timestamp": "2025-09-13T05:16:02.355861",
+    "error_type": "SyntaxError",
+    "error_message": "invalid syntax. Perhaps you forgot a comma? (<string>, line 1)",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Richard Wilks\\cli_multi_rapid_DEV\\cross_language_bridge\\communication_bridge.py\", line 113, in execute_python_command\n    result = eval(command) if command.startswith(\"eval:\") else exec(command)\n                                                               ^^^^^^^^^^^^^\n  File \"<string>\", line 1\n    print('Received broadcast: {'type': 'validation_test', 'timestamp': 46714.062}')\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nSyntaxError: invalid syntax. Perhaps you forgot a comma?\n",
+    "severity": "medium",
+    "context": {
+      "command": "print('Received broadcast: {'type': 'validation_test', 'timestamp': 46714.062}')",
+      "bridge_context": {
+        "broadcast": true,
+        "message": {
+          "type": "validation_test",
+          "timestamp": 46714.062
+        }
+      }
+    }
+  }
+}

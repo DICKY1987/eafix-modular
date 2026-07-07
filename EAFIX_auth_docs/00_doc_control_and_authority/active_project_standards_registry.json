@@ -1,0 +1,2473 @@
+{
+  "document_type": "active_project_standards_registry",
+  "schema_version": "1.0.0",
+  "registry_id": "EA_MOD_ACTIVE_PROJECT_STANDARDS_REGISTRY",
+  "generated_utc": "2026-05-05T16:51:38Z",
+  "project_context": {
+    "project": "EA_MOD / HUEY_P / EAFIX modular trading system",
+    "purpose": "Single mined registry of legacy standards that remain active under the current project direction.",
+    "non_goal": "This file does not preserve legacy documents wholesale and does not make stale prose authoritative."
+  },
+  "authority_policy": {
+    "legacy_files_are_authoritative": false,
+    "this_registry_is_candidate_authority": true,
+    "activation_requirement": "A rule becomes blocking only when its enforcement gate exists, has pass/fail criteria, and writes evidence.",
+    "source_traceability_required": true,
+    "current_alignment_required": true,
+    "conflicting_legacy_rules_are_superseded": true
+  },
+  "current_direction_filters": [
+    "determinism",
+    "idempotence",
+    "single_source_of_truth",
+    "versioned_contracts",
+    "fail_closed",
+    "explicit_fallbacks",
+    "no_silent_failures",
+    "module_centric_architecture",
+    "registry_indirection",
+    "path_resolution_policy",
+    "contract_validation",
+    "evidence_required",
+    "configuration_driven_development",
+    "auditability",
+    "security",
+    "trading_safety"
+  ],
+  "decision_policy": {
+    "active_rule_requirements": [
+      "matches_current_architecture",
+      "does_not_conflict_with_identity_or_registry_policy",
+      "has_or_can_have_enforcement_gate",
+      "has_source_file_traceability",
+      "has_evidence_requirement"
+    ],
+    "dispositions": [
+      "active",
+      "candidate_active",
+      "needs_review",
+      "superseded",
+      "legacy_reference_only"
+    ],
+    "fail_closed_default": "If a mined rule cannot be classified safely, mark it needs_review instead of active."
+  },
+  "source_file_index": [
+    {
+      "source_id": "SRC-PY-LEGACY-001",
+      "file": "HUEY_P_STANDARDS_python_coding.txt",
+      "classification": "legacy_language_standard",
+      "disposition": "mine_active_rules_and_supersede_conflicting_file_naming",
+      "authority": "non_authoritative_source_material"
+    },
+    {
+      "source_id": "SRC-PS-LEGACY-001",
+      "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+      "classification": "legacy_language_standard",
+      "disposition": "mine_active_rules_and_convert_to_powershell_gates",
+      "authority": "non_authoritative_source_material"
+    },
+    {
+      "source_id": "SRC-MQL4-LEGACY-001",
+      "file": "HUEY_P_STANDARDS_mql4_coding.txt",
+      "classification": "legacy_language_standard",
+      "disposition": "mine_active_rules_with_lifecycle_modernization",
+      "authority": "non_authoritative_source_material"
+    },
+    {
+      "source_id": "SRC-SPEC-DRAFT-001",
+      "file": "Here are the completed technical sp.txt",
+      "classification": "legacy_generated_specification_bundle",
+      "disposition": "archive_as_draft_generator_material",
+      "authority": "non_authoritative_source_material"
+    },
+    {
+      "source_id": "SRC-SYSTEM-LEGACY-001",
+      "file": "system.txt",
+      "classification": "legacy_gap_assessment_and_standards_spec",
+      "disposition": "mine_cpp_testing_security_and_trading_specific_rules",
+      "authority": "non_authoritative_source_material"
+    },
+    {
+      "source_id": "SRC-CORE-DIRECTION-001",
+      "file": "🎯 Core Design Principles (from ADR-0001)",
+      "classification": "current_direction_reference",
+      "disposition": "use_as_alignment_filter",
+      "authority": "directional_reference"
+    },
+    {
+      "source_id": "SRC-MODULE-DIRECTION-001",
+      "file": "MODULE CENTRIC REPOSITORY BEST PRACTICES.pdf",
+      "classification": "current_direction_reference",
+      "disposition": "use_as_module_architecture_alignment_filter",
+      "authority": "directional_reference"
+    },
+    {
+      "source_id": "SRC-MODULE-CATALOG-001",
+      "file": "module_catalog.json",
+      "classification": "current_structured_catalog",
+      "disposition": "use_for_module_id_and_process_binding_alignment",
+      "authority": "candidate_structured_reference"
+    },
+    {
+      "source_id": "SRC-PROCESS-CATALOG-001",
+      "file": "process_step_catalog.json",
+      "classification": "current_structured_catalog",
+      "disposition": "use_for_process_step_contract_alignment",
+      "authority": "candidate_structured_reference"
+    }
+  ],
+  "active_patterns": [
+    {
+      "pattern_id": "PATTERN-STANDARDS-MINING-001",
+      "status": "active",
+      "title": "Legacy-to-active standards mining",
+      "description": "Legacy standards are not merged wholesale. Each rule is extracted, classified, tested against current direction filters, assigned a disposition, and traced back to source files.",
+      "required_steps": [
+        "extract_rule_candidate",
+        "classify_domain",
+        "check_current_alignment",
+        "check_conflict",
+        "assign_enforcement",
+        "assign_disposition",
+        "record_source_traceability"
+      ],
+      "alignment": [
+        "single_source_of_truth",
+        "no_implied_behavior",
+        "auditability"
+      ]
+    },
+    {
+      "pattern_id": "PATTERN-ACTIVE-RULE-001",
+      "status": "active",
+      "title": "Active rule record",
+      "description": "A standard is active only when it has a stable ID, domain, category, current-direction alignment, source traceability, enforcement path, evidence requirement, and pass/fail semantics.",
+      "required_fields": [
+        "rule_id",
+        "status",
+        "domain",
+        "category",
+        "severity",
+        "rule",
+        "source_files",
+        "current_project_alignment",
+        "enforcement",
+        "evidence_required"
+      ]
+    },
+    {
+      "pattern_id": "PATTERN-SUPERSEDED-RULE-001",
+      "status": "active",
+      "title": "Superseded legacy rule record",
+      "description": "A legacy rule that conflicts with current identity, registry, module, or contract direction must be retained only as a superseded record with replacement guidance."
+    }
+  ],
+  "active_rules": [
+    {
+      "rule_id": "PY-FORMAT-001",
+      "status": "active",
+      "domain": "python",
+      "category": "formatting",
+      "severity": "error",
+      "title": "Format Python with Black",
+      "rule": "All Python code must pass Black formatting with line length 88.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "determinism",
+        "automated_quality_gate",
+        "developer_consistency"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "black"
+        ],
+        "candidate_command": "python -m black --check .",
+        "expected_exit_code": 0
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PY-IMPORT-001",
+      "status": "active",
+      "domain": "python",
+      "category": "imports",
+      "severity": "error",
+      "title": "Sort imports with isort",
+      "rule": "Python imports must be grouped as standard library, third party, then local application imports, with alphabetical sorting inside each group.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "determinism",
+        "automated_quality_gate"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "isort"
+        ],
+        "candidate_command": "python -m isort --check-only .",
+        "expected_exit_code": 0
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PY-TYPE-001",
+      "status": "active",
+      "domain": "python",
+      "category": "typing",
+      "severity": "error",
+      "title": "Require strict typing",
+      "rule": "All Python function and method signatures, return values, and class attributes must be typed and must pass strict mypy checks.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "contract_validation",
+        "fail_closed",
+        "automated_quality_gate"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "mypy"
+        ],
+        "candidate_command": "python -m mypy --strict .",
+        "expected_exit_code": 0
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PY-DOC-001",
+      "status": "active",
+      "domain": "python",
+      "category": "documentation",
+      "severity": "error",
+      "title": "Require public API docstrings",
+      "rule": "All public modules, classes, functions, and methods must have Google-style docstrings suitable for generated documentation.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "auditability",
+        "ai_context_quality"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "pydocstyle",
+          "ruff"
+        ],
+        "candidate_command": "python -m ruff check .",
+        "expected_exit_code": 0
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PY-ASYNC-001",
+      "status": "active",
+      "domain": "python",
+      "category": "async_io",
+      "severity": "error",
+      "title": "No blocking calls in async code",
+      "rule": "I/O-bound Python functions should use async/await, and blocking calls such as time.sleep() or requests.get() must not appear inside async functions.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "latency_control",
+        "service_reliability",
+        "deterministic_runtime"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "ruff",
+          "semgrep"
+        ],
+        "notes": "Use Semgrep rule to detect blocking calls inside async def."
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PY-LOG-001",
+      "status": "active",
+      "domain": "python",
+      "category": "logging",
+      "severity": "error",
+      "title": "Use structured safe logging",
+      "rule": "Python services must use centralized structured logging and must not log credentials, API keys, passwords, or other secrets.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "auditability",
+        "security",
+        "observability"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "semgrep",
+          "detect-secrets",
+          "bandit"
+        ],
+        "candidate_command": "detect-secrets scan --all-files",
+        "expected_exit_code": 0
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PY-ERR-001",
+      "status": "active",
+      "domain": "python",
+      "category": "error_handling",
+      "severity": "error",
+      "title": "Use specific exceptions",
+      "rule": "Python code must use specific custom exceptions for domain failures and must avoid broad generic exception handling when a narrower exception is possible.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "fail_closed",
+        "debuggability",
+        "auditability"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "ruff",
+          "semgrep"
+        ],
+        "notes": "Use lint and Semgrep patterns for broad except and project exception conventions."
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PY-GATE-001",
+      "status": "active",
+      "domain": "python",
+      "category": "ci_enforcement",
+      "severity": "error",
+      "title": "Python quality gates are blocking",
+      "rule": "Black, isort, mypy, lint, security scanning, and tests must run in pre-commit or CI and must block merge on failure.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "automated_quality_gate",
+        "no_implied_behavior",
+        "fail_closed"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "pre-commit",
+          "ci"
+        ],
+        "candidate_command": "pre-commit run --all-files",
+        "expected_exit_code": 0
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PS-NAME-001",
+      "status": "active",
+      "domain": "powershell",
+      "category": "naming",
+      "severity": "error",
+      "title": "Use approved Verb-Noun functions",
+      "rule": "PowerShell functions must use PascalCase approved Verb-Noun naming and approved PowerShell verbs.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "developer_consistency",
+        "script_discoverability"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "PSScriptAnalyzer"
+        ],
+        "candidate_command": "Invoke-ScriptAnalyzer -Path . -Recurse -Severity Error",
+        "expected_exit_code": 0
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PS-FUNC-001",
+      "status": "active",
+      "domain": "powershell",
+      "category": "advanced_functions",
+      "severity": "error",
+      "title": "Use CmdletBinding for non-trivial functions",
+      "rule": "Non-trivial PowerShell functions must use [CmdletBinding()] to support common parameters such as -Verbose, -Debug, and -ErrorAction.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "observability",
+        "operational_safety"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "PSScriptAnalyzer",
+          "custom_ast_check"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PS-SHOULD-001",
+      "status": "active",
+      "domain": "powershell",
+      "category": "safe_mutation",
+      "severity": "error",
+      "title": "Use SupportsShouldProcess for changes",
+      "rule": "PowerShell functions that create, modify, delete, or otherwise change system state must support ShouldProcess, enabling -WhatIf and -Confirm.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "fail_closed",
+        "safe_execution",
+        "rollback_awareness"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "PSScriptAnalyzer",
+          "custom_ast_check"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PS-OUTPUT-001",
+      "status": "active",
+      "domain": "powershell",
+      "category": "pipeline_contract",
+      "severity": "error",
+      "title": "Return objects, not formatted strings",
+      "rule": "Reusable PowerShell functions must emit objects suitable for pipeline consumption and must not use Write-Host for output that must be captured or redirected.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "machine_readability",
+        "cli_contracts"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "PSScriptAnalyzer",
+          "custom_ast_check"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PS-PARAM-001",
+      "status": "active",
+      "domain": "powershell",
+      "category": "input_validation",
+      "severity": "error",
+      "title": "Type and validate parameters",
+      "rule": "PowerShell parameters must have explicit types and appropriate validation attributes such as ValidateNotNullOrEmpty, ValidateSet, ValidateRange, or ValidateScript.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "input_validation",
+        "deterministic_execution"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "PSScriptAnalyzer",
+          "custom_ast_check"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PS-ERR-001",
+      "status": "active",
+      "domain": "powershell",
+      "category": "error_handling",
+      "severity": "error",
+      "title": "Promote risky errors to terminating errors",
+      "rule": "Risky PowerShell operations must use try/catch/finally and must promote required command failures with -ErrorAction Stop or controlled $ErrorActionPreference.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "fail_closed",
+        "debuggability"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "PSScriptAnalyzer",
+          "custom_ast_check"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PS-SEC-001",
+      "status": "active",
+      "domain": "powershell",
+      "category": "security",
+      "severity": "error",
+      "title": "No hardcoded secrets",
+      "rule": "PowerShell scripts must not hardcode credentials, API keys, passwords, or sensitive connection strings; automated credentials must come from approved secret storage.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "security",
+        "least_privilege"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "PSScriptAnalyzer",
+          "detect-secrets"
+        ],
+        "candidate_command": "detect-secrets scan --all-files",
+        "expected_exit_code": 0
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PS-PATH-001",
+      "status": "active",
+      "domain": "powershell",
+      "category": "path_safety",
+      "severity": "error",
+      "title": "Validate and sanitize paths",
+      "rule": "PowerShell scripts must treat external inputs as untrusted, validate paths, and use Join-Path or approved path-resolution modules instead of unsafe concatenation.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "path_resolution_policy",
+        "security",
+        "determinism"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "PSScriptAnalyzer",
+          "custom_ast_check"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PS-CONFIG-001",
+      "status": "active",
+      "domain": "powershell",
+      "category": "configuration",
+      "severity": "error",
+      "title": "No hardcoded runtime configuration",
+      "rule": "PowerShell scripts must read runtime configuration from the approved project configuration source and must not hardcode server names, paths, ports, or URIs.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "single_source_of_truth",
+        "configuration_driven_development"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "semgrep",
+          "custom_ast_check"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PS-EXIT-001",
+      "status": "active",
+      "domain": "powershell",
+      "category": "cli_contract",
+      "severity": "error",
+      "title": "Use standardized exit codes",
+      "rule": "PowerShell scripts used by automation must return standardized exit codes: 0 success, 1 general error, 2 invalid parameters/configuration, and 3 security/permission error.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "cli_contracts",
+        "orchestration",
+        "deterministic_routing"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "Pester",
+          "custom_harness"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PS-TEST-001",
+      "status": "active",
+      "domain": "powershell",
+      "category": "testing",
+      "severity": "error",
+      "title": "Test PowerShell with Pester",
+      "rule": "PowerShell modules and scripts must have Pester tests, with external dependencies mocked where needed.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "automated_quality_gate",
+        "testability"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "Pester"
+        ],
+        "candidate_command": "Invoke-Pester",
+        "expected_exit_code": 0
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "PS-MODULE-001",
+      "status": "active",
+      "domain": "powershell",
+      "category": "module_organization",
+      "severity": "error",
+      "title": "Use module manifests for reusable modules",
+      "rule": "Reusable PowerShell modules must have .psd1 manifests with explicit FunctionsToExport and required module metadata.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "module_boundary",
+        "ai_context_quality"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "PSScriptAnalyzer",
+          "custom_file_check"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "MQL4-LAYOUT-001",
+      "status": "active",
+      "domain": "mql4",
+      "category": "file_layout",
+      "severity": "error",
+      "title": "Use deterministic MQL4 file order",
+      "rule": "MQL4 files must use deterministic ordering: #property directives, #include statements, #define constants, input parameters, globals, event handlers, then helper functions.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_mql4_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "Here are the completed technical sp.txt",
+          "source_status": "legacy_reference",
+          "notes": "Used only where it modernizes lifecycle references to OnInit/OnTick style."
+        }
+      ],
+      "current_project_alignment": [
+        "determinism",
+        "ai_context_quality"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "custom_mql4_scanner"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "MQL4-LIFECYCLE-001",
+      "status": "active",
+      "domain": "mql4",
+      "category": "event_handlers",
+      "severity": "error",
+      "title": "Use modern Build 600+ event handlers",
+      "rule": "MQL4 EAs must prefer OnInit, OnTick, OnDeinit, OnTimer, OnTrade, and other Build 600+ event handlers instead of legacy init/start/deinit as the canonical standard.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_mql4_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "Here are the completed technical sp.txt",
+          "source_status": "legacy_reference",
+          "notes": "Used only where it modernizes lifecycle references to OnInit/OnTick style."
+        }
+      ],
+      "current_project_alignment": [
+        "platform_currentness",
+        "maintainability"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "custom_mql4_scanner"
+        ],
+        "notes": "Scanner should flag init(), start(), deinit() in new code unless explicitly grandfathered."
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "MQL4-INCLUDE-001",
+      "status": "active",
+      "domain": "mql4",
+      "category": "include_files",
+      "severity": "error",
+      "title": "Require include guards and header documentation",
+      "rule": ".mqh include files must use header guards and include a top comment block explaining purpose and provided functions.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_mql4_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "Here are the completed technical sp.txt",
+          "source_status": "legacy_reference",
+          "notes": "Used only where it modernizes lifecycle references to OnInit/OnTick style."
+        }
+      ],
+      "current_project_alignment": [
+        "module_boundary",
+        "ai_context_quality"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "custom_mql4_scanner"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "MQL4-NAME-001",
+      "status": "active",
+      "domain": "mql4",
+      "category": "naming",
+      "severity": "error",
+      "title": "Apply MQL4 naming conventions",
+      "rule": "MQL4 input parameters must use PascalCase, globals must use g_ plus camelCase, locals must use camelCase, functions must use PascalCase, and constants must use UPPER_SNAKE_CASE.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_mql4_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "Here are the completed technical sp.txt",
+          "source_status": "legacy_reference",
+          "notes": "Used only where it modernizes lifecycle references to OnInit/OnTick style."
+        }
+      ],
+      "current_project_alignment": [
+        "developer_consistency",
+        "ai_context_quality"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "custom_mql4_scanner"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "MQL4-CONST-001",
+      "status": "active",
+      "domain": "mql4",
+      "category": "constants",
+      "severity": "error",
+      "title": "No raw magic numeric literals in trading calls",
+      "rule": "Numeric literals used for order magic numbers, error codes, retry counts, or fixed trading parameters must be defined as named constants or input/config values.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_mql4_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "Here are the completed technical sp.txt",
+          "source_status": "legacy_reference",
+          "notes": "Used only where it modernizes lifecycle references to OnInit/OnTick style."
+        }
+      ],
+      "current_project_alignment": [
+        "auditability",
+        "risk_control"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "custom_mql4_scanner"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "MQL4-TRADE-ERR-001",
+      "status": "active",
+      "domain": "mql4",
+      "category": "trade_error_handling",
+      "severity": "error",
+      "title": "Check every trading function result",
+      "rule": "Every OrderSend, OrderClose, OrderModify, OrderDelete, and related trading function call must check the return value immediately and call GetLastError() on failure.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_mql4_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "Here are the completed technical sp.txt",
+          "source_status": "legacy_reference",
+          "notes": "Used only where it modernizes lifecycle references to OnInit/OnTick style."
+        }
+      ],
+      "current_project_alignment": [
+        "fail_closed",
+        "trading_safety",
+        "auditability"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "custom_mql4_scanner"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "MQL4-RETRY-001",
+      "status": "active",
+      "domain": "mql4",
+      "category": "broker_retry",
+      "severity": "error",
+      "title": "Use bounded retry for recoverable broker errors",
+      "rule": "Recoverable broker or trade-context errors must use bounded retry with short delay/backoff; infinite loops and aggressive retry loops are forbidden.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_mql4_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "Here are the completed technical sp.txt",
+          "source_status": "legacy_reference",
+          "notes": "Used only where it modernizes lifecycle references to OnInit/OnTick style."
+        }
+      ],
+      "current_project_alignment": [
+        "fail_closed",
+        "broker_safety",
+        "deterministic_execution"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "custom_mql4_scanner"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "MQL4-TICK-001",
+      "status": "active",
+      "domain": "mql4",
+      "category": "performance",
+      "severity": "error",
+      "title": "Keep OnTick lightweight",
+      "rule": "OnTick must remain lightweight; heavy calculations, file I/O, long loops, and periodic maintenance should be moved to OnTimer or offloaded services where practical.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_mql4_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "Here are the completed technical sp.txt",
+          "source_status": "legacy_reference",
+          "notes": "Used only where it modernizes lifecycle references to OnInit/OnTick style."
+        }
+      ],
+      "current_project_alignment": [
+        "latency_control",
+        "platform_stability"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "custom_mql4_scanner",
+          "manual_review"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "MQL4-MAGIC-001",
+      "status": "active",
+      "domain": "mql4",
+      "category": "order_identity",
+      "severity": "error",
+      "title": "Every EA order requires unique Magic Number",
+      "rule": "Every EA-managed order must use a unique configured Magic Number so automated trades can be distinguished from manual trades and other EAs.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_mql4_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "Here are the completed technical sp.txt",
+          "source_status": "legacy_reference",
+          "notes": "Used only where it modernizes lifecycle references to OnInit/OnTick style."
+        }
+      ],
+      "current_project_alignment": [
+        "traceability",
+        "trading_safety"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "custom_mql4_scanner"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "MQL4-TICKET-001",
+      "status": "active",
+      "domain": "mql4",
+      "category": "order_identity",
+      "severity": "error",
+      "title": "Persist and reuse OrderSend ticket",
+      "rule": "The ticket returned by OrderSend is the authoritative order identifier and must be stored and used for later OrderSelect, OrderModify, OrderClose, or OrderDelete calls.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_mql4_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "Here are the completed technical sp.txt",
+          "source_status": "legacy_reference",
+          "notes": "Used only where it modernizes lifecycle references to OnInit/OnTick style."
+        }
+      ],
+      "current_project_alignment": [
+        "traceability",
+        "order_lifecycle"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "custom_mql4_scanner",
+          "manual_review"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "MQL4-PRETRADE-001",
+      "status": "active",
+      "domain": "mql4",
+      "category": "pre_trade_validation",
+      "severity": "error",
+      "title": "Perform final EA-side pre-trade checks",
+      "rule": "Before any trade request, the EA must verify spread limits, free margin, trading permission/session, symbol, and price sanity.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_mql4_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "Here are the completed technical sp.txt",
+          "source_status": "legacy_reference",
+          "notes": "Used only where it modernizes lifecycle references to OnInit/OnTick style."
+        }
+      ],
+      "current_project_alignment": [
+        "fail_closed",
+        "risk_control",
+        "trading_safety"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "custom_mql4_scanner",
+          "integration_test"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "MQL4-PRICE-001",
+      "status": "active",
+      "domain": "mql4",
+      "category": "price_normalization",
+      "severity": "error",
+      "title": "Normalize trading prices",
+      "rule": "Stop-loss, take-profit, entry, and pending order prices must be normalized with NormalizeDouble and the symbol Digits/Point rules before broker submission.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_mql4_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "Here are the completed technical sp.txt",
+          "source_status": "legacy_reference",
+          "notes": "Used only where it modernizes lifecycle references to OnInit/OnTick style."
+        }
+      ],
+      "current_project_alignment": [
+        "broker_compatibility",
+        "trading_safety"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "custom_mql4_scanner"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "MQL4-TIME-001",
+      "status": "active",
+      "domain": "mql4",
+      "category": "time_handling",
+      "severity": "error",
+      "title": "Use broker server time",
+      "rule": "All MQL4 time-based trading logic must use TimeCurrent server time, not TimeLocal local-machine time.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_mql4_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "Here are the completed technical sp.txt",
+          "source_status": "legacy_reference",
+          "notes": "Used only where it modernizes lifecycle references to OnInit/OnTick style."
+        }
+      ],
+      "current_project_alignment": [
+        "determinism",
+        "broker_consistency"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "custom_mql4_scanner"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "CPP-RAII-001",
+      "status": "active",
+      "domain": "cpp",
+      "category": "memory_management",
+      "severity": "error",
+      "title": "Use RAII for owned resources",
+      "rule": "C++ code must tie sockets, handles, buffers, and other resources to object lifetime using RAII.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "resource_safety",
+        "fail_closed"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "clang-tidy",
+          "code_review_gate"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "CPP-SMARTPTR-001",
+      "status": "active",
+      "domain": "cpp",
+      "category": "memory_management",
+      "severity": "error",
+      "title": "No raw owned new/delete",
+      "rule": "Owned C++ resources must use std::unique_ptr or std::shared_ptr as appropriate; raw new/delete is forbidden for owned resources.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "memory_safety",
+        "determinism"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "clang-tidy"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "CPP-THREAD-001",
+      "status": "active",
+      "domain": "cpp",
+      "category": "thread_safety",
+      "severity": "error",
+      "title": "Protect shared state with mutexes",
+      "rule": "Any C++ data shared between threads, including signal queues, must be protected with std::mutex and lock_guard/unique_lock or equivalent safe synchronization.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "thread_safety",
+        "deterministic_runtime"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "clang-tidy",
+          "code_review_gate"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "CPP-DLL-001",
+      "status": "active",
+      "domain": "cpp",
+      "category": "dll_boundary",
+      "severity": "error",
+      "title": "Use MQL4-compatible DLL exports",
+      "rule": "Functions exported to MQL4 must use __declspec(dllexport), __stdcall, and extern \"C\" to avoid name mangling and calling-convention mismatches.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "platform_interop",
+        "contract_validation"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "custom_cpp_export_check"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "CPP-WINAPI-001",
+      "status": "active",
+      "domain": "cpp",
+      "category": "windows_api",
+      "severity": "error",
+      "title": "Check Windows API calls and wrap handles",
+      "rule": "Every fallible Windows API or Winsock call must check its return value immediately, and handles/sockets must be wrapped so they are always closed.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "fail_closed",
+        "resource_safety"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "clang-tidy",
+          "custom_cpp_check"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "CPP-EXCEPTION-001",
+      "status": "active",
+      "domain": "cpp",
+      "category": "dll_boundary",
+      "severity": "error",
+      "title": "Do not let exceptions cross DLL boundary",
+      "rule": "C++ exceptions must not cross exported DLL functions into MQL4; exported functions must catch exceptions and return integer error codes or documented error values.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "platform_interop",
+        "fail_closed"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "custom_cpp_export_check",
+          "code_review_gate"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "CPP-BUFFER-001",
+      "status": "active",
+      "domain": "cpp",
+      "category": "buffer_safety",
+      "severity": "error",
+      "title": "Validate caller-provided buffers",
+      "rule": "DLL functions that write into MQL4-provided buffers must accept and validate buffer sizes before writing.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "security",
+        "memory_safety"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "semgrep",
+          "custom_cpp_check"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "SEC-SECRETS-001",
+      "status": "active",
+      "domain": "cross_language",
+      "category": "credential_management",
+      "severity": "error",
+      "title": "No secrets in source or plain config",
+      "rule": "API keys, database credentials, broker credentials, and other secrets must not be stored in source code or plain configuration files; use environment variables or approved secret storage.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "security",
+        "single_source_of_truth",
+        "least_privilege"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "detect-secrets",
+          "semgrep"
+        ],
+        "candidate_command": "detect-secrets scan --all-files",
+        "expected_exit_code": 0
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "SEC-INPUT-001",
+      "status": "active",
+      "domain": "cross_language",
+      "category": "input_validation",
+      "severity": "error",
+      "title": "Validate all external inputs",
+      "rule": "Signal fields, configuration values, file inputs, network payloads, and command parameters must be validated for schema, range, type, and plausible trading values before processing.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "input_validation",
+        "fail_closed",
+        "trading_safety"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "jsonschema",
+          "pydantic",
+          "Pester",
+          "custom_mql4_scanner"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "SEC-LEAST-001",
+      "status": "active",
+      "domain": "cross_language",
+      "category": "least_privilege",
+      "severity": "error",
+      "title": "Run with least privilege",
+      "rule": "MT4, Python services, Docker services, scripts, and scheduled tasks should run with the minimum permissions needed for their function.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "security",
+        "blast_radius_reduction"
+      ],
+      "enforcement": {
+        "enforceable": false,
+        "method": "manual_review_required",
+        "notes": "Requires deployment policy and operational validation."
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "SEC-TLS-001",
+      "status": "active",
+      "domain": "cross_language",
+      "category": "transport_security",
+      "severity": "error",
+      "title": "Secure cross-machine transport",
+      "rule": "If communication crosses machine boundaries, TCP/HTTP communication must use TLS or an approved secure channel.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "security",
+        "data_integrity"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "integration_test",
+          "deployment_config_check"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "TEST-PY-001",
+      "status": "active",
+      "domain": "python",
+      "category": "unit_testing",
+      "severity": "error",
+      "title": "Use pytest with mocked external dependencies",
+      "rule": "Python unit tests must use pytest and mock external dependencies such as network, database, filesystem side effects, and broker interfaces.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "testability",
+        "determinism"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "pytest"
+        ],
+        "candidate_command": "python -m pytest",
+        "expected_exit_code": 0
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "TEST-COV-001",
+      "status": "active",
+      "domain": "cross_language",
+      "category": "coverage",
+      "severity": "error",
+      "title": "Maintain minimum coverage threshold",
+      "rule": "Automated tests must enforce at least 80 percent coverage for covered Python service code unless a module-specific waiver exists.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "quality_gate",
+        "risk_reduction"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "pytest-cov"
+        ],
+        "candidate_command": "python -m pytest --cov --cov-fail-under=80",
+        "expected_exit_code": 0
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "TEST-MQL4-001",
+      "status": "active",
+      "domain": "mql4",
+      "category": "unit_testing",
+      "severity": "error",
+      "title": "Test MQL4 public include functions through test EA scripts",
+      "rule": "MQL4 public .mqh functions must be testable by dedicated .mq4 test EAs/scripts using Assert-style helpers and logged pass/fail output.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "testability",
+        "platform_validation"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "metaeditor_compile",
+          "custom_mql4_test_runner"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "TEST-CPP-001",
+      "status": "active",
+      "domain": "cpp",
+      "category": "unit_testing",
+      "severity": "error",
+      "title": "Use C++ unit tests for DLL internals",
+      "rule": "C++ DLL internal logic must be covered by a lightweight C++ test framework such as Google Test.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "testability",
+        "dll_reliability"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "ctest",
+          "googletest"
+        ],
+        "candidate_command": "ctest --output-on-failure",
+        "expected_exit_code": 0
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "TEST-INT-001",
+      "status": "active",
+      "domain": "cross_language",
+      "category": "integration_testing",
+      "severity": "error",
+      "title": "Test Python to DLL bridge",
+      "rule": "Integration tests must validate that the Python BridgeService and C++ DLL/client exchange valid signals and errors according to contract.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "contract_validation",
+        "platform_interop"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "pytest",
+          "integration_harness"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "TEST-INT-002",
+      "status": "active",
+      "domain": "cross_language",
+      "category": "integration_testing",
+      "severity": "error",
+      "title": "Test DLL to MQL4 bridge behavior",
+      "rule": "Integration tests must validate that MQL4-facing DLL functions handle valid data, invalid data, and error codes correctly using a mock Python or socket service.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "contract_validation",
+        "platform_interop"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "custom_mql4_test_runner",
+          "pytest"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "TEST-E2E-001",
+      "status": "active",
+      "domain": "cross_language",
+      "category": "end_to_end_testing",
+      "severity": "error",
+      "title": "Use demo-account E2E tests only",
+      "rule": "Signal-to-trade lifecycle tests must run only on demo/simulated environments and must verify symbol, volume, SL/TP, Magic Number, and execution result capture.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "trading_safety",
+        "end_to_end_validation"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "e2e_harness",
+          "demo_account_gate"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "TEST-DATA-001",
+      "status": "active",
+      "domain": "cross_language",
+      "category": "test_data",
+      "severity": "error",
+      "title": "Do not use production data in tests",
+      "rule": "Tests must use static fixtures, generated data, sanitized data, or synthetic data; production trading data is forbidden unless explicitly sanitized and approved.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "security",
+        "repeatability"
+      ],
+      "enforcement": {
+        "enforceable": false,
+        "method": "manual_review_required",
+        "notes": "Requires fixture policy and review gate."
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "ARCH-DET-001",
+      "status": "active",
+      "domain": "architecture",
+      "category": "determinism",
+      "severity": "error",
+      "title": "Identical inputs produce identical outputs",
+      "rule": "All governed operations must be deterministic and idempotent: identical inputs and configuration snapshots must produce identical outputs or fail closed with evidence.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "🎯 Core Design Principles (from ADR-0001)",
+          "source_status": "current_direction_reference"
+        },
+        {
+          "file": "module_catalog.json",
+          "source_status": "candidate_structured_reference"
+        },
+        {
+          "file": "process_step_catalog.json",
+          "source_status": "candidate_structured_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "determinism",
+        "idempotence",
+        "auditability"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "contract_test",
+          "replay_test"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "ARCH-SSOT-001",
+      "status": "active",
+      "domain": "architecture",
+      "category": "single_source_of_truth",
+      "severity": "error",
+      "title": "Use versioned contracts as SSOT",
+      "rule": "Message formats, event schemas, configuration contracts, and process contracts must be defined in versioned canonical schemas or registries and validated before use.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "🎯 Core Design Principles (from ADR-0001)",
+          "source_status": "current_direction_reference"
+        },
+        {
+          "file": "module_catalog.json",
+          "source_status": "candidate_structured_reference"
+        },
+        {
+          "file": "process_step_catalog.json",
+          "source_status": "candidate_structured_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "single_source_of_truth",
+        "contract_validation"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "jsonschema",
+          "contract_validator"
+        ],
+        "candidate_command": "make contracts-validate-full",
+        "expected_exit_code": 0
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "ARCH-FAIL-001",
+      "status": "active",
+      "domain": "architecture",
+      "category": "defensive_posture",
+      "severity": "error",
+      "title": "Fail closed on integrity errors",
+      "rule": "Services must suppress trading decisions or state changes when input integrity, contract validation, risk checks, or dependency health checks fail.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "🎯 Core Design Principles (from ADR-0001)",
+          "source_status": "current_direction_reference"
+        },
+        {
+          "file": "module_catalog.json",
+          "source_status": "candidate_structured_reference"
+        },
+        {
+          "file": "process_step_catalog.json",
+          "source_status": "candidate_structured_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "fail_closed",
+        "risk_control"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "integration_test",
+          "contract_test"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "ARCH-FALLBACK-001",
+      "status": "active",
+      "domain": "architecture",
+      "category": "fallbacks",
+      "severity": "error",
+      "title": "Fallbacks must be explicit and audited",
+      "rule": "Fallback mechanisms must have a strict order, explicit activation conditions, and audit evidence; silent fallback is forbidden.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "🎯 Core Design Principles (from ADR-0001)",
+          "source_status": "current_direction_reference"
+        },
+        {
+          "file": "module_catalog.json",
+          "source_status": "candidate_structured_reference"
+        },
+        {
+          "file": "process_step_catalog.json",
+          "source_status": "candidate_structured_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "explicit_fallbacks",
+        "auditability",
+        "no_silent_failure"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "contract_test",
+          "log_assertion_test"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "TRADING-RISK-001",
+      "status": "active",
+      "domain": "trading",
+      "category": "risk_management",
+      "severity": "error",
+      "title": "Python RiskService is central pre-trade gatekeeper",
+      "rule": "Core pre-trade risk validation and lot sizing must be centralized in the Python RiskService; MQL4 may perform final broker-side sanity checks but must not duplicate or bypass core risk logic.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "🎯 Core Design Principles (from ADR-0001)",
+          "source_status": "current_direction_reference"
+        },
+        {
+          "file": "module_catalog.json",
+          "source_status": "candidate_structured_reference"
+        },
+        {
+          "file": "process_step_catalog.json",
+          "source_status": "candidate_structured_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "single_source_of_truth",
+        "risk_control",
+        "module_boundary"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "integration_test",
+          "architecture_scan"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "TRADING-EXEC-001",
+      "status": "active",
+      "domain": "trading",
+      "category": "execution_boundary",
+      "severity": "error",
+      "title": "ExecutionEngine owns OrderSend",
+      "rule": "ExecutionEngine.mqh or the approved execution module must be the sole MQL4 owner of OrderSend and common trade-error handling.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "🎯 Core Design Principles (from ADR-0001)",
+          "source_status": "current_direction_reference"
+        },
+        {
+          "file": "module_catalog.json",
+          "source_status": "candidate_structured_reference"
+        },
+        {
+          "file": "process_step_catalog.json",
+          "source_status": "candidate_structured_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "module_boundary",
+        "traceability",
+        "trading_safety"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "custom_mql4_scanner"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "TRADING-TIME-001",
+      "status": "active",
+      "domain": "trading",
+      "category": "time_standard",
+      "severity": "error",
+      "title": "Use UTC outside MT4 and server time inside MT4",
+      "rule": "Python/database timestamps must be ISO 8601 UTC; MQL4 trading-session logic must use broker server time through TimeCurrent.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "🎯 Core Design Principles (from ADR-0001)",
+          "source_status": "current_direction_reference"
+        },
+        {
+          "file": "module_catalog.json",
+          "source_status": "candidate_structured_reference"
+        },
+        {
+          "file": "process_step_catalog.json",
+          "source_status": "candidate_structured_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "determinism",
+        "auditability"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "schema_validation",
+          "custom_mql4_scanner"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "TRADING-FILE-001",
+      "status": "active",
+      "domain": "trading",
+      "category": "file_fallback",
+      "severity": "error",
+      "title": "Use atomic writes for file fallback",
+      "rule": "File-based communication fallback must write to a temporary file and then atomically rename to the final path to prevent partial reads.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "🎯 Core Design Principles (from ADR-0001)",
+          "source_status": "current_direction_reference"
+        },
+        {
+          "file": "module_catalog.json",
+          "source_status": "candidate_structured_reference"
+        },
+        {
+          "file": "process_step_catalog.json",
+          "source_status": "candidate_structured_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "data_integrity",
+        "explicit_fallbacks"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "integration_test",
+          "filesystem_harness"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "MODULE-BOUNDARY-001",
+      "status": "active",
+      "domain": "architecture",
+      "category": "module_centric_repository",
+      "severity": "error",
+      "title": "Modules own their full context",
+      "rule": "Each module should own its code, tests, docs, schemas, configuration, and state artifacts in or through a module-centered boundary.",
+      "source_files": [
+        {
+          "file": "MODULE CENTRIC REPOSITORY BEST PRACTICES.pdf",
+          "source_status": "current_direction_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "module_centric_architecture",
+        "ai_context_quality",
+        "drift_reduction"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "repository_structure_validator"
+        ]
+      },
+      "evidence_required": true
+    },
+    {
+      "rule_id": "MODULE-REGISTRY-001",
+      "status": "active",
+      "domain": "architecture",
+      "category": "registry_indirection",
+      "severity": "error",
+      "title": "Use registry/path indirection",
+      "rule": "Code, plans, and generated artifacts should use stable IDs, module/process bindings, path keys, or registries rather than hard-coded filesystem paths wherever practical.",
+      "source_files": [
+        {
+          "file": "MODULE CENTRIC REPOSITORY BEST PRACTICES.pdf",
+          "source_status": "current_direction_reference"
+        }
+      ],
+      "current_project_alignment": [
+        "registry_indirection",
+        "path_resolution_policy",
+        "determinism"
+      ],
+      "enforcement": {
+        "enforceable": true,
+        "method": "automated_gate",
+        "candidate_tooling": [
+          "registry_validator",
+          "path_policy_scanner"
+        ]
+      },
+      "evidence_required": true
+    }
+  ],
+  "active_gates": [
+    {
+      "gate_id": "GATE-PY-QUALITY-001",
+      "status": "candidate_active",
+      "domain": "python",
+      "title": "Python quality gate",
+      "commands": [
+        "python -m black --check .",
+        "python -m isort --check-only .",
+        "python -m mypy --strict .",
+        "python -m ruff check .",
+        "python -m pytest --cov --cov-fail-under=80"
+      ],
+      "expected_exit_code": 0,
+      "evidence": [
+        "evidence/python/black.log",
+        "evidence/python/isort.log",
+        "evidence/python/mypy.log",
+        "evidence/python/ruff.log",
+        "evidence/python/pytest.log"
+      ],
+      "covers_rules": [
+        "PY-FORMAT-001",
+        "PY-IMPORT-001",
+        "PY-TYPE-001",
+        "PY-DOC-001",
+        "TEST-PY-001",
+        "TEST-COV-001"
+      ]
+    },
+    {
+      "gate_id": "GATE-PS-QUALITY-001",
+      "status": "candidate_active",
+      "domain": "powershell",
+      "title": "PowerShell quality gate",
+      "commands": [
+        "Invoke-ScriptAnalyzer -Path . -Recurse -Severity Error",
+        "Invoke-Pester"
+      ],
+      "expected_exit_code": 0,
+      "evidence": [
+        "evidence/powershell/scriptanalyzer.log",
+        "evidence/powershell/pester.log"
+      ],
+      "covers_rules": [
+        "PS-NAME-001",
+        "PS-FUNC-001",
+        "PS-SHOULD-001",
+        "PS-PARAM-001",
+        "PS-ERR-001",
+        "PS-TEST-001"
+      ]
+    },
+    {
+      "gate_id": "GATE-MQL4-SAFETY-001",
+      "status": "needs_implementation",
+      "domain": "mql4",
+      "title": "MQL4 trading safety static gate",
+      "commands": [
+        "custom_mql4_scanner --rules active_project_standards_registry.json --path mt4/"
+      ],
+      "expected_exit_code": 0,
+      "evidence": [
+        "evidence/mql4/static_safety_scan.json",
+        "evidence/mql4/compile.log"
+      ],
+      "covers_rules": [
+        "MQL4-LIFECYCLE-001",
+        "MQL4-TRADE-ERR-001",
+        "MQL4-MAGIC-001",
+        "MQL4-PRETRADE-001",
+        "MQL4-PRICE-001",
+        "MQL4-TIME-001",
+        "TRADING-EXEC-001"
+      ]
+    },
+    {
+      "gate_id": "GATE-CPP-DLL-001",
+      "status": "needs_implementation",
+      "domain": "cpp",
+      "title": "C++ DLL safety and interop gate",
+      "commands": [
+        "clang-tidy <compile_commands.json>",
+        "ctest --output-on-failure",
+        "custom_cpp_export_check --dll-interface"
+      ],
+      "expected_exit_code": 0,
+      "evidence": [
+        "evidence/cpp/clang_tidy.log",
+        "evidence/cpp/ctest.log",
+        "evidence/cpp/export_check.json"
+      ],
+      "covers_rules": [
+        "CPP-RAII-001",
+        "CPP-SMARTPTR-001",
+        "CPP-DLL-001",
+        "CPP-EXCEPTION-001",
+        "CPP-BUFFER-001"
+      ]
+    },
+    {
+      "gate_id": "GATE-SECURITY-001",
+      "status": "candidate_active",
+      "domain": "cross_language",
+      "title": "Security scanning gate",
+      "commands": [
+        "detect-secrets scan --all-files",
+        "bandit -r .",
+        "semgrep scan --config auto"
+      ],
+      "expected_exit_code": 0,
+      "evidence": [
+        "evidence/security/detect_secrets.log",
+        "evidence/security/bandit.log",
+        "evidence/security/semgrep.log"
+      ],
+      "covers_rules": [
+        "SEC-SECRETS-001",
+        "SEC-INPUT-001",
+        "PY-LOG-001",
+        "PS-SEC-001"
+      ]
+    },
+    {
+      "gate_id": "GATE-CONTRACTS-001",
+      "status": "candidate_active",
+      "domain": "architecture",
+      "title": "Contract and schema validation gate",
+      "commands": [
+        "make contracts-validate-full"
+      ],
+      "expected_exit_code": 0,
+      "evidence": [
+        "evidence/contracts/contracts_validate_full.log"
+      ],
+      "covers_rules": [
+        "ARCH-SSOT-001",
+        "ARCH-FAIL-001",
+        "SEC-INPUT-001"
+      ]
+    }
+  ],
+  "superseded_rules": [
+    {
+      "rule_id": "SUPERSEDED-PY-FILENAME-001",
+      "legacy_rule": "All Python script files must follow [PROJECT]_[TYPE]_[DESCRIPTION].py or HUEY_P_TYPE_DESCRIPTION.py naming.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_python_coding.txt",
+          "source_status": "legacy_reference"
+        },
+        {
+          "file": "Here are the completed technical sp.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "reason_superseded": "Conflicts with the current numeric/registry identity direction and current inventory of numeric-ID-prefixed Python files.",
+      "replacement_policy": "Use current project identity policy: stable file IDs, registry/path indirection, and module/process bindings. Human-friendly names may remain descriptive after or around the stable ID when allowed by language/runtime constraints.",
+      "status": "superseded"
+    },
+    {
+      "rule_id": "SUPERSEDED-PS-FILENAME-001",
+      "legacy_rule": "All PowerShell script files must follow [PROJECT]_[TYPE]_[DESCRIPTION].ps1.",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_powershell_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "reason_superseded": "Potential conflict with current stable identity and path abstraction policy. The naming convention may be used for generated human-readable scripts only if it does not conflict with registry identity.",
+      "replacement_policy": "Use registry-managed identity and module/path abstraction; allow descriptive script names only as a secondary convention.",
+      "status": "superseded_or_conditional"
+    },
+    {
+      "rule_id": "SUPERSEDED-MQL4-LIFECYCLE-001",
+      "legacy_rule": "Core MQL4 functions are init(), start(), and deinit().",
+      "source_files": [
+        {
+          "file": "HUEY_P_STANDARDS_mql4_coding.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "reason_superseded": "Current MT4 Build 600+ style should use OnInit, OnTick, OnDeinit, OnTimer, and related event handlers as canonical lifecycle functions.",
+      "replacement_policy": "Use MQL4-LIFECYCLE-001 for new code. Existing legacy code may be grandfathered only with explicit migration status.",
+      "status": "superseded"
+    },
+    {
+      "rule_id": "SUPERSEDED-API-DOC-001",
+      "legacy_rule": "06_API_Contract_Documentation.md is the single source of truth for all message formats.",
+      "source_files": [
+        {
+          "file": "system.txt",
+          "source_status": "legacy_reference"
+        }
+      ],
+      "reason_superseded": "Current direction favors versioned contract schemas and registry-backed SSOT rather than a single narrative Markdown API document.",
+      "replacement_policy": "Use ARCH-SSOT-001: message formats must be defined in versioned JSON schemas, event contracts, or canonical registries; Markdown can be generated documentation only.",
+      "status": "superseded"
+    }
+  ],
+  "legacy_reference_rules": [
+    {
+      "legacy_id": "LEGACY-DOC-GENERATOR-001",
+      "source_file": "Here are the completed technical sp.txt",
+      "classification": "draft_generator_material",
+      "reason_not_active": "Contains generated-spec prose, placeholder citations, and duplicate rules. It is useful as source evidence but not suitable as executable authority.",
+      "use": "Archive and mine only unique valid rule candidates."
+    },
+    {
+      "legacy_id": "LEGACY-BEGINNER-ROADMAP-001",
+      "source_file": "# HUEY_P Trading System - Complete Beginner Development Roadmap",
+      "classification": "training_material",
+      "reason_not_active": "Useful for learning and examples but not a current governance standard or active execution contract.",
+      "use": "Reference for onboarding only."
+    },
+    {
+      "legacy_id": "LEGACY-DEPLOYMENT-001",
+      "source_file": "# HUEY_P Trading System - Complete Deployment Guide",
+      "classification": "deployment_snapshot",
+      "reason_not_active": "Deployment status and tool versions may be stale and must not drive current automation without verification.",
+      "use": "Historical deployment reference only."
+    }
+  ],
+  "needs_review": [
+    {
+      "review_id": "REVIEW-MQL4-SCANNER-001",
+      "topic": "Implement custom MQL4 static scanner",
+      "reason": "Several high-value MQL4 rules are enforceable only with a custom scanner or strict code review until tooling exists.",
+      "affected_rules": [
+        "MQL4-TRADE-ERR-001",
+        "MQL4-MAGIC-001",
+        "MQL4-PRETRADE-001",
+        "MQL4-PRICE-001",
+        "TRADING-EXEC-001"
+      ],
+      "recommended_next_action": "Create scanner rules for OrderSend ownership, unchecked trade calls, TimeLocal usage, NormalizeDouble usage, Magic Number presence, and raw numeric trading literals."
+    },
+    {
+      "review_id": "REVIEW-ID-POLICY-001",
+      "topic": "Finalize language-specific file identity naming",
+      "reason": "Legacy file naming rules conflict with current numeric/registry identity conventions. Python module import constraints may require a safe wrapper/facade strategy.",
+      "affected_rules": [
+        "SUPERSEDED-PY-FILENAME-001",
+        "SUPERSEDED-PS-FILENAME-001"
+      ],
+      "recommended_next_action": "Define final filename vs. registry-ID policy for Python, MQL4, PowerShell, C++, and generated artifacts."
+    },
+    {
+      "review_id": "REVIEW-RISK-SERVICE-001",
+      "topic": "Confirm RiskService vs. MQL4 responsibility boundary",
+      "reason": "The mined rule centralizes lot sizing and core risk in Python RiskService while allowing EA-side final checks. This boundary should be represented in module contracts.",
+      "affected_rules": [
+        "TRADING-RISK-001",
+        "MQL4-PRETRADE-001"
+      ],
+      "recommended_next_action": "Bind RiskService responsibility to module_catalog and process_step_catalog contracts."
+    },
+    {
+      "review_id": "REVIEW-FALLBACK-HIERARCHY-001",
+      "topic": "Finalize actual communication fallback hierarchy",
+      "reason": "Legacy documents mention sockets, named pipes, files, DDE, REST, Redis, and CSV. Current architecture must state which hierarchy is authoritative per channel.",
+      "affected_rules": [
+        "ARCH-FALLBACK-001",
+        "TRADING-FILE-001"
+      ],
+      "recommended_next_action": "Create per-channel fallback contracts for MT4↔Python price ingest, signal delivery, execution reports, and reentry decisions."
+    }
+  ],
+  "summary_counts": {
+    "source_files_indexed": 9,
+    "active_patterns": 3,
+    "active_rules": 62,
+    "active_gates": 6,
+    "superseded_rules": 4,
+    "legacy_reference_rules": 3,
+    "needs_review_items": 4,
+    "active_rules_by_domain": {
+      "python": 9,
+      "powershell": 12,
+      "mql4": 14,
+      "cpp": 8,
+      "cross_language": 9,
+      "architecture": 6,
+      "trading": 4
+    }
+  }
+}

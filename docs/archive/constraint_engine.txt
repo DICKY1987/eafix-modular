@@ -1,0 +1,392 @@
+# scripts/constraint-engine.ps1
+#!/usr/bin/env pwsh
+
+param(
+    [Parameter(Mandatory)]
+    [string]$ConstraintSet,
+    
+    [Parameter(Mandatory)]
+    [string[]]$Files,
+    
+    [string]$WorkflowContext = "",
+    [switch]$DryRun,
+    [switch]$Verbose
+)
+
+Import-Module powershell-yaml -ErrorAction Stop
+
+# Enhanced constraint evaluation with caching and reasoning
+class ConstraintEngine {
+    [hashtable]$Cache = @{}
+    [hashtable]$Config
+    [string]$WorkflowId
+    
+    ConstraintEngine([hashtable]$config, [string]$workflowId) {
+        $this.Config = $config
+        $this.WorkflowId = $workflowId
+    }
+    
+    [hashtable] EvaluateConstraintSet([string]$setName, [string[]]$files) {
+        $cacheKey = "$setName-$($files -join ',')"
+        
+        if ($this.Cache.ContainsKey($cacheKey)) {
+            Write-Host "🔄 Using cached constraint evaluation" -ForegroundColor Cyan
+            return $this.Cache[$cacheKey]
+        }
+        
+        $result = @{
+            setName = $setName
+            violations = @()
+            warnings = @()
+            selectedTool = $null
+            reasoning = @()
+            metadata = @{
+                evaluatedAt = Get-Date
+                files = $files
+                duration = 0
+            }
+        }
+        
+        $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+        
+        try {
+            $constraintSet = $this.Config.constraint_sets.$setName
+            if (-not $constraintSet) {
+                throw "Unknown constraint set: $setName"
+            }
+            
+            foreach ($constraintGroup in $constraintSet) {
+                $groupResult = $this.EvaluateConstraintGroup($constraintGroup, $files)
+                $result.violations += $groupResult.violations
+                $result.warnings += $groupResult.warnings
+                $result.reasoning += $groupResult.reasoning
+            }
+            
+            # Tool selection logic
+            $result.selectedTool = $this.SelectOptimalTool($result.violations, $files)
+            
+        } catch {
+            $result.violations += @{
+                id = "system.evaluation_error"
+                severity = "HARD_BLOCK" 
+                message = $_.Exception.Message
+            }
+        } finally {
+            $stopwatch.Stop()
+            $result.metadata.duration = $stopwatch.ElapsedMilliseconds
+        }
+        
+        # Cache successful evaluations
+        if ($result.violations.Count -eq 0) {
+            $this.Cache[$cacheKey] = $result
+        }
+        
+        return $result
+    }
+    
+    [hashtable] EvaluateConstraintGroup([string]$groupName, [string[]]$files) {
+        $result = @{
+            violations = @()
+            warnings = @()
+            reasoning = @()
+        }
+        
+        $constraints = $this.Config.constraints.$groupName
+        
+        foreach ($constraint in $constraints) {
+            $evaluation = $this.EvaluateConstraint($constraint, $files)
+            
+            if (-not $evaluation.passed) {
+                $violation = @{
+                    id = $constraint.id
+                    severity = $constraint.severity
+                    message = $evaluation.message
+                    context = $evaluation.context
+                }
+                
+                if ($constraint.severity -eq "HARD_BLOCK") {
+                    $result.violations += $violation
+                } else {
+                    $result.warnings += $violation
+                }
+            }
+            
+            $result.reasoning += "[$($constraint.id)] $($evaluation.reasoning)"
+        }
+        
+        return $result
+    }
+    
+    [hashtable] EvaluateConstraint([hashtable]$constraint, [string[]]$files) {
+        $result = @{
+            passed = $false
+            message = ""
+            reasoning = ""
+            context = @{}
+        }
+        
+        switch ($constraint.type) {
+            "git.clean_worktree" {
+                $result = $this.CheckGitClean($constraint.params)
+            }
+            "files.path_allowlist" {
+                $result = $this.CheckPathAllowlist($files, $constraint.params)
+            }
+            "files.count_limit" {
+                $result = $this.CheckFileCount($files, $constraint.params)
+            }
+            "files.size_limit" {
+                $result = $this.CheckFileSize($files, $constraint.params)
+            }
+            "python.syntax_valid" {
+                $result = $this.CheckPythonSyntax($files, $constraint.params)
+            }
+            "python.imports_resolve" {
+                $result = $this.CheckImportsResolve($files, $constraint.params)
+            }
+            "quality.lint_clean" {
+                $result = $this.CheckLintClean($files, $constraint.params)
+            }
+            "security.no_secrets" {
+                $result = $this.CheckNoSecrets($files, $constraint.params)
+            }
+            "quota.service_available" {
+                $result = $this.CheckServiceQuota($constraint.params)
+            }
+            "performance.complexity_ok" {
+                $result = $this.CheckComplexity($files, $constraint.params)
+            }
+            default {
+                $result.passed = $true
+                $result.reasoning = "Unknown constraint type: $($constraint.type)"
+            }
+        }
+        
+        return $result
+    }
+    
+    [string] SelectOptimalTool([object[]]$violations, [string[]]$files) {
+        $hardBlocks = $violations | Where-Object { $_.severity -eq "HARD_BLOCK" }
+        
+        if ($hardBlocks) {
+            $this.LogReasoning("Hard blocks detected, routing to fallback editor")
+            return "vscode_editor"
+        }
+        
+        # Intelligent tool selection based on file characteristics
+        $totalLines = 0
+        $complexity = "simple"
+        
+        foreach ($file in $files) {
+            if (Test-Path $file) {
+                $lines = (Get-Content $file).Count
+                $totalLines += $lines
+                
+                if ($lines -gt 500) {
+                    $complexity = "complex"
+                } elseif ($lines -gt 100 -and $complexity -eq "simple") {
+                    $complexity = "moderate"
+                }
+            }
+        }
+        
+        # Tool selection logic
+        if ($files.Count -gt 8 -or $totalLines -gt 2000) {
+            $this.LogReasoning("Large changeset detected, using Claude Code for better handling")
+            return "claude_code"
+        }
+        
+        if ($complexity -eq "simple" -and $files.Count -le 3) {
+            $this.LogReasoning("Simple changes, using local Aider for speed")
+            return "aider_local"
+        }
+        
+        $this.LogReasoning("Standard case, using configured default tool")
+        return $this.Config.routing.default_tool
+    }
+    
+    [void] LogReasoning([string]$message) {
+        if ($Verbose) {
+            Write-Host "🧠 $message" -ForegroundColor Blue
+        }
+    }
+    
+    # Constraint implementation methods
+    [hashtable] CheckGitClean([hashtable]$params) {
+        $result = @{ passed = $false; message = ""; reasoning = "" }
+        
+        $status = git status --porcelain
+        if ($status) {
+            $result.message = "Working directory has uncommitted changes"
+            $result.reasoning = "Git worktree must be clean for automated editing"
+            $result.context = @{ uncommitted_files = $status }
+        } else {
+            $result.passed = $true
+            $result.reasoning = "Git worktree is clean"
+        }
+        
+        return $result
+    }
+    
+    [hashtable] CheckPathAllowlist([string[]]$files, [hashtable]$params) {
+        $result = @{ passed = $true; message = ""; reasoning = ""; context = @{} }
+        $blocked = @()
+        
+        foreach ($file in $files) {
+            $allowed = $false
+            
+            # Check include patterns
+            foreach ($pattern in $params.include) {
+                if ($file -like $pattern) {
+                    $allowed = $true
+                    break
+                }
+            }
+            
+            # Check exclude patterns
+            if ($allowed -and $params.exclude) {
+                foreach ($pattern in $params.exclude) {
+                    if ($file -like $pattern) {
+                        $allowed = $false
+                        break
+                    }
+                }
+            }
+            
+            if (-not $allowed) {
+                $blocked += $file
+            }
+        }
+        
+        if ($blocked) {
+            $result.passed = $false
+            $result.message = "Files outside allowed paths: $($blocked -join ', ')"
+            $result.reasoning = "Path restrictions enforce safe editing boundaries"
+            $result.context = @{ blocked_files = $blocked }
+        } else {
+            $result.reasoning = "All files within allowed paths"
+        }
+        
+        return $result
+    }
+    
+    [hashtable] CheckFileCount([string[]]$files, [hashtable]$params) {
+        $result = @{ passed = $false; message = ""; reasoning = "" }
+        
+        if ($files.Count -le $params.limit) {
+            $result.passed = $true
+            $result.reasoning = "File count ($($files.Count)) within limit ($($params.limit))"
+        } else {
+            $result.message = "Too many files: $($files.Count) > $($params.limit)"
+            $result.reasoning = "Large changesets require manual review"
+            $result.context = @{ file_count = $files.Count; limit = $params.limit }
+        }
+        
+        return $result
+    }
+    
+    [hashtable] CheckPythonSyntax([string[]]$files, [hashtable]$params) {
+        $result = @{ passed = $true; message = ""; reasoning = ""; context = @{} }
+        $errors = @()
+        
+        $pythonFiles = $files | Where-Object { $_ -like "*.py" }
+        
+        foreach ($file in $pythonFiles) {
+            if (Test-Path $file) {
+                $syntaxCheck = python -m py_compile $file 2>&1
+                if ($LASTEXITCODE -ne 0) {
+                    $errors += @{ file = $file; error = $syntaxCheck }
+                }
+            }
+        }
+        
+        if ($errors) {
+            $result.passed = $false
+            $result.message = "Python syntax errors detected"
+            $result.reasoning = "Code must be syntactically valid for safe editing"
+            $result.context = @{ syntax_errors = $errors }
+        } else {
+            $result.reasoning = "All Python files have valid syntax"
+        }
+        
+        return $result
+    }
+    
+    [hashtable] CheckServiceQuota([hashtable]$params) {
+        $result = @{ passed = $true; message = ""; reasoning = "" }
+        
+        # Read quota tracker
+        $quotaPath = ".ai/quota-tracker.json"
+        if (Test-Path $quotaPath) {
+            $tracker = Get-Content $quotaPath | ConvertFrom-Json
+            $usage = $tracker.services.($params.service) ?? 0
+            $limit = $params.daily_limit
+            
+            if ($usage -ge ($limit * $params.threshold)) {
+                $result.passed = $false
+                $result.message = "Service quota threshold exceeded: $usage/$limit"
+                $result.reasoning = "Quota protection prevents overuse of premium services"
+            } else {
+                $result.reasoning = "Service quota available: $usage/$limit"
+            }
+        }
+        
+        return $result
+    }
+}
+
+# Main execution
+function Invoke-ConstraintEvaluation {
+    param(
+        [string]$ConstraintSet,
+        [string[]]$Files,
+        [string]$ConfigPath = ".ai/constraints/config.yaml"
+    )
+    
+    if (-not (Test-Path $ConfigPath)) {
+        throw "Constraint configuration not found: $ConfigPath"
+    }
+    
+    $config = Get-Content $ConfigPath -Raw | ConvertFrom-Yaml
+    $engine = [ConstraintEngine]::new($config, "WORKFLOW_$(Get-Date -Format 'yyyyMMdd_HHmmss')")
+    
+    Write-Host "🔍 Evaluating constraint set: $ConstraintSet" -ForegroundColor Blue
+    Write-Host "📁 Files: $($Files -join ', ')" -ForegroundColor Cyan
+    
+    $result = $engine.EvaluateConstraintSet($ConstraintSet, $Files)
+    
+    # Output results
+    Write-Host "`n📊 Constraint Evaluation Results:" -ForegroundColor Green
+    Write-Host "  Selected Tool: $($result.selectedTool)" -ForegroundColor Yellow
+    Write-Host "  Violations: $($result.violations.Count)" -ForegroundColor $(if($result.violations.Count -gt 0){"Red"}else{"Green"})
+    Write-Host "  Warnings: $($result.warnings.Count)" -ForegroundColor $(if($result.warnings.Count -gt 0){"Yellow"}else{"Green"})
+    Write-Host "  Duration: $($result.metadata.duration)ms" -ForegroundColor Cyan
+    
+    if ($result.violations) {
+        Write-Host "`n❌ Violations:" -ForegroundColor Red
+        foreach ($violation in $result.violations) {
+            Write-Host "  [$($violation.severity)] $($violation.id): $($violation.message)" -ForegroundColor Red
+        }
+    }
+    
+    if ($result.warnings) {
+        Write-Host "`n⚠️  Warnings:" -ForegroundColor Yellow
+        foreach ($warning in $result.warnings) {
+            Write-Host "  [$($warning.severity)] $($warning.id): $($warning.message)" -ForegroundColor Yellow
+        }
+    }
+    
+    if ($Verbose -and $result.reasoning) {
+        Write-Host "`n🧠 Reasoning:" -ForegroundColor Blue
+        foreach ($reason in $result.reasoning) {
+            Write-Host "  $reason" -ForegroundColor Blue
+        }
+    }
+    
+    return $result
+}
+
+# Script execution
+if ($MyInvocation.InvocationName -ne ".") {
+    Invoke-ConstraintEvaluation -ConstraintSet $ConstraintSet -Files $Files
+}

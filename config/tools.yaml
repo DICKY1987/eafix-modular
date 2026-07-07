@@ -1,0 +1,30 @@
+version: 1
+tools:
+  - name: claude-cli
+    capabilities: ["planning", "nlp", "testing"]
+    version_cmd: ["claude", "--version"]
+    health_cmd: ["claude", "--help"]
+    fallback: ["aider"]
+    cost_hint: 1.0
+    install_hint: "See https://github.com/anthropics/anthropic-cli"
+  - name: aider
+    capabilities: ["python", "refactor", "tests"]
+    version_cmd: ["aider", "--version"]
+    health_cmd: ["aider", "--help"]
+    fallback: ["cursor"]
+    cost_hint: 0.6
+    install_hint: "pip install aider-chat"
+  - name: cursor
+    capabilities: ["editor", "typescript", "docs"]
+    version_cmd: ["cursor", "--version"]
+    health_cmd: ["cursor", "--help"]
+    fallback: []
+    cost_hint: 0.4
+    install_hint: "See https://www.cursor.com/"
+  - name: gdw_runner
+    capabilities: ["gdw", "workflows", "chain"]
+    version_cmd: ["python", "-c", "print('gdw_runner 0.1')"]
+    health_cmd: ["python", "-c", "import json; print('ok')"]
+    fallback: ["python", "powershell"]
+    cost_hint: 0.0
+    install_hint: "Built-in lightweight executor"

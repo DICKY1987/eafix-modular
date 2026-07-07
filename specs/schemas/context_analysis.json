@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/context_analysis.json",
+  "title": "Context Analysis",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "files": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "language": { "type": "string" },
+    "summary": { "type": "string" },
+    "suggestions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" }
+        },
+        "required": ["title"]
+      }
+    }
+  }
+}

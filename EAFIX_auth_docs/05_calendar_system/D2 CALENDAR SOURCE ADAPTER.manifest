@@ -1,0 +1,244 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "atomic_module_manifest",
+  "packet_type": "unified_atomic_module_manifest",
+  "manifest_version": "0.1.0",
+  "generated_at_utc": "2026-06-24T06:56:42.646771+00:00",
+  "last_updated_utc": "2026-06-24T06:56:42.646771+00:00",
+  "source_authority": {
+    "authority_policy": "generated_from_canonical_sources"
+  },
+  "module_identity": {
+    "module_id": "50000000000000000003",
+    "numeric_module_id": "50000000000000000003",
+    "canonical_symbol": "D2_CALENDAR_SOURCE_ADAPTER",
+    "module_name": "Calendar Source Adapter",
+    "legacy_aliases": [],
+    "identity_status": "canonical",
+    "identity_model": "numeric_20_digit",
+    "version": "1.0.0",
+    "status": "canonical"
+  },
+  "module_classification": {
+    "module_role": "atomic_canonical_module",
+    "module_kind": "INTEGRATION_BRIDGE_MODULE",
+    "domain_group_id": "G1",
+    "domain_group_name": "Data Ingest Layer",
+    "phase_id": "PHASE_B",
+    "layer": 2,
+    "deployable_scope": "python_service"
+  },
+  "purpose": {
+    "primary_purpose": "Poll external calendar source(s) and emit raw calendar payloads."
+  },
+  "plain_language_summary": "Owns process step 3: Poll calendar source(s).",
+  "process_binding": {
+    "process_id": "HUEY_P_EAFIX_END_TO_END",
+    "process_version": "2.0.0",
+    "phase_id": "PHASE_B",
+    "step_id": "60000000000000000003",
+    "step_number": 3,
+    "step_code": "S03",
+    "step_name": "Poll calendar source(s)",
+    "dependency_step_ids": [
+      "60000000000000000002"
+    ],
+    "responsible": "calendar_service.py::poll_scheduler",
+    "entrypoint_files": [
+      "services\\calendar-ingestor\\src\\2099900093260118_main.py"
+    ],
+    "output_description": "CalendarRaw",
+    "process_binding_source": "process_step_catalog"
+  },
+  "contracts": {
+    "input_contracts": [
+      "CalendarSourceConfig",
+      "ScheduleTick"
+    ],
+    "output_contracts": [
+      "CalendarRaw"
+    ],
+    "output_description": "CalendarRaw",
+    "module_io_policy": {
+      "shared_kernel_access_policy": "stable_domain_neutral_primitives_only"
+    },
+    "contract_version_policy": "versioned_contracts_required"
+  },
+  "module_scope": {
+    "scope_in": [
+      "CalendarSourceConfig",
+      "ScheduleTick"
+    ],
+    "scope_out": [
+      "CalendarRaw"
+    ],
+    "responsibilities": [
+      "Poll calendar source(s)"
+    ],
+    "forbidden_responsibilities": [
+      "Anything outside this module's single declared responsibility (needs_review for explicit list)."
+    ],
+    "key_functions": [
+      "poll_scheduler"
+    ],
+    "atomicity_statement": "Owns process step 3: Poll calendar source(s)."
+  },
+  "file_ownership": {
+    "module_root": "services/calendar-ingestor",
+    "owned_files": [
+      "services/calendar-ingestor/src/2099900093260118_main.py",
+      "services/calendar-ingestor/src/2099900094260118_metrics.py",
+      "services/calendar-ingestor/src/2099900091260118_health.py",
+      "services/calendar-ingestor/src/2099900098260118___init__.py",
+      "services/calendar-ingestor/src/2099900097260118_python_calendar_system_patched.py",
+      "services/calendar-ingestor/src/2099900096260118_python_calendar_system.py",
+      "services/calendar-ingestor/src/2099900090260118_ff_auto_downloader.py",
+      "services/calendar-ingestor/src/2099900089260118_config.py",
+      "services/calendar-ingestor/src/2099900095260118_plugin.py",
+      "services/calendar-ingestor/src/2099900092260118_ingestor.py",
+      "services/calendar-ingestor/tests/2099900099260118_test_ingestor.py"
+    ],
+    "allowed_files": [
+      "services/calendar-ingestor/**"
+    ],
+    "forbidden_files": [
+      "**/other-service/**"
+    ],
+    "file_assignment_status": "partial",
+    "file_role_index": [
+      {
+        "path": "services/calendar-ingestor/src/2099900093260118_main.py",
+        "role": "source",
+        "ownership": "owned"
+      },
+      {
+        "path": "services/calendar-ingestor/src/2099900094260118_metrics.py",
+        "role": "source",
+        "ownership": "owned"
+      },
+      {
+        "path": "services/calendar-ingestor/src/2099900091260118_health.py",
+        "role": "source",
+        "ownership": "owned"
+      },
+      {
+        "path": "services/calendar-ingestor/src/2099900098260118___init__.py",
+        "role": "source",
+        "ownership": "owned"
+      },
+      {
+        "path": "services/calendar-ingestor/src/2099900097260118_python_calendar_system_patched.py",
+        "role": "source",
+        "ownership": "owned"
+      },
+      {
+        "path": "services/calendar-ingestor/src/2099900096260118_python_calendar_system.py",
+        "role": "source",
+        "ownership": "owned"
+      },
+      {
+        "path": "services/calendar-ingestor/src/2099900090260118_ff_auto_downloader.py",
+        "role": "source",
+        "ownership": "owned"
+      },
+      {
+        "path": "services/calendar-ingestor/src/2099900089260118_config.py",
+        "role": "source",
+        "ownership": "owned"
+      },
+      {
+        "path": "services/calendar-ingestor/src/2099900095260118_plugin.py",
+        "role": "source",
+        "ownership": "owned"
+      },
+      {
+        "path": "services/calendar-ingestor/src/2099900092260118_ingestor.py",
+        "role": "source",
+        "ownership": "owned"
+      },
+      {
+        "path": "services/calendar-ingestor/tests/2099900099260118_test_ingestor.py",
+        "role": "test",
+        "ownership": "owned"
+      }
+    ],
+    "ownership_derivation": "file_module_mapping"
+  },
+  "service_runtime": {
+    "service_home": "services/calendar-ingestor",
+    "runtime_kind": "python_service",
+    "language": "python",
+    "runtime_status": "active",
+    "microservice_port": null
+  },
+  "dependencies": [
+    {
+      "target_type": "module",
+      "target_id": "{'target_type': 'module', 'target_id': '50000000000000000002', 'relationship': 'requires', 'reason': 'Produces ScheduleTick.'}",
+      "relationship": "consumes_output",
+      "consumes_output_contracts": [
+        "needs_review"
+      ]
+    }
+  ],
+  "standards_and_gates": {
+    "blocking_gate_policy": "only_block_when_gate_has_pass_fail_and_evidence",
+    "quality_gates": {
+      "invariants": [
+        "HTTP 200; payload parsable; source_event_id present"
+      ]
+    }
+  },
+  "state_and_failure_behavior": {
+    "default_failure_behavior": "REJECT",
+    "failure_notes": "Retry w/ deterministic backoff; on persistent failure emit IngestError and skip cycle",
+    "validation_notes": "HTTP 200; payload parsable; source_event_id present"
+  },
+  "documentation_set": {
+    "required_documents": [
+      {
+        "document_name": "manifest.json",
+        "required": true,
+        "status": "generated"
+      },
+      {
+        "document_name": "README.md",
+        "required": true,
+        "status": "missing"
+      },
+      {
+        "document_name": "contracts.md",
+        "required": true,
+        "status": "missing"
+      }
+    ],
+    "documentation_completeness": "partial",
+    "missing_documents": [
+      "README.md",
+      "contracts.md"
+    ]
+  },
+  "reconciliation_status": {
+    "service_binding_status": "bound",
+    "submodule_doc_status": "not_applicable",
+    "mapped_file_count": 11,
+    "known_flags": [
+      "SERVICE_UNBOUND"
+    ],
+    "reconciliation_notes": "Identity & classification fully derived from locked vNext catalog.",
+    "last_reconciled_utc": "2026-06-24T06:56:42.646771+00:00"
+  },
+  "staleness_policy": {
+    "regenerate_if_changed": true,
+    "last_generated_from": [
+      "Claude_gen_atomic_module_catalog_vNext.json",
+      "module_catalog.json",
+      "process_step_catalog.json",
+      "file_module_mapping.csv"
+    ],
+    "staleness_status": "fresh"
+  },
+  "notes": [
+    "First-pass auto-fill from canonical sources. Required fields lacking source evidence are marked needs_review/unknown per fill-instruction doctrine; nothing fabricated."
+  ]
+}
