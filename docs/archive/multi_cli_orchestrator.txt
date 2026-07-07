@@ -1,0 +1,419 @@
+# Multi-CLI Tool Orchestrator
+# Implements intelligent routing between AI coding tools with task delegation
+
+class TaskOrchestrator {
+    [hashtable]$Config
+    [hashtable]$ActiveTasks
+    [string]$WorkspaceRoot
+    [string]$TaskQueuePath
+    
+    TaskOrchestrator([string]$workspaceRoot) {
+        $this.WorkspaceRoot = $workspaceRoot
+        $this.TaskQueuePath = Join-Path $workspaceRoot ".ai\task-queue.json"
+        $this.ActiveTasks = @{}
+        $this.Config = $this.LoadConfig()
+    }
+    
+    # Main orchestration method
+    [hashtable] ExecuteTask([string]$taskDescription, [string[]]$files, [hashtable]$context = @{}) {
+        $taskId = [guid]::NewGuid().ToString("N").Substring(0,8)
+        
+        Write-Host "🎯 Task $taskId`: $taskDescription" -ForegroundColor Cyan
+        
+        $task = @{
+            id = $taskId
+            description = $taskDescription
+            files = $files
+            context = $context
+            status = "analyzing"
+            tool_chain = @()
+            results = @{}
+            created = Get-Date
+        }
+        
+        $this.ActiveTasks[$taskId] = $task
+        
+        try {
+            # Step 1: Analyze and plan
+            $plan = $this.AnalyzeTask($task)
+            $task.plan = $plan
+            
+            # Step 2: Execute plan with tool chain
+            $result = $this.ExecutePlan($task)
+            $task.status = "completed"
+            $task.results = $result
+            
+            return $task
+        }
+        catch {
+            $task.status = "failed"
+            $task.error = $_.Exception.Message
+            Write-Host "❌ Task $taskId failed: $($_.Exception.Message)" -ForegroundColor Red
+            throw
+        }
+        finally {
+            $this.SaveTaskState($task)
+        }
+    }
+    
+    # Analyze task and create execution plan
+    [hashtable] AnalyzeTask([hashtable]$task) {
+        $complexity = $this.CalculateComplexity($task.files, $task.description)
+        $constraints = $this.CheckConstraints($task.files)
+        
+        # Determine tool chain based on complexity and constraints
+        $toolChain = $this.PlanToolChain($complexity, $constraints, $task.description)
+        
+        return @{
+            complexity = $complexity
+            constraints = $constraints
+            tool_chain = $toolChain
+            estimated_duration = $this.EstimateDuration($toolChain)
+        }
+    }
+    
+    # Execute the planned tool chain
+    [hashtable] ExecutePlan([hashtable]$task) {
+        $results = @{
+            steps = @()
+            files_changed = @()
+            summary = ""
+        }
+        
+        foreach ($step in $task.plan.tool_chain) {
+            Write-Host "🔧 Executing step: $($step.tool) - $($step.action)" -ForegroundColor Yellow
+            
+            $stepResult = $this.ExecuteToolStep($step, $task)
+            $results.steps += $stepResult
+            
+            # Check if this step suggests delegation
+            if ($stepResult.suggests_delegation) {
+                $delegationStep = $this.HandleDelegation($stepResult.delegation_request, $task)
+                if ($delegationStep) {
+                    $results.steps += $delegationStep
+                }
+            }
+            
+            # Update file tracking
+            if ($stepResult.files_modified) {
+                $results.files_changed += $stepResult.files_modified
+            }
+        }
+        
+        $results.summary = $this.GenerateSummary($results.steps)
+        return $results
+    }
+    
+    # Execute individual tool step
+    [hashtable] ExecuteToolStep([hashtable]$step, [hashtable]$task) {
+        $result = @{
+            tool = $step.tool
+            action = $step.action
+            start_time = Get-Date
+            success = $false
+            output = ""
+            files_modified = @()
+            suggests_delegation = $false
+        }
+        
+        try {
+            switch ($step.tool) {
+                "claude_code" {
+                    $result = $this.ExecuteClaudeCode($step, $task)
+                }
+                "aider" {
+                    $result = $this.ExecuteAider($step, $task)
+                }
+                "gh_copilot" {
+                    $result = $this.ExecuteGHCopilot($step, $task)
+                }
+                "vscode_manual" {
+                    $result = $this.ExecuteManualStep($step, $task)
+                }
+                default {
+                    throw "Unknown tool: $($step.tool)"
+                }
+            }
+            
+            $result.success = $true
+            $result.end_time = Get-Date
+            
+        }
+        catch {
+            $result.error = $_.Exception.Message
+            $result.end_time = Get-Date
+            Write-Host "❌ Step failed: $($_.Exception.Message)" -ForegroundColor Red
+        }
+        
+        return $result
+    }
+    
+    # Claude Code execution with context passing
+    [hashtable] ExecuteClaudeCode([hashtable]$step, [hashtable]$task) {
+        $contextFile = Join-Path $env:TEMP "claude_context_$($task.id).md"
+        $this.WriteContextFile($contextFile, $task)
+        
+        $prompt = @"
+Task: $($task.description)
+Files: $($task.files -join ', ')
+Previous steps: $($task.plan.tool_chain[0..([array]::IndexOf($task.plan.tool_chain, $step)-1)] | ForEach-Object { "$($_.tool): $($_.action)" })
+
+Context file: $contextFile
+
+Execute: $($step.action)
+"@
+        
+        # Execute claude command
+        $output = & claude --prompt $prompt --files $task.files 2>&1
+        
+        # Parse output for delegation suggestions
+        $delegation = $this.ParseForDelegation($output)
+        
+        return @{
+            tool = "claude_code"
+            action = $step.action
+            output = $output
+            files_modified = $this.DetectFileChanges($task.files)
+            suggests_delegation = $delegation.suggests
+            delegation_request = $delegation.request
+        }
+    }
+    
+    # Aider execution with context
+    [hashtable] ExecuteAider([hashtable]$step, [hashtable]$task) {
+        $message = "$($step.action) - Task: $($task.description)"
+        
+        # Build aider command with context
+        $aiderArgs = @(
+            "--yes"
+            "--message", $message
+        )
+        $aiderArgs += $task.files
+        
+        $output = & aider @aiderArgs 2>&1
+        
+        return @{
+            tool = "aider"
+            action = $step.action
+            output = $output
+            files_modified = $this.DetectFileChanges($task.files)
+            suggests_delegation = $false
+        }
+    }
+    
+    # GitHub Copilot CLI execution
+    [hashtable] ExecuteGHCopilot([hashtable]$step, [hashtable]$task) {
+        $prompt = "$($step.action) for task: $($task.description)"
+        
+        $output = & gh copilot suggest $prompt 2>&1
+        
+        # Copilot usually just suggests, doesn't modify files
+        return @{
+            tool = "gh_copilot"
+            action = $step.action
+            output = $output
+            files_modified = @()
+            suggests_delegation = $true
+            delegation_request = @{
+                tool = "aider"
+                action = "implement the suggested changes"
+                context = $output
+            }
+        }
+    }
+    
+    # Plan tool chain based on analysis
+    [array] PlanToolChain([int]$complexity, [hashtable]$constraints, [string]$description) {
+        $chain = @()
+        
+        # Route based on complexity and constraints
+        if ($constraints.violations.Count -gt 0) {
+            $chain += @{ tool = "vscode_manual"; action = "Manual review required due to constraint violations" }
+        }
+        elseif ($complexity -lt 30) {
+            # Simple task - use Aider
+            $chain += @{ tool = "aider"; action = "Implement changes" }
+        }
+        elseif ($complexity -lt 70) {
+            # Moderate complexity - start with Copilot suggestion, then Aider
+            $chain += @{ tool = "gh_copilot"; action = "Generate implementation suggestions" }
+            $chain += @{ tool = "aider"; action = "Implement suggested changes" }
+        }
+        else {
+            # Complex task - use Claude Code for analysis, then delegate
+            $chain += @{ tool = "claude_code"; action = "Analyze and break down the task" }
+            $chain += @{ tool = "aider"; action = "Implement the planned changes" }
+        }
+        
+        return $chain
+    }
+    
+    # Handle delegation between tools
+    [hashtable] HandleDelegation([hashtable]$delegationRequest, [hashtable]$task) {
+        if (-not $delegationRequest) { return $null }
+        
+        Write-Host "🔄 Delegating to $($delegationRequest.tool): $($delegationRequest.action)" -ForegroundColor Magenta
+        
+        # Create delegation step
+        $delegationStep = @{
+            tool = $delegationRequest.tool
+            action = $delegationRequest.action
+            context = $delegationRequest.context
+            is_delegation = $true
+        }
+        
+        return $this.ExecuteToolStep($delegationStep, $task)
+    }
+    
+    # Detect which files were actually modified
+    [string[]] DetectFileChanges([string[]]$watchFiles) {
+        # This would use git status or file timestamps to detect changes
+        $changed = @()
+        foreach ($file in $watchFiles) {
+            if (Test-Path $file) {
+                # Simple check - in practice you'd use git status
+                $changed += $file
+            }
+        }
+        return $changed
+    }
+    
+    # Parse tool output for delegation suggestions
+    [hashtable] ParseForDelegation([string]$output) {
+        # Look for patterns that suggest delegation
+        if ($output -match "(?i)(should use aider|delegate to aider|pass to aider)") {
+            return @{
+                suggests = $true
+                request = @{
+                    tool = "aider"
+                    action = "continue implementation"
+                    context = $output
+                }
+            }
+        }
+        
+        return @{ suggests = $false }
+    }
+    
+    # Calculate task complexity score
+    [int] CalculateComplexity([string[]]$files, [string]$description) {
+        $score = 0
+        
+        # File count factor
+        $score += $files.Count * 5
+        
+        # File size factor
+        foreach ($file in $files) {
+            if (Test-Path $file) {
+                $lines = (Get-Content $file -ErrorAction SilentlyContinue).Count
+                $score += [math]::Min(20, $lines / 50)
+            }
+        }
+        
+        # Description complexity
+        $complexKeywords = @("refactor", "architecture", "redesign", "optimize", "migrate")
+        $matches = $complexKeywords | Where-Object { $description -match $_ }
+        $score += $matches.Count * 15
+        
+        return [math]::Min(100, $score)
+    }
+    
+    # Check constraints
+    [hashtable] CheckConstraints([string[]]$files) {
+        $violations = @()
+        
+        # Example constraints
+        if ($files.Count -gt 10) {
+            $violations += "Too many files ($($files.Count) > 10)"
+        }
+        
+        foreach ($file in $files) {
+            if ($file -match "node_modules|\.git") {
+                $violations += "Restricted path: $file"
+            }
+        }
+        
+        return @{ violations = $violations }
+    }
+    
+    # Save task state for tracking
+    [void] SaveTaskState([hashtable]$task) {
+        $stateDir = Split-Path $this.TaskQueuePath -Parent
+        if (-not (Test-Path $stateDir)) {
+            New-Item -ItemType Directory -Path $stateDir -Force | Out-Null
+        }
+        
+        $task | ConvertTo-Json -Depth 10 | Set-Content -Path $this.TaskQueuePath -Encoding UTF8
+    }
+    
+    # Load configuration
+    [hashtable] LoadConfig() {
+        return @{
+            tools = @{
+                claude_code = @{ available = $true; priority = 1 }
+                aider = @{ available = $true; priority = 2 }
+                gh_copilot = @{ available = $true; priority = 3 }
+            }
+        }
+    }
+    
+    # Write context file for tools
+    [void] WriteContextFile([string]$path, [hashtable]$task) {
+        $context = @"
+# Task Context
+
+## Task ID: $($task.id)
+## Description: $($task.description)
+## Files: $($task.files -join ', ')
+
+## Previous Steps:
+$($task.results.steps | ForEach-Object { "- $($_.tool): $($_.action) ($(if($_.success){'✓'}else{'✗'}))" } | Out-String)
+
+## Current Status: $($task.status)
+"@
+        
+        Set-Content -Path $path -Value $context -Encoding UTF8
+    }
+    
+    # Generate summary of execution
+    [string] GenerateSummary([array]$steps) {
+        $successful = ($steps | Where-Object { $_.success }).Count
+        $total = $steps.Count
+        
+        return "Executed $total steps, $successful successful. Tools used: $($steps.tool | Sort-Object -Unique | Join-String ', ')"
+    }
+    
+    # Estimate duration
+    [string] EstimateDuration([array]$toolChain) {
+        $minutes = $toolChain.Count * 2  # 2 minutes per step
+        return "${minutes}m"
+    }
+}
+
+# Usage example
+function Start-MultiCLITask {
+    param(
+        [string]$Description,
+        [string[]]$Files,
+        [string]$WorkspaceRoot = (Get-Location).Path
+    )
+    
+    $orchestrator = [TaskOrchestrator]::new($WorkspaceRoot)
+    
+    try {
+        $result = $orchestrator.ExecuteTask($Description, $Files)
+        
+        Write-Host "`n🎉 Task completed successfully!" -ForegroundColor Green
+        Write-Host "Summary: $($result.results.summary)" -ForegroundColor Cyan
+        Write-Host "Files changed: $($result.results.files_changed -join ', ')" -ForegroundColor Yellow
+        
+        return $result
+    }
+    catch {
+        Write-Host "`n💥 Task failed: $($_.Exception.Message)" -ForegroundColor Red
+        throw
+    }
+}
+
+# Example usage:
+# Start-MultiCLITask -Description "Add error handling to auth module" -Files @("src/auth.py", "src/middleware.py")

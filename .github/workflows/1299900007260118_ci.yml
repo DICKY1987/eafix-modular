@@ -63,6 +63,9 @@ jobs:
           
       - name: Validate contract schemas
         run: make contracts-validate-full
+
+      - name: Validate atomic module manifests
+        run: python ci/2099900300260118_validate_atomic_module_manifests.py
         
       - name: Run P_ integration tests
         run: PYTHONPATH=. python P_tests/integration/test_p_folder_integration.py

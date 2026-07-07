@@ -1,0 +1,152 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug: Automated Recovery System",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/eafix/recovery/automated_recovery_system.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src:${workspaceFolder}"
+            },
+            "args": ["--debug"],
+            "stopOnEntry": false,
+            "justMyCode": false
+        },
+        {
+            "name": "Debug: Self-Healing Service Manager",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/eafix-modular/services/service-manager/src/main.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${workspaceFolder}/eafix-modular",
+                "REDIS_URL": "redis://localhost:6379"
+            },
+            "stopOnEntry": false,
+            "justMyCode": false
+        },
+        {
+            "name": "Debug: Predictive Failure Detector",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/eafix/predictive/predictive_failure_detector.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src:${workspaceFolder}"
+            },
+            "args": ["--train-models"],
+            "stopOnEntry": false,
+            "justMyCode": false
+        },
+        {
+            "name": "Debug: Guardian Risk Agent with Recovery",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/eafix/guardian/agents/risk_agent.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src:${workspaceFolder}"
+            },
+            "args": ["--test-recovery"],
+            "stopOnEntry": false,
+            "justMyCode": false
+        },
+        {
+            "name": "Debug: Cross-Language Bridge Test",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/test_cross_language_bridge.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "args": ["--debug", "--simulate-errors"],
+            "stopOnEntry": false,
+            "justMyCode": false
+        },
+        {
+            "name": "Debug: Enterprise CLI with Recovery Features",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/eafix_cli.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "args": ["system", "health", "--verbose"],
+            "stopOnEntry": false,
+            "justMyCode": false
+        },
+        {
+            "name": "Test: Recovery System Integration",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src:${workspaceFolder}"
+            },
+            "args": [
+                "tests/test_recovery_system.py",
+                "-v",
+                "--tb=short"
+            ],
+            "stopOnEntry": false,
+            "justMyCode": false
+        },
+        {
+            "name": "Test: Guardian Recovery Integration",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src:${workspaceFolder}"
+            },
+            "args": [
+                "tests/test_guardian_recovery.py",
+                "-v",
+                "--tb=short"
+            ],
+            "stopOnEntry": false,
+            "justMyCode": false
+        },
+        {
+            "name": "Test: Service Manager Self-Healing",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/eafix-modular",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}:${workspaceFolder}/eafix-modular"
+            },
+            "args": [
+                "tests/test_service_manager.py",
+                "-v",
+                "--tb=short"
+            ],
+            "stopOnEntry": false,
+            "justMyCode": false
+        },
+        {
+            "name": "Attach: Running Recovery System",
+            "type": "python",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 5678
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "."
+                }
+            ]
+        }
+    ]
+}

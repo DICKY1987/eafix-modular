@@ -1,0 +1,231 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "governance_validation_report",
+  "generated_at": "2026-06-21T14:30:00Z",
+  "purpose": "Validate governance integrity after the governance recovery exercise. Covers identity validation, glossary validation, routing validation, and lifecycle governance validation.",
+  "overall_status": "PASS_WITH_PENDING_ITEMS",
+  "identity_validation": {
+    "status": "PASS_WITH_PENDING_ITEMS",
+    "checks": [
+      {
+        "check_id": "ID-001",
+        "description": "Duplicate module IDs",
+        "status": "PASS",
+        "result": "No duplicate module_id values found across 27 modules in module_catalog.json.",
+        "evidence": "All 27 module_id values are unique: 50000000000000000001 through 50000000000000000026 plus 50000000000000000099 (SHARED_LIBS)."
+      },
+      {
+        "check_id": "ID-002",
+        "description": "Duplicate canonical symbols",
+        "status": "PASS",
+        "result": "No duplicate canonical_symbol values found across 27 modules.",
+        "evidence": "All 27 canonical symbols are unique in module_catalog.json."
+      },
+      {
+        "check_id": "ID-003",
+        "description": "Unresolved legacy aliases",
+        "status": "PASS",
+        "result": "All legacy aliases are resolved. 2 legacy aliases exist and both resolve to current canonical symbols.",
+        "aliases_resolved": [
+          {
+            "legacy_symbol": "O2_OMS",
+            "resolves_to": "O2_OMS_STATE_MACHINE",
+            "canonical_module_id": "50000000000000000019"
+          },
+          {
+            "legacy_symbol": "O3_PNL_CLASSIFIER",
+            "resolves_to": "O3_TRADE_CLOSE_CLASSIFIER",
+            "canonical_module_id": "50000000000000000020"
+          }
+        ]
+      },
+      {
+        "check_id": "ID-004",
+        "description": "Unresolved legacy references in identifier_map.json",
+        "status": "PASS",
+        "result": "identifier_map.json description field documents both aliases. The data entries show no orphan references.",
+        "evidence": "doc_authority.json entry for identifier_map.json: 'Symbol-to-numeric ID map: 27 modules (prefix 5*), 26 steps (prefix 6*), 2 aliases (O2_OMS -> O2_OMS_STATE_MACHINE, O3_PNL_CLASSIFIER -> O3_TRADE_CLOSE_CLASSIFIER)'."
+      },
+      {
+        "check_id": "ID-005",
+        "description": "Single identity authority source",
+        "status": "PASS",
+        "result": "module_catalog.json is the sole module identity authority. No parallel identity registries exist (Principle 1 satisfied). The identity_crosswalk.json is correctly classified as migration_reference authority_level 3, not an identity authority.",
+        "evidence": "doc_authority.json authority_level 1 for module identity: module_catalog.json only."
+      },
+      {
+        "check_id": "ID-006",
+        "description": "F1 prefix collision",
+        "status": "PENDING",
+        "severity": "low",
+        "result": "Two modules share the F1 prefix: F1_CONFIG_PREFERENCES (id 50000000000000000001) and F1_FLOW_ORCHESTRATOR (id 50000000000000000025). This is a naming inconsistency, not a functional defect. A future RENAME_SYMBOL MCR targeting F4_FLOW_ORCHESTRATOR is documented in module_naming_governance.json.",
+        "recommended_action": "File MCR: change_type RENAME_SYMBOL, F1_FLOW_ORCHESTRATOR -> F4_FLOW_ORCHESTRATOR. F1_FLOW_ORCHESTRATOR becomes legacy_alias on the surviving module record."
+      }
+    ]
+  },
+  "glossary_validation": {
+    "status": "PASS",
+    "checks": [
+      {
+        "check_id": "GLOSS-001",
+        "description": "Single canonical glossary",
+        "status": "PASS",
+        "result": "One canonical glossary file: EAFIX_auth_docs/Y_module governance glossary.json (schema_version 1.1.1, 81 terms). No competing authority files.",
+        "evidence": "glossary_reconciliation_report.json confirms all prior versions (1.1.0, 1.0.0) and working files have zero unique terms not present in the current canonical glossary."
+      },
+      {
+        "check_id": "GLOSS-002",
+        "description": "Duplicate terms in canonical glossary",
+        "status": "PASS",
+        "result": "No duplicate term names in Y_module governance glossary.json.",
+        "evidence": "81 unique term names verified programmatically."
+      },
+      {
+        "check_id": "GLOSS-003",
+        "description": "Conflicting definitions across glossary versions",
+        "status": "PASS",
+        "result": "Zero definition conflicts found between the deleted v1.1.0 file and the current v1.1.1 file. All 81 terms have identical definitions.",
+        "evidence": "glossary_reconciliation_report.json: conflict_terms = 0."
+      },
+      {
+        "check_id": "GLOSS-004",
+        "description": "Glossary registered in doc_authority",
+        "status": "PASS",
+        "result": "Y_module governance glossary.json is registered in doc_authority.json as classification: canonical, authority_level: 1.",
+        "evidence": "doc_authority.json entries list."
+      },
+      {
+        "check_id": "GLOSS-005",
+        "description": "Orphan working glossary files",
+        "status": "INFORMATIONAL",
+        "severity": "low",
+        "result": "Two working files remain present: module governance glossary bulk terms.json (72 terms) and x_module governance glossary bulk terms.json (77 terms). Both are strict subsets of the canonical 81-term glossary. Classified as archived working artifacts in governance_recovery_inventory.json.",
+        "recommended_action": "No action required. Files are harmless. May be cleaned up in a future pass if desired."
+      }
+    ]
+  },
+  "routing_validation": {
+    "status": "PASS",
+    "checks": [
+      {
+        "check_id": "ROUTE-001",
+        "description": "Canonical routing file location",
+        "status": "PASS",
+        "result": "Canonical routing file exists at repository root: eafix_project_knowledge_reference_routing_instructions.json.",
+        "evidence": "File confirmed at /eafix_project_knowledge_reference_routing_instructions.json."
+      },
+      {
+        "check_id": "ROUTE-002",
+        "description": "No duplicate routing file in EAFIX_auth_docs",
+        "status": "PASS",
+        "result": "The duplicate routing file EAFIX_auth_docs/eafix_project_knowledge_reference_routing_instructions.json was deleted in commit 0f2c238. No competing routing authority file exists.",
+        "evidence": "File does not exist at EAFIX_auth_docs/eafix_project_knowledge_reference_routing_instructions.json."
+      },
+      {
+        "check_id": "ROUTE-003",
+        "description": "Routing file registered in doc_authority",
+        "status": "PASS",
+        "result": "eafix_project_knowledge_reference_routing_instructions.json is registered in doc_authority.json as classification: canonical, authority_level: 1.",
+        "evidence": "doc_authority.json entries list."
+      }
+    ]
+  },
+  "governance_files_validation": {
+    "status": "PASS",
+    "checks": [
+      {
+        "check_id": "GOV-001",
+        "description": "Lifecycle governance file exists",
+        "status": "PASS",
+        "result": "module_lifecycle_governance.json created and registered. Contains 9 lifecycle statuses, 17 change types, MCR system design, catalog pass governance, and reconciliation flag queues. Recovered from deleted Mod_refactor_plan.txt.",
+        "evidence": "EAFIX_auth_docs/module_lifecycle_governance.json"
+      },
+      {
+        "check_id": "GOV-002",
+        "description": "Naming governance file exists",
+        "status": "PASS",
+        "result": "module_naming_governance.json created and registered. Contains domain prefix table (13 prefixes), ordinal rules, capability name rules, file naming conventions, contract naming rules, numeric ID opacity rules. Recovered from deleted Mod_refactor_plan.txt.",
+        "evidence": "EAFIX_auth_docs/module_naming_governance.json"
+      },
+      {
+        "check_id": "GOV-003",
+        "description": "All governance files registered in doc_authority",
+        "status": "PASS",
+        "result": "All 8 new governance files are registered in doc_authority.json: routing instructions, canonical glossary, lifecycle governance, naming governance, identity crosswalk, recovery inventory, glossary reconciliation report, and this validation report.",
+        "evidence": "doc_authority.json: 24 total entries (16 original + 8 new)."
+      },
+      {
+        "check_id": "GOV-004",
+        "description": "No parallel authority systems",
+        "status": "PASS",
+        "result": "Principle 1 satisfied. No canonical_module_registry.json, alternate identity registries, or duplicate module catalogs exist. identity_crosswalk.json is explicitly classified as migration_reference with a note that it must never become an authority source.",
+        "evidence": "Filesystem scan confirms no duplicate catalog files."
+      },
+      {
+        "check_id": "GOV-005",
+        "description": "Governance knowledge preserved from deleted files",
+        "status": "PASS",
+        "result": "All unique governance content from deleted files has been recovered. The deleted module governance glossary.json had zero unique terms. The deleted Mod_refactor_plan.txt had unique lifecycle and naming governance rules -- now captured in module_lifecycle_governance.json and module_naming_governance.json.",
+        "evidence": "governance_recovery_inventory.json contains evidence-based classification for all 7 reviewed files."
+      }
+    ]
+  },
+  "success_criteria_evaluation": {
+    "criteria": [
+      {
+        "criterion": "Module identity has exactly one authoritative source",
+        "status": "MET",
+        "evidence": "module_catalog.json is the sole identity authority (authority_level 1). identity_crosswalk.json is classified as migration_reference only."
+      },
+      {
+        "criterion": "Historical aliases remain resolvable",
+        "status": "MET",
+        "evidence": "O2_OMS and O3_PNL_CLASSIFIER are recorded as legacy_aliases in module_catalog.json and fully documented in identity_crosswalk.json."
+      },
+      {
+        "criterion": "Governance knowledge is preserved",
+        "status": "MET",
+        "evidence": "All unique governance content from Mod_refactor_plan.txt is captured in module_lifecycle_governance.json and module_naming_governance.json. Glossary content was already fully preserved."
+      },
+      {
+        "criterion": "Duplicate authority systems are eliminated",
+        "status": "MET",
+        "evidence": "Duplicate routing file was deleted in commit 0f2c238. Duplicate glossary files are classified as archived working artifacts, not authority sources."
+      },
+      {
+        "criterion": "Glossary definitions are reconciled",
+        "status": "MET",
+        "evidence": "glossary_reconciliation_report.json: 81 active terms, 0 conflicts, 0 unique terms lost from deletions."
+      },
+      {
+        "criterion": "Lifecycle governance exists",
+        "status": "MET",
+        "evidence": "module_lifecycle_governance.json created with complete lifecycle rules."
+      },
+      {
+        "criterion": "Naming governance exists",
+        "status": "MET",
+        "evidence": "module_naming_governance.json created with complete naming rules."
+      },
+      {
+        "criterion": "All governance files are registered",
+        "status": "MET",
+        "evidence": "doc_authority.json: 24 entries including all new governance files."
+      },
+      {
+        "criterion": "Validation report shows no unresolved identity conflicts",
+        "status": "MET_WITH_PENDING_ITEM",
+        "evidence": "No identity conflicts. One pending item: F1 prefix collision (F1_CONFIG_PREFERENCES and F1_FLOW_ORCHESTRATOR share the F1 prefix). Not a functional defect; requires a future RENAME_SYMBOL MCR. All aliases are resolved."
+      }
+    ]
+  },
+  "pending_items": [
+    {
+      "item_id": "PENDING-001",
+      "description": "F1 prefix collision: F1_CONFIG_PREFERENCES and F1_FLOW_ORCHESTRATOR share the F1 prefix.",
+      "severity": "low",
+      "recommended_action": "File MCR: RENAME_SYMBOL change_type, renaming F1_FLOW_ORCHESTRATOR to F4_FLOW_ORCHESTRATOR. Old symbol becomes legacy_alias.",
+      "blocking": false
+    }
+  ]
+}

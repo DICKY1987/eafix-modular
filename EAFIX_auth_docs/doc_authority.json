@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.1.0",
+  "document_type": "doc_authority",
+  "generated_at": "2026-06-22T00:00:00Z",
+  "decision_rule": {
+    "precedence": [
+      "canonical",
+      "supporting_reference",
+      "legacy_reference",
+      "generated",
+      "superseded"
+    ],
+    "rule": "Lower-precedence documents cannot override higher-precedence documents."
+  },
+  "control_files": [
+    "EAFIX_auth_docs/doc_authority.json",
+    "EAFIX_auth_docs/module_catalog.json",
+    "EAFIX_auth_docs/process_step_catalog.json",
+    "EAFIX_auth_docs/module_checklist.json",
+    "eafix_project_knowledge_reference_routing_instructions.json"
+  ],
+  "subject_authorities": [
+    {
+      "subject": "calendar",
+      "active_authority": "EAFIX_auth_docs/0199900001260118_Economic Calendar Integration Framework.md",
+      "supporting": [
+        "EAFIX_auth_docs/0199900007260118_Economic Calendar Trading System Documentation.md"
+      ],
+      "superseded": [
+        "EAFIX_auth_docs/superseded/0199900006260118_Economic Calendar Strategy ID Generation.md"
+      ]
+    },
+    {
+      "subject": "reentry",
+      "active_authority": "EAFIX_auth_docs/0110000073260118_06_reentry_subsystem.md",
+      "supporting": [
+        "EAFIX_auth_docs/0199900015260118_SS_HUEY_P Reentry Trading System (Architecture + Decomposition).md"
+      ],
+      "superseded": [
+        "EAFIX_auth_docs/superseded/0199900004260118_reentry subsystem is designed as a multi-dimensional decision matrix.md"
+      ]
+    },
+    {
+      "subject": "runbooks",
+      "active_authority": "EAFIX_auth_docs/0110000047260118_index.md",
+      "supporting": [
+        "EAFIX_auth_docs/0110000050260118_README.md"
+      ],
+      "superseded": [
+        "EAFIX_auth_docs/superseded/0199900014260118_README.md"
+      ]
+    },
+    {
+      "subject": "governance",
+      "active_authority": "EAFIX_auth_docs/Y_module governance glossary.json",
+      "supporting": [
+        "EAFIX_auth_docs/x_module governance glossary bulk terms.json"
+      ],
+      "superseded": [
+        "EAFIX_auth_docs/superseded/module governance glossary bulk terms.json"
+      ]
+    },
+    {
+      "subject": "module_metadata",
+      "active_authority": "EAFIX_auth_docs/module_catalog.json",
+      "supporting": [
+        "EAFIX_auth_docs/process_step_catalog.json",
+        "EAFIX_auth_docs/module_checklist.json",
+        "EAFIX_auth_docs/documentation_triage_matrix.json"
+      ],
+      "superseded": []
+    }
+  ],
+  "entries": [
+    {
+      "path": "eafix_project_knowledge_reference_routing_instructions.json",
+      "classification": "canonical",
+      "authority_level": 1,
+      "description": "Repository-level routing instructions control knowledge-routing decisions for documentation tasks."
+    },
+    {
+      "path": "EAFIX_auth_docs/module_catalog.json",
+      "classification": "canonical",
+      "authority_level": 1,
+      "description": "Single source of truth for module identity and canonical symbols."
+    },
+    {
+      "path": "EAFIX_auth_docs/process_step_catalog.json",
+      "classification": "canonical",
+      "authority_level": 1,
+      "description": "Canonical process-step definitions and step handoff sequence."
+    },
+    {
+      "path": "EAFIX_auth_docs/module_checklist.json",
+      "classification": "supporting_reference",
+      "authority_level": 2,
+      "description": "Checklist coverage map for required per-module and per-submodule documentation sets."
+    },
+    {
+      "path": "EAFIX_auth_docs/documentation_triage_matrix.json",
+      "classification": "generated",
+      "authority_level": 4,
+      "description": "Generated inventory and overlap triage matrix for cleanup operations."
+    }
+  ]
+}
