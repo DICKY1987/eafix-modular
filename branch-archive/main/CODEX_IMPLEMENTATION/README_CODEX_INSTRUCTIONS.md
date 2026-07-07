@@ -169,7 +169,7 @@ CODEX_IMPLEMENTATION/
 ### **Phase 1 Setup**:
 ```bash
 # Navigate to project
-cd "C:\Users\Richard Wilks\cli_multi_rapid_DEV"
+cd "<repo-root>"
 
 # Create recovery system structure
 mkdir -p src/eafix/recovery
