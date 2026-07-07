@@ -1,3 +1,10 @@
+---
+status: superseded
+superseded_by: EAFIX_auth_docs/0199900001260118_Economic Calendar Integration Framework.md
+reason: Calendar strategy-id generation content is absorbed into the broader integration framework.
+active_authority: false
+---
+
 Economic Calendar Strategy ID Generation.txt
 56.54 KB •1,443 lines
 •
