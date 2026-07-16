@@ -1,0 +1,83 @@
+name: Bootstrap EAFIX Registry System
+
+on:
+  push:
+    branches:
+      - copilot/eafix-registry-system-v1
+    paths:
+      - 'tools/registries/bootstrap-parts/**'
+      - '.github/workflows/registry-bootstrap.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Restore validated registry implementation
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat tools/registries/bootstrap-parts/part-*.b64 > /tmp/eafix-registry-source.b64
+          base64 --decode /tmp/eafix-registry-source.b64 > /tmp/eafix-registry-source.tar.gz
+          tar -xzf /tmp/eafix-registry-source.tar.gz -C .
+          rm -rf tools/registries/bootstrap-parts
+          rm -f .github/workflows/registry-bootstrap.yml
+          find tools tests -type d -name __pycache__ -prune -exec rm -rf {} + || true
+          find tools tests -type f -name '*.pyc' -delete || true
+
+      - name: Correct command-line wrapper
+        shell: bash
+        run: |
+          cat > tools/registries/build_registries.py <<'PY'
+          import argparse
+          from registry_core import run
+
+          if __name__ == '__main__':
+              parser = argparse.ArgumentParser()
+              parser.add_argument('--check', action='store_true')
+              parser.add_argument('--report-only', action='store_true')
+              args = parser.parse_args()
+              raise SystemExit(run(check=args.check, report_only=args.report_only))
+          PY
+
+      - name: Install validator dependency
+        run: python -m pip install --disable-pip-version-check jsonschema
+
+      - name: Generate and validate registry system
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/registries/build_registries.py
+          python tools/registries/validate_record_schemas.py
+          python tools/registries/validate_registry_ids.py
+          python tools/registries/validate_registry_references.py
+          python tools/registries/validate_registry_authority.py
+          python tools/registries/build_registries.py --check
+          python -m unittest discover -s tests/registries -p 'test_*.py'
+
+      - name: Commit final registry implementation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No registry changes to commit.'
+            exit 0
+          fi
+          git commit -m 'Implement populated EAFIX registry system'
+          git push origin HEAD:${GITHUB_REF_NAME}
