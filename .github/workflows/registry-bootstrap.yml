@@ -7,6 +7,12 @@ on:
     paths:
       - 'tools/registries/bootstrap-parts/**'
       - '.github/workflows/registry-bootstrap.yml'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'tools/registries/bootstrap-parts/**'
+      - '.github/workflows/registry-bootstrap.yml'
 
 permissions:
   contents: write
@@ -19,6 +25,7 @@ jobs:
       - name: Checkout feature branch
         uses: actions/checkout@v4
         with:
+          ref: copilot/eafix-registry-system-v1
           fetch-depth: 0
 
       - name: Set up Python
@@ -80,4 +87,4 @@ jobs:
             exit 0
           fi
           git commit -m 'Implement populated EAFIX registry system'
-          git push origin HEAD:${GITHUB_REF_NAME}
+          git push origin HEAD:copilot/eafix-registry-system-v1
