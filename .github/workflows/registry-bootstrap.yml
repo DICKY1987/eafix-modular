@@ -17,6 +17,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: registry-bootstrap-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   bootstrap:
     if: github.actor != 'github-actions[bot]'
