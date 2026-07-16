@@ -23,6 +23,7 @@ concurrency:
 
 jobs:
   bootstrap:
+    # This one-time workflow removes itself after publishing the final registry tree.
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-22.04
     steps:
