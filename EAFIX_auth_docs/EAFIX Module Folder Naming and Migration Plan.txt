@@ -1,0 +1,738 @@
+EAFIX Module Folder Naming and Migration Plan
+Plan ID: EAFIX-MODULE-FOLDER-NAMING-V1 Version: 1.0.0 Status: Proposed Repository: DICKY1987/eafix-modular Scope: Naming and migration of the 34 canonical module roots and their governed first-level containers.
+ 
+⸻
+ 
+1. Purpose
+This plan defines a simple, deterministic folder-naming convention for the EAFIX module-centric repository.
+The design must:
+	•	Make every module root visually distinguishable.
+	•	Make every governed first-level module folder identify its owning module.
+	•	Preserve conventional nested folder names.
+	•	Avoid introducing a full folder-identity registry unless a future requirement needs one.
+	•	Avoid breaking Python, MQL4, packaging, testing, documentation, and build tools.
+	•	Produce names deterministically from approved module identity data.
+	•	Prevent naming drift through lightweight validation.
+	•	Support a controlled and reversible migration.
+This plan addresses folder-name distinguishability.
+It does not create a complete path-independent folder-identity system for tracking every folder through ownership transfers, retirement, and arbitrary structural changes.
+ 
+⸻
+ 
+2. Scope
+2.1 Included
+This plan governs:
+	•	The physical name of each canonical module root.
+	•	The physical name of each approved first-level module-owned container.
+	•	The short module locator used in folder names.
+	•	The module-root identity marker.
+	•	The approved first-level container vocabulary.
+	•	Naming validation.
+	•	Rename-map generation.
+	•	Repository path-impact analysis.
+	•	Physical migration sequencing.
+	•	Rollback and verification.
+2.2 Excluded
+This plan does not define:
+	•	Module responsibilities
+	•	Module contracts
+	•	Process steps
+	•	Module dependencies
+	•	Nested folder taxonomy beyond the first level
+	•	Per-folder synthetic IDs such as FID-*
+	•	A permanent folder path registry
+	•	A reverse ID-to-path resolver
+	•	Identity markers in every nested folder
+	•	Runtime-created or generated directories
+	•	Which source files belong to each module
+	•	Ownership-transfer governance between modules
+Those matters remain governed separately.
+ 
+⸻
+ 
+3. Preconditions
+No folder rename may begin until the following conditions are met.
+3.1 Ratified 34-module authority
+The repository must contain one populated and approved authority containing all 34 module records.
+The current vNext catalog declares module_count: 34 but its modules array is empty, so it cannot currently serve as the executable naming source.
+Before implementation, one of the following must be completed:
+	1.	Repair and populate Claude_gen_atomic_module_catalog_vNext.json, or
+	2.	Create a ratified current catalog generated from the 34 approved manifests.
+The authority must contain, for every module:
+{
+  "module_id": "50000000000000000013",
+  "module_locator": "M0013",
+  "canonical_symbol": "R1_RISK_EVALUATOR",
+  "status": "canonical"
+}
+The routing and governance records must point to this populated authority as the source of truth for module existence and identity.
+3.2 Unique identity checks
+The authority must validate:
+canonical module records = 34
+unique module IDs = 34
+unique module locators = 34
+unique canonical symbols = 34
+duplicate IDs = 0
+duplicate locators = 0
+duplicate symbols = 0
+3.3 Container inventory
+Each module must have an approved list of first-level containers that it actually instantiates.
+The naming rule must not require every module to contain every possible folder.
+Example:
+{
+  "module_id": "50000000000000000013",
+  "containers": [
+    "src",
+    "tests",
+    "docs",
+    "schemas",
+    "config",
+    "scripts",
+    "context",
+    "state"
+  ]
+}
+A module with no implementation files may instead have:
+{
+  "module_id": "50000000000000000033",
+  "containers": [
+    "docs",
+    "schemas",
+    "context"
+  ]
+}
+Empty folders must not be created merely to satisfy a universal template.
+ 
+⸻
+ 
+4. Identity model
+4.1 Canonical module ID
+The existing 20-digit numeric module ID remains the permanent identity.
+Example:
+50000000000000000013
+Rules:
+	•	Never reused
+	•	Never renumbered
+	•	Retained after retirement
+	•	Not replaced by the folder name
+	•	Not treated as process order
+	•	Not treated as runtime layer
+	•	Not treated as semantic category
+The project glossary defines the module ID as a permanent opaque numeric identifier.
+4.2 Human locator
+Each module receives one short locator:
+M0013
+The lowercase rendering used in folder names is:
+m0013
+The locator must be stored explicitly in the ratified module authority.
+It must not be calculated at runtime by subtracting a numeric base from the opaque module ID unless the project formally changes its identity policy to permit that interpretation.
+Rules:
+	•	Assigned once
+	•	Never reused
+	•	Preserved after module retirement
+	•	Not derived from sorting
+	•	Not inferred from process order
+	•	Not inferred from the module symbol
+	•	Not independently stored in a separate locator registry
+The locator exists as a field in the same canonical module record as the module ID and symbol.
+ 
+⸻
+ 
+5. Naming rules
+N1 — Module-root name
+Each canonical module root must be named:
+<lowercase-locator>-<canonical-symbol-rendered-as-kebab-case>
+Example:
+m0013-r1-risk-evaluator/
+Transformation:
+R1_RISK_EVALUATOR
+→ r1-risk-evaluator
+Complete root:
+m0013-r1-risk-evaluator
+N2 — First-level governed containers
+Every approved first-level module-owned container must be named:
+<lowercase-locator>-<container-role>
+Examples:
+m0013-src/
+m0013-tests/
+m0013-docs/
+m0013-schemas/
+m0013-config/
+m0013-scripts/
+m0013-context/
+State uses a hidden, self-identifying form:
+.m0013-state/
+This rule applies only to containers listed in the approved container inventory for that module.
+N3 — Nested folders
+Folders below the governed first-level container retain conventional names.
+Example:
+m0013-tests/
+├── unit/
+├── integration/
+├── contract/
+└── acceptance/
+Do not use:
+m0013-tests/
+├── m0013-tests-unit/
+├── m0013-tests-integration/
+└── m0013-tests-contract/
+The prefixed parent already identifies ownership.
+N4 — Runtime-constrained folders
+Runtime-constrained names remain conventional.
+Examples:
+m0013-src/
+└── r1_risk_evaluator/
+m0017-src/
+├── Experts/
+├── Indicators/
+└── Include/
+Do not prefix:
+	•	Python package directories
+	•	MQL4 Experts
+	•	MQL4 Indicators
+	•	MQL4 Include
+	•	node_modules
+	•	dist
+	•	build
+	•	__pycache__
+	•	.pytest_cache
+	•	.venv
+	•	Other tool-generated directories
+N5 — Root identity marker
+Every module root must contain:
+.module-id
+Contents:
+50000000000000000013
+The marker must contain exactly one canonical module ID followed by a newline.
+It is used to verify:
+	•	Root-folder ownership
+	•	Locator correctness
+	•	Symbol rendering
+	•	Move correctness
+	•	Duplicate roots
+	•	Accidental cross-module nesting
+No .fid or .folder-id marker is required in standard child folders.
+N6 — Canonical symbol rename
+If a canonical symbol changes through accepted governance:
+R1_RISK_EVALUATOR
+→ R1_RISK_DECISION_ENGINE
+the root folder may change:
+m0013-r1-risk-evaluator/
+→ m0013-r1-risk-decision-engine/
+The following remain unchanged:
+module_id
+module_locator
+.module-id contents
+The old path must be recorded in the migration history.
+N7 — Locator reuse
+A retired module locator must never be assigned to another module.
+If M0013 is retired, M0013 remains retired permanently.
+ 
+⸻
+ 
+6. Approved first-level container vocabulary
+Initial allowed values:
+src
+tests
+docs
+schemas
+config
+scripts
+context
+state
+templates
+examples
+assets
+migrations
+The first eight are the standard baseline vocabulary.
+Additional roles such as templates, examples, assets, or migrations may be used only when included in that module’s approved container inventory.
+A contributor must not invent variants such as:
+source
+test
+documentation
+schema
+configs
+script
+contexts
+states
+without first changing the naming specification.
+ 
+⸻
+ 
+7. Example target structure
+m0013-r1-risk-evaluator/
+├── .module-id
+├── m0013-src/
+│   └── r1_risk_evaluator/
+├── m0013-tests/
+│   ├── unit/
+│   ├── integration/
+│   ├── contract/
+│   ├── acceptance/
+│   └── fixtures/
+├── m0013-docs/
+│   ├── architecture/
+│   ├── decisions/
+│   ├── runbook/
+│   └── failure-modes/
+├── m0013-schemas/
+│   ├── inputs/
+│   ├── outputs/
+│   └── examples/
+├── m0013-config/
+├── m0013-scripts/
+├── m0013-context/
+├── .m0013-state/
+├── 50000000000000000013_R1_RISK_EVALUATOR.manifest.json
+├── pyproject.toml
+├── AGENTS.md
+└── README.md
+Properties:
+Module root identifies the module.
+First-level containers identify the owner.
+Nested folders remain readable.
+Python packages remain import-compatible.
+State remains hidden.
+No folder registry is required.
+ 
+⸻
+ 
+8. Required artifacts
+8.1 Authored artifacts
+A. Ratified module authority
+Example:
+atomic_module_catalog.current.json
+Required fields:
+module_id
+module_locator
+canonical_symbol
+status
+legacy_aliases
+B. Naming specification
+module_folder_naming_spec.md
+C. Container inventory
+module_container_inventory.json
+Example:
+{
+  "schema_version": "1.0.0",
+  "modules": [
+    {
+      "module_id": "50000000000000000013",
+      "containers": [
+        "src",
+        "tests",
+        "docs",
+        "schemas",
+        "config",
+        "scripts",
+        "context",
+        "state"
+      ]
+    }
+  ]
+}
+D. Container inventory schema
+module_container_inventory.schema.json
+8.2 Generated artifacts
+These must never be hand-edited:
+MODULE_FOLDER_TREE.generated.md
+module_folder_rename_map.json
+module_folder_validation_report.json
+module_folder_path_impact_report.json
+module_folder_rollback_map.json
+No permanent folder_index.json is required under this plan.
+ 
+⸻
+ 
+9. Naming generator
+Create:
+tools/generate_module_folder_names.py
+Inputs:
+ratified module authority
+module container inventory
+naming specification version
+Outputs:
+expected module-root names
+expected first-level container names
+rename map
+generated folder tree
+validation input snapshot
+Requirements:
+	•	Stable module ordering
+	•	Stable container ordering
+	•	UTF-8
+	•	LF line endings
+	•	Deterministic JSON key order
+	•	No timestamps in deterministic content unless explicitly supplied
+	•	Same inputs produce byte-identical outputs
+	•	Report mode must not modify the filesystem
+	•	Migration mode requires an explicit approved rename map
+Example generated record:
+{
+  "module_id": "50000000000000000013",
+  "module_locator": "M0013",
+  "canonical_symbol": "R1_RISK_EVALUATOR",
+  "expected_root": "m0013-r1-risk-evaluator",
+  "expected_containers": {
+    "src": "m0013-src",
+    "tests": "m0013-tests",
+    "docs": "m0013-docs",
+    "schemas": "m0013-schemas",
+    "config": "m0013-config",
+    "scripts": "m0013-scripts",
+    "context": "m0013-context",
+    "state": ".m0013-state"
+  }
+}
+ 
+⸻
+ 
+10. Validation
+Create:
+tools/validate_module_folder_names.py
+10.1 Validation rules
+The validator must check:
+	1.	The canonical module authority contains exactly 34 active modules.
+	2.	Every module ID is unique.
+	3.	Every module locator is unique.
+	4.	Every canonical symbol is unique.
+	5.	Every module root matches the expected naming rule.
+	6.	Every module root contains .module-id.
+	7.	Every .module-id matches the owning canonical module ID.
+	8.	Every first-level governed container uses the correct locator.
+	9.	Every first-level governed container uses an approved role.
+	10.	No unprefixed governed src, tests, docs, schemas, config, scripts, context, or state folder exists inside a migrated module.
+	11.	No container uses another module’s locator.
+	12.	No unexpected container is silently accepted.
+	13.	Runtime-constrained folders are excluded.
+	14.	Generated and cache folders are excluded.
+	15.	Every module instantiates only containers approved by its inventory.
+	16.	Every required container in the inventory exists after migration.
+	17.	No two expected folder names collide.
+	18.	Re-running the generator produces no diff.
+	19.	No generated artifact was manually edited.
+	20.	No physical rename occurs outside the approved rename map.
+10.2 CI rollout
+Stage 1 — Report only
+The validator runs and uploads:
+module_folder_validation_report.json
+Failures are visible but do not block merges.
+Stage 2 — Blocking
+After the migration baseline is clean, CI blocks:
+	•	Invalid module-root names
+	•	Invalid locators
+	•	Missing .module-id
+	•	Wrong module ownership
+	•	Unprefixed governed containers
+	•	Unauthorized container roles
+	•	Stale generated rename maps
+	•	Manual edits to generated artifacts
+The naming rule is deterministic, but contributors can still violate it manually. Permanent lightweight validation is therefore required.
+ 
+⸻
+ 
+11. Pre-migration path-impact scan
+Before renaming any directory, scan the repository for consumers of the current paths.
+Create:
+tools/scan_module_path_consumers.py
+The scan must inspect:
+	•	pyproject.toml
+	•	pytest.ini
+	•	setup.cfg
+	•	tox.ini
+	•	Coverage configuration
+	•	Mypy configuration
+	•	Ruff configuration
+	•	Dockerfiles
+	•	Docker Compose files
+	•	GitHub Actions
+	•	PowerShell scripts
+	•	Shell scripts
+	•	Taskfiles
+	•	Makefiles
+	•	Sphinx configuration
+	•	Documentation links
+	•	Test discovery paths
+	•	Static-analysis globs
+	•	Package include/exclude rules
+	•	Build scripts
+	•	Deployment scripts
+	•	IDE workspace files
+	•	MT4 deployment scripts
+	•	MQL4 include references
+	•	Runtime file references
+	•	Hard-coded absolute or relative paths
+Output:
+module_folder_path_impact_report.json
+Each impacted reference must include:
+{
+  "path": ".github/workflows/test.yml",
+  "line": 42,
+  "current_reference": "src",
+  "expected_reference": "m0013-src",
+  "module_id": "50000000000000000013",
+  "action": "update",
+  "status": "pending"
+}
+No rename begins while unresolved path references remain.
+ 
+⸻
+ 
+12. Migration plan
+Phase 0 — Authority repair
+	1.	Inspect the current routing authority.
+	2.	Inspect current document authority.
+	3.	Repair or replace the empty 34-module source.
+	4.	Confirm all 34 records.
+	5.	Add explicit module locators.
+	6.	Validate uniqueness.
+	7.	Register the populated authority.
+	8.	Freeze the identity snapshot used for migration.
+Exit criteria
+34 valid module records
+34 unique locators
+0 missing symbols
+0 duplicate IDs
+0 unresolved authority conflicts affecting module identity
+ 
+⸻
+ 
+Phase 1 — Container inventory
+	1.	Inspect each module manifest.
+	2.	Inspect current source ownership.
+	3.	Determine which first-level containers each module needs.
+	4.	Avoid creating empty folders without evidence.
+	5.	Record unresolved modules as needs_review.
+	6.	Approve the final inventory.
+Exit criteria
+34 modules inventoried
+0 modules silently inferred
+0 unknown container roles
+0 duplicate role declarations
+ 
+⸻
+ 
+Phase 2 — Dry-run generation
+	1.	Generate expected root names.
+	2.	Generate expected container names.
+	3.	Generate target tree.
+	4.	Generate rename map.
+	5.	Detect collisions.
+	6.	Detect path-length risks.
+	7.	Detect invalid symbols.
+	8.	Detect inconsistent locators.
+	9.	Produce a human-readable review report.
+No files move during this phase.
+ 
+⸻
+ 
+Phase 3 — Path-impact analysis
+	1.	Scan all code and configuration.
+	2.	Identify all current path references.
+	3.	Classify each reference:  
+	•	must update
+	•	runtime constrained
+	•	generated
+	•	obsolete
+	•	needs review
+	4.	Produce per-module impact reports.
+	5.	Add expected verification commands.
+	6.	Add rollback instructions.
+No files move until every affected reference has a disposition.
+ 
+⸻
+ 
+Phase 4 — Pilot migration
+Select four representative modules:
+	1.	Pure Python module
+	2.	Python–MQL4 or MT4 module
+	3.	UI/backend module
+	4.	Shared-kernel or low-implementation module
+For each pilot:
+	1.	Create target root.
+	2.	Move files using git mv.
+	3.	Add .module-id.
+	4.	Rename approved first-level containers.
+	5.	Update packaging configuration.
+	6.	Update test paths.
+	7.	Update coverage paths.
+	8.	Update CI paths.
+	9.	Update documentation links.
+	10.	Update deployment paths.
+	11.	Regenerate the target tree and reports.
+	12.	Run module tests.
+	13.	Run repository validation.
+	14.	Test rollback.
+Pilot acceptance criteria
+imports pass
+tests pass
+packaging passes
+CI paths resolve
+MT4 paths pass where applicable
+generated tree is clean
+validator reports zero naming errors
+rollback succeeds
+ 
+⸻
+ 
+Phase 5 — Full migration
+Migrate in controlled batches.
+Batch A — Low-risk modules
+	•	Documentation-heavy modules
+	•	Modules with no runtime code
+	•	Modules with minimal path consumers
+Batch B — Pure Python modules
+	•	Calculation modules
+	•	Signal modules
+	•	Risk modules
+	•	Reentry modules
+Batch C — Services and integrations
+	•	Calendar services
+	•	Market adapters
+	•	Orchestration
+	•	Transport modules
+	•	Order-routing modules
+Batch D — UI modules
+	•	Dashboard backend
+	•	GUI gateway
+	•	Desktop operator
+	•	UI-related schemas
+Batch E — MT4 modules
+	•	Adapter transport
+	•	EA executor
+	•	MT4 overlay
+	•	Include files
+	•	Terminal deployment assets
+MT4-related moves occur last because terminal and include-path behavior is more sensitive.
+ 
+⸻
+ 
+Phase 6 — CI enforcement
+After all migrated modules pass:
+	1.	Switch naming validation to blocking.
+	2.	Block unprefixed governed containers.
+	3.	Block invalid root names.
+	4.	Block missing .module-id.
+	5.	Block incorrect locators.
+	6.	Block unauthorized roles.
+	7.	Block stale generated reports.
+	8.	Block manual changes outside approved rename maps.
+ 
+⸻
+ 
+Phase 7 — Closeout
+	1.	Confirm all 34 roots.
+	2.	Confirm all approved containers.
+	3.	Regenerate the final tree.
+	4.	Confirm no stale old paths remain.
+	5.	Preserve legacy-path history.
+	6.	Archive migration-only artifacts.
+	7.	Update repository structure documentation.
+	8.	Update AI routing references.
+	9.	Record the accepted naming policy version.
+	10.	Test a clean clone.
+ 
+⸻
+ 
+13. Rename map
+Every physical change must be represented before execution.
+Example:
+{
+  "module_id": "50000000000000000013",
+  "source_root": "services/risk-manager",
+  "target_root": "m0013-r1-risk-evaluator",
+  "moves": [
+    {
+      "source": "services/risk-manager/src",
+      "target": "m0013-r1-risk-evaluator/m0013-src"
+    },
+    {
+      "source": "services/risk-manager/tests",
+      "target": "m0013-r1-risk-evaluator/m0013-tests"
+    }
+  ],
+  "path_consumers": [],
+  "validation_commands": [],
+  "rollback_commands": []
+}
+Rules:
+	•	No unlisted move
+	•	No destructive overwrite
+	•	No merge of unrelated directories
+	•	No path reuse without review
+	•	No deletion until post-move validation succeeds
+ 
+⸻
+ 
+14. Rollback
+Every migration batch must be reversible.
+Rollback must restore:
+	•	Original folder paths
+	•	Original packaging paths
+	•	Original test configuration
+	•	Original CI references
+	•	Original deployment paths
+	•	Original documentation links
+Rollback may be implemented through:
+	•	Git revert
+	•	Generated inverse rename map
+	•	Verified reverse git mv commands
+The rollback map must be generated before migration.
+ 
+⸻
+ 
+15. Known limitations
+This naming plan does not provide:
+	•	Path-independent identities for nested folders
+	•	Ownership-transfer records for subfolders
+	•	Stable folder IDs after arbitrary role renames
+	•	A permanent path resolver
+	•	Folder retirement histories
+	•	Identity for every generated directory
+Those features should be introduced only if an actual requirement emerges.
+The current scheme is forward-compatible with a later composite-ID layer because the module ID and locator remain stable.
+ 
+⸻
+ 
+16. Definition of done
+The work is complete when:
+34/34 canonical modules have approved identities.
+34/34 modules have explicit locators.
+34/34 roots use the naming convention.
+34/34 roots contain valid .module-id markers.
+Every instantiated first-level container is approved.
+Every instantiated first-level container has the correct prefix.
+No unauthorized unprefixed governed container remains.
+No nested runtime-constrained folder was incorrectly renamed.
+All path consumers have been updated.
+All generated reports are deterministic.
+All Python imports pass.
+All Python tests pass.
+All packaging checks pass.
+All MQL4 compile/include checks pass where applicable.
+All UI builds pass where applicable.
+All CI workflows pass.
+All rollback maps are valid.
+Naming validation is blocking.
+A clean clone reproduces the same valid result.
+ 
+⸻
+ 
+17. Final governing rule
+The module ID is the permanent identity.
+
+The module locator is the visible owner label.
+
+The module root combines locator and canonical symbol.
+
+The first-level container combines locator and role.
+
+Nested folders remain conventional.
+
+Runtime-constrained folders remain unchanged.
+
+The naming generator produces the expected structure.
+
+The validator prevents drift.
+
+The migration map controls physical changes.
