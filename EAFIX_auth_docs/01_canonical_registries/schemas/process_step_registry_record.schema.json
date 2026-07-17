@@ -1,0 +1,306 @@
+{
+  "$id": "process_step.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifact_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "atomic_activities": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "authority_status": {
+      "enum": [
+        "canonical",
+        "canonical_candidate",
+        "generated",
+        "supporting_evidence",
+        "implementation_evidence",
+        "legacy_source",
+        "needs_review"
+      ]
+    },
+    "branches": {
+      "type": "array"
+    },
+    "change_request_refs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "confidence": {
+      "enum": [
+        "high",
+        "medium",
+        "low",
+        "unknown"
+      ]
+    },
+    "configuration_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "dependency_step_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "effective_from_utc": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "evidence_refs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "failure_control_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "gap_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "implementation_status": {
+      "type": "string"
+    },
+    "input_contract_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "integration_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "last_verified_commit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "output_contract_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "owner_module_id": {
+      "type": "string"
+    },
+    "owner_symbol_at_source": {
+      "type": "string"
+    },
+    "phase_id": {
+      "type": "string"
+    },
+    "preconditions": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "process_order": {
+      "type": "integer"
+    },
+    "record_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "record_type": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "record_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "source_hashes": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "source_refs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "commit_sha": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "line_end": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "line_start": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "role": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "role",
+          "commit_sha"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "status": {
+      "enum": [
+        "candidate",
+        "active",
+        "canonical",
+        "planned",
+        "partial",
+        "conflicted",
+        "deprecated",
+        "superseded",
+        "retired",
+        "archived"
+      ]
+    },
+    "step_code": {
+      "type": "string"
+    },
+    "step_id": {
+      "pattern": "^6\\d{19}$",
+      "type": "string"
+    },
+    "step_name": {
+      "type": "string"
+    },
+    "step_number": {
+      "type": "integer"
+    },
+    "superseded_by": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "supersedes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "supporting_module_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "terminal_outcomes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "trigger": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "validation_control_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "record_type",
+    "record_id",
+    "schema_version",
+    "record_version",
+    "status",
+    "authority_status",
+    "source_refs",
+    "source_hashes",
+    "confidence",
+    "effective_from_utc",
+    "supersedes",
+    "superseded_by",
+    "change_request_refs",
+    "last_verified_commit",
+    "step_id",
+    "step_code",
+    "step_number",
+    "step_name",
+    "phase_id",
+    "process_order",
+    "owner_module_id",
+    "owner_symbol_at_source",
+    "supporting_module_ids",
+    "dependency_step_ids",
+    "trigger",
+    "preconditions",
+    "input_contract_ids",
+    "atomic_activities",
+    "branches",
+    "output_contract_ids",
+    "integration_ids",
+    "artifact_ids",
+    "validation_control_ids",
+    "failure_control_ids",
+    "configuration_ids",
+    "implementation_status",
+    "evidence_refs",
+    "gap_ids",
+    "terminal_outcomes"
+  ],
+  "title": "Process step registry record",
+  "type": "object"
+}

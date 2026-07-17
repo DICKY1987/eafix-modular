@@ -1,0 +1,272 @@
+{
+  "$id": "contract.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "aliases": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "authority_status": {
+      "enum": [
+        "canonical",
+        "canonical_candidate",
+        "generated",
+        "supporting_evidence",
+        "implementation_evidence",
+        "legacy_source",
+        "needs_review"
+      ]
+    },
+    "change_request_refs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "checksum_fields": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "compatibility_policy": {
+      "type": "string"
+    },
+    "confidence": {
+      "enum": [
+        "high",
+        "medium",
+        "low",
+        "unknown"
+      ]
+    },
+    "conflicts": {
+      "type": "array"
+    },
+    "consumer_module_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "consumer_step_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "contract_id": {
+      "type": "string"
+    },
+    "contract_name": {
+      "type": "string"
+    },
+    "effective_from_utc": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "examples": {
+      "type": "array"
+    },
+    "idempotency_fields": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "implementation_status": {
+      "type": "string"
+    },
+    "last_verified_commit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "optional_fields": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "producer_module_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "producer_step_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "recommendation": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "record_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "record_type": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "record_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "type": "string"
+    },
+    "required_fields": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "schema_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "sequence_fields": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "source_hashes": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "source_refs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "commit_sha": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "line_end": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "line_start": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "role": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "role",
+          "commit_sha"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "status": {
+      "enum": [
+        "candidate",
+        "active",
+        "canonical",
+        "planned",
+        "partial",
+        "conflicted",
+        "deprecated",
+        "superseded",
+        "retired",
+        "archived"
+      ]
+    },
+    "superseded_by": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "supersedes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "version": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "record_type",
+    "record_id",
+    "schema_version",
+    "record_version",
+    "status",
+    "authority_status",
+    "source_refs",
+    "source_hashes",
+    "confidence",
+    "effective_from_utc",
+    "supersedes",
+    "superseded_by",
+    "change_request_refs",
+    "last_verified_commit",
+    "contract_id",
+    "contract_name",
+    "version",
+    "schema_ref",
+    "producer_module_ids",
+    "consumer_module_ids",
+    "producer_step_ids",
+    "consumer_step_ids",
+    "required_fields",
+    "optional_fields",
+    "compatibility_policy",
+    "idempotency_fields",
+    "sequence_fields",
+    "checksum_fields",
+    "examples",
+    "implementation_status",
+    "aliases",
+    "conflicts",
+    "recommendation"
+  ],
+  "title": "Contract registry record",
+  "type": "object"
+}

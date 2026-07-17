@@ -1,0 +1,41 @@
+---
+doc_id: DOC-REG-0001
+---
+# Generated Module Catalog
+
+> Generated from `module_registry.jsonl`. Do not edit manually.
+
+- `50000000000000000001` **F1_CONFIG_PREFERENCES** — Configuration Service (candidate)
+- `50000000000000000002` **F3_CLOCK_SCHEDULER** — Clock Scheduler (candidate)
+- `50000000000000000003` **D2_CALENDAR_SOURCE_ADAPTER** — Calendar Source Adapter (candidate)
+- `50000000000000000004` **D3_CALENDAR_NORMALIZER** — Calendar Normalizer (candidate)
+- `50000000000000000005` **F2_EVENT_LOG** — Event Log (candidate)
+- `50000000000000000006` **D4_CALENDAR_TRIGGER_BUILDER** — Calendar Trigger Builder (candidate)
+- `50000000000000000007` **D1_MARKET_FEED_ADAPTER** — Market Feed Adapter (candidate)
+- `50000000000000000008` **C1_BAR_BUILDER** — Bar Builder (candidate)
+- `50000000000000000009` **C2_INDICATOR_ENGINE** — Indicator Engine (candidate)
+- `50000000000000000010` **C3_FEATURE_PACKAGER** — Feature Packager (candidate)
+- `50000000000000000011` **S1_SIGNAL_ENGINE** — Signal Engine (candidate)
+- `50000000000000000012` **S2_INTENT_BUILDER** — Intent Builder (candidate)
+- `50000000000000000013` **R1_RISK_EVALUATOR** — Risk Evaluator (candidate)
+- `50000000000000000014` **R2_ORDER_INTENT_COMPILER** — Order Intent Compiler (candidate)
+- `50000000000000000015` **O1_ORDER_ROUTER** — Order Router (candidate)
+- `50000000000000000016` **B1_MT4_ADAPTER_TRANSPORT** — MT4 Adapter Transport (candidate)
+- `50000000000000000017` **B2_MT4_EA_EXECUTOR** — MT4 EA Executor (candidate)
+- `50000000000000000018` **B3_EXEC_EVENT_NORMALIZER** — Execution Event Normalizer (candidate)
+- `50000000000000000019` **O2_OMS_STATE_MACHINE** — OMS State Machine (candidate)
+- `50000000000000000020` **O3_TRADE_CLOSE_CLASSIFIER** — Trade Close Classifier (candidate)
+- `50000000000000000021` **E1_OUTCOME_BUCKETIZER** — Outcome Bucketizer (candidate)
+- `50000000000000000022` **E2_PROXIMITY_EVALUATOR** — Proximity Evaluator (candidate)
+- `50000000000000000023` **E3_MATRIX_LOOKUP** — Matrix Lookup (candidate)
+- `50000000000000000024` **E4_REENTRY_INTENT_BUILDER** — Reentry Intent Builder (candidate)
+- `50000000000000000025` **F4_FLOW_ORCHESTRATOR** — Flow Orchestrator (candidate)
+- `50000000000000000026` **P1_HEALTH_AGGREGATOR** — Health Aggregator (candidate)
+- `50000000000000000027` **R3_CORRELATION_GUARD** — Correlation Guard (candidate)
+- `50000000000000000028` **U1_DASHBOARD_BACKEND** — Dashboard Backend (candidate)
+- `50000000000000000029` **U2_GUI_GATEWAY** — GUI Gateway (candidate)
+- `50000000000000000030` **U3_MT4_EXPIRY_OVERLAY** — MT4 Expiry Overlay (candidate)
+- `50000000000000000031` **U4_DESKTOP_OPERATOR** — Desktop Operator (candidate)
+- `50000000000000000032` **P2_REPORTER** — Reporter (candidate)
+- `50000000000000000033` **SK1_PLUGIN_INTERFACE** — Plugin Interface (candidate)
+- `50000000000000000034` **SK2_IDEMPOTENCY** — Idempotency (candidate)

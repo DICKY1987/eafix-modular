@@ -1,0 +1,2954 @@
+{
+  "document_type": "generated_registry_snapshot",
+  "record_count": 52,
+  "records": [
+    {
+      "authority_status": "legacy_source",
+      "blocking": true,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [],
+      "control_id": "CONTROL::FAILURE::S01",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "FAIL_CLOSED",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": true,
+      "fail_criteria": "Reject invalid config; continue using last known good snapshot",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000001"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S01",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Reject invalid config; continue using last known good snapshot",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Resolve configuration snapshot",
+      "severity": "critical",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000001"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": false,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S02",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "DETERMINISTIC_DEGRADED_CONTINUE",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": false,
+      "fail_criteria": "If scheduler stalls, emit HealthReport alert and pause polling",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000002"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S02",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "If scheduler stalls, emit HealthReport alert and pause polling",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Emit schedule tick (calendar polling cadence)",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000002"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": false,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [],
+      "control_id": "CONTROL::FAILURE::S03",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "DETERMINISTIC_DEGRADED_CONTINUE",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": false,
+      "fail_criteria": "Retry w/ deterministic backoff; on persistent failure emit IngestError and skip cycle",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000003"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S03",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Retry w/ deterministic backoff; on persistent failure emit IngestError and skip cycle",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Poll calendar source(s)",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000003"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": false,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S04",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "DETERMINISTIC_DEGRADED_CONTINUE",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": false,
+      "fail_criteria": "Emit NormalizationError for malformed rows; continue with valid CalendarEvent",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000004"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S04",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Emit NormalizationError for malformed rows; continue with valid CalendarEvent",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Normalize raw calendar entries",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000004"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": true,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [],
+      "control_id": "CONTROL::FAILURE::S05",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "FAIL_CLOSED",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": true,
+      "fail_criteria": "Rollback and retry once; on persistent failure halt calendar pipeline",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000005"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S05",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Rollback and retry once; on persistent failure halt calendar pipeline",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Persist calendar events (append-only)",
+      "severity": "critical",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000005"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": false,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S06",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "DETERMINISTIC_DEGRADED_CONTINUE",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": false,
+      "fail_criteria": "Default to conservative suppression metadata; emit error event",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000006"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S06",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Default to conservative suppression metadata; emit error event",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Build anticipation triggers from calendar",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000006"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": false,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S07",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "DETERMINISTIC_DEGRADED_CONTINUE",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": false,
+      "fail_criteria": "Emit IngestError; skip malformed ticks",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000007"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S07",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Emit IngestError; skip malformed ticks",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Ingest market ticks",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000007"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": false,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S08",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "DETERMINISTIC_DEGRADED_CONTINUE",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": false,
+      "fail_criteria": "Drop out-of-order ticks per policy; emit error event",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000008"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S08",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Drop out-of-order ticks per policy; emit error event",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Aggregate ticks into bars",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000008"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": false,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S09",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "DETERMINISTIC_DEGRADED_CONTINUE",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": false,
+      "fail_criteria": "Emit indicator error; do not output partial snapshots unless flagged",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000009"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S09",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Emit indicator error; do not output partial snapshots unless flagged",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Compute indicators",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000009"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": true,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S10",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "FAIL_CLOSED",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": true,
+      "fail_criteria": "Emit packaging error; do not emit FeatureFrame",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000010"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S10",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Emit packaging error; do not emit FeatureFrame",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Assemble strategy feature frame",
+      "severity": "critical",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000010"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": false,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S11",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "DETERMINISTIC_DEGRADED_CONTINUE",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": false,
+      "fail_criteria": "On internal error, emit SignalSuppressed with deterministic reason code",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000011"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S11",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "On internal error, emit SignalSuppressed with deterministic reason code",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Generate signal (or suppression)",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000011"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": true,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S12",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "FAIL_CLOSED",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": true,
+      "fail_criteria": "Reject intent; emit error event",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000012"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S12",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Reject intent; emit error event",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Convert signal to trade intent",
+      "severity": "critical",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000012"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": true,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S13",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "FAIL_CLOSED",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": true,
+      "fail_criteria": "On rule engine failure default to REJECT with SAFETY_FAIL reason",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000013"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S13",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "On rule engine failure default to REJECT with SAFETY_FAIL reason",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Evaluate risk and size",
+      "severity": "critical",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000013"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": true,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S14",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "FAIL_CLOSED",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": true,
+      "fail_criteria": "If compilation fails, emit error; do not proceed to routing",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000014"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S14",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "If compilation fails, emit error; do not proceed to routing",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Compile order intent",
+      "severity": "critical",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000014"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": true,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S15",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "FAIL_CLOSED",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": true,
+      "fail_criteria": "If routing fails, emit error and reject",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000015"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S15",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "If routing fails, emit error and reject",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Route order to broker",
+      "severity": "critical",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000015"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": true,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S16",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "FAIL_CLOSED",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": true,
+      "fail_criteria": "Deterministic retry schedule; on persistent failure emit TransportError and stop",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000016"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S16",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Deterministic retry schedule; on persistent failure emit TransportError and stop",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Serialize and send to MT4 adapter",
+      "severity": "critical",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000016"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": false,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [],
+      "control_id": "CONTROL::FAILURE::S17",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "DETERMINISTIC_DEGRADED_CONTINUE",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": false,
+      "fail_criteria": "Classify and emit error events; retries per deterministic policy",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000017"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S17",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Classify and emit error events; retries per deterministic policy",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "EA executes broker order",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000017"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": false,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S18",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "DETERMINISTIC_DEGRADED_CONTINUE",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": false,
+      "fail_criteria": "Emit NormalizationError; quarantine malformed broker events",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000018"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S18",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Emit NormalizationError; quarantine malformed broker events",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Normalize broker events to canonical reports",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000018"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": true,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S19",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "FAIL_CLOSED",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": true,
+      "fail_criteria": "On OMS inconsistency, quarantine stream and halt new orders",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000019"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S19",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "On OMS inconsistency, quarantine stream and halt new orders",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Apply execution reports to OMS state",
+      "severity": "critical",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000019"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": false,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S20",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "DETERMINISTIC_DEGRADED_CONTINUE",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": false,
+      "fail_criteria": "If PnL cannot be computed, emit TradeClosed with COMPUTATION_ERROR flag",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000020"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S20",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "If PnL cannot be computed, emit TradeClosed with COMPUTATION_ERROR flag",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Classify trade close and compute canonical PnL",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000020"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": false,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S21",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "DETERMINISTIC_DEGRADED_CONTINUE",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": false,
+      "fail_criteria": "If mapping fails, emit UNKNOWN bucket and quarantine for review",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000021"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S21",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "If mapping fails, emit UNKNOWN bucket and quarantine for review",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Bucketize outcome",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000021"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": false,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S22",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "DETERMINISTIC_DEGRADED_CONTINUE",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": false,
+      "fail_criteria": "Emit proximity error; default to MOST_CONSERVATIVE proximity bucket",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000022"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S22",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Emit proximity error; default to MOST_CONSERVATIVE proximity bucket",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Compute event proximity",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000022"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": false,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S23",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "DETERMINISTIC_DEGRADED_CONTINUE",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": false,
+      "fail_criteria": "If matrix missing, emit MatrixFallbackUsed + safest MatrixDecision",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000023"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S23",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "If matrix missing, emit MatrixFallbackUsed + safest MatrixDecision",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Lookup matrix decision",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000023"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": false,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S24",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "DETERMINISTIC_DEGRADED_CONTINUE",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": false,
+      "fail_criteria": "Emit ReentrySuppressed with deterministic reason",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000024"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S24",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Emit ReentrySuppressed with deterministic reason",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Build reentry trade intent (or suppress)",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000024"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": true,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [],
+      "control_id": "CONTROL::FAILURE::S25",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "FAIL_CLOSED",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": true,
+      "fail_criteria": "On loop prevention trigger, enforce terminal cooldown and stop",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000025"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S25",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "On loop prevention trigger, enforce terminal cooldown and stop",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Loop: reentry intent follows same risk->order->route->transport->execute chain",
+      "severity": "critical",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000025"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": true,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::FAILURE::S26",
+      "control_record_type": "failure_mode",
+      "control_status": "active",
+      "default_behavior": "FAIL_CLOSED",
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": true,
+      "fail_criteria": "If health is unknown, default to risk-off posture (suppress new intents)",
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000026"
+      ],
+      "pass_criteria": null,
+      "record_id": "CONTROL::FAILURE::S26",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": true,
+      "rule": "If health is unknown, default to risk-off posture (suppress new intents)",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Health aggregation + SLO evaluation",
+      "severity": "critical",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "failure_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "failure_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000026"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [],
+      "control_id": "CONTROL::VALIDATION::S01",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000001"
+      ],
+      "pass_criteria": "Schema validate; stable ordering; hash snapshot",
+      "record_id": "CONTROL::VALIDATION::S01",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Schema validate; stable ordering; hash snapshot",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Resolve configuration snapshot",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000001"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S02",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000002"
+      ],
+      "pass_criteria": "Frozen-time mode supported for tests",
+      "record_id": "CONTROL::VALIDATION::S02",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Frozen-time mode supported for tests",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Emit schedule tick (calendar polling cadence)",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000002"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [],
+      "control_id": "CONTROL::VALIDATION::S03",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000003"
+      ],
+      "pass_criteria": "HTTP 200; payload parsable; source_event_id present",
+      "record_id": "CONTROL::VALIDATION::S03",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "HTTP 200; payload parsable; source_event_id present",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Poll calendar source(s)",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000003"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S04",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000004"
+      ],
+      "pass_criteria": "UTC conversion success; impact in enum; dedup policy applied",
+      "record_id": "CONTROL::VALIDATION::S04",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "UTC conversion success; impact in enum; dedup policy applied",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Normalize raw calendar entries",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000004"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [],
+      "control_id": "CONTROL::VALIDATION::S05",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000005"
+      ],
+      "pass_criteria": "Idempotent by message_id; ordered by created_utc + tie-breaker",
+      "record_id": "CONTROL::VALIDATION::S05",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Idempotent by message_id; ordered by created_utc + tie-breaker",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Persist calendar events (append-only)",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000005"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S06",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000006"
+      ],
+      "pass_criteria": "No duplicate trigger for event+offset; TTL rules applied",
+      "record_id": "CONTROL::VALIDATION::S06",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "No duplicate trigger for event+offset; TTL rules applied",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Build anticipation triggers from calendar",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000006"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S07",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000007"
+      ],
+      "pass_criteria": "Timestamp freshness; symbol normalization; reject malformed",
+      "record_id": "CONTROL::VALIDATION::S07",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Timestamp freshness; symbol normalization; reject malformed",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Ingest market ticks",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000007"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S08",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000008"
+      ],
+      "pass_criteria": "Deterministic bar boundaries; tie-breaker rules",
+      "record_id": "CONTROL::VALIDATION::S08",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Deterministic bar boundaries; tie-breaker rules",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Aggregate ticks into bars",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000008"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S09",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000009"
+      ],
+      "pass_criteria": "Deterministic rounding; indicator params pinned by config snapshot",
+      "record_id": "CONTROL::VALIDATION::S09",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Deterministic rounding; indicator params pinned by config snapshot",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Compute indicators",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000009"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S10",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000010"
+      ],
+      "pass_criteria": "Exact declared feature set; stable ordering",
+      "record_id": "CONTROL::VALIDATION::S10",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Exact declared feature set; stable ordering",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Assemble strategy feature frame",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000010"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S11",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000011"
+      ],
+      "pass_criteria": "Suppression reasons enumerated; no sizing/broker specifics",
+      "record_id": "CONTROL::VALIDATION::S11",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Suppression reasons enumerated; no sizing/broker specifics",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Generate signal (or suppression)",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000011"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S12",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000012"
+      ],
+      "pass_criteria": "Stable correlation_id from Signal; constraints + rationale attached",
+      "record_id": "CONTROL::VALIDATION::S12",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Stable correlation_id from Signal; constraints + rationale attached",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Convert signal to trade intent",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000012"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S13",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000013"
+      ],
+      "pass_criteria": "Idempotent for same inputs; deterministic sizing + rounding",
+      "record_id": "CONTROL::VALIDATION::S13",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Idempotent for same inputs; deterministic sizing + rounding",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Evaluate risk and size",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000013"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S14",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000014"
+      ],
+      "pass_criteria": "client_order_id + idempotency_key assigned per policy",
+      "record_id": "CONTROL::VALIDATION::S14",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "client_order_id + idempotency_key assigned per policy",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Compile order intent",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000014"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S15",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000015"
+      ],
+      "pass_criteria": "Routing deterministic; preserves OrderIntent hash",
+      "record_id": "CONTROL::VALIDATION::S15",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Routing deterministic; preserves OrderIntent hash",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Route order to broker",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000015"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S16",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000016"
+      ],
+      "pass_criteria": "Atomic write+rename (no partial reads); sequence + hash; idempotent resend",
+      "record_id": "CONTROL::VALIDATION::S16",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Atomic write+rename (no partial reads); sequence + hash; idempotent resend",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Serialize and send to MT4 adapter",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000016"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [],
+      "control_id": "CONTROL::VALIDATION::S17",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000017"
+      ],
+      "pass_criteria": "EA contains no strategy/risk logic; only execution",
+      "record_id": "CONTROL::VALIDATION::S17",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "EA contains no strategy/risk logic; only execution",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "EA executes broker order",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000017"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S18",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000018"
+      ],
+      "pass_criteria": "Dedup + ordering policy; canonical rounding",
+      "record_id": "CONTROL::VALIDATION::S18",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Dedup + ordering policy; canonical rounding",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Normalize broker events to canonical reports",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000018"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S19",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000019"
+      ],
+      "pass_criteria": "Idempotent fills; out-of-order handling per policy; stable final state",
+      "record_id": "CONTROL::VALIDATION::S19",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Idempotent fills; out-of-order handling per policy; stable final state",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Apply execution reports to OMS state",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000019"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S20",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000020"
+      ],
+      "pass_criteria": "Close reason enum; deterministic PnL rounding rules",
+      "record_id": "CONTROL::VALIDATION::S20",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Close reason enum; deterministic PnL rounding rules",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Classify trade close and compute canonical PnL",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000020"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S21",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000021"
+      ],
+      "pass_criteria": "Only enumerated buckets; stable bucket mapping",
+      "record_id": "CONTROL::VALIDATION::S21",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Only enumerated buckets; stable bucket mapping",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Bucketize outcome",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000021"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S22",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000022"
+      ],
+      "pass_criteria": "Frozen-time supported; thresholds validated (no overlaps/gaps)",
+      "record_id": "CONTROL::VALIDATION::S22",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Frozen-time supported; thresholds validated (no overlaps/gaps)",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Compute event proximity",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000022"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S23",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000023"
+      ],
+      "pass_criteria": "Deterministic fallback hierarchy; matrix version pinned",
+      "record_id": "CONTROL::VALIDATION::S23",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Deterministic fallback hierarchy; matrix version pinned",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Lookup matrix decision",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000023"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S24",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000024"
+      ],
+      "pass_criteria": "Hard cap: no reentry beyond R2; no circular chains",
+      "record_id": "CONTROL::VALIDATION::S24",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Hard cap: no reentry beyond R2; no circular chains",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Build reentry trade intent (or suppress)",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000024"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [],
+      "control_id": "CONTROL::VALIDATION::S25",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000025"
+      ],
+      "pass_criteria": "Chain depth < configured max; velocity limits; idempotency keys enforced",
+      "record_id": "CONTROL::VALIDATION::S25",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Chain depth < configured max; velocity limits; idempotency keys enforced",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Loop: reentry intent follows same risk->order->route->transport->execute chain",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000025"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "legacy_source",
+      "blocking": null,
+      "change_request_refs": [],
+      "confidence": "high",
+      "config_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "control_id": "CONTROL::VALIDATION::S26",
+      "control_record_type": "validation",
+      "control_status": "active",
+      "default_behavior": null,
+      "effective_from_utc": null,
+      "enforcement": "report_only_until_cutover",
+      "evidence_required": true,
+      "fail_closed": null,
+      "fail_criteria": null,
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "module_ids": [
+        "50000000000000000026"
+      ],
+      "pass_criteria": "Deterministic thresholds; stable report format",
+      "record_id": "CONTROL::VALIDATION::S26",
+      "record_type": "operational_control",
+      "record_version": "1.0.0",
+      "risk_off": null,
+      "rule": "Deterministic thresholds; stable report format",
+      "runbook_id": null,
+      "schema_version": "1.0.0",
+      "scope": "Health aggregation + SLO evaluation",
+      "severity": "high",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "validation_rule"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "validation_id_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [
+        "60000000000000000026"
+      ],
+      "superseded_by": [],
+      "supersedes": []
+    }
+  ],
+  "records_sha256": "324717794316a3694191e78610a73ff25a013f47731e589a69a3dc2dd51fab0c",
+  "registry_id": "REG-CONTROL",
+  "schema_version": "1.0.0",
+  "source_path": "EAFIX_auth_docs/01_canonical_registries/operational_control_registry.jsonl"
+}

@@ -1,0 +1,2403 @@
+{
+  "document_type": "generated_registry_snapshot",
+  "record_count": 34,
+  "records": [
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "F1_CONFIG_PREFERENCES",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [],
+      "domain_group": "foundation",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000001",
+      "module_kind": "INFRA_PLATFORM_MODULE",
+      "module_locator": null,
+      "module_name": "Configuration Service",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000001"
+      ],
+      "public_interfaces": [
+        "ConfigSource",
+        "ResolvedConfig"
+      ],
+      "purpose": "Owns process step 1: Resolve configuration snapshot.",
+      "record_id": "50000000000000000001",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Resolve configuration snapshot"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "ConfigSource"
+      ],
+      "scope_out": [
+        "ResolvedConfig"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for F1_CONFIG_PREFERENCES",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "F3_CLOCK_SCHEDULER",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000001"
+      ],
+      "domain_group": "foundation",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000002",
+      "module_kind": "INFRA_PLATFORM_MODULE",
+      "module_locator": null,
+      "module_name": "Clock Scheduler",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000002"
+      ],
+      "public_interfaces": [
+        "ResolvedConfig",
+        "ScheduleTick"
+      ],
+      "purpose": "Owns process step 2: Emit schedule tick (calendar polling cadence).",
+      "record_id": "50000000000000000002",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Emit schedule tick (calendar polling cadence)"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "ScheduleTick"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for F3_CLOCK_SCHEDULER",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "D2_CALENDAR_SOURCE_ADAPTER",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000002"
+      ],
+      "domain_group": "data_integration",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000003",
+      "module_kind": "INTEGRATION_BRIDGE_MODULE",
+      "module_locator": null,
+      "module_name": "Calendar Source Adapter",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000003"
+      ],
+      "public_interfaces": [
+        "CalendarRaw",
+        "CalendarSourceConfig",
+        "ScheduleTick"
+      ],
+      "purpose": "Owns process step 3: Poll calendar source(s).",
+      "record_id": "50000000000000000003",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Poll calendar source(s)"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "CalendarSourceConfig",
+        "ScheduleTick"
+      ],
+      "scope_out": [
+        "CalendarRaw"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for D2_CALENDAR_SOURCE_ADAPTER",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "D3_CALENDAR_NORMALIZER",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000003",
+        "50000000000000000001"
+      ],
+      "domain_group": "data_integration",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000004",
+      "module_kind": "INTEGRATION_BRIDGE_MODULE",
+      "module_locator": null,
+      "module_name": "Calendar Normalizer",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000004"
+      ],
+      "public_interfaces": [
+        "CalendarEvent",
+        "CalendarRaw",
+        "ResolvedConfig"
+      ],
+      "purpose": "Owns process step 4: Normalize raw calendar entries.",
+      "record_id": "50000000000000000004",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Normalize raw calendar entries"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "CalendarRaw",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "CalendarEvent"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for D3_CALENDAR_NORMALIZER",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "F2_EVENT_LOG",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000004"
+      ],
+      "domain_group": "foundation",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000005",
+      "module_kind": "INFRA_PLATFORM_MODULE",
+      "module_locator": null,
+      "module_name": "Event Log",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000005"
+      ],
+      "public_interfaces": [
+        "CalendarEvent",
+        "EventStream"
+      ],
+      "purpose": "Owns process step 5: Persist calendar events (append-only).",
+      "record_id": "50000000000000000005",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Persist calendar events (append-only)"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "CalendarEvent"
+      ],
+      "scope_out": [
+        "EventStream"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for F2_EVENT_LOG",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "D4_CALENDAR_TRIGGER_BUILDER",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000004",
+        "50000000000000000001",
+        "50000000000000000002"
+      ],
+      "domain_group": "data_integration",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000006",
+      "module_kind": "INTEGRATION_BRIDGE_MODULE",
+      "module_locator": null,
+      "module_name": "Calendar Trigger Builder",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000006"
+      ],
+      "public_interfaces": [
+        "CalendarEvent",
+        "CalendarTrigger",
+        "ResolvedConfig",
+        "ScheduleTick"
+      ],
+      "purpose": "Owns process step 6: Build anticipation triggers from calendar.",
+      "record_id": "50000000000000000006",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Build anticipation triggers from calendar"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "CalendarEvent",
+        "ScheduleTick",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "CalendarTrigger"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for D4_CALENDAR_TRIGGER_BUILDER",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "D1_MARKET_FEED_ADAPTER",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000001"
+      ],
+      "domain_group": "data_integration",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000007",
+      "module_kind": "INTEGRATION_BRIDGE_MODULE",
+      "module_locator": null,
+      "module_name": "Market Feed Adapter",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000007"
+      ],
+      "public_interfaces": [
+        "MarketTick",
+        "RawTick",
+        "ResolvedConfig"
+      ],
+      "purpose": "Owns process step 7: Ingest market ticks.",
+      "record_id": "50000000000000000007",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Ingest market ticks"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "RawTick",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "MarketTick"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for D1_MARKET_FEED_ADAPTER",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "C1_BAR_BUILDER",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000007",
+        "50000000000000000001"
+      ],
+      "domain_group": "core_processing",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000008",
+      "module_kind": "CORE_PROCESSING_MODULE",
+      "module_locator": null,
+      "module_name": "Bar Builder",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000008"
+      ],
+      "public_interfaces": [
+        "Bar",
+        "MarketTick",
+        "ResolvedConfig"
+      ],
+      "purpose": "Owns process step 8: Aggregate ticks into bars.",
+      "record_id": "50000000000000000008",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Aggregate ticks into bars"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "MarketTick",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "Bar"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for C1_BAR_BUILDER",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "C2_INDICATOR_ENGINE",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000008",
+        "50000000000000000001"
+      ],
+      "domain_group": "core_processing",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000009",
+      "module_kind": "CORE_PROCESSING_MODULE",
+      "module_locator": null,
+      "module_name": "Indicator Engine",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000009"
+      ],
+      "public_interfaces": [
+        "Bar",
+        "IndicatorSnapshot",
+        "ResolvedConfig"
+      ],
+      "purpose": "Owns process step 9: Compute indicators.",
+      "record_id": "50000000000000000009",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Compute indicators"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "Bar",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "IndicatorSnapshot"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for C2_INDICATOR_ENGINE",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "C3_FEATURE_PACKAGER",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000009",
+        "50000000000000000006",
+        "50000000000000000001"
+      ],
+      "domain_group": "core_processing",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000010",
+      "module_kind": "CORE_PROCESSING_MODULE",
+      "module_locator": null,
+      "module_name": "Feature Packager",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000010"
+      ],
+      "public_interfaces": [
+        "CalendarTrigger",
+        "FeatureFrame",
+        "IndicatorSnapshot",
+        "ResolvedConfig"
+      ],
+      "purpose": "Owns process step 10: Assemble strategy feature frame.",
+      "record_id": "50000000000000000010",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Assemble strategy feature frame"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "IndicatorSnapshot",
+        "CalendarTrigger",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "FeatureFrame"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for C3_FEATURE_PACKAGER",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "S1_SIGNAL_ENGINE",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000010",
+        "50000000000000000001"
+      ],
+      "domain_group": "signal_intent",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000011",
+      "module_kind": "DECISION_MODULE",
+      "module_locator": null,
+      "module_name": "Signal Engine",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000011"
+      ],
+      "public_interfaces": [
+        "FeatureFrame",
+        "PositionSummary",
+        "ResolvedConfig",
+        "Signal",
+        "SignalSuppressed"
+      ],
+      "purpose": "Owns process step 11: Generate signal (or suppression).",
+      "record_id": "50000000000000000011",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Generate signal (or suppression)"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "FeatureFrame",
+        "PositionSummary",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "Signal",
+        "SignalSuppressed"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for S1_SIGNAL_ENGINE",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "S2_INTENT_BUILDER",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000001",
+        "50000000000000000011"
+      ],
+      "domain_group": "signal_intent",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000012",
+      "module_kind": "DECISION_MODULE",
+      "module_locator": null,
+      "module_name": "Intent Builder",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000012"
+      ],
+      "public_interfaces": [
+        "ResolvedConfig",
+        "Signal",
+        "TradeIntent"
+      ],
+      "purpose": "Owns process step 12: Convert signal to trade intent.",
+      "record_id": "50000000000000000012",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Convert signal to trade intent"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "Signal",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "TradeIntent"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for S2_INTENT_BUILDER",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "R1_RISK_EVALUATOR",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000001",
+        "50000000000000000012"
+      ],
+      "domain_group": "risk",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000013",
+      "module_kind": "RISK_CONTROL_MODULE",
+      "module_locator": null,
+      "module_name": "Risk Evaluator",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000013"
+      ],
+      "public_interfaces": [
+        "PortfolioState",
+        "ResolvedConfig",
+        "RiskDecision",
+        "RiskPolicy",
+        "TradeIntent"
+      ],
+      "purpose": "Owns process step 13: Evaluate risk and size.",
+      "record_id": "50000000000000000013",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Evaluate risk and size"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "TradeIntent",
+        "PortfolioState",
+        "RiskPolicy",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "RiskDecision"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for R1_RISK_EVALUATOR",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "R2_ORDER_INTENT_COMPILER",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000001",
+        "50000000000000000013"
+      ],
+      "domain_group": "risk",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000014",
+      "module_kind": "RISK_CONTROL_MODULE",
+      "module_locator": null,
+      "module_name": "Order Intent Compiler",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000014"
+      ],
+      "public_interfaces": [
+        "OrderIntent",
+        "ResolvedConfig",
+        "RiskDecision"
+      ],
+      "purpose": "Owns process step 14: Compile order intent.",
+      "record_id": "50000000000000000014",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Compile order intent"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "RiskDecision",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "OrderIntent"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for R2_ORDER_INTENT_COMPILER",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "O1_ORDER_ROUTER",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000001",
+        "50000000000000000014"
+      ],
+      "domain_group": "order_management",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000015",
+      "module_kind": "ORDER_LIFECYCLE_MODULE",
+      "module_locator": null,
+      "module_name": "Order Router",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000015"
+      ],
+      "public_interfaces": [
+        "BrokerPolicy",
+        "OrderIntent",
+        "ResolvedConfig",
+        "RoutedOrderIntent"
+      ],
+      "purpose": "Owns process step 15: Route order to broker.",
+      "record_id": "50000000000000000015",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Route order to broker"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "OrderIntent",
+        "BrokerPolicy",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "RoutedOrderIntent"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for O1_ORDER_ROUTER",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "B1_MT4_ADAPTER_TRANSPORT",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000001",
+        "50000000000000000015"
+      ],
+      "domain_group": "broker_execution",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000016",
+      "module_kind": "MT4_BRIDGE_MODULE",
+      "module_locator": null,
+      "module_name": "MT4 Adapter Transport",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000016"
+      ],
+      "public_interfaces": [
+        "AdapterAck",
+        "BrokerOrderEnvelope",
+        "ResolvedConfig",
+        "RoutedOrderIntent"
+      ],
+      "purpose": "Owns process step 16: Serialize and send to MT4 adapter.",
+      "record_id": "50000000000000000016",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Serialize and send to MT4 adapter"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "RoutedOrderIntent",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "BrokerOrderEnvelope",
+        "AdapterAck"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for B1_MT4_ADAPTER_TRANSPORT",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "B2_MT4_EA_EXECUTOR",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000016"
+      ],
+      "domain_group": "broker_execution",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000017",
+      "module_kind": "MT4_BRIDGE_MODULE",
+      "module_locator": null,
+      "module_name": "MT4 EA Executor",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000017"
+      ],
+      "public_interfaces": [
+        "BrokerExecEvent",
+        "BrokerOrderEnvelope",
+        "EAHealth"
+      ],
+      "purpose": "Owns process step 17: EA executes broker order.",
+      "record_id": "50000000000000000017",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "EA executes broker order"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "BrokerOrderEnvelope"
+      ],
+      "scope_out": [
+        "BrokerExecEvent",
+        "EAHealth"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for B2_MT4_EA_EXECUTOR",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "B3_EXEC_EVENT_NORMALIZER",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000017",
+        "50000000000000000001"
+      ],
+      "domain_group": "broker_execution",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000018",
+      "module_kind": "MT4_BRIDGE_MODULE",
+      "module_locator": null,
+      "module_name": "Execution Event Normalizer",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000018"
+      ],
+      "public_interfaces": [
+        "BrokerExecEvent",
+        "ExecutionReport",
+        "PositionSnapshot",
+        "ResolvedConfig"
+      ],
+      "purpose": "Owns process step 18: Normalize broker events to canonical reports.",
+      "record_id": "50000000000000000018",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Normalize broker events to canonical reports"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "BrokerExecEvent",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "ExecutionReport",
+        "PositionSnapshot"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for B3_EXEC_EVENT_NORMALIZER",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "O2_OMS_STATE_MACHINE",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000018",
+        "50000000000000000001",
+        "50000000000000000015"
+      ],
+      "domain_group": "order_management",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000019",
+      "module_kind": "ORDER_LIFECYCLE_MODULE",
+      "module_locator": null,
+      "module_name": "OMS State Machine",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000019"
+      ],
+      "public_interfaces": [
+        "ExecutionReport",
+        "OrderStateChanged",
+        "PositionSnapshot",
+        "PositionStateChanged",
+        "ResolvedConfig",
+        "RoutedOrderIntent",
+        "TradeClosedRaw"
+      ],
+      "purpose": "Owns process step 19: Apply execution reports to OMS state.",
+      "record_id": "50000000000000000019",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Apply execution reports to OMS state"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "RoutedOrderIntent",
+        "ExecutionReport",
+        "PositionSnapshot",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "OrderStateChanged",
+        "PositionStateChanged",
+        "TradeClosedRaw"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for O2_OMS_STATE_MACHINE",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "O3_TRADE_CLOSE_CLASSIFIER",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000001",
+        "50000000000000000019"
+      ],
+      "domain_group": "order_management",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000020",
+      "module_kind": "ORDER_LIFECYCLE_MODULE",
+      "module_locator": null,
+      "module_name": "Trade Close Classifier",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000020"
+      ],
+      "public_interfaces": [
+        "ResolvedConfig",
+        "TradeClosed",
+        "TradeClosedRaw"
+      ],
+      "purpose": "Owns process step 20: Classify trade close and compute canonical PnL.",
+      "record_id": "50000000000000000020",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Classify trade close and compute canonical PnL"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "TradeClosedRaw",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "TradeClosed"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for O3_TRADE_CLOSE_CLASSIFIER",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "E1_OUTCOME_BUCKETIZER",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000001",
+        "50000000000000000020"
+      ],
+      "domain_group": "reentry",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000021",
+      "module_kind": "REENTRY_MODULE",
+      "module_locator": null,
+      "module_name": "Outcome Bucketizer",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000021"
+      ],
+      "public_interfaces": [
+        "OutcomeBucket",
+        "ResolvedConfig",
+        "TradeClosed"
+      ],
+      "purpose": "Owns process step 21: Bucketize outcome.",
+      "record_id": "50000000000000000021",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Bucketize outcome"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "TradeClosed",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "OutcomeBucket"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for E1_OUTCOME_BUCKETIZER",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "E2_PROXIMITY_EVALUATOR",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000004",
+        "50000000000000000001"
+      ],
+      "domain_group": "reentry",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000022",
+      "module_kind": "REENTRY_MODULE",
+      "module_locator": null,
+      "module_name": "Proximity Evaluator",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000022"
+      ],
+      "public_interfaces": [
+        "CalendarEvent",
+        "ClockTick",
+        "EventProximity",
+        "ResolvedConfig"
+      ],
+      "purpose": "Owns process step 22: Compute event proximity.",
+      "record_id": "50000000000000000022",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Compute event proximity"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "CalendarEvent",
+        "ClockTick",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "EventProximity"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for E2_PROXIMITY_EVALUATOR",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "E3_MATRIX_LOOKUP",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000021",
+        "50000000000000000022",
+        "50000000000000000001"
+      ],
+      "domain_group": "reentry",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000023",
+      "module_kind": "REENTRY_MODULE",
+      "module_locator": null,
+      "module_name": "Matrix Lookup",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000023"
+      ],
+      "public_interfaces": [
+        "EventProximity",
+        "MatrixDecision",
+        "MatrixProfile",
+        "OutcomeBucket",
+        "ResolvedConfig",
+        "SignalContext"
+      ],
+      "purpose": "Owns process step 23: Lookup matrix decision.",
+      "record_id": "50000000000000000023",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Lookup matrix decision"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "OutcomeBucket",
+        "EventProximity",
+        "SignalContext",
+        "MatrixProfile",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "MatrixDecision"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for E3_MATRIX_LOOKUP",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "E4_REENTRY_INTENT_BUILDER",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000023",
+        "50000000000000000001"
+      ],
+      "domain_group": "reentry",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000024",
+      "module_kind": "REENTRY_MODULE",
+      "module_locator": null,
+      "module_name": "Reentry Intent Builder",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000024"
+      ],
+      "public_interfaces": [
+        "MatrixDecision",
+        "ReentryChainState",
+        "ReentrySuppressed",
+        "ResolvedConfig",
+        "TradeIntent"
+      ],
+      "purpose": "Owns process step 24: Build reentry trade intent (or suppress).",
+      "record_id": "50000000000000000024",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Build reentry trade intent (or suppress)"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "MatrixDecision",
+        "ReentryChainState",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "TradeIntent",
+        "ReentrySuppressed"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for E4_REENTRY_INTENT_BUILDER",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "F4_FLOW_ORCHESTRATOR",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000024",
+        "50000000000000000012"
+      ],
+      "domain_group": "foundation",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [
+        "F1_FLOW_ORCHESTRATOR"
+      ],
+      "manifest_path": null,
+      "module_id": "50000000000000000025",
+      "module_kind": "INFRA_PLATFORM_MODULE",
+      "module_locator": null,
+      "module_name": "Flow Orchestrator",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000025"
+      ],
+      "public_interfaces": [
+        "Either",
+        "OutcomeBucket",
+        "RoutedOrderIntent",
+        "TradeIntent"
+      ],
+      "purpose": "Owns process step 25: Loop: reentry intent follows same risk->order->route->transport->execute chain.",
+      "record_id": "50000000000000000025",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Loop: reentry intent follows same risk->order->route->transport->execute chain"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "TradeIntent"
+      ],
+      "scope_out": [
+        "Either",
+        "RoutedOrderIntent",
+        "OutcomeBucket"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for F4_FLOW_ORCHESTRATOR",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "P1_HEALTH_AGGREGATOR",
+      "change_request_refs": [],
+      "confidence": "high",
+      "dependencies": [
+        "50000000000000000001"
+      ],
+      "domain_group": "operations",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000026",
+      "module_kind": "OBSERVABILITY_MODULE",
+      "module_locator": null,
+      "module_name": "Health Aggregator",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root"
+      ],
+      "process_step_ids": [
+        "60000000000000000026"
+      ],
+      "public_interfaces": [
+        "AdapterHealth",
+        "HealthReport",
+        "ModuleHealth",
+        "ResolvedConfig"
+      ],
+      "purpose": "Owns process step 26: Health aggregation + SLO evaluation.",
+      "record_id": "50000000000000000026",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [
+        "Health aggregation + SLO evaluation"
+      ],
+      "schema_version": "1.0.0",
+      "scope_in": [
+        "AdapterHealth",
+        "ModuleHealth",
+        "ResolvedConfig"
+      ],
+      "scope_out": [
+        "HealthReport"
+      ],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for P1_HEALTH_AGGREGATOR",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "R3_CORRELATION_GUARD",
+      "change_request_refs": [],
+      "confidence": "medium",
+      "dependencies": [],
+      "domain_group": "risk",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000027",
+      "module_kind": "RISK_CONTROL_MODULE",
+      "module_locator": null,
+      "module_name": "Correlation Guard",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root",
+        "purpose",
+        "scope_in",
+        "scope_out",
+        "responsibilities",
+        "dependencies"
+      ],
+      "process_step_ids": [],
+      "public_interfaces": [],
+      "purpose": "Candidate purpose derived from canonical symbol R3_CORRELATION_GUARD; authoritative manifest review required.",
+      "record_id": "50000000000000000027",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [],
+      "schema_version": "1.0.0",
+      "scope_in": [],
+      "scope_out": [],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for R3_CORRELATION_GUARD",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "U1_DASHBOARD_BACKEND",
+      "change_request_refs": [],
+      "confidence": "medium",
+      "dependencies": [],
+      "domain_group": "operator_ui",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000028",
+      "module_kind": "UI_MODULE",
+      "module_locator": null,
+      "module_name": "Dashboard Backend",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root",
+        "purpose",
+        "scope_in",
+        "scope_out",
+        "responsibilities",
+        "dependencies"
+      ],
+      "process_step_ids": [],
+      "public_interfaces": [],
+      "purpose": "Candidate purpose derived from canonical symbol U1_DASHBOARD_BACKEND; authoritative manifest review required.",
+      "record_id": "50000000000000000028",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [],
+      "schema_version": "1.0.0",
+      "scope_in": [],
+      "scope_out": [],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for U1_DASHBOARD_BACKEND",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "U2_GUI_GATEWAY",
+      "change_request_refs": [],
+      "confidence": "medium",
+      "dependencies": [],
+      "domain_group": "operator_ui",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000029",
+      "module_kind": "UI_MODULE",
+      "module_locator": null,
+      "module_name": "GUI Gateway",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root",
+        "purpose",
+        "scope_in",
+        "scope_out",
+        "responsibilities",
+        "dependencies"
+      ],
+      "process_step_ids": [],
+      "public_interfaces": [],
+      "purpose": "Candidate purpose derived from canonical symbol U2_GUI_GATEWAY; authoritative manifest review required.",
+      "record_id": "50000000000000000029",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [],
+      "schema_version": "1.0.0",
+      "scope_in": [],
+      "scope_out": [],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for U2_GUI_GATEWAY",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "U3_MT4_EXPIRY_OVERLAY",
+      "change_request_refs": [],
+      "confidence": "medium",
+      "dependencies": [],
+      "domain_group": "operator_ui",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000030",
+      "module_kind": "UI_MODULE",
+      "module_locator": null,
+      "module_name": "MT4 Expiry Overlay",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root",
+        "purpose",
+        "scope_in",
+        "scope_out",
+        "responsibilities",
+        "dependencies"
+      ],
+      "process_step_ids": [],
+      "public_interfaces": [],
+      "purpose": "Candidate purpose derived from canonical symbol U3_MT4_EXPIRY_OVERLAY; authoritative manifest review required.",
+      "record_id": "50000000000000000030",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [],
+      "schema_version": "1.0.0",
+      "scope_in": [],
+      "scope_out": [],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for U3_MT4_EXPIRY_OVERLAY",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "U4_DESKTOP_OPERATOR",
+      "change_request_refs": [],
+      "confidence": "medium",
+      "dependencies": [],
+      "domain_group": "operator_ui",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000031",
+      "module_kind": "UI_MODULE",
+      "module_locator": null,
+      "module_name": "Desktop Operator",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root",
+        "purpose",
+        "scope_in",
+        "scope_out",
+        "responsibilities",
+        "dependencies"
+      ],
+      "process_step_ids": [],
+      "public_interfaces": [],
+      "purpose": "Candidate purpose derived from canonical symbol U4_DESKTOP_OPERATOR; authoritative manifest review required.",
+      "record_id": "50000000000000000031",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [],
+      "schema_version": "1.0.0",
+      "scope_in": [],
+      "scope_out": [],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for U4_DESKTOP_OPERATOR",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "P2_REPORTER",
+      "change_request_refs": [],
+      "confidence": "medium",
+      "dependencies": [],
+      "domain_group": "operations",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000032",
+      "module_kind": "OBSERVABILITY_MODULE",
+      "module_locator": null,
+      "module_name": "Reporter",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root",
+        "purpose",
+        "scope_in",
+        "scope_out",
+        "responsibilities",
+        "dependencies"
+      ],
+      "process_step_ids": [],
+      "public_interfaces": [],
+      "purpose": "Candidate purpose derived from canonical symbol P2_REPORTER; authoritative manifest review required.",
+      "record_id": "50000000000000000032",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [],
+      "schema_version": "1.0.0",
+      "scope_in": [],
+      "scope_out": [],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for P2_REPORTER",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "SK1_PLUGIN_INTERFACE",
+      "change_request_refs": [],
+      "confidence": "medium",
+      "dependencies": [],
+      "domain_group": "shared_kernel",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000033",
+      "module_kind": "SHARED_KERNEL_MODULE",
+      "module_locator": null,
+      "module_name": "Plugin Interface",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root",
+        "purpose",
+        "scope_in",
+        "scope_out",
+        "responsibilities",
+        "dependencies"
+      ],
+      "process_step_ids": [],
+      "public_interfaces": [],
+      "purpose": "Candidate purpose derived from canonical symbol SK1_PLUGIN_INTERFACE; authoritative manifest review required.",
+      "record_id": "50000000000000000033",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [],
+      "schema_version": "1.0.0",
+      "scope_in": [],
+      "scope_out": [],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for SK1_PLUGIN_INTERFACE",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "canonical_symbol": "SK2_IDEMPOTENCY",
+      "change_request_refs": [],
+      "confidence": "medium",
+      "dependencies": [],
+      "domain_group": "shared_kernel",
+      "effective_from_utc": null,
+      "forbidden_responsibilities": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "layer": null,
+      "legacy_aliases": [],
+      "manifest_path": null,
+      "module_id": "50000000000000000034",
+      "module_kind": "SHARED_KERNEL_MODULE",
+      "module_locator": null,
+      "module_name": "Idempotency",
+      "module_root": null,
+      "needs_review_fields": [
+        "module_locator",
+        "manifest_path",
+        "module_root",
+        "purpose",
+        "scope_in",
+        "scope_out",
+        "responsibilities",
+        "dependencies"
+      ],
+      "process_step_ids": [],
+      "public_interfaces": [],
+      "purpose": "Candidate purpose derived from canonical symbol SK2_IDEMPOTENCY; authoritative manifest review required.",
+      "record_id": "50000000000000000034",
+      "record_type": "module",
+      "record_version": "1.0.0",
+      "responsibilities": [],
+      "schema_version": "1.0.0",
+      "scope_in": [],
+      "scope_out": [],
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": "34-manifest identity source for SK2_IDEMPOTENCY",
+          "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+          "role": "module_identity_source"
+        },
+        {
+          "commit_sha": "86fda07c6af16a52a679fb3cd6af2552b9eda32e",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "role": "independent_evidence_inventory"
+        }
+      ],
+      "status": "candidate",
+      "superseded_by": [],
+      "supersedes": []
+    }
+  ],
+  "records_sha256": "0a834036f78e4d17c4b57f4e9a4380090cc599a7d8dfba8aed74ec16d3d7fcf3",
+  "registry_id": "REG-MODULE",
+  "schema_version": "1.0.0",
+  "source_path": "EAFIX_auth_docs/01_canonical_registries/module_registry.jsonl"
+}

@@ -1,0 +1,159 @@
+{
+  "$id": "common_record_envelope.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "authority_status": {
+      "enum": [
+        "canonical",
+        "canonical_candidate",
+        "generated",
+        "supporting_evidence",
+        "implementation_evidence",
+        "legacy_source",
+        "needs_review"
+      ]
+    },
+    "change_request_refs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "confidence": {
+      "enum": [
+        "high",
+        "medium",
+        "low",
+        "unknown"
+      ]
+    },
+    "effective_from_utc": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "last_verified_commit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "record_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "record_type": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "record_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "source_hashes": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "source_refs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "commit_sha": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "line_end": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "line_start": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "role": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "role",
+          "commit_sha"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "status": {
+      "enum": [
+        "candidate",
+        "active",
+        "canonical",
+        "planned",
+        "partial",
+        "conflicted",
+        "deprecated",
+        "superseded",
+        "retired",
+        "archived"
+      ]
+    },
+    "superseded_by": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "supersedes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "record_type",
+    "record_id",
+    "schema_version",
+    "record_version",
+    "status",
+    "authority_status",
+    "source_refs",
+    "source_hashes",
+    "confidence",
+    "effective_from_utc",
+    "supersedes",
+    "superseded_by",
+    "change_request_refs",
+    "last_verified_commit"
+  ],
+  "title": "Common registry record envelope",
+  "type": "object"
+}

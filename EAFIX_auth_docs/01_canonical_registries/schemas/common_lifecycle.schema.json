@@ -1,0 +1,58 @@
+{
+  "$id": "common_lifecycle.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authority_status": {
+      "enum": [
+        "canonical",
+        "canonical_candidate",
+        "generated",
+        "supporting_evidence",
+        "implementation_evidence",
+        "legacy_source",
+        "needs_review"
+      ]
+    },
+    "effective_from_utc": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "enum": [
+        "candidate",
+        "active",
+        "canonical",
+        "planned",
+        "partial",
+        "conflicted",
+        "deprecated",
+        "superseded",
+        "retired",
+        "archived"
+      ]
+    },
+    "superseded_by": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "supersedes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "status",
+    "authority_status"
+  ],
+  "title": "Common lifecycle",
+  "type": "object"
+}

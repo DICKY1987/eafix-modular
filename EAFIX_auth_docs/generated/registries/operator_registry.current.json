@@ -1,0 +1,344 @@
+{
+  "document_type": "generated_registry_snapshot",
+  "record_count": 7,
+  "records": [
+    {
+      "authority_status": "canonical_candidate",
+      "change_request_refs": [],
+      "commands": [
+        "flatten_all_positions"
+      ],
+      "confidence": "medium",
+      "configuration_ids": [],
+      "control_id": "FLATTEN_ALL",
+      "disabled_state_rule": "Disabled unless authenticated, authorized, system state is known, and action preconditions pass.",
+      "effective_from_utc": null,
+      "escalation": "Escalate when verification fails or system state is unknown.",
+      "failure_control_ids": [],
+      "implementation_status": "needs_line_level_binding",
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "name": "Flatten All",
+      "operator_record_id": "OPERATOR::ACTION::FLATTEN_ALL",
+      "operator_record_type": "operator_action",
+      "record_id": "OPERATOR::ACTION::FLATTEN_ALL",
+      "record_type": "operator",
+      "record_version": "1.0.0",
+      "required_role": "admin",
+      "rollback": [
+        "Follow the linked runbook; do not auto-reverse broker-affecting actions."
+      ],
+      "safety_level": "critical",
+      "schema_version": "1.0.0",
+      "screen_id": null,
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": "Control named in canonical UI safety model; exact control record requires line-level extraction.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "role": "operator_control_authority"
+        }
+      ],
+      "status": "candidate",
+      "step_ids": [],
+      "superseded_by": [],
+      "supersedes": [],
+      "trigger": "explicit operator action",
+      "verification": [
+        "Verify all close requests are acknowledged and no open positions remain."
+      ]
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "change_request_refs": [],
+      "commands": [
+        "stop_calendar_imports"
+      ],
+      "confidence": "medium",
+      "configuration_ids": [],
+      "control_id": "STOP_IMPORTS",
+      "disabled_state_rule": "Disabled unless authenticated, authorized, system state is known, and action preconditions pass.",
+      "effective_from_utc": null,
+      "escalation": "Escalate when verification fails or system state is unknown.",
+      "failure_control_ids": [],
+      "implementation_status": "needs_line_level_binding",
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "name": "STOP Imports",
+      "operator_record_id": "OPERATOR::ACTION::STOP_IMPORTS",
+      "operator_record_type": "operator_action",
+      "record_id": "OPERATOR::ACTION::STOP_IMPORTS",
+      "record_type": "operator",
+      "record_version": "1.0.0",
+      "required_role": "admin",
+      "rollback": [
+        "Follow the linked runbook; do not auto-reverse broker-affecting actions."
+      ],
+      "safety_level": "critical",
+      "schema_version": "1.0.0",
+      "screen_id": null,
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": "Control named in canonical UI safety model; exact control record requires line-level extraction.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "role": "operator_control_authority"
+        }
+      ],
+      "status": "candidate",
+      "step_ids": [],
+      "superseded_by": [],
+      "supersedes": [],
+      "trigger": "explicit operator action",
+      "verification": [
+        "Verify calendar ingestion is paused and downstream trigger generation is suppressed."
+      ]
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "change_request_refs": [],
+      "commands": [
+        "services/dashboard-backend/src/2099900106260118_main.py"
+      ],
+      "confidence": "high",
+      "configuration_ids": [],
+      "control_id": null,
+      "disabled_state_rule": "Broker-affecting or decision-emitting controls must show disabled reason text when unavailable.",
+      "effective_from_utc": null,
+      "escalation": null,
+      "failure_control_ids": [],
+      "implementation_status": "documented",
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "name": "Dashboard Backend",
+      "operator_record_id": "UI-PRODUCT-DASHBOARD-BACKEND",
+      "operator_record_type": "ui_product",
+      "record_id": "UI-PRODUCT-DASHBOARD-BACKEND",
+      "record_type": "operator",
+      "record_version": "1.0.0",
+      "required_role": "service",
+      "rollback": [],
+      "safety_level": "medium",
+      "schema_version": "1.0.0",
+      "screen_id": null,
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "role": "ui_product_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [],
+      "superseded_by": [],
+      "supersedes": [],
+      "trigger": null,
+      "verification": [
+        "Implementation binding path exists or is queued as an artifact gap."
+      ]
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "change_request_refs": [],
+      "commands": [
+        "services/dashboard-backend/frontend/0099900037260118_trading_dashboard.tsx",
+        "services/desktop-ui/2099900135260118_tkinter_dashboard_gui.py"
+      ],
+      "confidence": "high",
+      "configuration_ids": [],
+      "control_id": null,
+      "disabled_state_rule": "Broker-affecting or decision-emitting controls must show disabled reason text when unavailable.",
+      "effective_from_utc": null,
+      "escalation": null,
+      "failure_control_ids": [],
+      "implementation_status": "documented",
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "name": "Desktop Operator UI",
+      "operator_record_id": "UI-PRODUCT-DESKTOP-OPERATOR",
+      "operator_record_type": "ui_product",
+      "record_id": "UI-PRODUCT-DESKTOP-OPERATOR",
+      "record_type": "operator",
+      "record_version": "1.0.0",
+      "required_role": "operator",
+      "rollback": [],
+      "safety_level": "high",
+      "schema_version": "1.0.0",
+      "screen_id": null,
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "role": "ui_product_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [],
+      "superseded_by": [],
+      "supersedes": [],
+      "trigger": null,
+      "verification": [
+        "Implementation binding path exists or is queued as an artifact gap."
+      ]
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "change_request_refs": [],
+      "commands": [
+        "observability/dashboards/1199900029260118_trading-system-overview.json"
+      ],
+      "confidence": "high",
+      "configuration_ids": [],
+      "control_id": null,
+      "disabled_state_rule": "Broker-affecting or decision-emitting controls must show disabled reason text when unavailable.",
+      "effective_from_utc": null,
+      "escalation": null,
+      "failure_control_ids": [],
+      "implementation_status": "documented",
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "name": "Trading System Overview Dashboard",
+      "operator_record_id": "UI-PRODUCT-GRAFANA-OPS",
+      "operator_record_type": "ui_product",
+      "record_id": "UI-PRODUCT-GRAFANA-OPS",
+      "record_type": "operator",
+      "record_version": "1.0.0",
+      "required_role": "operator",
+      "rollback": [],
+      "safety_level": "low",
+      "schema_version": "1.0.0",
+      "screen_id": null,
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "role": "ui_product_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [],
+      "superseded_by": [],
+      "supersedes": [],
+      "trigger": null,
+      "verification": [
+        "Implementation binding path exists or is queued as an artifact gap."
+      ]
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "change_request_refs": [],
+      "commands": [
+        "services/gui-gateway/src/2099900156260118_main.py"
+      ],
+      "confidence": "high",
+      "configuration_ids": [],
+      "control_id": null,
+      "disabled_state_rule": "Broker-affecting or decision-emitting controls must show disabled reason text when unavailable.",
+      "effective_from_utc": null,
+      "escalation": null,
+      "failure_control_ids": [],
+      "implementation_status": "documented",
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "name": "GUI Gateway",
+      "operator_record_id": "UI-PRODUCT-GUI-GATEWAY",
+      "operator_record_type": "ui_product",
+      "record_id": "UI-PRODUCT-GUI-GATEWAY",
+      "record_type": "operator",
+      "record_version": "1.0.0",
+      "required_role": "service",
+      "rollback": [],
+      "safety_level": "medium",
+      "schema_version": "1.0.0",
+      "screen_id": null,
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "role": "ui_product_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [],
+      "superseded_by": [],
+      "supersedes": [],
+      "trigger": null,
+      "verification": [
+        "Implementation binding path exists or is queued as an artifact gap."
+      ]
+    },
+    {
+      "authority_status": "canonical_candidate",
+      "change_request_refs": [],
+      "commands": [
+        "services/desktop-ui/2299900003260118_ExpiryZones.mq4"
+      ],
+      "confidence": "high",
+      "configuration_ids": [],
+      "control_id": null,
+      "disabled_state_rule": "Broker-affecting or decision-emitting controls must show disabled reason text when unavailable.",
+      "effective_from_utc": null,
+      "escalation": null,
+      "failure_control_ids": [],
+      "implementation_status": "documented",
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "name": "MT4 Expiry Zones Overlay",
+      "operator_record_id": "UI-PRODUCT-MT4-OVERLAY",
+      "operator_record_type": "ui_product",
+      "record_id": "UI-PRODUCT-MT4-OVERLAY",
+      "record_type": "operator",
+      "record_version": "1.0.0",
+      "required_role": "operator",
+      "rollback": [],
+      "safety_level": "medium",
+      "schema_version": "1.0.0",
+      "screen_id": null,
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+          "role": "ui_product_authority"
+        }
+      ],
+      "status": "active",
+      "step_ids": [],
+      "superseded_by": [],
+      "supersedes": [],
+      "trigger": null,
+      "verification": [
+        "Implementation binding path exists or is queued as an artifact gap."
+      ]
+    }
+  ],
+  "records_sha256": "ebcd28085804b6233d018bf09b07cf535f4fe4b3184821d8c580f43b2bd94b54",
+  "registry_id": "REG-OPERATOR",
+  "schema_version": "1.0.0",
+  "source_path": "EAFIX_auth_docs/01_canonical_registries/operator_registry.jsonl"
+}

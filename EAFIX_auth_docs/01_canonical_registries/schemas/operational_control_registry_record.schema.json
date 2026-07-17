@@ -1,0 +1,277 @@
+{
+  "$id": "operational_control.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authority_status": {
+      "enum": [
+        "canonical",
+        "canonical_candidate",
+        "generated",
+        "supporting_evidence",
+        "implementation_evidence",
+        "legacy_source",
+        "needs_review"
+      ]
+    },
+    "blocking": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "change_request_refs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "confidence": {
+      "enum": [
+        "high",
+        "medium",
+        "low",
+        "unknown"
+      ]
+    },
+    "config_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "control_id": {
+      "type": "string"
+    },
+    "control_record_type": {
+      "enum": [
+        "rule",
+        "validation",
+        "gate",
+        "failure_mode",
+        "retry_policy",
+        "timeout_policy",
+        "fallback_policy",
+        "invariant",
+        "risk_rule",
+        "slo",
+        "alert"
+      ]
+    },
+    "control_status": {
+      "type": "string"
+    },
+    "default_behavior": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "effective_from_utc": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "enforcement": {
+      "type": "string"
+    },
+    "evidence_required": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "fail_closed": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "fail_criteria": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "last_verified_commit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "module_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "pass_criteria": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "record_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "record_type": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "record_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "type": "string"
+    },
+    "risk_off": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "rule": {
+      "type": "string"
+    },
+    "runbook_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "scope": {
+      "type": "string"
+    },
+    "severity": {
+      "type": "string"
+    },
+    "source_hashes": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "source_refs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "commit_sha": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "line_end": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "line_start": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "role": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "role",
+          "commit_sha"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "status": {
+      "enum": [
+        "candidate",
+        "active",
+        "canonical",
+        "planned",
+        "partial",
+        "conflicted",
+        "deprecated",
+        "superseded",
+        "retired",
+        "archived"
+      ]
+    },
+    "step_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "superseded_by": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "supersedes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "record_type",
+    "record_id",
+    "schema_version",
+    "record_version",
+    "status",
+    "authority_status",
+    "source_refs",
+    "source_hashes",
+    "confidence",
+    "effective_from_utc",
+    "supersedes",
+    "superseded_by",
+    "change_request_refs",
+    "last_verified_commit",
+    "control_id",
+    "control_record_type",
+    "control_status",
+    "scope",
+    "module_ids",
+    "step_ids",
+    "config_ids",
+    "rule",
+    "pass_criteria",
+    "fail_criteria",
+    "default_behavior",
+    "severity",
+    "blocking",
+    "fail_closed",
+    "risk_off",
+    "enforcement",
+    "evidence_required",
+    "runbook_id"
+  ],
+  "title": "Operational control registry record",
+  "type": "object"
+}

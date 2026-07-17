@@ -1,0 +1,255 @@
+{
+  "$id": "artifact.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifact_id": {
+      "type": "string"
+    },
+    "artifact_type": {
+      "type": "string"
+    },
+    "authority_status": {
+      "enum": [
+        "canonical",
+        "canonical_candidate",
+        "generated",
+        "supporting_evidence",
+        "implementation_evidence",
+        "legacy_source",
+        "needs_review"
+      ]
+    },
+    "change_request_refs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "confidence": {
+      "enum": [
+        "high",
+        "medium",
+        "low",
+        "unknown"
+      ]
+    },
+    "content_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "contract_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "effective_from_utc": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "generator_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "governance_owner": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "last_verified_commit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "lifecycle_status": {
+      "type": "string"
+    },
+    "owner_module_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "ownership_class": {
+      "enum": [
+        "owned",
+        "shared",
+        "generated",
+        "external",
+        "runtime",
+        "temporary",
+        "legacy",
+        "needs_review",
+        "forbidden"
+      ]
+    },
+    "process_step_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "record_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "record_type": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "record_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "type": "string"
+    },
+    "relative_path": {
+      "type": "string"
+    },
+    "schema_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "shared_with_module_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "source_hashes": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "source_or_generated": {
+      "enum": [
+        "source",
+        "generated",
+        "external",
+        "runtime"
+      ]
+    },
+    "source_refs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "commit_sha": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "line_end": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "line_start": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "role": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "role",
+          "commit_sha"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "status": {
+      "enum": [
+        "candidate",
+        "active",
+        "canonical",
+        "planned",
+        "partial",
+        "conflicted",
+        "deprecated",
+        "superseded",
+        "retired",
+        "archived"
+      ]
+    },
+    "superseded_by": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "supersedes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "record_type",
+    "record_id",
+    "schema_version",
+    "record_version",
+    "status",
+    "authority_status",
+    "source_refs",
+    "source_hashes",
+    "confidence",
+    "effective_from_utc",
+    "supersedes",
+    "superseded_by",
+    "change_request_refs",
+    "last_verified_commit",
+    "artifact_id",
+    "relative_path",
+    "artifact_type",
+    "owner_module_id",
+    "shared_with_module_ids",
+    "ownership_class",
+    "lifecycle_status",
+    "source_or_generated",
+    "schema_ref",
+    "generator_id",
+    "process_step_ids",
+    "contract_ids",
+    "content_hash",
+    "governance_owner"
+  ],
+  "title": "Artifact registry record",
+  "type": "object"
+}

@@ -1,0 +1,279 @@
+{
+  "$id": "operator.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authority_status": {
+      "enum": [
+        "canonical",
+        "canonical_candidate",
+        "generated",
+        "supporting_evidence",
+        "implementation_evidence",
+        "legacy_source",
+        "needs_review"
+      ]
+    },
+    "change_request_refs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "commands": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "confidence": {
+      "enum": [
+        "high",
+        "medium",
+        "low",
+        "unknown"
+      ]
+    },
+    "configuration_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "control_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "disabled_state_rule": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "effective_from_utc": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "escalation": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "failure_control_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "implementation_status": {
+      "type": "string"
+    },
+    "integration_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "last_verified_commit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "operator_record_id": {
+      "type": "string"
+    },
+    "operator_record_type": {
+      "enum": [
+        "ui_product",
+        "screen",
+        "control",
+        "operator_action",
+        "runbook",
+        "escalation",
+        "permission"
+      ]
+    },
+    "record_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "record_type": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "record_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "type": "string"
+    },
+    "required_role": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "rollback": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "safety_level": {
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "screen_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_hashes": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "source_refs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "commit_sha": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "line_end": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "line_start": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "role": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "role",
+          "commit_sha"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "status": {
+      "enum": [
+        "candidate",
+        "active",
+        "canonical",
+        "planned",
+        "partial",
+        "conflicted",
+        "deprecated",
+        "superseded",
+        "retired",
+        "archived"
+      ]
+    },
+    "step_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "superseded_by": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "supersedes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "trigger": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "verification": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "record_type",
+    "record_id",
+    "schema_version",
+    "record_version",
+    "status",
+    "authority_status",
+    "source_refs",
+    "source_hashes",
+    "confidence",
+    "effective_from_utc",
+    "supersedes",
+    "superseded_by",
+    "change_request_refs",
+    "last_verified_commit",
+    "operator_record_id",
+    "operator_record_type",
+    "name",
+    "trigger",
+    "step_ids",
+    "failure_control_ids",
+    "screen_id",
+    "control_id",
+    "required_role",
+    "safety_level",
+    "disabled_state_rule",
+    "commands",
+    "verification",
+    "rollback",
+    "escalation",
+    "integration_ids",
+    "configuration_ids",
+    "implementation_status"
+  ],
+  "title": "Operator registry record",
+  "type": "object"
+}
