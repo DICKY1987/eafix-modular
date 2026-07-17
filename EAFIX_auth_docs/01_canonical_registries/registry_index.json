@@ -1,0 +1,251 @@
+{
+  "authored_format": "JSONL",
+  "authority_status": "canonical_candidate",
+  "authority_validator": "tools/registries/validate_registry_authority.py",
+  "baseline_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+  "build_mode": "shadow_report_only",
+  "builder": "tools/registries/build_registries.py",
+  "cross_reference_validator": "tools/registries/validate_registry_references.py",
+  "document_type": "registry_index",
+  "generated_snapshot_suffix": ".current.json",
+  "record_envelope_schema": "EAFIX_auth_docs/01_canonical_registries/schemas/common_record_envelope.schema.json",
+  "registries": [
+    {
+      "approved_for_cutover": false,
+      "authority_scope": "Who owns this responsibility?",
+      "dependencies": [
+        "REG-PROCESS"
+      ],
+      "generated_snapshot": "EAFIX_auth_docs/generated/registries/module_registry.current.json",
+      "generated_views": [
+        "module catalog",
+        "module dependency map",
+        "module-to-process map"
+      ],
+      "maturity_level": 2,
+      "name": "module",
+      "owner": "EAFIX Governance",
+      "path": "EAFIX_auth_docs/01_canonical_registries/module_registry.jsonl",
+      "record_id_field": "record_id",
+      "registry_id": "REG-MODULE",
+      "schema": "EAFIX_auth_docs/01_canonical_registries/schemas/module_registry_record.schema.json",
+      "status": "candidate",
+      "superseded_files": [],
+      "validator": "tools/registries/validate_record_schemas.py"
+    },
+    {
+      "approved_for_cutover": false,
+      "authority_scope": "Where is the implementation?",
+      "dependencies": [
+        "REG-MODULE"
+      ],
+      "generated_snapshot": "EAFIX_auth_docs/generated/registries/artifact_registry.current.json",
+      "generated_views": [
+        "artifact catalog",
+        "module file tree"
+      ],
+      "maturity_level": 2,
+      "name": "artifact",
+      "owner": "EAFIX Governance",
+      "path": "EAFIX_auth_docs/01_canonical_registries/artifact_registry.jsonl",
+      "record_id_field": "record_id",
+      "registry_id": "REG-ARTIFACT",
+      "schema": "EAFIX_auth_docs/01_canonical_registries/schemas/artifact_registry_record.schema.json",
+      "status": "candidate",
+      "superseded_files": [],
+      "validator": "tools/registries/validate_record_schemas.py"
+    },
+    {
+      "approved_for_cutover": false,
+      "authority_scope": "What data crosses the boundary?",
+      "dependencies": [
+        "REG-MODULE"
+      ],
+      "generated_snapshot": "EAFIX_auth_docs/generated/registries/contract_registry.current.json",
+      "generated_views": [
+        "contract catalog",
+        "producer-consumer matrix",
+        "compatibility report"
+      ],
+      "maturity_level": 2,
+      "name": "contract",
+      "owner": "EAFIX Governance",
+      "path": "EAFIX_auth_docs/01_canonical_registries/contract_registry.jsonl",
+      "record_id_field": "record_id",
+      "registry_id": "REG-CONTRACT",
+      "schema": "EAFIX_auth_docs/01_canonical_registries/schemas/contract_registry_record.schema.json",
+      "status": "candidate",
+      "superseded_files": [],
+      "validator": "tools/registries/validate_record_schemas.py"
+    },
+    {
+      "approved_for_cutover": false,
+      "authority_scope": "How does the data move?",
+      "dependencies": [
+        "REG-MODULE",
+        "REG-CONTRACT",
+        "REG-ARTIFACT"
+      ],
+      "generated_snapshot": "EAFIX_auth_docs/generated/registries/integration_registry.current.json",
+      "generated_views": [
+        "integration catalog",
+        "channel matrix"
+      ],
+      "maturity_level": 2,
+      "name": "integration",
+      "owner": "EAFIX Governance",
+      "path": "EAFIX_auth_docs/01_canonical_registries/integration_registry.jsonl",
+      "record_id_field": "record_id",
+      "registry_id": "REG-INTEGRATION",
+      "schema": "EAFIX_auth_docs/01_canonical_registries/schemas/integration_registry_record.schema.json",
+      "status": "candidate",
+      "superseded_files": [],
+      "validator": "tools/registries/validate_record_schemas.py"
+    },
+    {
+      "approved_for_cutover": false,
+      "authority_scope": "What happens and in what order?",
+      "dependencies": [
+        "REG-MODULE",
+        "REG-CONTRACT",
+        "REG-INTEGRATION",
+        "REG-ARTIFACT"
+      ],
+      "generated_snapshot": "EAFIX_auth_docs/generated/registries/process_registry.current.json",
+      "generated_views": [
+        "end-to-end process",
+        "phase views",
+        "module process views"
+      ],
+      "maturity_level": 2,
+      "name": "process",
+      "owner": "EAFIX Governance",
+      "path": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+      "record_id_field": "record_id",
+      "registry_id": "REG-PROCESS",
+      "schema": "EAFIX_auth_docs/01_canonical_registries/schemas/process_step_registry_record.schema.json",
+      "status": "candidate",
+      "superseded_files": [],
+      "validator": "tools/registries/validate_record_schemas.py"
+    },
+    {
+      "approved_for_cutover": false,
+      "authority_scope": "Which values control behavior?",
+      "dependencies": [
+        "REG-MODULE",
+        "REG-PROCESS",
+        "REG-ARTIFACT"
+      ],
+      "generated_snapshot": "EAFIX_auth_docs/generated/registries/configuration_registry.current.json",
+      "generated_views": [
+        "configuration reference"
+      ],
+      "maturity_level": 2,
+      "name": "configuration",
+      "owner": "EAFIX Governance",
+      "path": "EAFIX_auth_docs/01_canonical_registries/configuration_registry.jsonl",
+      "record_id_field": "record_id",
+      "registry_id": "REG-CONFIG",
+      "schema": "EAFIX_auth_docs/01_canonical_registries/schemas/configuration_registry_record.schema.json",
+      "status": "candidate",
+      "superseded_files": [],
+      "validator": "tools/registries/validate_record_schemas.py"
+    },
+    {
+      "approved_for_cutover": false,
+      "authority_scope": "What blocks or handles failure?",
+      "dependencies": [
+        "REG-MODULE",
+        "REG-PROCESS",
+        "REG-CONFIG"
+      ],
+      "generated_snapshot": "EAFIX_auth_docs/generated/registries/operational_control_registry.current.json",
+      "generated_views": [
+        "failure matrix",
+        "risk-control matrix",
+        "alert matrix"
+      ],
+      "maturity_level": 2,
+      "name": "operational_control",
+      "owner": "EAFIX Governance",
+      "path": "EAFIX_auth_docs/01_canonical_registries/operational_control_registry.jsonl",
+      "record_id_field": "record_id",
+      "registry_id": "REG-CONTROL",
+      "schema": "EAFIX_auth_docs/01_canonical_registries/schemas/operational_control_registry_record.schema.json",
+      "status": "candidate",
+      "superseded_files": [],
+      "validator": "tools/registries/validate_record_schemas.py"
+    },
+    {
+      "approved_for_cutover": false,
+      "authority_scope": "What can an operator do?",
+      "dependencies": [
+        "REG-PROCESS",
+        "REG-CONTROL",
+        "REG-INTEGRATION",
+        "REG-CONFIG"
+      ],
+      "generated_snapshot": "EAFIX_auth_docs/generated/registries/operator_registry.current.json",
+      "generated_views": [
+        "operator guide",
+        "runbook index"
+      ],
+      "maturity_level": 2,
+      "name": "operator",
+      "owner": "EAFIX Governance",
+      "path": "EAFIX_auth_docs/01_canonical_registries/operator_registry.jsonl",
+      "record_id_field": "record_id",
+      "registry_id": "REG-OPERATOR",
+      "schema": "EAFIX_auth_docs/01_canonical_registries/schemas/operator_registry_record.schema.json",
+      "status": "candidate",
+      "superseded_files": [],
+      "validator": "tools/registries/validate_record_schemas.py"
+    },
+    {
+      "approved_for_cutover": false,
+      "authority_scope": "Does this already exist?",
+      "dependencies": [
+        "REG-MODULE",
+        "REG-ARTIFACT",
+        "REG-INTEGRATION"
+      ],
+      "generated_snapshot": "EAFIX_auth_docs/generated/registries/reuse_registry.current.json",
+      "generated_views": [
+        "reuse catalog"
+      ],
+      "maturity_level": 2,
+      "name": "reuse",
+      "owner": "EAFIX Governance",
+      "path": "EAFIX_auth_docs/01_canonical_registries/reuse_registry.jsonl",
+      "record_id_field": "record_id",
+      "registry_id": "REG-REUSE",
+      "schema": "EAFIX_auth_docs/01_canonical_registries/schemas/reuse_registry_record.schema.json",
+      "status": "candidate",
+      "superseded_files": [],
+      "validator": "tools/registries/validate_record_schemas.py"
+    },
+    {
+      "approved_for_cutover": false,
+      "authority_scope": "Why was this changed?",
+      "dependencies": [],
+      "generated_snapshot": "EAFIX_auth_docs/generated/registries/decision_registry.current.json",
+      "generated_views": [
+        "decision log"
+      ],
+      "maturity_level": 2,
+      "name": "decision",
+      "owner": "EAFIX Governance",
+      "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+      "record_id_field": "record_id",
+      "registry_id": "REG-DECISION",
+      "schema": "EAFIX_auth_docs/01_canonical_registries/schemas/decision_registry_record.schema.json",
+      "status": "candidate",
+      "superseded_files": [],
+      "validator": "tools/registries/validate_record_schemas.py"
+    }
+  ],
+  "registry_system_id": "EAFIX-REGISTRY-SYSTEM",
+  "schema_version": "1.0.0",
+  "status": "candidate",
+  "validator": "tools/registries/validate_record_schemas.py"
+}

@@ -1,0 +1,26 @@
+{
+  "$id": "common_change_control.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "change_request_refs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "last_verified_commit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "change_request_refs",
+    "last_verified_commit"
+  ],
+  "title": "Common change control",
+  "type": "object"
+}

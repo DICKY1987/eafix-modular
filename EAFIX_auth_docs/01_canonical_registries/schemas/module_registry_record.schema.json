@@ -1,0 +1,280 @@
+{
+  "$id": "module.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authority_status": {
+      "enum": [
+        "canonical",
+        "canonical_candidate",
+        "generated",
+        "supporting_evidence",
+        "implementation_evidence",
+        "legacy_source",
+        "needs_review"
+      ]
+    },
+    "canonical_symbol": {
+      "type": "string"
+    },
+    "change_request_refs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "confidence": {
+      "enum": [
+        "high",
+        "medium",
+        "low",
+        "unknown"
+      ]
+    },
+    "dependencies": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "domain_group": {
+      "type": "string"
+    },
+    "effective_from_utc": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "forbidden_responsibilities": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "last_verified_commit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "layer": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "legacy_aliases": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "manifest_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "module_id": {
+      "pattern": "^5\\d{19}$",
+      "type": "string"
+    },
+    "module_kind": {
+      "type": "string"
+    },
+    "module_locator": {
+      "pattern": "^M\\d{4}$",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "module_name": {
+      "type": "string"
+    },
+    "module_root": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "needs_review_fields": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "process_step_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "public_interfaces": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "purpose": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "record_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "record_type": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "record_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "type": "string"
+    },
+    "responsibilities": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "scope_in": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "scope_out": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "source_hashes": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "source_refs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "commit_sha": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "line_end": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "line_start": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "role": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "role",
+          "commit_sha"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "status": {
+      "enum": [
+        "candidate",
+        "active",
+        "canonical",
+        "planned",
+        "partial",
+        "conflicted",
+        "deprecated",
+        "superseded",
+        "retired",
+        "archived"
+      ]
+    },
+    "superseded_by": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "supersedes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "record_type",
+    "record_id",
+    "schema_version",
+    "record_version",
+    "status",
+    "authority_status",
+    "source_refs",
+    "source_hashes",
+    "confidence",
+    "effective_from_utc",
+    "supersedes",
+    "superseded_by",
+    "change_request_refs",
+    "last_verified_commit",
+    "module_id",
+    "module_locator",
+    "canonical_symbol",
+    "module_name",
+    "purpose",
+    "module_kind",
+    "domain_group",
+    "layer",
+    "scope_in",
+    "scope_out",
+    "responsibilities",
+    "forbidden_responsibilities",
+    "process_step_ids",
+    "dependencies",
+    "public_interfaces",
+    "manifest_path",
+    "module_root",
+    "legacy_aliases",
+    "needs_review_fields"
+  ],
+  "title": "Module registry record",
+  "type": "object"
+}

@@ -1,0 +1,48 @@
+{
+  "$id": "common_source_ref.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "commit_sha": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "line_end": {
+      "minimum": 1,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "line_start": {
+      "minimum": 1,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "note": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "path": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "role": {
+      "minLength": 1,
+      "type": "string"
+    }
+  },
+  "required": [
+    "path",
+    "role",
+    "commit_sha"
+  ],
+  "title": "Common source reference",
+  "type": "object"
+}

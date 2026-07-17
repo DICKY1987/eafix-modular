@@ -1,0 +1,1995 @@
+{
+  "document_type": "generated_registry_snapshot",
+  "record_count": 26,
+  "records": [
+    {
+      "artifact_ids": [],
+      "atomic_activities": [
+        "Resolve configuration snapshot"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [],
+      "dependency_step_ids": [],
+      "effective_from_utc": null,
+      "evidence_refs": [],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S01"
+      ],
+      "gap_ids": [],
+      "implementation_status": "partial",
+      "input_contract_ids": [
+        "CONTRACT::CONFIGSOURCE::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000001",
+      "owner_symbol_at_source": "F1_CONFIG_PREFERENCES",
+      "phase_id": "PHASE_A",
+      "preconditions": [],
+      "process_order": 1,
+      "record_id": "60000000000000000001",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S01",
+      "step_id": "60000000000000000001",
+      "step_name": "Resolve configuration snapshot",
+      "step_number": 1,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S01"
+      ]
+    },
+    {
+      "artifact_ids": [
+        "10000000000000000560"
+      ],
+      "atomic_activities": [
+        "Emit schedule tick (calendar polling cadence)"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [
+        "services/calendar-ingestor/src/2099900093260118_main.py"
+      ],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S02"
+      ],
+      "gap_ids": [],
+      "implementation_status": "implementation_evidence_present",
+      "input_contract_ids": [
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::SCHEDULETICK::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000002",
+      "owner_symbol_at_source": "F3_CLOCK_SCHEDULER",
+      "phase_id": "PHASE_A",
+      "preconditions": [],
+      "process_order": 2,
+      "record_id": "60000000000000000002",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S02",
+      "step_id": "60000000000000000002",
+      "step_name": "Emit schedule tick (calendar polling cadence)",
+      "step_number": 2,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S02"
+      ]
+    },
+    {
+      "artifact_ids": [
+        "10000000000000000560"
+      ],
+      "atomic_activities": [
+        "Poll calendar source(s)"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [],
+      "dependency_step_ids": [
+        "60000000000000000002"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [
+        "services/calendar-ingestor/src/2099900093260118_main.py"
+      ],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S03"
+      ],
+      "gap_ids": [],
+      "implementation_status": "implementation_evidence_present",
+      "input_contract_ids": [
+        "CONTRACT::CALENDARSOURCECONFIG::UNVERSIONED",
+        "CONTRACT::SCHEDULETICK::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::CALENDARRAW::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000003",
+      "owner_symbol_at_source": "D2_CALENDAR_SOURCE_ADAPTER",
+      "phase_id": "PHASE_B",
+      "preconditions": [],
+      "process_order": 3,
+      "record_id": "60000000000000000003",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S03",
+      "step_id": "60000000000000000003",
+      "step_name": "Poll calendar source(s)",
+      "step_number": 3,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S03"
+      ]
+    },
+    {
+      "artifact_ids": [
+        "10000000000000000560"
+      ],
+      "atomic_activities": [
+        "Normalize raw calendar entries"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000003"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [
+        "services/calendar-ingestor/src/2099900093260118_main.py"
+      ],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S04"
+      ],
+      "gap_ids": [],
+      "implementation_status": "implementation_evidence_present",
+      "input_contract_ids": [
+        "CONTRACT::CALENDARRAW::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::CALENDAREVENT::1.0"
+      ],
+      "owner_module_id": "50000000000000000004",
+      "owner_symbol_at_source": "D3_CALENDAR_NORMALIZER",
+      "phase_id": "PHASE_B",
+      "preconditions": [],
+      "process_order": 4,
+      "record_id": "60000000000000000004",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S04",
+      "step_id": "60000000000000000004",
+      "step_name": "Normalize raw calendar entries",
+      "step_number": 4,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S04"
+      ]
+    },
+    {
+      "artifact_ids": [
+        "10000000000000000560"
+      ],
+      "atomic_activities": [
+        "Persist calendar events (append-only)"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [],
+      "dependency_step_ids": [
+        "60000000000000000004"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [
+        "services/calendar-ingestor/src/2099900093260118_main.py"
+      ],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S05"
+      ],
+      "gap_ids": [],
+      "implementation_status": "implementation_evidence_present",
+      "input_contract_ids": [
+        "CONTRACT::CALENDAREVENT::1.0"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::EVENTSTREAM::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000005",
+      "owner_symbol_at_source": "F2_EVENT_LOG",
+      "phase_id": "PHASE_B",
+      "preconditions": [],
+      "process_order": 5,
+      "record_id": "60000000000000000005",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S05",
+      "step_id": "60000000000000000005",
+      "step_name": "Persist calendar events (append-only)",
+      "step_number": 5,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S05"
+      ]
+    },
+    {
+      "artifact_ids": [
+        "10000000000000000560"
+      ],
+      "atomic_activities": [
+        "Build anticipation triggers from calendar"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000002",
+        "60000000000000000004"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [
+        "services/calendar-ingestor/src/2099900093260118_main.py"
+      ],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S06"
+      ],
+      "gap_ids": [],
+      "implementation_status": "implementation_evidence_present",
+      "input_contract_ids": [
+        "CONTRACT::CALENDAREVENT::1.0",
+        "CONTRACT::SCHEDULETICK::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::CALENDARTRIGGER::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000006",
+      "owner_symbol_at_source": "D4_CALENDAR_TRIGGER_BUILDER",
+      "phase_id": "PHASE_B",
+      "preconditions": [],
+      "process_order": 6,
+      "record_id": "60000000000000000006",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S06",
+      "step_id": "60000000000000000006",
+      "step_name": "Build anticipation triggers from calendar",
+      "step_number": 6,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S06"
+      ]
+    },
+    {
+      "artifact_ids": [
+        "10000000000000000587"
+      ],
+      "atomic_activities": [
+        "Ingest market ticks"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [
+        "services/data-ingestor/src/2099900112260118_main.py"
+      ],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S07"
+      ],
+      "gap_ids": [],
+      "implementation_status": "implementation_evidence_present",
+      "input_contract_ids": [
+        "CONTRACT::RAWTICK::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::MARKETTICK::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000007",
+      "owner_symbol_at_source": "D1_MARKET_FEED_ADAPTER",
+      "phase_id": "PHASE_C",
+      "preconditions": [],
+      "process_order": 7,
+      "record_id": "60000000000000000007",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S07",
+      "step_id": "60000000000000000007",
+      "step_name": "Ingest market ticks",
+      "step_number": 7,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S07"
+      ]
+    },
+    {
+      "artifact_ids": [],
+      "atomic_activities": [
+        "Aggregate ticks into bars"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000007"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S08"
+      ],
+      "gap_ids": [],
+      "implementation_status": "partial",
+      "input_contract_ids": [
+        "CONTRACT::MARKETTICK::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::BAR::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000008",
+      "owner_symbol_at_source": "C1_BAR_BUILDER",
+      "phase_id": "PHASE_C",
+      "preconditions": [],
+      "process_order": 8,
+      "record_id": "60000000000000000008",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S08",
+      "step_id": "60000000000000000008",
+      "step_name": "Aggregate ticks into bars",
+      "step_number": 8,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S08"
+      ]
+    },
+    {
+      "artifact_ids": [
+        "10000000000000000607"
+      ],
+      "atomic_activities": [
+        "Compute indicators"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000008"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [
+        "services/desktop-ui/2099900128260118_expiry_indicator_service.py"
+      ],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S09"
+      ],
+      "gap_ids": [],
+      "implementation_status": "implementation_evidence_present",
+      "input_contract_ids": [
+        "CONTRACT::BAR::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::INDICATORSNAPSHOT::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000009",
+      "owner_symbol_at_source": "C2_INDICATOR_ENGINE",
+      "phase_id": "PHASE_C",
+      "preconditions": [],
+      "process_order": 9,
+      "record_id": "60000000000000000009",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S09",
+      "step_id": "60000000000000000009",
+      "step_name": "Compute indicators",
+      "step_number": 9,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S09"
+      ]
+    },
+    {
+      "artifact_ids": [],
+      "atomic_activities": [
+        "Assemble strategy feature frame"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000006",
+        "60000000000000000009"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S10"
+      ],
+      "gap_ids": [],
+      "implementation_status": "partial",
+      "input_contract_ids": [
+        "CONTRACT::INDICATORSNAPSHOT::UNVERSIONED",
+        "CONTRACT::CALENDARTRIGGER::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::FEATUREFRAME::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000010",
+      "owner_symbol_at_source": "C3_FEATURE_PACKAGER",
+      "phase_id": "PHASE_D",
+      "preconditions": [],
+      "process_order": 10,
+      "record_id": "60000000000000000010",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S10",
+      "step_id": "60000000000000000010",
+      "step_name": "Assemble strategy feature frame",
+      "step_number": 10,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S10"
+      ]
+    },
+    {
+      "artifact_ids": [
+        "10000000000000000073"
+      ],
+      "atomic_activities": [
+        "Generate signal (or suppression)"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000010"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [
+        "compliance/auto-remediation/2099900012260118_remediation-engine.py"
+      ],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S11"
+      ],
+      "gap_ids": [],
+      "implementation_status": "implementation_evidence_present",
+      "input_contract_ids": [
+        "CONTRACT::FEATUREFRAME::UNVERSIONED",
+        "CONTRACT::POSITIONSUMMARY::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::SIGNAL::1.0",
+        "CONTRACT::SIGNALSUPPRESSED::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000011",
+      "owner_symbol_at_source": "S1_SIGNAL_ENGINE",
+      "phase_id": "PHASE_E",
+      "preconditions": [],
+      "process_order": 11,
+      "record_id": "60000000000000000011",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S11",
+      "step_id": "60000000000000000011",
+      "step_name": "Generate signal (or suppression)",
+      "step_number": 11,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S11"
+      ]
+    },
+    {
+      "artifact_ids": [],
+      "atomic_activities": [
+        "Convert signal to trade intent"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000011"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S12"
+      ],
+      "gap_ids": [],
+      "implementation_status": "partial",
+      "input_contract_ids": [
+        "CONTRACT::SIGNAL::1.0",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::TRADEINTENT::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000012",
+      "owner_symbol_at_source": "S2_INTENT_BUILDER",
+      "phase_id": "PHASE_E",
+      "preconditions": [],
+      "process_order": 12,
+      "record_id": "60000000000000000012",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S12",
+      "step_id": "60000000000000000012",
+      "step_name": "Convert signal to trade intent",
+      "step_number": 12,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S12"
+      ]
+    },
+    {
+      "artifact_ids": [],
+      "atomic_activities": [
+        "Evaluate risk and size"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000012"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S13"
+      ],
+      "gap_ids": [],
+      "implementation_status": "partial",
+      "input_contract_ids": [
+        "CONTRACT::TRADEINTENT::UNVERSIONED",
+        "CONTRACT::PORTFOLIOSTATE::UNVERSIONED",
+        "CONTRACT::RISKPOLICY::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::RISKDECISION::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000013",
+      "owner_symbol_at_source": "R1_RISK_EVALUATOR",
+      "phase_id": "PHASE_E",
+      "preconditions": [],
+      "process_order": 13,
+      "record_id": "60000000000000000013",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S13",
+      "step_id": "60000000000000000013",
+      "step_name": "Evaluate risk and size",
+      "step_number": 13,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S13"
+      ]
+    },
+    {
+      "artifact_ids": [],
+      "atomic_activities": [
+        "Compile order intent"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000013"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [
+        "services/transport-router/src/2099900199260118_main.py"
+      ],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S14"
+      ],
+      "gap_ids": [],
+      "implementation_status": "implementation_evidence_present",
+      "input_contract_ids": [
+        "CONTRACT::RISKDECISION::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::ORDERINTENT::1.2"
+      ],
+      "owner_module_id": "50000000000000000014",
+      "owner_symbol_at_source": "R2_ORDER_INTENT_COMPILER",
+      "phase_id": "PHASE_F",
+      "preconditions": [],
+      "process_order": 14,
+      "record_id": "60000000000000000014",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S14",
+      "step_id": "60000000000000000014",
+      "step_name": "Compile order intent",
+      "step_number": 14,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S14"
+      ]
+    },
+    {
+      "artifact_ids": [],
+      "atomic_activities": [
+        "Route order to broker"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000014"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [
+        "services/transport-router/src/2099900199260118_main.py"
+      ],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S15"
+      ],
+      "gap_ids": [],
+      "implementation_status": "implementation_evidence_present",
+      "input_contract_ids": [
+        "CONTRACT::ORDERINTENT::1.2",
+        "CONTRACT::BROKERPOLICY::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::ROUTEDORDERINTENT::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000015",
+      "owner_symbol_at_source": "O1_ORDER_ROUTER",
+      "phase_id": "PHASE_G",
+      "preconditions": [],
+      "process_order": 15,
+      "record_id": "60000000000000000015",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S15",
+      "step_id": "60000000000000000015",
+      "step_name": "Route order to broker",
+      "step_number": 15,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S15"
+      ]
+    },
+    {
+      "artifact_ids": [],
+      "atomic_activities": [
+        "Serialize and send to MT4 adapter"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000015"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [
+        "services/transport-router/src/2099900199260118_main.py"
+      ],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S16"
+      ],
+      "gap_ids": [],
+      "implementation_status": "implementation_evidence_present",
+      "input_contract_ids": [
+        "CONTRACT::ROUTEDORDERINTENT::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::BROKERORDERENVELOPE::UNVERSIONED",
+        "CONTRACT::ADAPTERACK::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000016",
+      "owner_symbol_at_source": "B1_MT4_ADAPTER_TRANSPORT",
+      "phase_id": "PHASE_G",
+      "preconditions": [],
+      "process_order": 16,
+      "record_id": "60000000000000000016",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S16",
+      "step_id": "60000000000000000016",
+      "step_name": "Serialize and send to MT4 adapter",
+      "step_number": 16,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S16"
+      ]
+    },
+    {
+      "artifact_ids": [],
+      "atomic_activities": [
+        "EA executes broker order"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [],
+      "dependency_step_ids": [
+        "60000000000000000016"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [
+        "services/transport-router/src/2099900199260118_main.py"
+      ],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S17"
+      ],
+      "gap_ids": [],
+      "implementation_status": "implementation_evidence_present",
+      "input_contract_ids": [
+        "CONTRACT::BROKERORDERENVELOPE::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::BROKEREXECEVENT::UNVERSIONED",
+        "CONTRACT::EAHEALTH::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000017",
+      "owner_symbol_at_source": "B2_MT4_EA_EXECUTOR",
+      "phase_id": "PHASE_G",
+      "preconditions": [],
+      "process_order": 17,
+      "record_id": "60000000000000000017",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S17",
+      "step_id": "60000000000000000017",
+      "step_name": "EA executes broker order",
+      "step_number": 17,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S17"
+      ]
+    },
+    {
+      "artifact_ids": [
+        "10000000000000000623"
+      ],
+      "atomic_activities": [
+        "Normalize broker events to canonical reports"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000017"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [
+        "services/event-gateway/src/2099900141260118_main.py"
+      ],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S18"
+      ],
+      "gap_ids": [],
+      "implementation_status": "implementation_evidence_present",
+      "input_contract_ids": [
+        "CONTRACT::BROKEREXECEVENT::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::EXECUTIONREPORT::1.0",
+        "CONTRACT::POSITIONSNAPSHOT::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000018",
+      "owner_symbol_at_source": "B3_EXEC_EVENT_NORMALIZER",
+      "phase_id": "PHASE_H",
+      "preconditions": [],
+      "process_order": 18,
+      "record_id": "60000000000000000018",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S18",
+      "step_id": "60000000000000000018",
+      "step_name": "Normalize broker events to canonical reports",
+      "step_number": 18,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S18"
+      ]
+    },
+    {
+      "artifact_ids": [],
+      "atomic_activities": [
+        "Apply execution reports to OMS state"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000015",
+        "60000000000000000018"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S19"
+      ],
+      "gap_ids": [],
+      "implementation_status": "partial",
+      "input_contract_ids": [
+        "CONTRACT::ROUTEDORDERINTENT::UNVERSIONED",
+        "CONTRACT::EXECUTIONREPORT::1.0",
+        "CONTRACT::POSITIONSNAPSHOT::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::ORDERSTATECHANGED::UNVERSIONED",
+        "CONTRACT::POSITIONSTATECHANGED::UNVERSIONED",
+        "CONTRACT::TRADECLOSEDRAW::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000019",
+      "owner_symbol_at_source": "O2_OMS_STATE_MACHINE",
+      "phase_id": "PHASE_I",
+      "preconditions": [],
+      "process_order": 19,
+      "record_id": "60000000000000000019",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S19",
+      "step_id": "60000000000000000019",
+      "step_name": "Apply execution reports to OMS state",
+      "step_number": 19,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S19"
+      ]
+    },
+    {
+      "artifact_ids": [],
+      "atomic_activities": [
+        "Classify trade close and compute canonical PnL"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000019"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S20"
+      ],
+      "gap_ids": [],
+      "implementation_status": "partial",
+      "input_contract_ids": [
+        "CONTRACT::TRADECLOSEDRAW::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::TRADECLOSED::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000020",
+      "owner_symbol_at_source": "O3_TRADE_CLOSE_CLASSIFIER",
+      "phase_id": "PHASE_I",
+      "preconditions": [],
+      "process_order": 20,
+      "record_id": "60000000000000000020",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S20",
+      "step_id": "60000000000000000020",
+      "step_name": "Classify trade close and compute canonical PnL",
+      "step_number": 20,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S20"
+      ]
+    },
+    {
+      "artifact_ids": [],
+      "atomic_activities": [
+        "Bucketize outcome"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000020"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S21"
+      ],
+      "gap_ids": [],
+      "implementation_status": "partial",
+      "input_contract_ids": [
+        "CONTRACT::TRADECLOSED::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::OUTCOMEBUCKET::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000021",
+      "owner_symbol_at_source": "E1_OUTCOME_BUCKETIZER",
+      "phase_id": "PHASE_I",
+      "preconditions": [],
+      "process_order": 21,
+      "record_id": "60000000000000000021",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S21",
+      "step_id": "60000000000000000021",
+      "step_name": "Bucketize outcome",
+      "step_number": 21,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S21"
+      ]
+    },
+    {
+      "artifact_ids": [
+        "10000000000000000623"
+      ],
+      "atomic_activities": [
+        "Compute event proximity"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000004"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [
+        "services/event-gateway/src/2099900141260118_main.py"
+      ],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S22"
+      ],
+      "gap_ids": [],
+      "implementation_status": "implementation_evidence_present",
+      "input_contract_ids": [
+        "CONTRACT::CALENDAREVENT::1.0",
+        "CONTRACT::CLOCKTICK::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::EVENTPROXIMITY::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000022",
+      "owner_symbol_at_source": "E2_PROXIMITY_EVALUATOR",
+      "phase_id": "PHASE_I",
+      "preconditions": [],
+      "process_order": 22,
+      "record_id": "60000000000000000022",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S22",
+      "step_id": "60000000000000000022",
+      "step_name": "Compute event proximity",
+      "step_number": 22,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S22"
+      ]
+    },
+    {
+      "artifact_ids": [],
+      "atomic_activities": [
+        "Lookup matrix decision"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000021",
+        "60000000000000000022"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [
+        "services/reentry-matrix-svc/src/2099900174260118_main.py"
+      ],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S23"
+      ],
+      "gap_ids": [],
+      "implementation_status": "implementation_evidence_present",
+      "input_contract_ids": [
+        "CONTRACT::OUTCOMEBUCKET::UNVERSIONED",
+        "CONTRACT::EVENTPROXIMITY::UNVERSIONED",
+        "CONTRACT::SIGNALCONTEXT::UNVERSIONED",
+        "CONTRACT::MATRIXPROFILE::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::MATRIXDECISION::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000023",
+      "owner_symbol_at_source": "E3_MATRIX_LOOKUP",
+      "phase_id": "PHASE_I",
+      "preconditions": [],
+      "process_order": 23,
+      "record_id": "60000000000000000023",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S23",
+      "step_id": "60000000000000000023",
+      "step_name": "Lookup matrix decision",
+      "step_number": 23,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S23"
+      ]
+    },
+    {
+      "artifact_ids": [],
+      "atomic_activities": [
+        "Build reentry trade intent (or suppress)"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001",
+        "60000000000000000023"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [
+        "services/reentry-engine/src/2099900166260118_main.py"
+      ],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S24"
+      ],
+      "gap_ids": [],
+      "implementation_status": "implementation_evidence_present",
+      "input_contract_ids": [
+        "CONTRACT::MATRIXDECISION::UNVERSIONED",
+        "CONTRACT::REENTRYCHAINSTATE::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::TRADEINTENT::UNVERSIONED",
+        "CONTRACT::REENTRYSUPPRESSED::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000024",
+      "owner_symbol_at_source": "E4_REENTRY_INTENT_BUILDER",
+      "phase_id": "PHASE_I",
+      "preconditions": [],
+      "process_order": 24,
+      "record_id": "60000000000000000024",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S24",
+      "step_id": "60000000000000000024",
+      "step_name": "Build reentry trade intent (or suppress)",
+      "step_number": 24,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S24"
+      ]
+    },
+    {
+      "artifact_ids": [],
+      "atomic_activities": [
+        "Loop: reentry intent follows same risk->order->route->transport->execute chain"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [],
+      "dependency_step_ids": [
+        "60000000000000000012",
+        "60000000000000000024"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [
+        "services/transport-router/src/2099900199260118_main.py"
+      ],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S25"
+      ],
+      "gap_ids": [
+        "GAP::SYMBOL::F1_VS_F4_FLOW_ORCHESTRATOR"
+      ],
+      "implementation_status": "implementation_evidence_present",
+      "input_contract_ids": [
+        "CONTRACT::TRADEINTENT::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::EITHER::UNVERSIONED",
+        "CONTRACT::ROUTEDORDERINTENT::UNVERSIONED",
+        "CONTRACT::OUTCOMEBUCKET::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000025",
+      "owner_symbol_at_source": "F1_FLOW_ORCHESTRATOR",
+      "phase_id": "PHASE_J",
+      "preconditions": [],
+      "process_order": 25,
+      "record_id": "60000000000000000025",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S25",
+      "step_id": "60000000000000000025",
+      "step_name": "Loop: reentry intent follows same risk->order->route->transport->execute chain",
+      "step_number": 25,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S25"
+      ]
+    },
+    {
+      "artifact_ids": [],
+      "atomic_activities": [
+        "Health aggregation + SLO evaluation"
+      ],
+      "authority_status": "legacy_source",
+      "branches": [],
+      "change_request_refs": [],
+      "confidence": "high",
+      "configuration_ids": [
+        "CFG::RESOLVED_CONFIG"
+      ],
+      "dependency_step_ids": [
+        "60000000000000000001"
+      ],
+      "effective_from_utc": null,
+      "evidence_refs": [
+        "services/telemetry-daemon/src/2099900192260118_main.py"
+      ],
+      "failure_control_ids": [
+        "CONTROL::FAILURE::S26"
+      ],
+      "gap_ids": [],
+      "implementation_status": "implementation_evidence_present",
+      "input_contract_ids": [
+        "CONTRACT::ADAPTERHEALTH::UNVERSIONED",
+        "CONTRACT::MODULEHEALTH::UNVERSIONED",
+        "CONTRACT::RESOLVEDCONFIG::UNVERSIONED"
+      ],
+      "integration_ids": [],
+      "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "output_contract_ids": [
+        "CONTRACT::HEALTHREPORT::UNVERSIONED"
+      ],
+      "owner_module_id": "50000000000000000026",
+      "owner_symbol_at_source": "P1_HEALTH_AGGREGATOR",
+      "phase_id": "PHASE_J",
+      "preconditions": [],
+      "process_order": 26,
+      "record_id": "60000000000000000026",
+      "record_type": "process_step",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+          "role": "process_step_identity"
+        },
+        {
+          "commit_sha": "32694cacd212b7615af83555f8ac7e64397376f1",
+          "line_end": null,
+          "line_start": null,
+          "note": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+          "role": "phase_and_control_authority"
+        }
+      ],
+      "status": "active",
+      "step_code": "S26",
+      "step_id": "60000000000000000026",
+      "step_name": "Health aggregation + SLO evaluation",
+      "step_number": 26,
+      "superseded_by": [],
+      "supersedes": [],
+      "supporting_module_ids": [],
+      "terminal_outcomes": [],
+      "trigger": null,
+      "validation_control_ids": [
+        "CONTROL::VALIDATION::S26"
+      ]
+    }
+  ],
+  "records_sha256": "3e11a350c327ac479441df3efb52233781ebb8898b4bced99daccd8945e50bb8",
+  "registry_id": "REG-PROCESS",
+  "schema_version": "1.0.0",
+  "source_path": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl"
+}

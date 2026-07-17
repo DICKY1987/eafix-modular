@@ -1,0 +1,34 @@
+{
+  "baseline_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+  "branch": "copilot/eafix-registry-system-v1",
+  "conflict_queue": "EAFIX_auth_docs/01_canonical_registries/registry_conflict_queue.jsonl",
+  "created_at_utc": "2026-07-16T00:00:00Z",
+  "cutover_policy": "No registry becomes canonical on this branch. Registry-by-registry cutover requires clean parity, resolved high-severity conflicts, routing/doc-authority updates, and blocking CI in separate PRs.",
+  "document_type": "registry_migration_baseline",
+  "plan_id": "EAFIX-REGISTRY-SYSTEM-IMPLEMENTATION-V1",
+  "plan_version": "1.0.0",
+  "schema_version": "1.0.0",
+  "source_inventory": "EAFIX_auth_docs/01_canonical_registries/registry_source_inventory.jsonl",
+  "target_registries": [
+    "module",
+    "artifact",
+    "contract",
+    "integration",
+    "process",
+    "configuration",
+    "operational_control",
+    "operator",
+    "reuse",
+    "decision"
+  ],
+  "temporary_anti_drift_rule": {
+    "active": true,
+    "rules": [
+      "No new independent end-to-end process document.",
+      "No new independent module catalog.",
+      "No new contract list.",
+      "No new communication-channel list.",
+      "New information must update an existing authority or enter the registry migration queue."
+    ]
+  }
+}

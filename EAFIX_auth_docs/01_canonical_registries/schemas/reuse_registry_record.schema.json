@@ -1,0 +1,256 @@
+{
+  "$id": "reuse.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifact_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "authority_status": {
+      "enum": [
+        "canonical",
+        "canonical_candidate",
+        "generated",
+        "supporting_evidence",
+        "implementation_evidence",
+        "legacy_source",
+        "needs_review"
+      ]
+    },
+    "best_use_cases": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "change_request_refs": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "confidence": {
+      "enum": [
+        "high",
+        "medium",
+        "low",
+        "unknown"
+      ]
+    },
+    "constraints": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "cost": {},
+    "do_not_rebuild": {
+      "type": "boolean"
+    },
+    "effective_from_utc": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "inputs": {
+      "type": "array"
+    },
+    "integration_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "last_verified_commit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "module_ids": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "name": {
+      "type": "string"
+    },
+    "outputs": {
+      "type": "array"
+    },
+    "poor_use_cases": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "record_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "record_type": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "record_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "type": "string"
+    },
+    "replacement_strength": {
+      "type": "string"
+    },
+    "reuse_id": {
+      "type": "string"
+    },
+    "reuse_record_type": {
+      "enum": [
+        "capability",
+        "pattern",
+        "tool",
+        "library",
+        "service",
+        "repeatable_process"
+      ]
+    },
+    "reuse_status": {
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "source_hashes": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "source_refs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "commit_sha": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "line_end": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "line_start": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "role": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "role",
+          "commit_sha"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "status": {
+      "enum": [
+        "candidate",
+        "active",
+        "canonical",
+        "planned",
+        "partial",
+        "conflicted",
+        "deprecated",
+        "superseded",
+        "retired",
+        "archived"
+      ]
+    },
+    "superseded_by": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "supersedes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "usage_limits": {},
+    "validation_evidence": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "what_it_does": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "record_type",
+    "record_id",
+    "schema_version",
+    "record_version",
+    "status",
+    "authority_status",
+    "source_refs",
+    "source_hashes",
+    "confidence",
+    "effective_from_utc",
+    "supersedes",
+    "superseded_by",
+    "change_request_refs",
+    "last_verified_commit",
+    "reuse_id",
+    "reuse_record_type",
+    "name",
+    "reuse_status",
+    "what_it_does",
+    "inputs",
+    "outputs",
+    "best_use_cases",
+    "poor_use_cases",
+    "module_ids",
+    "artifact_ids",
+    "integration_ids",
+    "constraints",
+    "cost",
+    "usage_limits",
+    "replacement_strength",
+    "do_not_rebuild",
+    "validation_evidence"
+  ],
+  "title": "Reuse registry record",
+  "type": "object"
+}
