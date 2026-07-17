@@ -11,6 +11,19 @@ ROOT=Path(__file__).resolve().parents[2]
 REG_ROOT=ROOT/'EAFIX_auth_docs/01_canonical_registries'
 GEN_ROOT=ROOT/'EAFIX_auth_docs/generated/registries'
 
+# authority_status -> status values that are a valid combination for that authority state.
+# Calibrated against the current dataset (see registry_core.run) plus the natural
+# forward/backward transitions each authority state can still reach.
+AUTHORITY_STATE_MATRIX={
+    'canonical':{'canonical'},
+    'canonical_candidate':{'candidate','active','partial','planned','deprecated'},
+    'generated':{'candidate','active','partial','canonical'},
+    'supporting_evidence':{'active','partial','deprecated','archived'},
+    'implementation_evidence':{'active','partial','deprecated','archived'},
+    'legacy_source':{'active','deprecated','superseded','retired','archived'},
+    'needs_review':{'candidate','active','partial','conflicted','planned'},
+}
+
 def canonical_json(data:Any)->str:
     return json.dumps(data,sort_keys=True,separators=(',',':'),ensure_ascii=False)
 def sha(data:Any)->str: return hashlib.sha256(canonical_json(data).encode()).hexdigest()
@@ -48,13 +61,17 @@ def validate_schemas(idx,all_records):
     return errors
 def validate_ids(all_records):
     errors=[]
+    global_owners=defaultdict(set)
     for name,recs in all_records.items():
         seen=set()
         for rec in recs:
             rid=rec.get('record_id')
             if rid in seen: errors.append(f'{name}: duplicate record_id {rid}')
             seen.add(rid)
+            global_owners[rid].add(name)
         if [r['record_id'] for r in recs] != sorted(r['record_id'] for r in recs): errors.append(f'{name}: JSONL records are not sorted by record_id')
+    for rid,owners in global_owners.items():
+        if len(owners)>1: errors.append(f"global: record_id {rid} used across multiple registries: {', '.join(sorted(owners))}")
     return errors
 def ids(all_records,name): return {r['record_id'] for r in all_records[name]}
 def validate_refs(all_records):
@@ -74,9 +91,21 @@ def validate_refs(all_records):
     return e
 def validate_authority(all_records):
     e=[]
+    global_index={r['record_id']:(name,r) for name,recs in all_records.items() for r in recs}
     for name,recs in all_records.items():
         for r in recs:
-            if r['authority_status']=='canonical' and r['status']!='canonical': e.append(f"{name}:{r['record_id']}: canonical authority requires canonical status")
+            astat=r['authority_status']; stat=r['status']
+            allowed=AUTHORITY_STATE_MATRIX.get(astat)
+            if allowed is not None and stat not in allowed:
+                e.append(f"{name}:{r['record_id']}: authority_status {astat} does not permit status {stat} (allowed: {sorted(allowed)})")
+            for sup_id in r.get('supersedes',[]):
+                target=global_index.get(sup_id)
+                if target is None: e.append(f"{name}:{r['record_id']}: supersedes unknown record_id {sup_id}")
+                elif r['record_id'] not in target[1].get('superseded_by',[]): e.append(f"{name}:{r['record_id']}: supersedes {sup_id} but {sup_id} does not list it in superseded_by")
+            for sb_id in r.get('superseded_by',[]):
+                target=global_index.get(sb_id)
+                if target is None: e.append(f"{name}:{r['record_id']}: superseded_by unknown record_id {sb_id}")
+                elif r['record_id'] not in target[1].get('supersedes',[]): e.append(f"{name}:{r['record_id']}: superseded_by {sb_id} but {sb_id} does not list it in supersedes")
     return e
 def build_snapshots(idx,all_records,check=False):
     changed=[]; outputs={}
@@ -100,8 +129,18 @@ def graph(all_records):
         edges.append({'from':r['owner_module_id'],'to':r['step_id'],'type':'owns_step'})
         for d in r['dependency_step_ids']: edges.append({'from':d,'to':r['step_id'],'type':'step_precedes'})
     return {'schema_version':'1.0.0','document_type':'eafix_registry_graph','nodes':{k:v for k,v in all_records.items()},'edges':sorted(edges,key=lambda x:(x['type'],x['from'],x['to']))}
-def reports(all_records,errors):
-    conflicts=[r for name,recs in all_records.items() for r in recs if r['status']=='conflicted' or r['authority_status']=='needs_review']
+def conflict_detail(name,r,registry_owner):
+    reasons=[]
+    if r['status']=='conflicted': reasons.append('status_conflicted')
+    if r['authority_status']=='needs_review': reasons.append('authority_needs_review')
+    severity='high' if 'status_conflicted' in reasons else 'medium'
+    return {
+        'registry_record':r['record_id'],'registry_name':name,'status':r['status'],'authority_status':r['authority_status'],
+        'severity':severity,'reasons':reasons,'owner_module_id':r.get('owner_module_id'),'registry_owner':registry_owner,
+        'resolution_state':'unresolved','resolution_notes':None}
+def reports(idx,all_records,errors):
+    registry_owners={r['name']:r['owner'] for r in idx['registries']}
+    conflicts=[conflict_detail(name,r,registry_owners[name]) for name,recs in all_records.items() for r in recs if r['status']=='conflicted' or r['authority_status']=='needs_review']
     orphans=[]
     for r in all_records['module']:
         if not r['process_step_ids'] and not any(r['module_id'] in c['producer_module_ids']+c['consumer_module_ids'] for c in all_records['contract']): orphans.append({'record_id':r['record_id'],'reason':'module has no process or contract links'})
@@ -111,7 +150,7 @@ def reports(all_records,errors):
     return {
       'registry_cross_reference_report.json':{'schema_version':'1.0.0','validation_error_count':len(errors),'errors':errors,'status':'pass' if not errors else 'fail'},
       'registry_orphan_report.json':{'schema_version':'1.0.0','orphan_count':len(orphans),'orphans':orphans},
-      'registry_conflict_report.json':{'schema_version':'1.0.0','conflict_count':len(conflicts),'conflicts':[{'registry_record':r['record_id'],'status':r['status'],'authority_status':r['authority_status']} for r in conflicts]},
+      'registry_conflict_report.json':{'schema_version':'1.1.0','conflict_count':len(conflicts),'severity_counts':{s:sum(c['severity']==s for c in conflicts) for s in ('high','medium')},'conflicts':conflicts},
       'registry_completeness_report.json':{'schema_version':'1.0.0','registries':completeness}}
 def mermaid(all_records):
     lines=['flowchart LR']
@@ -133,7 +172,7 @@ def run(check=False,report_only=False):
     changed,snaps=build_snapshots(idx,all_records,check=check)
     if not check:
         write_json(GEN_ROOT/'eafix_registry_graph.current.json',graph(all_records))
-        for n,d in reports(all_records,errors).items(): write_json(GEN_ROOT/n,d)
+        for n,d in reports(idx,all_records,errors).items(): write_json(GEN_ROOT/n,d)
         write_text(GEN_ROOT/'registry_dependency_graph.mmd',mermaid(all_records))
         for n,t in views(all_records).items(): write_text(GEN_ROOT/n,t)
         manifest={'schema_version':'1.0.0','document_type':'registry_build_manifest','input_hashes':{r['path']:hashlib.sha256((ROOT/r['path']).read_bytes()).hexdigest() for r in idx['registries']},'output_hashes':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(GEN_ROOT.glob('*')) if p.is_file()}}
