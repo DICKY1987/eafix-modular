@@ -1,0 +1,1453 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eafix.local/schemas/EAFIX_SSOT_REGISTRY_DELIVERY_VERIFICATION_SPEC.schema.json",
+  "title": "EAFIX SSOT Registry Delivery Verification Specification Schema",
+  "description": "Structural schema for the canonical verification specification bound to EAFIX-SSOT-REGISTRY-SYSTEM-MASTER-V2 version 2.0.0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "document_type",
+    "verification_spec_id",
+    "verification_spec_version",
+    "status",
+    "generated_at_utc",
+    "title",
+    "purpose",
+    "target_plan",
+    "repository",
+    "routing_and_authority",
+    "authority_model",
+    "required_package_artifacts",
+    "verification_operating_model",
+    "plan_obligation_inventory",
+    "verdict_taxonomy",
+    "severity_model",
+    "verification_modes",
+    "evidence_contract",
+    "freshness_contract",
+    "anti_false_completion_controls",
+    "verification_gates",
+    "completion_policy",
+    "semantic_validation_rules",
+    "agent_execution_contract",
+    "failure_handling",
+    "integrity"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "./EAFIX_SSOT_REGISTRY_DELIVERY_VERIFICATION_SPEC.schema.json"
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "document_type": {
+      "type": "string",
+      "const": "ssot_registry_delivery_verification_specification"
+    },
+    "verification_spec_id": {
+      "type": "string",
+      "const": "EAFIX-SSOT-DELIVERY-VERIFICATION-001"
+    },
+    "verification_spec_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "proposed_pending_owner_ratification",
+        "ratified_current",
+        "superseded"
+      ]
+    },
+    "generated_at_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "title": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "purpose": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "target_plan": {
+      "$ref": "#/$defs/targetPlan"
+    },
+    "repository": {
+      "$ref": "#/$defs/repository"
+    },
+    "routing_and_authority": {
+      "$ref": "#/$defs/routingAuthority"
+    },
+    "authority_model": {
+      "$ref": "#/$defs/authorityModel"
+    },
+    "required_package_artifacts": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "$ref": "#/$defs/packageArtifact"
+      }
+    },
+    "verification_operating_model": {
+      "$ref": "#/$defs/operatingModel"
+    },
+    "plan_obligation_inventory": {
+      "$ref": "#/$defs/obligationInventory"
+    },
+    "verdict_taxonomy": {
+      "$ref": "#/$defs/verdictTaxonomy"
+    },
+    "severity_model": {
+      "$ref": "#/$defs/severityModel"
+    },
+    "verification_modes": {
+      "$ref": "#/$defs/verificationModes"
+    },
+    "evidence_contract": {
+      "$ref": "#/$defs/evidenceContract"
+    },
+    "freshness_contract": {
+      "$ref": "#/$defs/freshnessContract"
+    },
+    "anti_false_completion_controls": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/antiFalseControl"
+      }
+    },
+    "verification_gates": {
+      "type": "array",
+      "minItems": 11,
+      "maxItems": 11,
+      "items": {
+        "$ref": "#/$defs/gate"
+      }
+    },
+    "completion_policy": {
+      "$ref": "#/$defs/completionPolicy"
+    },
+    "semantic_validation_rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/semanticRule"
+      }
+    },
+    "agent_execution_contract": {
+      "$ref": "#/$defs/agentContract"
+    },
+    "failure_handling": {
+      "$ref": "#/$defs/failureHandling"
+    },
+    "integrity": {
+      "$ref": "#/$defs/integrity"
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stringArray": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      }
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "targetPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "plan_id",
+        "plan_version",
+        "document_type",
+        "filename",
+        "sha256",
+        "byte_size",
+        "expected_status_before_execution",
+        "binding_rule"
+      ],
+      "properties": {
+        "plan_id": {
+          "type": "string",
+          "const": "EAFIX-SSOT-REGISTRY-SYSTEM-MASTER-V2"
+        },
+        "plan_version": {
+          "type": "string",
+          "const": "2.0.0"
+        },
+        "document_type": {
+          "type": "string",
+          "const": "final_merged_ssot_registry_system_implementation_plan"
+        },
+        "filename": {
+          "type": "string",
+          "const": "EAFIX_SSOT_REGISTRY_SYSTEM_FINAL_MERGED_IMPLEMENTATION_PLAN_v2_0_0.json"
+        },
+        "sha256": {
+          "type": "string",
+          "const": "1fc42c139e0a290942a393fe22e0022f6e72cee32d221921bd0143c29513b7d8"
+        },
+        "byte_size": {
+          "type": "integer",
+          "const": 471712
+        },
+        "expected_status_before_execution": {
+          "type": "string",
+          "const": "proposed_pending_owner_ratification"
+        },
+        "binding_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "full_name",
+        "default_branch_observed",
+        "target_commit_policy",
+        "working_tree_policy",
+        "branch_policy"
+      ],
+      "properties": {
+        "full_name": {
+          "type": "string",
+          "const": "DICKY1987/eafix-modular"
+        },
+        "default_branch_observed": {
+          "type": "string",
+          "const": "master"
+        },
+        "target_commit_policy": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "working_tree_policy": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "branch_policy": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "requiredReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "document_id",
+        "path",
+        "scope",
+        "required_when",
+        "missing_behavior"
+      ],
+      "properties": {
+        "document_id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "path": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "scope": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "required_when": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "missing_behavior": {
+          "type": "string",
+          "enum": [
+            "blocked_for_dependent_scope",
+            "global_blocker"
+          ]
+        }
+      }
+    },
+    "routingAuthority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "routing_authority",
+        "routing_first_rule",
+        "matched_routes",
+        "required_reference_documents",
+        "pre_cutover_priority",
+        "post_cutover_priority",
+        "conflict_rule",
+        "missing_reference_rule"
+      ],
+      "properties": {
+        "routing_authority": {
+          "type": "string",
+          "const": "eafix_project_knowledge_reference_routing_instructions.json"
+        },
+        "routing_first_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "matched_routes": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "required_reference_documents": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/requiredReference"
+          }
+        },
+        "pre_cutover_priority": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "post_cutover_priority": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "conflict_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "missing_reference_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "authorityModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonical_artifact",
+        "schema_artifact",
+        "generated_derivatives",
+        "run_specific_artifacts",
+        "rules"
+      ],
+      "properties": {
+        "canonical_artifact": {
+          "type": "string",
+          "const": "EAFIX_SSOT_REGISTRY_DELIVERY_VERIFICATION_SPEC_v1_0_0.json"
+        },
+        "schema_artifact": {
+          "type": "string",
+          "const": "EAFIX_SSOT_REGISTRY_DELIVERY_VERIFICATION_SPEC.schema.json"
+        },
+        "generated_derivatives": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "run_specific_artifacts": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        }
+      }
+    },
+    "packageArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "package_order",
+        "path",
+        "artifact_role",
+        "authorship",
+        "required_for_current_request"
+      ],
+      "properties": {
+        "package_order": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "path": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "artifact_role": {
+          "type": "string",
+          "enum": [
+            "canonical_verification_specification",
+            "verification_specification_schema",
+            "plan_obligation_coverage_matrix",
+            "human_readable_checklist",
+            "run_specific_verification_report"
+          ]
+        },
+        "authorship": {
+          "type": "string",
+          "enum": [
+            "authored",
+            "generated",
+            "run_specific"
+          ]
+        },
+        "required_for_current_request": {
+          "type": "boolean"
+        }
+      }
+    },
+    "operatingModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "principle",
+        "independence_rule",
+        "result_separation_rule",
+        "verification_order",
+        "progression_rule",
+        "scope_rule",
+        "reverification_rule"
+      ],
+      "properties": {
+        "principle": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "independence_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "result_separation_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "verification_order": {
+          "type": "array",
+          "minItems": 11,
+          "maxItems": 11,
+          "items": {
+            "type": "string",
+            "pattern": "^VERIFY-GATE-[0-9]{2}$"
+          }
+        },
+        "progression_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "scope_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "reverification_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "expectedCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_entries",
+        "phases",
+        "tasks",
+        "task_acceptance_clauses",
+        "task_outputs",
+        "task_evidence_requirements",
+        "phase_exit_gates",
+        "phase_exit_gate_conditions",
+        "validation_rules",
+        "human_decisions",
+        "write_scopes",
+        "definition_of_done_criteria",
+        "global_constraints",
+        "failure_conditions",
+        "agent_execution_rules"
+      ],
+      "properties": {
+        "source_entries": {
+          "type": "integer",
+          "const": 13
+        },
+        "phases": {
+          "type": "integer",
+          "const": 17
+        },
+        "tasks": {
+          "type": "integer",
+          "const": 195
+        },
+        "task_acceptance_clauses": {
+          "type": "integer",
+          "const": 551
+        },
+        "task_outputs": {
+          "type": "integer",
+          "const": 219
+        },
+        "task_evidence_requirements": {
+          "type": "integer",
+          "const": 129
+        },
+        "phase_exit_gates": {
+          "type": "integer",
+          "const": 17
+        },
+        "phase_exit_gate_conditions": {
+          "type": "integer",
+          "const": 90
+        },
+        "validation_rules": {
+          "type": "integer",
+          "const": 60
+        },
+        "human_decisions": {
+          "type": "integer",
+          "const": 18
+        },
+        "write_scopes": {
+          "type": "integer",
+          "const": 14
+        },
+        "definition_of_done_criteria": {
+          "type": "integer",
+          "const": 27
+        },
+        "global_constraints": {
+          "type": "integer",
+          "const": 22
+        },
+        "failure_conditions": {
+          "type": "integer",
+          "const": 20
+        },
+        "agent_execution_rules": {
+          "type": "integer",
+          "const": 13
+        }
+      }
+    },
+    "obligationGenerationRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_id",
+        "source_class",
+        "json_path",
+        "id_template",
+        "expected_count",
+        "required_check_dimensions"
+      ],
+      "properties": {
+        "rule_id": {
+          "type": "string",
+          "pattern": "^OGR-[0-9]{3}$"
+        },
+        "source_class": {
+          "type": "string",
+          "enum": [
+            "source_entry",
+            "phase",
+            "task",
+            "task_acceptance_clause",
+            "task_output",
+            "task_evidence_requirement",
+            "phase_exit_gate",
+            "phase_exit_gate_condition",
+            "validation_rule",
+            "human_decision",
+            "write_scope",
+            "definition_of_done",
+            "global_constraint",
+            "failure_condition",
+            "agent_execution_rule"
+          ]
+        },
+        "json_path": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "id_template": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "expected_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "required_check_dimensions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        }
+      }
+    },
+    "obligationInventory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expected_counts",
+        "expected_total_obligations",
+        "obligation_generation_rules",
+        "stable_obligation_id_rule",
+        "source_pointer_rule",
+        "coverage_statuses",
+        "blocking_coverage_statuses",
+        "multiple_mapping_rule",
+        "count_change_rule"
+      ],
+      "properties": {
+        "expected_counts": {
+          "$ref": "#/$defs/expectedCounts"
+        },
+        "expected_total_obligations": {
+          "type": "integer",
+          "const": 1405
+        },
+        "obligation_generation_rules": {
+          "type": "array",
+          "minItems": 15,
+          "maxItems": 15,
+          "items": {
+            "$ref": "#/$defs/obligationGenerationRule"
+          }
+        },
+        "stable_obligation_id_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "source_pointer_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "coverage_statuses": {
+          "type": "array",
+          "const": [
+            "mapped_exactly_once",
+            "mapped_multiple_explained",
+            "unmapped",
+            "invalid_source_pointer"
+          ]
+        },
+        "blocking_coverage_statuses": {
+          "type": "array",
+          "const": [
+            "unmapped",
+            "invalid_source_pointer"
+          ]
+        },
+        "multiple_mapping_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "count_change_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "verdictDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verdict",
+        "meaning"
+      ],
+      "properties": {
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "blocked",
+            "not_applicable"
+          ]
+        },
+        "meaning": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "verdictTaxonomy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowed_verdicts",
+        "prohibited_verdicts",
+        "not_applicable_rules",
+        "blocked_rule",
+        "warning_rule"
+      ],
+      "properties": {
+        "allowed_verdicts": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {
+            "$ref": "#/$defs/verdictDefinition"
+          }
+        },
+        "prohibited_verdicts": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "not_applicable_rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "blocked_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "warning_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "severityDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "severity",
+        "completion_effect"
+      ],
+      "properties": {
+        "severity": {
+          "type": "string",
+          "enum": [
+            "blocker",
+            "high",
+            "medium",
+            "advisory"
+          ]
+        },
+        "completion_effect": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "severityModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "levels",
+        "default_fail_closed_severities"
+      ],
+      "properties": {
+        "levels": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {
+            "$ref": "#/$defs/severityDefinition"
+          }
+        },
+        "default_fail_closed_severities": {
+          "type": "array",
+          "const": [
+            "blocker",
+            "high"
+          ]
+        }
+      }
+    },
+    "modeDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "rule"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "automated",
+            "manual",
+            "hybrid"
+          ]
+        },
+        "rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "verificationModes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "values"
+      ],
+      "properties": {
+        "values": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/modeDefinition"
+          }
+        }
+      }
+    },
+    "evidenceContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_root_template",
+        "required_context_fields",
+        "evidence_record_required_fields",
+        "evidence_types",
+        "hash_rule",
+        "command_rule",
+        "manual_rule",
+        "reference_rule"
+      ],
+      "properties": {
+        "run_root_template": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "required_context_fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "evidence_record_required_fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "evidence_types": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "hash_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "command_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "manual_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "reference_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "freshnessContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding_dimensions",
+        "freshness_statuses",
+        "stale_triggers",
+        "rule"
+      ],
+      "properties": {
+        "binding_dimensions": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "freshness_statuses": {
+          "type": "array",
+          "const": [
+            "fresh",
+            "stale",
+            "unverifiable"
+          ]
+        },
+        "stale_triggers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "antiFalseControl": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "control_id",
+        "pattern",
+        "detection",
+        "blocking_when"
+      ],
+      "properties": {
+        "control_id": {
+          "type": "string",
+          "pattern": "^AFC-[0-9]{3}$"
+        },
+        "pattern": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "detection": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "blocking_when": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "requirementSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_type",
+        "source_id",
+        "json_pointer",
+        "summary"
+      ],
+      "properties": {
+        "source_type": {
+          "type": "string",
+          "enum": [
+            "plan_section",
+            "phase",
+            "task",
+            "acceptance",
+            "output",
+            "evidence_requirement",
+            "exit_gate",
+            "validation_rule",
+            "human_decision",
+            "write_scope",
+            "definition_of_done",
+            "global_constraint",
+            "failure_condition",
+            "agent_execution_rule",
+            "authority_model",
+            "verification_spec_section"
+          ]
+        },
+        "source_id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "json_pointer": {
+          "type": "string",
+          "pattern": "^/.*|^/$"
+        },
+        "summary": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "evidenceRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_type",
+        "description",
+        "minimum_count",
+        "freshness_required"
+      ],
+      "properties": {
+        "evidence_type": {
+          "type": "string",
+          "enum": [
+            "target_binding",
+            "repository_state",
+            "source_hash_inventory",
+            "command_transcript",
+            "raw_validator_output",
+            "test_report",
+            "ci_run",
+            "artifact",
+            "artifact_hash_manifest",
+            "schema_validation",
+            "decision_record",
+            "approval_record",
+            "diff",
+            "clean_tree_proof",
+            "coverage_matrix",
+            "mutation_result",
+            "rollback_result",
+            "consumer_failure_proof",
+            "supersession_record",
+            "routing_resolution",
+            "authority_map",
+            "parity_report",
+            "baseline_report",
+            "stability_report",
+            "migration_map",
+            "path_impact_report",
+            "runbook",
+            "pr_record",
+            "commit_record",
+            "manual_review_record"
+          ]
+        },
+        "description": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "minimum_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "freshness_required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "negativeTest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "mutation",
+        "expected_failure",
+        "isolation_rule"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "const": true
+        },
+        "mutation": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "expected_failure": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "isolation_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "check_id",
+        "title",
+        "category",
+        "severity",
+        "control_type",
+        "verification_mode",
+        "automation_level",
+        "applicability",
+        "phase_refs",
+        "requirement_sources",
+        "preconditions",
+        "procedure",
+        "commands",
+        "expected_results",
+        "required_evidence",
+        "allowed_verdicts",
+        "fail_closed",
+        "remediation_on_fail"
+      ],
+      "properties": {
+        "check_id": {
+          "type": "string",
+          "pattern": "^VER-G[0-9]{2}-[0-9]{3}$"
+        },
+        "title": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "input_scope",
+            "coverage",
+            "execution",
+            "artifact_integrity",
+            "authority_governance",
+            "parity_evidence",
+            "determinism",
+            "mutation",
+            "migration_rollback",
+            "operational_readiness",
+            "final_declaration",
+            "anti_false_completion"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "blocker",
+            "high",
+            "medium",
+            "advisory"
+          ]
+        },
+        "control_type": {
+          "type": "string",
+          "enum": [
+            "preventive",
+            "detective",
+            "corrective"
+          ]
+        },
+        "verification_mode": {
+          "type": "string",
+          "enum": [
+            "automated",
+            "manual",
+            "hybrid"
+          ]
+        },
+        "automation_level": {
+          "type": "string",
+          "enum": [
+            "fully_automated",
+            "partially_automated",
+            "manual"
+          ]
+        },
+        "applicability": {
+          "type": "string",
+          "enum": [
+            "always",
+            "when_phase_delivered",
+            "when_registry_cutover",
+            "when_migration_performed",
+            "when_runtime_available",
+            "when_ci_available"
+          ]
+        },
+        "phase_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^PHASE-[0-9]{2}$"
+          }
+        },
+        "requirement_sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/requirementSource"
+          }
+        },
+        "preconditions": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "procedure": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "commands": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "expected_results": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "required_evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/evidenceRequirement"
+          }
+        },
+        "allowed_verdicts": {
+          "type": "array",
+          "const": [
+            "pass",
+            "fail",
+            "blocked",
+            "not_applicable"
+          ]
+        },
+        "fail_closed": {
+          "type": "boolean"
+        },
+        "remediation_on_fail": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "negative_test": {
+          "$ref": "#/$defs/negativeTest"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "severity": {
+                "enum": [
+                  "blocker",
+                  "high"
+                ]
+              }
+            },
+            "required": [
+              "severity"
+            ]
+          },
+          "then": {
+            "properties": {
+              "fail_closed": {
+                "const": true
+              }
+            }
+          }
+        }
+      ]
+    },
+    "passPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "blocking_checks_must",
+        "high_checks_must",
+        "blocked_counts_as_failure",
+        "not_applicable_requires_approval"
+      ],
+      "properties": {
+        "blocking_checks_must": {
+          "type": "string",
+          "const": "pass"
+        },
+        "high_checks_must": {
+          "type": "string",
+          "const": "pass"
+        },
+        "blocked_counts_as_failure": {
+          "type": "boolean",
+          "const": true
+        },
+        "not_applicable_requires_approval": {
+          "type": "boolean",
+          "const": true
+        }
+      }
+    },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gate_id",
+        "order",
+        "title",
+        "purpose",
+        "depends_on",
+        "phase_refs",
+        "checks",
+        "pass_policy",
+        "on_fail"
+      ],
+      "properties": {
+        "gate_id": {
+          "type": "string",
+          "pattern": "^VERIFY-GATE-[0-9]{2}$"
+        },
+        "order": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "title": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "purpose": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "depends_on": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^VERIFY-GATE-[0-9]{2}$"
+          }
+        },
+        "phase_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^PHASE-[0-9]{2}$"
+          }
+        },
+        "checks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/check"
+          }
+        },
+        "pass_policy": {
+          "$ref": "#/$defs/passPolicy"
+        },
+        "on_fail": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "completionPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "final_status_values",
+        "verified_complete_requires",
+        "verified_incomplete_when",
+        "verification_blocked_when",
+        "residual_finding_rule",
+        "status_claim_rule"
+      ],
+      "properties": {
+        "final_status_values": {
+          "type": "array",
+          "const": [
+            "verified_complete",
+            "verified_incomplete",
+            "verification_blocked"
+          ]
+        },
+        "verified_complete_requires": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "verified_incomplete_when": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "verification_blocked_when": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "residual_finding_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "status_claim_rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "semanticRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_id",
+        "rule"
+      ],
+      "properties": {
+        "rule_id": {
+          "type": "string",
+          "pattern": "^SEM-[0-9]{3}$"
+        },
+        "rule": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "agentContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "before_verification",
+        "during_verification",
+        "after_verification",
+        "prohibited_behavior"
+      ],
+      "properties": {
+        "before_verification": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "during_verification": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "after_verification": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "prohibited_behavior": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        }
+      }
+    },
+    "failureHandling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "global_fail_closed_conditions",
+        "required_response"
+      ],
+      "properties": {
+        "global_fail_closed_conditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "required_response": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        }
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "serialization",
+        "self_hash_policy",
+        "schema_draft",
+        "target_plan_sha256",
+        "expected_gate_count",
+        "expected_check_count",
+        "expected_obligation_count"
+      ],
+      "properties": {
+        "serialization": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "self_hash_policy": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "schema_draft": {
+          "type": "string",
+          "const": "https://json-schema.org/draft/2020-12/schema"
+        },
+        "target_plan_sha256": {
+          "type": "string",
+          "const": "1fc42c139e0a290942a393fe22e0022f6e72cee32d221921bd0143c29513b7d8"
+        },
+        "expected_gate_count": {
+          "type": "integer",
+          "const": 11
+        },
+        "expected_check_count": {
+          "type": "integer",
+          "const": 86
+        },
+        "expected_obligation_count": {
+          "type": "integer",
+          "const": 1405
+        }
+      }
+    }
+  }
+}

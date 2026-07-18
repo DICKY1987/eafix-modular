@@ -1,0 +1,950 @@
+{
+  "plan_id": "EAFIX-REGISTRY-CONFLICT-BURNDOWN-001",
+  "plan_version": "1.0.0",
+  "document_type": "agent_implementation_plan",
+  "title": "EAFIX Registry Conflict and Divergence Burn-Down Plan",
+  "status": "blocked_on_predecessor",
+  "generated_at_utc": "2026-07-17T23:05:00Z",
+  "roadmap_ref": {
+    "roadmap_id": "EAFIX-REGISTRY-COMPLETION-ROADMAP-001",
+    "implements_steps": [
+      "STEP-01",
+      "STEP-02",
+      "STEP-03",
+      "STEP-04"
+    ]
+  },
+  "problem_statement": {
+    "summary": "Two predecessor plans made the registry tooling trustworthy and made disagreement with reality visible. Neither was permitted to fix a single fact. This plan resolves the data: the parity baseline, the 22 flagged contract records, the 25 governance review items, the two orphan classifications, and the stub module records.",
+    "nature_of_this_plan": "This is the first DATA plan in the sequence. Every predecessor forbade modifying authored JSONL records. This plan is the only one authorized to modify them, and that authorization is narrow, evidence-gated, and enumerated.",
+    "central_risk": "The fastest route to a clean parity report is to copy authority values into registry records until everything agrees. That produces a green build and a worthless registry: a lossy duplicate of the documents it was built to replace, carrying no independent evidentiary weight. The entire evidence protocol in this plan exists to make that shortcut impossible to take accidentally and visible when taken deliberately."
+  },
+  "repository": {
+    "full_name": "DICKY1987/eafix-modular",
+    "default_branch": "master",
+    "recommended_branch_prefix": "fix/registry-burndown-",
+    "branch_rule": "This plan produces MANY branches and PRs, not one. See batching_and_pr_discipline. A single mega-PR containing fifty record changes is unreviewable and is prohibited.",
+    "revert_policy": "Forward remediation per batch. Each burn-down PR is independently revertible because each is scoped to one registry and one work class. Never revert a batch to unblock a later batch; fix forward or stop the batch."
+  },
+  "predecessor_dependency": {
+    "requires_plan_ids": [
+      "EAFIX-REGISTRY-POST-MERGE-REMEDIATION-001",
+      "EAFIX-REGISTRY-AUTHORITY-PARITY-001"
+    ],
+    "requires_state": "both merged to master with all acceptance_criteria satisfied",
+    "reason": "Resolving divergences requires (a) a deterministic generator, so a resolution is provable rather than incidental, and (b) a parity report and frozen baseline, so 'resolved' has a machine-checkable meaning. Without both, burn-down is unverifiable editing.",
+    "gate_rule": "If either predecessor is incomplete, stop. Do not edit authored data to fix a problem the tooling cannot yet measure.",
+    "verification_commands": [
+      "git fetch origin --prune",
+      "git switch master",
+      "git pull --ff-only origin master",
+      "python tools/registries/build_registries.py --check",
+      "python tools/registries/build_registries.py && git diff --exit-code",
+      "python tools/registries/validate_authority_parity.py --check"
+    ],
+    "acceptance": [
+      "build --check reports errors=0 changed=0",
+      "two consecutive builds produce no diff",
+      "parity --check reports new_divergences=0 and stale_baseline_entries=0",
+      "registry_index.json shows authority_status canonical_candidate and approved_for_cutover false"
+    ]
+  },
+  "objective": {
+    "primary": "Reduce the parity baseline to zero for every cutover-track registry, and close every needs_review record, conflict-queue entry, orphan classification, and stub record — using recorded evidence for each resolution.",
+    "secondary": "Distinguish registry data defects from genuine code-level integration defects, and route the latter out of the registry system as code issues rather than absorbing them into the data.",
+    "completion_definition": "Baseline empty for module, process, contract, and artifact registries; needs_review count zero across all registries; registry_conflict_queue.jsonl empty; both orphan classifications dispositioned; zero module records at confidence low and zero with empty responsibilities or process_step_ids; every resolution carries an evidence record; no authority document was edited to make parity pass; no authority cutover performed."
+  },
+  "mandatory_routing_and_authority": {
+    "routing_authority": "eafix_project_knowledge_reference_routing_instructions.json",
+    "matched_routes": [
+      "validation and governance",
+      "module and process contracts",
+      "repository file ownership",
+      "generated artifacts",
+      "code modification"
+    ],
+    "required_references": [
+      {
+        "path": "eafix_project_knowledge_reference_routing_instructions.json",
+        "role": "mandatory routing and conflict-resolution authority"
+      },
+      {
+        "path": "EAFIX_auth_docs/01_canonical_registries/doc_authority.json",
+        "role": "document authority and supersession governance"
+      },
+      {
+        "path": "EAFIX_auth_docs/01_canonical_registries/parity_authority_map.json",
+        "role": "declares which document is the parity authority for which registry"
+      },
+      {
+        "path": "EAFIX_auth_docs/generated/registries/registry_authority_parity_report.json",
+        "role": "the enumerated work inventory for this plan"
+      },
+      {
+        "path": "EAFIX_auth_docs/01_canonical_registries/registry_authority_parity_baseline.json",
+        "role": "the burn-down ledger; shrinks only through evidenced resolution"
+      },
+      {
+        "path": "EAFIX_auth_docs/01_canonical_registries/registry_conflict_queue.jsonl",
+        "role": "the 25 governance review items"
+      },
+      {
+        "path": "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+        "role": "parity authority for module identity and responsibilities; corroboration only, not primary evidence"
+      },
+      {
+        "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+        "role": "parity authority for process steps and handoffs; corroboration only, not primary evidence"
+      },
+      {
+        "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+        "role": "parity authority for phases, validation contracts, failure contracts; corroboration only"
+      },
+      {
+        "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv",
+        "role": "parity authority for file-to-module mapping; corroboration only"
+      },
+      {
+        "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_services_ai_reference_20260510.json",
+        "role": "service and implementation companion reference; useful for locating primary code evidence"
+      }
+    ],
+    "rules": [
+      "Registries remain shadow canonical candidates for the entire duration of this plan. Cutover is EAFIX-REGISTRY-CUTOVER-001.",
+      "Canonical catalogs continue to win conflicts. A divergence is never resolved by editing the authority without governance approval.",
+      "Authority agreement is CORROBORATION, not EVIDENCE. See evidence_protocol.",
+      "This plan may modify authored JSONL registry records. It may not modify doc_authority.json, routing instructions, registry_index.json authority state, parity_authority_map.json, schemas, or any canonical authority document.",
+      "Adapter and normalization corrections are tooling changes and are permitted, but only in their own PR class with their own baseline discipline. See PHASE-02.",
+      "If a required reference is missing, record that fact and make no resolution that depends on it."
+    ]
+  },
+  "scope": {
+    "in_scope": [
+      "EAFIX_auth_docs/01_canonical_registries/contract_registry.jsonl",
+      "EAFIX_auth_docs/01_canonical_registries/module_registry.jsonl",
+      "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+      "EAFIX_auth_docs/01_canonical_registries/artifact_registry.jsonl",
+      "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl (resolution decisions only)",
+      "EAFIX_auth_docs/01_canonical_registries/registry_conflict_queue.jsonl (closure)",
+      "EAFIX_auth_docs/01_canonical_registries/registry_authority_parity_baseline.json (shrink only, or governed re-derivation in PHASE-02)",
+      "tools/registries/authority_projection.py (adapter/normalization corrections only, PHASE-02)",
+      "EAFIX_auth_docs/generated/registries/* (regenerated, never hand-edited)"
+    ],
+    "out_of_scope": [
+      "Registry authority cutover",
+      "registry_index.json authority_status or approved_for_cutover changes",
+      "doc_authority.json changes",
+      "Routing instruction changes",
+      "parity_authority_map.json changes (that is EAFIX-REGISTRY-COVERAGE-001)",
+      "Registry schema changes (unrepresentable verdicts are EAFIX-REGISTRY-COVERAGE-001, STEP-06)",
+      "The six no_declared_authority registries (EAFIX-REGISTRY-COVERAGE-001, STEP-05)",
+      "Fixing code-level integration defects discovered during contract burn-down",
+      "Downstream consumer wiring",
+      "Editing any canonical authority document"
+    ],
+    "explicit_non_goal": {
+      "name": "Making parity green by copying",
+      "decision": "Prohibited",
+      "reason": "A registry record that agrees with the authority because it was copied from the authority carries zero independent evidentiary weight. It cannot corroborate the authority, cannot detect authority staleness, and cannot justify cutover — because cutting over to a copy replaces a document with a worse-formatted version of the same document. Every resolution must trace to a primary source, or be explicitly and visibly marked as authority-derived at reduced confidence.",
+      "detection": "PHASE-07 audits the ratio of resolutions carrying E1/E2 primary evidence versus E3-only. A burn-down that is overwhelmingly E3-only did not investigate; it transcribed."
+    },
+    "environmental_blocker": {
+      "name": "GitHub Actions billing/account lock",
+      "effect": "Checks may fail before any job starts.",
+      "rule": "Do not count startup-blocked checks as passing. Complete local validation, but do not merge any batch until CI can execute."
+    }
+  },
+  "confirmed_open_findings": [
+    {
+      "id": "FND-BURN-001",
+      "priority": "P1",
+      "title": "22 contract records flagged conflicted / needs_review",
+      "source": "contract_registry.jsonl (97 records total), registry_conflict_queue.jsonl",
+      "why_hardest": "Contracts are where coupling lives. A contract conflict means two modules disagree about their interface. The old documents papered over that; the registry surfaced it. Some fraction of these are registry defects and some are real integration defects in the system itself.",
+      "target": "needs_review = 0 across contract_registry; every conflict either resolved with evidence or converted to a code issue with the registry recording the true conflicting state"
+    },
+    {
+      "id": "FND-BURN-002",
+      "priority": "P1",
+      "title": "Parity baseline non-empty for cutover-track registries",
+      "source": "registry_authority_parity_baseline.json",
+      "why_hardest": "The baseline is the only machine-checkable definition of 'the registries disagree with reality'. It is the burn-down ledger. Its size at the start of this plan is unknown until PHASE-00 snapshots it.",
+      "target": "baseline empty for module, process, contract, artifact registries"
+    },
+    {
+      "id": "FND-BURN-003",
+      "priority": "P2",
+      "title": "Stub module records with confidence medium and empty responsibilities / process_step_ids",
+      "source": "module_registry.jsonl (known: R3_CORRELATION_GUARD, U1_DASHBOARD_BACKEND, U2_GUI_GATEWAY; full list determined in PHASE-00)",
+      "note": "34/34 modules are populated but several are shells. The registry could not invent facts that were never written down, so it flagged the hole. Filling the hole requires finding the facts, not fabricating them.",
+      "target": "zero records with empty responsibilities or empty process_step_ids where the module has an implementation; modules with no implementation recorded explicitly as planned status"
+    },
+    {
+      "id": "FND-BURN-004",
+      "priority": "P2",
+      "title": "25 governance review items and 2 orphan classifications",
+      "source": "registry_conflict_queue.jsonl; orphan report (includes SK1_PLUGIN_INTERFACE and SK2_IDEMPOTENCY)",
+      "target": "conflict queue empty; both orphans dispositioned with a decision_registry record"
+    },
+    {
+      "id": "FND-BURN-005",
+      "priority": "P2",
+      "title": "Possible dangling module.process_step_id references",
+      "source": "AMD-REG-001 preflight probe result from the remediation plan",
+      "conditional": "Applies only if the remediation plan's PHASE-00 probe found a non-empty difference and baselined those errors.",
+      "target": "baselined foreign_reference_errors for module.process_step_ids reduced to zero; the temporary exemption added by AMD-REG-001 removed from the remediation plan's required_results"
+    }
+  ],
+  "evidence_protocol": {
+    "principle": "A resolution is an assertion about the system. Every assertion carries its evidence class in the record's source_refs. The registry's value is that its facts are traceable; a resolution without a trace destroys that value for the record it touches.",
+    "evidence_classes": [
+      {
+        "class": "E1_CODE",
+        "description": "Implementation source: file path plus commit SHA plus the specific symbol, function, message type, or field observed.",
+        "strength": "primary",
+        "confidence_ceiling": "high"
+      },
+      {
+        "class": "E2_ARTIFACT",
+        "description": "A concrete non-code artifact in the repository: manifest, config file, schema, CI definition, .mqh header, message contract file.",
+        "strength": "primary",
+        "confidence_ceiling": "high"
+      },
+      {
+        "class": "E3_AUTHORITY",
+        "description": "A canonical catalog asserts the fact.",
+        "strength": "CORROBORATION ONLY",
+        "confidence_ceiling": "medium",
+        "rule": "E3 alone never justifies confidence high. A record resolved on E3 alone is tagged derived_from_authority_only and remains visible as such. This is the single most important rule in this plan."
+      },
+      {
+        "class": "E4_HISTORICAL",
+        "description": "Superseded documents, git history, prior commits, retired manifests.",
+        "strength": "supporting",
+        "confidence_ceiling": "medium",
+        "rule": "Never sufficient alone. May corroborate E1/E2 or explain how a divergence arose."
+      },
+      {
+        "class": "E5_JUDGEMENT",
+        "description": "A recorded human architectural decision by the repository owner.",
+        "strength": "authoritative for decisions, not for facts",
+        "confidence_ceiling": "high",
+        "rule": "Requires a decision_registry record with rationale. Valid for 'what shall be', invalid for 'what is'."
+      }
+    ],
+    "resolution_rules": [
+      "A registry_defect resolution SHOULD carry at least one E1 or E2 reference.",
+      "Where no E1/E2 evidence exists and the fact is asserted only by the authority, the resolution is permitted but MUST set confidence to medium and MUST tag the record derived_from_authority_only. Such records are visible in the completeness report and are a known cutover consideration, not a hidden one.",
+      "Where the registry and the authority disagree AND primary evidence supports the registry, the disposition is authority_stale_suspected. Record it, open a governance issue, and leave the divergence baselined. This plan does not edit authority documents.",
+      "Where primary evidence contradicts BOTH the registry and the authority, that is the most valuable finding in the burn-down. Record it, correct the registry to match primary evidence, open a governance issue for the authority, and leave the resulting parity divergence baselined with disposition authority_stale_suspected.",
+      "Never delete a record to resolve a divergence. Retirement is a status transition through the authority-state matrix, with a decision_registry record."
+    ],
+    "source_refs_contract": {
+      "required_fields": [
+        "evidence_class",
+        "path",
+        "commit_sha",
+        "locator",
+        "observed_at_utc",
+        "resolves_parity_id"
+      ],
+      "rules": [
+        "commit_sha is required for E1/E2/E4 so the evidence is re-checkable at a fixed point in history.",
+        "locator identifies what within the file was observed: symbol name, line anchor, JSON pointer, or CSV row key. 'The file' is not a locator.",
+        "resolves_parity_id links the resolution to the exact baseline entry it retires, so the ledger and the data cannot drift apart."
+      ]
+    }
+  },
+  "disposition_classes": {
+    "note": "These are the values written into the baseline during PHASE-03 triage. The parity plan defined the enum; this plan defines what each one obligates.",
+    "classes": [
+      {
+        "disposition": "registry_defect_accepted",
+        "meaning": "The registry record is wrong; the authority is right.",
+        "obligation": "Correct the record with E1/E2 evidence where available, else mark derived_from_authority_only at confidence medium. Remove the baseline entry in the same PR.",
+        "expected_volume": "high"
+      },
+      {
+        "disposition": "authority_stale_suspected",
+        "meaning": "Primary evidence supports the registry over the authority.",
+        "obligation": "Do NOT edit the record. Do NOT edit the authority. Open a governance issue, attach the evidence, keep the baseline entry with this disposition. Resolution moves to EAFIX-REGISTRY-CUTOVER-001 or a governance PR outside this plan.",
+        "expected_volume": "low but non-zero; a burn-down that finds zero stale authority almost certainly did not look"
+      },
+      {
+        "disposition": "adapter_gap_accepted",
+        "meaning": "The comparison itself is wrong: normalization, join key, or projection defect.",
+        "obligation": "Route to PHASE-02 as a tooling fix, not a data fix. Never correct data to compensate for a broken comparison.",
+        "expected_volume": "concentrated; usually a few defects producing many divergences"
+      },
+      {
+        "disposition": "not_comparable_accepted",
+        "meaning": "Free prose or structurally incomparable field, deliberately accepted.",
+        "obligation": "Written rationale required. Counts against cutover for that registry unless the criteria in EAFIX-REGISTRY-AUTHORITY-PARITY-001 cutover_criteria are satisfied.",
+        "expected_volume": "low"
+      },
+      {
+        "disposition": "code_defect_referred",
+        "meaning": "NEW CLASS introduced by this plan. The divergence reflects a genuine disagreement between two modules in the running system, not a documentation error.",
+        "obligation": "Record the true, conflicting state in the registry with evidence from both sides. Open a code issue. Keep the baseline entry with this disposition. The registry's job is to record reality accurately, including when reality is broken.",
+        "expected_volume": "unknown; this is the class that justifies the entire registry system",
+        "schema_change_note": "This value must be added to the baseline schema's disposition enum. That is a schema change to the baseline file only, not to any registry record schema, and is permitted by this plan."
+      }
+    ]
+  },
+  "batching_and_pr_discipline": {
+    "principle": "Burn-down is many small, independently reviewable, independently revertible changes. Reviewability is the constraint, not throughput.",
+    "rules": [
+      "One PR = one registry + one work class + at most 10 record changes.",
+      "Every PR must leave master green: build --check clean, parity --check clean, no new divergences, no stale baseline entries.",
+      "Every PR removes from the baseline exactly the parity_ids it resolved, and no others. Baseline shrinkage must equal the resolutions claimed.",
+      "Generated artifacts are regenerated in the same PR and reviewed alongside the authored change. An authored change whose generated diff was not read is not reviewed.",
+      "Never mix a tooling change and a data change in one PR. PHASE-02 adapter PRs and PHASE-04/05/06 data PRs are separate classes.",
+      "Never mix registries in one PR.",
+      "PR title: fix(registry): burn-down <registry> <work-class> batch <n>",
+      "Branch: fix/registry-burndown-<registry>-<work-class>-<n>"
+    ],
+    "ordering_rule": "Burn down in dependency order — module and process registries first, then contract and artifact, which reference them. Resolving a contract's producer_module_id against a module record that is itself about to change wastes the work and churns parity_ids.",
+    "stop_rule": "If any batch produces an unexplained parity delta — divergences appearing or disappearing beyond the ones claimed — stop the batch, do not merge, and diagnose. Unexplained ledger movement means either the tooling or the understanding is wrong, and both are worse than a slow burn-down."
+  },
+  "record_count_governance": {
+    "problem": "EAFIX-REGISTRY-POST-MERGE-REMEDIATION-001 PHASE-08 asserts required_results.records = 291 as an invariant. This plan will legitimately change that number: resolving an authority_only divergence means adding a record the registry was missing.",
+    "rules": [
+      "Record count changes are permitted in this plan ONLY as the direct result of a dispositioned baseline entry.",
+      "Every PR that changes the record count must state: prior count, new count, delta, and the parity_id of each entry that justifies each added or retired record.",
+      "Records are never deleted. Retirement is a status transition, so retirement does not decrease the count.",
+      "PHASE-07 publishes the final count and the full add ledger.",
+      "The 291 constant in the remediation plan's required_results must be replaced with a reference to the current committed count rather than a hardcoded literal. A hardcoded count becomes a lie the moment the burn-down succeeds.",
+      "Amendment AMD-BURN-001 covers this: see predecessor_plan_amendments."
+    ]
+  },
+  "predecessor_plan_amendments": [
+    {
+      "amendment_id": "AMD-BURN-001",
+      "target_plan_id": "EAFIX-REGISTRY-POST-MERGE-REMEDIATION-001",
+      "target": "PHASE-08.required_results.records",
+      "change": "Replace the literal 291 with a committed expected-count file (EAFIX_auth_docs/01_canonical_registries/registry_expected_counts.json) that is updated deliberately in any PR that changes record counts, and validated as an exact match.",
+      "reason": "A hardcoded record count is a correctness assertion that this plan is designed to invalidate. Making it a governed file preserves the fail-closed property (an unexpected count change still blocks) while allowing intentional change through review."
+    },
+    {
+      "amendment_id": "AMD-BURN-002",
+      "target_plan_id": "EAFIX-REGISTRY-POST-MERGE-REMEDIATION-001",
+      "target": "AMD-REG-001 baselined foreign_reference_errors exemption",
+      "change": "Remove the module.process_step_id foreign-reference exemption once FND-BURN-005 is resolved, restoring foreign_reference_errors = 0 as an unconditional blocking requirement.",
+      "reason": "Temporary exemptions that outlive their cause become permanent holes. The exemption's removal is an explicit deliverable of this plan, not an assumption."
+    },
+    {
+      "amendment_id": "AMD-BURN-003",
+      "target_plan_id": "EAFIX-REGISTRY-COMPLETION-ROADMAP-001",
+      "target": "definition_of_finished: 'No stub records: every module record has responsibilities, process_step_ids, and confidence high.'",
+      "change": "Amend to: 'No stub records: every module record has responsibilities and process_step_ids populated or an explicit planned status; confidence reflects the evidence class actually available per the evidence_protocol; zero records at confidence low; derived_from_authority_only records are enumerated and visible.'",
+      "reason": "The roadmap criterion and the evidence protocol contradict each other. Facts asserted only by a catalog with no primary code or artifact backing are genuinely medium-confidence. Forcing confidence high would require either fabricating evidence or lying about the confidence field — and the confidence field exists precisely to carry this information. The evidence protocol wins; the roadmap criterion is corrected."
+    },
+    {
+      "amendment_id": "AMD-BURN-004",
+      "target_plan_id": "EAFIX-REGISTRY-AUTHORITY-PARITY-001",
+      "target": "parity_record_contract.disposition_values",
+      "change": "Add code_defect_referred to the disposition enum and to the baseline schema.",
+      "reason": "The parity plan's disposition enum assumed every divergence is a documentation problem. Contract burn-down will surface divergences that are real integration defects in the running system. Those need a distinct, honest disposition rather than being mislabeled registry_defect_accepted."
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": "PHASE-00",
+      "name": "Dependency gate and work inventory snapshot",
+      "tasks": [
+        {
+          "task_id": "BURN-001",
+          "action": "Verify both predecessor plans are merged and the system is green.",
+          "commands": [
+            "git fetch origin --prune",
+            "git switch master",
+            "git pull --ff-only origin master",
+            "python tools/registries/build_registries.py --check",
+            "python tools/registries/build_registries.py",
+            "git diff --exit-code",
+            "python tools/registries/validate_authority_parity.py --check",
+            "python -m unittest discover -s tests/registries -p \"test_*.py\""
+          ],
+          "acceptance": [
+            "All commands exit zero.",
+            "parity reports new_divergences=0, stale_baseline_entries=0.",
+            "registry_index.json unchanged: canonical_candidate, approved_for_cutover false."
+          ],
+          "fail_closed": "If anything is red, stop. Do not begin editing data on an unproven substrate."
+        },
+        {
+          "task_id": "BURN-002",
+          "action": "Snapshot the exact work inventory. This plan was authored without knowing these numbers; every count below is discovered, not assumed.",
+          "requirements": [
+            "Total baseline entries, broken down by registry and by verdict.",
+            "contract_registry: total records, needs_review count, conflict-queue entries referencing contracts.",
+            "module_registry: total records, count with empty responsibilities, count with empty process_step_ids, count at each confidence level, full list of stub module_ids.",
+            "registry_conflict_queue.jsonl: total open entries.",
+            "Orphan report: the two orphan classifications with their current state.",
+            "AMD-REG-001 outcome: whether dangling module.process_step_id references were baselined, and how many.",
+            "Current total record count across all registries (confirm or correct the 291 figure)."
+          ],
+          "outputs": [
+            "BURNDOWN_INVENTORY.md committed to the branch as the plan's own baseline of record",
+            "Per-registry, per-verdict, per-class counts table"
+          ],
+          "acceptance": [
+            "Every number in this plan's confirmed_open_findings is either confirmed or corrected against actual data.",
+            "No estimate. Every figure is computed from committed files."
+          ]
+        },
+        {
+          "task_id": "BURN-003",
+          "action": "Land AMD-BURN-001 and AMD-BURN-004 as enabling changes before any burn-down batch.",
+          "requirements": [
+            "Create registry_expected_counts.json from the snapshot and wire it into validation, replacing the hardcoded 291.",
+            "Add code_defect_referred to the baseline disposition enum and schema.",
+            "These are tooling/governance changes: one PR, no data changes."
+          ],
+          "acceptance": [
+            "Validation still green.",
+            "An intentional count change updates the file; an unintentional one still blocks."
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-01",
+      "name": "Systematic divergence clustering (mechanical, no edits)",
+      "rationale": "Per-record triage of a large baseline is expensive and, done first, is mostly wasted. Divergences cluster. A field that diverges on nearly every joined record is one adapter or normalization defect wearing fifty costumes — not fifty data defects. Cluster first, so PHASE-02 can collapse the baseline with a handful of tooling fixes before any human reads a single record.",
+      "tasks": [
+        {
+          "task_id": "BURN-010",
+          "action": "Implement a deterministic clustering report over the parity baseline.",
+          "method": [
+            "Group every non-agree parity record by (registry, authority_path, field, verdict).",
+            "For each cluster compute: cluster size, joined-record population for that mapping, and divergence_rate = size / population.",
+            "Emit clusters sorted by size descending, deterministically."
+          ],
+          "requirements": [
+            "Pure analysis. Reads the parity report. Writes one generated artifact. Modifies no authored data.",
+            "The clustering report is a managed generated output: rendered, hashed, --check covered, byte-stable. It is evidence and must be reproducible.",
+            "No fuzzy grouping. Exact key tuples only."
+          ],
+          "outputs": [
+            "EAFIX_auth_docs/generated/registries/parity_divergence_clusters.json",
+            "EAFIX_auth_docs/generated/registries/parity_divergence_clusters.generated.md"
+          ]
+        },
+        {
+          "task_id": "BURN-011",
+          "action": "Apply systematic-defect heuristics to route clusters.",
+          "heuristics": [
+            {
+              "pattern": "field_divergence rate >= 0.80 on a single field",
+              "inference": "suspected normalization or projection defect",
+              "route": "PHASE-02 adapter review, NOT per-record triage",
+              "reason": "Eighty percent of records being individually wrong in the same field is far less likely than one comparison rule being wrong."
+            },
+            {
+              "pattern": "authority_only rate ~1.00 AND registry_only rate ~1.00 on the same mapping",
+              "inference": "join key format mismatch — the two sides never matched at all (e.g. M-01 vs M01, path separators, case)",
+              "route": "PHASE-02 join key normalization fix",
+              "reason": "This produces a maximally alarming report from a trivial defect, and no amount of data editing would ever fix it."
+            },
+            {
+              "pattern": "authority_only rate high, registry_only rate ~0",
+              "inference": "genuine registry under-coverage — the registry really is missing records",
+              "route": "PHASE-04/05/06 data burn-down"
+            },
+            {
+              "pattern": "field_divergence rate low and scattered across records",
+              "inference": "genuine per-record data defects",
+              "route": "PHASE-03 per-record triage"
+            },
+            {
+              "pattern": "registry_only concentrated in one module or subsystem",
+              "inference": "possible authority staleness for that subsystem, or registry over-claim",
+              "route": "PHASE-03 triage with elevated attention; strong candidate for authority_stale_suspected"
+            }
+          ],
+          "rules": [
+            "A heuristic ROUTES work. It never dispositions a record. Only PHASE-02 findings or PHASE-03 triage assign a disposition.",
+            "Heuristic thresholds are declared constants in the tooling, not judgement calls at review time.",
+            "A cluster routed to PHASE-02 that turns out NOT to be a tooling defect returns to PHASE-03 triage with that finding recorded."
+          ],
+          "outputs": [
+            "Routing table: cluster -> suspected class -> destination phase"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-02",
+      "name": "Adapter and normalization corrections (tooling PRs)",
+      "rationale": "Fix the comparison before trusting what it reports. Every divergence this phase removes was never a data problem, and every hour spent triaging one would have been wasted.",
+      "tasks": [
+        {
+          "task_id": "BURN-020",
+          "action": "For each PHASE-01 cluster routed as suspected systematic: prove or disprove the tooling defect by hand-checking at least 3 records in the cluster against primary sources.",
+          "requirements": [
+            "Hand-check means: read the authority document, read the registry record, read the primary source, and state whether they actually disagree.",
+            "If they do not actually disagree, the comparison is defective. Proceed to fix.",
+            "If they do actually disagree, the cluster is genuine data divergence. Return it to PHASE-03 and record that the heuristic misrouted it."
+          ],
+          "acceptance": [
+            "Every cluster has a written verdict: tooling_defect_confirmed or genuine_divergence_confirmed, with the hand-check evidence."
+          ]
+        },
+        {
+          "task_id": "BURN-021",
+          "action": "Correct confirmed adapter, normalization, and join-key defects in tools/registries/authority_projection.py.",
+          "requirements": [
+            "One PR per adapter defect.",
+            "Add a regression test reproducing the defect using a synthetic fixture before fixing it.",
+            "Normalization rule changes are declared in parity_authority_map.json ONLY IF that mapping change is approved as a governance change — otherwise the fix belongs in the adapter's projection, not the map.",
+            "Never widen normalization to make things match. Widening normalization (aggressive case folding, punctuation stripping, whitespace obliteration) is copying by another name: it hides real divergence inside the comparison rule. Every normalization change must be justified as reflecting a genuine formatting equivalence, not a semantic one."
+          ],
+          "prohibited": [
+            "Fuzzy matching, similarity thresholds, or any non-deterministic comparison (already prohibited by the parity plan; restated because this is the phase where the temptation peaks)",
+            "Normalizing away a difference that is actually meaningful"
+          ]
+        },
+        {
+          "task_id": "BURN-022",
+          "action": "Re-derive the baseline for affected mappings only, under governed exception.",
+          "rationale": "An adapter fix changes the comparison space, so parity_ids for that mapping may change wholesale. The parity plan forbids tooling from auto-appending to the baseline (PAR-051). This is the one sanctioned exception, and it is bounded.",
+          "requirements": [
+            "Re-derivation is scoped to the single mapping the adapter fix touched. No other mapping's baseline entries may change in that PR.",
+            "The PR must report, per verdict, the before and after counts for that mapping.",
+            "The PR must state the expected direction and magnitude of the change BEFORE showing the result, and reviewers confirm the actual delta matches the explanation.",
+            "A re-derivation that increases divergence count is not automatically wrong — a fixed adapter may reveal real divergence a broken one was hiding — but it must be explained.",
+            "An adapter fix whose baseline delta cannot be explained is not merged."
+          ],
+          "acceptance": [
+            "Baseline delta fully explained by the adapter change.",
+            "No unrelated mapping's entries touched.",
+            "parity --check green afterwards."
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-03",
+      "name": "Per-record triage and disposition (STEP-01; classification only, no edits)",
+      "tasks": [
+        {
+          "task_id": "BURN-030",
+          "action": "Disposition every remaining baseline entry into exactly one class.",
+          "requirements": [
+            "Classification requires investigation: locate primary evidence (E1/E2) where it exists before choosing a class.",
+            "A disposition of registry_defect_accepted chosen without looking for primary evidence is a guess wearing a label. The disposition record must state what was searched.",
+            "Every disposition is authored into registry_authority_parity_baseline.json with a written rationale field.",
+            "No registry record is edited in this phase. Classification only."
+          ],
+          "acceptance": [
+            "unreviewed disposition count = 0",
+            "Every entry carries a rationale",
+            "Every entry states which evidence classes were searched and what was found"
+          ],
+          "batching": "Triage may be batched per registry. Triage PRs touch only the baseline file and are a distinct PR class from data PRs."
+        },
+        {
+          "task_id": "BURN-031",
+          "action": "Open tracking issues from triage output.",
+          "requirements": [
+            "One governance issue per authority_stale_suspected finding, with evidence attached.",
+            "One code issue per code_defect_referred finding, naming both modules and the conflicting interface claims.",
+            "One tracking issue per registry summarizing per-class counts, referenced from the burn-down PRs that follow."
+          ]
+        },
+        {
+          "task_id": "BURN-032",
+          "action": "Publish the triage summary and re-plan the remaining work against real numbers.",
+          "outputs": [
+            "Per-registry, per-disposition counts",
+            "Batch plan: ordered list of PRs to execute in PHASE-04/05/06",
+            "E1/E2-available versus E3-only ratio, forecast per registry"
+          ],
+          "decision_gate": {
+            "condition": "If the E3-only forecast exceeds a declared threshold (recommend 50%) for a registry",
+            "action": "Stop and escalate before burn-down. That registry's facts are not independently evidenced anywhere, which means burn-down would largely transcribe the authority. That is a finding about the system worth surfacing to the owner, not a task to grind through. It may indicate the registry should be a derived projection of the authority rather than an independent source."
+          }
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-04",
+      "name": "Contract burn-down (STEP-02)",
+      "rationale": "Executed after module and process burn-down per the ordering rule, because contracts reference module and process IDs.",
+      "tasks": [
+        {
+          "task_id": "BURN-040",
+          "action": "For each conflicted or needs_review contract record, establish the actual interface from primary evidence.",
+          "method": [
+            "Identify producer_module_id and consumer_module_id.",
+            "Locate the actual message/data structure in code or artifact: struct, schema, .mqh header, serializer, config contract.",
+            "Compare what the producer emits against what the consumer expects.",
+            "Record the finding before deciding the disposition."
+          ],
+          "branching_rule": [
+            "Producer and consumer agree, registry record was wrong -> registry_defect_accepted. Correct the record with E1/E2 source_refs, clear needs_review, remove the baseline entry.",
+            "Producer and consumer genuinely disagree -> code_defect_referred. Record the true conflicting state in the registry with evidence from BOTH sides. Open a code issue. Keep the baseline entry with this disposition. Do NOT invent a reconciled interface that exists in neither module.",
+            "Neither side has locatable primary evidence -> resolve on E3 with confidence medium, tag derived_from_authority_only, and record that primary evidence was searched for and not found."
+          ],
+          "acceptance_per_batch": [
+            "needs_review cleared only for records with recorded evidence",
+            "Baseline shrinkage equals resolutions claimed",
+            "build --check and parity --check green"
+          ]
+        },
+        {
+          "task_id": "BURN-041",
+          "action": "Reach contract_registry needs_review = 0 and baseline empty except code_defect_referred and authority_stale_suspected entries.",
+          "note": "Contract registry cutover per EAFIX-REGISTRY-AUTHORITY-PARITY-001 cutover_criteria requires an EMPTY baseline. code_defect_referred entries therefore block contract cutover until the underlying code issues close. That is correct: a registry accurately recording a broken interface should not be promoted to authoritative-and-blocking while the interface is still broken. Surface this to the owner as a cutover dependency rather than resolving it here.",
+          "escalation": "If code_defect_referred entries would indefinitely block contract cutover, that is a governance decision for the owner — either fix the code, or define a cutover exception class with recorded rationale. This plan does not make that call."
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-05",
+      "name": "Module stub population (STEP-03)",
+      "tasks": [
+        {
+          "task_id": "BURN-050",
+          "action": "For each stub module identified in BURN-002, locate primary evidence for responsibilities and process_step_ids.",
+          "method": [
+            "Use file_module_mapping.csv and the services reference to locate the module's implementation files.",
+            "Derive responsibilities from what the code actually does, corroborated by the module catalog.",
+            "Derive process_step_ids from actual call sites, handlers, and message flow, validated against process_registry IDs."
+          ],
+          "branching_rule": [
+            "Implementation exists -> populate from E1 evidence, confidence high.",
+            "Implementation does not exist (planned module) -> set an explicit planned/not_implemented status rather than leaving fields empty. An empty field says 'we do not know'; a planned status says 'there is nothing to know yet'. These are different facts and the registry must distinguish them.",
+            "Implementation exists but responsibilities are only describable from the catalog -> populate at confidence medium, tagged derived_from_authority_only."
+          ],
+          "acceptance": [
+            "Zero records with empty responsibilities that lack a planned status",
+            "Zero records at confidence low",
+            "needs_review_fields empty across module_registry",
+            "Every populated process_step_id resolves against process_registry (closes FND-BURN-005)"
+          ]
+        },
+        {
+          "task_id": "BURN-051",
+          "action": "Remove the AMD-REG-001 foreign-reference exemption (AMD-BURN-002).",
+          "acceptance": [
+            "foreign_reference_errors = 0 unconditionally and blocking",
+            "No exemption remains in the remediation plan's required_results"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-06",
+      "name": "Orphans and conflict-queue closure (STEP-04)",
+      "tasks": [
+        {
+          "task_id": "BURN-060",
+          "action": "Disposition the two orphan classifications (including SK1_PLUGIN_INTERFACE and SK2_IDEMPOTENCY).",
+          "requirements": [
+            "Each closure is an architectural judgement (E5) and therefore requires a decision_registry record with rationale.",
+            "Reclassification, retention as orphan-by-design, or retirement are all valid outcomes. Silence is not.",
+            "Retirement is a status transition, never a deletion."
+          ]
+        },
+        {
+          "task_id": "BURN-061",
+          "action": "Close every remaining entry in registry_conflict_queue.jsonl.",
+          "requirements": [
+            "Every closure carries evidence or a decision_registry record.",
+            "An entry closed as 'no longer applicable' must state what changed to make it inapplicable.",
+            "The queue is emptied by resolution, never by truncation."
+          ],
+          "acceptance": [
+            "registry_conflict_queue.jsonl has zero open entries",
+            "The 25 review items each map to a recorded closure"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-07",
+      "name": "Exit validation and honesty audit",
+      "tasks": [
+        {
+          "task_id": "BURN-070",
+          "action": "Full validation on a clean tree.",
+          "commands": [
+            "python tools/registries/build_registries.py",
+            "python tools/registries/build_registries.py --check",
+            "python tools/registries/validate_record_schemas.py",
+            "python tools/registries/validate_registry_ids.py",
+            "python tools/registries/validate_registry_references.py",
+            "python tools/registries/validate_registry_authority.py",
+            "python tools/registries/validate_authority_parity.py --check",
+            "python -m unittest discover -s tests/registries -p \"test_*.py\"",
+            "git diff --check"
+          ],
+          "required_results": {
+            "schema_errors": 0,
+            "duplicate_id_errors": 0,
+            "foreign_reference_errors": 0,
+            "authority_errors": 0,
+            "generated_output_differences": 0,
+            "test_failures": 0,
+            "new_divergences": 0,
+            "stale_baseline_entries": 0,
+            "unreviewed_dispositions": 0,
+            "needs_review_records": 0,
+            "open_conflict_queue_entries": 0,
+            "records_matching_expected_counts_file": true
+          },
+          "baseline_exit_state": {
+            "module_registry": 0,
+            "process_registry": 0,
+            "artifact_registry": 0,
+            "contract_registry": "0 except entries dispositioned code_defect_referred or authority_stale_suspected, each with an open tracked issue",
+            "no_declared_authority_registries": "out of scope; unchanged"
+          }
+        },
+        {
+          "task_id": "BURN-071",
+          "action": "Honesty audit. This is the task that determines whether the burn-down was real.",
+          "checks": [
+            "Ratio of resolutions carrying E1/E2 primary evidence versus E3-only, per registry. Publish it. A high E3-only ratio means the registry largely transcribes the authority and its cutover value is correspondingly reduced.",
+            "Count of authority_stale_suspected findings. Zero across a large burn-down is a red flag, not a success: it means either the authority is perfect or nobody looked at primary evidence.",
+            "Count of code_defect_referred findings. Publish with issue links.",
+            "Count of records tagged derived_from_authority_only. Publish per registry.",
+            "Confirm zero authority documents, routing files, doc_authority.json, registry_index.json, parity_authority_map.json, or schema files were modified.",
+            "Confirm zero records were deleted.",
+            "Confirm every baseline removal has a corresponding resolves_parity_id in a committed record's source_refs."
+          ],
+          "outputs": [
+            "BURNDOWN_EXIT_REPORT.md with all counts, the evidence-class ratio, and the delta against BURNDOWN_INVENTORY.md"
+          ],
+          "rule": "The exit report states what was actually learned about the system, not merely that the numbers reached zero. A burn-down that produced no findings about the codebase did not investigate it."
+        },
+        {
+          "task_id": "BURN-072",
+          "action": "Handoff.",
+          "outputs": [
+            "Confirm STEP-01 through STEP-04 of the roadmap are complete.",
+            "Confirm which registries now satisfy EAFIX-REGISTRY-AUTHORITY-PARITY-001 cutover_criteria and which do not, with the blocking reason for each.",
+            "Open EAFIX-REGISTRY-COVERAGE-001 (STEP-05/06) with the unrepresentable and not_comparable inventory this plan deliberately left untouched.",
+            "Explicitly confirm no cutover was performed."
+          ]
+        }
+      ]
+    }
+  ],
+  "file_change_map": [
+    {
+      "path": "EAFIX_auth_docs/01_canonical_registries/contract_registry.jsonl",
+      "change": [
+        "Evidence-backed record corrections",
+        "needs_review cleared per record with evidence",
+        "True conflicting state recorded for code_defect_referred cases"
+      ]
+    },
+    {
+      "path": "EAFIX_auth_docs/01_canonical_registries/module_registry.jsonl",
+      "change": [
+        "Stub population from primary evidence",
+        "Explicit planned status for unimplemented modules",
+        "Confidence set per evidence class",
+        "process_step_ids populated and FK-valid"
+      ]
+    },
+    {
+      "path": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+      "change": [
+        "Evidence-backed corrections resolving baseline entries"
+      ]
+    },
+    {
+      "path": "EAFIX_auth_docs/01_canonical_registries/artifact_registry.jsonl",
+      "change": [
+        "Evidence-backed corrections resolving baseline entries"
+      ]
+    },
+    {
+      "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+      "change": [
+        "New decision records for orphan dispositions, retirements, and E5 judgements"
+      ]
+    },
+    {
+      "path": "EAFIX_auth_docs/01_canonical_registries/registry_conflict_queue.jsonl",
+      "change": [
+        "Entries closed with recorded resolution; emptied by resolution only"
+      ]
+    },
+    {
+      "path": "EAFIX_auth_docs/01_canonical_registries/registry_authority_parity_baseline.json",
+      "change": [
+        "Dispositions authored in PHASE-03",
+        "Entries removed as resolved, one-for-one with committed evidence",
+        "Governed re-derivation for adapter-fixed mappings only (PHASE-02)",
+        "disposition enum extended with code_defect_referred"
+      ]
+    },
+    {
+      "path": "EAFIX_auth_docs/01_canonical_registries/registry_expected_counts.json",
+      "change": [
+        "New governed file replacing the hardcoded 291 (AMD-BURN-001)"
+      ]
+    },
+    {
+      "path": "tools/registries/authority_projection.py",
+      "change": [
+        "Adapter, normalization, and join-key defect fixes (PHASE-02 only)"
+      ]
+    },
+    {
+      "path": "tools/registries/parity_core.py",
+      "change": [
+        "Clustering report support (BURN-010)"
+      ]
+    },
+    {
+      "path": "tests/registries/test_authority_parity.py",
+      "change": [
+        "Regression test per adapter defect fixed",
+        "Clustering determinism tests"
+      ]
+    },
+    {
+      "path": "EAFIX_auth_docs/generated/registries/*",
+      "change": [
+        "Regenerated in every PR that changes authored data",
+        "New managed outputs: parity_divergence_clusters.json, parity_divergence_clusters.generated.md"
+      ]
+    },
+    {
+      "path": "EAFIX_auth_docs/01_canonical_registries/registry_index.json",
+      "change": [
+        "NO CHANGE. Authority state is untouched by this plan."
+      ]
+    },
+    {
+      "path": "EAFIX_auth_docs/01_canonical_registries/doc_authority.json",
+      "change": [
+        "NO CHANGE."
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    "BURNDOWN_INVENTORY.md exists and every count in this plan is confirmed or corrected against real data.",
+    "Clustering report is a deterministic, managed, --check-covered generated artifact.",
+    "Every confirmed adapter defect has a regression test and a bounded, explained baseline re-derivation.",
+    "Zero unreviewed dispositions in the baseline.",
+    "Every disposition carries a rationale and states which evidence classes were searched.",
+    "contract_registry needs_review = 0.",
+    "Zero module records with empty responsibilities lacking an explicit planned status; zero at confidence low.",
+    "Every module process_step_id resolves; foreign_reference_errors = 0 unconditionally and blocking.",
+    "registry_conflict_queue.jsonl empty; the 25 review items each map to a recorded closure.",
+    "Both orphan classifications dispositioned with decision_registry records.",
+    "Baseline empty for module, process, and artifact registries; contract baseline empty except tracked code_defect_referred and authority_stale_suspected entries.",
+    "Every baseline removal traces to a resolves_parity_id in a committed record's source_refs.",
+    "Zero records deleted.",
+    "Zero authority, routing, doc_authority, registry_index, parity_authority_map, or schema files modified.",
+    "Record count matches registry_expected_counts.json, and every count change is justified by an enumerated parity_id.",
+    "BURNDOWN_EXIT_REPORT.md publishes the E1/E2-versus-E3-only ratio, authority-staleness findings, and code-defect findings.",
+    "No authority cutover performed.",
+    "Registries remain canonical_candidate with approved_for_cutover false."
+  ],
+  "evidence_required": [
+    "BURNDOWN_INVENTORY.md with the real starting numbers",
+    "Clustering report and routing table",
+    "Per-cluster hand-check verdicts (tooling_defect_confirmed / genuine_divergence_confirmed)",
+    "Before/after baseline counts per adapter-fix PR, with the explanation stated before the result",
+    "Fully dispositioned baseline with rationales",
+    "One PR per batch, each with prior/new record counts and resolved parity_ids",
+    "Governance issue links for every authority_stale_suspected finding",
+    "Code issue links for every code_defect_referred finding",
+    "Full validation output on a clean tree",
+    "Python 3.9 and 3.11 test output",
+    "BURNDOWN_EXIT_REPORT.md with the honesty audit",
+    "Explicit confirmation that no authority document was edited",
+    "Explicit confirmation that no cutover was performed",
+    "Per-registry cutover-readiness statement with blocking reasons"
+  ],
+  "failure_handling": {
+    "fail_closed_conditions": [
+      "Either predecessor plan incomplete or master not green at PHASE-00",
+      "A batch produces an unexplained parity delta",
+      "Baseline shrinkage exceeds the resolutions claimed in a PR",
+      "A baseline entry removed without a corresponding resolves_parity_id in committed evidence",
+      "Any authority, routing, doc_authority, registry_index, parity_authority_map, or schema file appears in a burn-down diff",
+      "Any record deleted",
+      "Record count changes without an enumerated justifying parity_id",
+      "An adapter fix whose baseline delta cannot be explained",
+      "Normalization widened to make values match rather than to reflect genuine formatting equivalence",
+      "E3-only resolution ratio exceeds the declared threshold for a registry (escalate, do not grind)",
+      "Two consecutive builds produce a diff",
+      "CI cannot execute"
+    ],
+    "response": [
+      "Stop the batch. Do not merge.",
+      "Preserve logs, diffs, the parity report, and the clustering report.",
+      "Classify the cause as adapter logic, normalization rule, evidence misread, authority drift, genuine code defect, baseline hygiene, or environmental CI blockage.",
+      "Open a focused issue. Never widen this plan's scope to absorb a finding it was not authorized to fix."
+    ],
+    "specific_traps": [
+      {
+        "name": "Resolution by transcription",
+        "description": "Copying authority values into registry records to clear the baseline.",
+        "rule": "Prohibited without primary evidence. Where the authority is the only source, the record is tagged derived_from_authority_only at confidence medium and stays visible. The tag is the point: it tells a future reader exactly how much this record is worth.",
+        "detection": "BURN-071 evidence-class ratio."
+      },
+      {
+        "name": "Normalization laundering",
+        "description": "Widening a normalization rule until two genuinely different values compare equal.",
+        "rule": "Prohibited. Normalization encodes formatting equivalence, never semantic equivalence. If you are arguing that two values 'basically mean the same thing', you are writing a disposition, not a normalization rule.",
+        "detection": "PHASE-02 hand-checks and adapter regression tests."
+      },
+      {
+        "name": "Inventing a reconciled interface",
+        "description": "When producer and consumer genuinely disagree, writing a contract record describing a third interface that neither implements.",
+        "rule": "Prohibited. Record the conflict as it exists. The registry's value is that it reports reality, including broken reality.",
+        "detection": "Contract records whose source_refs cite only one side, or neither."
+      },
+      {
+        "name": "Scope absorption",
+        "description": "Fixing schemas, adding mappings, or cutting over because the burn-down surfaced the need.",
+        "rule": "Prohibited. Those are EAFIX-REGISTRY-COVERAGE-001 and EAFIX-REGISTRY-CUTOVER-001. Record the finding, hand it off, stay in scope."
+      },
+      {
+        "name": "Silent queue emptying",
+        "description": "Closing conflict-queue entries as stale or not-applicable without stating what changed.",
+        "rule": "Prohibited. A queue emptied without resolution is worse than a full queue, because it looks finished."
+      }
+    ]
+  },
+  "agent_final_response_contract": {
+    "must_report": [
+      "Starting inventory versus final counts",
+      "Clusters found and how many divergences collapsed via adapter fixes rather than data edits",
+      "Per-registry, per-disposition counts",
+      "E1/E2 primary-evidence ratio versus E3-only, per registry",
+      "Count of records tagged derived_from_authority_only",
+      "Authority-staleness findings with governance issue links",
+      "Code-defect findings with code issue links",
+      "Record count delta with justifying parity_ids",
+      "PRs merged, with branch names and SHAs",
+      "Full validation output",
+      "Remaining blockers and per-registry cutover readiness",
+      "Confirmation that no authority document was edited",
+      "Confirmation that no cutover was performed",
+      "Confirmation that no record was deleted"
+    ],
+    "must_not_claim": [
+      "Divergences resolved, when they were baselined, re-derived away, or normalized away",
+      "Evidence-backed, when the only evidence was the authority asserting the same thing",
+      "The registry is correct, when it merely agrees with the authority it was copied from",
+      "Contract conflicts resolved, when they were referred as code defects",
+      "Zero baseline, when code_defect_referred or authority_stale_suspected entries remain",
+      "confidence high on a record resolved from E3 alone",
+      "Cutover readiness for any registry with a non-empty baseline",
+      "The queue is closed, when entries were dismissed rather than resolved",
+      "CI passed when jobs were blocked before execution",
+      "Any registry is canonical"
+    ]
+  }
+}

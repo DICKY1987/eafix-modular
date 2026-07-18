@@ -1,0 +1,223 @@
+{
+  "roadmap_id": "EAFIX-REGISTRY-COMPLETION-ROADMAP-001",
+  "roadmap_version": "1.0.0",
+  "document_type": "step_roadmap",
+  "title": "Steps from Post-Parity State to Finished, Ready-to-Use Registry System",
+  "generated_at_utc": "2026-07-17T22:45:00Z",
+  "assumed_starting_state": {
+    "completed_plans": [
+      "EAFIX-REGISTRY-POST-MERGE-REMEDIATION-001",
+      "EAFIX-REGISTRY-AUTHORITY-PARITY-001"
+    ],
+    "state": [
+      "Tooling is deterministic: two builds byte-identical, --check covers every managed output, manifest verifies, Python 3.9/3.11 green.",
+      "Structural validation and parity regression are blocking in CI.",
+      "Parity report exists with a frozen baseline of known divergences.",
+      "All 10 registries carry a coverage classification; 6 are no_declared_authority.",
+      "Registries remain canonical_candidate; approved_for_cutover false.",
+      "22 contract review items, 25 governance conflicts, 2 orphan classifications, and 3+ stub modules remain unresolved."
+    ]
+  },
+  "definition_of_finished": {
+    "statement": "The registry system is finished when it is the authoritative source of truth its consumers actually use, and the documents it replaced are formally superseded.",
+    "criteria": [
+      "Every registry is either canonical (cut over) or explicitly retired with a recorded decision.",
+      "Parity baseline is empty for every cut-over registry.",
+      "Zero needs_review records; zero unresolved conflict-queue entries; zero undispositioned orphans.",
+      "No stub records: every module record has responsibilities, process_step_ids, and confidence high.",
+      "All validation is blocking; report-only mode is removed from CI.",
+      "At least one downstream consumer derives artifacts from registry data in CI, proving the system is used, not just correct.",
+      "Superseded documents are marked superseded in doc_authority.json and carry pointer headers to their replacing registry.",
+      "An operator runbook exists for adding, changing, and retiring registry records."
+    ]
+  },
+  "steps": [
+    {
+      "step_id": "STEP-01",
+      "phase": "Divergence burn-down",
+      "plan_id": "EAFIX-REGISTRY-CONFLICT-BURNDOWN-001",
+      "name": "Triage the parity baseline into work classes",
+      "description": "Classify every baselined divergence into exactly one disposition class: registry_defect (fix the registry record), authority_stale (authority is wrong; open governance issue to update it), adapter_gap (comparison rule wrong; fix tooling), or accepted_difference (documented, deliberate). No fixes yet; classification only.",
+      "inputs": [
+        "registry_authority_parity_baseline.json",
+        "registry_authority_parity_report.json"
+      ],
+      "outputs": [
+        "Baseline with every entry dispositioned (no 'unreviewed' remaining)",
+        "One tracking issue per registry with per-class counts"
+      ],
+      "done_when": "unreviewed disposition count = 0",
+      "governance_note": "authority_stale items require governance approval before the authority document may change; the registry never wins by default."
+    },
+    {
+      "step_id": "STEP-02",
+      "phase": "Divergence burn-down",
+      "plan_id": "EAFIX-REGISTRY-CONFLICT-BURNDOWN-001",
+      "name": "Resolve contract divergences and the 22 contract review items together",
+      "description": "Contracts are the highest-risk area. For each conflicted contract: identify producer and consumer modules, determine the actual interface from code/authority evidence, correct the contract record, record the evidence in source_refs, and clear the needs_review flag. Where two modules genuinely disagree about their interface, that is a real integration defect — open a code issue, do not paper over it in the registry.",
+      "inputs": [
+        "contract_registry.jsonl (97 records, 22 flagged)",
+        "registry_conflict_queue.jsonl",
+        "parity report contract_registry section",
+        "updated_trading_process_aligned.json"
+      ],
+      "outputs": [
+        "Contract registry with 0 needs_review records",
+        "Baseline entries for contract_registry removed as resolved",
+        "Code issues for any genuine interface mismatch discovered"
+      ],
+      "done_when": "contract_registry: needs_review = 0, conflict queue empty for contracts, parity baseline empty for contract_registry"
+    },
+    {
+      "step_id": "STEP-03",
+      "phase": "Divergence burn-down",
+      "plan_id": "EAFIX-REGISTRY-CONFLICT-BURNDOWN-001",
+      "name": "Populate stub module records",
+      "description": "Complete every module record flagged confidence: medium or with empty responsibilities/process_step_ids (R3_CORRELATION_GUARD, U1_DASHBOARD_BACKEND, U2_GUI_GATEWAY, and any others). Facts must be extracted from code and authority documents with source_refs, never invented. If a module genuinely has no implementation yet, record it explicitly as planned status rather than leaving fields empty.",
+      "outputs": [
+        "module_registry.jsonl with all 34 records at confidence high",
+        "needs_review_fields empty across the module registry"
+      ],
+      "done_when": "0 stub records; module parity baseline empty"
+    },
+    {
+      "step_id": "STEP-04",
+      "phase": "Divergence burn-down",
+      "plan_id": "EAFIX-REGISTRY-CONFLICT-BURNDOWN-001",
+      "name": "Disposition orphans and close the conflict queue",
+      "description": "Resolve the 2 orphan classifications (including SK1_PLUGIN_INTERFACE / SK2_IDEMPOTENCY reclassification if warranted) and every remaining item in registry_conflict_queue.jsonl and the 25-item review set. Every closure carries evidence and lands as a decision_registry record where it reflects an architectural judgement.",
+      "done_when": "conflict queue empty; 0 orphans undispositioned; the 25 review items each closed with recorded disposition"
+    },
+    {
+      "step_id": "STEP-05",
+      "phase": "Coverage completion",
+      "plan_id": "EAFIX-REGISTRY-COVERAGE-001",
+      "name": "Establish an authority basis for the six no_declared_authority registries",
+      "description": "integration, configuration, operational_control, operator, reuse, and decision registries cannot cut over on parity evidence because nothing external verifies them. For each, choose exactly one path: (a) nominate an existing document as its parity authority via doc_authority.json and add the mapping + adapter, (b) declare the registry born-canonical because no prior document exists — verified instead by targeted evidence checks (e.g. configuration records verified against actual config files in the repo; operational controls against deployed risk-control code), or (c) retire the registry as not needed, recorded in decision_registry.",
+      "outputs": [
+        "Updated parity_authority_map.json (governed change)",
+        "New adapters and evidence validators as required",
+        "decision_registry records for every born-canonical or retirement decision"
+      ],
+      "done_when": "0 registries with unresolved authority basis"
+    },
+    {
+      "step_id": "STEP-06",
+      "phase": "Coverage completion",
+      "plan_id": "EAFIX-REGISTRY-COVERAGE-001",
+      "name": "Close schema gaps (unrepresentable) and comparison gaps (not_comparable)",
+      "description": "For every unrepresentable verdict: extend the registry schema so the fact can be expressed, then populate it. For every not_comparable field: either define a deterministic normalization that makes it comparable, or record an accepted disposition with written rationale. Schema changes go through the normal schema + validator + regeneration cycle.",
+      "done_when": "unrepresentable = 0 for all cutover-track registries; every not_comparable field dispositioned"
+    },
+    {
+      "step_id": "STEP-07",
+      "phase": "Stabilization",
+      "plan_id": "EAFIX-REGISTRY-CUTOVER-001",
+      "name": "Prove sustained green parity per registry",
+      "description": "For each registry meeting the cutover criteria (baseline empty, authority_only = 0, field_divergence = 0, unrepresentable = 0, registry_only dispositioned), hold it green across the declared minimum consecutive commits (recommend 10) with normal repository activity continuing. This proves stability under change, not a lucky snapshot.",
+      "done_when": "Per-registry green-streak counter reaches threshold, tracked in a generated stability report"
+    },
+    {
+      "step_id": "STEP-08",
+      "phase": "Cutover",
+      "plan_id": "EAFIX-REGISTRY-CUTOVER-001",
+      "name": "Execute per-registry authority cutover",
+      "description": "For each qualified registry, in dependency order (module and process first, since contract/artifact reference them): record governance approval in decision_registry; set authority_status canonical and approved_for_cutover true in registry_index.json for that registry only; update doc_authority.json to mark the predecessor document superseded-by-registry; add a superseded banner + pointer to the top of the predecessor document; flip that registry's advisory findings to blocking in CI.",
+      "order": [
+        "module_registry",
+        "process_registry",
+        "contract_registry",
+        "artifact_registry",
+        "remaining registries as they qualify"
+      ],
+      "done_when": "Each target registry canonical in registry_index.json with supersession recorded",
+      "rollback": "Cutover is a metadata flip; rollback = revert the registry_index/doc_authority commit. Predecessor documents are retained superseded, never deleted, precisely so rollback and audit remain possible."
+    },
+    {
+      "step_id": "STEP-09",
+      "phase": "Cutover",
+      "plan_id": "EAFIX-REGISTRY-CUTOVER-001",
+      "name": "Remove report-only mode and retire shadow scaffolding",
+      "description": "Once all cutover-track registries are canonical: delete continue-on-error and --report-only paths from CI for those registries, rename the workflow to drop '(Shadow)', and make the full validation suite (structural + parity + authority-state) a required check for merge. The parity job remains permanently — it now guards against the canonical registries drifting from any remaining authoritative documents and from each other.",
+      "done_when": "CI has no advisory escape hatch for canonical registries; validation is a required branch-protection check"
+    },
+    {
+      "step_id": "STEP-10",
+      "phase": "Consumption",
+      "plan_id": "EAFIX-REGISTRY-CONSUMPTION-001",
+      "name": "Wire the first downstream consumers",
+      "description": "A correct registry nobody reads is not finished. Convert at least the first consumers from hand-authored to registry-derived: (a) generated architecture docs replace their hand-written counterparts, (b) CI derives the module dependency graph for build ordering / impact analysis from module_registry, (c) AI agent context packs (routing instructions, module briefs) are generated from registry data instead of maintained by hand, (d) implementation contracts for new work are instantiated from contract_registry records.",
+      "outputs": [
+        "At least one CI job that consumes registry .current.json snapshots as input",
+        "Generated agent-context artifacts with a build-manifest provenance chain"
+      ],
+      "done_when": "Deleting a registry record visibly breaks a downstream consumer's CI — proof of real dependency"
+    },
+    {
+      "step_id": "STEP-11",
+      "phase": "Operations",
+      "plan_id": "EAFIX-REGISTRY-OPERATIONS-001",
+      "name": "Establish the change workflow and runbook",
+      "description": "Document and enforce the steady-state lifecycle: how a record is added (authored JSONL edit -> schema/FK validation -> regeneration -> PR with generated diff reviewed together), how a record is changed, how a record is retired (status transition per the authority-state matrix, never deletion), and how a new registry is introduced (index entry, schema, adapters, baseline). Add PR templates and a CODEOWNERS rule for 01_canonical_registries/.",
+      "outputs": [
+        "REGISTRY_OPERATIONS_RUNBOOK.md",
+        "PR template for registry changes",
+        "CODEOWNERS coverage for authored registry paths"
+      ],
+      "done_when": "A new record can be added end-to-end by following the runbook alone, gated entirely by existing CI"
+    },
+    {
+      "step_id": "STEP-12",
+      "phase": "Operations",
+      "plan_id": "EAFIX-REGISTRY-OPERATIONS-001",
+      "name": "Final supersession sweep and declaration of done",
+      "description": "Audit every legacy architecture/contract/process document against doc_authority.json: each is either (a) superseded with pointer, (b) still authoritative for facts no registry covers (recorded), or (c) archived with a decision record. Publish a final system status report generated from registry data itself, and record the completion in decision_registry.",
+      "done_when": "definition_of_finished criteria all satisfied; completion decision recorded"
+    }
+  ],
+  "dependency_graph": {
+    "STEP-01": [],
+    "STEP-02": ["STEP-01"],
+    "STEP-03": ["STEP-01"],
+    "STEP-04": ["STEP-01"],
+    "STEP-05": [],
+    "STEP-06": ["STEP-01"],
+    "STEP-07": ["STEP-02", "STEP-03", "STEP-04", "STEP-06"],
+    "STEP-08": ["STEP-07", "STEP-05"],
+    "STEP-09": ["STEP-08"],
+    "STEP-10": ["STEP-08"],
+    "STEP-11": ["STEP-08"],
+    "STEP-12": ["STEP-09", "STEP-10", "STEP-11"],
+    "parallelizable": [
+      "STEP-02, STEP-03, STEP-04, STEP-06 after triage",
+      "STEP-05 can start immediately, in parallel with all burn-down work",
+      "STEP-10 and STEP-11 in parallel after first cutovers"
+    ]
+  },
+  "invariants_for_all_steps": [
+    "The remediation plan's determinism guarantees are never regressed: two builds byte-identical, --check total, manifest verified.",
+    "Every registry data change carries source_refs evidence; no fact is invented to satisfy a validator.",
+    "Authority documents change only through governance approval, never to make parity pass.",
+    "The baseline only shrinks by resolution, never by silent regeneration.",
+    "Cutover is always per-registry and always reversible via metadata revert.",
+    "Predecessor documents are superseded, never deleted."
+  ],
+  "risk_register": [
+    {
+      "risk": "Burn-down stalls because contract conflicts reveal real code-level integration defects",
+      "mitigation": "STEP-02 explicitly splits registry correction from code fixes; registry records the true (conflicting) state and the code issue tracks resolution. Cutover for contract_registry can proceed with dispositioned registry_only records even while code issues remain open."
+    },
+    {
+      "risk": "Born-canonical registries (STEP-05 path b) become unverified assertion islands",
+      "mitigation": "Path b requires substitute evidence validators (config records vs actual config files, etc.) so every registry has some external check, even without a predecessor document."
+    },
+    {
+      "risk": "Consumers never materialize and the system decays into well-validated shelfware",
+      "mitigation": "STEP-10's done_when is deliberately harsh: a registry deletion must break consumer CI. If no consumer can be wired, that is a signal to revisit whether the registry earns its maintenance cost."
+    },
+    {
+      "risk": "Post-cutover drift between canonical registries and reality (code)",
+      "mitigation": "STEP-09 keeps parity permanent, and STEP-10's derived artifacts mean drift surfaces as consumer breakage rather than silent staleness."
+    }
+  ]
+}

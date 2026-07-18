@@ -1,0 +1,985 @@
+{
+  "plan_id": "EAFIX-REGISTRY-AUTHORITY-PARITY-001",
+  "plan_version": "1.0.0",
+  "document_type": "agent_implementation_plan",
+  "title": "EAFIX Registry Authority Parity Plan (Real Shadow Validation)",
+  "status": "blocked_on_predecessor",
+  "generated_at_utc": "2026-07-17T22:20:00Z",
+  "problem_statement": {
+    "summary": "The registry system validates only internal consistency. Nothing compares the shadow canonical candidate JSONL registries against the documents that are currently authoritative. 'Shadow validation' therefore proves the registries agree with themselves, not that they agree with reality.",
+    "consequence": "There is no evidence path to authority cutover. approved_for_cutover cannot be justified by any artifact the system currently produces.",
+    "this_plan_produces": "A deterministic, reviewable parity report between each shadow registry and its declared external authority, plus a frozen baseline that makes parity regressions blocking while known divergences remain visible and advisory."
+  },
+  "repository": {
+    "full_name": "DICKY1987/eafix-modular",
+    "default_branch": "master",
+    "recommended_branch": "feat/registry-authority-parity",
+    "recommended_pr_title": "feat(registry): add authority parity validation and baseline ratchet",
+    "revert_policy": "Forward remediation only. This plan adds a new read-only validator and new generated artifacts; it changes no authored registry record, no authority document, and no routing file. Revert the branch if parity tooling destabilizes the deterministic build."
+  },
+  "predecessor_dependency": {
+    "requires_plan_id": "EAFIX-REGISTRY-POST-MERGE-REMEDIATION-001",
+    "requires_state": "merged to master with all acceptance_criteria satisfied",
+    "reason": "Parity output is a generated artifact. Until the remediation plan lands, generated artifacts are not deterministic, not fully covered by --check, and the manifest is not trustworthy. A parity report produced by an unrepaired generator is not evidence.",
+    "gate_rule": "If the predecessor is not merged, stop. Do not implement parity on top of a non-deterministic renderer.",
+    "verification_commands": [
+      "git log --oneline -n 20 origin/master",
+      "python tools/registries/build_registries.py --check",
+      "python tools/registries/build_registries.py && git diff --exit-code"
+    ]
+  },
+  "predecessor_plan_amendments": {
+    "target_plan_id": "EAFIX-REGISTRY-POST-MERGE-REMEDIATION-001",
+    "reason": "REG-FIX-040 introduces module process_step_id foreign-key validation that does not exist today. PHASE-08 requires foreign_reference_errors = 0. PHASE-04 forbids populating missing data. If current authored data contains dangling process_step_ids, those three requirements collide and the plan fails closed at PHASE-08 with no lawful resolution inside its own scope.",
+    "amendment_id": "AMD-REG-001",
+    "insert_into_phase": "PHASE-00",
+    "task": {
+      "task_id": "REG-FIX-004",
+      "action": "Read-only preflight probe: determine whether current authored data already violates the process_step_id foreign key before implementing the validator that will enforce it.",
+      "method": [
+        "Collect the set of process step IDs declared in process_registry.jsonl.",
+        "Collect every module process_step_ids value from module_registry.jsonl.",
+        "Compute the set difference (module-referenced IDs not present in the process registry).",
+        "Treat an empty or absent process_step_ids list as not a violation. Absence of data is a known stub condition, not a dangling reference.",
+        "Write no files. Modify no records."
+      ],
+      "branching_rule": [
+        "If the difference is empty: DEF-REG-004 is a pure tooling task. Proceed with the remediation plan unchanged.",
+        "If the difference is non-empty: DEF-REG-004 has uncovered a data defect. Do NOT resolve it in the remediation PR. Record each dangling reference, open a separate data-defect issue, and amend PHASE-08 required_results to permit a documented, enumerated, baselined set of known foreign_reference_errors for module.process_step_ids only. All other reference classes remain zero."
+      ],
+      "evidence": [
+        "Exact count of dangling module.process_step_id references",
+        "Enumerated list of (module_id, invalid process_step_id) pairs, or explicit confirmation the list is empty",
+        "Confirmation that no files were written by the probe"
+      ],
+      "rationale": "Discover whether this is a code task or a data task in PHASE-00, not at hour six of PHASE-08."
+    }
+  },
+  "objective": {
+    "primary": "Produce deterministic, reviewable evidence of whether each shadow canonical candidate registry agrees with the document that is currently authoritative for the same facts.",
+    "secondary": "Make parity regressions blocking immediately via a frozen baseline, without waiting for existing divergences to be resolved.",
+    "completion_definition": "A deterministic registry_authority_parity_report.json exists as a managed output; every registry is classified as either authority-covered or explicitly no_declared_authority; every divergence carries a stable parity_id, a verdict, and a disposition; a frozen parity baseline exists; CI blocks any parity regression beyond baseline; no authority cutover occurs and no authored record is modified."
+  },
+  "mandatory_routing_and_authority": {
+    "routing_authority": "eafix_project_knowledge_reference_routing_instructions.json",
+    "matched_routes": [
+      "validation and governance",
+      "module and process contracts",
+      "generated artifacts",
+      "code modification",
+      "repository file ownership"
+    ],
+    "required_references": [
+      {
+        "path": "eafix_project_knowledge_reference_routing_instructions.json",
+        "role": "mandatory routing and conflict-resolution authority"
+      },
+      {
+        "path": "EAFIX_auth_docs/01_canonical_registries/doc_authority.json",
+        "role": "document authority and supersession governance; the source of truth for which document is authoritative for which fact domain"
+      },
+      {
+        "path": "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+        "role": "PARITY AUTHORITY for module identity and responsibilities"
+      },
+      {
+        "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+        "role": "PARITY AUTHORITY for process steps and handoffs"
+      },
+      {
+        "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+        "role": "PARITY AUTHORITY for phases, validation contracts, and failure contracts"
+      },
+      {
+        "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv",
+        "role": "PARITY AUTHORITY for physical file-to-module mapping"
+      },
+      {
+        "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_services_ai_reference_20260510.json",
+        "role": "companion reference; NOT a parity authority unless doc_authority.json declares it one"
+      },
+      {
+        "path": "EAFIX_auth_docs/01_canonical_registries/registry_index.json",
+        "role": "registry maturity and authority_status; must remain canonical_candidate / approved_for_cutover false"
+      }
+    ],
+    "rules": [
+      "The JSONL registries remain shadow canonical candidates for the entire duration of this plan.",
+      "The existing canonical catalogs win every conflict. A divergence is a finding about the registry, never an instruction to edit the authority.",
+      "This plan reports divergence. It does not resolve divergence.",
+      "Do not modify any authored JSONL record to make parity pass. Doing so destroys the evidence this plan exists to produce.",
+      "Do not modify routing instructions, doc_authority.json, supersession state, registry_index.json, or any canonical authority assignment.",
+      "Do not remove the 25 review items or the two orphan classifications.",
+      "If a declared parity authority file is missing, record that fact, mark the affected registry authority_unavailable, and make no parity conclusion that depends on it. Absence of an authority is never evidence of agreement.",
+      "doc_authority.json is the arbiter of which document is a parity authority. If this plan's authority mapping and doc_authority.json disagree, doc_authority.json wins and the mapping in this plan is amended, not the reverse."
+    ]
+  },
+  "scope": {
+    "in_scope": [
+      "tools/registries/authority_projection.py (new)",
+      "tools/registries/parity_core.py (new)",
+      "tools/registries/validate_authority_parity.py (new)",
+      "tools/registries/registry_core.py (register parity outputs as managed outputs only)",
+      "tests/registries/test_authority_parity.py (new)",
+      "EAFIX_auth_docs/01_canonical_registries/parity_authority_map.json (new, authored)",
+      "EAFIX_auth_docs/01_canonical_registries/registry_authority_parity_baseline.json (new, authored, frozen)",
+      "EAFIX_auth_docs/generated/registries/registry_authority_parity_report.json (new, generated)",
+      "EAFIX_auth_docs/generated/registries/authority_parity.generated.md (new, generated)",
+      ".github/workflows/registry-validation.yml (add parity job)"
+    ],
+    "out_of_scope": [
+      "Registry authority cutover",
+      "Resolving any parity divergence",
+      "Resolving the 25 governance conflicts or the 22 contract review items",
+      "Populating stub module records (R3_CORRELATION_GUARD, U1_DASHBOARD_BACKEND, U2_GUI_GATEWAY, or any other)",
+      "Editing any canonical authority document",
+      "Editing doc_authority.json or routing instructions",
+      "Editing registry_index.json authority_status or approved_for_cutover",
+      "Changing any authored JSONL registry record",
+      "Reclassification of SK1_PLUGIN_INTERFACE or SK2_IDEMPOTENCY",
+      "Semantic equivalence judgement (see explicit_non_goal)"
+    ],
+    "explicit_non_goal": {
+      "name": "Semantic equivalence",
+      "decision": "Do not implement",
+      "reason": "Parity compares declared, normalized, structurally comparable fields. It does not judge whether two differently-worded prose responsibilities 'mean the same thing'. Fuzzy matching, similarity scoring, and LLM-judged equivalence are prohibited: they are non-deterministic and would make the report unreproducible, which defeats the entire purpose of the artifact.",
+      "consequence": "Prose fields are compared by normalized exact match or are declared not_comparable. A not_comparable field is a visible adapter gap, not a silent pass."
+    },
+    "environmental_blocker": {
+      "name": "GitHub Actions billing/account lock",
+      "effect": "Checks may fail before any job starts.",
+      "rule": "Do not count startup-blocked checks as passing or as code failures. Complete local validation, but do not merge until CI can execute."
+    }
+  },
+  "confirmed_gaps": [
+    {
+      "id": "GAP-PAR-001",
+      "priority": "P1",
+      "title": "No registry-to-authority comparison exists",
+      "evidence": "Every validator in tools/registries/ operates exclusively on files under 01_canonical_registries/*.jsonl. No code path reads module_catalog.json or process_step_catalog.json.",
+      "consequence": "The system labels its own output 'shadow validation' while performing zero shadow comparison. The registries could be internally perfect and wholly wrong.",
+      "required_fix": "Implement authority projection adapters and a parity engine producing a managed, deterministic parity report."
+    },
+    {
+      "id": "GAP-PAR-002",
+      "priority": "P1",
+      "title": "No evidence path to cutover exists",
+      "evidence": "registry_index.json carries authority_status: canonical_candidate and approved_for_cutover: false, but no artifact defines what evidence would justify flipping either field.",
+      "consequence": "Cutover would necessarily be a judgement call, which contradicts the fail-closed, evidence-driven design of the system.",
+      "required_fix": "Define machine-checkable cutover criteria in terms of the parity report and baseline. Define only; do not execute."
+    },
+    {
+      "id": "GAP-PAR-003",
+      "priority": "P2",
+      "title": "Registries with no external authority are indistinguishable from registries that agree",
+      "evidence": "integration, configuration, operational_control, operator, reuse, and decision registries have no declared canonical counterpart document.",
+      "consequence": "A parity report that silently omits them would report zero divergences for six registries, which reads as verified when it means unverified.",
+      "required_fix": "Every registry must appear in the parity report with an explicit coverage classification: authority_covered, no_declared_authority, or authority_unavailable."
+    },
+    {
+      "id": "GAP-PAR-004",
+      "priority": "P2",
+      "title": "Adapter gaps would masquerade as data agreement",
+      "evidence": "An authority field with no corresponding registry field, or a prose field with no deterministic comparison, produces no divergence record under a naive comparison.",
+      "consequence": "Comparison coverage would be silently overstated. 'We did not check' would be indistinguishable from 'we checked and it agreed'.",
+      "required_fix": "Introduce the unrepresentable and not_comparable verdicts and count them separately from agree."
+    },
+    {
+      "id": "GAP-PAR-005",
+      "priority": "P2",
+      "title": "Parity cannot be made blocking without first resolving every divergence",
+      "evidence": "Existing divergences are unknown in number and out of scope to resolve, so a strict blocking gate would fail on day one and be disabled, repeating the report-only trap the remediation plan is fixing.",
+      "required_fix": "Freeze a baseline of known divergences. Block on any parity_id not present in the baseline. Absolute count stays advisory; regression is blocking."
+    }
+  ],
+  "parity_authority_map": {
+    "storage": "EAFIX_auth_docs/01_canonical_registries/parity_authority_map.json (authored, human-reviewed, governed)",
+    "rule": "This mapping is authored data, not code. Adding or removing a mapping is a governance change requiring review, not a tooling change.",
+    "validation": "Every entry must be consistent with doc_authority.json. A mapping naming a document that doc_authority.json does not declare authoritative is a blocking error.",
+    "mappings": [
+      {
+        "registry": "module_registry",
+        "authority_path": "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+        "join_key": "module_id",
+        "compared_fields": [
+          "module_id",
+          "existence",
+          "responsibilities",
+          "dependencies"
+        ],
+        "coverage": "authority_covered"
+      },
+      {
+        "registry": "process_registry",
+        "authority_path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+        "join_key": "process_step_id",
+        "compared_fields": [
+          "process_step_id",
+          "existence",
+          "owning_module_id",
+          "handoff_targets",
+          "sequence"
+        ],
+        "coverage": "authority_covered"
+      },
+      {
+        "registry": "process_registry",
+        "authority_path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+        "join_key": "phase_id",
+        "compared_fields": [
+          "phase_id",
+          "existence",
+          "validation_contract_ref",
+          "failure_contract_ref"
+        ],
+        "coverage": "authority_covered",
+        "note": "A registry may have more than one declared authority. Each mapping is evaluated independently and reported independently."
+      },
+      {
+        "registry": "contract_registry",
+        "authority_path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+        "join_key": "contract_id",
+        "compared_fields": [
+          "contract_id",
+          "existence",
+          "producer_module_id",
+          "consumer_module_id"
+        ],
+        "coverage": "authority_covered",
+        "note": "Expected to be the highest-divergence mapping. That is the point. This is where the 22 contract review items will acquire external evidence."
+      },
+      {
+        "registry": "artifact_registry",
+        "authority_path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv",
+        "join_key": "file_path",
+        "compared_fields": [
+          "file_path",
+          "existence",
+          "owning_module_id"
+        ],
+        "coverage": "authority_covered"
+      },
+      {
+        "registry": "integration_registry",
+        "coverage": "no_declared_authority"
+      },
+      {
+        "registry": "configuration_registry",
+        "coverage": "no_declared_authority"
+      },
+      {
+        "registry": "operational_control_registry",
+        "coverage": "no_declared_authority"
+      },
+      {
+        "registry": "operator_registry",
+        "coverage": "no_declared_authority"
+      },
+      {
+        "registry": "reuse_registry",
+        "coverage": "no_declared_authority"
+      },
+      {
+        "registry": "decision_registry",
+        "coverage": "no_declared_authority"
+      }
+    ]
+  },
+  "verdict_taxonomy": {
+    "rule": "Every compared fact resolves to exactly one verdict. The taxonomy is closed. An unclassifiable comparison is a blocking tooling error, not a silent pass.",
+    "verdicts": [
+      {
+        "verdict": "agree",
+        "meaning": "The join key exists in both sources and every compared field matches after normalization.",
+        "counts_as_evidence": true
+      },
+      {
+        "verdict": "registry_only",
+        "meaning": "The join key exists in the registry but not in the authority. The registry asserts a fact the authority does not.",
+        "counts_as_evidence": false,
+        "interpretation": "Registry over-claim. Either the registry invented a record or the authority is stale. Requires human disposition."
+      },
+      {
+        "verdict": "authority_only",
+        "meaning": "The join key exists in the authority but not in the registry. The registry is missing a fact the authority asserts.",
+        "counts_as_evidence": false,
+        "interpretation": "Registry under-coverage. Blocks cutover for that registry: an incomplete registry cannot replace the document it omits."
+      },
+      {
+        "verdict": "field_divergence",
+        "meaning": "The join key exists in both sources but at least one compared field differs after normalization.",
+        "counts_as_evidence": false,
+        "interpretation": "Direct contradiction. The most serious verdict. The authority wins."
+      },
+      {
+        "verdict": "not_comparable",
+        "meaning": "The field exists in both sources but has no deterministic comparison rule (typically free prose).",
+        "counts_as_evidence": false,
+        "interpretation": "Known measurement limit. Not a data defect. Must be counted separately and must never be reported as agreement."
+      },
+      {
+        "verdict": "unrepresentable",
+        "meaning": "The authority asserts a fact for which the registry schema has no corresponding field.",
+        "counts_as_evidence": false,
+        "interpretation": "Schema gap in the registry system itself. Blocks cutover: a registry that cannot express a fact cannot replace the document that asserts it."
+      },
+      {
+        "verdict": "authority_unavailable",
+        "meaning": "The declared authority file is missing or unreadable.",
+        "counts_as_evidence": false,
+        "interpretation": "Fail closed. Never degrade to agree."
+      }
+    ],
+    "prohibited_verdicts": [
+      "probably_agrees",
+      "similar",
+      "close_enough",
+      "any confidence score",
+      "any similarity percentage"
+    ]
+  },
+  "implementation_architecture": {
+    "pattern": "project, then compare, then render; identical to the predecessor plan's pure-render discipline",
+    "invariant": "The parity engine is strictly read-only with respect to all authored data. It reads registries, reads authorities, and emits generated artifacts. It has no write path to 01_canonical_registries/*.jsonl.",
+    "components": [
+      {
+        "name": "load_parity_authority_map",
+        "contract": "Load parity_authority_map.json, cross-validate every mapping against doc_authority.json, and fail closed on any mapping naming a non-authoritative or unknown document."
+      },
+      {
+        "name": "project_authority",
+        "contract": "For a given authority document, return a deterministic mapping of join_key -> normalized fact dict. One adapter per authority document format (JSON catalog, aligned-process JSON, CSV). Adapters are pure, total, and never mutate their input."
+      },
+      {
+        "name": "project_registry",
+        "contract": "For a given registry, return a deterministic mapping of join_key -> normalized fact dict using the same normalized field vocabulary as project_authority."
+      },
+      {
+        "name": "normalize_value",
+        "contract": "Deterministic value normalization: strip surrounding whitespace, collapse internal whitespace runs to a single space, apply declared case folding, and sort unordered collections. No stemming, no fuzzy matching, no semantic interpretation. Normalization rules are declared per field in the authority map, not inferred."
+      },
+      {
+        "name": "compare_parity",
+        "contract": "Given projected authority facts and projected registry facts, emit one parity record per compared fact with a closed-taxonomy verdict and a stable parity_id. Perform no writes."
+      },
+      {
+        "name": "stable_parity_id",
+        "contract": "Deterministic identifier derived from (registry, authority_path, join_key, field). Must be stable across runs, machines, and unrelated data changes, because the baseline is keyed on it. Must not incorporate the compared values, or a divergence would change identity when it changes shape and silently escape the baseline."
+      },
+      {
+        "name": "render_parity_outputs",
+        "contract": "Return repository-relative POSIX path -> exact UTF-8 bytes for registry_authority_parity_report.json and authority_parity.generated.md. Integrates with the predecessor plan's render_expected_outputs so both are covered by --check."
+      },
+      {
+        "name": "evaluate_baseline",
+        "contract": "Compare current non-agree parity_ids against registry_authority_parity_baseline.json. Emit new_divergences (blocking), resolved_divergences (advisory, prompts baseline tightening), and known_divergences (advisory)."
+      }
+    ],
+    "managed_outputs_added": [
+      "registry_authority_parity_report.json",
+      "authority_parity.generated.md"
+    ],
+    "managed_outputs_rule": "Both new artifacts MUST be registered in the predecessor plan's managed_outputs list and covered by render/compare/write, the build manifest, and --check. An unmanaged generated artifact reintroduces exactly the drift class DEF-REG-003 exists to eliminate."
+  },
+  "parity_record_contract": {
+    "required_fields": [
+      "parity_id",
+      "registry",
+      "authority_path",
+      "join_key_name",
+      "join_key_value",
+      "field",
+      "verdict",
+      "registry_value",
+      "authority_value",
+      "normalization_applied",
+      "disposition"
+    ],
+    "disposition_values": [
+      "unreviewed",
+      "registry_defect_accepted",
+      "authority_stale_suspected",
+      "adapter_gap_accepted",
+      "not_comparable_accepted"
+    ],
+    "disposition_default": "unreviewed",
+    "rules": [
+      "disposition is authored in the baseline file, never inferred by tooling.",
+      "authority_stale_suspected does NOT license editing the authority. It opens a governance issue and nothing else.",
+      "A record with verdict agree carries no disposition.",
+      "registry_value and authority_value must be recorded verbatim post-normalization, so a reviewer can see exactly what was compared without rerunning the tool."
+    ]
+  },
+  "phases": [
+    {
+      "phase_id": "PHASE-00",
+      "name": "Dependency gate, preflight, and authority inventory",
+      "tasks": [
+        {
+          "task_id": "PAR-001",
+          "action": "Verify the predecessor plan is merged and the build is deterministic.",
+          "commands": [
+            "git fetch origin --prune",
+            "git switch master",
+            "git pull --ff-only origin master",
+            "python tools/registries/build_registries.py --check",
+            "python tools/registries/build_registries.py",
+            "git diff --exit-code"
+          ],
+          "acceptance": [
+            "--check reports errors=0 and changed=0.",
+            "A build followed by git diff --exit-code produces no diff.",
+            "The build manifest does not hash itself and contains no backslash keys."
+          ],
+          "fail_closed": "If any acceptance item fails, stop. EAFIX-REGISTRY-POST-MERGE-REMEDIATION-001 is not complete and parity output would not be reproducible evidence."
+        },
+        {
+          "task_id": "PAR-002",
+          "action": "Create the working branch.",
+          "commands": [
+            "git switch -c feat/registry-authority-parity",
+            "git status --short"
+          ],
+          "acceptance": [
+            "Working tree clean."
+          ]
+        },
+        {
+          "task_id": "PAR-003",
+          "action": "Inventory every declared parity authority and confirm it is readable.",
+          "requirements": [
+            "For each authority_path in this plan's parity_authority_map: confirm existence, record size and SHA-256.",
+            "Record the concrete top-level shape of each document (keys, record container, ID field names) without interpreting content.",
+            "Confirm doc_authority.json declares each one authoritative for the fact domain claimed."
+          ],
+          "evidence": [
+            "Table of authority_path, exists, sha256, declared-in-doc_authority",
+            "Explicit list of any authority that is missing or not declared"
+          ],
+          "branching_rule": [
+            "Missing file: mark the mapping authority_unavailable, keep it in the map, and proceed. Do not silently drop it.",
+            "Present but not declared in doc_authority.json: blocking. Stop and open a governance issue. This plan does not get to nominate authorities."
+          ]
+        },
+        {
+          "task_id": "PAR-004",
+          "action": "Confirm registry authority state is untouched and will remain so.",
+          "acceptance": [
+            "registry_index.json shows authority_status canonical_candidate and approved_for_cutover false.",
+            "No file in the planned diff is a routing, doc_authority, or registry_index file."
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-01",
+      "name": "Author the parity authority map",
+      "tasks": [
+        {
+          "task_id": "PAR-010",
+          "action": "Create EAFIX_auth_docs/01_canonical_registries/parity_authority_map.json from this plan's parity_authority_map section.",
+          "requirements": [
+            "Every one of the 10 registries appears exactly once in a coverage classification.",
+            "Every authority_covered mapping declares join_key, compared_fields, and per-field normalization rules.",
+            "Registries with no canonical counterpart are explicitly marked no_declared_authority with a written reason.",
+            "The file is authored data. It is not generated and must not be regenerated by any tool."
+          ],
+          "acceptance": [
+            "The map is valid JSON, stably sorted, LF newlines, trailing newline.",
+            "Loading the map cross-validates clean against doc_authority.json."
+          ]
+        },
+        {
+          "task_id": "PAR-011",
+          "action": "Add a JSON Schema for the parity authority map under 01_canonical_registries/schemas/.",
+          "requirements": [
+            "coverage is an enum: authority_covered, no_declared_authority, authority_unavailable.",
+            "authority_covered requires authority_path, join_key, and non-empty compared_fields.",
+            "no_declared_authority forbids authority_path and requires a reason.",
+            "Schema validation of this file is a blocking error class."
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-02",
+      "name": "Implement authority projection adapters",
+      "tasks": [
+        {
+          "task_id": "PAR-020",
+          "action": "Implement tools/registries/authority_projection.py with one pure adapter per authority document format.",
+          "adapters": [
+            "project_module_catalog (JSON catalog -> module_id facts)",
+            "project_process_step_catalog (JSON catalog -> process_step_id facts)",
+            "project_aligned_trading_process (JSON -> phase_id and contract_id facts)",
+            "project_file_module_mapping (CSV -> file_path facts)"
+          ],
+          "requirements": [
+            "Adapters are pure functions: document bytes in, normalized fact mapping out.",
+            "Adapters never write, never mutate input, and never reach across to the registries.",
+            "Every adapter declares which authority fields it projects AND which it deliberately does not.",
+            "An authority field that is projected by no adapter and has no registry counterpart must surface as unrepresentable, not vanish.",
+            "CSV parsing is explicit about encoding, delimiter, and header handling. No dialect sniffing: sniffing is non-deterministic across inputs."
+          ],
+          "acceptance": [
+            "Running an adapter twice on identical bytes yields identical output.",
+            "Adapter output ordering is deterministic (sorted by join key).",
+            "No adapter raises on an unexpected extra field; it records it as unprojected."
+          ]
+        },
+        {
+          "task_id": "PAR-021",
+          "action": "Implement the matching registry-side projection into the same normalized field vocabulary.",
+          "requirements": [
+            "Field vocabulary is declared once and shared. Two spellings of the same concept across the two sides is a defect.",
+            "Registry projection reads only the authored JSONL, never the generated snapshots. Comparing generated output to an authority would test the renderer, not the data."
+          ]
+        },
+        {
+          "task_id": "PAR-022",
+          "action": "Implement normalize_value with declared, per-field normalization rules.",
+          "prohibited": [
+            "Fuzzy string matching",
+            "Similarity scoring",
+            "Stemming or lemmatization",
+            "LLM-based equivalence judgement",
+            "Any comparison whose result depends on anything but the two input values and the declared rule"
+          ],
+          "requirements": [
+            "Each parity record records normalization_applied so a reviewer can reproduce the comparison by hand."
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-03",
+      "name": "Implement the parity engine",
+      "tasks": [
+        {
+          "task_id": "PAR-030",
+          "action": "Implement tools/registries/parity_core.py: compare_parity, stable_parity_id, and the closed verdict taxonomy.",
+          "acceptance": [
+            "Every compared fact receives exactly one verdict from the closed taxonomy.",
+            "An unclassifiable comparison raises a blocking error rather than defaulting to any verdict.",
+            "parity_id is stable across runs, machines, and value changes.",
+            "The engine performs zero writes."
+          ]
+        },
+        {
+          "task_id": "PAR-031",
+          "action": "Implement full coverage accounting.",
+          "requirements": [
+            "The report includes per-registry counts for every verdict in the taxonomy.",
+            "The report includes a coverage_summary distinguishing: facts compared, facts not_comparable, facts unrepresentable, registries with no_declared_authority, and authorities unavailable.",
+            "agree counts are never aggregated with not_comparable or unrepresentable counts into a single 'passing' number."
+          ],
+          "rationale": "GAP-PAR-003 and GAP-PAR-004. A single headline pass rate would recreate exactly the ambiguity this plan exists to remove."
+        },
+        {
+          "task_id": "PAR-032",
+          "action": "Implement tools/registries/validate_authority_parity.py as a thin CLI wrapper over parity_core, matching the existing validator script conventions.",
+          "flags": [
+            "--check (no-write comparison, exit nonzero on regression beyond baseline)",
+            "--report-only (advisory findings do not fail; regressions still fail)"
+          ],
+          "rule": "--report-only must never suppress a new divergence, a schema error, or an authority_unavailable condition. It suppresses known baselined findings only."
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-04",
+      "name": "Render parity outputs deterministically",
+      "tasks": [
+        {
+          "task_id": "PAR-040",
+          "action": "Add registry_authority_parity_report.json and authority_parity.generated.md to the predecessor plan's managed_outputs and render pipeline.",
+          "requirements": [
+            "Both artifacts flow through render_expected_outputs / compare_expected_outputs / write_expected_outputs.",
+            "Both are hashed into the build manifest as outputs.",
+            "Both are covered by --check.",
+            "Stable sorted JSON, UTF-8, LF newlines, trailing newline, POSIX path keys.",
+            "Python 3.9-compatible writes."
+          ],
+          "acceptance": [
+            "Tampering either artifact causes --check to fail without rewriting it.",
+            "Two consecutive builds produce byte-identical parity outputs."
+          ]
+        },
+        {
+          "task_id": "PAR-041",
+          "action": "Render the Markdown parity view for human review.",
+          "requirements": [
+            "Grouped by registry, then by verdict severity: field_divergence, authority_only, registry_only, unrepresentable, not_comparable.",
+            "Every divergence row shows parity_id, join key, field, registry value, authority value, disposition.",
+            "The header states plainly that the registries are shadow candidates and the authority wins every conflict.",
+            "Deterministic ordering. No timestamps, no run IDs, no hostnames, no absolute paths anywhere in the rendered bytes."
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-05",
+      "name": "Freeze the parity baseline",
+      "tasks": [
+        {
+          "task_id": "PAR-050",
+          "action": "Generate the initial baseline from the first clean parity run, then commit it as authored data.",
+          "requirements": [
+            "registry_authority_parity_baseline.json contains every current non-agree parity_id with verdict and disposition unreviewed.",
+            "The baseline is authored and governed. After this initial generation it is never regenerated wholesale; it is edited deliberately, record by record.",
+            "The baseline stores parity_id and verdict only, not values. A divergence whose values change but whose identity persists stays baselined; that is intended."
+          ],
+          "acceptance": [
+            "A parity run against the frozen baseline reports new_divergences = 0.",
+            "The baseline record count equals the current non-agree parity record count."
+          ]
+        },
+        {
+          "task_id": "PAR-051",
+          "action": "Implement evaluate_baseline with a one-way ratchet.",
+          "rules": [
+            "new_divergence (parity_id not in baseline) is BLOCKING.",
+            "known_divergence (parity_id in baseline) is advisory.",
+            "resolved_divergence (baseline parity_id no longer divergent) is advisory but MUST be reported loudly and prompts baseline tightening.",
+            "Adding an entry to the baseline is a reviewable governance change and must be visible in the PR diff. Never allow tooling to append to the baseline automatically."
+          ],
+          "rationale": "GAP-PAR-005. Auto-appending baselines are how ratchets quietly become rubber stamps."
+        },
+        {
+          "task_id": "PAR-052",
+          "action": "Add a baseline hygiene check.",
+          "requirements": [
+            "A baselined parity_id that no longer exists in the current comparison space (stale entry) is a blocking error. Stale baseline entries hide regressions.",
+            "The baseline is sorted by parity_id and byte-stable."
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-06",
+      "name": "Tests",
+      "required_tests": [
+        "test_authority_map_validates_against_doc_authority",
+        "test_every_registry_has_explicit_coverage_classification",
+        "test_adapters_are_pure_and_deterministic",
+        "test_adapter_output_is_stably_sorted",
+        "test_missing_authority_yields_authority_unavailable_not_agree",
+        "test_registry_only_detected",
+        "test_authority_only_detected",
+        "test_field_divergence_detected",
+        "test_unrepresentable_authority_field_is_reported",
+        "test_not_comparable_is_never_counted_as_agree",
+        "test_parity_id_is_stable_across_runs",
+        "test_parity_id_is_stable_when_values_change",
+        "test_parity_id_changes_when_field_or_join_key_changes",
+        "test_new_divergence_is_blocking",
+        "test_known_divergence_is_advisory",
+        "test_resolved_divergence_is_reported",
+        "test_stale_baseline_entry_is_blocking",
+        "test_report_only_does_not_hide_new_divergence",
+        "test_parity_report_is_byte_stable_across_two_builds",
+        "test_check_detects_parity_report_drift_without_writing",
+        "test_check_detects_parity_markdown_drift_without_writing",
+        "test_parity_engine_writes_no_authored_files",
+        "test_parity_engine_reads_authored_jsonl_not_generated_snapshots",
+        "test_current_dataset_produces_zero_new_divergences_against_baseline"
+      ],
+      "test_rules": [
+        "Use temporary directories, synthetic fixtures, or patched roots. Never assert on live production counts other than in the single dataset test.",
+        "Fixture authorities and fixture registries must be small and hand-verifiable.",
+        "Never leave committed files modified after a test.",
+        "Tests must be order-independent and pass on Windows and Linux.",
+        "Tests must pass on Python 3.9 and 3.11."
+      ]
+    },
+    {
+      "phase_id": "PHASE-07",
+      "name": "CI integration",
+      "tasks": [
+        {
+          "task_id": "PAR-070",
+          "action": "Add parity validation to .github/workflows/registry-validation.yml.",
+          "requirements": [
+            "Reuse the 3.9/3.11 matrix established by the predecessor plan.",
+            "Parity regression check is BLOCKING (no continue-on-error).",
+            "Absolute divergence count is ADVISORY.",
+            "Parity report and Markdown view upload as artifacts with if: always().",
+            "Retain master/develop branch filters. Do not add main."
+          ]
+        },
+        {
+          "task_id": "PAR-071",
+          "recommended_step_sequence": [
+            "Checkout",
+            "Set up matrix Python",
+            "Install jsonschema",
+            "Run unit tests",
+            "Run normal generation",
+            "Run build --check (blocking)",
+            "Run validate_authority_parity.py --check (blocking on regression)",
+            "Run git diff --exit-code for generated directories (blocking)",
+            "Upload parity artifacts"
+          ]
+        },
+        {
+          "task_id": "PAR-072",
+          "action": "Update the check name to stop overstating what runs.",
+          "change": "Rename the job so that parity and structural validation are separately identifiable in the checks list. A single green 'Registry Validation (Shadow)' that never shadowed anything was itself part of GAP-PAR-001."
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-08",
+      "name": "Full local validation",
+      "commands": [
+        "python tools/registries/build_registries.py",
+        "python tools/registries/build_registries.py --check",
+        "python tools/registries/validate_record_schemas.py",
+        "python tools/registries/validate_registry_ids.py",
+        "python tools/registries/validate_registry_references.py",
+        "python tools/registries/validate_registry_authority.py",
+        "python tools/registries/validate_authority_parity.py --check",
+        "python -m unittest discover -s tests/registries -p \"test_*.py\"",
+        "git diff --check"
+      ],
+      "required_results": {
+        "registries_classified": 10,
+        "registries_unclassified": 0,
+        "authority_map_schema_errors": 0,
+        "authorities_unavailable": 0,
+        "new_divergences": 0,
+        "stale_baseline_entries": 0,
+        "generated_output_differences": 0,
+        "test_failures": 0,
+        "authored_jsonl_records_modified": 0
+      },
+      "explicitly_not_required": {
+        "known_divergences": "Any value. This number is expected to be large, especially for contract_registry. A low number here would be more suspicious than a high one, and would suggest the adapters are not actually comparing anything.",
+        "not_comparable": "Any value. Must be visible, not zero.",
+        "unrepresentable": "Any value. Must be visible, not zero."
+      },
+      "required_runtime_evidence": [
+        "Python 3.9 full-suite pass",
+        "Python 3.11 full-suite pass",
+        "Two-build byte-stable parity output proof",
+        "Proof that parity execution modified zero authored files"
+      ],
+      "mutation_tests": [
+        "Tamper the parity report and prove --check fails without rewriting it.",
+        "Inject a synthetic divergence into a fixture registry and prove it is reported as new_divergence and blocks.",
+        "Remove a fixture authority file and prove the result is authority_unavailable, not agree.",
+        "Delete a baseline entry that still diverges and prove the run blocks.",
+        "Add a baseline entry for a non-existent parity_id and prove stale-entry detection blocks.",
+        "Restore clean state and prove new_divergences returns to zero."
+      ]
+    },
+    {
+      "phase_id": "PHASE-09",
+      "name": "Publish PR",
+      "tasks": [
+        {
+          "task_id": "PAR-090",
+          "commands": [
+            "git status --short",
+            "git diff --check",
+            "git diff --stat",
+            "git add -A",
+            "git diff --cached --check",
+            "git commit -m \"feat(registry): add authority parity validation and baseline ratchet\"",
+            "git push -u origin feat/registry-authority-parity"
+          ]
+        },
+        {
+          "task_id": "PAR-091",
+          "action": "Open a PR against master.",
+          "required_pr_sections": [
+            "Summary",
+            "Gaps closed (GAP-PAR-001 through GAP-PAR-005)",
+            "Authority map and its doc_authority.json cross-validation",
+            "Per-registry coverage classification table",
+            "Per-registry verdict counts",
+            "Baseline size and what it means",
+            "Explicit statement that known divergences are NOT resolved by this PR",
+            "Python 3.9 and 3.11 evidence",
+            "Two-build determinism evidence",
+            "Mutation-test evidence",
+            "Proof that zero authored JSONL records changed",
+            "GitHub Actions account blocker status",
+            "Governance boundary: no authority cutover, no authority document edited"
+          ]
+        },
+        {
+          "task_id": "PAR-092",
+          "action": "Open a separate tracking issue per registry with a non-zero baseline, for burn-down under the successor plan.",
+          "rule": "Issues record divergences. They do not resolve them. Resolution is EAFIX-REGISTRY-CONFLICT-BURNDOWN-001."
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-10",
+      "name": "CI and merge gate",
+      "tasks": [
+        {
+          "task_id": "PAR-100",
+          "owner": "repository owner",
+          "action": "Resolve the GitHub Actions billing/account lock."
+        },
+        {
+          "task_id": "PAR-101",
+          "required_checks": [
+            "Registry Structural Validation",
+            "Registry Authority Parity",
+            "Doc ID Validation",
+            "PR title lint",
+            "All repository-required checks"
+          ],
+          "rule": "Skipped, neutral, startup-blocked, or account-locked checks are not passing evidence."
+        },
+        {
+          "task_id": "PAR-102",
+          "merge_conditions": [
+            "All blocking checks execute and pass on 3.9 and 3.11",
+            "new_divergences = 0 against the frozen baseline",
+            "Zero authored JSONL records changed",
+            "Zero authority, routing, doc_authority, or registry_index files changed",
+            "Two consecutive builds produce no diff",
+            "Every registry carries an explicit coverage classification",
+            "PR description matches the final state"
+          ]
+        }
+      ]
+    }
+  ],
+  "cutover_criteria": {
+    "status": "DEFINED ONLY. This plan does not execute cutover and does not authorize it.",
+    "principle": "Cutover is per-registry, never global. A registry becomes authoritative when it can be shown to contain everything its predecessor document contains and to contradict it nowhere.",
+    "per_registry_requirements": [
+      "coverage is authority_covered. A no_declared_authority registry cannot cut over on parity evidence alone and requires a separate governance basis.",
+      "authority_only count is zero. The registry omits nothing the authority asserts.",
+      "field_divergence count is zero. The registry contradicts the authority nowhere.",
+      "unrepresentable count is zero. The registry schema can express every fact the authority asserts.",
+      "registry_only records are each dispositioned with recorded evidence. Extra facts are permitted only when justified.",
+      "not_comparable count is zero, or every not_comparable field is dispositioned as accepted with a written reason.",
+      "The baseline contains zero entries for that registry.",
+      "Parity has been green on that registry across a declared minimum number of consecutive commits (recommend 10) to demonstrate stability rather than a single lucky run.",
+      "All structural validation is blocking and green.",
+      "Governance approval is recorded in decision_registry."
+    ],
+    "cutover_actions_when_earned": [
+      "Set the registry's authority_status to canonical in registry_index.json.",
+      "Set approved_for_cutover to true for that registry only.",
+      "Update doc_authority.json to record supersession of the predecessor document.",
+      "Flip that registry's advisory findings to blocking.",
+      "Retain the predecessor document as superseded, not deleted, so parity remains auditable after the fact."
+    ],
+    "anti_pattern_warning": "Do not achieve cutover by editing registry records to match the authority without understanding each divergence. That converts parity from evidence into a copy operation and quietly makes the registries a lossy duplicate of the documents they were meant to replace."
+  },
+  "successor_plans": [
+    {
+      "plan_id": "EAFIX-REGISTRY-CONFLICT-BURNDOWN-001",
+      "purpose": "Resolve baselined divergences and the 22/25 contract review items using the now-trustworthy parity report as input.",
+      "unblocked_by": "This plan. Burn-down cannot be prioritized before divergences are enumerated with external evidence."
+    },
+    {
+      "plan_id": "EAFIX-REGISTRY-CUTOVER-001",
+      "purpose": "Execute per-registry authority cutover against the criteria defined in this plan's cutover_criteria section.",
+      "unblocked_by": "EAFIX-REGISTRY-CONFLICT-BURNDOWN-001 reaching a zero baseline for the target registry."
+    }
+  ],
+  "acceptance_criteria": [
+    "parity_authority_map.json exists, is schema-valid, and cross-validates against doc_authority.json.",
+    "All 10 registries carry an explicit coverage classification; none is silently omitted.",
+    "registry_authority_parity_report.json is a managed, deterministic, manifest-hashed, --check-covered generated artifact.",
+    "authority_parity.generated.md renders a human-reviewable divergence view with deterministic ordering.",
+    "Every compared fact carries a closed-taxonomy verdict and a stable parity_id.",
+    "not_comparable and unrepresentable are counted separately from agree and are never aggregated into a pass rate.",
+    "A missing authority yields authority_unavailable and never degrades to agree.",
+    "registry_authority_parity_baseline.json is frozen and committed as authored, reviewable data.",
+    "New divergences block CI. Known divergences are advisory. Resolved divergences are reported.",
+    "Stale baseline entries block CI.",
+    "The parity engine writes zero authored files and reads authored JSONL rather than generated snapshots.",
+    "Two consecutive builds produce byte-identical parity output.",
+    "The suite passes on Python 3.9 and 3.11.",
+    "Zero authored registry records changed.",
+    "Zero authority, routing, doc_authority, or registry_index changes.",
+    "The 25 review items and two orphan classifications remain visible.",
+    "No authority cutover occurs.",
+    "Machine-checkable cutover criteria are documented and not executed."
+  ],
+  "evidence_required": [
+    "Branch and commit SHA",
+    "PR URL",
+    "git diff --stat",
+    "Authority inventory table with SHA-256 per authority document",
+    "doc_authority.json cross-validation output",
+    "Per-registry coverage classification table",
+    "Per-registry verdict count table",
+    "Baseline size and per-registry breakdown",
+    "Python 3.9 test output",
+    "Python 3.11 test output",
+    "Two-build no-diff proof for parity artifacts",
+    "Mutation-test output for all six mutation cases",
+    "Proof that zero authored JSONL files were modified",
+    "GitHub Actions run URLs",
+    "Explicit confirmation that authority cutover was not performed",
+    "Explicit confirmation that no divergence was resolved by editing a registry record"
+  ],
+  "failure_handling": {
+    "fail_closed_conditions": [
+      "Predecessor plan not merged or build not deterministic",
+      "An authority document is missing or not declared in doc_authority.json",
+      "Any registry lacks a coverage classification",
+      "Any compared fact resolves to no verdict or to a verdict outside the closed taxonomy",
+      "Any authored JSONL record appears in the diff",
+      "Any authority, routing, doc_authority, or registry_index file appears in the diff",
+      "Parity engine writes during --check",
+      "parity_id proves unstable across runs or machines",
+      "Baseline is modified by tooling rather than by an authored, reviewed diff",
+      "Stale baseline entries present",
+      "Output variance between Python 3.9 and 3.11",
+      "Second build produces a diff",
+      "CI cannot execute"
+    ],
+    "response": [
+      "Stop the merge.",
+      "Preserve logs, diffs, and the parity report artifact.",
+      "Revert only the parity branch changes.",
+      "Classify the cause as adapter logic, normalization rule, authority drift, registry data defect, baseline hygiene, platform variance, or environmental CI blockage.",
+      "Open a focused issue for any data or governance conflict. Never resolve one inside this plan."
+    ],
+    "specific_trap": {
+      "name": "The tempting shortcut",
+      "description": "When parity reports a large number of divergences, the fastest way to a green build is to edit the authored registry records until they match the authority.",
+      "rule": "This is prohibited by scope and by the anti_pattern_warning in cutover_criteria. A large baseline is the correct, expected, honest result of the first parity run. It is the deliverable, not a failure."
+    }
+  },
+  "agent_final_response_contract": {
+    "must_report": [
+      "Files added and changed",
+      "Gaps closed",
+      "Authority inventory and cross-validation result",
+      "Per-registry coverage classification",
+      "Per-registry verdict counts",
+      "Baseline size and per-registry breakdown",
+      "Tests added",
+      "Commands executed",
+      "Exact validation results",
+      "Remaining blockers",
+      "PR URL and commit SHA",
+      "Confirmation that zero authored records changed",
+      "Confirmation that authority cutover was not performed"
+    ],
+    "must_not_claim": [
+      "The registries agree with reality, when only baselined comparison was performed",
+      "A registry is verified, when its coverage is no_declared_authority",
+      "Parity passed, when the pass was against a baseline of known divergences",
+      "Zero divergences, when divergences were baselined rather than resolved",
+      "Full comparison coverage, when not_comparable or unrepresentable counts are non-zero",
+      "Candidate registries are canonical",
+      "Python 3.9 support without executing Python 3.9",
+      "Determinism without two consecutive byte-stable builds",
+      "CI passed when jobs were blocked before execution",
+      "Cutover readiness for any registry whose baseline is non-empty"
+    ]
+  }
+}

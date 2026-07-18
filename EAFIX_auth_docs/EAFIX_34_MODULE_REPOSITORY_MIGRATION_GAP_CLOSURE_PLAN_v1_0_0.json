@@ -1,0 +1,1221 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "repository_module_migration_remediation_plan",
+  "plan_id": "EAFIX-34-MODULE-REPOSITORY-MIGRATION-GAP-CLOSURE-V1",
+  "plan_version": "1.0.0",
+  "status": "proposed",
+  "repository": "DICKY1987/eafix-modular",
+  "title": "Close the governance, ownership, packaging, and migration gaps in the proposed 34-module repository structure",
+  "objective": "Extend the existing module-folder naming and migration plan into a complete, deterministic, evidence-backed repository migration plan. The completed plan must ratify the 34-module identity authority and locator assignments, resolve naming conflicts, define module and global folder profiles, map every tracked repository path to an approved disposition, resolve shared-file ownership, generate the target tree and rename maps deterministically, migrate in controlled waves, preserve runtime and build behavior, and enforce the final structure in CI.",
+  "supersedes_or_extends": {
+    "extends": [
+      "EAFIX Module Folder Naming and Migration Plan.txt",
+      "EAFIX-MODULE-FOLDER-NAMING-V1 Version.txt"
+    ],
+    "incorporates_target_structure_from": [
+      "EAFIX_PROPOSED_34_MODULE_FILE_TREE(1).md"
+    ],
+    "duplicate_handling": {
+      "finding": "The two naming-plan text files are content-identical and must not remain independent authorities.",
+      "required_action": "Select one canonical plan filename, classify the duplicate as superseded or delete it through the repository documentation-governance process, and update routing/authority references."
+    }
+  },
+  "authority_and_routing": {
+    "routing_authority": "eafix_project_knowledge_reference_routing_instructions.json",
+    "matched_routes": [
+      "ROUTE_MODULE_ARCHITECTURE",
+      "architecture_review",
+      "implementation_planning",
+      "validation_or_test_design"
+    ],
+    "required_reference_documents": [
+      "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+      "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+      "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+      "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/EAFIX-Modular — End-to-End Module Map.txt",
+      "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv",
+      "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_services_ai_reference_20260510.json",
+      "EAFIX_auth_docs/00_doc_control_and_authority/doc_authority.json",
+      "EAFIX_auth_docs/module_naming_governance.json"
+    ],
+    "additional_required_for_34_module_ratification": [
+      "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json",
+      "EAFIX_auth_docs/manifests/module_manifests/*.manifest.json",
+      "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/EAFIX module reconciliation worksheet.md",
+      "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/EAFIX module reconciliation worksheet.csv"
+    ],
+    "authority_priority": [
+      "Ratified 34-module identity authority created by this plan",
+      "Active canonical governance JSON",
+      "Current machine-readable module and process catalogs",
+      "Physical file-to-module mapping",
+      "Human-readable architecture maps",
+      "Generated/session-derived service references",
+      "Proposed target-tree documents"
+    ],
+    "conflict_rule": "A proposed tree or narrative plan cannot override an active canonical governance record. Conflicts must be resolved through a recorded human decision, MCR, authority update, or explicit supersession before migration."
+  },
+  "problem_register": [
+    {
+      "problem_id": "P-01",
+      "title": "Unratified 34-module identity authority",
+      "severity": "blocker",
+      "description": "The current canonical module catalog contains 27 modules, while the vNext file declares 34 but contains an empty modules array. The 34-module manifests are a de facto source but are not yet the governance-recognized identity authority."
+    },
+    {
+      "problem_id": "P-02",
+      "title": "Unratified M0001-M0034 locator assignments",
+      "severity": "blocker",
+      "description": "The proposed tree assigns locators in numeric-ID order, but the naming plan requires explicit, permanent, non-derived locator assignments."
+    },
+    {
+      "problem_id": "P-03",
+      "title": "Conflicting manifest filename convention",
+      "severity": "high",
+      "description": "The plan/tree use a single underscore between module ID and canonical symbol, while current naming governance requires a double underscore."
+    },
+    {
+      "problem_id": "P-04",
+      "title": "F4_FLOW_ORCHESTRATOR rename is not fully governed",
+      "severity": "blocker",
+      "description": "F4 is the intended collision resolution, but current naming governance still identifies the change as pending an accepted rename-symbol MCR."
+    },
+    {
+      "problem_id": "P-05",
+      "title": "Universal target tree conflicts with evidence-based container instantiation",
+      "severity": "high",
+      "description": "The target tree shows nearly every baseline container for every module, while the naming plan forbids creating unsupported empty folders and requires a per-module container inventory."
+    },
+    {
+      "problem_id": "P-06",
+      "title": "No governed nested module profiles",
+      "severity": "high",
+      "description": "Python, MT4, UI, mixed-runtime, shared-kernel, and documentation-only modules need different nested structures, but the current plan governs only module roots and first-level containers."
+    },
+    {
+      "problem_id": "P-07",
+      "title": "Module-root artifacts are not governed",
+      "severity": "high",
+      "description": "The proposed tree requires .module-id, manifest, AGENTS.md, README.md, and sometimes pyproject.toml, but the plan does not define required/optional root artifacts, generators, or validators."
+    },
+    {
+      "problem_id": "P-08",
+      "title": "Packaging model is unresolved",
+      "severity": "blocker",
+      "description": "The naming-plan example includes per-module pyproject.toml files, while the proposed tree shows only a repository-root pyproject.toml."
+    },
+    {
+      "problem_id": "P-09",
+      "title": "Global repository roots are outside current plan scope",
+      "severity": "high",
+      "description": "architecture, contracts, governance, integration-tests, tools, EAFIX_auth_docs, .github, and .state are shown in the target tree without governed ownership, migration, or validation rules."
+    },
+    {
+      "problem_id": "P-10",
+      "title": "Global contract schemas versus module-local schemas is unresolved",
+      "severity": "blocker",
+      "description": "The target retains global contracts while every module receives schemas. Canonical ownership, references, projections, compatibility policy, and duplicate prevention are undefined."
+    },
+    {
+      "problem_id": "P-11",
+      "title": "No complete file-destination matrix",
+      "severity": "blocker",
+      "description": "The proposed tree requires every existing repository path to reach an approved destination, but the current plan explicitly excludes deciding which files belong to which modules."
+    },
+    {
+      "problem_id": "P-12",
+      "title": "Multi-module and unmapped files have no disposition policy",
+      "severity": "blocker",
+      "description": "Current service files can map to multiple modules and several shared/UI files have no canonical module assignment. A one-path-one-destination rule cannot be applied without split, wrapper, shared, or compatibility-layer decisions."
+    },
+    {
+      "problem_id": "P-13",
+      "title": "Global .state contract is undefined",
+      "severity": "medium",
+      "description": "The target tree contains a global .state directory, but committed/generated/runtime contents and its relationship to the plan's no-permanent-folder-index rule are undefined."
+    },
+    {
+      "problem_id": "P-14",
+      "title": "The proposed tree is hand-authored instead of generated from ratified inputs",
+      "severity": "high",
+      "description": "The tree can drift from identity, container, profile, packaging, and root-artifact decisions unless it becomes a generated artifact."
+    }
+  ],
+  "global_constraints": {
+    "no_physical_migration_before_preflight": true,
+    "no_fabricated_ownership": "No file, folder, schema, package, or contract may be assigned to a module without an evidence reference or an explicit human decision record.",
+    "one_identity_source": "After ratification, all generators and validators must consume one current 34-module authority.",
+    "locator_permanence": "Locators are assigned once, stored explicitly with module identity, never inferred at runtime, and never reused after retirement.",
+    "naming_governance_first": "Folder generation must not proceed while the manifest separator or F4 symbol conflict remains open.",
+    "no_unsupported_empty_folders": "The generated tree may contain only containers and nested folders approved by the module inventory and profile policy, except where a tool requires an empty directory and that exception is documented.",
+    "single_schema_authority": "A contract shape has exactly one canonical definition. Module-local schema areas may contain references, projections, examples, or module-private schemas, but must not duplicate canonical cross-module schemas.",
+    "deterministic_generation": "Same approved inputs must produce byte-identical trees, rename maps, inventories, and reports.",
+    "report_only_before_blocking": "New structural validators begin in report-only mode and become blocking only after a clean baseline.",
+    "write_allowlists": "Every implementation task must declare an explicit write allowlist and forbidden paths.",
+    "archive_immunity": "Superseded/archive areas cannot be used as current authority and cannot be modified unless a task explicitly governs archival cleanup.",
+    "rollback_required": "Every move or split must have an executable rollback entry and a pre-migration checkpoint.",
+    "branch_policy": "Use an approved non-default branch; no direct push to master."
+  },
+  "human_decision_register": [
+    {
+      "decision_id": "HD-01",
+      "title": "Ratify the 34-module identity authority",
+      "options": [
+        "Populate and ratify the existing vNext catalog",
+        "Create atomic_module_catalog.current.json from the 34 approved manifests",
+        "Adopt another machine-readable current pointer that contains all 34 records"
+      ],
+      "required_output": "module_identity_ratification.json",
+      "blocking": true
+    },
+    {
+      "decision_id": "HD-02",
+      "title": "Ratify M0001-M0034 locator assignments",
+      "options": [
+        "Approve the proposed mapping in numeric-ID order",
+        "Approve a different permanent mapping"
+      ],
+      "required_output": "module_locator_assignments.json",
+      "blocking": true
+    },
+    {
+      "decision_id": "HD-03",
+      "title": "Resolve manifest filename separator",
+      "options": [
+        "Use the governed double underscore",
+        "Amend module_naming_governance.json to approve the single underscore"
+      ],
+      "recommended_option": "Use the governed double underscore",
+      "blocking": true
+    },
+    {
+      "decision_id": "HD-04",
+      "title": "Complete the F4_FLOW_ORCHESTRATOR rename governance",
+      "options": [
+        "Accept the existing/intended RENAME_SYMBOL MCR",
+        "Create and accept a new RENAME_SYMBOL MCR",
+        "Reject F4 and select another collision-free canonical symbol"
+      ],
+      "blocking": true
+    },
+    {
+      "decision_id": "HD-05",
+      "title": "Choose the Python packaging model",
+      "options": [
+        "One repository-root pyproject.toml",
+        "Per-module pyproject.toml for independently packaged modules",
+        "Workspace root plus selected independently packaged modules"
+      ],
+      "blocking": true
+    },
+    {
+      "decision_id": "HD-06",
+      "title": "Approve the global contract and module-schema ownership model",
+      "recommended_option": "Global contracts owns canonical cross-module and external-boundary schemas; module schema folders hold references, examples, projections, and module-private schemas.",
+      "blocking": true
+    },
+    {
+      "decision_id": "HD-07",
+      "title": "Approve treatment of multi-module and unmapped files",
+      "allowed_dispositions": [
+        "move_intact_to_single_owner",
+        "split_into_module_owned_files",
+        "retain_in_global_shared_location",
+        "retain_in_service_compatibility_layer",
+        "generate_wrapper_or_adapter",
+        "archive",
+        "needs_review"
+      ],
+      "blocking": true
+    },
+    {
+      "decision_id": "HD-08",
+      "title": "Define the committed versus runtime contents of global .state",
+      "blocking": false
+    }
+  ],
+  "artifact_model": {
+    "authored_artifacts": [
+      {
+        "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/module_identity_ratification.json",
+        "purpose": "Governance-approved 34-module identity set and authority transition"
+      },
+      {
+        "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/module_locator_assignments.json",
+        "purpose": "Permanent explicit module locator assignments"
+      },
+      {
+        "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/old_catalog_to_34_crosswalk.json",
+        "purpose": "27/28/34 identity and alias reconciliation"
+      },
+      {
+        "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/module_container_inventory.json",
+        "purpose": "Approved first-level containers instantiated by each module"
+      },
+      {
+        "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/module_folder_profiles.json",
+        "purpose": "Approved nested folder profiles by module/runtime type"
+      },
+      {
+        "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/module_root_artifact_inventory.json",
+        "purpose": "Required and optional files at each module root"
+      },
+      {
+        "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/global_root_policy.json",
+        "purpose": "Ownership and governance of non-module repository roots"
+      },
+      {
+        "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/schema_placement_policy.json",
+        "purpose": "Canonical schema ownership, references, projections, and duplicate-prevention rules"
+      },
+      {
+        "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/packaging_decision.json",
+        "purpose": "Root, workspace, and per-module packaging decision"
+      },
+      {
+        "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/shared_file_resolution_decisions.json",
+        "purpose": "Human-approved dispositions for multi-module and unmapped files"
+      }
+    ],
+    "generated_artifacts": [
+      {
+        "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/file_destination_matrix.generated.json",
+        "purpose": "One record for every tracked source path and its approved target disposition"
+      },
+      {
+        "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/MODULE_FOLDER_TREE.generated.md",
+        "purpose": "Generated target repository tree"
+      },
+      {
+        "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/module_folder_rename_map.generated.json",
+        "purpose": "Approved source-to-target path map"
+      },
+      {
+        "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/module_folder_path_impact_report.generated.json",
+        "purpose": "References requiring updates across code, CI, packaging, docs, Docker, PowerShell, and MT4"
+      },
+      {
+        "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/module_folder_rollback_map.generated.json",
+        "purpose": "Executable inverse map for migration rollback"
+      },
+      {
+        "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/module_folder_validation_report.generated.json",
+        "purpose": "Structural compliance and migration verification"
+      },
+      {
+        "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/shared_file_resolution_report.generated.json",
+        "purpose": "Status and evidence report for multi-owner and unmapped paths"
+      },
+      {
+        "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/global_root_inventory.generated.json",
+        "purpose": "Inventory and destination status for non-module top-level paths"
+      }
+    ],
+    "generated_file_rule": "Generated artifacts must not be hand-edited."
+  },
+  "module_profile_model": {
+    "required_profiles": [
+      {
+        "profile_id": "PYTHON_STANDARD",
+        "applies_to": "Python-only atomic modules",
+        "nested_structure": {
+          "src": [
+            "<python_package_name>/"
+          ],
+          "tests": [
+            "unit/",
+            "integration/",
+            "contract/",
+            "acceptance/"
+          ],
+          "docs": [
+            "architecture/",
+            "decisions/",
+            "runbook/",
+            "failure-modes/"
+          ],
+          "schemas": [
+            "inputs/",
+            "outputs/",
+            "examples/"
+          ]
+        }
+      },
+      {
+        "profile_id": "MT4_NATIVE",
+        "applies_to": "MQL4/MT4-native modules",
+        "nested_structure": {
+          "src": [
+            "Experts/",
+            "Indicators/",
+            "Include/"
+          ],
+          "tests": [
+            "unit/",
+            "integration/",
+            "contract/",
+            "acceptance/"
+          ],
+          "docs": [
+            "architecture/",
+            "decisions/",
+            "runbook/",
+            "failure-modes/"
+          ],
+          "schemas": [
+            "inputs/",
+            "outputs/",
+            "examples/"
+          ]
+        }
+      },
+      {
+        "profile_id": "MIXED_PYTHON_MT4",
+        "applies_to": "Bridge/transport modules spanning Python and MQL4",
+        "nested_structure": {
+          "src": [
+            "python/",
+            "Experts/",
+            "Indicators/",
+            "Include/"
+          ],
+          "tests": [
+            "unit/",
+            "integration/",
+            "contract/",
+            "acceptance/"
+          ]
+        }
+      },
+      {
+        "profile_id": "UI_FULL_STACK",
+        "applies_to": "Modules containing distinct backend and frontend implementations",
+        "nested_structure": {
+          "src": [
+            "backend/",
+            "frontend/"
+          ],
+          "tests": [
+            "unit/",
+            "integration/",
+            "contract/",
+            "acceptance/"
+          ]
+        }
+      },
+      {
+        "profile_id": "SHARED_KERNEL",
+        "applies_to": "Reusable shared-kernel modules",
+        "nested_structure": {
+          "src": [
+            "<python_package_name>/"
+          ],
+          "tests": [
+            "unit/",
+            "integration/",
+            "contract/",
+            "acceptance/"
+          ],
+          "examples": []
+        }
+      },
+      {
+        "profile_id": "DOCUMENTATION_ONLY",
+        "applies_to": "Modules without executable implementation files",
+        "nested_structure": {
+          "docs": [
+            "architecture/",
+            "decisions/",
+            "runbook/",
+            "failure-modes/"
+          ],
+          "schemas": [
+            "inputs/",
+            "outputs/",
+            "examples/"
+          ],
+          "context": []
+        }
+      }
+    ],
+    "profile_rule": "Every module must select exactly one primary profile and may declare evidence-backed profile extensions. Folders not required by the selected profile or container inventory must not be generated."
+  },
+  "file_destination_record_schema": {
+    "required_fields": [
+      "source_path",
+      "path_type",
+      "tracked",
+      "current_owner_modules",
+      "current_global_owner",
+      "evidence_refs",
+      "ownership_status",
+      "approved_disposition",
+      "target_path_or_paths",
+      "split_spec_ref",
+      "wrapper_or_adapter_ref",
+      "path_consumers",
+      "migration_wave",
+      "rollback_paths",
+      "human_decision_ref",
+      "validation_refs"
+    ],
+    "ownership_status_values": [
+      "single_module",
+      "multi_module",
+      "global_shared",
+      "unmapped",
+      "generated",
+      "runtime_only",
+      "archive",
+      "needs_review"
+    ],
+    "approved_disposition_values": [
+      "move",
+      "rename_in_place",
+      "split",
+      "retain_global",
+      "retain_compatibility_layer",
+      "generate_wrapper",
+      "archive",
+      "exclude_runtime_generated",
+      "needs_review"
+    ]
+  },
+  "workstreams": [
+    {
+      "workstream_id": "WSP",
+      "title": "Preflight freeze and authority validation",
+      "depends_on": [],
+      "problem_refs": [
+        "P-01",
+        "P-14"
+      ],
+      "tasks": [
+        {
+          "task_id": "WSP-T1",
+          "title": "Freeze repository baseline",
+          "human_gate": false,
+          "steps": [
+            "Record branch, commit SHA, tracked file list, symlinks, submodules, ignored generated paths, and current top-level tree.",
+            "Validate that the three source documents are present and record hashes.",
+            "Verify that the two naming-plan text files are identical."
+          ],
+          "outputs": [
+            "repository_migration_baseline.generated.json",
+            "source_document_hashes.generated.json"
+          ],
+          "acceptance_criteria": [
+            "Every tracked path is present exactly once in the baseline inventory.",
+            "The duplicate-plan finding is deterministically confirmed."
+          ]
+        },
+        {
+          "task_id": "WSP-T2",
+          "title": "Select the canonical naming-plan document",
+          "human_gate": true,
+          "steps": [
+            "Choose the surviving filename.",
+            "Mark the duplicate as superseded or delete it through documentation governance.",
+            "Update doc authority and routing only after the human decision."
+          ],
+          "acceptance_criteria": [
+            "Exactly one active naming-plan authority remains.",
+            "No routing or authority record points to the retired duplicate."
+          ]
+        }
+      ]
+    },
+    {
+      "workstream_id": "WS1",
+      "title": "Ratify module identities, symbols, and locators",
+      "depends_on": [
+        "WSP"
+      ],
+      "problem_refs": [
+        "P-01",
+        "P-02",
+        "P-04"
+      ],
+      "tasks": [
+        {
+          "task_id": "WS1-T1",
+          "title": "Build the 27/28/34 identity crosswalk",
+          "human_gate": false,
+          "steps": [
+            "Extract module records from module_catalog.json, the readable module map, the vNext decisions, and all 34 manifests.",
+            "Produce one row per identity with current ID, symbols, aliases, status, source authority, and unresolved conflict flags."
+          ],
+          "outputs": [
+            "old_catalog_to_34_crosswalk.json"
+          ],
+          "acceptance_criteria": [
+            "All 34 proposed module IDs appear exactly once.",
+            "Every old identity is mapped, retired, aliased, or explicitly unresolved."
+          ]
+        },
+        {
+          "task_id": "WS1-T2",
+          "title": "Resolve F4_FLOW_ORCHESTRATOR governance",
+          "human_gate": true,
+          "steps": [
+            "Locate or create the required RENAME_SYMBOL MCR.",
+            "Record F1_FLOW_ORCHESTRATOR as a legacy alias if F4 is accepted.",
+            "Preserve numeric module ID 50000000000000000025."
+          ],
+          "acceptance_criteria": [
+            "No active prefix+ordinal collision remains.",
+            "The accepted symbol is identical across identity authority, manifests, routing, crosswalks, and generated paths."
+          ]
+        },
+        {
+          "task_id": "WS1-T3",
+          "title": "Ratify the 34-module authority",
+          "human_gate": true,
+          "steps": [
+            "Select and populate the current machine-readable identity authority.",
+            "Include module_id, canonical_symbol, status, module_locator, and legacy_aliases for every module.",
+            "Update routing and document authority to recognize the ratified source."
+          ],
+          "outputs": [
+            "module_identity_ratification.json",
+            "module_locator_assignments.json"
+          ],
+          "acceptance_criteria": [
+            "Active module count equals 34.",
+            "IDs, symbols, and locators are each unique.",
+            "No locator is derived at validation time.",
+            "Older 25/27/28-module sources are explicitly classified as supporting, legacy, superseded, or partial."
+          ]
+        }
+      ]
+    },
+    {
+      "workstream_id": "WS2",
+      "title": "Resolve naming, packaging, and module-root artifact policy",
+      "depends_on": [
+        "WS1"
+      ],
+      "problem_refs": [
+        "P-03",
+        "P-07",
+        "P-08"
+      ],
+      "tasks": [
+        {
+          "task_id": "WS2-T1",
+          "title": "Resolve manifest filename convention",
+          "human_gate": true,
+          "steps": [
+            "Apply HD-03.",
+            "Update the naming specification and all target-tree templates to the accepted separator.",
+            "Add a validator for manifest filename, module ID, canonical symbol, and .module-id agreement."
+          ],
+          "acceptance_criteria": [
+            "One manifest filename convention is active.",
+            "All generated module paths use the same convention."
+          ]
+        },
+        {
+          "task_id": "WS2-T2",
+          "title": "Choose packaging model",
+          "human_gate": true,
+          "steps": [
+            "Inventory current package/import/build behavior.",
+            "Evaluate root-only, per-module, and workspace packaging against runtime and deployment requirements.",
+            "Record the accepted model and migration consequences."
+          ],
+          "outputs": [
+            "packaging_decision.json"
+          ],
+          "acceptance_criteria": [
+            "The target tree contains pyproject.toml files only where the decision requires them.",
+            "Build, install, test, and import commands are defined for the selected model."
+          ]
+        },
+        {
+          "task_id": "WS2-T3",
+          "title": "Define module-root artifact inventory",
+          "human_gate": true,
+          "steps": [
+            "Classify .module-id, manifest, README.md, AGENTS.md, pyproject.toml, and other root files as required, optional, generated, or prohibited by profile.",
+            "Define provenance and generation rules for README.md and AGENTS.md.",
+            "Forbid creation of empty generic context files without evidence."
+          ],
+          "outputs": [
+            "module_root_artifact_inventory.json"
+          ],
+          "acceptance_criteria": [
+            "Every module has an explicit root-artifact set.",
+            "Every required artifact has an owner, source, and validation rule."
+          ]
+        }
+      ]
+    },
+    {
+      "workstream_id": "WS3",
+      "title": "Define containers and nested module profiles",
+      "depends_on": [
+        "WS1",
+        "WS2"
+      ],
+      "problem_refs": [
+        "P-05",
+        "P-06"
+      ],
+      "tasks": [
+        {
+          "task_id": "WS3-T1",
+          "title": "Create module container inventory",
+          "human_gate": true,
+          "steps": [
+            "Derive current implementation needs from manifests, file mapping, runtime evidence, tests, and documentation.",
+            "Assign only first-level containers actually required by each module.",
+            "Record not_applicable reasons for omitted baseline containers."
+          ],
+          "outputs": [
+            "module_container_inventory.json",
+            "module_container_inventory.schema.json"
+          ],
+          "acceptance_criteria": [
+            "All 34 modules appear exactly once.",
+            "No unsupported container variant is used.",
+            "No empty folder is required solely for visual uniformity."
+          ]
+        },
+        {
+          "task_id": "WS3-T2",
+          "title": "Create nested module profiles",
+          "human_gate": true,
+          "steps": [
+            "Ratify Python, MT4-native, mixed-runtime, UI full-stack, shared-kernel, and documentation-only profiles.",
+            "Assign exactly one primary profile to each module.",
+            "Record evidence-backed extensions for exceptional modules."
+          ],
+          "outputs": [
+            "module_folder_profiles.json",
+            "module_folder_profiles.schema.json"
+          ],
+          "acceptance_criteria": [
+            "Every proposed nested folder is authorized by a profile or explicit extension.",
+            "Runtime-constrained directory names remain unchanged."
+          ]
+        }
+      ]
+    },
+    {
+      "workstream_id": "WS4",
+      "title": "Govern global roots, schemas, state, and integration assets",
+      "depends_on": [
+        "WS2",
+        "WS3"
+      ],
+      "problem_refs": [
+        "P-09",
+        "P-10",
+        "P-13"
+      ],
+      "tasks": [
+        {
+          "task_id": "WS4-T1",
+          "title": "Inventory and classify non-module top-level paths",
+          "human_gate": false,
+          "steps": [
+            "Inventory architecture, contracts, governance, integration-tests, tools, EAFIX_auth_docs, .github, .state, and all other top-level paths.",
+            "Classify each as canonical global root, migration candidate, compatibility root, generated root, runtime-only root, or archive."
+          ],
+          "outputs": [
+            "global_root_inventory.generated.json"
+          ],
+          "acceptance_criteria": [
+            "Every current and proposed non-module root is classified."
+          ]
+        },
+        {
+          "task_id": "WS4-T2",
+          "title": "Approve global root policy",
+          "human_gate": true,
+          "steps": [
+            "Define purpose, owner, allowed content, prohibited content, naming, validation, and migration rules for each global root.",
+            "Define the relationship between integration-tests and module-local tests."
+          ],
+          "outputs": [
+            "global_root_policy.json"
+          ],
+          "acceptance_criteria": [
+            "No global root exists solely because it appeared in the proposed tree.",
+            "Every retained global root has an explicit authority and owner."
+          ]
+        },
+        {
+          "task_id": "WS4-T3",
+          "title": "Approve schema placement policy",
+          "human_gate": true,
+          "steps": [
+            "Classify schemas as cross-module canonical, external-boundary canonical, module-private, projection, example, or compatibility schema.",
+            "Define reference direction and prohibit copied canonical definitions.",
+            "Define compatibility/versioning checks."
+          ],
+          "outputs": [
+            "schema_placement_policy.json"
+          ],
+          "acceptance_criteria": [
+            "Every schema file has exactly one canonical owner.",
+            "Duplicate canonical schema definitions equal zero.",
+            "Module-local schemas cannot silently override global contracts."
+          ]
+        },
+        {
+          "task_id": "WS4-T4",
+          "title": "Define global .state contract",
+          "human_gate": true,
+          "steps": [
+            "Classify each state artifact as committed-generated, ignored-runtime, or prohibited.",
+            "Define regeneration, cleanup, and validation behavior.",
+            "Resolve whether any path index is permitted and ensure it does not become a second identity authority."
+          ],
+          "acceptance_criteria": [
+            "Committed state is deterministic.",
+            "Runtime state is ignored and reproducible.",
+            "No permanent folder registry conflicts with the ratified identity authority."
+          ]
+        }
+      ]
+    },
+    {
+      "workstream_id": "WS5",
+      "title": "Map every repository path and resolve shared ownership",
+      "depends_on": [
+        "WS1",
+        "WS3",
+        "WS4"
+      ],
+      "problem_refs": [
+        "P-11",
+        "P-12"
+      ],
+      "tasks": [
+        {
+          "task_id": "WS5-T1",
+          "title": "Generate initial file-destination matrix",
+          "human_gate": false,
+          "steps": [
+            "Join the tracked-file baseline with file_module_mapping.csv, module manifests, service references, test references, packaging metadata, and global-root policy.",
+            "Emit unresolved records rather than guessing."
+          ],
+          "outputs": [
+            "file_destination_matrix.generated.json"
+          ],
+          "acceptance_criteria": [
+            "Every tracked source path appears exactly once as a source record.",
+            "No multi-owner file is silently assigned to one module.",
+            "No unmapped path is omitted."
+          ]
+        },
+        {
+          "task_id": "WS5-T2",
+          "title": "Resolve multi-module service files",
+          "human_gate": true,
+          "steps": [
+            "Review calendar-ingestor files jointly mapped to D2, D3, F2, and D4.",
+            "Review reentry-engine files jointly mapped to E1, E2, and E4.",
+            "Review transport-router files jointly mapped to R2, O1, and B1.",
+            "For each file, approve move, split, shared compatibility layer, wrapper, or archive."
+          ],
+          "outputs": [
+            "shared_file_resolution_decisions.json"
+          ],
+          "acceptance_criteria": [
+            "Every multi-owner file has one approved disposition.",
+            "Every split has a split specification and behavioral equivalence test."
+          ]
+        },
+        {
+          "task_id": "WS5-T3",
+          "title": "Resolve unmapped shared and UI files",
+          "human_gate": true,
+          "steps": [
+            "Review shared/idempotency, shared plugin, shared/reentry, shared/positioning, dashboard, GUI, desktop UI, and other unmapped paths.",
+            "Assign a module, retain globally, create a compatibility location, archive, or leave needs_review with an owner and deadline."
+          ],
+          "acceptance_criteria": [
+            "Unmapped tracked paths equal zero before physical migration.",
+            "Every globally retained implementation file has a justified global owner."
+          ]
+        },
+        {
+          "task_id": "WS5-T4",
+          "title": "Finalize destination and split specifications",
+          "human_gate": true,
+          "steps": [
+            "Populate target_path_or_paths, migration wave, rollback path, path consumers, and validation refs.",
+            "Freeze the matrix with a content hash."
+          ],
+          "acceptance_criteria": [
+            "Every tracked path has a non-needs_review disposition.",
+            "Every move and split has an inverse rollback instruction.",
+            "The matrix hash is referenced by all generated migration artifacts."
+          ]
+        }
+      ]
+    },
+    {
+      "workstream_id": "WS6",
+      "title": "Build deterministic generators, validators, and impact analysis",
+      "depends_on": [
+        "WS1",
+        "WS2",
+        "WS3",
+        "WS4",
+        "WS5"
+      ],
+      "problem_refs": [
+        "P-14"
+      ],
+      "tasks": [
+        {
+          "task_id": "WS6-T1",
+          "title": "Generate the authoritative target tree",
+          "human_gate": false,
+          "steps": [
+            "Generate module roots from the ratified identity authority and locator assignments.",
+            "Generate first-level containers from module_container_inventory.json.",
+            "Generate nested folders from module_folder_profiles.json.",
+            "Generate root artifacts from module_root_artifact_inventory.json.",
+            "Generate global roots from global_root_policy.json."
+          ],
+          "outputs": [
+            "MODULE_FOLDER_TREE.generated.md"
+          ],
+          "acceptance_criteria": [
+            "The generated tree contains 34 unique module roots.",
+            "No hand-authored target-tree path exists without an approved source rule.",
+            "Repeated generation is byte-identical."
+          ]
+        },
+        {
+          "task_id": "WS6-T2",
+          "title": "Generate rename, rollback, and impact maps",
+          "human_gate": false,
+          "steps": [
+            "Generate source-to-target operations from the frozen destination matrix.",
+            "Generate exact inverse rollback operations.",
+            "Scan source, tests, docs, workflows, Docker, PowerShell, packaging, MT4 includes, configuration, and scripts for path consumers."
+          ],
+          "outputs": [
+            "module_folder_rename_map.generated.json",
+            "module_folder_rollback_map.generated.json",
+            "module_folder_path_impact_report.generated.json"
+          ],
+          "acceptance_criteria": [
+            "Every move has exactly one rollback operation.",
+            "Every path reference is classified as update_required, generated, runtime-only, false_positive, or needs_review.",
+            "Unresolved path consumers equal zero before each migration wave."
+          ]
+        },
+        {
+          "task_id": "WS6-T3",
+          "title": "Implement structural validator",
+          "human_gate": false,
+          "steps": [
+            "Validate identity, locator, root name, .module-id, manifest filename, container inventory, profile structure, root artifacts, global roots, schema ownership, destination completeness, and duplicate paths.",
+            "Add report-only CI workflow."
+          ],
+          "acceptance_criteria": [
+            "Validator can run on the pre-migration and proposed-tree states.",
+            "All findings have stable rule IDs and machine-readable output."
+          ]
+        }
+      ]
+    },
+    {
+      "workstream_id": "WS7",
+      "title": "Run controlled pilot migrations",
+      "depends_on": [
+        "WS6"
+      ],
+      "problem_refs": [
+        "P-05",
+        "P-06",
+        "P-07",
+        "P-11",
+        "P-12"
+      ],
+      "tasks": [
+        {
+          "task_id": "WS7-T1",
+          "title": "Select pilots",
+          "human_gate": true,
+          "selection_rules": [
+            "One low-dependency Python module with single-owner files",
+            "One shared-kernel or documentation-light module",
+            "One mixed-runtime or MT4-sensitive module only after the first two pass"
+          ],
+          "acceptance_criteria": [
+            "Pilot selection covers at least two profile types.",
+            "No pilot includes an unresolved multi-owner path."
+          ]
+        },
+        {
+          "task_id": "WS7-T2",
+          "title": "Execute report-only pilot dry runs",
+          "human_gate": false,
+          "steps": [
+            "Apply operations in a temporary worktree or disposable branch.",
+            "Update path consumers.",
+            "Run structure, import, test, packaging, documentation-link, Docker, PowerShell, and MT4 checks as applicable.",
+            "Apply rollback and verify return to the exact baseline."
+          ],
+          "acceptance_criteria": [
+            "Forward migration passes all applicable gates.",
+            "Rollback restores byte-identical tracked content and expected paths.",
+            "No hidden dependency remains unclassified."
+          ]
+        },
+        {
+          "task_id": "WS7-T3",
+          "title": "Approve pilot results",
+          "human_gate": true,
+          "acceptance_criteria": [
+            "Pilot validation report is clean.",
+            "Any discovered rule changes are applied to authored inputs and generators, not patched into generated outputs."
+          ]
+        }
+      ]
+    },
+    {
+      "workstream_id": "WS8",
+      "title": "Execute repository-wide migration waves",
+      "depends_on": [
+        "WS7"
+      ],
+      "tasks": [
+        {
+          "task_id": "WS8-T1",
+          "title": "Wave 1 — governance and documentation pointers",
+          "human_gate": true,
+          "scope": [
+            "Ratified authority updates",
+            "Routing updates",
+            "Canonical plan consolidation",
+            "Generated target tree and reports"
+          ],
+          "acceptance_criteria": [
+            "Governance is internally consistent before code movement."
+          ]
+        },
+        {
+          "task_id": "WS8-T2",
+          "title": "Wave 2 — single-owner Python modules",
+          "human_gate": true,
+          "acceptance_criteria": [
+            "Imports, tests, packaging, and service startup checks pass."
+          ]
+        },
+        {
+          "task_id": "WS8-T3",
+          "title": "Wave 3 — UI and shared-kernel modules",
+          "human_gate": true,
+          "acceptance_criteria": [
+            "Backend/frontend, plugin, idempotency, and UI contract checks pass."
+          ]
+        },
+        {
+          "task_id": "WS8-T4",
+          "title": "Wave 4 — split multi-module services",
+          "human_gate": true,
+          "acceptance_criteria": [
+            "Behavioral equivalence tests pass.",
+            "No compatibility wrapper is removed before all consumers migrate."
+          ]
+        },
+        {
+          "task_id": "WS8-T5",
+          "title": "Wave 5 — MT4 and mixed-runtime modules",
+          "human_gate": true,
+          "acceptance_criteria": [
+            "MQL4 include paths, Experts/Indicators placement, terminal deployment scripts, and bridge integration tests pass."
+          ]
+        },
+        {
+          "task_id": "WS8-T6",
+          "title": "Wave 6 — global roots and cleanup",
+          "human_gate": true,
+          "acceptance_criteria": [
+            "Global root policy passes.",
+            "No tracked source path remains at an unapproved legacy location.",
+            "Archives are not routed as active authority."
+          ]
+        }
+      ]
+    },
+    {
+      "workstream_id": "WS9",
+      "title": "Final verification and CI enforcement",
+      "depends_on": [
+        "WS8"
+      ],
+      "tasks": [
+        {
+          "task_id": "WS9-T1",
+          "title": "Run clean-clone verification",
+          "human_gate": false,
+          "steps": [
+            "Clone the migrated branch into a clean environment.",
+            "Regenerate all generated artifacts.",
+            "Run structural validation, all applicable tests, builds, packaging checks, docs-link checks, workflows, Docker checks, PowerShell checks, and MT4 checks.",
+            "Compare generated artifacts with committed generated outputs."
+          ],
+          "acceptance_criteria": [
+            "Generated artifact drift equals zero.",
+            "Unmapped paths equal zero.",
+            "Unresolved ownership decisions equal zero.",
+            "Missing path references equal zero.",
+            "Duplicate module roots, IDs, locators, symbols, and canonical schemas equal zero."
+          ]
+        },
+        {
+          "task_id": "WS9-T2",
+          "title": "Switch structural validation from report-only to blocking",
+          "human_gate": true,
+          "acceptance_criteria": [
+            "The clean baseline passes all blocking structural rules.",
+            "The workflow protects the default branch and pull requests."
+          ]
+        },
+        {
+          "task_id": "WS9-T3",
+          "title": "Publish migration completion record",
+          "human_gate": true,
+          "outputs": [
+            "module_repository_migration_completion_report.json"
+          ],
+          "acceptance_criteria": [
+            "Completion report references baseline SHA, final SHA, authority versions, decision records, artifact hashes, validation results, and rollback retention policy."
+          ]
+        }
+      ]
+    }
+  ],
+  "execution_order": [
+    "WSP",
+    "WS1",
+    "WS2",
+    "WS3",
+    "WS4",
+    "WS5",
+    "WS6",
+    "WS7",
+    "WS8",
+    "WS9"
+  ],
+  "migration_wave_gate": {
+    "required_before_each_wave": [
+      "Approved source-to-target operations",
+      "Zero needs_review path consumers in wave scope",
+      "Executable rollback operations",
+      "Clean pre-wave working tree",
+      "Baseline commit or tag",
+      "Applicable tests identified",
+      "Human approval"
+    ],
+    "automatic_stop_conditions": [
+      "Unexpected tracked file modification",
+      "Unmapped file discovered",
+      "Import or packaging failure",
+      "Schema authority duplication",
+      "MQL4 include/deployment failure",
+      "Rollback verification failure",
+      "Generated artifact drift",
+      "Validator rule regression"
+    ]
+  },
+  "validation_rules": [
+    {
+      "rule_id": "V-001",
+      "description": "Exactly 34 active canonical module records exist."
+    },
+    {
+      "rule_id": "V-002",
+      "description": "Module IDs, canonical symbols, and locators are unique."
+    },
+    {
+      "rule_id": "V-003",
+      "description": "Each module root matches locator plus kebab-case canonical symbol."
+    },
+    {
+      "rule_id": "V-004",
+      "description": ".module-id content matches the ratified module ID."
+    },
+    {
+      "rule_id": "V-005",
+      "description": "Manifest filename, manifest identity, folder identity, and .module-id agree."
+    },
+    {
+      "rule_id": "V-006",
+      "description": "Every first-level module container is approved in the container inventory."
+    },
+    {
+      "rule_id": "V-007",
+      "description": "Every nested folder is allowed by the selected module profile or extension."
+    },
+    {
+      "rule_id": "V-008",
+      "description": "Every required module-root artifact exists; prohibited artifacts do not exist."
+    },
+    {
+      "rule_id": "V-009",
+      "description": "Every tracked baseline path has an approved final disposition."
+    },
+    {
+      "rule_id": "V-010",
+      "description": "Every multi-owner or unmapped file has a human decision record."
+    },
+    {
+      "rule_id": "V-011",
+      "description": "Every move or split has an executable rollback entry."
+    },
+    {
+      "rule_id": "V-012",
+      "description": "Every retained global root complies with global_root_policy.json."
+    },
+    {
+      "rule_id": "V-013",
+      "description": "Every canonical schema has exactly one authority location."
+    },
+    {
+      "rule_id": "V-014",
+      "description": "Generated artifacts are current and byte-identical after regeneration."
+    },
+    {
+      "rule_id": "V-015",
+      "description": "No active authority or runtime path points to a retired legacy location."
+    },
+    {
+      "rule_id": "V-016",
+      "description": "No unsupported empty folder is committed."
+    }
+  ],
+  "definition_of_done": [
+    "One governance-recognized, populated 34-module identity authority exists.",
+    "All 34 permanent locator assignments are ratified.",
+    "F4_FLOW_ORCHESTRATOR and manifest filename governance conflicts are closed.",
+    "The packaging model is recorded and implemented.",
+    "Every module has an approved container inventory, profile, and root-artifact inventory.",
+    "Every non-module root has an approved global-root policy.",
+    "Canonical schema ownership and module-local schema use are unambiguous.",
+    "Every tracked source path has one approved disposition with evidence and rollback.",
+    "Every multi-module or previously unmapped file has an approved resolution.",
+    "The target tree, rename map, impact report, rollback map, and validation report are generated deterministically.",
+    "Pilot migrations and rollback tests pass.",
+    "All migration waves pass applicable runtime, test, packaging, documentation, Docker, PowerShell, and MT4 checks.",
+    "Clean-clone regeneration produces zero drift.",
+    "Blocking CI prevents structural drift after migration."
+  ],
+  "out_of_scope": [
+    "Changing module responsibilities or contracts except where required to resolve identity or ownership conflicts",
+    "Adding, removing, merging, or splitting canonical modules outside an approved MCR",
+    "Refactoring business logic not required for file decomposition or path migration",
+    "Treating the proposed tree as authority before it is regenerated from approved inputs",
+    "Creating empty folders solely for visual symmetry"
+  ]
+}

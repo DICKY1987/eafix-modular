@@ -1,0 +1,2871 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "master_ssot_registry_system_implementation_plan",
+  "plan_id": "EAFIX-SSOT-REGISTRY-SYSTEM-MASTER-V1",
+  "plan_version": "1.0.0",
+  "status": "proposed_ready_for_governance_review",
+  "generated_at_utc": "2026-07-17T00:00:00Z",
+  "repository": {
+    "full_name": "DICKY1987/eafix-modular",
+    "default_branch_observed": "master",
+    "branch_rule": "Resolve the currently permitted branch namespace from repository rules before branch creation; never push directly to the default branch.",
+    "delivery_model": "one master plan executed through multiple bounded pull requests"
+  },
+  "title": "EAFIX Single-Source-of-Truth Registry System Master Implementation Plan",
+  "objective": {
+    "primary": "Deliver one governed registry system in which every authoritative fact has exactly one declared owner, stable identity, provenance, validation, deterministic projections, and an enforceable change path.",
+    "secondary": [
+      "Harden the existing ten-registry candidate implementation so it is deterministic, cross-reference safe, Python 3.9 compatible, and fully covered by no-write check mode.",
+      "Ratify the 34-module identity universe and permanent locators without allowing narrative plans or hand-authored trees to become authority.",
+      "Populate and reconcile module, process, contract, artifact, integration, operator, configuration, operational-control, reuse, and decision registries.",
+      "Create an explicit field-level authority map so schema files and specialized policy references remain canonical only for the facts they uniquely own.",
+      "Cut over routing and document authority only after candidate integrity and authority parity are proven.",
+      "Use the registry system to generate and validate the module-centric repository migration, including target tree, path maps, impact maps, rollback maps, and CI enforcement."
+    ],
+    "completion_definition": "The project has one active implementation plan, one machine-readable authority manifest, one canonical owner for every governed fact, complete and valid domain registries, deterministic generated views, a ratified 34-module set, a fully mapped repository, successful staged migration, clean-clone reproducibility, and blocking CI that prevents authority, registry, and structure drift."
+  },
+  "core_design_decision": {
+    "decision": "Do not collapse all project data into one monolithic registry file.",
+    "model": "Keep bounded domain registries, unify them through a canonical registry authority manifest, cross-registry graph, stable identifiers, and deterministic generated projections.",
+    "reason": [
+      "The existing implementation already separates ten domain registries.",
+      "A single giant data file would increase merge conflicts, validation blast radius, and ownership ambiguity.",
+      "Single source of truth means one authoritative owner per fact, not one physical file for every fact.",
+      "Field-level contract shapes remain canonical in schema files; registries store identities, links, producers, consumers, status, and provenance."
+    ]
+  },
+  "source_plan_consolidation": {
+    "consolidation_rule": "This master plan becomes the sole sequencing and implementation authority after approval. Source plans become provenance, superseded implementation plans, or non-authoritative reference inputs.",
+    "sources": [
+      {
+        "filename": "EAFIX_34_MODULE_REPOSITORY_MIGRATION_GAP_CLOSURE_PLAN_v1_0_0.json",
+        "sha256": "92be3505aff174fe91a1844d67d01d139fe9642bf4889373e193ee4653c8b847",
+        "role": "module identity, naming, packaging, ownership, repository migration, and structural validation track",
+        "disposition": "absorbed_and_superseded_after_master_plan_approval",
+        "content_preserved_in": [
+          "PHASE-05",
+          "PHASE-08",
+          "PHASE-09",
+          "PHASE-10",
+          "PHASE-11",
+          "PHASE-12",
+          "PHASE-13"
+        ]
+      },
+      {
+        "filename": "EAFIX Module Folder Naming and Migration Plan.txt",
+        "sha256": "b7a0369edf26c97171a54ea673b9ee220106d08487f8f2f9f8bf1e7d258f1645",
+        "role": "naming rules and migration mechanics",
+        "disposition": "convert_normative_rules_to_registry_backed_policy_then_supersede",
+        "content_preserved_in": [
+          "global_constraints",
+          "PHASE-05",
+          "PHASE-08",
+          "validation_catalog"
+        ]
+      },
+      {
+        "filename": "EAFIX-MODULE-FOLDER-NAMING-V1 Version.txt",
+        "sha256": "b7a0369edf26c97171a54ea673b9ee220106d08487f8f2f9f8bf1e7d258f1645",
+        "role": "byte-identical duplicate of the naming plan",
+        "disposition": "superseded_duplicate",
+        "duplicate_of": "EAFIX Module Folder Naming and Migration Plan.txt"
+      },
+      {
+        "filename": "EAFIX_PROPOSED_34_MODULE_FILE_TREE(1).md",
+        "sha256": "3be2e54dddc63086aab0659904dbe8665a460e236d1ad109dcf51435a69ed1fd",
+        "role": "proposed target visualization and seed expectations",
+        "disposition": "non_authoritative_reference_then_replace_with_generated_projection",
+        "content_preserved_in": [
+          "PHASE-10"
+        ]
+      },
+      {
+        "filename": "EAFIX_REGISTRY_POST_MERGE_REMEDIATION_IMPLEMENTATION_PLAN_v1_1_0.json",
+        "sha256": "5599abc4f4c7880c8757fb4786eaef6069da61631a508fd4b2fc995868f5d8b1",
+        "role": "registry engine determinism, candidate integrity, foreign-key baseline, authority-parity shadow, and CI remediation",
+        "disposition": "absorbed_and_superseded_after_master_plan_approval",
+        "content_preserved_in": [
+          "PHASE-00",
+          "PHASE-01",
+          "PHASE-02",
+          "PHASE-03",
+          "PHASE-13"
+        ]
+      },
+      {
+        "filename": "EAFIX_REGISTRY_POST_MERGE_REMEDIATION_IMPLEMENTATION_PLAN_v1_0_0.json",
+        "sha256": "d4da1e433183d27189d17f80678caa037590b479a5482ebcfc5c2ac1a81795fa",
+        "role": "superseded registry remediation baseline",
+        "disposition": "archive_as_superseded_provenance",
+        "superseded_by": "EAFIX_REGISTRY_POST_MERGE_REMEDIATION_IMPLEMENTATION_PLAN_v1_1_0.json"
+      },
+      {
+        "filename": "EAFIX_REGISTRY_POST_MERGE_REMEDIATION_PLAN_AMENDMENT_v1_0_1.json",
+        "sha256": "9b17283952ff05e3dd7c3e1590e5280d8df3dffaca74fb907dee39ed23915912",
+        "role": "amendment provenance explaining the v1.0.0 to v1.1.0 changes",
+        "disposition": "archive_as_applied_amendment_provenance",
+        "applied_to": "EAFIX_REGISTRY_POST_MERGE_REMEDIATION_IMPLEMENTATION_PLAN_v1_1_0.json"
+      }
+    ]
+  },
+  "routing_and_authority": {
+    "routing_authority": "eafix_project_knowledge_reference_routing_instructions.json",
+    "matched_routes": [
+      "architecture_review",
+      "implementation_planning",
+      "validation_or_test_design",
+      "code_modification",
+      "service_reuse_decision",
+      "mt4_integration_work",
+      "ui_design_or_review",
+      "calendar_system_work"
+    ],
+    "required_references": [
+      {
+        "document_id": "DOC_MODULE_CATALOG",
+        "path": "EAFIX_auth_docs/01_canonical_registries/module_catalog.json"
+      },
+      {
+        "document_id": "DOC_PROCESS_STEP_CATALOG",
+        "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json"
+      },
+      {
+        "document_id": "DOC_ALIGNED_PROCESS",
+        "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json"
+      },
+      {
+        "document_id": "DOC_FILE_MODULE_MAPPING",
+        "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv"
+      },
+      {
+        "document_id": "DOC_SERVICES_AI_REFERENCE",
+        "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_services_ai_reference_20260510.json"
+      },
+      {
+        "document_id": "DOC_CAPABILITY_REGISTRY",
+        "path": "EAFIX_auth_docs/01_canonical_registries/converted_capability_registry.json"
+      },
+      {
+        "document_id": "DOC_MT4_AUTHORITATIVE_REF",
+        "path": "EAFIX_auth_docs/01_canonical_registries/mt4 authoritative reference for ai.json"
+      },
+      {
+        "document_id": "DOC_COMM_CHANNELS",
+        "path": "EAFIX_auth_docs/01_canonical_registries/communication_channels.json"
+      },
+      {
+        "document_id": "DOC_UI_CATALOG",
+        "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json"
+      },
+      {
+        "document_id": "DOC_CAL_DES_RULES",
+        "path": "EAFIX_auth_docs/05_calendar_system/EAFIX CALENDAR DES RULES.pdf"
+      },
+      {
+        "document_id": "DOC_AUTHORITY",
+        "path": "EAFIX_auth_docs/00_doc_control_and_authority/doc_authority.json"
+      },
+      {
+        "document_id": "MODULE_NAMING_GOVERNANCE",
+        "path": "resolve_at_preflight"
+      }
+    ],
+    "preflight_reference_warning": "The naming-governance file path cited by the source plans was not resolvable at the expected current-master locations during consolidation. PHASE-00 must locate the active file or record it as missing before any naming decision.",
+    "authority_priority_before_cutover": [
+      "Current subject-specific canonical governance artifacts",
+      "Current canonical module and process catalogs",
+      "Current physical file mapping",
+      "Current specialized platform, UI, channel, calendar, and schema authorities",
+      "Generated or session-derived references",
+      "Source implementation plans",
+      "Proposed target tree"
+    ],
+    "authority_priority_after_cutover": [
+      "Registry authority manifest for field-level source selection",
+      "Canonical authored domain registry or explicitly registered external authority selected by that manifest",
+      "Generated current views and compatibility projections",
+      "Human-readable generated documentation",
+      "Historical and superseded artifacts"
+    ],
+    "conflict_rule": "No candidate registry value, proposed tree, narrative plan, or generated report may override a current authority. A conflict is resolved only by a governed decision with provenance, followed by an explicit authority update or cutover."
+  },
+  "problem_register": [
+    {
+      "problem_id": "SSOT-P01",
+      "severity": "blocker",
+      "title": "Multiple implementation plans compete for sequencing authority",
+      "resolution_phase": "PHASE-00"
+    },
+    {
+      "problem_id": "SSOT-P02",
+      "severity": "high",
+      "title": "Two naming plans are byte-identical duplicates",
+      "resolution_phase": "PHASE-00"
+    },
+    {
+      "problem_id": "SSOT-P03",
+      "severity": "high",
+      "title": "Registry remediation v1.0.0 and its amendment are already superseded by v1.1.0",
+      "resolution_phase": "PHASE-00"
+    },
+    {
+      "problem_id": "SSOT-P04",
+      "severity": "blocker",
+      "title": "Candidate registries are internally useful but are not yet the declared authority",
+      "resolution_phase": "PHASE-07"
+    },
+    {
+      "problem_id": "SSOT-P05",
+      "severity": "blocker",
+      "title": "Known deterministic-build and validation defects must be repaired before any authority cutover",
+      "resolution_phase": "PHASE-01"
+    },
+    {
+      "problem_id": "SSOT-P06",
+      "severity": "blocker",
+      "title": "Authority parity is advisory and unresolved differences are not yet governed",
+      "resolution_phase": "PHASE-04"
+    },
+    {
+      "problem_id": "SSOT-P07",
+      "severity": "blocker",
+      "title": "The current 27-module authority and the proposed 34-module universe are not reconciled",
+      "resolution_phase": "PHASE-05"
+    },
+    {
+      "problem_id": "SSOT-P08",
+      "severity": "high",
+      "title": "Creating standalone ratification and policy JSON files could create new parallel authorities",
+      "resolution_phase": "PHASE-03"
+    },
+    {
+      "problem_id": "SSOT-P09",
+      "severity": "blocker",
+      "title": "Module locator, F4 symbol, manifest separator, packaging, schema placement, shared-file, and state decisions remain open",
+      "resolution_phase": "PHASE-05"
+    },
+    {
+      "problem_id": "SSOT-P10",
+      "severity": "blocker",
+      "title": "Current file mapping contains multi-module and unmapped ownership records",
+      "resolution_phase": "PHASE-09"
+    },
+    {
+      "problem_id": "SSOT-P11",
+      "severity": "high",
+      "title": "The proposed 34-module tree is hand-authored and can drift",
+      "resolution_phase": "PHASE-10"
+    },
+    {
+      "problem_id": "SSOT-P12",
+      "severity": "blocker",
+      "title": "The source plans do not provide a complete governed authority-cutover procedure",
+      "resolution_phase": "PHASE-07"
+    },
+    {
+      "problem_id": "SSOT-P13",
+      "severity": "high",
+      "title": "No unified ongoing change policy guarantees that registries, generated views, routing, and repository structure remain synchronized",
+      "resolution_phase": "PHASE-14"
+    },
+    {
+      "problem_id": "SSOT-P14",
+      "severity": "high",
+      "title": "Some routed reference paths may be stale or missing and must not be silently substituted",
+      "resolution_phase": "PHASE-00"
+    }
+  ],
+  "authority_model": {
+    "registry_authority_manifest": {
+      "recommended_path": "EAFIX_auth_docs/01_canonical_registries/registry_authority_manifest.json",
+      "schema_path": "EAFIX_auth_docs/01_canonical_registries/registry_authority_manifest.schema.json",
+      "purpose": "Declare, at field-group granularity, the one canonical source for each governed fact, the current pointer, schema, owner, cutover state, generated projections, and conflict policy.",
+      "must_not_contain": "Duplicated copies of all domain records."
+    },
+    "canonical_authored_registries": [
+      "artifact_registry.jsonl",
+      "configuration_registry.jsonl",
+      "contract_registry.jsonl",
+      "decision_registry.jsonl",
+      "integration_registry.jsonl",
+      "module_registry.jsonl",
+      "operational_control_registry.jsonl",
+      "operator_registry.jsonl",
+      "process_registry.jsonl",
+      "reuse_registry.jsonl"
+    ],
+    "generated_current_views": [
+      "artifact_registry.current.json",
+      "configuration_registry.current.json",
+      "contract_registry.current.json",
+      "decision_registry.current.json",
+      "integration_registry.current.json",
+      "module_registry.current.json",
+      "operational_control_registry.current.json",
+      "operator_registry.current.json",
+      "process_registry.current.json",
+      "reuse_registry.current.json"
+    ],
+    "cross_registry_projections": [
+      "eafix_registry_graph.current.json",
+      "registry_cross_reference_report.json",
+      "registry_orphan_report.json",
+      "registry_conflict_report.json",
+      "registry_completeness_report.json",
+      "registry_authority_parity_report.json",
+      "registry_dependency_graph.mmd",
+      "registry_build_manifest.json"
+    ],
+    "external_authority_rule": "A specialized external artifact may remain canonical for facts that do not belong inside a registry, such as field-level schema definitions, MT4 platform facts, deterministic calendar rules, or detailed UI behavior. It must be registered in the artifact registry and selected explicitly in the authority manifest. No overlapping registry field may claim the same fact.",
+    "canonical_fact_examples": [
+      {
+        "fact_group": "module identity, locator, lifecycle, aliases, and relationships",
+        "canonical_owner": "module_registry.jsonl"
+      },
+      {
+        "fact_group": "process step identity, order, dependencies, and module bindings",
+        "canonical_owner": "process_registry.jsonl"
+      },
+      {
+        "fact_group": "contract identity, versions, producers, consumers, schema links, and status",
+        "canonical_owner": "contract_registry.jsonl"
+      },
+      {
+        "fact_group": "contract field names, types, constraints, and compatibility",
+        "canonical_owner": "registered schema files"
+      },
+      {
+        "fact_group": "repository path identity, ownership, source/generated/runtime classification, and target disposition",
+        "canonical_owner": "artifact_registry.jsonl"
+      },
+      {
+        "fact_group": "approved architecture, naming, packaging, cutover, and migration decisions",
+        "canonical_owner": "decision_registry.jsonl"
+      },
+      {
+        "fact_group": "UI entity identities and cross-registry links",
+        "canonical_owner": "operator_registry.jsonl"
+      },
+      {
+        "fact_group": "detailed UI behavior until migrated by explicit decision",
+        "canonical_owner": "registered UI catalog"
+      },
+      {
+        "fact_group": "MT4 platform constraints",
+        "canonical_owner": "registered MT4 authoritative reference"
+      },
+      {
+        "fact_group": "calendar deterministic rules",
+        "canonical_owner": "registered calendar DES rules"
+      }
+    ],
+    "no_parallel_authority_rule": "Standalone ratification, crosswalk, policy, inventory, and migration files are either immutable approval evidence or generated projections. They must never be independently editable current authorities after cutover."
+  },
+  "registry_record_minimum_contract": {
+    "required_common_fields": [
+      "record_id",
+      "record_type",
+      "schema_version",
+      "status",
+      "canonical_key",
+      "authority_source_refs",
+      "decision_refs",
+      "provenance",
+      "supersedes",
+      "valid_from_utc",
+      "valid_to_utc",
+      "content_hash"
+    ],
+    "status_values": [
+      "proposed",
+      "needs_review",
+      "approved",
+      "active",
+      "deprecated",
+      "superseded",
+      "retired",
+      "rejected"
+    ],
+    "rules": [
+      "Stable IDs are never reused.",
+      "A record cannot become active without resolvable provenance and required decision references.",
+      "Superseded and retired records remain addressable.",
+      "Cross-registry references use stable IDs, not paths or display names.",
+      "Paths are repository-relative POSIX strings.",
+      "Generated views do not introduce facts absent from authored registries or registered external authorities."
+    ]
+  },
+  "global_constraints": {
+    "no_fabrication": "No module, process, file owner, contract shape, path, port, protocol, policy, or target disposition may be invented. Unknown facts remain needs_review and block affected cutover or migration scope.",
+    "one_active_plan": "After approval, this JSON is the only active implementation-sequencing plan for the registry system and module migration.",
+    "one_authority_per_fact": "Every governed fact group has exactly one canonical owner selected by the authority manifest.",
+    "determinism": "Same approved inputs produce byte-identical outputs on supported platforms.",
+    "no_write_check_mode": "Check mode performs zero writes and compares every managed generated artifact.",
+    "report_only_before_blocking": "New parity and structure checks begin in report-only mode and become blocking only after a clean, approved baseline.",
+    "write_allowlists": "Every task references an explicit write scope. Any path outside that scope is forbidden.",
+    "archive_immunity": "Archived and superseded areas are excluded from authority and are modified only by an explicit archival task.",
+    "branch_safety": "Use an allowed non-default branch; no direct push to master.",
+    "rollback": "Every authority cutover, generated path change, move, split, and compatibility shim has a tested rollback.",
+    "schema_single_home": "A cross-module contract shape has one canonical schema. Module-local schema folders contain references, projections, examples, or module-private schemas only.",
+    "runtime_compatibility": "Migration may not change MT4, Python, UI, calendar, transport, broker, packaging, or deployment behavior unless a separately approved functional change is required.",
+    "generated_not_hand_edited": "Current views, graphs, reports, catalogs, target trees, rename maps, and validation reports are generated and protected from manual edits.",
+    "dynamic_baseline": "Source-plan counts such as 291 records, 10 registries, PR 74, or a specific merge SHA are provenance hints, not permanent acceptance constants. PHASE-00 re-verifies the current baseline."
+  },
+  "write_scopes": [
+    {
+      "write_scope_id": "WS-PLAN-CONTROL",
+      "allowlist": [
+        "this master plan path",
+        "plan consolidation record",
+        "archive/supersession metadata for source plans"
+      ],
+      "forbidden": [
+        "domain registry facts",
+        "runtime source",
+        "authority cutover files"
+      ]
+    },
+    {
+      "write_scope_id": "WS-REGISTRY-ENGINE",
+      "allowlist": [
+        "tools/registries/**",
+        "tests/registries/**",
+        ".github/workflows/registry-validation.yml",
+        "EAFIX_auth_docs/generated/registries/**"
+      ],
+      "forbidden": [
+        "current authority files",
+        "unrelated source files"
+      ]
+    },
+    {
+      "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+      "allowlist": [
+        "EAFIX_auth_docs/01_canonical_registries/registry_authority_manifest*.json",
+        "EAFIX_auth_docs/01_canonical_registries/*registry*.schema.json",
+        "EAFIX_auth_docs/01_canonical_registries/*_registry.jsonl",
+        "tests/registries/**",
+        "tools/registries/**"
+      ],
+      "forbidden": [
+        "doc_authority.json",
+        "routing authority",
+        "runtime source until cutover approval"
+      ]
+    },
+    {
+      "write_scope_id": "WS-DATA-CORRECTION",
+      "allowlist": [
+        "approved registry JSONL records named in the correction decision",
+        "decision registry records",
+        "tests and fixtures required for the corrected references"
+      ],
+      "forbidden": [
+        "silent deletion of references",
+        "unapproved authority edits"
+      ]
+    },
+    {
+      "write_scope_id": "WS-AUTHORITY-CUTOVER",
+      "allowlist": [
+        "eafix_project_knowledge_reference_routing_instructions.json",
+        "EAFIX_auth_docs/00_doc_control_and_authority/doc_authority.json",
+        "registry_authority_manifest.json",
+        "approved compatibility projections",
+        "registry cutover and rollback records"
+      ],
+      "forbidden": [
+        "unrelated registry content",
+        "runtime source",
+        "physical module moves"
+      ]
+    },
+    {
+      "write_scope_id": "WS-MIGRATION-POLICY",
+      "allowlist": [
+        "decision/configuration/module/artifact registry records required by the approved migration policy",
+        "EAFIX_auth_docs/generated/registries/migration/**",
+        "tools/registries/migration/**",
+        "tests/registries/migration/**"
+      ],
+      "forbidden": [
+        "physical tracked-file moves"
+      ]
+    },
+    {
+      "write_scope_id": "WS-MODULE-MIGRATION",
+      "allowlist": [
+        "only source and target paths enumerated in the approved wave map",
+        "path consumers enumerated in the approved impact report",
+        "generated migration reports",
+        "wave-specific tests and CI paths"
+      ],
+      "forbidden": [
+        "any unlisted path",
+        "authority changes not part of the wave"
+      ]
+    }
+  ],
+  "human_decision_register": [
+    {
+      "decision_id": "HD-SSOT-001",
+      "title": "Approve this master plan as the sole implementation sequencing authority",
+      "blocking": true,
+      "recommended": "approve_and_supersede_source_plans"
+    },
+    {
+      "decision_id": "HD-SSOT-002",
+      "title": "Approve canonical authored registry form",
+      "blocking": true,
+      "recommended": "JSONL files are authored canonical registries; *.current.json files are generated views"
+    },
+    {
+      "decision_id": "HD-SSOT-003",
+      "title": "Approve field-level authority manifest model",
+      "blocking": true,
+      "recommended": "registries own identities and relationships; registered specialized artifacts own field-level facts not suitable for registries"
+    },
+    {
+      "decision_id": "HD-SSOT-004",
+      "title": "Ratify the 34-module identity universe and permanent M0001-M0034 locators",
+      "blocking": true
+    },
+    {
+      "decision_id": "HD-SSOT-005",
+      "title": "Resolve F4_FLOW_ORCHESTRATOR symbol governance",
+      "blocking": true
+    },
+    {
+      "decision_id": "HD-SSOT-006",
+      "title": "Resolve manifest filename separator",
+      "blocking": true,
+      "recommended": "use the currently governed convention once the active naming-governance authority is located"
+    },
+    {
+      "decision_id": "HD-SSOT-007",
+      "title": "Choose repository Python packaging model",
+      "blocking": true,
+      "options": [
+        "single root package",
+        "workspace with selected module packages",
+        "independent per-module packages"
+      ],
+      "recommended": "workspace with selected independently packaged modules only where runtime evidence requires it"
+    },
+    {
+      "decision_id": "HD-SSOT-008",
+      "title": "Approve contract schema placement and module-local schema policy",
+      "blocking": true,
+      "recommended": "canonical cross-module and boundary shapes remain in registered global schema homes; module-local folders contain references, examples, projections, and private schemas"
+    },
+    {
+      "decision_id": "HD-SSOT-009",
+      "title": "Approve multi-owner and unmapped file dispositions",
+      "blocking": true,
+      "allowed": [
+        "single_owner_move",
+        "split",
+        "retain_global",
+        "compatibility_layer",
+        "wrapper_adapter",
+        "archive",
+        "runtime_exclude"
+      ]
+    },
+    {
+      "decision_id": "HD-SSOT-010",
+      "title": "Approve committed versus runtime-only global .state content",
+      "blocking": true
+    },
+    {
+      "decision_id": "HD-SSOT-011",
+      "title": "Approve authority cutover",
+      "blocking": true,
+      "preconditions": [
+        "candidate integrity clean",
+        "blocking parity conflicts resolved",
+        "authority coverage complete",
+        "cutover rollback tested",
+        "routing and doc-authority patch reviewed"
+      ]
+    }
+  ],
+  "execution_profiles": [
+    {
+      "profile_id": "PROFILE-CLEAN-FK-BASELINE",
+      "condition": "invalid_module_process_reference_count == 0",
+      "behavior": "Enable blocking module-to-process foreign-key validation in the registry-engine remediation track."
+    },
+    {
+      "profile_id": "PROFILE-DIRTY-FK-BASELINE",
+      "condition": "invalid_module_process_reference_count > 0",
+      "behavior": "Create a separate governed data-correction track; continue unrelated engine work; do not enable blocking FK enforcement or claim full completion until the baseline is corrected."
+    }
+  ],
+  "pr_delivery_sequence": [
+    {
+      "pr_id": "PR-01",
+      "scope": "plan consolidation and read-only baseline",
+      "phases": [
+        "PHASE-00"
+      ]
+    },
+    {
+      "pr_id": "PR-02",
+      "scope": "registry engine determinism and candidate-integrity remediation",
+      "phases": [
+        "PHASE-01"
+      ]
+    },
+    {
+      "pr_id": "PR-03",
+      "scope": "authority-parity comparator and report-only CI",
+      "phases": [
+        "PHASE-02"
+      ]
+    },
+    {
+      "pr_id": "PR-04",
+      "scope": "SSOT authority manifest, common schemas, and change policy",
+      "phases": [
+        "PHASE-03"
+      ]
+    },
+    {
+      "pr_id": "PR-05",
+      "scope": "governed data corrections and conflict decisions",
+      "phases": [
+        "PHASE-04"
+      ]
+    },
+    {
+      "pr_id": "PR-06",
+      "scope": "34-module ratification and naming decisions",
+      "phases": [
+        "PHASE-05"
+      ]
+    },
+    {
+      "pr_id": "PR-07",
+      "scope": "complete domain registry population and cross-registry validation",
+      "phases": [
+        "PHASE-06"
+      ]
+    },
+    {
+      "pr_id": "PR-08",
+      "scope": "authority cutover",
+      "phases": [
+        "PHASE-07"
+      ]
+    },
+    {
+      "pr_id": "PR-09",
+      "scope": "module/global-root policy records and generated projections",
+      "phases": [
+        "PHASE-08"
+      ]
+    },
+    {
+      "pr_id": "PR-10",
+      "scope": "file ownership and destination resolution",
+      "phases": [
+        "PHASE-09"
+      ]
+    },
+    {
+      "pr_id": "PR-11",
+      "scope": "migration generators, validators, and dry-run artifacts",
+      "phases": [
+        "PHASE-10"
+      ]
+    },
+    {
+      "pr_id": "PR-12",
+      "scope": "pilot migrations",
+      "phases": [
+        "PHASE-11"
+      ]
+    },
+    {
+      "pr_id": "PR-13+",
+      "scope": "bounded repository migration waves",
+      "phases": [
+        "PHASE-12"
+      ]
+    },
+    {
+      "pr_id": "PR-FINAL",
+      "scope": "final enforcement, completion record, and operating governance",
+      "phases": [
+        "PHASE-13",
+        "PHASE-14"
+      ]
+    }
+  ],
+  "phases": [
+    {
+      "phase_id": "PHASE-00",
+      "name": "Consolidate plan authority and freeze the verified baseline",
+      "purpose": "Establish one active plan, verify routing and repository rules, classify every source plan, and capture a read-only baseline before implementation.",
+      "entry_conditions": [
+        "All seven source files are available and hashable."
+      ],
+      "tasks": [
+        {
+          "task_id": "SSOT-0001",
+          "title": "Verify source-plan hashes and relationships",
+          "write_scope_id": "WS-PLAN-CONTROL",
+          "depends_on": [],
+          "actions": [
+            "Hash all source plans.",
+            "Confirm the two naming-plan files are byte-identical.",
+            "Confirm registry remediation v1.1.0 supersedes v1.0.0 and already incorporates the amendment.",
+            "Record source provenance in the master-plan consolidation record."
+          ],
+          "outputs": [
+            "plan_source_consolidation_record.json"
+          ],
+          "acceptance": [
+            "All seven source files have SHA-256 values.",
+            "Duplicate and supersession relationships match the source content.",
+            "No source plan remains ambiguously active."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0002",
+          "title": "Resolve mandatory routing references",
+          "write_scope_id": "WS-PLAN-CONTROL",
+          "depends_on": [],
+          "actions": [
+            "Read the routing JSON.",
+            "Resolve every required reference path against current master.",
+            "Record missing, stale, moved, or ambiguous references.",
+            "Locate the active module naming-governance authority or open a blocking governance gap."
+          ],
+          "outputs": [
+            "routing_reference_resolution_report.json"
+          ],
+          "acceptance": [
+            "Every required document has resolved, missing, or needs-review status.",
+            "No missing reference is silently replaced.",
+            "The naming-governance path is resolved before PHASE-05."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0003",
+          "title": "Resolve branch, ruleset, and CI execution constraints",
+          "write_scope_id": "WS-PLAN-CONTROL",
+          "depends_on": [],
+          "actions": [
+            "Identify the allowed branch namespace from current repository rules.",
+            "Confirm default branch.",
+            "Check whether GitHub Actions can start jobs.",
+            "Record required checks and environmental blockers."
+          ],
+          "outputs": [
+            "repository_delivery_baseline.json"
+          ],
+          "acceptance": [
+            "Branch naming is evidence-backed.",
+            "Startup-blocked CI is not counted as passing.",
+            "No implementation branch is created before this task passes."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0004",
+          "title": "Capture registry and authority baseline",
+          "write_scope_id": "WS-PLAN-CONTROL",
+          "depends_on": [],
+          "actions": [
+            "Record current authored registry files, schemas, record counts, generated outputs, tool versions, and current pointers.",
+            "Run candidate validation and two normal builds without committing changes.",
+            "Run an independent read-only module-to-process foreign-key probe.",
+            "Record current canonical authorities and their hashes."
+          ],
+          "outputs": [
+            "registry_baseline_report.json",
+            "module_process_reference_probe.json",
+            "authority_source_inventory.json"
+          ],
+          "acceptance": [
+            "Baseline counts are measured rather than copied from a source plan.",
+            "Exactly one FK execution profile is selected.",
+            "The working tree returns to clean state."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0005",
+          "title": "Approve this master plan as the sole sequencing authority",
+          "write_scope_id": "WS-PLAN-CONTROL",
+          "depends_on": [],
+          "actions": [
+            "Review this plan against the source consolidation record.",
+            "Record HD-SSOT-001.",
+            "Mark source plans superseded, duplicate, applied amendment, or reference-only as specified."
+          ],
+          "outputs": [
+            "master_plan_approval_record.json"
+          ],
+          "acceptance": [
+            "One active implementation plan remains.",
+            "Source-plan content is traceable through SHA-256 and preserved disposition."
+          ],
+          "human_gate": true
+        }
+      ],
+      "exit_gate": {
+        "gate_id": "GATE-00-BASELINE",
+        "pass_condition": [
+          "one active plan",
+          "routing references resolved or explicitly blocked",
+          "allowed branch namespace known",
+          "baseline captured",
+          "FK profile selected",
+          "working tree clean"
+        ],
+        "on_fail": "Stop. No registry code, authority, or repository migration changes are allowed."
+      }
+    },
+    {
+      "phase_id": "PHASE-01",
+      "name": "Harden the registry engine and candidate-integrity pipeline",
+      "purpose": "Absorb the complete registry-remediation v1.1.0 track and make candidate generation deterministic, complete, cross-reference safe, and enforceable.",
+      "depends_on": [
+        "PHASE-00"
+      ],
+      "tasks": [
+        {
+          "task_id": "SSOT-0101",
+          "title": "Implement one pure render pipeline for all managed outputs",
+          "write_scope_id": "WS-REGISTRY-ENGINE",
+          "depends_on": [],
+          "actions": [
+            "Render snapshots, graph, reports, Mermaid, Markdown, and build manifest in memory.",
+            "Use one expected-output map for write and check modes.",
+            "Build the manifest last."
+          ],
+          "outputs": [
+            "render_expected_outputs implementation",
+            "managed_output_inventory"
+          ],
+          "acceptance": [
+            "Every managed output is emitted by the same render path.",
+            "No generated artifact has separate write/check semantics."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0102",
+          "title": "Repair build-manifest integrity and path normalization",
+          "write_scope_id": "WS-REGISTRY-ENGINE",
+          "depends_on": [],
+          "actions": [
+            "Exclude registry_build_manifest.json from its own output hashes.",
+            "Store repository-relative POSIX path keys.",
+            "Verify every input and output hash.",
+            "Reject absolute paths and backslashes."
+          ],
+          "outputs": [
+            "manifest verifier",
+            "manifest regression tests"
+          ],
+          "acceptance": [
+            "Manifest self-hash absent.",
+            "All listed hashes verify.",
+            "No platform-dependent path keys."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0103",
+          "title": "Implement Python 3.9-compatible stable writes",
+          "write_scope_id": "WS-REGISTRY-ENGINE",
+          "depends_on": [],
+          "actions": [
+            "Use binary writes or Path.open with UTF-8 and LF.",
+            "Remove unsupported newline arguments from Path.write_text.",
+            "Ensure exact bytes are shared across Python 3.9 and 3.11."
+          ],
+          "outputs": [
+            "stable writer implementation",
+            "cross-version tests"
+          ],
+          "acceptance": [
+            "Python 3.9 and 3.11 produce identical output bytes."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0104",
+          "title": "Complete no-write check mode",
+          "write_scope_id": "WS-REGISTRY-ENGINE",
+          "depends_on": [],
+          "actions": [
+            "Compare every managed generated artifact.",
+            "Report missing and different files deterministically.",
+            "Perform zero writes, including reports and manifests."
+          ],
+          "outputs": [
+            "complete --check implementation",
+            "drift mutation tests"
+          ],
+          "acceptance": [
+            "Tampering each output class causes failure without rewriting.",
+            "A clean baseline returns zero differences."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0105",
+          "title": "Implement complete cross-registry validation",
+          "write_scope_id": "WS-REGISTRY-ENGINE",
+          "depends_on": [],
+          "actions": [
+            "Validate all schema-declared ID references.",
+            "Apply the selected FK baseline profile.",
+            "Separate structural errors from advisory governance findings.",
+            "Preserve review and orphan records unless separately resolved."
+          ],
+          "outputs": [
+            "reference validator updates",
+            "FK tests",
+            "classification tests"
+          ],
+          "acceptance": [
+            "Enabled foreign references resolve.",
+            "Dirty baseline follows the data-correction track.",
+            "Advisory findings cannot hide structural failure."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0106",
+          "title": "Create candidate-integrity regression and mutation suite",
+          "write_scope_id": "WS-REGISTRY-ENGINE",
+          "depends_on": [],
+          "actions": [
+            "Add tests for self-hash, POSIX paths, hash verification, two-build stability, every output class, no-write behavior, FK validation, and current dataset completeness.",
+            "Use temporary roots and order-independent tests."
+          ],
+          "outputs": [
+            "expanded registry test suite"
+          ],
+          "acceptance": [
+            "Tests pass on Windows/Linux-compatible paths.",
+            "Tests leave the repository clean."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0107",
+          "title": "Make Registry Candidate Integrity blocking",
+          "write_scope_id": "WS-REGISTRY-ENGINE",
+          "depends_on": [],
+          "actions": [
+            "Create a Python 3.9/3.11 CI matrix.",
+            "Remove continue-on-error from structural validation and generated-output parity.",
+            "Preserve verified branch filters.",
+            "Keep governance review findings advisory."
+          ],
+          "outputs": [
+            ".github/workflows/registry-validation.yml"
+          ],
+          "acceptance": [
+            "Candidate integrity executes and passes.",
+            "Blocked-before-start jobs are not accepted as evidence."
+          ],
+          "human_gate": false
+        }
+      ],
+      "exit_gate": {
+        "gate_id": "GATE-01-CANDIDATE-INTEGRITY",
+        "pass_condition": [
+          "schema errors = 0",
+          "duplicate ID errors = 0",
+          "enabled foreign-reference errors = 0 under selected profile",
+          "two consecutive builds produce no diff",
+          "--check writes no files",
+          "Python 3.9 and 3.11 tests pass",
+          "candidate-integrity CI passes"
+        ],
+        "on_fail": "Stop authority work. Preserve logs and fix the registry engine only."
+      }
+    },
+    {
+      "phase_id": "PHASE-02",
+      "name": "Implement genuine authority-parity shadow validation",
+      "purpose": "Compare candidate registry facts to routed current authorities without changing authority or silently approving mismatches.",
+      "depends_on": [
+        "PHASE-01"
+      ],
+      "tasks": [
+        {
+          "task_id": "SSOT-0201",
+          "title": "Create authority-parity rule schema and mappings",
+          "write_scope_id": "WS-REGISTRY-ENGINE",
+          "depends_on": [],
+          "actions": [
+            "Map candidate fields to routed authority document IDs, paths, keys, and normalization rules.",
+            "Require field-level provenance.",
+            "Classify unsupported fields not_comparable rather than guessing."
+          ],
+          "outputs": [
+            "tools/registries/authority_parity_rules.json",
+            "authority parity rule validator"
+          ],
+          "acceptance": [
+            "Every rule resolves through the routing JSON.",
+            "No lower-authority source is hard-coded when a routed authority exists."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0202",
+          "title": "Implement pure authority-parity comparator",
+          "write_scope_id": "WS-REGISTRY-ENGINE",
+          "depends_on": [],
+          "actions": [
+            "Load candidate and authority sources read-only.",
+            "Support exact_match, normalized_match, compatible_extension, candidate_missing, authority_missing, conflicting_value, not_comparable, and approved_exception.",
+            "Never mutate either side."
+          ],
+          "outputs": [
+            "tools/registries/authority_parity.py"
+          ],
+          "acceptance": [
+            "All classifications are deterministic.",
+            "conflicting_value can never normalize to a match."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0203",
+          "title": "Implement parity CLI and deterministic report",
+          "write_scope_id": "WS-REGISTRY-ENGINE",
+          "depends_on": [],
+          "actions": [
+            "Validate source availability.",
+            "Produce a schema-valid report with source inventory, counts, comparisons, severities, and execution errors.",
+            "Write only the designated generated report."
+          ],
+          "outputs": [
+            "tools/registries/compare_registry_authority.py",
+            "registry_authority_parity_report.json"
+          ],
+          "acceptance": [
+            "Comparator execution errors = 0.",
+            "Report schema errors = 0.",
+            "Two runs are byte-identical."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0204",
+          "title": "Add parity tests and advisory CI job",
+          "write_scope_id": "WS-REGISTRY-ENGINE",
+          "depends_on": [],
+          "actions": [
+            "Test normalization, missing sources, conflicts, approved exceptions, no mutation, and deterministic output.",
+            "Create separate Registry Authority Parity (Shadow) job.",
+            "Require comparator execution while keeping mismatch counts advisory until PHASE-04 decisions."
+          ],
+          "outputs": [
+            "tests/registries/test_authority_parity.py",
+            "updated registry-validation workflow"
+          ],
+          "acceptance": [
+            "Parity tool executes in CI.",
+            "Mismatches remain visible and cannot change authority."
+          ],
+          "human_gate": false
+        }
+      ],
+      "exit_gate": {
+        "gate_id": "GATE-02-PARITY-TOOL",
+        "pass_condition": [
+          "comparator execution errors = 0",
+          "report schema errors = 0",
+          "all comparisons cite routed authority or explicit unavailable/not_comparable status",
+          "no source mutation"
+        ],
+        "on_fail": "Stop. Do not use parity output for decisions or cutover."
+      }
+    },
+    {
+      "phase_id": "PHASE-03",
+      "name": "Define the SSOT authority contract and registry governance",
+      "purpose": "Create the missing authority layer that turns valid candidate registries into a governed system without creating parallel standalone authorities.",
+      "depends_on": [
+        "PHASE-02"
+      ],
+      "tasks": [
+        {
+          "task_id": "SSOT-0301",
+          "title": "Approve authored-versus-generated registry model",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Record HD-SSOT-002.",
+            "Declare JSONL registries authored canonical candidates and *.current.json generated projections.",
+            "Define current-pointer and compatibility-projection behavior."
+          ],
+          "outputs": [
+            "decision registry record for authored/generated model"
+          ],
+          "acceptance": [
+            "Exactly one authored source exists for each registry.",
+            "Generated views are non-editable."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0302",
+          "title": "Create registry authority manifest schema",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Define field groups, canonical source, source type, owner, schema, current pointer, cutover state, external authority refs, projections, and conflict policy.",
+            "Require no overlapping active ownership."
+          ],
+          "outputs": [
+            "registry_authority_manifest.schema.json"
+          ],
+          "acceptance": [
+            "Schema rejects duplicate active owners for the same fact group.",
+            "Schema supports registered external authorities without duplicating their content."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0303",
+          "title": "Create candidate registry authority manifest",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Map all governed fact groups to candidate registries or registered specialized authorities.",
+            "Mark every mapping pre_cutover.",
+            "Register contract schemas, MT4 reference, UI catalog, calendar DES rules, and other retained specialized authorities in artifact registry."
+          ],
+          "outputs": [
+            "registry_authority_manifest.json",
+            "authority_coverage_matrix.generated.json"
+          ],
+          "acceptance": [
+            "Every governed fact group has exactly one proposed owner.",
+            "Every external authority is registered and hash-addressable.",
+            "No cutover state is active yet."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0304",
+          "title": "Publish common registry record and lifecycle policy",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Define required common fields, statuses, stable ID reuse prohibition, supersession, provenance, valid-time, decision references, and content hashing.",
+            "Define change classes and approval levels."
+          ],
+          "outputs": [
+            "registry_record_common.schema.json",
+            "registry_change_policy.json or equivalent decision/configuration records"
+          ],
+          "acceptance": [
+            "All ten registry schemas compose with the common contract.",
+            "Lifecycle transitions are validated."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0305",
+          "title": "Define standalone-artifact classification",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Classify ratification files, crosswalks, inventories, policies, trees, and migration reports as canonical registry records, immutable approval evidence, or generated projections.",
+            "Prohibit independently editable duplicate authority files."
+          ],
+          "outputs": [
+            "artifact_classification_report.json",
+            "decision registry records"
+          ],
+          "acceptance": [
+            "Every planned JSON artifact has one classification.",
+            "No planned artifact can silently become a second SSOT."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0306",
+          "title": "Approve field-level authority model",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Record HD-SSOT-003.",
+            "Review coverage matrix and specialized-authority boundaries.",
+            "Approve cutover criteria and rollback semantics."
+          ],
+          "outputs": [
+            "authority model approval record"
+          ],
+          "acceptance": [
+            "Authority model is human-approved.",
+            "No unresolved overlapping field ownership remains."
+          ],
+          "human_gate": true
+        }
+      ],
+      "exit_gate": {
+        "gate_id": "GATE-03-AUTHORITY-MODEL",
+        "pass_condition": [
+          "authority manifest schema valid",
+          "all fact groups covered",
+          "no overlapping active owners",
+          "all external authorities registered",
+          "common lifecycle contract adopted",
+          "human approval recorded"
+        ],
+        "on_fail": "Stop registry population and authority cutover."
+      }
+    },
+    {
+      "phase_id": "PHASE-04",
+      "name": "Resolve authority-parity conflicts and registry data defects",
+      "purpose": "Convert advisory mismatch inventory into governed decisions and clean candidate data, while preventing automatic or invented corrections.",
+      "depends_on": [
+        "PHASE-03"
+      ],
+      "tasks": [
+        {
+          "task_id": "SSOT-0401",
+          "title": "Classify every parity mismatch and open review item",
+          "write_scope_id": "WS-DATA-CORRECTION",
+          "depends_on": [],
+          "actions": [
+            "Group mismatches by fact group, severity, source authority, and required owner.",
+            "Include existing review and orphan items.",
+            "Separate tool defects, stale paths, aliases, missing facts, conflicting values, and non-comparable fields."
+          ],
+          "outputs": [
+            "authority_conflict_work_queue.generated.json"
+          ],
+          "acceptance": [
+            "Every mismatch has an owner and required disposition.",
+            "No mismatch disappears between reports without a decision."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0402",
+          "title": "Resolve dirty module-to-process references",
+          "write_scope_id": "WS-DATA-CORRECTION",
+          "depends_on": [],
+          "actions": [
+            "For PROFILE-DIRTY-FK-BASELINE, trace each invalid pair to module and process authorities.",
+            "Create correction decisions and update only approved registry records.",
+            "Enable blocking FK validation only after probe returns zero."
+          ],
+          "outputs": [
+            "data correction decision records",
+            "corrected registry records",
+            "clean FK probe"
+          ],
+          "acceptance": [
+            "Zero invalid references without deleted or invented values.",
+            "FK enforcement becomes blocking."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0403",
+          "title": "Resolve aliases, stale paths, and conflicting values",
+          "write_scope_id": "WS-DATA-CORRECTION",
+          "depends_on": [],
+          "actions": [
+            "Use routed authority priority.",
+            "Record aliases rather than overwriting stable identities.",
+            "Correct stale paths using artifact evidence.",
+            "Require a decision record for every conflicting value."
+          ],
+          "outputs": [
+            "decision registry records",
+            "approved data corrections"
+          ],
+          "acceptance": [
+            "Every changed value cites authority and decision provenance.",
+            "No lower-authority source wins silently."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0404",
+          "title": "Define cutover-blocking versus permitted residual classifications",
+          "write_scope_id": "WS-DATA-CORRECTION",
+          "depends_on": [],
+          "actions": [
+            "Mark identity, ownership, dependency, contract-link, process, and authority-pointer conflicts blocking.",
+            "Allow not_comparable only where the authority manifest deliberately retains an external canonical source.",
+            "Require zero candidate_missing for cutover-required fields."
+          ],
+          "outputs": [
+            "cutover_parity_policy decision record"
+          ],
+          "acceptance": [
+            "Blocking mismatch count is deterministic.",
+            "Allowed residuals have explicit field-group ownership and rationale."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0405",
+          "title": "Regenerate and review clean parity baseline",
+          "write_scope_id": "WS-DATA-CORRECTION",
+          "depends_on": [],
+          "actions": [
+            "Run full candidate integrity and parity comparison.",
+            "Review all diffs.",
+            "Freeze approved cutover baseline hashes."
+          ],
+          "outputs": [
+            "authority_parity_cutover_baseline.json"
+          ],
+          "acceptance": [
+            "Blocking mismatch count = 0.",
+            "All residual advisory items comply with the approved policy.",
+            "Candidate integrity remains clean."
+          ],
+          "human_gate": false
+        }
+      ],
+      "exit_gate": {
+        "gate_id": "GATE-04-PARITY-READINESS",
+        "pass_condition": [
+          "blocking parity mismatches = 0",
+          "FK baseline clean",
+          "review/orphan dispositions preserved",
+          "candidate integrity still passes",
+          "cutover baseline hashes frozen"
+        ],
+        "on_fail": "No authority cutover. Continue focused data-correction PRs."
+      }
+    },
+    {
+      "phase_id": "PHASE-05",
+      "name": "Ratify the 34-module universe and close naming decisions",
+      "purpose": "Resolve the 27/28/34 conflict, permanent locators, naming rules, packaging, schema placement, shared ownership policy, and state policy as registry-backed decisions.",
+      "depends_on": [
+        "PHASE-04"
+      ],
+      "tasks": [
+        {
+          "task_id": "SSOT-0501",
+          "title": "Build evidence-backed 27/28/34 module crosswalk",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Compare current module catalog, module manifests, vNext catalog, module maps, reconciliation worksheets, file mapping, and existing candidate module registry.",
+            "Map legacy IDs and symbols to proposed canonical records.",
+            "Do not create or remove modules without an MCR."
+          ],
+          "outputs": [
+            "old_catalog_to_34_crosswalk evidence artifact",
+            "module alias proposals"
+          ],
+          "acceptance": [
+            "Every legacy module is mapped, retired with decision, or explicitly blocking.",
+            "No duplicate module ID or symbol."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0502",
+          "title": "Resolve F4 and active naming-governance authority",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Locate the active naming-governance record.",
+            "Complete or create the required rename-symbol MCR for F4_FLOW_ORCHESTRATOR.",
+            "Resolve any collision before ratification."
+          ],
+          "outputs": [
+            "F4 decision record",
+            "resolved naming-governance reference"
+          ],
+          "acceptance": [
+            "F4 canonical symbol has accepted governance.",
+            "No symbol collision remains."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0503",
+          "title": "Ratify module IDs, canonical symbols, and permanent locators",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Record HD-SSOT-004.",
+            "Approve exactly 34 module records.",
+            "Store module_locator in each module registry record.",
+            "Never derive or reuse locators."
+          ],
+          "outputs": [
+            "34 approved module registry records",
+            "module ratification approval evidence"
+          ],
+          "acceptance": [
+            "active modules = 34",
+            "unique module IDs = 34",
+            "unique symbols = 34",
+            "unique locators = 34"
+          ],
+          "human_gate": true
+        },
+        {
+          "task_id": "SSOT-0504",
+          "title": "Resolve manifest filename convention",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Record HD-SSOT-006.",
+            "Reconcile source-plan single-underscore examples with active governance.",
+            "Update generator and validator expectations only after decision."
+          ],
+          "outputs": [
+            "manifest filename decision record"
+          ],
+          "acceptance": [
+            "One convention is active.",
+            "All 34 expected manifest names are derivable deterministically."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0505",
+          "title": "Resolve packaging model",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Inventory current pyproject, package, workspace, deployment, and test behavior.",
+            "Record HD-SSOT-007.",
+            "Assign package policy per module profile only when evidence requires it."
+          ],
+          "outputs": [
+            "packaging decision records",
+            "configuration registry records"
+          ],
+          "acceptance": [
+            "No duplicate or conflicting package roots.",
+            "Imports and build tools have a migration strategy."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0506",
+          "title": "Resolve schema placement and global .state policy",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Record HD-SSOT-008 and HD-SSOT-010.",
+            "Declare canonical cross-module schema homes.",
+            "Define module-private schema rules.",
+            "Classify committed generated state versus runtime-only state."
+          ],
+          "outputs": [
+            "schema placement decision",
+            "state policy decision",
+            "artifact/configuration registry records"
+          ],
+          "acceptance": [
+            "No canonical schema duplication.",
+            "Runtime-only state is excluded from versioned authority."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0507",
+          "title": "Resolve multi-owner disposition vocabulary",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Approve allowed dispositions: move, split, retain global, compatibility layer, wrapper, archive, runtime exclude.",
+            "Define required evidence and rollback for each."
+          ],
+          "outputs": [
+            "shared ownership decision policy"
+          ],
+          "acceptance": [
+            "Every disposition has validation and rollback requirements."
+          ],
+          "human_gate": false
+        }
+      ],
+      "exit_gate": {
+        "gate_id": "GATE-05-MODULE-RATIFICATION",
+        "pass_condition": [
+          "34 active modules",
+          "unique IDs, symbols, locators",
+          "F4 resolved",
+          "manifest convention resolved",
+          "packaging policy resolved",
+          "schema and state policy resolved",
+          "multi-owner vocabulary approved"
+        ],
+        "on_fail": "Stop domain completion and repository design."
+      }
+    },
+    {
+      "phase_id": "PHASE-06",
+      "name": "Complete and reconcile all domain registries",
+      "purpose": "Populate the registry system so identities, links, provenance, ownership, and lifecycle are complete enough to support authority cutover and repository generation.",
+      "depends_on": [
+        "PHASE-05"
+      ],
+      "tasks": [
+        {
+          "task_id": "SSOT-0601",
+          "title": "Complete module registry",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Populate all 34 module identities, locators, aliases, statuses, responsibilities, dependencies, process links, service/runtime links, profile refs, and authority refs.",
+            "Represent non-process modules without fabricated process steps."
+          ],
+          "outputs": [
+            "complete module_registry.jsonl"
+          ],
+          "acceptance": [
+            "34 active module records.",
+            "All module references valid.",
+            "No invented step links."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0602",
+          "title": "Complete process registry",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Populate canonical steps, codes, order, phase, dependencies, module owners, input/output contract IDs, validation controls, and failure controls.",
+            "Reconcile process-step and aligned-process authorities."
+          ],
+          "outputs": [
+            "complete process_registry.jsonl"
+          ],
+          "acceptance": [
+            "Step IDs and codes unique.",
+            "Phase and dependency graph acyclic where required.",
+            "Module and contract references valid."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0603",
+          "title": "Complete contract registry without duplicating shapes",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Register input and output contracts, versions, producers, consumers, process links, schema refs, implementation status, examples, and compatibility policy.",
+            "Keep field definitions in canonical schemas.",
+            "Record unresolved contracts as blocking for affected buildability."
+          ],
+          "outputs": [
+            "complete contract_registry.jsonl"
+          ],
+          "acceptance": [
+            "Every contract link resolves.",
+            "One canonical schema per shape.",
+            "No field-shape duplication."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0604",
+          "title": "Complete artifact registry baseline",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Inventory every tracked path plus approved runtime/generated exclusions.",
+            "Store repository-relative POSIX paths, path type, owner, consumers, source/generated classification, hashes, and authority refs.",
+            "Replace absolute Windows paths in mapping inputs."
+          ],
+          "outputs": [
+            "complete artifact_registry.jsonl baseline"
+          ],
+          "acceptance": [
+            "Every tracked path represented once.",
+            "No absolute path remains.",
+            "Multi-owner/unmapped records are explicit."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0605",
+          "title": "Complete integration and operator registries",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Register channels, protocols, ports, directions, producers, consumers, contracts, UI entities, APIs, WebSockets, safety controls, and specialized authority refs.",
+            "Preserve MT4 and UI authority boundaries."
+          ],
+          "outputs": [
+            "complete integration_registry.jsonl",
+            "complete operator_registry.jsonl"
+          ],
+          "acceptance": [
+            "Channel and UI IDs unique.",
+            "Ports/protocols match routed authorities or have decisions.",
+            "All links resolve."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0606",
+          "title": "Complete configuration, operational-control, reuse, and decision registries",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Register configuration identities and owners, safety/failure controls, existing reusable capabilities, and all approval decisions from prior phases.",
+            "Search capability registry before custom implementation records are accepted."
+          ],
+          "outputs": [
+            "complete configuration_registry.jsonl",
+            "complete operational_control_registry.jsonl",
+            "complete reuse_registry.jsonl",
+            "complete decision_registry.jsonl"
+          ],
+          "acceptance": [
+            "All prior human decisions have stable IDs.",
+            "Every custom-solution record explains why reuse was insufficient.",
+            "Safety controls have owners and validation refs."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0607",
+          "title": "Run full cross-registry completeness and orphan analysis",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Generate graph and reports.",
+            "Resolve duplicate IDs, broken references, orphaned required records, missing provenance, and incompatible status transitions.",
+            "Preserve approved external-authority links."
+          ],
+          "outputs": [
+            "clean registry reports",
+            "frozen registry content hashes"
+          ],
+          "acceptance": [
+            "Schema errors = 0.",
+            "Duplicate IDs = 0.",
+            "Enabled foreign-reference errors = 0.",
+            "Unapproved orphans = 0.",
+            "Required provenance gaps = 0."
+          ],
+          "human_gate": false
+        }
+      ],
+      "exit_gate": {
+        "gate_id": "GATE-06-DOMAIN-COMPLETENESS",
+        "pass_condition": [
+          "all ten authored registries schema-valid",
+          "all required cross-registry references valid",
+          "authority coverage complete",
+          "no blocking orphan or conflict",
+          "two builds byte-identical"
+        ],
+        "on_fail": "No authority cutover."
+      }
+    },
+    {
+      "phase_id": "PHASE-07",
+      "name": "Perform governed registry authority cutover",
+      "purpose": "Make the registry authority manifest and approved domain sources the routed current authority while preserving reversible compatibility projections.",
+      "depends_on": [
+        "PHASE-06"
+      ],
+      "tasks": [
+        {
+          "task_id": "SSOT-0701",
+          "title": "Generate cutover diff and rollback package",
+          "write_scope_id": "WS-AUTHORITY-CUTOVER",
+          "depends_on": [],
+          "actions": [
+            "Generate exact routing, doc-authority, authority-manifest, current-pointer, and compatibility-projection changes.",
+            "Create inverse patch restoring previous authority pointers.",
+            "Prove rollback in a temporary branch or worktree."
+          ],
+          "outputs": [
+            "authority_cutover_patch",
+            "authority_cutover_rollback_patch",
+            "rollback_test_report"
+          ],
+          "acceptance": [
+            "Cutover and rollback patches are deterministic.",
+            "Rollback restores the prior authority model without data loss."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0702",
+          "title": "Review field-level authority coverage",
+          "write_scope_id": "WS-AUTHORITY-CUTOVER",
+          "depends_on": [],
+          "actions": [
+            "Confirm every governed fact group has one canonical owner after cutover.",
+            "Confirm retained external authorities are registered and non-overlapping.",
+            "Confirm old plans and catalogs are classified as generated, supporting, superseded, or compatibility projections."
+          ],
+          "outputs": [
+            "final authority coverage report"
+          ],
+          "acceptance": [
+            "No dual active authority.",
+            "No fact group lacks an owner."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0703",
+          "title": "Approve authority cutover",
+          "write_scope_id": "WS-AUTHORITY-CUTOVER",
+          "depends_on": [],
+          "actions": [
+            "Record HD-SSOT-011.",
+            "Review candidate integrity, parity baseline, registry completeness, and rollback evidence.",
+            "Approve exact commit scope."
+          ],
+          "outputs": [
+            "authority cutover decision record"
+          ],
+          "acceptance": [
+            "Human approval references frozen hashes and patch.",
+            "No physical module move is included."
+          ],
+          "human_gate": true
+        },
+        {
+          "task_id": "SSOT-0704",
+          "title": "Update routing and document authority atomically",
+          "write_scope_id": "WS-AUTHORITY-CUTOVER",
+          "depends_on": [],
+          "actions": [
+            "Activate registry authority manifest.",
+            "Point module/process/artifact/contract/etc. routes to canonical registry sources or registered external authorities.",
+            "Reclassify former independent catalogs according to approved compatibility policy.",
+            "Register generated current views."
+          ],
+          "outputs": [
+            "updated routing JSON",
+            "updated doc_authority.json",
+            "active registry_authority_manifest.json",
+            "registry_cutover_record.json"
+          ],
+          "acceptance": [
+            "All authority pointers resolve.",
+            "No stale active path remains.",
+            "Candidate registries are no longer described as shadow."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0705",
+          "title": "Validate cutover from a clean clone",
+          "write_scope_id": "WS-AUTHORITY-CUTOVER",
+          "depends_on": [],
+          "actions": [
+            "Clone the cutover commit.",
+            "Run routing resolution, candidate integrity, parity, authority coverage, and generated-output checks.",
+            "Run rollback rehearsal once more."
+          ],
+          "outputs": [
+            "cutover_clean_clone_report.json"
+          ],
+          "acceptance": [
+            "All checks pass.",
+            "Rollback remains executable.",
+            "No working-tree drift."
+          ],
+          "human_gate": false
+        }
+      ],
+      "exit_gate": {
+        "gate_id": "GATE-07-AUTHORITY-CUTOVER",
+        "pass_condition": [
+          "one owner per governed fact",
+          "routing and doc authority point to approved sources",
+          "registry integrity clean",
+          "cutover parity policy satisfied",
+          "clean-clone validation passes",
+          "rollback tested"
+        ],
+        "on_fail": "Apply authority rollback immediately and keep prior authorities active."
+      }
+    },
+    {
+      "phase_id": "PHASE-08",
+      "name": "Encode module-folder, profile, global-root, and root-artifact policy in the registry system",
+      "purpose": "Convert naming-plan rules and gap-closure policy into registry-backed decisions and generated projections before any physical migration.",
+      "depends_on": [
+        "PHASE-07"
+      ],
+      "tasks": [
+        {
+          "task_id": "SSOT-0801",
+          "title": "Create module folder naming policy records",
+          "write_scope_id": "WS-MIGRATION-POLICY",
+          "depends_on": [],
+          "actions": [
+            "Encode module root, first-level container, hidden state, nested folder, runtime-constrained folder, locator reuse, and .module-id rules.",
+            "Reference the accepted naming decision and active module records."
+          ],
+          "outputs": [
+            "decision/configuration registry records for naming policy",
+            "generated naming specification"
+          ],
+          "acceptance": [
+            "Names derive deterministically from locator and canonical symbol.",
+            "Nested runtime folders remain conventional."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0802",
+          "title": "Create module container inventory and profile assignments",
+          "write_scope_id": "WS-MIGRATION-POLICY",
+          "depends_on": [],
+          "actions": [
+            "Define evidence-backed containers per module.",
+            "Assign exactly one primary profile: Python, MT4, mixed Python/MT4, UI full stack, shared kernel, or documentation-only.",
+            "Allow approved extensions only."
+          ],
+          "outputs": [
+            "module/configuration registry records",
+            "module_container_inventory.generated.json",
+            "module_folder_profiles.generated.json"
+          ],
+          "acceptance": [
+            "All 34 modules have a profile and container inventory.",
+            "Unsupported empty folders are not generated."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0803",
+          "title": "Create module-root artifact policy",
+          "write_scope_id": "WS-MIGRATION-POLICY",
+          "depends_on": [],
+          "actions": [
+            "Define required and optional .module-id, manifest, AGENTS.md, README.md, package metadata, and runtime-specific files.",
+            "Tie manifest naming to the approved convention."
+          ],
+          "outputs": [
+            "module_root_artifact_inventory.generated.json"
+          ],
+          "acceptance": [
+            "Every module has deterministic required artifacts.",
+            "Prohibited duplicate authority artifacts are identified."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0804",
+          "title": "Create global-root policy",
+          "write_scope_id": "WS-MIGRATION-POLICY",
+          "depends_on": [],
+          "actions": [
+            "Classify architecture, contracts, governance, integration-tests, tools, EAFIX_auth_docs, .github, and .state.",
+            "Assign owners, allowed content, generated/runtime status, and migration rules."
+          ],
+          "outputs": [
+            "global_root_policy.generated.json",
+            "artifact/configuration registry records"
+          ],
+          "acceptance": [
+            "Every retained global root has one owner and purpose.",
+            "Global roots cannot become dumping grounds."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0805",
+          "title": "Generate policy projections and validate",
+          "write_scope_id": "WS-MIGRATION-POLICY",
+          "depends_on": [],
+          "actions": [
+            "Generate human-readable naming and layout docs from registry data.",
+            "Validate 34 expected root names and manifest names.",
+            "Compare only as a diagnostic against the proposed hand-authored tree."
+          ],
+          "outputs": [
+            "module_folder_naming_spec.generated.md",
+            "module_policy_validation_report.json"
+          ],
+          "acceptance": [
+            "Generated projections contain no independent facts.",
+            "All policy checks pass."
+          ],
+          "human_gate": false
+        }
+      ],
+      "exit_gate": {
+        "gate_id": "GATE-08-MIGRATION-POLICY",
+        "pass_condition": [
+          "34 profile assignments",
+          "34 container inventories",
+          "34 root-artifact inventories",
+          "global roots governed",
+          "naming validation clean",
+          "no unsupported empty folders"
+        ],
+        "on_fail": "No path mapping or physical migration."
+      }
+    },
+    {
+      "phase_id": "PHASE-09",
+      "name": "Map every repository path and resolve ownership",
+      "purpose": "Make artifact registry coverage complete and approve one evidence-backed disposition for every tracked path.",
+      "depends_on": [
+        "PHASE-08"
+      ],
+      "tasks": [
+        {
+          "task_id": "SSOT-0901",
+          "title": "Scan tracked repository paths and consumers",
+          "write_scope_id": "WS-MIGRATION-POLICY",
+          "depends_on": [],
+          "actions": [
+            "Enumerate git-tracked files and directories.",
+            "Detect imports, includes, package references, CI paths, docs links, Docker, PowerShell, MT4 deployment paths, tests, coverage, and runtime configuration consumers.",
+            "Classify generated and runtime-only paths."
+          ],
+          "outputs": [
+            "artifact path inventory",
+            "path consumer graph"
+          ],
+          "acceptance": [
+            "Every tracked path is represented.",
+            "Every path consumer is discoverable or marked needs_review."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0902",
+          "title": "Generate initial destination matrix from artifact registry",
+          "write_scope_id": "WS-MIGRATION-POLICY",
+          "depends_on": [],
+          "actions": [
+            "For each path, propose current owner, evidence refs, target disposition, target path(s), migration wave, rollback path, and validation refs.",
+            "Do not assign ambiguous ownership automatically."
+          ],
+          "outputs": [
+            "file_destination_matrix.generated.json"
+          ],
+          "acceptance": [
+            "Exactly one matrix record per tracked path.",
+            "All ambiguous records remain explicit."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0903",
+          "title": "Resolve multi-module service files",
+          "write_scope_id": "WS-MIGRATION-POLICY",
+          "depends_on": [],
+          "actions": [
+            "Analyze calendar-ingestor, reentry-engine, shared UI/gateway, transport, and other multi-owner services.",
+            "Choose split, single owner, global shared, compatibility layer, or wrapper based on evidence.",
+            "Define split specifications before moves."
+          ],
+          "outputs": [
+            "shared-file decision records",
+            "split specifications",
+            "wrapper/adapter specifications"
+          ],
+          "acceptance": [
+            "Every multi-owner path has approved disposition and rollback."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0904",
+          "title": "Resolve unmapped UI, shared, generated, and global files",
+          "write_scope_id": "WS-MIGRATION-POLICY",
+          "depends_on": [],
+          "actions": [
+            "Use UI catalog, service source, capability registry, file mapping, and runtime evidence.",
+            "Register global ownership where module ownership is inappropriate.",
+            "Exclude runtime-generated paths from migration."
+          ],
+          "outputs": [
+            "approved artifact registry updates"
+          ],
+          "acceptance": [
+            "Unmapped tracked path count = 0.",
+            "No runtime-only path is committed as authority."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-0905",
+          "title": "Freeze final path dispositions",
+          "write_scope_id": "WS-MIGRATION-POLICY",
+          "depends_on": [],
+          "actions": [
+            "Record HD-SSOT-009.",
+            "Approve every move/split/retain/archive operation.",
+            "Freeze matrix hash and per-wave scope."
+          ],
+          "outputs": [
+            "final file destination matrix",
+            "path disposition approval record"
+          ],
+          "acceptance": [
+            "Every tracked path has approved final disposition.",
+            "needs_review count = 0 for all planned waves."
+          ],
+          "human_gate": true
+        }
+      ],
+      "exit_gate": {
+        "gate_id": "GATE-09-PATH-COVERAGE",
+        "pass_condition": [
+          "tracked path coverage = 100%",
+          "unmapped tracked paths = 0",
+          "multi-owner unresolved paths = 0",
+          "every operation has rollback",
+          "every consumer has update or compatibility strategy"
+        ],
+        "on_fail": "No migration generator may emit executable moves."
+      }
+    },
+    {
+      "phase_id": "PHASE-10",
+      "name": "Generate target tree, rename maps, impact maps, rollback maps, and structural validators",
+      "purpose": "Replace the hand-authored proposed tree with deterministic registry-derived migration artifacts and prove dry-run safety.",
+      "depends_on": [
+        "PHASE-09"
+      ],
+      "tasks": [
+        {
+          "task_id": "SSOT-1001",
+          "title": "Implement migration renderers",
+          "write_scope_id": "WS-MIGRATION-POLICY",
+          "depends_on": [],
+          "actions": [
+            "Generate expected module roots, first-level containers, nested profiles, root artifacts, global roots, and target paths from registries.",
+            "Use stable sort and LF UTF-8.",
+            "Reject collisions and path-length hazards."
+          ],
+          "outputs": [
+            "migration renderer library"
+          ],
+          "acceptance": [
+            "Same registry inputs produce byte-identical outputs.",
+            "No hand-authored target path enters output."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-1002",
+          "title": "Generate authoritative migration projections",
+          "write_scope_id": "WS-MIGRATION-POLICY",
+          "depends_on": [],
+          "actions": [
+            "Generate target tree, rename map, rollback map, legacy path index, path impact report, global root inventory, shared-file resolution report, and validation report."
+          ],
+          "outputs": [
+            "MODULE_FOLDER_TREE.generated.md",
+            "module_folder_rename_map.generated.json",
+            "module_folder_rollback_map.generated.json",
+            "module_folder_legacy_path_index.generated.json",
+            "module_folder_path_impact_report.generated.json",
+            "global_root_inventory.generated.json",
+            "shared_file_resolution_report.generated.json"
+          ],
+          "acceptance": [
+            "All generated artifacts are covered by --check.",
+            "Proposed hand-authored tree is replaced as implementation input."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-1003",
+          "title": "Implement structural and migration validator",
+          "write_scope_id": "WS-MIGRATION-POLICY",
+          "depends_on": [],
+          "actions": [
+            "Validate 34 roots, unique IDs/locators/symbols, .module-id, manifest identity, containers, profiles, root artifacts, path coverage, global roots, schema authority, rollback entries, stale paths, and generated parity.",
+            "Support pre-migration, per-wave, and final modes."
+          ],
+          "outputs": [
+            "structural validator",
+            "migration validator tests"
+          ],
+          "acceptance": [
+            "All rules in validation_catalog are executable.",
+            "Mutation tests fail on each rule violation."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-1004",
+          "title": "Run report-only dry run without physical moves",
+          "write_scope_id": "WS-MIGRATION-POLICY",
+          "depends_on": [],
+          "actions": [
+            "Render all operations.",
+            "Apply them in a disposable worktree or simulated filesystem.",
+            "Run path-consumer rewrites and validation.",
+            "Execute rollback."
+          ],
+          "outputs": [
+            "migration_dry_run_report.json"
+          ],
+          "acceptance": [
+            "No default working-tree changes.",
+            "Forward and rollback simulations pass.",
+            "Unexpected path changes = 0."
+          ],
+          "human_gate": false
+        }
+      ],
+      "exit_gate": {
+        "gate_id": "GATE-10-MIGRATION-ARTIFACTS",
+        "pass_condition": [
+          "all generated migration artifacts deterministic",
+          "collision count = 0",
+          "unmapped operations = 0",
+          "dry-run forward validation passes",
+          "dry-run rollback passes",
+          "report-only validator clean"
+        ],
+        "on_fail": "Fix registry facts or generators; never hand-edit generated outputs."
+      }
+    },
+    {
+      "phase_id": "PHASE-11",
+      "name": "Execute controlled pilot migrations",
+      "purpose": "Prove migration mechanics on representative profiles before repository-wide movement.",
+      "depends_on": [
+        "PHASE-10"
+      ],
+      "tasks": [
+        {
+          "task_id": "SSOT-1101",
+          "title": "Select representative pilot modules",
+          "write_scope_id": "WS-MODULE-MIGRATION",
+          "depends_on": [],
+          "actions": [
+            "Select at least one single-owner Python module, one documentation/shared-kernel or UI module, and one MT4 or mixed-runtime module if risk permits.",
+            "Exclude unresolved shared-file modules."
+          ],
+          "outputs": [
+            "pilot selection decision"
+          ],
+          "acceptance": [
+            "Pilots cover distinct profiles and path-impact types.",
+            "Each pilot has complete rollback and tests."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-1102",
+          "title": "Execute pilot wave in bounded PRs",
+          "write_scope_id": "WS-MODULE-MIGRATION",
+          "depends_on": [],
+          "actions": [
+            "Create target roots.",
+            "Use git mv only for approved operations.",
+            "Add .module-id and approved root artifacts.",
+            "Update all enumerated consumers.",
+            "Regenerate registry projections."
+          ],
+          "outputs": [
+            "pilot migration commits",
+            "pilot validation reports"
+          ],
+          "acceptance": [
+            "No unapproved path changes.",
+            "Module, integration, packaging, UI/MT4-specific tests pass."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-1103",
+          "title": "Execute and verify pilot rollback",
+          "write_scope_id": "WS-MODULE-MIGRATION",
+          "depends_on": [],
+          "actions": [
+            "Apply rollback map in a disposable branch/worktree.",
+            "Run validation against pre-wave baseline.",
+            "Confirm history and content hashes preserved."
+          ],
+          "outputs": [
+            "pilot rollback report"
+          ],
+          "acceptance": [
+            "Rollback restores baseline paths and behavior.",
+            "No data or history loss."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-1104",
+          "title": "Approve migration-wave continuation",
+          "write_scope_id": "WS-MODULE-MIGRATION",
+          "depends_on": [],
+          "actions": [
+            "Review pilot diffs, tests, path impact, and rollback evidence.",
+            "Record approval or required generator/policy corrections."
+          ],
+          "outputs": [
+            "pilot approval decision"
+          ],
+          "acceptance": [
+            "Pilot acceptance complete before PHASE-12."
+          ],
+          "human_gate": true
+        }
+      ],
+      "exit_gate": {
+        "gate_id": "GATE-11-PILOT",
+        "pass_condition": [
+          "all pilot tests pass",
+          "all pilot structural checks pass",
+          "rollback proven",
+          "no unexpected changes",
+          "human approval recorded"
+        ],
+        "on_fail": "Rollback pilots and return to PHASE-08, PHASE-09, or PHASE-10 based on root cause."
+      }
+    },
+    {
+      "phase_id": "PHASE-12",
+      "name": "Execute repository-wide migration waves",
+      "purpose": "Move the repository incrementally using registry-derived, reviewable, reversible wave maps.",
+      "depends_on": [
+        "PHASE-11"
+      ],
+      "wave_gate": {
+        "required_before_each_wave": [
+          "approved source-to-target operations",
+          "zero needs_review paths in scope",
+          "executable rollback",
+          "clean pre-wave tree",
+          "baseline tag or commit",
+          "applicable tests identified",
+          "human approval"
+        ],
+        "automatic_stop_conditions": [
+          "unexpected tracked-file modification",
+          "unmapped file discovered",
+          "import, packaging, or deployment failure",
+          "schema authority duplication",
+          "MT4 include or terminal deployment failure",
+          "UI API/WebSocket binding failure",
+          "calendar deterministic artifact or path violation",
+          "rollback verification failure",
+          "generated artifact drift",
+          "validator regression"
+        ]
+      },
+      "tasks": [
+        {
+          "task_id": "SSOT-1201",
+          "title": "Wave 1: governance pointers, generated docs, and compatibility projections",
+          "write_scope_id": "WS-MODULE-MIGRATION",
+          "depends_on": [],
+          "actions": [
+            "Move or regenerate approved governance and documentation paths.",
+            "Update routing, artifact registry, and links without changing domain facts."
+          ],
+          "outputs": [
+            "wave-1 report"
+          ],
+          "acceptance": [
+            "Authority resolution and docs links pass."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-1202",
+          "title": "Wave 2: single-owner Python modules",
+          "write_scope_id": "WS-MODULE-MIGRATION",
+          "depends_on": [],
+          "actions": [
+            "Migrate modules with single-owner files and low shared-runtime risk.",
+            "Update imports, packaging, tests, CI, and deployment paths."
+          ],
+          "outputs": [
+            "wave-2 report"
+          ],
+          "acceptance": [
+            "Python 3.9/3.11 tests pass.",
+            "No import or package drift."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-1203",
+          "title": "Wave 3: UI and shared-kernel modules",
+          "write_scope_id": "WS-MODULE-MIGRATION",
+          "depends_on": [],
+          "actions": [
+            "Migrate UI backend/frontend and shared-kernel paths according to approved profiles.",
+            "Preserve REST/WebSocket, safety, plugin, and shared capability bindings."
+          ],
+          "outputs": [
+            "wave-3 report"
+          ],
+          "acceptance": [
+            "UI contract and safety-control tests pass.",
+            "Shared imports remain valid."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-1204",
+          "title": "Wave 4: split multi-module services",
+          "write_scope_id": "WS-MODULE-MIGRATION",
+          "depends_on": [],
+          "actions": [
+            "Apply approved split specifications.",
+            "Add compatibility wrappers/adapters where required.",
+            "Remove shims only under a separately approved removal condition."
+          ],
+          "outputs": [
+            "wave-4 report",
+            "compatibility shim inventory"
+          ],
+          "acceptance": [
+            "All module boundaries and integration tests pass.",
+            "No duplicate live implementation remains."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-1205",
+          "title": "Wave 5: MT4 and mixed-runtime modules",
+          "write_scope_id": "WS-MODULE-MIGRATION",
+          "depends_on": [],
+          "actions": [
+            "Migrate MQL4 Experts, Indicators, Include, and Python bridge components without renaming runtime-constrained folders.",
+            "Update include paths, terminal deployment paths, WebRequest/DDE/file transport configuration, and tests."
+          ],
+          "outputs": [
+            "wave-5 report"
+          ],
+          "acceptance": [
+            "MQL4 compilation/deployment validation passes.",
+            "MT4-Python channel bindings remain correct.",
+            "No MQL5 substitutions."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-1206",
+          "title": "Wave 6: global roots, archive cleanup, and legacy path retirement",
+          "write_scope_id": "WS-MODULE-MIGRATION",
+          "depends_on": [],
+          "actions": [
+            "Apply global-root policy.",
+            "Archive superseded plans and historical artifacts with manifest.",
+            "Remove compatibility paths only after zero consumers.",
+            "Regenerate final routing and structure docs."
+          ],
+          "outputs": [
+            "wave-6 report",
+            "archive manifest",
+            "legacy path retirement report"
+          ],
+          "acceptance": [
+            "Zero active consumer references retired paths.",
+            "Archive excluded from normal routing."
+          ],
+          "human_gate": false
+        }
+      ],
+      "exit_gate": {
+        "gate_id": "GATE-12-WAVES",
+        "pass_condition": [
+          "every wave passed its tests and structural checks",
+          "every wave rollback remained executable until merge",
+          "all tracked paths reached approved disposition",
+          "no active stale path",
+          "runtime behavior preserved"
+        ],
+        "on_fail": "Stop the current wave, apply its rollback, preserve prior merged waves, and correct registry data or generator logic."
+      }
+    },
+    {
+      "phase_id": "PHASE-13",
+      "name": "Run final clean-clone verification and enable blocking enforcement",
+      "purpose": "Prove the completed registry and repository are reproducible and make all approved integrity and structure checks blocking.",
+      "depends_on": [
+        "PHASE-12"
+      ],
+      "tasks": [
+        {
+          "task_id": "SSOT-1301",
+          "title": "Run complete clean-clone validation matrix",
+          "write_scope_id": "WS-REGISTRY-ENGINE",
+          "depends_on": [],
+          "actions": [
+            "Run registry build/check, schemas, IDs, references, authority, parity, structure, migration completion, tests, packaging, UI, transport, calendar, MT4, docs links, and git diff checks.",
+            "Run on Python 3.9 and 3.11 where applicable."
+          ],
+          "outputs": [
+            "final_validation_report.json"
+          ],
+          "acceptance": [
+            "All blocking checks execute and pass.",
+            "No skipped or account-blocked job counts as pass."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-1302",
+          "title": "Prove deterministic regeneration and no-drift state",
+          "write_scope_id": "WS-REGISTRY-ENGINE",
+          "depends_on": [],
+          "actions": [
+            "Run two consecutive full generations.",
+            "Verify build manifest hashes.",
+            "Tamper each generated-output class in fixtures and prove check mode detects drift without writing."
+          ],
+          "outputs": [
+            "final_determinism_report.json"
+          ],
+          "acceptance": [
+            "Two builds produce no diff.",
+            "All mutation tests pass."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-1303",
+          "title": "Switch approved validators from report-only to blocking",
+          "write_scope_id": "WS-REGISTRY-ENGINE",
+          "depends_on": [],
+          "actions": [
+            "Make candidate integrity, authority coverage, generated parity, structure, path coverage, and stale-path checks blocking.",
+            "Keep only explicitly approved advisory classes non-blocking."
+          ],
+          "outputs": [
+            "blocking CI configuration"
+          ],
+          "acceptance": [
+            "Required checks are protected and execute on master/develop or current approved branches."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-1304",
+          "title": "Publish completion and source-plan supersession record",
+          "write_scope_id": "WS-PLAN-CONTROL",
+          "depends_on": [],
+          "actions": [
+            "Record final hashes, PRs, checks, generated artifacts, authority owners, migration results, rollback status, known residuals, and archived source plans.",
+            "Update project knowledge summary/router."
+          ],
+          "outputs": [
+            "registry_system_completion_record.json",
+            "plan supersession record"
+          ],
+          "acceptance": [
+            "Source plans no longer appear active.",
+            "Final authority and routing are discoverable."
+          ],
+          "human_gate": false
+        }
+      ],
+      "exit_gate": {
+        "gate_id": "GATE-13-FINAL",
+        "pass_condition": [
+          "clean clone passes",
+          "two-build determinism",
+          "blocking CI active",
+          "all 34 modules valid",
+          "all tracked paths governed",
+          "zero active stale paths",
+          "completion record published"
+        ],
+        "on_fail": "The system is not complete; do not close the master plan."
+      }
+    },
+    {
+      "phase_id": "PHASE-14",
+      "name": "Operate the registry system as an ongoing governance process",
+      "purpose": "Prevent future drift by making registry-first changes, deterministic regeneration, and evidence-backed lifecycle management mandatory.",
+      "depends_on": [
+        "PHASE-13"
+      ],
+      "tasks": [
+        {
+          "task_id": "SSOT-1401",
+          "title": "Adopt registry-first change workflow",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Require proposed changes to start with a decision or domain registry update.",
+            "Regenerate all projections.",
+            "Validate impact before runtime or path changes.",
+            "Reject direct edits to generated files."
+          ],
+          "outputs": [
+            "registry change runbook"
+          ],
+          "acceptance": [
+            "Every accepted change has decision/provenance and generated evidence."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-1402",
+          "title": "Implement lifecycle operations",
+          "write_scope_id": "WS-REGISTRY-GOVERNANCE",
+          "depends_on": [],
+          "actions": [
+            "Support add, rename, split, merge, deprecate, supersede, retire, and ownership transfer without ID reuse.",
+            "Generate crosswalks and compatibility projections."
+          ],
+          "outputs": [
+            "lifecycle validator and runbook"
+          ],
+          "acceptance": [
+            "All lifecycle transitions schema-valid and reversible where required."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-1403",
+          "title": "Implement scheduled drift and routing validation",
+          "write_scope_id": "WS-REGISTRY-ENGINE",
+          "depends_on": [],
+          "actions": [
+            "Regularly check authority paths, missing sources, generated parity, orphan records, stale links, and repository structure.",
+            "Notify only on meaningful failures."
+          ],
+          "outputs": [
+            "scheduled CI workflow or equivalent"
+          ],
+          "acceptance": [
+            "Drift is detected before release or merge."
+          ],
+          "human_gate": false
+        },
+        {
+          "task_id": "SSOT-1404",
+          "title": "Define periodic governance review",
+          "write_scope_id": "WS-PLAN-CONTROL",
+          "depends_on": [],
+          "actions": [
+            "Review needs_review items, approved exceptions, external authority freshness, compatibility shims, retired paths, and schema versions.",
+            "Create focused issues for unresolved work."
+          ],
+          "outputs": [
+            "periodic governance review record template"
+          ],
+          "acceptance": [
+            "No temporary exception becomes permanent without approval."
+          ],
+          "human_gate": false
+        }
+      ],
+      "exit_gate": {
+        "gate_id": "GATE-14-OPERATING-MODEL",
+        "pass_condition": [
+          "registry-first runbook active",
+          "lifecycle operations tested",
+          "scheduled drift checks active",
+          "governance review cadence defined"
+        ],
+        "on_fail": "Treat operating governance as incomplete even if the initial migration succeeded."
+      }
+    }
+  ],
+  "validation_catalog": [
+    {
+      "rule_id": "VAL-001",
+      "category": "plan_control",
+      "description": "Exactly one active implementation plan exists."
+    },
+    {
+      "rule_id": "VAL-002",
+      "category": "routing",
+      "description": "Every required routed reference resolves or is explicitly blocking; no silent substitution."
+    },
+    {
+      "rule_id": "VAL-003",
+      "category": "registry_engine",
+      "description": "Every authored registry and generated artifact parses and validates against its schema."
+    },
+    {
+      "rule_id": "VAL-004",
+      "category": "identity",
+      "description": "Record IDs are unique within and across declared namespaces."
+    },
+    {
+      "rule_id": "VAL-005",
+      "category": "references",
+      "description": "Every enabled cross-registry reference resolves."
+    },
+    {
+      "rule_id": "VAL-006",
+      "category": "determinism",
+      "description": "Two consecutive complete builds are byte-identical and produce no Git diff."
+    },
+    {
+      "rule_id": "VAL-007",
+      "category": "check_mode",
+      "description": "Check mode compares every managed output and writes zero files."
+    },
+    {
+      "rule_id": "VAL-008",
+      "category": "manifest",
+      "description": "The build manifest excludes its own hash and all listed hashes verify."
+    },
+    {
+      "rule_id": "VAL-009",
+      "category": "paths",
+      "description": "All registry paths are repository-relative POSIX paths."
+    },
+    {
+      "rule_id": "VAL-010",
+      "category": "compatibility",
+      "description": "Python 3.9 and 3.11 produce compatible and byte-stable outputs."
+    },
+    {
+      "rule_id": "VAL-011",
+      "category": "authority_parity",
+      "description": "Every parity comparison cites a routed authority or explicit unavailable/not_comparable classification."
+    },
+    {
+      "rule_id": "VAL-012",
+      "category": "authority_parity",
+      "description": "Blocking cutover mismatches are zero."
+    },
+    {
+      "rule_id": "VAL-013",
+      "category": "authority",
+      "description": "Every governed fact group has exactly one active canonical owner."
+    },
+    {
+      "rule_id": "VAL-014",
+      "category": "authority",
+      "description": "Every retained external authority is registered, hash-addressable, and non-overlapping."
+    },
+    {
+      "rule_id": "VAL-015",
+      "category": "module_identity",
+      "description": "Exactly 34 active canonical module records exist after ratification."
+    },
+    {
+      "rule_id": "VAL-016",
+      "category": "module_identity",
+      "description": "Module IDs, canonical symbols, and locators are each unique and locators are never derived or reused."
+    },
+    {
+      "rule_id": "VAL-017",
+      "category": "process",
+      "description": "Module-to-process references are valid and no non-process module receives a fabricated step."
+    },
+    {
+      "rule_id": "VAL-018",
+      "category": "contracts",
+      "description": "Contract identity and linkage live in the contract registry while field shapes have one canonical schema."
+    },
+    {
+      "rule_id": "VAL-019",
+      "category": "artifacts",
+      "description": "Every tracked path has one artifact registry record and approved final disposition."
+    },
+    {
+      "rule_id": "VAL-020",
+      "category": "artifacts",
+      "description": "Every multi-owner or formerly unmapped path has a decision record."
+    },
+    {
+      "rule_id": "VAL-021",
+      "category": "reuse",
+      "description": "Custom capability records cite the capability registry search and explain why reuse was insufficient."
+    },
+    {
+      "rule_id": "VAL-022",
+      "category": "module_structure",
+      "description": "Each module root matches locator plus kebab-case canonical symbol."
+    },
+    {
+      "rule_id": "VAL-023",
+      "category": "module_structure",
+      "description": ".module-id matches the module registry identity."
+    },
+    {
+      "rule_id": "VAL-024",
+      "category": "module_structure",
+      "description": "Manifest filename, manifest identity, folder identity, and .module-id agree."
+    },
+    {
+      "rule_id": "VAL-025",
+      "category": "module_structure",
+      "description": "Every first-level module container is approved by the module's registry-backed inventory."
+    },
+    {
+      "rule_id": "VAL-026",
+      "category": "module_structure",
+      "description": "Every nested folder is allowed by the selected profile or approved extension."
+    },
+    {
+      "rule_id": "VAL-027",
+      "category": "module_structure",
+      "description": "Every required root artifact exists and prohibited duplicate authority artifacts do not."
+    },
+    {
+      "rule_id": "VAL-028",
+      "category": "global_roots",
+      "description": "Every retained global root complies with the approved global-root policy."
+    },
+    {
+      "rule_id": "VAL-029",
+      "category": "rollback",
+      "description": "Every authority cutover, move, split, and wrapper has an executable rollback."
+    },
+    {
+      "rule_id": "VAL-030",
+      "category": "generated_outputs",
+      "description": "Generated current views, graphs, docs, trees, maps, and reports are current and not hand-edited."
+    },
+    {
+      "rule_id": "VAL-031",
+      "category": "stale_paths",
+      "description": "No active authority, runtime, CI, packaging, docs, PowerShell, Docker, UI, calendar, or MT4 reference points to a retired path."
+    },
+    {
+      "rule_id": "VAL-032",
+      "category": "empty_folders",
+      "description": "No unsupported empty folder is committed."
+    },
+    {
+      "rule_id": "VAL-033",
+      "category": "mt4",
+      "description": "MQL4 runtime-constrained folders and include/deployment behavior remain valid; no MQL5 substitution occurs."
+    },
+    {
+      "rule_id": "VAL-034",
+      "category": "ui",
+      "description": "UI API, WebSocket, safety-control, and implementation bindings remain valid."
+    },
+    {
+      "rule_id": "VAL-035",
+      "category": "calendar",
+      "description": "Calendar deterministic identities and single-writer rules are not altered by path migration."
+    },
+    {
+      "rule_id": "VAL-036",
+      "category": "transport",
+      "description": "MT4-Python ports, protocols, directions, contracts, and owners remain consistent with the registered channel authority."
+    },
+    {
+      "rule_id": "VAL-037",
+      "category": "archive",
+      "description": "Archived and superseded files are excluded from normal routing and cannot re-enter authority."
+    },
+    {
+      "rule_id": "VAL-038",
+      "category": "ci",
+      "description": "All required checks execute; skipped, neutral, startup-blocked, or account-locked jobs are not passing evidence."
+    },
+    {
+      "rule_id": "VAL-039",
+      "category": "clean_clone",
+      "description": "A clean clone regenerates all managed outputs with zero drift."
+    },
+    {
+      "rule_id": "VAL-040",
+      "category": "operating_governance",
+      "description": "Future changes follow registry-first lifecycle and regenerate all dependent projections."
+    }
+  ],
+  "definition_of_done": [
+    "This master JSON is approved and is the only active implementation-sequencing plan.",
+    "Source plan duplicates, superseded versions, and reference-only artifacts have recorded dispositions.",
+    "The registry engine is deterministic, Python 3.9/3.11 compatible, cross-reference safe, and fully covered by no-write check mode.",
+    "Candidate integrity is blocking and passes.",
+    "Authority-parity comparison executes deterministically and all cutover-blocking mismatches are resolved.",
+    "A schema-valid registry authority manifest assigns exactly one canonical owner to every governed fact group.",
+    "All ten authored domain registries are complete, valid, provenance-backed, and cross-linked.",
+    "The 34-module universe, canonical symbols, and permanent locators are ratified.",
+    "F4, manifest naming, packaging, schema placement, shared-file, and state decisions are closed.",
+    "Routing and document authority have completed a governed, reversible cutover.",
+    "Every tracked repository path is registered and has an approved final disposition.",
+    "The target tree, rename map, impact report, rollback map, legacy-path index, and validation reports are generated deterministically.",
+    "Pilot and repository-wide migration waves pass all applicable Python, packaging, UI, calendar, transport, MT4, documentation, and structural checks.",
+    "No active path or authority reference points to retired locations.",
+    "A clean clone produces zero generated drift.",
+    "Blocking CI prevents registry, authority, generated-artifact, and repository-structure drift.",
+    "Registry-first lifecycle and periodic governance review are operational."
+  ],
+  "failure_handling": {
+    "fail_closed_conditions": [
+      "A required authority source is missing or ambiguous.",
+      "A generated output changes between identical builds.",
+      "Check mode writes files.",
+      "A record count or stable ID changes without an approved source decision.",
+      "A foreign-reference baseline is dirty and enforcement is enabled anyway.",
+      "A candidate or parity tool mutates an authority source.",
+      "A cutover creates overlapping or missing fact ownership.",
+      "A source plan or generated file remains independently editable as authority.",
+      "An unmapped or unexpected path appears in a migration wave.",
+      "A rollback cannot restore the previous authority or path state.",
+      "MT4, UI, calendar, transport, packaging, or runtime behavior fails after migration.",
+      "CI cannot execute.",
+      "Archive content is routed as current authority."
+    ],
+    "response": [
+      "Stop the current phase or wave.",
+      "Preserve logs, hashes, diffs, reports, and selected execution profile.",
+      "Do not manufacture a green result by deleting references or lowering severity.",
+      "Apply the phase-specific rollback when authority or physical paths changed.",
+      "Classify the root cause as tool defect, data defect, authority conflict, source drift, path-consumer omission, platform variance, or environmental CI blockage.",
+      "Open a focused decision or correction issue under the governing authority.",
+      "Resume only from the earliest invalidated gate."
+    ]
+  },
+  "agent_execution_contract": {
+    "must_report": [
+      "phase and task IDs completed",
+      "branch, commit SHA, and PR URL",
+      "write scope used",
+      "files changed",
+      "authority and decision records created",
+      "commands executed",
+      "exact validation counts and results",
+      "generated artifacts changed",
+      "two-build determinism evidence",
+      "clean-clone evidence",
+      "selected FK profile",
+      "parity classification and severity counts",
+      "remaining blockers and needs_review items",
+      "rollback evidence",
+      "confirmation that no out-of-scope authority or path changes occurred"
+    ],
+    "must_not_claim": [
+      "A source plan is current after this master plan is approved.",
+      "Candidate registries are canonical before PHASE-07 passes.",
+      "Authority parity is proven when routed sources were not loaded.",
+      "All conflicts are resolved merely because a report exists.",
+      "CI passed when jobs did not start.",
+      "Determinism is proven without two consecutive byte-stable builds.",
+      "A migration succeeded without rollback evidence and path-consumer validation.",
+      "A generated projection is an authored authority.",
+      "The project has one SSOT while two sources actively own the same fact."
+    ]
+  }
+}
