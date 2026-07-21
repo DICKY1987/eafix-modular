@@ -1,0 +1,40 @@
+name: One-time stale branch cleanup
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - '.github/workflows/one-time-stale-branch-cleanup.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  delete-stale-branches:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Delete approved stale branches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          branches=(
+            'copilot/analyze-and-describe-10-branches'
+            'copilot/copilotresolve-conflict-in-pr-29'
+            'copilot/eafix-registry-bootstrap-trigger'
+            'copilot/eafix-registry-system-v1'
+            'agent/delete-stale-copilot-branches'
+          )
+
+          for branch in "${branches[@]}"; do
+            if gh api "repos/${REPOSITORY}/git/ref/heads/${branch}" >/dev/null 2>&1; then
+              gh api --method DELETE "repos/${REPOSITORY}/git/refs/heads/${branch}"
+              echo "Deleted ${branch}"
+            else
+              echo "Already absent: ${branch}"
+            fi
+          done
