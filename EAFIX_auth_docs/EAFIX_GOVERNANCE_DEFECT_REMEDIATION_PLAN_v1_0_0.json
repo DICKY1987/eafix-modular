@@ -1,0 +1,1658 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "governance_defect_remediation_implementation_plan",
+  "plan_id": "EAFIX-GOVERNANCE-DEFECT-REMEDIATION-001",
+  "plan_version": "1.0.0",
+  "status": "proposed_pending_owner_ratification",
+  "generated_at_utc": "2026-07-23T00:00:00Z",
+  "repository": {
+    "url": "https://github.com/DICKY1987/eafix-modular",
+    "branch": "master",
+    "head_commit_at_audit": "43f096239a492130f20e864418b0996df09439f1",
+    "head_commit_date": "2026-07-20T23:55:42-05:00",
+    "canonical_docs_root": "EAFIX_auth_docs"
+  },
+  "title": "EAFIX Governance Defect Remediation Plan (Pre-Execution Gate for MASTER-V2)",
+  "objective": "Remediate every governance, provenance, duplication, routing, and artifact-integrity defect identified by live repository audit, so that EAFIX-SSOT-REGISTRY-SYSTEM-MASTER-V2 can be lawfully ratified and executed on a verified baseline. This plan does not re-plan, re-sequence, or replace MASTER-V2. It is a bounded predecessor that removes the conditions which currently make MASTER-V2 ratification unsafe.",
+  "relationship_to_master_plan": {
+    "successor_plan_id": "EAFIX-SSOT-REGISTRY-SYSTEM-MASTER-V2",
+    "successor_plan_version": "2.0.0",
+    "successor_plan_sha256": "1fc42c139e0a290942a393fe22e0022f6e72cee32d221921bd0143c29513b7d8",
+    "relationship": "blocking_predecessor",
+    "rule": "MASTER-V2 must not transition from proposed_pending_owner_ratification to ratified until this plan reaches definition_of_done or the owner explicitly waives a specific finding through the human_decision_register.",
+    "explicit_non_goals": [
+      "Do not modify MASTER-V2 phase or task content except where PHASE-01 requires a provenance correction.",
+      "Do not execute any MASTER-V2 phase.",
+      "Do not perform registry conflict burn-down, authority cutover, or repository migration.",
+      "Do not populate registry data content beyond what a finding explicitly requires."
+    ]
+  },
+  "mandatory_routing_and_authority": {
+    "human_authority": "Dick (GitHub: DICKY1987) is the sole decision authority for every human_decision_register gate in this plan.",
+    "documentation_authority_root": "EAFIX_auth_docs",
+    "authority_precedence": [
+      "canonical",
+      "supporting_reference",
+      "legacy_reference",
+      "generated",
+      "superseded"
+    ],
+    "unresolved_authority_notice": "This plan treats the doc-authority question as OPEN. Two doc_authority.json files exist with contradictory self-descriptions and incompatible schemas (see FND-04). No task in this plan may cite either file as settled authority until HD-03 is decided.",
+    "branch_namespace": "copilot/*",
+    "prohibited_branch_prefixes": [
+      "fix/",
+      "claude/"
+    ],
+    "push_credentials_note": "Deliverables are produced as git format-patch / git am compatible artifacts. The executing agent does not push to protected branches."
+  },
+  "evidence_protocol": {
+    "classes": {
+      "E1_CODE": "Primary. Executable source or tooling read directly from the repository at a named commit.",
+      "E2_ARTIFACT": "Primary. A committed file's actual bytes, hash, or parsed content read at a named commit.",
+      "E3_AUTHORITY": "Corroboration only. An authority document's assertion about the world. Confidence capped at medium. Never sufficient alone to close a finding.",
+      "E4_HISTORICAL": "Supporting. Git history, commit messages, prior reports.",
+      "E5_JUDGEMENT": "Architectural or governance decision. Must be attributed to a named human decision gate."
+    },
+    "prohibitions": [
+      "Resolution by transcription: restating an authority claim as if it were verified fact.",
+      "Normalization laundering: reformatting a defective record and declaring it repaired.",
+      "Inventing reconciled interfaces, hashes, counts, or file contents that were not observed.",
+      "Deleting a reference, record, or file solely to make a validator pass.",
+      "Marking a finding resolved on E3_AUTHORITY evidence alone."
+    ],
+    "honesty_audit_metric": "Report the ratio of findings closed on E1/E2 evidence to findings closed on E3-only or E5-only evidence. A high E3/E5 ratio is a quality warning, not a success signal."
+  },
+  "audit_provenance": {
+    "method": "Full-depth git clone of master, byte-level sha256 comparison, whole-tree grep, and direct JSON parse.",
+    "verified_at_commit": "43f096239a492130f20e864418b0996df09439f1",
+    "corrections_to_prior_assumptions": [
+      {
+        "prior_assumption": "doc_authority.json carries stale EA-REG/ path references that no longer resolve because EA-REG/ was removed.",
+        "verified_reality": "EA-REG/ EXISTS at repository root. Most EA-REG/ references resolve correctly. Exactly three are broken.",
+        "evidence_class": "E2_ARTIFACT"
+      },
+      {
+        "prior_assumption": "The .state/evidence trail indicates a competing concurrent workstream executing against an unknown plan.",
+        "verified_reality": "The .state trail is a COMPLETED historical workstream dated 2026-03-17 to 2026-05-18, predating every SSOT registry plan (2026-07-17 onward). It is stale state, not active competition.",
+        "evidence_class": "E2_ARTIFACT"
+      },
+      {
+        "prior_assumption": "The registry holds 22 flagged conflicts.",
+        "verified_reality": "registry_conflict_queue.jsonl contains 11 records on master, all with status=conflicted.",
+        "evidence_class": "E2_ARTIFACT"
+      }
+    ]
+  },
+  "baseline_facts_verified": {
+    "registry_record_counts": {
+      "module": 34,
+      "contract": 97,
+      "process": 26,
+      "integration": 9,
+      "configuration": 7,
+      "operational_control": 52,
+      "operator": 7,
+      "decision": 7,
+      "reuse": 12,
+      "artifact": 40
+    },
+    "registry_conflict_queue_records": 11,
+    "registry_index_authority_status": "canonical_candidate",
+    "registry_index_approved_for_cutover": false,
+    "registry_index_build_mode": "shadow_report_only",
+    "registry_index_baseline_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+    "vnext_catalog_declared_modules": 34,
+    "vnext_catalog_actual_modules_array_length": 0
+  },
+  "problem_register": [
+    {
+      "finding_id": "FND-01",
+      "severity": "critical",
+      "title": "MASTER-V2 provenance cites two source documents that have never existed in repository history",
+      "evidence_class": "E2_ARTIFACT + E4_HISTORICAL",
+      "verified_observation": [
+        "MASTER-V2 source_plan_consolidation.sources declares 13 sources with unique_content_hash_count 12.",
+        "Source SRC-REG-REMEDIATION-V1-1 cites EAFIX_REGISTRY_POST_MERGE_REMEDIATION_IMPLEMENTATION_PLAN_v1_1_0.json sha256 5599abc4f4c7880c8757fb4786eaef6069da61631a508fd4b2fc995868f5d8b1.",
+        "Source SRC-REG-REMEDIATION-AMENDMENT cites EAFIX_REGISTRY_POST_MERGE_REMEDIATION_PLAN_AMENDMENT_v1_0_1.json sha256 9b17283952ff05e3dd7c3e1590e5280d8df3dffaca74fb907dee39ed23915912.",
+        "Neither filename appears in any commit across all refs (git log --all --diff-filter=ADMR returned no match).",
+        "Only EAFIX_REGISTRY_POST_MERGE_REMEDIATION_IMPLEMENTATION_PLAN_v1_0_0.json exists on master.",
+        "MASTER-V2 decision_gates_from_active_remediation contains GATE-REG-FK-BASELINE and GATE-AUTHORITY-PARITY-TOOL; the latter states parity mismatches are advisory in v1.1.0, making that gate semantically dependent on the unverifiable source."
+      ],
+      "why_it_matters": "MASTER-V2 is the intended sole sequencing authority. Its own provenance record asserts facts that cannot be verified against any artifact. Ratifying it would install an unverifiable claim at the root of the authority chain, violating the derive-do-not-fabricate principle the registry system exists to enforce.",
+      "resolution_requires_human_decision": "HD-01"
+    },
+    {
+      "finding_id": "FND-02",
+      "severity": "medium",
+      "title": "Five byte-identical copies of MASTER-V2 exist in the canonical docs root",
+      "evidence_class": "E2_ARTIFACT",
+      "verified_observation": [
+        "All five files hash to 1fc42c139e0a290942a393fe22e0022f6e72cee32d221921bd0143c29513b7d8 and are 471712 bytes.",
+        "Filenames: Chat_2_..., Chat_3_..., Chat_..., bare EAFIX_SSOT_REGISTRY_SYSTEM_FINAL_MERGED_IMPLEMENTATION_PLAN_v2_0_0.json, Final_...",
+        "The verification specification target_plan.filename names EAFIX_SSOT_REGISTRY_SYSTEM_FINAL_MERGED_IMPLEMENTATION_PLAN_v2_0_0.json (the bare form)."
+      ],
+      "why_it_matters": "Five candidate authority files for one plan. Any consumer resolving by filename may bind to a copy the governance process does not track.",
+      "resolution_requires_human_decision": "HD-02"
+    },
+    {
+      "finding_id": "FND-03",
+      "severity": "medium",
+      "title": "Eleven superseded source plans remain in the canonical docs root without supersession metadata",
+      "evidence_class": "E2_ARTIFACT + E3_AUTHORITY",
+      "verified_observation": [
+        "MASTER-V2 assigns each of its 13 sources an explicit disposition (absorbed_and_superseded_by_this_plan, absorbed_and_superseded_for_sequencing, archive_as_superseded_by_v1_1_0, reference_only, superseded_duplicate).",
+        "The corresponding files still sit in EAFIX_auth_docs/ root alongside the active plan.",
+        "None carry the machine-readable supersession metadata required by authority_and_supersession_checklist.md step 6 (status, superseded_by, reason, active_authority=false).",
+        "EAFIX-MODULE-FOLDER-NAMING-V1 Version.txt (the declared byte-identical duplicate) is already absent from the tree; that specific cleanup is complete.",
+        "99_archive_superseded_do_not_route/archive_manifest.json exists but its entries carry reviewer_decision=pending."
+      ],
+      "why_it_matters": "Superseded plans indistinguishable from active plans by location or metadata. A future agent may route to a superseded plan.",
+      "resolution_requires_human_decision": "HD-02"
+    },
+    {
+      "finding_id": "FND-04",
+      "severity": "high",
+      "title": "Two doc_authority.json files exist with contradictory self-descriptions and incompatible schemas",
+      "evidence_class": "E2_ARTIFACT",
+      "verified_observation": [
+        "EAFIX_auth_docs/00_doc_control_and_authority/doc_authority.json: generated 2026-05-05, updated_at 2026-06-21T18:00:00Z, 24 entries, uses authority_level integer ranking, and states in update_note: this file is the sole doc authority; the transitional working copy has been removed.",
+        "EAFIX_auth_docs/doc_authority.json: generated_at 2026-06-22T00:00:00Z (one day LATER), 5 entries, uses a different schema with control_files, subject_authorities, and a decision_rule precedence array.",
+        "The working copy the 00_ file claims was removed still exists and is dated after it.",
+        "authority_and_supersession_checklist.md step 1 names EAFIX_auth_docs/doc_authority.json (the root copy) as a required control file."
+      ],
+      "why_it_matters": "The document that decides which documents win is itself ambiguous. Every downstream routing decision inherits this ambiguity.",
+      "resolution_requires_human_decision": "HD-03"
+    },
+    {
+      "finding_id": "FND-05",
+      "severity": "high",
+      "title": "Control-file routing paths do not resolve",
+      "evidence_class": "E2_ARTIFACT",
+      "verified_observation": [
+        "EAFIX_auth_docs/doc_authority.json control_files lists EAFIX_auth_docs/module_catalog.json, EAFIX_auth_docs/process_step_catalog.json, EAFIX_auth_docs/module_checklist.json.",
+        "None of those three paths exist. The files actually live in EAFIX_auth_docs/01_canonical_registries/.",
+        "control_files also lists eafix_project_knowledge_reference_routing_instructions.json, which exists only at EAFIX_auth_docs/99_archive_superseded_do_not_route/ - a folder whose routing_policy is do_not_route_by_default.",
+        "authority_and_supersession_checklist.md step 1 repeats the same three broken paths and the same archived routing-instructions reference."
+      ],
+      "why_it_matters": "The mandatory entry gate for all documentation work names files that cannot be opened, and points one control file into the do-not-route archive.",
+      "resolution_requires_human_decision": null
+    },
+    {
+      "finding_id": "FND-06",
+      "severity": "high",
+      "title": "documentation_triage_matrix.json is malformed and cannot be parsed",
+      "evidence_class": "E2_ARTIFACT",
+      "verified_observation": [
+        "json.load fails: Expecting ',' delimiter: line 1163 column 7 (char 43495).",
+        "Root cause is a single missing comma at line 1162 after the target_action key in the entry for EAFIX_auth_docs/superseded/0199900004260118_reentry subsystem is designed as a multi-dimensional decision matrix.md.",
+        "File is 1255 lines, 46883 bytes.",
+        "authority_and_supersession_checklist.md step 3 requires this file to be regenerated with SHA256-based duplicate detection; step 7 requires it to be updated."
+      ],
+      "why_it_matters": "A required governance control artifact is unreadable by any automated consumer. Any tool that parses it fails closed or is silently skipped.",
+      "resolution_requires_human_decision": null
+    },
+    {
+      "finding_id": "FND-07",
+      "severity": "low",
+      "title": "Three EA-REG path references are broken (EA-REG itself exists)",
+      "evidence_class": "E2_ARTIFACT",
+      "verified_observation": [
+        "EA-REG/ EXISTS at repository root. The prior assumption that the directory was removed is incorrect.",
+        "Broken: EA-REG/ALIGNMENT_VALIDATION_REPORT.md, EA-REG/VALIDATION_GATES.md, EA-REG/file_registry.csv.",
+        "Resolving correctly: EA-REG/identifier_map.json, EA-REG/solution_spec.json, and five EA-REG/superseded/ entries.",
+        "00_doc_control_and_authority/doc_authority.json already self-documents two of the three as FILE NOT FOUND ON DISK as of 2026-06-26."
+      ],
+      "why_it_matters": "Small, contained path drift. Already partially self-documented. Must not be over-corrected into a directory-wide restructure.",
+      "resolution_requires_human_decision": null
+    },
+    {
+      "finding_id": "FND-08",
+      "severity": "high",
+      "title": "vNext atomic module catalog declares 34 modules but its modules array is empty",
+      "evidence_class": "E2_ARTIFACT",
+      "verified_observation": [
+        "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json parses successfully; modules is a list of length 0.",
+        "module_registry.jsonl on master contains 34 records.",
+        "The catalog is referenced as LOCKED_PASS_1 with a declared 34-module universe."
+      ],
+      "why_it_matters": "MASTER-V2 PHASE-06 ratifies the 34-module identity universe. It cannot ratify against an empty array. The 34 identities must come from a verified source, not be reconstructed by inference.",
+      "resolution_requires_human_decision": "HD-04"
+    },
+    {
+      "finding_id": "FND-09",
+      "severity": "low",
+      "title": "Stale execution state from a completed prior workstream is unclassified",
+      "evidence_class": "E2_ARTIFACT + E4_HISTORICAL",
+      "verified_observation": [
+        ".state/evidence contains phase and gate IDs (PH-01 through PH-04, GATE-CFG-001 through GATE-CFG-006) that match no phase ID in any SSOT registry plan.",
+        ".state/final_status.json is dated 2026-03-17T00:01:55Z; .state/evidence/phase_1_4_completion_summary.json is dated 2026-05-18T05:47:05Z. Both predate the earliest SSOT registry plan (2026-07-17).",
+        ".state/final_status.json contains machine-specific absolute Windows paths under C:\\\\Users\\\\richg\\\\eafix-modular\\\\.",
+        "phase_1_4_completion_summary.json records overall_status PASS with a residual limitation that runtime source files were not moved because the worktree was dirty."
+      ],
+      "why_it_matters": "Not an active competing workstream. It is undated-in-place historical state that a future agent could mistake for current execution status, and it embeds one developer's local filesystem layout.",
+      "resolution_requires_human_decision": "HD-05"
+    },
+    {
+      "finding_id": "FND-10",
+      "severity": "informational",
+      "title": "The verification package is an unexecuted template set and must not be read as completed verification",
+      "evidence_class": "E2_ARTIFACT",
+      "verified_observation": [
+        "EAFIX_SSOT_REGISTRY_DELIVERY_VERIFICATION_REPORT.json: report_status not_run, final_status null, completion_claim_supported false.",
+        "EAFIX_SSOT_REGISTRY_DELIVERY_VERIFICATION_EVIDENCE_MANIFEST.json: document_state unexecuted_template, evidence_records_collected 0 of 194 required minimum, requirements_unsatisfied 199 of 199.",
+        "EAFIX_SSOT_REGISTRY_DELIVERY_OBLIGATION_MATRIX.generated.json: status generated_unexecuted, 1405 obligations mapped to 86 checks at 100.0 percent coverage, 0 unmapped.",
+        "The verification spec target_plan sha256 matches the MASTER-V2 bytes on master exactly, so the binding is intact."
+      ],
+      "why_it_matters": "The mapping layer is sound and reusable. The verdict layer is empty. Presence of these files is not evidence of verification.",
+      "resolution_requires_human_decision": null
+    }
+  ],
+  "human_decision_register": [
+    {
+      "decision_id": "HD-01",
+      "title": "Disposition of the unverifiable MASTER-V2 provenance sources",
+      "blocks_phase": "PHASE-01",
+      "finding_refs": [
+        "FND-01"
+      ],
+      "question": "Two cited source documents (remediation v1.1.0 and amendment v1.0.1) have never existed in repository history. How is MASTER-V2's provenance to be made truthful?",
+      "options": [
+        {
+          "option_id": "HD-01-A",
+          "label": "Locate and commit",
+          "description": "Owner produces the two files from an external location. Their sha256 is verified against the cited values, they are committed, and provenance is confirmed intact.",
+          "consequence": "Strongest outcome. MASTER-V2 provenance becomes fully verifiable. No plan content changes."
+        },
+        {
+          "option_id": "HD-01-B",
+          "label": "Correct provenance to observed reality",
+          "description": "Amend MASTER-V2 source_plan_consolidation to remove the two unverifiable sources, reduce source_count from 13 to 11, recompute unique_content_hash_count, and add an explicit provenance_gap_note recording that the v1.1.0 lineage could not be substantiated.",
+          "consequence": "MASTER-V2 sha256 changes. The verification spec target_plan binding (currently 1fc42c...) MUST be re-bound in the same change or every verification run becomes invalid."
+        },
+        {
+          "option_id": "HD-01-C",
+          "label": "Ratify with recorded exception",
+          "description": "Leave MASTER-V2 bytes unchanged. Record a standing governance exception naming FND-01, and require any MASTER-V2 phase whose content derives from the v1.1.0 lineage to re-derive its justification from E1/E2 evidence before execution.",
+          "consequence": "Preserves the hash binding and avoids churn, but leaves an unverifiable assertion inside the root authority document."
+        }
+      ],
+      "decision_owner": "Dick",
+      "recorded_decision": null,
+      "recorded_rationale": null,
+      "prohibition": "The executing agent must not select an option, must not fabricate the missing files, and must not synthesize content matching the cited hashes."
+    },
+    {
+      "decision_id": "HD-02",
+      "title": "Canonical filename for MASTER-V2 and archival destination for superseded plans",
+      "blocks_phase": "PHASE-02",
+      "finding_refs": [
+        "FND-02",
+        "FND-03"
+      ],
+      "question": "Which single filename is canonical for MASTER-V2, and where do the eleven superseded source plans go?",
+      "options": [
+        {
+          "option_id": "HD-02-A",
+          "label": "Bind to the spec-named file",
+          "description": "Retain EAFIX_SSOT_REGISTRY_SYSTEM_FINAL_MERGED_IMPLEMENTATION_PLAN_v2_0_0.json (the bare form already named in the verification spec target_plan.filename). Delete the four Chat_/Final_ prefixed duplicates.",
+          "consequence": "Zero downstream reference churn. Recommended on evidence: the verification spec already names this exact filename."
+        },
+        {
+          "option_id": "HD-02-B",
+          "label": "Bind to a different filename",
+          "description": "Owner names an alternative canonical filename. All references, including verification spec target_plan.filename, are updated in the same change.",
+          "consequence": "Requires coordinated reference update; higher risk."
+        }
+      ],
+      "sub_decision": {
+        "id": "HD-02-ARCHIVE",
+        "question": "Destination for the eleven superseded source plans.",
+        "options": [
+          {
+            "option_id": "ARC-A",
+            "label": "99_archive_superseded_do_not_route/",
+            "description": "Move all superseded plans there and register each in archive_manifest.json with reviewer_decision set to approved."
+          },
+          {
+            "option_id": "ARC-B",
+            "label": "superseded/",
+            "description": "Use the existing EAFIX_auth_docs/superseded/ folder, which already holds four superseded documents."
+          },
+          {
+            "option_id": "ARC-C",
+            "label": "Retain in place with metadata only",
+            "description": "Leave files where they are and add supersession metadata sidecar records. Lowest disruption, weakest routing protection."
+          }
+        ]
+      },
+      "decision_owner": "Dick",
+      "recorded_decision": null,
+      "prohibition": "No file may be deleted before the owner records a decision. Deletion of the four duplicates is lawful only because their bytes are provably identical to the retained file; the agent must re-verify hash equality immediately before deletion."
+    },
+    {
+      "decision_id": "HD-03",
+      "title": "Which doc_authority.json is canonical",
+      "blocks_phase": "PHASE-03",
+      "finding_refs": [
+        "FND-04",
+        "FND-05"
+      ],
+      "question": "Two doc_authority.json files exist with contradictory self-descriptions and incompatible schemas. Which is canonical, and what happens to the other?",
+      "options": [
+        {
+          "option_id": "HD-03-A",
+          "label": "00_doc_control_and_authority copy is canonical",
+          "description": "It has 24 entries versus 5, was updated during a documented governance recovery exercise, sits in the folder named for doc control, and explicitly claims sole authority. Delete or archive the root copy and update authority_and_supersession_checklist.md step 1 to point at it.",
+          "consequence": "Honours the file's own claim. Requires updating the checklist and any consumer expecting the root path."
+        },
+        {
+          "option_id": "HD-03-B",
+          "label": "Root copy is canonical",
+          "description": "It is dated one day later and matches the path already named in authority_and_supersession_checklist.md step 1. Its 5 entries must first be reconciled against the 24 in the other file so no authority record is lost.",
+          "consequence": "Requires a documented merge of 24 entries into the 5-entry schema before the other file is archived. Higher effort, higher risk of silent record loss."
+        },
+        {
+          "option_id": "HD-03-C",
+          "label": "Merge into one new canonical file",
+          "description": "Produce a single reconciled doc_authority.json adopting one schema, containing the union of all entries, with every merge decision recorded.",
+          "consequence": "Cleanest end state, highest effort. Requires a per-entry reconciliation record."
+        }
+      ],
+      "decision_owner": "Dick",
+      "recorded_decision": null,
+      "prohibition": "Neither file may be edited, moved, or deleted before this decision is recorded. The agent must not infer canonicity from file modification date alone."
+    },
+    {
+      "decision_id": "HD-04",
+      "title": "Authoritative source for the 34 module identities",
+      "blocks_phase": "PHASE-05",
+      "finding_refs": [
+        "FND-08"
+      ],
+      "question": "The vNext catalog declares 34 modules but holds an empty array. From which verified source are the 34 identities to be populated?",
+      "options": [
+        {
+          "option_id": "HD-04-A",
+          "label": "Populate from module_registry.jsonl",
+          "description": "Derive the 34 catalog entries from the 34 records already present in module_registry.jsonl, which is the authored registry authority.",
+          "consequence": "Consistent with the registry-as-authority model. Requires a field-mapping record showing exactly which registry field populates which catalog field."
+        },
+        {
+          "option_id": "HD-04-B",
+          "label": "Populate from an external authored source",
+          "description": "Owner supplies the authored 34-module catalog content from outside the repository. Contents are committed and hash-recorded.",
+          "consequence": "Requires provenance evidence for the supplied content."
+        },
+        {
+          "option_id": "HD-04-C",
+          "label": "Retire the vNext catalog",
+          "description": "Declare Claude_gen_atomic_module_catalog_vNext.json superseded by module_registry.jsonl, archive it, and remove it from routing.",
+          "consequence": "Eliminates the dual-authority problem entirely. Requires confirming that no consumer depends on the catalog's distinct schema."
+        }
+      ],
+      "decision_owner": "Dick",
+      "recorded_decision": null,
+      "prohibition": "The agent must not populate the modules array by inference, reconstruction, or transcription from prose documents. If HD-04-A is selected, every populated field must trace to a named registry field."
+    },
+    {
+      "decision_id": "HD-05",
+      "title": "Disposition of stale .state execution evidence",
+      "blocks_phase": "PHASE-06",
+      "finding_refs": [
+        "FND-09"
+      ],
+      "question": "The .state trail is completed historical state from a prior workstream, containing machine-specific absolute paths. What is its disposition?",
+      "options": [
+        {
+          "option_id": "HD-05-A",
+          "label": "Annotate in place",
+          "description": "Add .state/WORKSTREAM_PROVENANCE.md recording the workstream identity, date range, completed status, and an explicit statement that it is unrelated to the SSOT registry plans. Change no evidence files.",
+          "consequence": "Preserves the audit trail intact. Recommended default: minimal, reversible, and matches proportionality."
+        },
+        {
+          "option_id": "HD-05-B",
+          "label": "Archive the tree",
+          "description": "Move .state to an archive location with a manifest.",
+          "consequence": "Reduces confusion but may break any tooling that reads .state."
+        },
+        {
+          "option_id": "HD-05-C",
+          "label": "Leave untouched",
+          "description": "Record the finding as accepted risk and take no action.",
+          "consequence": "Zero effort; the misreading risk persists."
+        }
+      ],
+      "decision_owner": "Dick",
+      "recorded_decision": null,
+      "prohibition": "The agent must not sanitize, rewrite, or delete historical evidence records. The absolute Windows paths are part of the historical record and must be annotated, not edited."
+    },
+    {
+      "decision_id": "HD-06",
+      "title": "Ratification of MASTER-V2 for execution",
+      "blocks_phase": "PHASE-07",
+      "finding_refs": [
+        "FND-01",
+        "FND-10"
+      ],
+      "question": "With all remediation complete, is MASTER-V2 ratified for execution, and does its status change from proposed_pending_owner_ratification?",
+      "options": [
+        {
+          "option_id": "HD-06-A",
+          "label": "Ratify",
+          "description": "All findings closed or explicitly waived. MASTER-V2 status transitions to ratified_for_execution. The verification spec binding is confirmed current."
+        },
+        {
+          "option_id": "HD-06-B",
+          "label": "Ratify with scoped exceptions",
+          "description": "Ratify while naming specific findings as accepted risk, each with a rationale and a review date."
+        },
+        {
+          "option_id": "HD-06-C",
+          "label": "Withhold ratification",
+          "description": "One or more findings remain unacceptable. Plan returns to remediation with named blockers."
+        }
+      ],
+      "decision_owner": "Dick",
+      "recorded_decision": null,
+      "prohibition": "The agent must never set MASTER-V2 status to ratified without a recorded HD-06 decision, and must never report this plan complete while any finding is open and unwaived."
+    }
+  ],
+  "write_scopes": {
+    "rule": "Each task declares the exact paths it may create, modify, or delete. Any write outside a task's declared scope is a plan violation and must abort the task.",
+    "global_prohibited_paths": [
+      "EAFIX_auth_docs/01_canonical_registries/*.jsonl",
+      "EAFIX_auth_docs/generated/**",
+      "tools/registries/**",
+      ".github/workflows/**",
+      "EA-REG/**",
+      "services/**",
+      "compliance/**"
+    ],
+    "global_prohibition_rationale": "Authored registry data, generated projections, registry tooling, and CI are owned by MASTER-V2 phases. This plan repairs governance metadata only. EA-REG, services, and compliance are entirely out of scope."
+  },
+  "phases": [
+    {
+      "phase_id": "PHASE-00",
+      "title": "Freeze the baseline and re-verify every finding before any write",
+      "execution_mode": "read_only",
+      "gate_rule": "No task in any later phase may begin until every PHASE-00 task reports a verdict. If any finding fails to reproduce, STOP and report the divergence. Do not proceed on a stale audit.",
+      "human_decision_gates": [],
+      "tasks": [
+        {
+          "task_id": "GOV-000",
+          "action": "Capture and freeze the working baseline.",
+          "method": [
+            "git clone https://github.com/DICKY1987/eafix-modular.git && cd eafix-modular",
+            "git fetch --unshallow || true",
+            "git rev-parse HEAD",
+            "Record HEAD commit sha, commit date, and branch."
+          ],
+          "acceptance_criteria": [
+            "HEAD sha recorded.",
+            "If HEAD differs from 43f0962, every PHASE-00 verification task must still be run and any divergence reported before proceeding."
+          ],
+          "evidence_required": [
+            "Recorded HEAD sha and date.",
+            "Explicit statement of whether HEAD matches the audit baseline."
+          ],
+          "write_scope": [],
+          "failure_handling": "If the clone or fetch fails, abort the plan. Do not work from a partial tree."
+        },
+        {
+          "task_id": "GOV-001",
+          "action": "Re-verify FND-01: confirm the two cited provenance sources exist nowhere in history.",
+          "method": [
+            "git log --all --diff-filter=ADMR --name-only --format='COMMIT %h %ci' | grep -iE 'REMEDIATION_IMPLEMENTATION_PLAN_v1_1_0|PLAN_AMENDMENT_v1_0_1' | sort -u",
+            "find . -path ./.git -prune -o -iname '*REMEDIATION*' -print -o -iname '*AMENDMENT*' -print",
+            "Parse MASTER-V2 source_plan_consolidation.sources and list every source whose canonical_filename does not resolve on disk."
+          ],
+          "acceptance_criteria": [
+            "Verdict recorded: sources absent from all history (confirms FND-01) or found (FND-01 refuted).",
+            "Exact list of unresolvable source filenames with their cited sha256 values."
+          ],
+          "evidence_required": [
+            "Raw command output.",
+            "Enumerated unresolvable-source list.",
+            "Evidence class E2_ARTIFACT and E4_HISTORICAL."
+          ],
+          "write_scope": [],
+          "failure_handling": "If the files ARE found, mark FND-01 refuted, verify their sha256 against the cited values, and skip PHASE-01 tasks GOV-011 onward."
+        },
+        {
+          "task_id": "GOV-002",
+          "action": "Re-verify FND-02 and FND-03: duplicate and superseded document inventory.",
+          "method": [
+            "sha256sum EAFIX_auth_docs/*FINAL_MERGED_IMPLEMENTATION_PLAN_v2_0_0.json",
+            "For each of the 13 MASTER-V2 declared sources, resolve its canonical_filename on disk and record path, sha256, and declared disposition.",
+            "For each resolved file, test whether it carries supersession metadata keys (status, superseded_by, reason, active_authority)."
+          ],
+          "acceptance_criteria": [
+            "Duplicate set enumerated with hashes proving identity.",
+            "Table of source filename, on-disk path, declared disposition, supersession metadata present true or false."
+          ],
+          "evidence_required": [
+            "Hash table.",
+            "Supersession metadata coverage count."
+          ],
+          "write_scope": [],
+          "failure_handling": "If any two supposed duplicates differ in hash, escalate immediately. Non-identical copies are a different and more serious problem than duplication."
+        },
+        {
+          "task_id": "GOV-003",
+          "action": "Re-verify FND-04 and FND-05: doc authority collision and control-file path resolution.",
+          "method": [
+            "Parse both doc_authority.json files. Record generated_at, updated_at, entry count, schema key set, and any self-authority claim.",
+            "For every path named in control_files and in authority_and_supersession_checklist.md step 1, test existence and record the actual location if found elsewhere.",
+            "Record whether any resolved control file lives under 99_archive_superseded_do_not_route."
+          ],
+          "acceptance_criteria": [
+            "Both files characterised.",
+            "Every control-file path classified as resolves, resolves_elsewhere, or missing.",
+            "Archive-routing conflict explicitly flagged if present."
+          ],
+          "evidence_required": [
+            "Side-by-side comparison table.",
+            "Path resolution table."
+          ],
+          "write_scope": [],
+          "failure_handling": "None. Read-only characterisation."
+        },
+        {
+          "task_id": "GOV-004",
+          "action": "Re-verify FND-06, FND-07, FND-08, FND-09, FND-10.",
+          "method": [
+            "json.load(EAFIX_auth_docs/documentation_triage_matrix.json) and capture the exact exception text and line/column.",
+            "Extract every EA-REG path reference from both doc_authority files and test each for existence.",
+            "Parse Claude_gen_atomic_module_catalog_vNext.json and record len(modules) and the declared module count.",
+            "wc -l on each of the ten registry JSONL files and on registry_conflict_queue.jsonl.",
+            "Read .state/final_status.json and .state/evidence/phase_1_4_completion_summary.json; record timestamps and any absolute filesystem paths.",
+            "Read report_status, final_status, document_state, and evidence_records_collected from the three verification package artifacts.",
+            "Recompute sha256 of the MASTER-V2 file named in the verification spec target_plan and compare to the spec's declared hash."
+          ],
+          "acceptance_criteria": [
+            "Parse failure of the triage matrix reproduced with exact coordinates, or FND-06 marked refuted.",
+            "EA-REG references split into resolving and broken with counts.",
+            "vNext modules array length recorded.",
+            "All ten registry counts and conflict queue count recorded.",
+            ".state timestamps recorded and confirmed to predate 2026-07-17.",
+            "Verification spec target_plan hash binding confirmed intact or broken."
+          ],
+          "evidence_required": [
+            "Raw parse exception text.",
+            "Path resolution results.",
+            "All counts.",
+            "Hash comparison result."
+          ],
+          "write_scope": [],
+          "failure_handling": "If the verification spec hash binding is already broken at baseline, raise it as a new finding before proceeding."
+        },
+        {
+          "task_id": "GOV-005",
+          "action": "Produce the frozen baseline report and open the human decision gates.",
+          "method": [
+            "Consolidate GOV-001 through GOV-004 into a single baseline report.",
+            "For each of the ten findings record: confirmed, refuted, or changed.",
+            "Present HD-01 through HD-05 to the owner with the verified evidence attached to each."
+          ],
+          "acceptance_criteria": [
+            "Baseline report produced.",
+            "Every finding has a reproduction verdict.",
+            "HD gates presented with evidence."
+          ],
+          "evidence_required": [
+            "governance_remediation_baseline_report.json containing findings, verdicts, counts, and the HEAD sha."
+          ],
+          "write_scope": [
+            "governance_remediation_baseline_report.json"
+          ],
+          "failure_handling": "If three or more findings are refuted, stop and request a fresh audit rather than executing a plan built on a stale picture."
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-01",
+      "title": "Resolve the MASTER-V2 provenance integrity defect",
+      "execution_mode": "write_gated",
+      "gate_rule": "Blocked on HD-01. No task may run until the owner records a decision.",
+      "human_decision_gates": [
+        "HD-01"
+      ],
+      "depends_on": [
+        "PHASE-00"
+      ],
+      "tasks": [
+        {
+          "task_id": "GOV-010",
+          "action": "Apply HD-01-A: verify and commit the recovered source files.",
+          "conditional_on": "HD-01 decision == HD-01-A",
+          "method": [
+            "Receive the two files from the owner.",
+            "Compute sha256 of each and compare byte-for-byte against 5599abc4f4c7880c8757fb4786eaef6069da61631a508fd4b2fc995868f5d8b1 and 9b17283952ff05e3dd7c3e1590e5280d8df3dffaca74fb907dee39ed23915912.",
+            "If and only if both match, commit them to EAFIX_auth_docs/ under their canonical filenames.",
+            "Re-run the MASTER-V2 source resolution check from GOV-001."
+          ],
+          "acceptance_criteria": [
+            "Both sha256 values match exactly.",
+            "All 13 MASTER-V2 sources now resolve on disk.",
+            "MASTER-V2 bytes unchanged."
+          ],
+          "evidence_required": [
+            "sha256 of each committed file.",
+            "Confirmation that unresolvable-source count is now zero.",
+            "Confirmation MASTER-V2 sha256 still equals 1fc42c139e0a290942a393fe22e0022f6e72cee32d221921bd0143c29513b7d8."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/EAFIX_REGISTRY_POST_MERGE_REMEDIATION_IMPLEMENTATION_PLAN_v1_1_0.json",
+            "EAFIX_auth_docs/EAFIX_REGISTRY_POST_MERGE_REMEDIATION_PLAN_AMENDMENT_v1_0_1.json"
+          ],
+          "failure_handling": "If either hash mismatches, DO NOT COMMIT. The supplied file is not the cited artifact. Return to HD-01 and report the mismatch with both hashes."
+        },
+        {
+          "task_id": "GOV-011",
+          "action": "Apply HD-01-B: correct MASTER-V2 provenance to observed reality and re-bind the verification spec.",
+          "conditional_on": "HD-01 decision == HD-01-B",
+          "method": [
+            "Remove SRC-REG-REMEDIATION-V1-1 and SRC-REG-REMEDIATION-AMENDMENT from source_plan_consolidation.sources.",
+            "Set source_count to the actual remaining count and recompute unique_content_hash_count from the remaining sources' distinct sha256 values.",
+            "Update the SRC-REG-REMEDIATION-V1-0 disposition, which currently reads archive_as_superseded_by_v1_1_0 and would otherwise reference a removed source.",
+            "Add a provenance_gap_note recording the removal, the cited hashes, and the evidence that the files never existed in history.",
+            "Review decision_gates_from_active_remediation. GATE-AUTHORITY-PARITY-TOOL states parity mismatches are advisory in v1.1.0; rewrite that note to state its actual basis or mark the gate as requiring re-derivation.",
+            "Recompute MASTER-V2 sha256.",
+            "In the SAME change, update EAFIX_SSOT_REGISTRY_DELIVERY_VERIFICATION_SPEC_v1_0_0.json target_plan.sha256 and target_plan.byte_size to the new values.",
+            "Re-run the package validator."
+          ],
+          "acceptance_criteria": [
+            "No source in MASTER-V2 fails to resolve on disk.",
+            "source_count equals the actual number of sources listed.",
+            "unique_content_hash_count equals the count of distinct sha256 values among listed sources.",
+            "No remaining disposition string references a removed source.",
+            "Verification spec target_plan.sha256 equals the recomputed MASTER-V2 hash.",
+            "python validate_eafix_ssot_registry_verification_package.py reports no binding errors."
+          ],
+          "evidence_required": [
+            "Old and new MASTER-V2 sha256.",
+            "Old and new source_count and unique_content_hash_count.",
+            "Validator output.",
+            "Diff of the verification spec target_plan block."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/EAFIX_SSOT_REGISTRY_SYSTEM_FINAL_MERGED_IMPLEMENTATION_PLAN_v2_0_0.json",
+            "EAFIX_auth_docs/EAFIX_SSOT_REGISTRY_DELIVERY_VERIFICATION_SPEC_v1_0_0.json"
+          ],
+          "failure_handling": "If the plan hash changes without the spec being updated in the same commit, the verification package is invalidated. Abort and revert rather than commit a split change."
+        },
+        {
+          "task_id": "GOV-012",
+          "action": "Apply HD-01-C: record a standing governance exception without altering MASTER-V2 bytes.",
+          "conditional_on": "HD-01 decision == HD-01-C",
+          "method": [
+            "Create EAFIX_auth_docs/governance_exceptions.json with an exception record naming FND-01, the two cited filenames, their cited hashes, the evidence of absence, the owner's rationale, and a review date.",
+            "Enumerate every MASTER-V2 element whose content derives from the v1.1.0 lineage, minimally decision_gates_from_active_remediation GATE-REG-FK-BASELINE and GATE-AUTHORITY-PARITY-TOOL.",
+            "For each, record a re_derivation_required flag requiring E1 or E2 justification before that gate is executed."
+          ],
+          "acceptance_criteria": [
+            "Exception file created and parses.",
+            "Every derived element enumerated with re_derivation_required set.",
+            "MASTER-V2 sha256 unchanged at 1fc42c139e0a290942a393fe22e0022f6e72cee32d221921bd0143c29513b7d8."
+          ],
+          "evidence_required": [
+            "Exception record contents.",
+            "Enumerated derived-element list.",
+            "Confirmation MASTER-V2 hash unchanged."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/governance_exceptions.json"
+          ],
+          "failure_handling": "If MASTER-V2 bytes change under this option, the option has been violated. Revert."
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-02",
+      "title": "Deduplicate MASTER-V2 and archive superseded source plans",
+      "execution_mode": "write_gated",
+      "gate_rule": "Blocked on HD-02 and its HD-02-ARCHIVE sub-decision.",
+      "human_decision_gates": [
+        "HD-02"
+      ],
+      "depends_on": [
+        "PHASE-01"
+      ],
+      "tasks": [
+        {
+          "task_id": "GOV-020",
+          "action": "Collapse the five MASTER-V2 copies to the single owner-selected canonical filename.",
+          "method": [
+            "Immediately before deletion, recompute sha256 of all five files and assert all are identical.",
+            "Retain the HD-02 selected filename. Delete the other four with git rm.",
+            "grep the whole tree for each deleted filename and update any reference found."
+          ],
+          "acceptance_criteria": [
+            "Exactly one file matching *FINAL_MERGED_IMPLEMENTATION_PLAN_v2_0_0.json remains in EAFIX_auth_docs/.",
+            "Its sha256 is unchanged from the pre-deletion value.",
+            "grep for the four deleted filenames returns no hits outside git history."
+          ],
+          "evidence_required": [
+            "Pre-deletion hash table for all five.",
+            "Post-state directory listing.",
+            "grep output proving no dangling references."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/Chat_EAFIX_SSOT_REGISTRY_SYSTEM_FINAL_MERGED_IMPLEMENTATION_PLAN_v2_0_0.json",
+            "EAFIX_auth_docs/Chat_2_EAFIX_SSOT_REGISTRY_SYSTEM_FINAL_MERGED_IMPLEMENTATION_PLAN_v2_0_0.json",
+            "EAFIX_auth_docs/Chat_3_EAFIX_SSOT_REGISTRY_SYSTEM_FINAL_MERGED_IMPLEMENTATION_PLAN_v2_0_0.json",
+            "EAFIX_auth_docs/Final_EAFIX_SSOT_REGISTRY_SYSTEM_FINAL_MERGED_IMPLEMENTATION_PLAN_v2_0_0.json",
+            "EAFIX_auth_docs/EAFIX_SSOT_REGISTRY_SYSTEM_FINAL_MERGED_IMPLEMENTATION_PLAN_v2_0_0.json"
+          ],
+          "failure_handling": "If any hash differs at the moment of deletion, abort. Do not delete a file whose bytes are not provably identical to the retained copy."
+        },
+        {
+          "task_id": "GOV-021",
+          "action": "Attach machine-readable supersession metadata to every superseded source plan.",
+          "method": [
+            "For each MASTER-V2 source with a superseding disposition, create a sidecar record capturing: file path, sha256, document_id, declared disposition, superseded_by (MASTER-V2 plan_id), reason, active_authority false, and decision date.",
+            "For JSON source plans where the schema permits, additionally set an in-file supersession block. Do not alter any other field.",
+            "Record every file whose sha256 changed as a result and confirm the change is confined to the supersession block."
+          ],
+          "acceptance_criteria": [
+            "Every superseded source has a supersession record.",
+            "Chat_EAFIX_SSOT_REGISTRY_SYSTEM_MASTER_IMPLEMENTATION_PLAN_v1_0_0.json is marked superseded_by MASTER-V2.",
+            "EAFIX_PROPOSED_34_MODULE_FILE_TREE.md is classified reference_only, not superseded, matching its declared disposition.",
+            "No source plan's substantive content is altered."
+          ],
+          "evidence_required": [
+            "Supersession record set.",
+            "Before and after hash for every modified file.",
+            "Per-file diff confined to supersession fields."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/supersession_records.json",
+            "EAFIX_auth_docs/EAFIX*.json",
+            "EAFIX_auth_docs/EAFIX*.md",
+            "EAFIX_auth_docs/EAFIX*.txt",
+            "EAFIX_auth_docs/Chat_EAFIX_SSOT_REGISTRY_SYSTEM_MASTER_IMPLEMENTATION_PLAN_v1_0_0.json"
+          ],
+          "failure_handling": "If a diff extends beyond the supersession block, revert that file and record it for manual handling."
+        },
+        {
+          "task_id": "GOV-022",
+          "action": "Execute the archival move per the HD-02-ARCHIVE decision and update the archive manifest.",
+          "conditional_on": "HD-02-ARCHIVE decision is ARC-A or ARC-B",
+          "method": [
+            "git mv each superseded plan to the selected destination.",
+            "Add an entry to 99_archive_superseded_do_not_route/archive_manifest.json for each moved file with file, replacement, sha256, reason, and reviewer_decision approved.",
+            "Resolve the pre-existing archive_manifest entries currently carrying reviewer_decision pending by presenting them to the owner.",
+            "grep the tree for every moved path and repair references."
+          ],
+          "acceptance_criteria": [
+            "Every superseded plan resides at the selected destination.",
+            "archive_manifest.json parses and contains an entry for every moved file.",
+            "No archive_manifest entry retains reviewer_decision pending without an owner note.",
+            "No active document references a moved file by its old path."
+          ],
+          "evidence_required": [
+            "Move log with old and new paths.",
+            "Updated manifest entry count.",
+            "Dangling-reference grep proving zero hits."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/99_archive_superseded_do_not_route/**",
+            "EAFIX_auth_docs/superseded/**",
+            "EAFIX_auth_docs/EAFIX*"
+          ],
+          "failure_handling": "If a moved file is still referenced by an active document, restore it and record the blocking reference. Never leave a live reference pointing into the do-not-route archive."
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-03",
+      "title": "Resolve the doc-authority collision and repair control-file routing",
+      "execution_mode": "write_gated",
+      "gate_rule": "Blocked on HD-03. Neither doc_authority.json may be edited, moved, or deleted before the decision is recorded.",
+      "human_decision_gates": [
+        "HD-03"
+      ],
+      "depends_on": [
+        "PHASE-02"
+      ],
+      "tasks": [
+        {
+          "task_id": "GOV-030",
+          "action": "Produce a full entry-level reconciliation of the two doc_authority.json files.",
+          "method": [
+            "Extract all 24 entries from the 00_doc_control_and_authority copy and all 5 from the root copy.",
+            "Key entries by the document path they govern.",
+            "Classify each as: present in both and agreeing, present in both and conflicting, present only in the 24-entry file, or present only in the 5-entry file.",
+            "For every conflicting pair, record both assertions verbatim without resolving them.",
+            "Map the authority_level integer scheme against the canonical/supporting_reference/legacy_reference/generated/superseded precedence scheme and record whether the mapping is total or lossy."
+          ],
+          "acceptance_criteria": [
+            "All 29 entries classified with no entry unaccounted for.",
+            "Every conflicting pair recorded with both assertions.",
+            "Schema mapping explicitly declared total or lossy, with the lossy cases enumerated."
+          ],
+          "evidence_required": [
+            "doc_authority_reconciliation.json containing the full classification.",
+            "Conflict count.",
+            "Entries-unique-to-each-file counts."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/doc_authority_reconciliation.json"
+          ],
+          "failure_handling": "If the two schemes cannot be mapped without loss, that fact must be surfaced to HD-03 before any file is retired. Never silently drop an entry."
+        },
+        {
+          "task_id": "GOV-031",
+          "action": "Establish the single canonical doc_authority.json per the HD-03 decision.",
+          "method": [
+            "Apply the owner's selected option using the GOV-030 reconciliation as the merge input.",
+            "For HD-03-A: retire the root copy and carry forward any entry unique to it.",
+            "For HD-03-B: merge the 24 entries into the root copy's schema before retiring the other.",
+            "For HD-03-C: write a new reconciled file adopting one schema with the union of entries.",
+            "Retired files move to archive with a supersession record. They are not deleted.",
+            "Every carried-forward, transformed, or dropped entry is recorded with a rationale."
+          ],
+          "acceptance_criteria": [
+            "Exactly one doc_authority.json is designated canonical, and it declares that status in-file.",
+            "The retired file carries supersession metadata and is not routable.",
+            "Total governed-document coverage in the canonical file is greater than or equal to the union count from GOV-030, or every omission is explicitly recorded with a rationale.",
+            "The canonical file parses and validates against its declared schema_version."
+          ],
+          "evidence_required": [
+            "Entry count before and after.",
+            "Per-entry disposition log.",
+            "Parse and schema validation result."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/doc_authority.json",
+            "EAFIX_auth_docs/00_doc_control_and_authority/doc_authority.json",
+            "EAFIX_auth_docs/99_archive_superseded_do_not_route/**"
+          ],
+          "failure_handling": "If post-merge coverage is lower than the union count and any omission lacks a rationale, revert. Silent authority-record loss is the worst possible outcome of this phase."
+        },
+        {
+          "task_id": "GOV-032",
+          "action": "Repair every broken control-file path.",
+          "method": [
+            "In the canonical doc_authority.json control_files list, correct the three paths to EAFIX_auth_docs/01_canonical_registries/module_catalog.json, /process_step_catalog.json, and /module_checklist.json.",
+            "Resolve the eafix_project_knowledge_reference_routing_instructions.json reference, which currently exists only inside 99_archive_superseded_do_not_route. Either promote the file out of the archive, or replace the control-file reference with the live routing authority, or remove it from control_files. Record which and why.",
+            "Apply the identical corrections to authority_and_supersession_checklist.md step 1.",
+            "Re-test every corrected path for existence."
+          ],
+          "acceptance_criteria": [
+            "Every path in control_files resolves on disk.",
+            "No control file resolves to a path inside 99_archive_superseded_do_not_route.",
+            "authority_and_supersession_checklist.md step 1 lists only resolving paths.",
+            "The checklist and the canonical doc_authority.json name an identical control-file set."
+          ],
+          "evidence_required": [
+            "Path resolution table showing all entries resolving.",
+            "Rationale for the routing-instructions disposition.",
+            "Diff of both files."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/doc_authority.json",
+            "EAFIX_auth_docs/00_doc_control_and_authority/doc_authority.json",
+            "EAFIX_auth_docs/authority_and_supersession_checklist.md"
+          ],
+          "failure_handling": "If a control file genuinely does not exist anywhere, do not invent it. Record it as a missing-artifact finding and remove it from control_files with an explicit note."
+        },
+        {
+          "task_id": "GOV-033",
+          "action": "Repair the three broken EA-REG references, bounded strictly to those three.",
+          "method": [
+            "For EA-REG/ALIGNMENT_VALIDATION_REPORT.md, EA-REG/VALIDATION_GATES.md, and EA-REG/file_registry.csv, determine whether each is generated, relocated, or genuinely absent.",
+            "Note that EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_registry.csv exists and may be the relocated target of the third reference. Verify before asserting.",
+            "For generated artifacts, replace the reference with a generation instruction rather than a path claim.",
+            "For genuinely absent artifacts, mark the entry with an explicit not-present status and the date verified.",
+            "Change nothing else in EA-REG and add no new EA-REG files."
+          ],
+          "acceptance_criteria": [
+            "All three references are either resolving, marked generated with a named generator, or marked explicitly absent.",
+            "The count of resolving EA-REG references has not decreased from its baseline value.",
+            "No file inside EA-REG/ has been created, modified, or deleted."
+          ],
+          "evidence_required": [
+            "Per-reference disposition with evidence.",
+            "Before and after broken-reference counts.",
+            "git status confirming EA-REG/ is untouched."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/doc_authority.json",
+            "EAFIX_auth_docs/00_doc_control_and_authority/doc_authority.json"
+          ],
+          "failure_handling": "This task must not expand into an EA-REG restructure. If resolution appears to require moving EA-REG content, stop and record it as out-of-scope for owner routing."
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-04",
+      "title": "Repair malformed governance artifacts",
+      "execution_mode": "write",
+      "gate_rule": "No human decision gate. Repairs are deterministic and evidence-bound.",
+      "human_decision_gates": [],
+      "depends_on": [
+        "PHASE-00"
+      ],
+      "parallelizable_with": [
+        "PHASE-01",
+        "PHASE-02",
+        "PHASE-03"
+      ],
+      "tasks": [
+        {
+          "task_id": "GOV-040",
+          "action": "Repair documentation_triage_matrix.json with the minimum possible edit.",
+          "method": [
+            "Insert the single missing comma at line 1162 after the target_action value in the entry for the reentry decision-matrix document.",
+            "Change no other byte.",
+            "json.load the file to confirm it parses.",
+            "Count entries and confirm the count is consistent with the pre-repair structure.",
+            "Run a whole-file scan for any further syntax defect beyond the first."
+          ],
+          "acceptance_criteria": [
+            "json.load succeeds.",
+            "The diff is exactly one character.",
+            "Entry count is recorded and no entry has been added or lost.",
+            "No second syntax defect remains."
+          ],
+          "evidence_required": [
+            "The one-line diff.",
+            "Successful parse output.",
+            "Entry count.",
+            "Before and after sha256."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/documentation_triage_matrix.json"
+          ],
+          "failure_handling": "If parsing still fails after the comma insertion, do not attempt bulk reformatting. Report the next defect coordinates and stop. Reformatting a governance artifact destroys its diff history."
+        },
+        {
+          "task_id": "GOV-041",
+          "action": "Validate every JSON and JSONL governance artifact in the canonical docs tree.",
+          "method": [
+            "Recursively json.load every .json file under EAFIX_auth_docs.",
+            "Line-by-line json.loads every .jsonl file under EAFIX_auth_docs.",
+            "Record path, result, and exception coordinates for each failure."
+          ],
+          "acceptance_criteria": [
+            "Every file tested.",
+            "Complete pass/fail inventory produced.",
+            "Zero parse failures remaining, or each remaining failure explicitly recorded with coordinates and a reason it was not repaired in this plan."
+          ],
+          "evidence_required": [
+            "Full inventory with counts of files tested, passed, and failed."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/governance_artifact_parse_report.json"
+          ],
+          "failure_handling": "Do not repair a defect outside this plan's scope. Registry JSONL data belongs to MASTER-V2; record such defects and route them, do not fix them here."
+        },
+        {
+          "task_id": "GOV-042",
+          "action": "Regenerate the triage matrix duplicate-detection data as required by the supersession checklist.",
+          "depends_on": [
+            "GOV-040"
+          ],
+          "method": [
+            "Compute sha256 for every document under EAFIX_auth_docs.",
+            "Group by hash to identify byte-identical duplicate sets.",
+            "Update documentation_triage_matrix.json duplicate_of and sha256 fields from the computed values only.",
+            "Confirm the four MASTER-V2 duplicates removed in GOV-020 no longer appear as a duplicate group."
+          ],
+          "acceptance_criteria": [
+            "Every entry carries a computed sha256.",
+            "duplicate_of is populated from hash grouping, never from filename similarity.",
+            "All duplicate groups are enumerated with member counts.",
+            "The file still parses after regeneration."
+          ],
+          "evidence_required": [
+            "Duplicate group inventory.",
+            "Count of entries with populated sha256 before and after."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/documentation_triage_matrix.json"
+          ],
+          "failure_handling": "Never infer duplication from filename resemblance. Only byte-identical hashes constitute a duplicate."
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-05",
+      "title": "Reconcile the 34-module catalog population defect",
+      "execution_mode": "write_gated",
+      "gate_rule": "Blocked on HD-04. The modules array must never be populated by inference.",
+      "human_decision_gates": [
+        "HD-04"
+      ],
+      "depends_on": [
+        "PHASE-00"
+      ],
+      "tasks": [
+        {
+          "task_id": "GOV-050",
+          "action": "Characterise the module identity universe across every candidate source before any write.",
+          "method": [
+            "Extract module identifiers from module_registry.jsonl (34 records observed).",
+            "Extract module identifiers from 01_canonical_registries/module_catalog.json.",
+            "Extract the declared module set from Claude_gen_atomic_module_catalog_vNext.json, noting the modules array is empty.",
+            "Extract module identifiers from 10_services_source_inventory_and_file_mapping/file_module_mapping.csv.",
+            "Compute pairwise set differences across all sources.",
+            "Record every identifier present in one source and absent from another."
+          ],
+          "acceptance_criteria": [
+            "Identifier set and count recorded for every source.",
+            "Complete pairwise difference matrix produced.",
+            "An explicit statement of whether all sources agree on exactly 34 identities."
+          ],
+          "evidence_required": [
+            "module_identity_reconciliation.json with per-source sets, counts, and differences."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/module_identity_reconciliation.json"
+          ],
+          "failure_handling": "If sources disagree on the identity set, that disagreement is itself a finding. Report it to HD-04 rather than selecting a winner."
+        },
+        {
+          "task_id": "GOV-051",
+          "action": "Populate the vNext catalog from module_registry.jsonl with an explicit field-mapping record.",
+          "conditional_on": "HD-04 decision == HD-04-A",
+          "method": [
+            "Author a field-mapping record declaring, for each vNext catalog field, exactly which module_registry.jsonl field populates it.",
+            "Populate only fields with a declared mapping. Leave unmapped fields absent rather than guessed.",
+            "For any catalog field with no registry counterpart, record it as unpopulated with a reason. Do not invent a value.",
+            "Confirm the resulting modules array length equals 34 and equals the registry record count.",
+            "Confirm the LOCKED_PASS_1 designation remains accurate or update it with an owner note."
+          ],
+          "acceptance_criteria": [
+            "len(modules) == 34 and equals the module_registry.jsonl record count.",
+            "Every populated field traces to a named registry field in the mapping record.",
+            "Zero fields populated without a mapping entry.",
+            "Unpopulated fields are enumerated with reasons.",
+            "The file parses and validates against module_catalog.schema.json if that schema applies."
+          ],
+          "evidence_required": [
+            "Field-mapping record.",
+            "Count assertions.",
+            "List of unpopulated fields with reasons.",
+            "Schema validation result."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json",
+            "EAFIX_auth_docs/module_catalog_field_mapping.json"
+          ],
+          "failure_handling": "If any catalog field cannot be traced to a registry field, leave it unpopulated. Populating by inference violates the evidence protocol and would corrupt the identity universe that MASTER-V2 PHASE-06 ratifies."
+        },
+        {
+          "task_id": "GOV-052",
+          "action": "Commit owner-supplied catalog content with provenance.",
+          "conditional_on": "HD-04 decision == HD-04-B",
+          "method": [
+            "Receive the authored catalog content from the owner.",
+            "Record its sha256 and stated origin.",
+            "Validate that its module identity set matches the 34 identities characterised in GOV-050, and enumerate any divergence.",
+            "Commit only after divergences are either zero or explicitly accepted by the owner."
+          ],
+          "acceptance_criteria": [
+            "Content committed with a recorded sha256 and origin.",
+            "Identity set divergence from module_registry.jsonl is zero or explicitly accepted.",
+            "len(modules) == 34."
+          ],
+          "evidence_required": [
+            "sha256 and provenance statement.",
+            "Divergence report."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json"
+          ],
+          "failure_handling": "Do not accept content whose identity set diverges from the registry without an explicit owner acceptance record."
+        },
+        {
+          "task_id": "GOV-053",
+          "action": "Retire the vNext catalog as superseded by module_registry.jsonl.",
+          "conditional_on": "HD-04 decision == HD-04-C",
+          "method": [
+            "grep the whole tree for every consumer of Claude_gen_atomic_module_catalog_vNext.json.",
+            "For each consumer, confirm module_registry.jsonl can satisfy it, or record the gap.",
+            "Only if every consumer is satisfiable, mark the catalog superseded_by module_registry.jsonl, move it to archive, and register it in archive_manifest.json.",
+            "Update all routing references."
+          ],
+          "acceptance_criteria": [
+            "Complete consumer inventory produced.",
+            "Every consumer either migrated or its gap recorded.",
+            "No active reference to the retired catalog remains.",
+            "Archive manifest entry created."
+          ],
+          "evidence_required": [
+            "Consumer inventory.",
+            "Per-consumer disposition.",
+            "Dangling-reference grep proving zero hits."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/**",
+            "EAFIX_auth_docs/99_archive_superseded_do_not_route/**"
+          ],
+          "failure_handling": "If any consumer requires a field the registry does not carry, do not retire the catalog. Report the blocking gap to HD-04."
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-06",
+      "title": "Classify stale execution state",
+      "execution_mode": "write_gated",
+      "gate_rule": "Blocked on HD-05. Historical evidence records must never be edited or deleted.",
+      "human_decision_gates": [
+        "HD-05"
+      ],
+      "depends_on": [
+        "PHASE-00"
+      ],
+      "parallelizable_with": [
+        "PHASE-05"
+      ],
+      "tasks": [
+        {
+          "task_id": "GOV-060",
+          "action": "Annotate the .state tree with workstream provenance.",
+          "conditional_on": "HD-05 decision == HD-05-A",
+          "method": [
+            "Create .state/WORKSTREAM_PROVENANCE.md recording: the phase and gate IDs present (PH-01 through PH-04, PH-03A through PH-03D, PH-04A, PH-04B, GATE-CFG-001 through GATE-CFG-006), the observed date range 2026-03-17 to 2026-05-18, the recorded overall_status PASS, and the recorded residual limitation.",
+            "State explicitly that this evidence belongs to a completed prior workstream and has no relationship to any SSOT registry plan phase ID.",
+            "Note that .state/final_status.json contains machine-specific absolute paths under C:\\\\Users\\\\richg\\\\ which are preserved as historical record and must not be edited.",
+            "Modify no existing file under .state."
+          ],
+          "acceptance_criteria": [
+            "Provenance file created.",
+            "Every phase and gate ID present in the tree is enumerated.",
+            "Date range and status recorded from the actual files.",
+            "git status shows exactly one added file under .state and zero modifications."
+          ],
+          "evidence_required": [
+            "The provenance file contents.",
+            "git status output proving no existing file changed."
+          ],
+          "write_scope": [
+            ".state/WORKSTREAM_PROVENANCE.md"
+          ],
+          "failure_handling": "If any existing .state file shows as modified, revert it. Historical evidence is immutable."
+        },
+        {
+          "task_id": "GOV-061",
+          "action": "Archive the .state tree with a manifest.",
+          "conditional_on": "HD-05 decision == HD-05-B",
+          "method": [
+            "grep the whole tree, including tooling and CI, for readers of .state paths.",
+            "If any active reader exists, report it and do not move.",
+            "Otherwise git mv the tree to the owner-designated archive location and write a manifest recording original paths, hashes, and the workstream date range."
+          ],
+          "acceptance_criteria": [
+            "Consumer scan completed with results recorded.",
+            "Move executed only if zero active readers.",
+            "Manifest lists every moved file with its original path and sha256."
+          ],
+          "evidence_required": [
+            "Consumer scan output.",
+            "Move log.",
+            "Manifest."
+          ],
+          "write_scope": [
+            ".state/**"
+          ],
+          "failure_handling": "If any tool or workflow reads .state, abort the move and report the dependency."
+        },
+        {
+          "task_id": "GOV-062",
+          "action": "Record accepted risk and take no action.",
+          "conditional_on": "HD-05 decision == HD-05-C",
+          "method": [
+            "Add an accepted-risk record for FND-09 to EAFIX_auth_docs/governance_exceptions.json with the owner's rationale and a review date."
+          ],
+          "acceptance_criteria": [
+            "Accepted-risk record created.",
+            "No file under .state changed."
+          ],
+          "evidence_required": [
+            "Exception record.",
+            "git status proving .state untouched."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/governance_exceptions.json"
+          ],
+          "failure_handling": "None."
+        }
+      ]
+    },
+    {
+      "phase_id": "PHASE-07",
+      "title": "Re-verify the whole tree and ratify MASTER-V2",
+      "execution_mode": "read_only_then_gated_write",
+      "gate_rule": "Blocked on HD-06 and on every prior phase reaching its acceptance criteria. This phase must not begin while any finding is open and unwaived.",
+      "human_decision_gates": [
+        "HD-06"
+      ],
+      "depends_on": [
+        "PHASE-01",
+        "PHASE-02",
+        "PHASE-03",
+        "PHASE-04",
+        "PHASE-05",
+        "PHASE-06"
+      ],
+      "tasks": [
+        {
+          "task_id": "GOV-070",
+          "action": "Re-run the complete PHASE-00 verification suite against the remediated tree.",
+          "method": [
+            "Re-execute GOV-001 through GOV-004 verbatim.",
+            "Compare every result against the frozen baseline from GOV-005.",
+            "Record every finding as closed, open, or waived, with the evidence class that closed it."
+          ],
+          "acceptance_criteria": [
+            "Every one of the ten findings has a terminal disposition.",
+            "Zero findings are open without an HD-recorded waiver.",
+            "Every closure cites E1 or E2 evidence, or names the human decision gate that authorised an E5 closure."
+          ],
+          "evidence_required": [
+            "Baseline versus post-remediation comparison for every finding.",
+            "Evidence class per closure.",
+            "The E1/E2 to E3/E5 closure ratio required by the honesty audit metric."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/governance_remediation_final_report.json"
+          ],
+          "failure_handling": "A finding closed only on E3 or E5 evidence must be reported as such in the ratio, never presented as equivalent to an E1/E2 closure."
+        },
+        {
+          "task_id": "GOV-071",
+          "action": "Confirm the verification package binding is intact and consistent.",
+          "method": [
+            "Recompute sha256 and byte size of the canonical MASTER-V2 file.",
+            "Compare against verification spec target_plan.sha256 and target_plan.byte_size.",
+            "Confirm target_plan.filename matches the surviving canonical filename from GOV-020.",
+            "Run python validate_eafix_ssot_registry_verification_package.py against the package.",
+            "Confirm the obligation matrix still reports 1405 obligations, 86 checks, and 100.0 percent coverage.",
+            "Confirm the evidence manifest and report remain in their unexecuted state and have not been partially filled."
+          ],
+          "acceptance_criteria": [
+            "target_plan.sha256 equals the recomputed hash.",
+            "target_plan.filename resolves to an existing file.",
+            "The package validator reports zero binding errors.",
+            "Obligation coverage is unchanged at 100.0 percent with zero unmapped obligations.",
+            "Evidence manifest document_state remains unexecuted_template and report_status remains not_run."
+          ],
+          "evidence_required": [
+            "Hash comparison.",
+            "Validator output.",
+            "Coverage counts.",
+            "Verification package state confirmation."
+          ],
+          "write_scope": [],
+          "failure_handling": "If the binding is broken, the cause is almost certainly a PHASE-01 plan edit committed without the paired spec update. Return to PHASE-01 and repair both together."
+        },
+        {
+          "task_id": "GOV-072",
+          "action": "Execute the supersession checklist end to end as its own entry gate.",
+          "method": [
+            "Walk all ten steps of authority_and_supersession_checklist.md in order.",
+            "Record a pass or fail verdict with evidence for each step.",
+            "Step 8 in particular: prove that no active reference points to any superseded or archived file."
+          ],
+          "acceptance_criteria": [
+            "All ten steps recorded with verdicts.",
+            "Step 8 passes with a zero-hit dangling-reference scan.",
+            "Any failing step is enumerated with the specific blocking condition."
+          ],
+          "evidence_required": [
+            "Per-step verdict table.",
+            "Dangling-reference scan output."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/supersession_checklist_execution_record.json"
+          ],
+          "failure_handling": "The checklist is a gate, not a formality. A failing step blocks HD-06."
+        },
+        {
+          "task_id": "GOV-073",
+          "action": "Present the ratification decision and apply the recorded outcome.",
+          "method": [
+            "Present the final report, the closure ratio, and any waived findings to the owner for HD-06.",
+            "On HD-06-A or HD-06-B, update MASTER-V2 status from proposed_pending_owner_ratification to the owner-recorded value, and record any scoped exceptions.",
+            "If the status edit changes MASTER-V2 bytes, update the verification spec target_plan binding in the SAME commit and re-run the validator.",
+            "On HD-06-C, record the named blockers and return the plan to remediation."
+          ],
+          "acceptance_criteria": [
+            "MASTER-V2 status reflects the recorded decision and no other value.",
+            "If bytes changed, the spec binding was updated in the same commit and the validator passes.",
+            "Every waived finding has a rationale and a review date."
+          ],
+          "evidence_required": [
+            "The recorded decision.",
+            "MASTER-V2 sha256 before and after.",
+            "Validator output if the hash changed.",
+            "Waiver records."
+          ],
+          "write_scope": [
+            "EAFIX_auth_docs/EAFIX_SSOT_REGISTRY_SYSTEM_FINAL_MERGED_IMPLEMENTATION_PLAN_v2_0_0.json",
+            "EAFIX_auth_docs/EAFIX_SSOT_REGISTRY_DELIVERY_VERIFICATION_SPEC_v1_0_0.json",
+            "EAFIX_auth_docs/governance_exceptions.json"
+          ],
+          "failure_handling": "Never set the status to ratified without a recorded HD-06 decision. Never change plan bytes without re-binding the spec in the same commit."
+        }
+      ]
+    }
+  ],
+  "execution_order": {
+    "strict_sequence": [
+      "PHASE-00",
+      "PHASE-01",
+      "PHASE-02",
+      "PHASE-03",
+      "PHASE-07"
+    ],
+    "parallel_allowed": [
+      {
+        "group": [
+          "PHASE-04",
+          "PHASE-05",
+          "PHASE-06"
+        ],
+        "after": "PHASE-00",
+        "before": "PHASE-07",
+        "rationale": "These three phases touch disjoint write scopes (documentation_triage_matrix, module catalog, .state) and share no decision gate."
+      }
+    ],
+    "critical_path": "PHASE-00 -> HD-01 -> PHASE-01 -> HD-02 -> PHASE-02 -> HD-03 -> PHASE-03 -> HD-06 -> PHASE-07",
+    "note": "PHASE-04 has no human decision gate and can start immediately after PHASE-00. It is the cheapest early win."
+  },
+  "pr_delivery_sequence": [
+    {
+      "pr": 1,
+      "branch": "copilot/gov-baseline-freeze",
+      "phases": [
+        "PHASE-00"
+      ],
+      "content": "Baseline report only. No governance file modified.",
+      "reviewable_claim": "Every finding independently reproduced at a named commit."
+    },
+    {
+      "pr": 2,
+      "branch": "copilot/gov-artifact-repair",
+      "phases": [
+        "PHASE-04"
+      ],
+      "content": "Triage matrix comma fix, full parse inventory, hash-based duplicate regeneration.",
+      "reviewable_claim": "Every governance JSON and JSONL file parses, or the exception is recorded."
+    },
+    {
+      "pr": 3,
+      "branch": "copilot/gov-provenance-integrity",
+      "phases": [
+        "PHASE-01"
+      ],
+      "content": "The HD-01 outcome. If HD-01-B, the plan edit and spec re-binding land together in this single PR.",
+      "reviewable_claim": "MASTER-V2 provenance is either verified, corrected, or exception-recorded."
+    },
+    {
+      "pr": 4,
+      "branch": "copilot/gov-dedup-archive",
+      "phases": [
+        "PHASE-02"
+      ],
+      "content": "Duplicate collapse, supersession metadata, archival moves.",
+      "reviewable_claim": "One canonical plan file. Every superseded source is marked and archived."
+    },
+    {
+      "pr": 5,
+      "branch": "copilot/gov-doc-authority",
+      "phases": [
+        "PHASE-03"
+      ],
+      "content": "Doc authority reconciliation and control-file path repair.",
+      "reviewable_claim": "Exactly one doc authority. Every control-file path resolves."
+    },
+    {
+      "pr": 6,
+      "branch": "copilot/gov-module-catalog",
+      "phases": [
+        "PHASE-05"
+      ],
+      "content": "The HD-04 outcome plus the field-mapping record.",
+      "reviewable_claim": "The 34-module identity universe is populated from a named source or explicitly retired."
+    },
+    {
+      "pr": 7,
+      "branch": "copilot/gov-state-classification",
+      "phases": [
+        "PHASE-06"
+      ],
+      "content": "The HD-05 outcome.",
+      "reviewable_claim": "Stale execution state is classified. No historical evidence altered."
+    },
+    {
+      "pr": 8,
+      "branch": "copilot/gov-ratification",
+      "phases": [
+        "PHASE-07"
+      ],
+      "content": "Final report, checklist execution record, and the HD-06 status transition.",
+      "reviewable_claim": "Every finding has a terminal disposition. MASTER-V2 is ratified or explicitly withheld."
+    }
+  ],
+  "validation_catalog": [
+    {
+      "validation_id": "VAL-01",
+      "name": "Governance artifact parseability",
+      "rule": "Every .json file under EAFIX_auth_docs loads with json.load and every .jsonl line loads with json.loads.",
+      "blocking": true,
+      "applies_to_phases": [
+        "PHASE-04",
+        "PHASE-07"
+      ]
+    },
+    {
+      "validation_id": "VAL-02",
+      "name": "Source resolvability",
+      "rule": "Every source declared in MASTER-V2 source_plan_consolidation resolves to an existing file, or is removed with a recorded provenance gap, or is covered by a recorded exception.",
+      "blocking": true,
+      "applies_to_phases": [
+        "PHASE-01",
+        "PHASE-07"
+      ]
+    },
+    {
+      "validation_id": "VAL-03",
+      "name": "Plan-to-spec hash binding",
+      "rule": "Verification spec target_plan.sha256 and byte_size equal the recomputed values of the file named in target_plan.filename.",
+      "blocking": true,
+      "applies_to_phases": [
+        "PHASE-01",
+        "PHASE-07"
+      ]
+    },
+    {
+      "validation_id": "VAL-04",
+      "name": "Canonical uniqueness",
+      "rule": "Exactly one file matching *FINAL_MERGED_IMPLEMENTATION_PLAN_v2_0_0.json exists under EAFIX_auth_docs.",
+      "blocking": true,
+      "applies_to_phases": [
+        "PHASE-02",
+        "PHASE-07"
+      ]
+    },
+    {
+      "validation_id": "VAL-05",
+      "name": "Control-file resolvability",
+      "rule": "Every path in the canonical doc_authority.json control_files exists, and none resolves inside 99_archive_superseded_do_not_route.",
+      "blocking": true,
+      "applies_to_phases": [
+        "PHASE-03",
+        "PHASE-07"
+      ]
+    },
+    {
+      "validation_id": "VAL-06",
+      "name": "Single doc authority",
+      "rule": "Exactly one doc_authority.json is designated canonical and declares that status in-file; any other copy carries supersession metadata.",
+      "blocking": true,
+      "applies_to_phases": [
+        "PHASE-03",
+        "PHASE-07"
+      ]
+    },
+    {
+      "validation_id": "VAL-07",
+      "name": "No dangling references to archived content",
+      "rule": "No active document references a path that has been moved to an archive or superseded location.",
+      "blocking": true,
+      "applies_to_phases": [
+        "PHASE-02",
+        "PHASE-03",
+        "PHASE-07"
+      ]
+    },
+    {
+      "validation_id": "VAL-08",
+      "name": "Module identity consistency",
+      "rule": "If the vNext catalog is retained, len(modules) equals the module_registry.jsonl record count of 34, and every populated field traces to a named source field.",
+      "blocking": true,
+      "applies_to_phases": [
+        "PHASE-05",
+        "PHASE-07"
+      ]
+    },
+    {
+      "validation_id": "VAL-09",
+      "name": "Historical evidence immutability",
+      "rule": "No pre-existing file under .state is modified or deleted by this plan.",
+      "blocking": true,
+      "applies_to_phases": [
+        "PHASE-06",
+        "PHASE-07"
+      ]
+    },
+    {
+      "validation_id": "VAL-10",
+      "name": "Write scope containment",
+      "rule": "Every changed path in every PR appears in the declared write_scope of a task in that PR's phases.",
+      "blocking": true,
+      "applies_to_phases": [
+        "ALL"
+      ]
+    },
+    {
+      "validation_id": "VAL-11",
+      "name": "Registry data untouched",
+      "rule": "No file under EAFIX_auth_docs/01_canonical_registries/*.jsonl, EAFIX_auth_docs/generated/, tools/registries/, EA-REG/, services/, or compliance/ is modified by this plan.",
+      "blocking": true,
+      "applies_to_phases": [
+        "ALL"
+      ]
+    },
+    {
+      "validation_id": "VAL-12",
+      "name": "Verification package remains unexecuted",
+      "rule": "The evidence manifest document_state remains unexecuted_template and the report report_status remains not_run. This plan does not run verification.",
+      "blocking": true,
+      "applies_to_phases": [
+        "PHASE-07"
+      ]
+    }
+  ],
+  "definition_of_done": {
+    "required": [
+      "All ten findings in the problem_register have a terminal disposition of closed or waived, with no finding open.",
+      "Every closure cites E1_CODE or E2_ARTIFACT evidence, or names the human decision gate that authorised an E5_JUDGEMENT closure.",
+      "All twelve validations in the validation_catalog pass.",
+      "All six human decision gates have a recorded decision with a rationale.",
+      "Exactly one canonical MASTER-V2 file and exactly one canonical doc_authority.json exist.",
+      "Every governance JSON and JSONL artifact under EAFIX_auth_docs parses.",
+      "The verification spec target_plan binding matches the canonical plan file's actual bytes.",
+      "The authority_and_supersession_checklist has been executed end to end with all ten steps recorded.",
+      "No file under any globally prohibited path has been modified.",
+      "The honesty audit ratio has been reported.",
+      "MASTER-V2 status reflects the recorded HD-06 decision."
+    ],
+    "explicitly_not_required": [
+      "Executing any MASTER-V2 phase.",
+      "Running the verification package to produce verdicts.",
+      "Resolving the eleven records in registry_conflict_queue.jsonl. That is MASTER-V2 PHASE-04 work.",
+      "Changing registry_index.json authority_status from canonical_candidate or approved_for_cutover from false.",
+      "Any repository migration or file move outside EAFIX_auth_docs and .state."
+    ]
+  },
+  "failure_handling": {
+    "fail_closed_default": "On any ambiguity, stop and report. Do not proceed on an assumption.",
+    "hard_stops": [
+      "Two files believed identical have different hashes.",
+      "A merge or archival step would reduce authority-record coverage without a recorded rationale for each omission.",
+      "A MASTER-V2 byte change is proposed without a paired verification spec re-binding in the same commit.",
+      "Resolution of a finding would require creating a file, hash, count, or record that was never observed.",
+      "A write is attempted outside the executing task's declared write_scope.",
+      "Three or more findings fail to reproduce at PHASE-00, indicating a stale audit."
+    ],
+    "prohibited_recoveries": [
+      "Deleting a reference to silence a validator.",
+      "Reformatting a governance artifact to make it parse.",
+      "Populating a field by inference to satisfy a count assertion.",
+      "Marking a finding closed on E3_AUTHORITY evidence alone.",
+      "Editing historical evidence to remove machine-specific paths.",
+      "Reporting the plan complete while any finding is open and unwaived."
+    ],
+    "escalation": "Any hard stop returns to the owner with the observed state, the expected state, the evidence for both, and the options available. The agent proposes; it does not decide."
+  },
+  "agent_execution_contract": {
+    "before_each_task": [
+      "Restate the task_id, its declared write_scope, and any conditional_on gate.",
+      "Confirm the gating human decision has been recorded, if the task declares one.",
+      "Confirm the current branch is under copilot/*."
+    ],
+    "during_each_task": [
+      "Verify every claim against the repository before asserting it.",
+      "Record the evidence class for each assertion.",
+      "Abort immediately on any write outside the declared scope."
+    ],
+    "after_each_task": [
+      "Report acceptance criteria as met or not met, individually and explicitly.",
+      "Attach the required evidence.",
+      "List every path changed and confirm each appears in the declared write_scope."
+    ]
+  },
+  "agent_final_response_contract": {
+    "required_sections": [
+      "Findings table: finding_id, disposition (closed/waived/open), closing evidence class.",
+      "Honesty audit: count of E1/E2 closures versus E3-only and E5-only closures, expressed as a ratio.",
+      "Validation results: all twelve validations with pass or fail.",
+      "Human decisions: all six gates with the recorded decision, or explicitly marked awaiting decision.",
+      "Changed-path inventory with the authorising task_id for each path.",
+      "Hash ledger: before and after sha256 for MASTER-V2, the verification spec, and every modified governance artifact.",
+      "Residual risk: everything not fixed, with the reason.",
+      "Explicit statement of what was NOT done, referencing definition_of_done.explicitly_not_required."
+    ],
+    "prohibited_claims": [
+      "Claiming the plan is complete while any finding is open and unwaived.",
+      "Claiming a finding is verified when it was closed on authority assertion alone.",
+      "Claiming MASTER-V2 is ratified without a recorded HD-06 decision.",
+      "Claiming verification was performed. This plan does not run the verification package.",
+      "Presenting an E5_JUDGEMENT closure as equivalent to an E1/E2 closure."
+    ],
+    "required_disclosure": "If any acceptance criterion was met by changing the criterion rather than the artifact, say so explicitly and prominently."
+  },
+  "out_of_scope": [
+    "All seventeen MASTER-V2 phases (PHASE-00 through PHASE-16).",
+    "Registry conflict burn-down: the eleven conflicted records in registry_conflict_queue.jsonl.",
+    "Authority cutover and any change to registry_index.json approved_for_cutover.",
+    "Repository migration and the 34-module folder restructure.",
+    "Any change inside EA-REG/, services/, compliance/, tools/, or .github/.",
+    "Executing the verification package to produce verdicts.",
+    "Populating registry JSONL content."
+  ],
+  "integrity": {
+    "finding_count": 10,
+    "phase_count": 8,
+    "task_count": 30,
+    "human_decision_gate_count": 6,
+    "validation_count": 12,
+    "pr_count": 8,
+    "all_findings_have_phase_coverage": true
+  }
+}

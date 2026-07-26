@@ -1,0 +1,775 @@
+{
+  "document_type": "registry_ingestion_matrix_skeleton",
+  "matrix_id": "EAFIX-REGISTRY-INGESTION-MATRIX-SKELETON-001",
+  "matrix_version": "0.1.0-skeleton",
+  "status": "skeleton_pending_owner_review",
+  "generated_at_utc": "2026-07-20T23:34:44Z",
+  "repository": "DICKY1987/eafix-modular",
+  "pinned_commit": "e846d04a6eede56e6b790701d0fa762fe90297d6",
+  "derived_from": {
+    "source_document": "Document 2 \u2014 repository search assessment",
+    "extends_registry": "EAFIX_auth_docs/01_canonical_registries/registry_source_inventory.jsonl",
+    "instruction": "EXTEND the existing source-inventory registry; do NOT fork a parallel authority"
+  },
+  "conventions": {
+    "evidence_class": {
+      "E1_CODE": "primary",
+      "E2_ARTIFACT": "primary",
+      "E3_AUTHORITY": "corroboration, cap confidence=medium",
+      "E4_HISTORICAL": "supporting",
+      "E5_JUDGEMENT": "decisions"
+    },
+    "authority_disposition_values": [
+      "evidence_primary",
+      "evidence_primary_authored_candidate",
+      "evidence_reference",
+      "evidence_needs_crosswalk",
+      "evidence_stale_regenerate_first",
+      "generated_projection_never_write_target",
+      "reuse_logic_only_not_authority",
+      "design_evidence_reference_only",
+      "superseded_excluded",
+      "excluded_do_not_route"
+    ],
+    "stub_marker": "TBD_OWNER = requires Dick's decision before population",
+    "row_status_values": [
+      "skeleton_unpopulated",
+      "populated_pending_validation",
+      "validated",
+      "ingested",
+      "rejected"
+    ]
+  },
+  "destination_registries": [
+    {
+      "registry": "module_registry",
+      "authored_path": "EAFIX_auth_docs/01_canonical_registries/module_registry.jsonl",
+      "current_records": 34,
+      "generated_projection": "EAFIX_auth_docs/generated/registries/module_registry.current.json",
+      "write_target": true
+    },
+    {
+      "registry": "contract_registry",
+      "authored_path": "EAFIX_auth_docs/01_canonical_registries/contract_registry.jsonl",
+      "current_records": 97,
+      "generated_projection": "EAFIX_auth_docs/generated/registries/contract_registry.current.json",
+      "write_target": true
+    },
+    {
+      "registry": "process_registry",
+      "authored_path": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+      "current_records": 26,
+      "generated_projection": "EAFIX_auth_docs/generated/registries/process_registry.current.json",
+      "write_target": true
+    },
+    {
+      "registry": "integration_registry",
+      "authored_path": "EAFIX_auth_docs/01_canonical_registries/integration_registry.jsonl",
+      "current_records": 9,
+      "generated_projection": "EAFIX_auth_docs/generated/registries/integration_registry.current.json",
+      "write_target": true
+    },
+    {
+      "registry": "configuration_registry",
+      "authored_path": "EAFIX_auth_docs/01_canonical_registries/configuration_registry.jsonl",
+      "current_records": 7,
+      "generated_projection": "EAFIX_auth_docs/generated/registries/configuration_registry.current.json",
+      "write_target": true
+    },
+    {
+      "registry": "operational_control_registry",
+      "authored_path": "EAFIX_auth_docs/01_canonical_registries/operational_control_registry.jsonl",
+      "current_records": 52,
+      "generated_projection": "EAFIX_auth_docs/generated/registries/operational_control_registry.current.json",
+      "write_target": true
+    },
+    {
+      "registry": "operator_registry",
+      "authored_path": "EAFIX_auth_docs/01_canonical_registries/operator_registry.jsonl",
+      "current_records": 7,
+      "generated_projection": "EAFIX_auth_docs/generated/registries/operator_registry.current.json",
+      "write_target": true
+    },
+    {
+      "registry": "decision_registry",
+      "authored_path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+      "current_records": 7,
+      "generated_projection": "EAFIX_auth_docs/generated/registries/decision_registry.current.json",
+      "write_target": true
+    },
+    {
+      "registry": "reuse_registry",
+      "authored_path": "EAFIX_auth_docs/01_canonical_registries/reuse_registry.jsonl",
+      "current_records": 12,
+      "generated_projection": "EAFIX_auth_docs/generated/registries/reuse_registry.current.json",
+      "write_target": true
+    },
+    {
+      "registry": "artifact_registry",
+      "authored_path": "EAFIX_auth_docs/01_canonical_registries/artifact_registry.jsonl",
+      "current_records": 40,
+      "generated_projection": "EAFIX_auth_docs/generated/registries/artifact_registry.current.json",
+      "write_target": true
+    }
+  ],
+  "governance_registries": [
+    {
+      "registry": "registry_source_inventory",
+      "authored_path": "EAFIX_auth_docs/01_canonical_registries/registry_source_inventory.jsonl",
+      "current_records": 13
+    },
+    {
+      "registry": "registry_conflict_queue",
+      "authored_path": "EAFIX_auth_docs/01_canonical_registries/registry_conflict_queue.jsonl",
+      "current_records": 11
+    }
+  ],
+  "already_inventoried_sources": [
+    {
+      "source_id": "SRC-ALIGNED",
+      "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+      "authority_status": "supporting_evidence",
+      "baseline_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "stale_vs_head": true
+    },
+    {
+      "source_id": "SRC-CAP",
+      "path": "EAFIX_auth_docs/01_canonical_registries/converted_capability_registry.json",
+      "authority_status": "supporting_evidence",
+      "baseline_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "stale_vs_head": true
+    },
+    {
+      "source_id": "SRC-CHANNELS",
+      "path": "EAFIX_auth_docs/01_canonical_registries/communication_channels.json",
+      "authority_status": "supporting_evidence",
+      "baseline_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "stale_vs_head": true
+    },
+    {
+      "source_id": "SRC-CONTRACT-EVIDENCE",
+      "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+      "authority_status": "supporting_evidence",
+      "baseline_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "stale_vs_head": true
+    },
+    {
+      "source_id": "SRC-DOC-AUTH",
+      "path": "EAFIX_auth_docs/00_doc_control_and_authority/doc_authority.json",
+      "authority_status": "supporting_evidence",
+      "baseline_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "stale_vs_head": true
+    },
+    {
+      "source_id": "SRC-FILE-MAP",
+      "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv",
+      "authority_status": "supporting_evidence",
+      "baseline_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "stale_vs_head": true
+    },
+    {
+      "source_id": "SRC-FILE-REG",
+      "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_registry.csv",
+      "authority_status": "supporting_evidence",
+      "baseline_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "stale_vs_head": true
+    },
+    {
+      "source_id": "SRC-MANIFEST-BUNDLE",
+      "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+      "authority_status": "supporting_evidence",
+      "baseline_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "stale_vs_head": true
+    },
+    {
+      "source_id": "SRC-MODULE-CATALOG",
+      "path": "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+      "authority_status": "supporting_evidence",
+      "baseline_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "stale_vs_head": true
+    },
+    {
+      "source_id": "SRC-PROCESS",
+      "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+      "authority_status": "supporting_evidence",
+      "baseline_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "stale_vs_head": true
+    },
+    {
+      "source_id": "SRC-ROUTING",
+      "path": "eafix_project_knowledge_reference_routing_instructions.json",
+      "authority_status": "supporting_evidence",
+      "baseline_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "stale_vs_head": true
+    },
+    {
+      "source_id": "SRC-SERVICES",
+      "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_services_ai_reference_20260510.json",
+      "authority_status": "supporting_evidence",
+      "baseline_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "stale_vs_head": true
+    },
+    {
+      "source_id": "SRC-UI",
+      "path": "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+      "authority_status": "supporting_evidence",
+      "baseline_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+      "stale_vs_head": true
+    }
+  ],
+  "already_inventoried_note": "All 13 existing entries are authority_status=supporting_evidence and pinned to baseline_commit 32694cac (STALE vs HEAD e846d04a6e); re-verify source_refs on ingestion.",
+  "candidate_source_rows": [
+    {
+      "source_id": "SRC-CONTRACT-EVENTS",
+      "path": "contracts/events/",
+      "exists_on_master": true,
+      "pinned_commit": "e846d04a6eede56e6b790701d0fa762fe90297d6",
+      "glob_expansion": {
+        "pattern": "contracts/events/**/*.json",
+        "match_count": 7,
+        "members": [
+          "contracts/events/1199900003260118_CalendarEvent@1.0.json",
+          "contracts/events/1199900004260118_ExecutionReport@1.0.json",
+          "contracts/events/1199900005260118_IndicatorVector@1.1.json",
+          "contracts/events/1199900006260118_OrderIntent@1.2.json",
+          "contracts/events/1199900007260118_PriceTick@1.0.json",
+          "contracts/events/1199900008260118_ReentryDecision@1.0.json",
+          "contracts/events/1199900009260118_Signal@1.0.json"
+        ]
+      },
+      "ingestion_priority": "P1",
+      "destination_registries": [
+        "contract"
+      ],
+      "candidate_destination_fields": {
+        "schema_ref": "file path",
+        "schema_version": "from @X.Y in filename/schema",
+        "contract_name": "from title",
+        "required_fields": "from JSON Schema required[]",
+        "optional_fields": "schema props - required",
+        "examples": "schema examples",
+        "source_hashes": "sha256 per file"
+      },
+      "evidence_class": "E2_ARTIFACT",
+      "authority_disposition": "evidence_primary_authored_candidate",
+      "transformation_rule": "TBD_OWNER: parse each *@ver.json schema; join to contract_id by name+version; populate schema_ref/fields",
+      "conflict_rule": "TBD_OWNER: on name collision across versions, keep highest ratified version; log IndicatorVector vs IndicatorSnapshot",
+      "freshness_requirement": "source_refs must pin commit; record stale if source file or repo HEAD moves off e846d04a6e",
+      "validator": "contracts/validate_json_schemas.py (reuse)",
+      "human_decision_required": {
+        "required": false,
+        "gate": null,
+        "reason": "deterministic schema extraction"
+      },
+      "already_inventoried": false,
+      "notes": "7 event schemas present incl IndicatorVector@1.1, OrderIntent@1.2, ReentryDecision@1.0",
+      "row_status": "skeleton_unpopulated"
+    },
+    {
+      "source_id": "SRC-CONTRACT-MODELS",
+      "path": "contracts/models/",
+      "exists_on_master": true,
+      "pinned_commit": "e846d04a6eede56e6b790701d0fa762fe90297d6",
+      "glob_expansion": {
+        "pattern": "contracts/models/**/*.py",
+        "match_count": 8,
+        "members": [
+          "contracts/models/2099900016260118_csv_models.py",
+          "contracts/models/2099900017260118_event_models.py",
+          "contracts/models/2099900018260118_json_models.py",
+          "contracts/models/2099900019260118___init__.py",
+          "contracts/models/__init__.py",
+          "contracts/models/csv_models.py",
+          "contracts/models/event_models.py",
+          "contracts/models/json_models.py"
+        ]
+      },
+      "ingestion_priority": "P1",
+      "destination_registries": [
+        "contract"
+      ],
+      "candidate_destination_fields": {
+        "required_fields": "model field names",
+        "optional_fields": "Optional[...] fields",
+        "field_types": "python annotations",
+        "checksum_fields": "",
+        "idempotency_fields": "",
+        "implementation_status": "model_defined"
+      },
+      "evidence_class": "E1_CODE",
+      "authority_disposition": "evidence_primary",
+      "transformation_rule": "TBD_OWNER: introspect pydantic/dataclass models; map model->contract; fill field types where schema absent",
+      "conflict_rule": "TBD_OWNER: model vs schema field drift -> needs_review, do not auto-overwrite schema-derived fields",
+      "freshness_requirement": "source_refs must pin commit; record stale if source file or repo HEAD moves off e846d04a6e",
+      "validator": "contracts/validate_csv_artifacts.py + validate_json_schemas.py (reuse)",
+      "human_decision_required": {
+        "required": false,
+        "gate": null,
+        "reason": "code is primary evidence"
+      },
+      "already_inventoried": false,
+      "notes": "8 matches incl DUPLICATES: numeric-prefixed AND plain (event_models.py vs 2099..._event_models.py) - dedup before ingest",
+      "row_status": "skeleton_unpopulated"
+    },
+    {
+      "source_id": "SRC-CONTRACT-SNAPSHOT",
+      "path": "EAFIX_auth_docs/generated/registries/contract_registry.current.json",
+      "exists_on_master": true,
+      "pinned_commit": "e846d04a6eede56e6b790701d0fa762fe90297d6",
+      "glob_expansion": null,
+      "ingestion_priority": "P1",
+      "destination_registries": [
+        "contract"
+      ],
+      "candidate_destination_fields": {
+        "(candidate baseline only)": "producer/consumer ids, status, confidence, source_refs, last_verified_commit"
+      },
+      "evidence_class": "E2_ARTIFACT",
+      "authority_disposition": "generated_projection_never_write_target",
+      "transformation_rule": "TBD_OWNER: use as candidate/parity baseline ONLY; diff against authored contract_registry.jsonl; never copy verbatim",
+      "conflict_rule": "TBD_OWNER: snapshot value never wins over authored .jsonl or E1/E2 source; snapshot-only records -> needs_review",
+      "freshness_requirement": "source_refs must pin commit; record stale if source file or repo HEAD moves off e846d04a6e",
+      "validator": "parity/diff against authored jsonl",
+      "human_decision_required": {
+        "required": true,
+        "gate": "TBD_OWNER: cutover gate",
+        "reason": "promoting any snapshot record to authored requires owner ratification"
+      },
+      "already_inventoried": false,
+      "notes": "document_type=generated_registry_snapshot (confirmed). 97 records. Baseline, not authority.",
+      "row_status": "skeleton_unpopulated"
+    },
+    {
+      "source_id": "SRC-CONTRACT-TRIGGERS",
+      "path": "contracts/triggers/",
+      "exists_on_master": true,
+      "pinned_commit": "e846d04a6eede56e6b790701d0fa762fe90297d6",
+      "glob_expansion": {
+        "pattern": "contracts/triggers/**/*",
+        "match_count": 8,
+        "members": [
+          "contracts/triggers/0199900116260118_automation_verification_architecture.md",
+          "contracts/triggers/0199900117260118_trigger_contract_template.yaml",
+          "contracts/triggers/0199900118260118_trigger.FILE_IDENTITY_CREATE.yaml",
+          "contracts/triggers/0199900127260118_run_alvt_pilot.md",
+          "contracts/triggers/0199900128260118_new_trigger_checklist.md",
+          "contracts/triggers/0199900129260118_pilot_baseline_locked.md",
+          "contracts/triggers/0199900130260118_layer2_plus_backlog.md",
+          "contracts/triggers/pilot_trigger_selection.md"
+        ]
+      },
+      "ingestion_priority": "P1",
+      "destination_registries": [
+        "operational_control",
+        "contract"
+      ],
+      "candidate_destination_fields": {
+        "trigger contracts": "trigger id, preconditions, verification design"
+      },
+      "evidence_class": "E2_ARTIFACT",
+      "authority_disposition": "evidence_reference",
+      "transformation_rule": "TBD_OWNER: map trigger yaml -> operational_control gates; link contract refs",
+      "conflict_rule": "TBD_OWNER: template/backlog files are non-normative; exclude *_template.* from authority",
+      "freshness_requirement": "source_refs must pin commit; record stale if source file or repo HEAD moves off e846d04a6e",
+      "validator": "TBD_OWNER",
+      "human_decision_required": {
+        "required": false,
+        "gate": null,
+        "reason": ""
+      },
+      "already_inventoried": false,
+      "notes": "8 matches incl templates+backlog md (non-normative)",
+      "row_status": "skeleton_unpopulated"
+    },
+    {
+      "source_id": "SRC-CTX-SCHEMA",
+      "path": "context_packet_schema.json",
+      "exists_on_master": true,
+      "pinned_commit": "e846d04a6eede56e6b790701d0fa762fe90297d6",
+      "glob_expansion": null,
+      "ingestion_priority": "P1",
+      "destination_registries": [
+        "module",
+        "contract",
+        "artifact",
+        "process",
+        "operational_control",
+        "integration"
+      ],
+      "candidate_destination_fields": {
+        "(schema of packets)": "defines module & work-cell packet field contracts"
+      },
+      "evidence_class": "E2_ARTIFACT",
+      "authority_disposition": "evidence_reference",
+      "transformation_rule": "TBD_OWNER: use schema to validate packet ingestion, not as record source itself",
+      "conflict_rule": "TBD_OWNER",
+      "freshness_requirement": "source_refs must pin commit; record stale if source file or repo HEAD moves off e846d04a6e",
+      "validator": "TBD_OWNER",
+      "human_decision_required": {
+        "required": false,
+        "gate": null,
+        "reason": ""
+      },
+      "already_inventoried": false,
+      "notes": "PATH CORRECTION: Document 2 said context_packets/context_packet_schema.json (404). Actual: repo ROOT.",
+      "row_status": "skeleton_unpopulated"
+    },
+    {
+      "source_id": "SRC-CTX-PACKETS",
+      "path": "context_packets/*/context_packet.json",
+      "exists_on_master": true,
+      "pinned_commit": "e846d04a6eede56e6b790701d0fa762fe90297d6",
+      "glob_expansion": {
+        "pattern": "context_packets/**/context_packet.json",
+        "match_count": 27,
+        "members": [
+          "context_packets/50000000000000000001/context_packet.json",
+          "context_packets/50000000000000000002/context_packet.json",
+          "context_packets/50000000000000000003/context_packet.json",
+          "context_packets/50000000000000000004/context_packet.json",
+          "context_packets/50000000000000000005/context_packet.json",
+          "context_packets/50000000000000000006/context_packet.json",
+          "context_packets/50000000000000000007/context_packet.json",
+          "context_packets/50000000000000000008/context_packet.json",
+          "context_packets/50000000000000000009/context_packet.json",
+          "context_packets/50000000000000000010/context_packet.json",
+          "context_packets/50000000000000000011/context_packet.json",
+          "context_packets/50000000000000000012/context_packet.json",
+          "context_packets/50000000000000000013/context_packet.json",
+          "context_packets/50000000000000000014/context_packet.json",
+          "context_packets/50000000000000000015/context_packet.json",
+          "context_packets/50000000000000000016/context_packet.json",
+          "context_packets/50000000000000000017/context_packet.json",
+          "context_packets/50000000000000000018/context_packet.json",
+          "context_packets/50000000000000000019/context_packet.json",
+          "context_packets/50000000000000000020/context_packet.json",
+          "context_packets/50000000000000000021/context_packet.json",
+          "context_packets/50000000000000000022/context_packet.json",
+          "context_packets/50000000000000000023/context_packet.json",
+          "context_packets/50000000000000000024/context_packet.json",
+          "context_packets/50000000000000000025/context_packet.json",
+          "context_packets/50000000000000000026/context_packet.json",
+          "context_packets/50000000000000000099/context_packet.json"
+        ]
+      },
+      "ingestion_priority": "P1",
+      "destination_registries": [
+        "module",
+        "contract",
+        "artifact",
+        "process",
+        "operational_control",
+        "integration",
+        "reuse"
+      ],
+      "candidate_destination_fields": {
+        "source_refs": "packet source_files",
+        "process_step_ids": "process step codes",
+        "public_interfaces": "in/out contracts",
+        "responsibilities": "purpose",
+        "scope_in/scope_out": "allowed/forbidden files",
+        "validation gates": "acceptance gates"
+      },
+      "evidence_class": "E2_ARTIFACT",
+      "authority_disposition": "evidence_stale_regenerate_first",
+      "transformation_rule": "TBD_OWNER: JOIN each packet to module_registry by module_id/symbol; derive candidate fields; DO NOT ingest raw",
+      "conflict_rule": "TBD_OWNER: broad forbidden[] lists must be derived-complement, not enumerated (derive-don't-fabricate); Windows backslash paths must normalize",
+      "freshness_requirement": "source_refs must pin commit; record stale if source file or repo HEAD moves off e846d04a6e",
+      "validator": "context_packet_schema.json + path normalization (reuse from EA-REG generator)",
+      "human_decision_required": {
+        "required": true,
+        "gate": "TBD_OWNER",
+        "reason": "packets are stale (generated 2026-05-18, backslash paths) - regenerate before ingest"
+      },
+      "already_inventoried": false,
+      "notes": "27 packets present (ids 5000...0001-...0027)",
+      "row_status": "skeleton_unpopulated"
+    },
+    {
+      "source_id": "SRC-DAG-CONFIG",
+      "path": "dag/config/ + dag/patterns/",
+      "exists_on_master": true,
+      "pinned_commit": "e846d04a6eede56e6b790701d0fa762fe90297d6",
+      "glob_expansion": {
+        "pattern": "dag/config/*.yaml",
+        "match_count": 3,
+        "members": [
+          "dag/config/1299900043260118_dag_graph.yaml",
+          "dag/config/1299900044260118_example_dag.yaml",
+          "dag/config/1299900045260118_quality_gates.yaml"
+        ]
+      },
+      "ingestion_priority": "P1",
+      "destination_registries": [
+        "process",
+        "operational_control",
+        "integration",
+        "reuse",
+        "module"
+      ],
+      "candidate_destination_fields": {
+        "process nodes/edges": "node ids, phase ids, workstreams",
+        "operational_control": "verification nodes, SLAs, quality gates",
+        "integration": "python/EA handoff edges",
+        "reuse": "verification patterns"
+      },
+      "evidence_class": "E2_ARTIFACT",
+      "authority_disposition": "evidence_needs_crosswalk",
+      "transformation_rule": "TBD_OWNER: crosswalk descriptive DAG node ids -> canonical process_step_catalog ids BEFORE ingest",
+      "conflict_rule": "TBD_OWNER: DAG derived from atomic_process_flow md; process_step_catalog wins on any id conflict",
+      "freshness_requirement": "source_refs must pin commit; record stale if source file or repo HEAD moves off e846d04a6e",
+      "validator": "dag/2099900035260118_validate_dag.py + validate_dag_structure.ps1 (reuse)",
+      "human_decision_required": {
+        "required": true,
+        "gate": "TBD_OWNER",
+        "reason": "node-id crosswalk is a modeling decision"
+      },
+      "already_inventoried": false,
+      "notes": "dag_graph.yaml, quality_gates.yaml, pattern_registry.yaml present",
+      "row_status": "skeleton_unpopulated"
+    },
+    {
+      "source_id": "SRC-MANIFEST-GAP-REPORT",
+      "path": "EAFIX_auth_docs/contracts_registry/manifest_generator_gap_report.md",
+      "exists_on_master": true,
+      "pinned_commit": "e846d04a6eede56e6b790701d0fa762fe90297d6",
+      "glob_expansion": null,
+      "ingestion_priority": "P3",
+      "destination_registries": [
+        "contract",
+        "module",
+        "artifact",
+        "integration"
+      ],
+      "candidate_destination_fields": {
+        "(remediation queue, not data)": "join algorithm + source precedence for contract generator"
+      },
+      "evidence_class": "E4_HISTORICAL",
+      "authority_disposition": "design_evidence_reference_only",
+      "transformation_rule": "TBD_OWNER: extract join/precedence LOGIC into generator; convert findings to conflict_queue rows; DO NOT ingest md as data",
+      "conflict_rule": "TBD_OWNER",
+      "freshness_requirement": "source_refs must pin commit; record stale if source file or repo HEAD moves off e846d04a6e",
+      "validator": "n/a (design input)",
+      "human_decision_required": {
+        "required": false,
+        "gate": null,
+        "reason": ""
+      },
+      "already_inventoried": false,
+      "notes": "Narrative report. Highest-value DESIGN input per Document 2, but evidence-only.",
+      "row_status": "skeleton_unpopulated"
+    },
+    {
+      "source_id": "SRC-MANIFESTS-BUNDLE",
+      "path": "EAFIX_auth_docs/manifests/",
+      "exists_on_master": true,
+      "pinned_commit": "e846d04a6eede56e6b790701d0fa762fe90297d6",
+      "glob_expansion": {
+        "pattern": "EAFIX_auth_docs/manifests/manifest_*.json",
+        "match_count": 6,
+        "members": [
+          "EAFIX_auth_docs/manifests/manifest_fill_coverage_report.vNext.json",
+          "EAFIX_auth_docs/manifests/manifest_generation_report.json",
+          "EAFIX_auth_docs/manifests/manifest_schema_field_map.json",
+          "EAFIX_auth_docs/manifests/manifest_source_authority_snapshot.json",
+          "EAFIX_auth_docs/manifests/manifest_unresolved_items.json",
+          "EAFIX_auth_docs/manifests/manifest_validation_report.json"
+        ]
+      },
+      "ingestion_priority": "P1",
+      "destination_registries": [
+        "module"
+      ],
+      "candidate_destination_fields": {
+        "module manifest fields": "input/output contract metadata, coverage, unresolved items"
+      },
+      "evidence_class": "E2_ARTIFACT",
+      "authority_disposition": "evidence_primary",
+      "transformation_rule": "TBD_OWNER: use manifest_*.json to populate module_registry manifest-linked fields + feed conflict_queue",
+      "conflict_rule": "TBD_OWNER",
+      "freshness_requirement": "source_refs must pin commit; record stale if source file or repo HEAD moves off e846d04a6e",
+      "validator": "TBD_OWNER",
+      "human_decision_required": {
+        "required": false,
+        "gate": null,
+        "reason": ""
+      },
+      "already_inventoried": false,
+      "notes": "6 manifest reports incl unresolved_items, validation_report, source_authority_snapshot",
+      "row_status": "skeleton_unpopulated"
+    },
+    {
+      "source_id": "SRC-REPO-AUTOOPS",
+      "path": "config/repo_autoops.yaml",
+      "exists_on_master": true,
+      "pinned_commit": "e846d04a6eede56e6b790701d0fa762fe90297d6",
+      "glob_expansion": null,
+      "ingestion_priority": "P2",
+      "destination_registries": [
+        "configuration",
+        "operational_control"
+      ],
+      "candidate_destination_fields": {
+        "automation triggers": "repo op settings, branch/workflow controls"
+      },
+      "evidence_class": "E2_ARTIFACT",
+      "authority_disposition": "evidence_reference",
+      "transformation_rule": "TBD_OWNER: map to configuration_registry + op_control; scope-limited (not module/contract source)",
+      "conflict_rule": "TBD_OWNER",
+      "freshness_requirement": "source_refs must pin commit; record stale if source file or repo HEAD moves off e846d04a6e",
+      "validator": "TBD_OWNER",
+      "human_decision_required": {
+        "required": false,
+        "gate": null,
+        "reason": ""
+      },
+      "already_inventoried": false,
+      "notes": "Config/op-control scope only.",
+      "row_status": "skeleton_unpopulated"
+    },
+    {
+      "source_id": "SRC-EAREG-GENERATOR",
+      "path": "EA-REG/generate_three_artifact_catalogs.py",
+      "exists_on_master": true,
+      "pinned_commit": "e846d04a6eede56e6b790701d0fa762fe90297d6",
+      "glob_expansion": null,
+      "ingestion_priority": "P2",
+      "destination_registries": [
+        "reuse"
+      ],
+      "candidate_destination_fields": {
+        "(reuse primitives only)": "path normalization, alias resolution, physical-file joins, scope classification, ordered dedup"
+      },
+      "evidence_class": "E1_CODE",
+      "authority_disposition": "reuse_logic_only_not_authority",
+      "transformation_rule": "TBD_OWNER: extract primitives into new build framework; DO NOT run its 3 outputs as the registry",
+      "conflict_rule": "TBD_OWNER: EA-REG assumes 3-artifact arch; reconcile to 10-registry design",
+      "freshness_requirement": "source_refs must pin commit; record stale if source file or repo HEAD moves off e846d04a6e",
+      "validator": "n/a",
+      "human_decision_required": {
+        "required": false,
+        "gate": null,
+        "reason": ""
+      },
+      "already_inventoried": false,
+      "notes": "EA-REG exists on master, but doc_authority.json EA-REG paths are stale/unrouted - verify routing before reuse.",
+      "row_status": "skeleton_unpopulated"
+    },
+    {
+      "source_id": "SRC-CONTRACT-VALIDATORS",
+      "path": "contracts/validate_*.py",
+      "exists_on_master": true,
+      "pinned_commit": "e846d04a6eede56e6b790701d0fa762fe90297d6",
+      "glob_expansion": {
+        "pattern": "contracts/validate_*.py",
+        "match_count": 2,
+        "members": [
+          "contracts/validate_csv_artifacts.py",
+          "contracts/validate_json_schemas.py"
+        ]
+      },
+      "ingestion_priority": "P2",
+      "destination_registries": [
+        "reuse"
+      ],
+      "candidate_destination_fields": {
+        "(validators)": "schema validation, csv contract validation - wire into CI"
+      },
+      "evidence_class": "E1_CODE",
+      "authority_disposition": "reuse_logic_only_not_authority",
+      "transformation_rule": "TBD_OWNER: adopt as ingestion + CI validators for contract registry",
+      "conflict_rule": "n/a",
+      "freshness_requirement": "source_refs must pin commit; record stale if source file or repo HEAD moves off e846d04a6e",
+      "validator": "self (these ARE validators)",
+      "human_decision_required": {
+        "required": false,
+        "gate": null,
+        "reason": ""
+      },
+      "already_inventoried": false,
+      "notes": "Both present: validate_json_schemas.py + validate_csv_artifacts.py",
+      "row_status": "skeleton_unpopulated"
+    },
+    {
+      "source_id": "SRC-EAREG-SUPERSEDED",
+      "path": "EA-REG/superseded/",
+      "exists_on_master": true,
+      "pinned_commit": "e846d04a6eede56e6b790701d0fa762fe90297d6",
+      "glob_expansion": {
+        "pattern": "EA-REG/superseded/*",
+        "match_count": 7,
+        "members": [
+          "EA-REG/superseded/LEGACY_HUEY_P_TACTICAL_SPEC_pre-modular.txt",
+          "EA-REG/superseded/MIGRATION_COMPLETION_SUMMARY.md",
+          "EA-REG/superseded/PowerShell7_reference_note.txt",
+          "EA-REG/superseded/SOLUTION_FILE_MANIFEST.md",
+          "EA-REG/superseded/numeric_only_identifier_migration.json",
+          "EA-REG/superseded/python_files_inventory.json",
+          "EA-REG/superseded/stripped_down_id_migration_spec.json"
+        ]
+      },
+      "ingestion_priority": "EXCLUDE",
+      "destination_registries": [],
+      "candidate_destination_fields": {},
+      "evidence_class": "E4_HISTORICAL",
+      "authority_disposition": "superseded_excluded",
+      "transformation_rule": "EXCLUDE from authority; historical evidence only if independently reconfirmed",
+      "conflict_rule": "n/a",
+      "freshness_requirement": "source_refs must pin commit; record stale if source file or repo HEAD moves off e846d04a6e",
+      "validator": "n/a",
+      "human_decision_required": {
+        "required": false,
+        "gate": null,
+        "reason": ""
+      },
+      "already_inventoried": false,
+      "notes": "MIGRATION_COMPLETION_SUMMARY.md, SOLUTION_FILE_MANIFEST.md present under superseded/",
+      "row_status": "skeleton_unpopulated"
+    },
+    {
+      "source_id": "SRC-ARCHIVE-DNR",
+      "path": "EAFIX_auth_docs/99_archive_superseded_do_not_route/",
+      "exists_on_master": true,
+      "pinned_commit": "e846d04a6eede56e6b790701d0fa762fe90297d6",
+      "glob_expansion": null,
+      "ingestion_priority": "EXCLUDE",
+      "destination_registries": [],
+      "candidate_destination_fields": {},
+      "evidence_class": "E4_HISTORICAL",
+      "authority_disposition": "excluded_do_not_route",
+      "transformation_rule": "EXCLUDE - explicitly do-not-route archive",
+      "conflict_rule": "n/a",
+      "freshness_requirement": "source_refs must pin commit; record stale if source file or repo HEAD moves off e846d04a6e",
+      "validator": "n/a",
+      "human_decision_required": {
+        "required": false,
+        "gate": null,
+        "reason": ""
+      },
+      "already_inventoried": false,
+      "notes": "Directory present; name declares exclusion.",
+      "row_status": "skeleton_unpopulated"
+    }
+  ],
+  "open_owner_decisions": [
+    "OD-1: IndicatorVector vs IndicatorSnapshot naming/version conflict (contracts/events)",
+    "OD-2: OrderIntent.side vocabulary conflict",
+    "OD-3: two divergent ReentryDecision definitions",
+    "OD-4: regenerate 27 context_packets (stale 2026-05-18, backslash paths) before ingest? y/n",
+    "OD-5: DAG node-id -> process_step_catalog crosswalk ownership",
+    "OD-6: component identity - distinct entity, derived, or retired? (no component registry found)",
+    "OD-7: promote any generated snapshot record to authored .jsonl? (cutover gate)"
+  ],
+  "existence_check_findings": {
+    "checked_against_commit": "e846d04a6eede56e6b790701d0fa762fe90297d6",
+    "path_corrections": [
+      {
+        "document2_path": "context_packets/context_packet_schema.json",
+        "status": "404",
+        "actual_path": "context_packet_schema.json (repo root)"
+      }
+    ],
+    "confirmed_present": "all other Document 2 named sources + globs resolved (see rows)",
+    "duplicate_pattern_flag": "contracts/models has numeric-prefixed AND plain copies of csv/event/json models - dedup before ingest"
+  }
+}
