@@ -1,0 +1,133 @@
+{
+  "document_type": "governance_remediation_baseline_report",
+  "report_id": "GOV-005-BASELINE-REVERIFY",
+  "generated_at_utc": "2026-07-26T00:00:00Z",
+  "plan_ref": "EAFIX-GOVERNANCE-DEFECT-REMEDIATION-001 v1.1.0",
+  "baseline_commit": {
+    "description": "Post-cleanup baseline: upload commit 4d25a24 with the dedup patch applied",
+    "upload_commit": "4d25a24de9b2f152e9834fafe8c60c0db07e1a73",
+    "upload_commit_date": "2026-07-26T00:07:37-05:00",
+    "dedup_patch": "0001-governance-dedup-upload-collisions.patch",
+    "prior_audit_baseline": "43f096239a492130f20e864418b0996df09439f1",
+    "note": "4d25a24 is a descendant of the original audit baseline 43f0962."
+  },
+  "method": "PHASE-00 GOV-001..GOV-004 re-executed verbatim against the post-cleanup tree; whole-tree basename search used for source resolution.",
+  "registry_baseline_facts": {
+    "module": 34,
+    "contract": 97,
+    "process": 26,
+    "integration": 9,
+    "configuration": 7,
+    "operational_control": 52,
+    "operator": 7,
+    "decision": 7,
+    "reuse": 12,
+    "artifact": 40,
+    "conflict_queue_records": 11,
+    "decision_registry_records": [
+      "DEC-REG-001",
+      "DEC-REG-002",
+      "DEC-REG-003",
+      "DEC-REG-004",
+      "DEC-REG-005",
+      "DEC-REG-006",
+      "DEC-REG-007"
+    ],
+    "note": "Registry counts are byte-for-byte unchanged from the original audit. DEC-REG-008..021 remain loose files, NOT appended to decision_registry.jsonl."
+  },
+  "finding_verdicts": [
+    {
+      "finding": "FND-01",
+      "verdict": "CONFIRMED",
+      "severity": "critical",
+      "detail": "MASTER-V2 cites 13 sources. Whole-tree search resolves 11 (five via space-named/Chat_ variants of the cited underscore names). Exactly two remain phantom: index 2 (EAFIX_REGISTRY_POST_MERGE_REMEDIATION_IMPLEMENTATION_PLAN_v1_1_0.json - note the tree has v1_0_0, NOT the cited v1_1_0) and index 3 (EAFIX_REGISTRY_POST_MERGE_REMEDIATION_PLAN_AMENDMENT_v1_0_1.json - truly absent). Neither appears in any commit on any ref. Unchanged from original audit.",
+      "evidence_class": "E2_ARTIFACT + E4_HISTORICAL"
+    },
+    {
+      "finding": "FND-02",
+      "verdict": "RESOLVED",
+      "severity": "medium",
+      "detail": "Exactly one MASTER-V2 copy remains (the spec-named bare filename). The dedup patch collapsed the other four. Hash binding to verification spec target_plan intact.",
+      "evidence_class": "E2_ARTIFACT"
+    },
+    {
+      "finding": "FND-03",
+      "verdict": "OPEN",
+      "severity": "medium",
+      "detail": "Superseded source plans still reside at EAFIX_auth_docs root without supersession metadata. Awaits HD-02 / PHASE-02 GOV-021.",
+      "evidence_class": "E2_ARTIFACT"
+    },
+    {
+      "finding": "FND-04",
+      "verdict": "OPEN",
+      "severity": "high",
+      "detail": "Two doc_authority.json files still present (root 5-entry + 00_ 24-entry). Awaits HD-03 / PHASE-03.",
+      "evidence_class": "E2_ARTIFACT"
+    },
+    {
+      "finding": "FND-05",
+      "verdict": "OPEN",
+      "severity": "high",
+      "detail": "4 of 5 control_files paths in root doc_authority.json do not resolve. Awaits PHASE-03 GOV-032.",
+      "evidence_class": "E2_ARTIFACT"
+    },
+    {
+      "finding": "FND-06",
+      "verdict": "OPEN",
+      "severity": "high",
+      "detail": "documentation_triage_matrix.json still malformed at line 1163 (missing comma). Awaits PHASE-04 GOV-040 (no gate).",
+      "evidence_class": "E2_ARTIFACT"
+    },
+    {
+      "finding": "FND-07",
+      "verdict": "OPEN(low)",
+      "severity": "low",
+      "detail": "EA-REG broken-reference status unchanged (3 broken of a mostly-resolving set). Awaits PHASE-03 GOV-033.",
+      "evidence_class": "E2_ARTIFACT"
+    },
+    {
+      "finding": "FND-08",
+      "verdict": "OPEN",
+      "severity": "high",
+      "detail": "vNext catalog modules[] still length 0. Supporting universe evidence unchanged: catalog 27 (=26 atomic + SHARED_LIBS), registry 34, process_registry 26. Awaits HD-04 / PHASE-05.",
+      "evidence_class": "E2_ARTIFACT"
+    },
+    {
+      "finding": "FND-09",
+      "verdict": "OPEN",
+      "severity": "low",
+      "detail": ".state present; no WORKSTREAM_PROVENANCE.md annotation yet. Awaits HD-05 / PHASE-06.",
+      "evidence_class": "E2_ARTIFACT"
+    },
+    {
+      "finding": "FND-10",
+      "verdict": "CONFIRMED(informational)",
+      "severity": "informational",
+      "detail": "Verification package still unexecuted: report_status not_run, final_status null. As designed - this plan does not run verification.",
+      "evidence_class": "E2_ARTIFACT"
+    },
+    {
+      "finding": "FND-11",
+      "verdict": "CONFIRMED",
+      "severity": "high",
+      "detail": "Two authority_level 1 canonical documents physically reside in 99_archive_superseded_do_not_route/: eafix_project_knowledge_reference_routing_instructions.json and 'Y_module governance glossary.json'. Awaits HD-03 adjunct / PHASE-03 GOV-034.",
+      "evidence_class": "E2_ARTIFACT + E4_HISTORICAL"
+    }
+  ],
+  "delta_from_original_audit": [
+    "FND-02 moved from OPEN to RESOLVED via the dedup patch (four duplicate MASTER-V2 copies removed).",
+    "The upload commit 4d25a24 added the four session artifacts, the ingestion decisions, and several new governance reports; none altered any registry data or resolved any other finding.",
+    "Source-resolution analysis refined: 5 of the 8 'unresolved' sources are simply space-named/Chat_ variants of the cited underscore filenames and are present. Only indices 2 and 3 are genuine phantoms - identical to the original FND-01 conclusion.",
+    "No finding regressed. No registry count changed."
+  ],
+  "gate_readiness": {
+    "HD-01": "ready (FND-01 confirmed; recommend recover-first then HD-01-D)",
+    "HD-02": "partially satisfied (FND-02 dedup done; FND-03 archival still pending) - proceed to GOV-021/022",
+    "HD-03": "ready (FND-04, FND-05, FND-11 all confirmed)",
+    "HD-04": "ready (FND-08 confirmed; 27-vs-34 evidence intact)",
+    "HD-05": "ready (FND-09 confirmed)",
+    "HD-06": "blocked until all above close - as designed"
+  },
+  "honesty_note": "Every verdict above is E2_ARTIFACT (direct file/hash/parse observation) or E2+E4 (adds git history). No verdict rests on authority assertion (E3) alone.",
+  "recommended_next_action": "Land the dedup patch on master (FND-02 closure), then record HD-01 and HD-03 decisions - those two unblock the most downstream tasks. FND-06 (triage matrix comma) can proceed immediately in parallel; it has no gate."
+}
