@@ -353,8 +353,7 @@
       "services/dashboard-backend/src/2099900105260118_dashboard_backend.py",
       "services/dashboard-backend/src/2099900106260118_main.py",
       "services/dashboard-backend/src/2099900107260118_plugin.py",
-      "services/dashboard-backend/src/advanced_indicators.py",
-      "services/dashboard-backend/requirements.txt"
+      "services/dashboard-backend/src/advanced_indicators.py"
     ],
     "source_files": [
       "services/dashboard-backend/src/2099900105260118_dashboard_backend.py",
@@ -365,26 +364,13 @@
     "test_files": [],
     "contract_files": [],
     "documentation_files": [],
-    "configuration_files": [
-      "services/dashboard-backend/requirements.txt"
-    ],
+    "configuration_files": [],
     "schema_files": [],
     "generated_files": [],
     "evidence_files": [],
     "allowed_files": [],
     "forbidden_files": [],
     "file_role_index": [
-      {
-        "path": "services/dashboard-backend/requirements.txt",
-        "service": "dashboard-backend",
-        "role": "dependency_manifest",
-        "ownership": "owned",
-        "is_test": false,
-        "canonical_modules": [
-          "U1_DASHBOARD_BACKEND"
-        ],
-        "notes": "Pins the packaged C2 indicator runtime dependency"
-      },
       {
         "path": "services/dashboard-backend/src/advanced_indicators.py",
         "service": "dashboard-backend",
@@ -451,19 +437,7 @@
     "external_systems": [],
     "operator_settings_required": []
   },
-  "dependencies": [
-    {
-      "target_type": "module",
-      "target_id": "50000000000000000009",
-      "target_symbol": "C2_INDICATOR_ENGINE",
-      "relationship": "runtime_dependency",
-      "consumes_output_contracts": [],
-      "version_constraint": "==1.0.0",
-      "optional": false,
-      "reason": "Dashboard advanced-indicator runtime adapter imports the canonical packaged C2 implementation.",
-      "allowed_access_mode": "public_package_api"
-    }
-  ],
+  "dependencies": [],
   "standards_and_gates": {
     "applicable_rule_ids": [
       "VAL-U1_DASHBOARD_BACKEND-NEEDS_REVIEW"
