@@ -182,7 +182,8 @@
       "shared/idempotency/patterns/2099900212260118_exactly_once_execution.py",
       "shared/idempotency/patterns/2099900213260118_outbox_pattern.py",
       "shared/idempotency/patterns/2099900214260118_saga_coordinator.py",
-      "shared/idempotency/stores/2099900215260118_redis_store.py"
+      "shared/idempotency/stores/2099900215260118_redis_store.py",
+      "m0034-sk2-idempotency/m0034-context/work-cells/R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION.json"
     ],
     "source_files": [
       "shared/idempotency/2099900209260118___init__.py",
@@ -196,13 +197,24 @@
     "test_files": [],
     "contract_files": [],
     "documentation_files": [],
-    "configuration_files": [],
+    "configuration_files": [
+      "m0034-sk2-idempotency/m0034-context/work-cells/R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION.json"
+    ],
     "schema_files": [],
     "generated_files": [],
     "evidence_files": [],
     "allowed_files": [],
     "forbidden_files": [],
     "file_role_index": [
+      {
+        "path": "m0034-sk2-idempotency/m0034-context/work-cells/R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION.json",
+        "service": "idempotency",
+        "role": "work_cell_binding",
+        "ownership": "owned",
+        "is_test": false,
+        "canonical_modules": ["SK2_IDEMPOTENCY"],
+        "notes": "Legacy R1_7 identity reclassified by MIG-0019"
+      },
       {
         "path": "shared/idempotency/models/2099900211260118_idempotency_key.py",
         "service": null,
