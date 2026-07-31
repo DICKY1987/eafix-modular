@@ -15,6 +15,11 @@
       "reviewer": "OpenAI Codex review session 019fb81c-7759-7bf3-b2dc-a47dfb44699b",
       "mode": "read_only_fresh_session",
       "result": "one_P2_finding"
+    },
+    {
+      "reviewer": "OpenAI Codex review sessions 019fb842-72f1-74f3-9437-cf85d4f10ce9, 019fb84b-288b-7ec0-aa6f-b59564ca22a8, and 019fb852-709b-77e1-9407-9c739bba416f",
+      "mode": "read_only_final_gate_with_two_remediation_reviews",
+      "result": "dashboard import claim disproven as a P10 regression; attempted out-of-scope compatibility changes fully reverted"
     }
   ],
   "requested_claude_review": {
@@ -39,6 +44,15 @@
       "status": "dismissed_not_reproducible",
       "resolution": "The underlying ReentryVocabulary loader catches file errors and uses its embedded canonical default vocabulary; an explicit missing-file test returned the expected duration and generation tokens without raising. The root setuptools project also does not package the top-level shared namespace, so the asserted wheel deployment path is not a supported packaging configuration in this project.",
       "follow_up": "P30 source consolidation must define canonical package-resource handling when shared/reentry compatibility wrappers are replaced."
+    },
+    {
+      "id": "P10-REVIEW-003",
+      "severity": "P1",
+      "title": "P10 allegedly broke the dashboard AdvancedIndicatorEngine import",
+      "status": "dismissed_preexisting_and_not_caused_by_p10",
+      "resolution": "The pre-P10 dashboard entrypoint imported .advanced_indicators, but the only legacy file was named 2099900104260118_advanced_indicators.py and never defined AdvancedIndicatorEngine. Thus the relative import and requested symbol were already unsatisfied before P10. Two attempted compatibility remediations were reviewed, shown to require inventing packaging and calculation behavior outside the approved relocation, and fully reverted.",
+      "validation": "git show of base 7f2abe0 confirms the mismatched filename, unchanged import, and absence of any AdvancedIndicatorEngine class; repository-wide symbol search finds no implementation. P10 preserves the legacy file byte-for-byte at its approved canonical owner and creates no new dashboard runtime regression.",
+      "follow_up": "Treat restoration or design of the dashboard indicator facade as a separately scoped product/runtime repair, not a physical-file migration change."
     }
   ],
   "scope_audit": {
@@ -93,5 +107,5 @@
       "historical state evidence"
     ]
   },
-  "review_exit_status": "passed_with_claude_access_constraint_recorded"
+  "review_exit_status": "passed_with_final_false-positive_classification_and_claude_access_constraint_recorded"
 }
