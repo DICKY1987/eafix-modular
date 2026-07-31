@@ -1,0 +1,71 @@
+{
+  "document_type": "eafix_migration_phase_execution_evidence",
+  "schema_version": "1.0.0",
+  "phase": "P20_REGENERATION_AND_RECLASSIFICATION",
+  "base_commit_sha": "a51dc4f89bbc2875c4c9bfbdf1305641abe5fc6f",
+  "execution_commit_sha": "302bf79f486a679032f397138deb691a7584b654",
+  "generator": "tools/migration/generate_p20_outputs.py",
+  "operations": {
+    "MIG-0014": {
+      "status": "completed",
+      "source_path": "docs/reference/1110000003260118_indicator_record.schema.json",
+      "source_sha256": "9280f94d80ac9f324848e14042555dcca3a887ed244a97524d2671faca45d3ae",
+      "output_path": "docs/reference/generated/indicator_record.schema.json",
+      "output_sha256": "21f70f8c93195bb1d74f388695bba6dbb9388de719c7b0135bddfb5a0e83ea5f",
+      "result": "Canonical C2 schema projected without document identity fields and marked non-authoritative; semantic comparison passes."
+    },
+    "MIG-0015": {
+      "status": "completed",
+      "source_path": "services/dashboard-backend/work_cells/UI_GATEWAY_REST_API_GATEWAY.json",
+      "source_sha256": "063e86f0a38149189981d23a2492bc1c9dd4bf3e297955b36d9f81153bba4cb0",
+      "output_path": "m0029-u2-gui-gateway/m0029-context/work-cells/UI_GATEWAY_REST_API_GATEWAY.json",
+      "output_sha256": "d70f9c4fef18feb5aea5c52db9f27d325f3bd3e23379c726608eb4af78ce6bc5",
+      "canonical_owner": "U2_GUI_GATEWAY"
+    },
+    "MIG-0016": {
+      "status": "completed",
+      "source_path": "services/dashboard-backend/work_cells/UI_GATEWAY_WEBSOCKET_GATEWAY.json",
+      "source_sha256": "e5f616bcbe49ae7c37b05767ef47bb596a194d723ecb8897ef9eb9d522bb468a",
+      "output_path": "m0029-u2-gui-gateway/m0029-context/work-cells/UI_GATEWAY_WEBSOCKET_GATEWAY.json",
+      "output_sha256": "a59b642560d251346a098f60800d953d15dd2a81a8035d71b7f9428292459124",
+      "canonical_owner": "U2_GUI_GATEWAY"
+    },
+    "MIG-0017": {
+      "status": "completed",
+      "source_path": "services/execution-engine/work_cells/EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT.json",
+      "source_sha256": "5951300cfb7228c341834fe4760cd8aeb03ed9a3dc3c82c674d7731654f7b922",
+      "output_path": "m0017-b2-mt4-ea-executor/m0017-context/work-cells/EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT.json",
+      "output_sha256": "dd035022c8052149c601c7debdb5ef45b9d64535737ae9a8d604e8b08dd03132",
+      "canonical_owner": "B2_MT4_EA_EXECUTOR"
+    },
+    "MIG-0018": {
+      "status": "completed",
+      "source_path": "services/risk-manager/work_cells/R1_4_CORRELATION_GUARDS.json",
+      "source_sha256": "bf711bda9ae6009ff90a1463d494d7639e5654f3797a3cab71fd8c4111aa96bb",
+      "output_path": "m0027-r3-correlation-guard/m0027-context/work-cells/R1_4_CORRELATION_GUARDS.json",
+      "output_sha256": "a1deaad6c6683814b954954b43d79cbebb7bd0cb09764db365d57ede15305d18",
+      "canonical_owner": "R3_CORRELATION_GUARD",
+      "legacy_identity_preserved": "R1_4_CORRELATION_GUARDS"
+    },
+    "MIG-0019": {
+      "status": "completed",
+      "source_path": "services/risk-manager/work_cells/R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION.json",
+      "source_sha256": "656797fa991d35b8d7625717ce1e5ff7909a252aff66df744565510b3e052a85",
+      "output_path": "m0034-sk2-idempotency/m0034-context/work-cells/R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION.json",
+      "output_sha256": "784e562e0369b23a02b670b81195cc01721700491ef6b82cccacc0c9ab8e6441",
+      "canonical_owner": "SK2_IDEMPOTENCY",
+      "legacy_identity_preserved": "R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION"
+    }
+  },
+  "validation": {
+    "deterministic_generator_check": "passed for 6 outputs",
+    "focused_tests": "3 passed",
+    "full_repository_suite": "passed in clean Python 3.12 validation environment with --no-cov",
+    "doc_id_coverage": "passed",
+    "doc_id_uniqueness": "passed with 15 known baseline duplicates and no new duplicates",
+    "registry_generation": "291 records across 10 registries; errors=0; changed=0",
+    "json_parse": "all changed JSON passed",
+    "git_diff_check": "passed"
+  },
+  "generated_at_utc": "2026-07-31T13:30:00Z"
+}
