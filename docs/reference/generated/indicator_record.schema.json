@@ -1,7 +1,4 @@
 {
-  "_doc_id": "DOC-CONFIG-0124",
-
-  "doc_id": "DOC-CONFIG-0045",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.org/schemas/indicator_record.schema.json",
   "title": "IndicatorRecord",
@@ -17,6 +14,12 @@
   ],
   "additionalProperties": false,
   "properties": {
+    "_doc_id": {
+      "type": "string"
+    },
+    "doc_id": {
+      "type": "string"
+    },
     "IndicatorID": {
       "type": "string",
       "minLength": 3,
@@ -243,5 +246,6 @@
     "Notes": {
       "type": "string"
     }
-  }
+  },
+  "$comment": "Generated non-authoritative documentation projection; canonical source: m0009-c2-indicator-engine/m0009-schemas/inputs/1199900011260118_indicator_record.schema.json"
 }

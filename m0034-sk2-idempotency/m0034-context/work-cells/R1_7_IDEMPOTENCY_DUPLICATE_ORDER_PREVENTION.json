@@ -1,0 +1,50 @@
+{
+  "manifest_type": "canonical_work_cell_binding",
+  "generated_at_utc": "2026-07-31T00:00:00Z",
+  "work_cell_id": "R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION",
+  "legacy_work_cell_aliases": [
+    "R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION"
+  ],
+  "work_cell_type": "risk_rule_family",
+  "owner_module_id": "50000000000000000034",
+  "parent_module_symbol": "SK2_IDEMPOTENCY",
+  "legacy_parent_module_symbol": "R1_RISK_EVALUATOR",
+  "requires_agent_capability": [
+    "python"
+  ],
+  "context_packet_path": "context_packets/50000000000000000034/R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION/work_cell_context.json",
+  "service": "idempotency",
+  "source_files": [
+    "shared/idempotency/2099900209260118___init__.py",
+    "shared/idempotency/middleware/2099900210260118_fastapi_middleware.py",
+    "shared/idempotency/models/2099900211260118_idempotency_key.py",
+    "shared/idempotency/patterns/2099900212260118_exactly_once_execution.py",
+    "shared/idempotency/patterns/2099900213260118_outbox_pattern.py",
+    "shared/idempotency/patterns/2099900214260118_saga_coordinator.py",
+    "shared/idempotency/stores/2099900215260118_redis_store.py"
+  ],
+  "test_files": [],
+  "allowed_dependencies": [],
+  "forbidden_dependencies": [
+    "B2_MT4_EA_EXECUTOR",
+    "B3_EXEC_EVENT_NORMALIZER",
+    "D2_CALENDAR_SOURCE_ADAPTER",
+    "D3_CALENDAR_NORMALIZER",
+    "D4_CALENDAR_TRIGGER_BUILDER"
+  ],
+  "required_reference_documents": [
+    "DOC_MODULE_CATALOG",
+    "DOC_PROCESS_STEP_CATALOG",
+    "DOC_ALIGNED_PROCESS",
+    "DOC_ROUTING_INSTRUCTIONS",
+    "DOC_DECOMPOSITION_MODEL",
+    "DOC_MT4_AUTHORITATIVE_REF",
+    "DOC_ATOMIC_LIFECYCLE_MD",
+    "DOC_FILE_MODULE_MAPPING",
+    "DOC_SERVICES_AI_REFERENCE"
+  ],
+  "notes": [
+    "Regenerated from the canonical module manifest during P20.",
+    "Legacy risk-manager binding retained as lineage evidence: services/risk-manager/work_cells/R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION.json."
+  ]
+}

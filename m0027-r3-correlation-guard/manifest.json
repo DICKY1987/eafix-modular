@@ -180,7 +180,8 @@
       "shared/reentry/2099900219260118_indicator_validator.py",
       "shared/reentry/2099900220260118_reentry_helpers_cli.py",
       "shared/reentry/2099900221260118_vocab.py",
-      "shared/reentry/2099900222260118___init__.py"
+      "shared/reentry/2099900222260118___init__.py",
+      "m0027-r3-correlation-guard/m0027-context/work-cells/R1_4_CORRELATION_GUARDS.json"
     ],
     "source_files": [
       "shared/positioning/2099900216260118_positioning_ratio_index.py",
@@ -194,13 +195,24 @@
     "test_files": [],
     "contract_files": [],
     "documentation_files": [],
-    "configuration_files": [],
+    "configuration_files": [
+      "m0027-r3-correlation-guard/m0027-context/work-cells/R1_4_CORRELATION_GUARDS.json"
+    ],
     "schema_files": [],
     "generated_files": [],
     "evidence_files": [],
     "allowed_files": [],
     "forbidden_files": [],
     "file_role_index": [
+      {
+        "path": "m0027-r3-correlation-guard/m0027-context/work-cells/R1_4_CORRELATION_GUARDS.json",
+        "service": "correlation-guard",
+        "role": "work_cell_binding",
+        "ownership": "owned",
+        "is_test": false,
+        "canonical_modules": ["R3_CORRELATION_GUARD"],
+        "notes": "Legacy R1_4 identity reclassified by MIG-0018"
+      },
       {
         "path": "shared/reentry/2099900220260118_reentry_helpers_cli.py",
         "service": null,

@@ -1,19 +1,24 @@
 {
-  "manifest_type": "service_work_cell_binding",
-  "generated_at_utc": "2026-05-18T05:47:05Z",
+  "manifest_type": "canonical_work_cell_binding",
+  "generated_at_utc": "2026-07-31T00:00:00Z",
   "work_cell_id": "EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT",
+  "legacy_work_cell_aliases": [
+    "EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT"
+  ],
   "work_cell_type": "ea_side_mql4_system",
+  "owner_module_id": "50000000000000000017",
   "parent_module_symbol": "B2_MT4_EA_EXECUTOR",
+  "legacy_parent_module_symbol": "B2_MT4_EA_EXECUTOR",
   "requires_agent_capability": [
     "mql4"
   ],
   "context_packet_path": "context_packets/50000000000000000017/EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT/work_cell_context.json",
   "service": "execution-engine",
   "source_files": [
-    "services\\execution-engine\\src\\2099900144260118_plugin.py"
+    "services/execution-engine/src/2099900144260118_plugin.py"
   ],
   "test_files": [
-    "services\\execution-engine\\tests\\2099900145260118_test_execution_engine_plugin.py"
+    "services/execution-engine/tests/2099900145260118_test_execution_engine_plugin.py"
   ],
   "allowed_dependencies": [
     "B1_MT4_ADAPTER_TRANSPORT"
@@ -43,7 +48,7 @@
     "DOC_EA_EXECUTION_ENGINE_SAMPLE"
   ],
   "notes": [
-    "Manifest-only Phase 3 binding; no runtime logic was moved by this completion pass.",
-    "Use this file as the source-scope contract for subsequent behavior-preserving extraction."
+    "Regenerated from the canonical module manifest during P20.",
+    "Legacy execution-engine binding retained as lineage evidence: services/execution-engine/work_cells/EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT.json."
   ]
 }
