@@ -2,8 +2,8 @@
   "document_type": "eafix_migration_independent_review_report",
   "schema_version": "1.0.0",
   "review_date": "2026-07-31",
-  "reviewed_range": "origin/master...review/p10-independent-remediation",
-  "reviewed_base": "8c69309a741658b184522c396d24ae4fa7be115d",
+  "reviewed_range": "origin/master...migration/physical-file-map-v1-p10",
+  "reviewed_base": "7f2abe02e3d9c61367a6267d923a3bde65ddcbf5",
   "p10_head_before_remediation": "6a09a5757595d8875db6f10e5df39f1a8f7e0bc5",
   "reviewers": [
     {
@@ -15,6 +15,11 @@
       "reviewer": "OpenAI Codex review session 019fb81c-7759-7bf3-b2dc-a47dfb44699b",
       "mode": "read_only_fresh_session",
       "result": "one_P2_finding"
+    },
+    {
+      "reviewer": "OpenAI Codex review session 019fb842-72f1-74f3-9437-cf85d4f10ce9",
+      "mode": "read_only_final_merge_gate",
+      "result": "one_P1_finding"
     }
   ],
   "requested_claude_review": {
@@ -39,6 +44,14 @@
       "status": "dismissed_not_reproducible",
       "resolution": "The underlying ReentryVocabulary loader catches file errors and uses its embedded canonical default vocabulary; an explicit missing-file test returned the expected duration and generation tokens without raising. The root setuptools project also does not package the top-level shared namespace, so the asserted wheel deployment path is not a supported packaging configuration in this project.",
       "follow_up": "P30 source consolidation must define canonical package-resource handling when shared/reentry compatibility wrappers are replaced."
+    },
+    {
+      "id": "P10-REVIEW-003",
+      "severity": "P1",
+      "title": "Dashboard entrypoint lost its advanced indicator runtime import after MIG-0007",
+      "status": "resolved",
+      "resolution": "Added a dashboard-owned compatibility adapter that exposes the canonical C2 implementation from its atomic-module source root, registered the adapter in the U1 manifest, and retained the dashboard entrypoint's stable relative import.",
+      "validation": "Two focused regression tests verify the canonical target, retired source absence, and dashboard entrypoint adapter import."
     }
   ],
   "scope_audit": {
@@ -93,5 +106,5 @@
       "historical state evidence"
     ]
   },
-  "review_exit_status": "passed_with_claude_access_constraint_recorded"
+  "review_exit_status": "passed_after_final_runtime_compatibility_remediation_with_claude_access_constraint_recorded"
 }

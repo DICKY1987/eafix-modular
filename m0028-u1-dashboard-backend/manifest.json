@@ -352,12 +352,14 @@
     "owned_files": [
       "services/dashboard-backend/src/2099900105260118_dashboard_backend.py",
       "services/dashboard-backend/src/2099900106260118_main.py",
-      "services/dashboard-backend/src/2099900107260118_plugin.py"
+      "services/dashboard-backend/src/2099900107260118_plugin.py",
+      "services/dashboard-backend/src/advanced_indicators.py"
     ],
     "source_files": [
       "services/dashboard-backend/src/2099900105260118_dashboard_backend.py",
       "services/dashboard-backend/src/2099900106260118_main.py",
-      "services/dashboard-backend/src/2099900107260118_plugin.py"
+      "services/dashboard-backend/src/2099900107260118_plugin.py",
+      "services/dashboard-backend/src/advanced_indicators.py"
     ],
     "test_files": [],
     "contract_files": [],
@@ -369,6 +371,17 @@
     "allowed_files": [],
     "forbidden_files": [],
     "file_role_index": [
+      {
+        "path": "services/dashboard-backend/src/advanced_indicators.py",
+        "service": "dashboard-backend",
+        "role": "compatibility_adapter",
+        "ownership": "owned",
+        "is_test": false,
+        "canonical_modules": [
+          "U1_DASHBOARD_BACKEND"
+        ],
+        "notes": "Runtime adapter for the C2 indicator implementation relocated by MIG-0007"
+      },
       {
         "path": "services/dashboard-backend/src/2099900107260118_plugin.py",
         "service": "dashboard-backend",
