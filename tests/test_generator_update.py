@@ -33,4 +33,3 @@ def test_legacy_generator_fails_explicitly_when_retired_inputs_are_absent():
         generator.load_physical_registry_rows()
     with pytest.raises(FileNotFoundError, match="classification rules not found"):
         generator.load_classification_rules()
-
