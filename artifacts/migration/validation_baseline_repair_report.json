@@ -1,0 +1,54 @@
+{
+  "document_type": "eafix_validation_baseline_repair_report",
+  "schema_version": "1.0.0",
+  "date": "2026-07-31",
+  "base_commit": "8c69309a741658b184522c396d24ae4fa7be115d",
+  "branch": "fix/restore-migration-validation-baseline",
+  "environment": {
+    "path": "C:\\Users\\richg\\MigrationValidationVenv",
+    "python": "3.12.10",
+    "install_command": "python -m pip install -r requirements.txt",
+    "install_result": "passed after repairing incompatible Pydantic/Rich constraints and excluding unsupported Semgrep on Windows"
+  },
+  "doc_id_validation": {
+    "candidate_sources_reviewed": [96, 97],
+    "candidate_prs_merged": false,
+    "unrelated_pr_97_triage_matrix_change_included": false,
+    "scanner_scope": "Git-tracked files only",
+    "tracked_files": 2018,
+    "prefixed_files": 421,
+    "coverage_ratio": 0.20862239841427155,
+    "known_duplicate_ids": 15,
+    "coverage_gate": "passed",
+    "uniqueness_gate": "passed",
+    "unit_tests": "3 passed"
+  },
+  "collection_repairs": [
+    "Removed six stale tests for repo_autoops, which was intentionally deleted by consolidation commit 20b815e5eae69ce794bd3be6a64c30ff64013c8f.",
+    "Moved the optional GDW runner import behind the pytest-benchmark skip gate.",
+    "Restored the missing opening docstring delimiter in lib/cost_tracker.py.",
+    "Confirmed PyYAML and FastAPI were already declared dependencies and installed them from requirements.txt."
+  ],
+  "dependency_repairs": [
+    "Constrained Pydantic to >=2.11.9,<2.13 for CrewAI 1.15 compatibility.",
+    "Constrained Rich to >=13.7.1,<15 for Instructor compatibility.",
+    "Marked Semgrep non-Windows because Semgrep does not support native Windows installation."
+  ],
+  "full_collection": {
+    "result": "passed",
+    "collection_errors": 0
+  },
+  "full_execution_baseline": {
+    "result": "six_pre_existing_failures",
+    "failures": [
+      "tests/test_generator_update.py::test_process_step_catalog_uses_numeric_module_ids",
+      "tests/test_generator_update.py::test_file_registry_builder_uses_physical_ids_and_new_columns",
+      "tests/test_gui_terminal_core.py::test_policy_manager_allows_echo",
+      "tests/test_gui_terminal_core.py::test_event_bus_basic_pubsub",
+      "tests/test_gui_terminal_core.py::test_plugin_manager_discovers_and_loads",
+      "tests/test_validator_update.py::test_validator_reports_all_statuses_pass"
+    ],
+    "note": "Work Package 2 requires reproducible installation and successful collection. These execution failures are recorded for later final-suite remediation and are unrelated to P10 outputs."
+  },
+  "exit_status": "passed"
+}
