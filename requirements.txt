@@ -9,13 +9,13 @@ langchain-community>=0.1.0
 # Data Management
 sqlmodel>=0.0.39
 redis>=8.0.1
-pydantic>=2.13.4
+pydantic>=2.11.9,<2.13
 
 # API and CLI
 fastapi>=0.139.2
 uvicorn[standard]>=0.51.0
 typer[all]>=0.27.0
-rich>=15.0.0
+rich>=13.7.1,<15
 
 # Monitoring and Observability  
 prometheus-client>=0.26.0
@@ -39,7 +39,7 @@ radon
 pytest
 coverage
 hypothesis
-semgrep
+semgrep; sys_platform != "win32"
 pip-audit
 pip-licenses
 PyYAML>=6.0
