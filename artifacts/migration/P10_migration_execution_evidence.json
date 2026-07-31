@@ -1,0 +1,1118 @@
+{
+  "document_type": "p10_migration_execution_evidence",
+  "schema_version": "1.0.0",
+  "repository": "DICKY1987/eafix-modular",
+  "branch": "migration/physical-file-map-v1-p10",
+  "starting_commit": "8c69309a741658b184522c396d24ae4fa7be115d",
+  "migration_commit_sha": null,
+  "operations": {
+    "MIG-0001": {
+      "operation_id": "MIG-0001",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "status": "completed",
+      "operation_type": "git_mv",
+      "source_paths": [
+        "EAFIX_auth_docs/06_strategy_signal_risk_reentry_oms/0110000074260118_06_signal_model_mapping.md"
+      ],
+      "output_paths": [
+        "m0023-e3-matrix-lookup/m0023-docs/architecture/0110000074260118_06_signal_model_mapping.md"
+      ],
+      "source_sha256_before": [
+        "af8f71ceb09d6fbc0f9706cdc088812352d9503b0a9d8c85b4353a7dfd6c79a9"
+      ],
+      "output_sha256_after": [
+        "af8f71ceb09d6fbc0f9706cdc088812352d9503b0a9d8c85b4353a7dfd6c79a9"
+      ],
+      "commit_sha": null,
+      "references_found": [
+        {
+          "source_path": "EAFIX_auth_docs/06_strategy_signal_risk_reentry_oms/0110000074260118_06_signal_model_mapping.md",
+          "candidate_files": [
+            "EAFIX_auth_docs/documentation_triage_matrix.json",
+            "file_list.txt"
+          ]
+        }
+      ],
+      "references_updated": [
+        "m0023-e3-matrix-lookup/manifest.json"
+      ],
+      "references_intentionally_retained": [
+        {
+          "path": "file_list.txt",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        }
+      ],
+      "commands_run": [
+        "git mv -- EAFIX_auth_docs/06_strategy_signal_risk_reentry_oms/0110000074260118_06_signal_model_mapping.md m0023-e3-matrix-lookup/m0023-docs/architecture/0110000074260118_06_signal_model_mapping.md",
+        "exact-path and filename reference scans",
+        "operation-specific JSON/Python/test validation"
+      ],
+      "validations_run": [
+        "update documentation links",
+        "verify no canonical global authority conflict",
+        "Update and validate documentation links and repository path references."
+      ],
+      "validation_results": {
+        "source_absent": true,
+        "output_present": true,
+        "json_parse": "not_applicable",
+        "python_compile": "not_applicable",
+        "focused_tests": "passed for moved plugin/parity and adjacent indicator/contract tests",
+        "registry_tests": "15 passed",
+        "full_suite": "blocked during collection by unrelated missing baseline modules/dependencies: repo_autoops, lib.gdw_runner, yaml, fastapi"
+      },
+      "preconditions_result": "passed",
+      "postconditions_result": "passed_with_documented_historical_references",
+      "deviations": [],
+      "rollback_performed": false,
+      "rollback_details": null,
+      "started_at_utc": "2026-07-31T09:36:51.344883+00:00",
+      "completed_at_utc": "2026-07-31T11:38:59.153002+00:00"
+    },
+    "MIG-0002": {
+      "operation_id": "MIG-0002",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "status": "completed",
+      "operation_type": "git_mv",
+      "source_paths": [
+        "EAFIX_auth_docs/09_product_requirements_and_design/0110000076260118_07_transport_bridge_contracts.md"
+      ],
+      "output_paths": [
+        "m0016-b1-mt4-adapter-transport/m0016-docs/architecture/0110000076260118_07_transport_bridge_contracts.md"
+      ],
+      "source_sha256_before": [
+        "e7f96103cd541796b472fb8fadbe6cbc6a86ada1c948d3478c071a697c9b6793"
+      ],
+      "output_sha256_after": [
+        "e7f96103cd541796b472fb8fadbe6cbc6a86ada1c948d3478c071a697c9b6793"
+      ],
+      "commit_sha": null,
+      "references_found": [
+        {
+          "source_path": "EAFIX_auth_docs/09_product_requirements_and_design/0110000076260118_07_transport_bridge_contracts.md",
+          "candidate_files": [
+            "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/source_grounded_trading_process_spec.md",
+            "EAFIX_auth_docs/documentation_triage_matrix.json",
+            "file_list.txt"
+          ]
+        }
+      ],
+      "references_updated": [
+        "m0016-b1-mt4-adapter-transport/manifest.json"
+      ],
+      "references_intentionally_retained": [
+        {
+          "path": "file_list.txt",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        }
+      ],
+      "commands_run": [
+        "git mv -- EAFIX_auth_docs/09_product_requirements_and_design/0110000076260118_07_transport_bridge_contracts.md m0016-b1-mt4-adapter-transport/m0016-docs/architecture/0110000076260118_07_transport_bridge_contracts.md",
+        "exact-path and filename reference scans",
+        "operation-specific JSON/Python/test validation"
+      ],
+      "validations_run": [
+        "update links",
+        "verify contract references remain global",
+        "Update and validate documentation links and repository path references."
+      ],
+      "validation_results": {
+        "source_absent": true,
+        "output_present": true,
+        "json_parse": "not_applicable",
+        "python_compile": "not_applicable",
+        "focused_tests": "passed for moved plugin/parity and adjacent indicator/contract tests",
+        "registry_tests": "15 passed",
+        "full_suite": "blocked during collection by unrelated missing baseline modules/dependencies: repo_autoops, lib.gdw_runner, yaml, fastapi"
+      },
+      "preconditions_result": "passed",
+      "postconditions_result": "passed_with_documented_historical_references",
+      "deviations": [],
+      "rollback_performed": false,
+      "rollback_details": null,
+      "started_at_utc": "2026-07-31T09:36:51.344883+00:00",
+      "completed_at_utc": "2026-07-31T11:38:59.153002+00:00"
+    },
+    "MIG-0003": {
+      "operation_id": "MIG-0003",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "status": "completed",
+      "operation_type": "git_mv_rename",
+      "source_paths": [
+        "contracts/schemas/json/1199900010260118_hybrid_id.schema.json"
+      ],
+      "output_paths": [
+        "contracts/schemas/json/1199900010260118_reentry_key.schema.json"
+      ],
+      "source_sha256_before": [
+        "c12fb1e5c1128fcf63a0c49edbbd1849590f788a6e7be9b80bb636092224c89e"
+      ],
+      "output_sha256_after": [
+        "1da1158573f97fbda3446e97e4c2be5487849a7cc1df2d1f02fe962d0cafd750"
+      ],
+      "commit_sha": null,
+      "references_found": [
+        {
+          "source_path": "contracts/schemas/json/1199900010260118_hybrid_id.schema.json",
+          "candidate_files": [
+            "file_list.txt"
+          ]
+        }
+      ],
+      "references_updated": [
+        "contracts/schemas/json/1199900010260118_reentry_key.schema.json"
+      ],
+      "references_intentionally_retained": [
+        {
+          "path": "file_list.txt",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        }
+      ],
+      "commands_run": [
+        "git mv -- contracts/schemas/json/1199900010260118_hybrid_id.schema.json contracts/schemas/json/1199900010260118_reentry_key.schema.json",
+        "exact-path and filename reference scans",
+        "operation-specific JSON/Python/test validation"
+      ],
+      "validations_run": [
+        "update schema refs",
+        "run contract tests",
+        "verify MQL4 compatibility",
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "validation_results": {
+        "source_absent": true,
+        "output_present": true,
+        "json_parse": "passed",
+        "python_compile": "not_applicable",
+        "focused_tests": "passed for moved plugin/parity and adjacent indicator/contract tests",
+        "registry_tests": "15 passed",
+        "full_suite": "blocked during collection by unrelated missing baseline modules/dependencies: repo_autoops, lib.gdw_runner, yaml, fastapi"
+      },
+      "preconditions_result": "passed",
+      "postconditions_result": "passed_with_documented_historical_references",
+      "deviations": [],
+      "rollback_performed": false,
+      "rollback_details": null,
+      "started_at_utc": "2026-07-31T09:36:51.344883+00:00",
+      "completed_at_utc": "2026-07-31T11:38:59.153002+00:00"
+    },
+    "MIG-0004": {
+      "operation_id": "MIG-0004",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "status": "completed",
+      "operation_type": "git_mv",
+      "source_paths": [
+        "contracts/schemas/json/1199900011260118_indicator_record.schema.json"
+      ],
+      "output_paths": [
+        "m0009-c2-indicator-engine/m0009-schemas/inputs/1199900011260118_indicator_record.schema.json"
+      ],
+      "source_sha256_before": [
+        "1d2b966563e6e7f89d5d93a2ee0d82ca78f2081fb5ff68a06c5fefc83ca81e0c"
+      ],
+      "output_sha256_after": [
+        "7d021a7d886e66bc8e7104e4cd42fe611503fbb25076dd198757f127bfca8fc7"
+      ],
+      "commit_sha": null,
+      "references_found": [
+        {
+          "source_path": "contracts/schemas/json/1199900011260118_indicator_record.schema.json",
+          "candidate_files": [
+            "file_list.txt"
+          ]
+        }
+      ],
+      "references_updated": [
+        "m0009-c2-indicator-engine/manifest.json"
+      ],
+      "references_intentionally_retained": [
+        {
+          "path": "file_list.txt",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        }
+      ],
+      "commands_run": [
+        "git mv -- contracts/schemas/json/1199900011260118_indicator_record.schema.json m0009-c2-indicator-engine/m0009-schemas/inputs/1199900011260118_indicator_record.schema.json",
+        "exact-path and filename reference scans",
+        "operation-specific JSON/Python/test validation"
+      ],
+      "validations_run": [
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "validation_results": {
+        "source_absent": true,
+        "output_present": true,
+        "json_parse": "passed",
+        "python_compile": "not_applicable",
+        "focused_tests": "passed for moved plugin/parity and adjacent indicator/contract tests",
+        "registry_tests": "15 passed",
+        "full_suite": "blocked during collection by unrelated missing baseline modules/dependencies: repo_autoops, lib.gdw_runner, yaml, fastapi"
+      },
+      "preconditions_result": "passed",
+      "postconditions_result": "passed_with_documented_historical_references",
+      "deviations": [
+        "Schema extended to permit optional _doc_id/doc_id metadata used by the approved fixture."
+      ],
+      "rollback_performed": false,
+      "rollback_details": null,
+      "started_at_utc": "2026-07-31T09:36:51.344883+00:00",
+      "completed_at_utc": "2026-07-31T11:38:59.153002+00:00"
+    },
+    "MIG-0005": {
+      "operation_id": "MIG-0005",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "status": "completed",
+      "operation_type": "git_mv",
+      "source_paths": [
+        "docs/reference/1110000004260118_indicator_records_full.json"
+      ],
+      "output_paths": [
+        "m0009-c2-indicator-engine/m0009-config/indicator_records_full.json"
+      ],
+      "source_sha256_before": [
+        "585d87cee82669b98dfe867db59a75af85173515dc7fadb84c8fd194e7a2dcd5"
+      ],
+      "output_sha256_after": [
+        "d49f0a6192b32f8aaf5965191b813418e73a30d4dfd05ba4a7261e9c35a76e35"
+      ],
+      "commit_sha": null,
+      "references_found": [
+        {
+          "source_path": "docs/reference/1110000004260118_indicator_records_full.json",
+          "candidate_files": [
+            "file_list.txt"
+          ]
+        }
+      ],
+      "references_updated": [
+        "m0009-c2-indicator-engine/manifest.json"
+      ],
+      "references_intentionally_retained": [
+        {
+          "path": "file_list.txt",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        }
+      ],
+      "commands_run": [
+        "git mv -- docs/reference/1110000004260118_indicator_records_full.json m0009-c2-indicator-engine/m0009-config/indicator_records_full.json",
+        "exact-path and filename reference scans",
+        "operation-specific JSON/Python/test validation"
+      ],
+      "validations_run": [
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "validation_results": {
+        "source_absent": true,
+        "output_present": true,
+        "json_parse": "passed",
+        "python_compile": "not_applicable",
+        "focused_tests": "passed for moved plugin/parity and adjacent indicator/contract tests",
+        "registry_tests": "15 passed",
+        "full_suite": "blocked during collection by unrelated missing baseline modules/dependencies: repo_autoops, lib.gdw_runner, yaml, fastapi"
+      },
+      "preconditions_result": "passed",
+      "postconditions_result": "passed_with_documented_historical_references",
+      "deviations": [
+        "Removed malformed three-line metadata prefix and normalized JSON-encoded Inputs/Thresholds into schema-required objects; indicator semantics preserved.",
+        "Git recognizes the move at 45% similarity after required JSON normalization; source/target lineage remains detectable with --find-renames=10%."
+      ],
+      "rollback_performed": false,
+      "rollback_details": null,
+      "started_at_utc": "2026-07-31T09:36:51.344883+00:00",
+      "completed_at_utc": "2026-07-31T11:38:59.153002+00:00"
+    },
+    "MIG-0006": {
+      "operation_id": "MIG-0006",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "status": "completed",
+      "operation_type": "git_mv",
+      "source_paths": [
+        "docs/reference/1110000005260118_indicator_records_sample.json"
+      ],
+      "output_paths": [
+        "m0009-c2-indicator-engine/m0009-schemas/examples/indicator_records_sample.json"
+      ],
+      "source_sha256_before": [
+        "1daa72de67029531e5d30ad12ca8e0acea7a4948e5044db803309ee30664012c"
+      ],
+      "output_sha256_after": [
+        "e7dbe21a845204e881e2e5f8d43e38683a69a20293dbb8f5988256e5f181b096"
+      ],
+      "commit_sha": null,
+      "references_found": [
+        {
+          "source_path": "docs/reference/1110000005260118_indicator_records_sample.json",
+          "candidate_files": [
+            "file_list.txt"
+          ]
+        }
+      ],
+      "references_updated": [
+        "m0009-c2-indicator-engine/manifest.json"
+      ],
+      "references_intentionally_retained": [
+        {
+          "path": "file_list.txt",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        }
+      ],
+      "commands_run": [
+        "git mv -- docs/reference/1110000005260118_indicator_records_sample.json m0009-c2-indicator-engine/m0009-schemas/examples/indicator_records_sample.json",
+        "exact-path and filename reference scans",
+        "operation-specific JSON/Python/test validation"
+      ],
+      "validations_run": [
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "validation_results": {
+        "source_absent": true,
+        "output_present": true,
+        "json_parse": "passed",
+        "python_compile": "not_applicable",
+        "focused_tests": "passed for moved plugin/parity and adjacent indicator/contract tests",
+        "registry_tests": "15 passed",
+        "full_suite": "blocked during collection by unrelated missing baseline modules/dependencies: repo_autoops, lib.gdw_runner, yaml, fastapi"
+      },
+      "preconditions_result": "passed",
+      "postconditions_result": "passed_with_documented_historical_references",
+      "deviations": [
+        "Removed malformed three-line metadata prefix and normalized JSON-encoded Inputs/Thresholds into schema-required objects; indicator semantics preserved.",
+        "Git recognizes the move at 28% similarity after required JSON normalization; source/target lineage remains detectable with --find-renames=10%."
+      ],
+      "rollback_performed": false,
+      "rollback_details": null,
+      "started_at_utc": "2026-07-31T09:36:51.344883+00:00",
+      "completed_at_utc": "2026-07-31T11:38:59.153002+00:00"
+    },
+    "MIG-0007": {
+      "operation_id": "MIG-0007",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "status": "completed",
+      "operation_type": "git_mv",
+      "source_paths": [
+        "services/dashboard-backend/src/2099900104260118_advanced_indicators.py"
+      ],
+      "output_paths": [
+        "m0009-c2-indicator-engine/m0009-src/c2_indicator_engine/advanced_indicators.py"
+      ],
+      "source_sha256_before": [
+        "2a92208b32e459be840cfdf31eda71241173b3298c2af6cdc3f27d9bfa35e67d"
+      ],
+      "output_sha256_after": [
+        "2a92208b32e459be840cfdf31eda71241173b3298c2af6cdc3f27d9bfa35e67d"
+      ],
+      "commit_sha": null,
+      "references_found": [
+        {
+          "source_path": "services/dashboard-backend/src/2099900104260118_advanced_indicators.py",
+          "candidate_files": [
+            ".state/evidence/PH-02-WARN-R1/baseline_warning_inventory.json",
+            ".state/evidence/PH-02-WARN-R1/file_classification_report.json",
+            "EA-REG/superseded/python_files_inventory.json",
+            "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+            "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+            "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_services_ai_reference_20260510.json",
+            "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv",
+            "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/python_files_inventory.json",
+            "EAFIX_auth_docs/12_ai_summary_routers_and_reference_guides/eafix_project_knowledge_summary_router.json",
+            "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json",
+            "EAFIX_auth_docs/manifests/manifest_population_exceptions.md",
+            "context_packets/50000000000000000001/F1_CONFIG_PREFERENCES__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000001/context_packet.json",
+            "context_packets/50000000000000000002/F3_CLOCK_SCHEDULER__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000002/context_packet.json",
+            "context_packets/50000000000000000003/D2_CALENDAR_SOURCE_ADAPTER__SOURCE_REGISTRY_AND_POLLING/work_cell_context.json",
+            "context_packets/50000000000000000003/context_packet.json",
+            "context_packets/50000000000000000004/D3_CALENDAR_NORMALIZER__TIMESTAMP_IMPACT_IDENTITY/work_cell_context.json",
+            "context_packets/50000000000000000004/context_packet.json",
+            "context_packets/50000000000000000005/F2_EVENT_LOG__APPEND_ONLY_CALENDAR_EVENT_STORE/work_cell_context.json",
+            "context_packets/50000000000000000005/context_packet.json",
+            "context_packets/50000000000000000006/D4_CALENDAR_TRIGGER_BUILDER__ANTICIPATION_AND_SUPPRESSION/work_cell_context.json",
+            "context_packets/50000000000000000006/context_packet.json",
+            "context_packets/50000000000000000007/D1_MARKET_FEED_ADAPTER__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000007/context_packet.json",
+            "context_packets/50000000000000000008/C1_BAR_BUILDER__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000008/context_packet.json",
+            "context_packets/50000000000000000009/C2_INDICATOR_ENGINE__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000009/context_packet.json",
+            "context_packets/50000000000000000010/C3_FEATURE_PACKAGER__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000010/context_packet.json",
+            "context_packets/50000000000000000011/EA_SYSTEM_A_SIGNAL_PIPELINE__MQL4_SIGNAL_EXPORT/work_cell_context.json",
+            "context_packets/50000000000000000011/S1_1_ECO_HIGH_MED_SIGNAL_GENERATOR/work_cell_context.json",
+            "context_packets/50000000000000000011/S1_2_ANTICIPATION_1H_8H_SIGNAL_GENERATOR/work_cell_context.json",
+            "context_packets/50000000000000000011/S1_3_EQUITY_OPEN_SIGNAL_GENERATOR/work_cell_context.json",
+            "context_packets/50000000000000000011/S1_4_ALL_INDICATOR_SIGNAL_GENERATOR/work_cell_context.json",
+            "context_packets/50000000000000000011/S1_5_CONFIDENCE_SCORING/work_cell_context.json",
+            "context_packets/50000000000000000011/S1_6_SUPPRESSION_REASON_MAPPING/work_cell_context.json",
+            "context_packets/50000000000000000011/S1_7_SIGNAL_VALIDATION/work_cell_context.json",
+            "context_packets/50000000000000000011/context_packet.json",
+            "context_packets/50000000000000000012/S2_INTENT_BUILDER__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000012/context_packet.json",
+            "context_packets/50000000000000000013/R1_1_POSITION_LIMIT_CHECKS/work_cell_context.json",
+            "context_packets/50000000000000000013/R1_2_PORTFOLIO_EXPOSURE_CHECKS/work_cell_context.json",
+            "context_packets/50000000000000000013/R1_3_MARGIN_FREE_MARGIN_CHECKS/work_cell_context.json",
+            "context_packets/50000000000000000013/R1_4_CORRELATION_GUARDS/work_cell_context.json",
+            "context_packets/50000000000000000013/R1_5_SPREAD_SLIPPAGE_GUARDS/work_cell_context.json",
+            "context_packets/50000000000000000013/R1_6_CIRCUIT_BREAKERS/work_cell_context.json",
+            "context_packets/50000000000000000013/R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION/work_cell_context.json",
+            "context_packets/50000000000000000013/R1_8_DETERMINISTIC_SIZING_ENGINE/work_cell_context.json",
+            "context_packets/50000000000000000013/R1_9_RISK_DECISION_ASSEMBLER/work_cell_context.json",
+            "context_packets/50000000000000000013/context_packet.json",
+            "context_packets/50000000000000000014/R2_ORDER_INTENT_COMPILER__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000014/context_packet.json",
+            "context_packets/50000000000000000015/O1_ORDER_ROUTER__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000015/context_packet.json",
+            "context_packets/50000000000000000016/B1_MT4_ADAPTER_TRANSPORT__CSV_SOCKET_BRIDGE/work_cell_context.json",
+            "context_packets/50000000000000000016/EA_SYSTEM_B_COMMUNICATION_BRIDGES__MQL4_TRANSPORTS/work_cell_context.json",
+            "context_packets/50000000000000000016/context_packet.json",
+            "context_packets/50000000000000000017/B2_MT4_EA_EXECUTOR__ORDERSEND_EXECUTION/work_cell_context.json",
+            "context_packets/50000000000000000017/EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT/work_cell_context.json",
+            "context_packets/50000000000000000017/context_packet.json",
+            "context_packets/50000000000000000018/B3_EXEC_EVENT_NORMALIZER__BROKER_FEEDBACK/work_cell_context.json",
+            "context_packets/50000000000000000018/context_packet.json",
+            "context_packets/50000000000000000019/O2_OMS_STATE_MACHINE__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000019/context_packet.json",
+            "context_packets/50000000000000000020/O3_TRADE_CLOSE_CLASSIFIER__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000020/context_packet.json",
+            "context_packets/50000000000000000021/E1_OUTCOME_BUCKETIZER__CLOSE_RESULT_CLASSIFICATION/work_cell_context.json",
+            "context_packets/50000000000000000021/context_packet.json",
+            "context_packets/50000000000000000022/E2_PROXIMITY_EVALUATOR__EVENT_PROXIMITY_BUCKETS/work_cell_context.json",
+            "context_packets/50000000000000000022/context_packet.json",
+            "context_packets/50000000000000000023/E3_MATRIX_LOOKUP__VERSIONED_DECISION_RESOLUTION/work_cell_context.json",
+            "context_packets/50000000000000000023/context_packet.json",
+            "context_packets/50000000000000000024/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION/work_cell_context.json",
+            "context_packets/50000000000000000024/context_packet.json",
+            "context_packets/50000000000000000025/F1_FLOW_ORCHESTRATOR__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000025/context_packet.json",
+            "context_packets/50000000000000000026/P1_HEALTH_AGGREGATOR__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000026/context_packet.json",
+            "context_packets/50000000000000000099/UI_GATEWAY_REST_API_GATEWAY/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_GATEWAY_WEBSOCKET_GATEWAY/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_ALERTS/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_CONFIGURATION/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_DDE_PRICE_FEED/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_ECONOMIC_CALENDAR/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_EQUITY_RISK/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_HISTORY_ANALYTICS/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_LIVE_TRADING/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_REENTRY_MATRIX/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_REENTRY_PARAMETER_SETS/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_SIGNALS_HISTORY/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_SYSTEM_STATUS/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_TRADE_HISTORY/work_cell_context.json",
+            "context_packets/50000000000000000099/ai_readme.md",
+            "context_packets/50000000000000000099/context_packet.json",
+            "file_list.txt",
+            "m0028-u1-dashboard-backend/manifest.json",
+            "services/dashboard-backend/work_cells/UI_GATEWAY_REST_API_GATEWAY.json",
+            "services/dashboard-backend/work_cells/UI_GATEWAY_WEBSOCKET_GATEWAY.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_ALERTS.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_CONFIGURATION.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_DDE_PRICE_FEED.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_ECONOMIC_CALENDAR.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_EQUITY_RISK.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_HISTORY_ANALYTICS.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_LIVE_TRADING.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_REENTRY_MATRIX.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_REENTRY_PARAMETER_SETS.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_SIGNALS_HISTORY.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_SYSTEM_STATUS.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_TRADE_HISTORY.json",
+            "submodule_context_catalog.json"
+          ]
+        }
+      ],
+      "references_updated": [
+        "m0028-u1-dashboard-backend/manifest.json",
+        "m0009-c2-indicator-engine/manifest.json"
+      ],
+      "references_intentionally_retained": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_services_ai_reference_20260510.json",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        },
+        {
+          "path": "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        },
+        {
+          "path": "EAFIX_auth_docs/manifests/manifest_population_exceptions.md",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        },
+        {
+          "path": "file_list.txt",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        }
+      ],
+      "commands_run": [
+        "git mv -- services/dashboard-backend/src/2099900104260118_advanced_indicators.py m0009-c2-indicator-engine/m0009-src/c2_indicator_engine/advanced_indicators.py",
+        "exact-path and filename reference scans",
+        "operation-specific JSON/Python/test validation"
+      ],
+      "validations_run": [
+        "update imports",
+        "run C2 and dashboard tests",
+        "Compile every Python output.",
+        "Run an import/reference scan and update all imports that point to removed source paths."
+      ],
+      "validation_results": {
+        "source_absent": true,
+        "output_present": true,
+        "json_parse": "not_applicable",
+        "python_compile": "passed",
+        "focused_tests": "passed for moved plugin/parity and adjacent indicator/contract tests",
+        "registry_tests": "15 passed",
+        "full_suite": "blocked during collection by unrelated missing baseline modules/dependencies: repo_autoops, lib.gdw_runner, yaml, fastapi"
+      },
+      "preconditions_result": "passed",
+      "postconditions_result": "passed_with_documented_historical_references",
+      "deviations": [],
+      "rollback_performed": false,
+      "rollback_details": null,
+      "started_at_utc": "2026-07-31T09:36:51.344883+00:00",
+      "completed_at_utc": "2026-07-31T11:38:59.153002+00:00"
+    },
+    "MIG-0008": {
+      "operation_id": "MIG-0008",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "status": "completed",
+      "operation_type": "git_mv",
+      "source_paths": [
+        "services/dashboard-backend/src/2099900108260118_tkinter_dashboard_gui.py"
+      ],
+      "output_paths": [
+        "m0031-u4-desktop-operator/m0031-src/frontend/tkinter_dashboard_gui.py"
+      ],
+      "source_sha256_before": [
+        "84f67a3f403c4e6d5da908c1c446e99f1c19b0884e3be4e6d5cedd1c5e9edddb"
+      ],
+      "output_sha256_after": [
+        "84f67a3f403c4e6d5da908c1c446e99f1c19b0884e3be4e6d5cedd1c5e9edddb"
+      ],
+      "commit_sha": null,
+      "references_found": [
+        {
+          "source_path": "services/dashboard-backend/src/2099900108260118_tkinter_dashboard_gui.py",
+          "candidate_files": [
+            ".state/evidence/PH-02-WARN-R1/baseline_warning_inventory.json",
+            ".state/evidence/PH-02-WARN-R1/file_classification_report.json",
+            "EA-REG/superseded/python_files_inventory.json",
+            "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+            "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+            "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_services_ai_reference_20260510.json",
+            "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv",
+            "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/python_files_inventory.json",
+            "EAFIX_auth_docs/12_ai_summary_routers_and_reference_guides/eafix_project_knowledge_summary_router.json",
+            "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json",
+            "EAFIX_auth_docs/manifests/manifest_population_exceptions.md",
+            "context_packets/50000000000000000001/F1_CONFIG_PREFERENCES__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000001/context_packet.json",
+            "context_packets/50000000000000000002/F3_CLOCK_SCHEDULER__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000002/context_packet.json",
+            "context_packets/50000000000000000003/D2_CALENDAR_SOURCE_ADAPTER__SOURCE_REGISTRY_AND_POLLING/work_cell_context.json",
+            "context_packets/50000000000000000003/context_packet.json",
+            "context_packets/50000000000000000004/D3_CALENDAR_NORMALIZER__TIMESTAMP_IMPACT_IDENTITY/work_cell_context.json",
+            "context_packets/50000000000000000004/context_packet.json",
+            "context_packets/50000000000000000005/F2_EVENT_LOG__APPEND_ONLY_CALENDAR_EVENT_STORE/work_cell_context.json",
+            "context_packets/50000000000000000005/context_packet.json",
+            "context_packets/50000000000000000006/D4_CALENDAR_TRIGGER_BUILDER__ANTICIPATION_AND_SUPPRESSION/work_cell_context.json",
+            "context_packets/50000000000000000006/context_packet.json",
+            "context_packets/50000000000000000007/D1_MARKET_FEED_ADAPTER__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000007/context_packet.json",
+            "context_packets/50000000000000000008/C1_BAR_BUILDER__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000008/context_packet.json",
+            "context_packets/50000000000000000009/C2_INDICATOR_ENGINE__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000009/context_packet.json",
+            "context_packets/50000000000000000010/C3_FEATURE_PACKAGER__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000010/context_packet.json",
+            "context_packets/50000000000000000011/EA_SYSTEM_A_SIGNAL_PIPELINE__MQL4_SIGNAL_EXPORT/work_cell_context.json",
+            "context_packets/50000000000000000011/S1_1_ECO_HIGH_MED_SIGNAL_GENERATOR/work_cell_context.json",
+            "context_packets/50000000000000000011/S1_2_ANTICIPATION_1H_8H_SIGNAL_GENERATOR/work_cell_context.json",
+            "context_packets/50000000000000000011/S1_3_EQUITY_OPEN_SIGNAL_GENERATOR/work_cell_context.json",
+            "context_packets/50000000000000000011/S1_4_ALL_INDICATOR_SIGNAL_GENERATOR/work_cell_context.json",
+            "context_packets/50000000000000000011/S1_5_CONFIDENCE_SCORING/work_cell_context.json",
+            "context_packets/50000000000000000011/S1_6_SUPPRESSION_REASON_MAPPING/work_cell_context.json",
+            "context_packets/50000000000000000011/S1_7_SIGNAL_VALIDATION/work_cell_context.json",
+            "context_packets/50000000000000000011/context_packet.json",
+            "context_packets/50000000000000000012/S2_INTENT_BUILDER__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000012/context_packet.json",
+            "context_packets/50000000000000000013/R1_1_POSITION_LIMIT_CHECKS/work_cell_context.json",
+            "context_packets/50000000000000000013/R1_2_PORTFOLIO_EXPOSURE_CHECKS/work_cell_context.json",
+            "context_packets/50000000000000000013/R1_3_MARGIN_FREE_MARGIN_CHECKS/work_cell_context.json",
+            "context_packets/50000000000000000013/R1_4_CORRELATION_GUARDS/work_cell_context.json",
+            "context_packets/50000000000000000013/R1_5_SPREAD_SLIPPAGE_GUARDS/work_cell_context.json",
+            "context_packets/50000000000000000013/R1_6_CIRCUIT_BREAKERS/work_cell_context.json",
+            "context_packets/50000000000000000013/R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION/work_cell_context.json",
+            "context_packets/50000000000000000013/R1_8_DETERMINISTIC_SIZING_ENGINE/work_cell_context.json",
+            "context_packets/50000000000000000013/R1_9_RISK_DECISION_ASSEMBLER/work_cell_context.json",
+            "context_packets/50000000000000000013/context_packet.json",
+            "context_packets/50000000000000000014/R2_ORDER_INTENT_COMPILER__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000014/context_packet.json",
+            "context_packets/50000000000000000015/O1_ORDER_ROUTER__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000015/context_packet.json",
+            "context_packets/50000000000000000016/B1_MT4_ADAPTER_TRANSPORT__CSV_SOCKET_BRIDGE/work_cell_context.json",
+            "context_packets/50000000000000000016/EA_SYSTEM_B_COMMUNICATION_BRIDGES__MQL4_TRANSPORTS/work_cell_context.json",
+            "context_packets/50000000000000000016/context_packet.json",
+            "context_packets/50000000000000000017/B2_MT4_EA_EXECUTOR__ORDERSEND_EXECUTION/work_cell_context.json",
+            "context_packets/50000000000000000017/EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT/work_cell_context.json",
+            "context_packets/50000000000000000017/context_packet.json",
+            "context_packets/50000000000000000018/B3_EXEC_EVENT_NORMALIZER__BROKER_FEEDBACK/work_cell_context.json",
+            "context_packets/50000000000000000018/context_packet.json",
+            "context_packets/50000000000000000019/O2_OMS_STATE_MACHINE__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000019/context_packet.json",
+            "context_packets/50000000000000000020/O3_TRADE_CLOSE_CLASSIFIER__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000020/context_packet.json",
+            "context_packets/50000000000000000021/E1_OUTCOME_BUCKETIZER__CLOSE_RESULT_CLASSIFICATION/work_cell_context.json",
+            "context_packets/50000000000000000021/context_packet.json",
+            "context_packets/50000000000000000022/E2_PROXIMITY_EVALUATOR__EVENT_PROXIMITY_BUCKETS/work_cell_context.json",
+            "context_packets/50000000000000000022/context_packet.json",
+            "context_packets/50000000000000000023/E3_MATRIX_LOOKUP__VERSIONED_DECISION_RESOLUTION/work_cell_context.json",
+            "context_packets/50000000000000000023/context_packet.json",
+            "context_packets/50000000000000000024/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION/work_cell_context.json",
+            "context_packets/50000000000000000024/context_packet.json",
+            "context_packets/50000000000000000025/F1_FLOW_ORCHESTRATOR__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000025/context_packet.json",
+            "context_packets/50000000000000000026/P1_HEALTH_AGGREGATOR__MODULE_CONTEXT_BOUNDARY/work_cell_context.json",
+            "context_packets/50000000000000000026/context_packet.json",
+            "context_packets/50000000000000000099/UI_GATEWAY_REST_API_GATEWAY/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_GATEWAY_WEBSOCKET_GATEWAY/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_ALERTS/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_CONFIGURATION/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_DDE_PRICE_FEED/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_ECONOMIC_CALENDAR/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_EQUITY_RISK/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_HISTORY_ANALYTICS/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_LIVE_TRADING/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_REENTRY_MATRIX/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_REENTRY_PARAMETER_SETS/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_SIGNALS_HISTORY/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_SYSTEM_STATUS/work_cell_context.json",
+            "context_packets/50000000000000000099/UI_UI_SCREEN_TRADE_HISTORY/work_cell_context.json",
+            "context_packets/50000000000000000099/ai_readme.md",
+            "context_packets/50000000000000000099/context_packet.json",
+            "file_list.txt",
+            "m0028-u1-dashboard-backend/manifest.json",
+            "services/dashboard-backend/work_cells/UI_GATEWAY_REST_API_GATEWAY.json",
+            "services/dashboard-backend/work_cells/UI_GATEWAY_WEBSOCKET_GATEWAY.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_ALERTS.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_CONFIGURATION.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_DDE_PRICE_FEED.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_ECONOMIC_CALENDAR.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_EQUITY_RISK.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_HISTORY_ANALYTICS.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_LIVE_TRADING.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_REENTRY_MATRIX.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_REENTRY_PARAMETER_SETS.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_SIGNALS_HISTORY.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_SYSTEM_STATUS.json",
+            "services/dashboard-backend/work_cells/UI_UI_SCREEN_TRADE_HISTORY.json",
+            "submodule_context_catalog.json"
+          ]
+        }
+      ],
+      "references_updated": [
+        "m0028-u1-dashboard-backend/manifest.json",
+        "m0031-u4-desktop-operator/manifest.json"
+      ],
+      "references_intentionally_retained": [
+        {
+          "path": "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_services_ai_reference_20260510.json",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        },
+        {
+          "path": "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        },
+        {
+          "path": "EAFIX_auth_docs/manifests/manifest_population_exceptions.md",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        },
+        {
+          "path": "file_list.txt",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        }
+      ],
+      "commands_run": [
+        "git mv -- services/dashboard-backend/src/2099900108260118_tkinter_dashboard_gui.py m0031-u4-desktop-operator/m0031-src/frontend/tkinter_dashboard_gui.py",
+        "exact-path and filename reference scans",
+        "operation-specific JSON/Python/test validation"
+      ],
+      "validations_run": [
+        "Compile every Python output.",
+        "Run an import/reference scan and update all imports that point to removed source paths."
+      ],
+      "validation_results": {
+        "source_absent": true,
+        "output_present": true,
+        "json_parse": "not_applicable",
+        "python_compile": "passed",
+        "focused_tests": "passed for moved plugin/parity and adjacent indicator/contract tests",
+        "registry_tests": "15 passed",
+        "full_suite": "blocked during collection by unrelated missing baseline modules/dependencies: repo_autoops, lib.gdw_runner, yaml, fastapi"
+      },
+      "preconditions_result": "passed",
+      "postconditions_result": "passed_with_documented_historical_references",
+      "deviations": [],
+      "rollback_performed": false,
+      "rollback_details": null,
+      "started_at_utc": "2026-07-31T09:36:51.344883+00:00",
+      "completed_at_utc": "2026-07-31T11:38:59.153002+00:00"
+    },
+    "MIG-0009": {
+      "operation_id": "MIG-0009",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "status": "completed",
+      "operation_type": "git_mv",
+      "source_paths": [
+        "services/reentry-engine/work_cells/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json"
+      ],
+      "output_paths": [
+        "m0024-e4-reentry-intent-builder/m0024-context/work-cells/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json"
+      ],
+      "source_sha256_before": [
+        "7cdb29bf01fe6bbc71367fa7e769d1b0614f4df2d14cee5e408f7bad91aec231"
+      ],
+      "output_sha256_after": [
+        "7cdb29bf01fe6bbc71367fa7e769d1b0614f4df2d14cee5e408f7bad91aec231"
+      ],
+      "commit_sha": null,
+      "references_found": [
+        {
+          "source_path": "services/reentry-engine/work_cells/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json",
+          "candidate_files": [
+            ".state/evidence/PH-03D/service_work_cell_manifest_report.json",
+            "file_list.txt"
+          ]
+        }
+      ],
+      "references_updated": [
+        "m0024-e4-reentry-intent-builder/manifest.json"
+      ],
+      "references_intentionally_retained": [
+        {
+          "path": ".state/evidence/PH-03D/service_work_cell_manifest_report.json",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        },
+        {
+          "path": "file_list.txt",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        }
+      ],
+      "commands_run": [
+        "git mv -- services/reentry-engine/work_cells/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json m0024-e4-reentry-intent-builder/m0024-context/work-cells/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json",
+        "exact-path and filename reference scans",
+        "operation-specific JSON/Python/test validation"
+      ],
+      "validations_run": [
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "validation_results": {
+        "source_absent": true,
+        "output_present": true,
+        "json_parse": "passed",
+        "python_compile": "not_applicable",
+        "focused_tests": "passed for moved plugin/parity and adjacent indicator/contract tests",
+        "registry_tests": "15 passed",
+        "full_suite": "blocked during collection by unrelated missing baseline modules/dependencies: repo_autoops, lib.gdw_runner, yaml, fastapi"
+      },
+      "preconditions_result": "passed",
+      "postconditions_result": "passed_with_documented_historical_references",
+      "deviations": [],
+      "rollback_performed": false,
+      "rollback_details": null,
+      "started_at_utc": "2026-07-31T09:36:51.344883+00:00",
+      "completed_at_utc": "2026-07-31T11:38:59.153002+00:00"
+    },
+    "MIG-0010": {
+      "operation_id": "MIG-0010",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "status": "completed",
+      "operation_type": "git_mv",
+      "source_paths": [
+        "shared/reentry/1199900031260118_reentry_vocab.json"
+      ],
+      "output_paths": [
+        "m0023-e3-matrix-lookup/m0023-config/reentry_vocab.json"
+      ],
+      "source_sha256_before": [
+        "087840831e216519ad14458a83f875dbcb9f313236d3505bffedacdb34d262a0"
+      ],
+      "output_sha256_after": [
+        "087840831e216519ad14458a83f875dbcb9f313236d3505bffedacdb34d262a0"
+      ],
+      "commit_sha": null,
+      "references_found": [
+        {
+          "source_path": "shared/reentry/1199900031260118_reentry_vocab.json",
+          "candidate_files": [
+            "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
+            "file_list.txt",
+            "shared/reentry/vocab.py"
+          ]
+        }
+      ],
+      "references_updated": [
+        "shared/reentry/vocab.py",
+        "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
+        "m0023-e3-matrix-lookup/manifest.json"
+      ],
+      "references_intentionally_retained": [
+        {
+          "path": "file_list.txt",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        }
+      ],
+      "commands_run": [
+        "git mv -- shared/reentry/1199900031260118_reentry_vocab.json m0023-e3-matrix-lookup/m0023-config/reentry_vocab.json",
+        "exact-path and filename reference scans",
+        "operation-specific JSON/Python/test validation"
+      ],
+      "validations_run": [
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "validation_results": {
+        "source_absent": true,
+        "output_present": true,
+        "json_parse": "passed",
+        "python_compile": "not_applicable",
+        "focused_tests": "passed for moved plugin/parity and adjacent indicator/contract tests",
+        "registry_tests": "15 passed",
+        "full_suite": "blocked during collection by unrelated missing baseline modules/dependencies: repo_autoops, lib.gdw_runner, yaml, fastapi"
+      },
+      "preconditions_result": "passed",
+      "postconditions_result": "passed_with_documented_historical_references",
+      "deviations": [],
+      "rollback_performed": false,
+      "rollback_details": null,
+      "started_at_utc": "2026-07-31T09:36:51.344883+00:00",
+      "completed_at_utc": "2026-07-31T11:38:59.153002+00:00"
+    },
+    "MIG-0011": {
+      "operation_id": "MIG-0011",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "status": "completed",
+      "operation_type": "git_mv",
+      "source_paths": [
+        "tests/2099900223260118_test_plugin_system.py"
+      ],
+      "output_paths": [
+        "m0033-sk1-plugin-interface/m0033-tests/unit/test_plugin_system.py"
+      ],
+      "source_sha256_before": [
+        "e0b009207affa98f9c6260b5d3007658105d6b95bd30dd7df4f53a3f611ad13e"
+      ],
+      "output_sha256_after": [
+        "e0b009207affa98f9c6260b5d3007658105d6b95bd30dd7df4f53a3f611ad13e"
+      ],
+      "commit_sha": null,
+      "references_found": [
+        {
+          "source_path": "tests/2099900223260118_test_plugin_system.py",
+          "candidate_files": [
+            "EA-REG/superseded/PowerShell7_reference_note.txt",
+            "EA-REG/superseded/python_files_inventory.json",
+            "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_module_files_ai_reference.json",
+            "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv",
+            "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/python_files_inventory.json",
+            "EAFIX_auth_docs/12_ai_summary_routers_and_reference_guides/eafix_project_knowledge_summary_router.json",
+            "EAFIX_auth_docs/manifests/manifest_population_exceptions.md",
+            "file_list.txt"
+          ]
+        }
+      ],
+      "references_updated": [
+        "m0033-sk1-plugin-interface/manifest.json"
+      ],
+      "references_intentionally_retained": [
+        {
+          "path": "EAFIX_auth_docs/manifests/manifest_population_exceptions.md",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        },
+        {
+          "path": "file_list.txt",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        }
+      ],
+      "commands_run": [
+        "git mv -- tests/2099900223260118_test_plugin_system.py m0033-sk1-plugin-interface/m0033-tests/unit/test_plugin_system.py",
+        "exact-path and filename reference scans",
+        "operation-specific JSON/Python/test validation"
+      ],
+      "validations_run": [
+        "Compile every Python output.",
+        "Run an import/reference scan and update all imports that point to removed source paths.",
+        "Run the moved or rewritten test directly before the full repository test suite."
+      ],
+      "validation_results": {
+        "source_absent": true,
+        "output_present": true,
+        "json_parse": "not_applicable",
+        "python_compile": "passed",
+        "focused_tests": "passed for moved plugin/parity and adjacent indicator/contract tests",
+        "registry_tests": "15 passed",
+        "full_suite": "blocked during collection by unrelated missing baseline modules/dependencies: repo_autoops, lib.gdw_runner, yaml, fastapi"
+      },
+      "preconditions_result": "passed",
+      "postconditions_result": "passed_with_documented_historical_references",
+      "deviations": [],
+      "rollback_performed": false,
+      "rollback_details": null,
+      "started_at_utc": "2026-07-31T09:36:51.344883+00:00",
+      "completed_at_utc": "2026-07-31T11:38:59.153002+00:00"
+    },
+    "MIG-0012": {
+      "operation_id": "MIG-0012",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "status": "completed",
+      "operation_type": "git_mv",
+      "source_paths": [
+        "tests/contracts/fixtures/1199900033260118_indicator_record_valid.json"
+      ],
+      "output_paths": [
+        "m0009-c2-indicator-engine/m0009-tests/contract/fixtures/indicator_record_valid.json"
+      ],
+      "source_sha256_before": [
+        "1cad7bf3a7f557f97418db25240179efd6aa016db1c91254668030f2b86c8ac4"
+      ],
+      "output_sha256_after": [
+        "1cad7bf3a7f557f97418db25240179efd6aa016db1c91254668030f2b86c8ac4"
+      ],
+      "commit_sha": null,
+      "references_found": [
+        {
+          "source_path": "tests/contracts/fixtures/1199900033260118_indicator_record_valid.json",
+          "candidate_files": [
+            "EAFIX_auth_docs/01_canonical_registries/contract_registry.jsonl",
+            "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+            "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_summary.md",
+            "EAFIX_auth_docs/generated/registries/contract_registry.current.json",
+            "EAFIX_auth_docs/generated/registries/eafix_registry_graph.current.json",
+            "file_list.txt"
+          ]
+        }
+      ],
+      "references_updated": [
+        "EAFIX_auth_docs/01_canonical_registries/contract_registry.jsonl",
+        "EAFIX_auth_docs/generated/registries/contract_registry.current.json",
+        "EAFIX_auth_docs/generated/registries/eafix_registry_graph.current.json",
+        "m0009-c2-indicator-engine/manifest.json"
+      ],
+      "references_intentionally_retained": [
+        {
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        },
+        {
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_summary.md",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        },
+        {
+          "path": "file_list.txt",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        }
+      ],
+      "commands_run": [
+        "git mv -- tests/contracts/fixtures/1199900033260118_indicator_record_valid.json m0009-c2-indicator-engine/m0009-tests/contract/fixtures/indicator_record_valid.json",
+        "exact-path and filename reference scans",
+        "operation-specific JSON/Python/test validation"
+      ],
+      "validations_run": [
+        "Parse every JSON output and validate it against its applicable schema when one exists.",
+        "Run the moved or rewritten test directly before the full repository test suite."
+      ],
+      "validation_results": {
+        "source_absent": true,
+        "output_present": true,
+        "json_parse": "passed",
+        "python_compile": "not_applicable",
+        "focused_tests": "passed for moved plugin/parity and adjacent indicator/contract tests",
+        "registry_tests": "15 passed",
+        "full_suite": "blocked during collection by unrelated missing baseline modules/dependencies: repo_autoops, lib.gdw_runner, yaml, fastapi"
+      },
+      "preconditions_result": "passed",
+      "postconditions_result": "passed_with_documented_historical_references",
+      "deviations": [],
+      "rollback_performed": false,
+      "rollback_details": null,
+      "started_at_utc": "2026-07-31T09:36:51.344883+00:00",
+      "completed_at_utc": "2026-07-31T11:38:59.153002+00:00"
+    },
+    "MIG-0013": {
+      "operation_id": "MIG-0013",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "status": "completed",
+      "operation_type": "git_mv",
+      "source_paths": [
+        "tests/contracts/properties/test_hybrid_id_parity.py"
+      ],
+      "output_paths": [
+        "m0023-e3-matrix-lookup/m0023-tests/contract/test_hybrid_id_parity.py"
+      ],
+      "source_sha256_before": [
+        "2034eba2ecaa7de4f7b7fe98bce13a57b66d5a28d8a1e106f581c10b20cd02bb"
+      ],
+      "output_sha256_after": [
+        "2034eba2ecaa7de4f7b7fe98bce13a57b66d5a28d8a1e106f581c10b20cd02bb"
+      ],
+      "commit_sha": null,
+      "references_found": [
+        {
+          "source_path": "tests/contracts/properties/test_hybrid_id_parity.py",
+          "candidate_files": [
+            "EA-REG/superseded/PowerShell7_reference_note.txt",
+            "file_list.txt"
+          ]
+        }
+      ],
+      "references_updated": [
+        "m0023-e3-matrix-lookup/manifest.json"
+      ],
+      "references_intentionally_retained": [
+        {
+          "path": "EA-REG/superseded/PowerShell7_reference_note.txt",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        },
+        {
+          "path": "file_list.txt",
+          "reason": "Historical inventory, generated baseline evidence, archived note, or pre-migration exception record; retained to preserve audit history."
+        }
+      ],
+      "commands_run": [
+        "git mv -- tests/contracts/properties/test_hybrid_id_parity.py m0023-e3-matrix-lookup/m0023-tests/contract/test_hybrid_id_parity.py",
+        "exact-path and filename reference scans",
+        "operation-specific JSON/Python/test validation"
+      ],
+      "validations_run": [
+        "Compile every Python output.",
+        "Run an import/reference scan and update all imports that point to removed source paths.",
+        "Run the moved or rewritten test directly before the full repository test suite."
+      ],
+      "validation_results": {
+        "source_absent": true,
+        "output_present": true,
+        "json_parse": "not_applicable",
+        "python_compile": "passed",
+        "focused_tests": "passed for moved plugin/parity and adjacent indicator/contract tests",
+        "registry_tests": "15 passed",
+        "full_suite": "blocked during collection by unrelated missing baseline modules/dependencies: repo_autoops, lib.gdw_runner, yaml, fastapi"
+      },
+      "preconditions_result": "passed",
+      "postconditions_result": "passed_with_documented_historical_references",
+      "deviations": [],
+      "rollback_performed": false,
+      "rollback_details": null,
+      "started_at_utc": "2026-07-31T09:36:51.344883+00:00",
+      "completed_at_utc": "2026-07-31T11:38:59.153002+00:00"
+    }
+  },
+  "phase_validation": {
+    "focused_tests": "36 passed total (33 moved tests; 3 adjacent indicator/contract)",
+    "registry_tests": "15 passed",
+    "strict_json_and_schema_validation": "passed after documented baseline data normalization",
+    "python_compilation": "passed",
+    "full_suite": "attempted; blocked at collection by unrelated missing modules/dependencies",
+    "doc_id_validation": "workflow references missing doc_id_subsystem/validation directory; unavailable",
+    "p20_started": false
+  },
+  "generated_at_utc": "2026-07-31T11:38:59.153002+00:00"
+}
