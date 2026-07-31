@@ -12,7 +12,12 @@ class ReentryVocabulary(_MODULE.ReentryVocabulary):
 
     def __init__(self, vocab_file=None):
         if vocab_file is None:
-            vocab_file = Path(__file__).with_name("1199900031260118_reentry_vocab.json")
+            vocab_file = (
+                Path(__file__).resolve().parents[2]
+                / "m0023-e3-matrix-lookup"
+                / "m0023-config"
+                / "reentry_vocab.json"
+            )
         super().__init__(vocab_file)
 
 __all__ = ["ReentryVocabulary"]

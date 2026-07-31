@@ -1,0 +1,111 @@
+{
+  "document_type": "eafix_migration_independent_review_report",
+  "schema_version": "1.0.0",
+  "review_date": "2026-07-31",
+  "reviewed_range": "origin/master...review/p10-independent-remediation",
+  "reviewed_base": "8c69309a741658b184522c396d24ae4fa7be115d",
+  "p10_head_before_remediation": "6a09a5757595d8875db6f10e5df39f1a8f7e0bc5",
+  "reviewers": [
+    {
+      "reviewer": "OpenAI Codex review session 019fb819-986d-7ea3-981d-0069096779cf",
+      "mode": "read_only",
+      "result": "one_P1_finding"
+    },
+    {
+      "reviewer": "OpenAI Codex review session 019fb81c-7759-7bf3-b2dc-a47dfb44699b",
+      "mode": "read_only_fresh_session",
+      "result": "one_P2_finding"
+    },
+    {
+      "reviewer": "OpenAI Codex review sessions 019fb842-72f1-74f3-9437-cf85d4f10ce9, 019fb84b-288b-7ec0-aa6f-b59564ca22a8, and 019fb852-709b-77e1-9407-9c739bba416f",
+      "mode": "read_only_final_gate_with_two_remediation_reviews",
+      "result": "dashboard import claim disproven as a P10 regression; attempted out-of-scope compatibility changes fully reverted"
+    }
+  ],
+  "requested_claude_review": {
+    "attempted": true,
+    "completed": false,
+    "blocker": "Organization policy disables Claude subscription access for Claude Code and no Anthropic API key is available.",
+    "substitution": "A second fresh read-only Codex review session plus deterministic evidence, hash, path, and test audits."
+  },
+  "findings": [
+    {
+      "id": "P10-REVIEW-001",
+      "severity": "P1",
+      "title": "Relocated tests were outside pytest discovery roots",
+      "status": "resolved",
+      "resolution": "Added the two P10 module test roots to pytest.ini, made the repository root an explicit Python path, and registered the existing unit/integration markers.",
+      "validation": "Both roots collect 33 tests and all 33 tests pass through the documented pytest executable."
+    },
+    {
+      "id": "P10-REVIEW-002",
+      "severity": "P2",
+      "title": "Default reentry vocabulary allegedly raises FileNotFoundError in installed deployments",
+      "status": "dismissed_not_reproducible",
+      "resolution": "The underlying ReentryVocabulary loader catches file errors and uses its embedded canonical default vocabulary; an explicit missing-file test returned the expected duration and generation tokens without raising. The root setuptools project also does not package the top-level shared namespace, so the asserted wheel deployment path is not a supported packaging configuration in this project.",
+      "follow_up": "P30 source consolidation must define canonical package-resource handling when shared/reentry compatibility wrappers are replaced."
+    },
+    {
+      "id": "P10-REVIEW-003",
+      "severity": "P1",
+      "title": "P10 allegedly broke the dashboard AdvancedIndicatorEngine import",
+      "status": "dismissed_preexisting_and_not_caused_by_p10",
+      "resolution": "The pre-P10 dashboard entrypoint imported .advanced_indicators, but the only legacy file was named 2099900104260118_advanced_indicators.py and never defined AdvancedIndicatorEngine. Thus the relative import and requested symbol were already unsatisfied before P10. Two attempted compatibility remediations were reviewed, shown to require inventing packaging and calculation behavior outside the approved relocation, and fully reverted.",
+      "validation": "git show of base 7f2abe0 confirms the mismatched filename, unchanged import, and absence of any AdvancedIndicatorEngine class; repository-wide symbol search finds no implementation. P10 preserves the legacy file byte-for-byte at its approved canonical owner and creates no new dashboard runtime regression.",
+      "follow_up": "Treat restoration or design of the dashboard indicator facade as a separately scoped product/runtime repair, not a physical-file migration change."
+    }
+  ],
+  "scope_audit": {
+    "approved_relocations": 13,
+    "relocations_detected_at_10_percent_similarity": 13,
+    "unlisted_physical_moves": 0,
+    "git_diff_check": "passed",
+    "changed_support_files_classified": true
+  },
+  "evidence_integrity": {
+    "map_p10_operations": 13,
+    "evidence_operation_ids": 13,
+    "missing_or_duplicate_ids": 0,
+    "source_path_mismatches": 0,
+    "output_path_mismatches": 0,
+    "source_sha256_mismatches": 0,
+    "output_sha256_mismatches": 0,
+    "migration_commit_sha_mismatches": 0,
+    "migration_commit_sha": "2c3ee1e0e6128401fb6cf0b0b419708a281762e6"
+  },
+  "content_transformations": [
+    {
+      "operations": ["MIG-0005", "MIG-0006"],
+      "decision": "approved_as_validation_repair",
+      "rationale": "The original three-line prefixes made both artifacts invalid JSON and JSON-encoded Inputs/Thresholds violated the declared object schema. The repairs preserve record meaning while making the declared P10 outputs machine-valid. Lineage and before/after hashes are explicit in execution evidence."
+    },
+    {
+      "operations": ["MIG-0004", "MIG-0012"],
+      "decision": "schema_authority_approved",
+      "rationale": "The schema permits optional _doc_id/doc_id metadata so repository document identity and contract fixture validity can coexist; the fixture itself remains byte-identical to its source blob."
+    },
+    {
+      "operations": ["MIG-0005"],
+      "decision": "identifier_and_type_repairs_approved",
+      "rationale": "COMMFX_LINK_Z satisfies the schema's UPPER_SNAKE_CASE identity and symbol_scope is normalized to the schema-required array. Repository scans and focused schema/consumer tests are required again before merge."
+    },
+    {
+      "operations": ["MIG-0003"],
+      "decision": "canonical_schema_rename_approved",
+      "rationale": "The filename, $id, and title consistently describe the Reentry Key boundary; active-reference scans and contract tests are required before merge."
+    }
+  ],
+  "stale_path_classification": {
+    "active_hits": 0,
+    "remaining_hit_classes": [
+      "authoritative migration map",
+      "migration preflight and execution evidence",
+      "historical file inventory",
+      "dated/superseded source inventories",
+      "historical generated manifest bundle",
+      "historical contract evidence",
+      "historical state evidence"
+    ]
+  },
+  "review_exit_status": "passed_with_final_false-positive_classification_and_claude_access_constraint_recorded"
+}

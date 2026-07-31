@@ -64,7 +64,7 @@ Services with only stub/plugin files (no main processor):
 | Hybrid ID spec | `contracts/identifiers/0199900025260118_hybrid_id.md` | Confirmed |
 | CSV atomic write policy | `contracts/policies/0199900026260118_csv_atomic_write.md` | Confirmed |
 | Parameter sets config | `config/1199900002260118_parameter_sets.json` | Confirmed |
-| Reentry vocabulary | `shared/reentry/1199900031260118_reentry_vocab.json` | Confirmed |
+| Reentry vocabulary | `m0023-e3-matrix-lookup/m0023-config/reentry_vocab.json` | Confirmed |
 | Risk manager plugin | `services/risk-manager/src/2099900183260118_plugin.py` | Plugin only — no main |
 | Execution engine plugin | `services/execution-engine/src/2099900144260118_plugin.py` | Plugin only — no main |
 
@@ -2053,7 +2053,7 @@ manual_override_emergency_stop:
 | Postgres | All | Postgres | UNKNOWN | UNKNOWN | Optional enterprise; NOT currently active |
 | Dead-letter queue | S18 | Redis DLQ | eafix.*.dlq | same as topic | Confirmed — max 3 retries |
 | Parameter sets | S23 | JSON file | config/1199900002260118_parameter_sets.json | UNKNOWN — no JSON schema for this file | Yes — file confirmed |
-| Reentry vocabulary | S24 | JSON file | shared/reentry/1199900031260118_reentry_vocab.json | UNKNOWN | Yes — file confirmed |
+| Reentry vocabulary | S24 | JSON file | m0023-e3-matrix-lookup/m0023-config/reentry_vocab.json | UNKNOWN | Yes — file confirmed |
 | Audit log | All | UNKNOWN | UNKNOWN | UNKNOWN | Not confirmed |
 | Chain history | S24–S25 | In-memory dict | reentry-engine RAM | N/A | Confirmed in-memory; not durable |
 

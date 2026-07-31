@@ -232,7 +232,10 @@
       "services/reentry-matrix-svc/src/2099900177260118_processor.py",
       "services/reentry-matrix-svc/src/2099900178260118_resolver.py",
       "services/reentry-matrix-svc/src/2099900179260118___init__.py",
-      "services/reentry-matrix-svc/tests/2099900180260118_test_processor.py"
+      "services/reentry-matrix-svc/tests/2099900180260118_test_processor.py",
+      "m0023-e3-matrix-lookup/m0023-docs/architecture/0110000074260118_06_signal_model_mapping.md",
+      "m0023-e3-matrix-lookup/m0023-config/reentry_vocab.json",
+      "m0023-e3-matrix-lookup/m0023-tests/contract/test_hybrid_id_parity.py"
     ],
     "source_files": [
       "services/reentry-matrix-svc/src/2099900172260118_config.py",
@@ -245,12 +248,16 @@
       "services/reentry-matrix-svc/src/2099900179260118___init__.py"
     ],
     "test_files": [
-      "services/reentry-matrix-svc/tests/2099900180260118_test_processor.py"
+      "services/reentry-matrix-svc/tests/2099900180260118_test_processor.py",
+      "m0023-e3-matrix-lookup/m0023-tests/contract/test_hybrid_id_parity.py"
     ],
     "contract_files": [],
-    "documentation_files": [],
+    "documentation_files": [
+      "m0023-e3-matrix-lookup/m0023-docs/architecture/0110000074260118_06_signal_model_mapping.md"
+    ],
     "configuration_files": [
-      "services/reentry-matrix-svc/src/2099900172260118_config.py"
+      "services/reentry-matrix-svc/src/2099900172260118_config.py",
+      "m0023-e3-matrix-lookup/m0023-config/reentry_vocab.json"
     ],
     "schema_files": [],
     "generated_files": [],
@@ -356,6 +363,39 @@
           "E3_MATRIX_LOOKUP"
         ],
         "notes": ""
+      },
+      {
+        "path": "m0023-e3-matrix-lookup/m0023-docs/architecture/0110000074260118_06_signal_model_mapping.md",
+        "service": "m0023-e3-matrix-lookup",
+        "role": "documentation",
+        "ownership": "owned",
+        "is_test": false,
+        "canonical_modules": [
+          "MATRIX_LOOKUP"
+        ],
+        "notes": "Relocated by MIG-0001"
+      },
+      {
+        "path": "m0023-e3-matrix-lookup/m0023-config/reentry_vocab.json",
+        "service": "m0023-e3-matrix-lookup",
+        "role": "configuration",
+        "ownership": "owned",
+        "is_test": false,
+        "canonical_modules": [
+          "MATRIX_LOOKUP"
+        ],
+        "notes": "Relocated by MIG-0010"
+      },
+      {
+        "path": "m0023-e3-matrix-lookup/m0023-tests/contract/test_hybrid_id_parity.py",
+        "service": "m0023-e3-matrix-lookup",
+        "role": "test",
+        "ownership": "owned",
+        "is_test": true,
+        "canonical_modules": [
+          "MATRIX_LOOKUP"
+        ],
+        "notes": "Relocated by MIG-0013"
       }
     ],
     "unassigned_candidate_files": [],

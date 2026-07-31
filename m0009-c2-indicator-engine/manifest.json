@@ -193,20 +193,32 @@
       "services/indicator-engine/src/2099900159260118_plugin.py",
       "services/indicator-engine/src/currency_strength/2099900160260118_strength_calculator.py",
       "services/indicator-engine/src/indicators/2099900161260118_advanced_indicators.py",
-      "services/indicator-engine/tests/2099900162260118_test_indicator_plugin.py"
+      "services/indicator-engine/tests/2099900162260118_test_indicator_plugin.py",
+      "m0009-c2-indicator-engine/m0009-schemas/inputs/1199900011260118_indicator_record.schema.json",
+      "m0009-c2-indicator-engine/m0009-config/indicator_records_full.json",
+      "m0009-c2-indicator-engine/m0009-schemas/examples/indicator_records_sample.json",
+      "m0009-c2-indicator-engine/m0009-src/c2_indicator_engine/advanced_indicators.py",
+      "m0009-c2-indicator-engine/m0009-tests/contract/fixtures/indicator_record_valid.json"
     ],
     "source_files": [
       "services/indicator-engine/src/2099900159260118_plugin.py",
       "services/indicator-engine/src/currency_strength/2099900160260118_strength_calculator.py",
-      "services/indicator-engine/src/indicators/2099900161260118_advanced_indicators.py"
+      "services/indicator-engine/src/indicators/2099900161260118_advanced_indicators.py",
+      "m0009-c2-indicator-engine/m0009-src/c2_indicator_engine/advanced_indicators.py"
     ],
     "test_files": [
-      "services/indicator-engine/tests/2099900162260118_test_indicator_plugin.py"
+      "services/indicator-engine/tests/2099900162260118_test_indicator_plugin.py",
+      "m0009-c2-indicator-engine/m0009-tests/contract/fixtures/indicator_record_valid.json"
     ],
     "contract_files": [],
     "documentation_files": [],
-    "configuration_files": [],
-    "schema_files": [],
+    "configuration_files": [
+      "m0009-c2-indicator-engine/m0009-config/indicator_records_full.json"
+    ],
+    "schema_files": [
+      "m0009-c2-indicator-engine/m0009-schemas/inputs/1199900011260118_indicator_record.schema.json",
+      "m0009-c2-indicator-engine/m0009-schemas/examples/indicator_records_sample.json"
+    ],
     "generated_files": [],
     "evidence_files": [],
     "allowed_files": [],
@@ -255,6 +267,61 @@
           "C2_INDICATOR_ENGINE"
         ],
         "notes": ""
+      },
+      {
+        "path": "m0009-c2-indicator-engine/m0009-schemas/inputs/1199900011260118_indicator_record.schema.json",
+        "service": "m0009-c2-indicator-engine",
+        "role": "schema",
+        "ownership": "owned",
+        "is_test": false,
+        "canonical_modules": [
+          "INDICATOR_ENGINE"
+        ],
+        "notes": "Relocated by MIG-0004"
+      },
+      {
+        "path": "m0009-c2-indicator-engine/m0009-config/indicator_records_full.json",
+        "service": "m0009-c2-indicator-engine",
+        "role": "configuration",
+        "ownership": "owned",
+        "is_test": false,
+        "canonical_modules": [
+          "INDICATOR_ENGINE"
+        ],
+        "notes": "Relocated by MIG-0005"
+      },
+      {
+        "path": "m0009-c2-indicator-engine/m0009-schemas/examples/indicator_records_sample.json",
+        "service": "m0009-c2-indicator-engine",
+        "role": "schema",
+        "ownership": "owned",
+        "is_test": false,
+        "canonical_modules": [
+          "INDICATOR_ENGINE"
+        ],
+        "notes": "Relocated by MIG-0006"
+      },
+      {
+        "path": "m0009-c2-indicator-engine/m0009-src/c2_indicator_engine/advanced_indicators.py",
+        "service": "m0009-c2-indicator-engine",
+        "role": "source",
+        "ownership": "owned",
+        "is_test": false,
+        "canonical_modules": [
+          "INDICATOR_ENGINE"
+        ],
+        "notes": "Relocated by MIG-0007"
+      },
+      {
+        "path": "m0009-c2-indicator-engine/m0009-tests/contract/fixtures/indicator_record_valid.json",
+        "service": "m0009-c2-indicator-engine",
+        "role": "test",
+        "ownership": "owned",
+        "is_test": true,
+        "canonical_modules": [
+          "INDICATOR_ENGINE"
+        ],
+        "notes": "Relocated by MIG-0012"
       }
     ],
     "unassigned_candidate_files": [],
