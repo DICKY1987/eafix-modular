@@ -1,0 +1,625 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "eafix_process_consolidation_plan",
+  "title": "EAFIX Process Authority Repair and Registry-Centered Consolidation Plan",
+  "repository": "DICKY1987/eafix-modular",
+  "status": "proposed",
+  "objective": {
+    "primary": "Establish one governed process authority by repairing the broken lineage, validating the existing 26-step process spine, enriching the existing process registry with missing behavioral and evidence fields, resolving supersession claims, and generating all human, machine, and visual process representations from that governed source.",
+    "non_goals": [
+      "Do not invent a new canonical_process.json authority.",
+      "Do not rediscover the S01-S26 process spine from scratch.",
+      "Do not treat generated artifacts as independent process authorities.",
+      "Do not archive or supersede existing process documents before every substantive statement is reconciled."
+    ],
+    "target_state": {
+      "authored_authority": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+      "authority_status": "pending formal governance decision",
+      "generated_outputs": [
+        "process step catalog",
+        "aligned process JSON",
+        "human-readable end-to-end process specification",
+        "module swimlane views",
+        "subsystem process views",
+        "decision and failure-path diagrams",
+        "module-process crosswalk",
+        "contract-process crosswalk",
+        "implementation and gap reports"
+      ]
+    }
+  },
+  "current_state_findings": {
+    "process_spine": {
+      "step_count": 26,
+      "step_codes": "S01-S26",
+      "phase_count": 10,
+      "phases": "PHASE_A-PHASE_J",
+      "existing_alignment": "process_registry.jsonl and process_step_catalog.json are reported to agree on step_code, step_name, module_id, and module_symbol for all 26 records"
+    },
+    "existing_crosswalk": {
+      "file": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/atonic to canonical crosswalk.csv",
+      "row_count": 27,
+      "relationship_types": [
+        "ONE_TO_MANY",
+        "CANONICAL_ONLY",
+        "PARTIAL",
+        "ATONIC_ONLY"
+      ]
+    },
+    "registry_field_population_problem": {
+      "existing_fields": [
+        "branches",
+        "preconditions",
+        "terminal_outcomes",
+        "trigger",
+        "failure_control_ids",
+        "evidence_refs",
+        "dependency_step_ids",
+        "input_contract_ids",
+        "output_contract_ids",
+        "supporting_module_ids",
+        "source_hashes"
+      ],
+      "known_empty_or_underpopulated_fields": [
+        "branches",
+        "preconditions",
+        "terminal_outcomes",
+        "trigger",
+        "supporting_module_ids",
+        "source_hashes"
+      ],
+      "interpretation": "The primary problem is behavioral and evidence field population, not initial step discovery."
+    },
+    "authority_lineage_defect": {
+      "missing_declared_sources": [
+        "updated_trading_process_aligned.yaml",
+        "2026012201113002_updated_trading_process_v2.yaml"
+      ],
+      "affected_artifacts": [
+        "process_step_catalog.json",
+        "updated_trading_process_aligned.json",
+        "source-grounded process specifications"
+      ],
+      "risk": "Generated artifacts reference missing source files and unverifiable source hashes."
+    },
+    "supersession_defect": {
+      "claiming_document": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
+      "document_status": "DRAFT",
+      "claim": "Declares itself a replacement authority for the missing YAML sources.",
+      "problem": "The supersession claim is not yet registered or governed."
+    },
+    "confidence_defect": {
+      "current_pattern": "Records use authority_status legacy_source with confidence high.",
+      "problem": "A single scalar high-confidence value can conceal low implementation confidence, absent evidence, or legacy-only sourcing.",
+      "recommended_model": [
+        "identity_confidence",
+        "sequence_confidence",
+        "responsibility_confidence",
+        "implementation_confidence",
+        "contract_confidence"
+      ]
+    }
+  },
+  "governing_principles": [
+    {
+      "id": "PRINCIPLE-01",
+      "name": "Registry-centered authority",
+      "rule": "Extend and govern process_registry.jsonl rather than create a competing canonical process file."
+    },
+    {
+      "id": "PRINCIPLE-02",
+      "name": "Formal re-rooting",
+      "rule": "No artifact becomes authoritative through implication; missing-lineage recovery or formal authority re-rooting requires a decision record."
+    },
+    {
+      "id": "PRINCIPLE-03",
+      "name": "Targeted enrichment",
+      "rule": "Review process documents for missing fields, child activities, branches, failures, conflicts, and implementation evidence rather than re-extract settled step identities."
+    },
+    {
+      "id": "PRINCIPLE-04",
+      "name": "Preserve granularity",
+      "rule": "Distinguish phase, step, child activity, branch, failure path, retry, loop, and terminal outcome."
+    },
+    {
+      "id": "PRINCIPLE-05",
+      "name": "Evidence-specific confidence",
+      "rule": "Confidence must be decomposed by identity, sequence, ownership, implementation, and contract support where the current schema permits or through a governed schema revision."
+    },
+    {
+      "id": "PRINCIPLE-06",
+      "name": "Generated artifacts are projections",
+      "rule": "Catalogs, aligned JSON, Markdown, diagrams, and subsystem views must be generated from the governed authority and must not become separate authored authorities."
+    },
+    {
+      "id": "PRINCIPLE-07",
+      "name": "No silent loss",
+      "rule": "Every substantive source statement must be adopted, merged, represented as a child or branch, classified as obsolete, rejected with evidence, or marked non-process."
+    }
+  ],
+  "execution_model": {
+    "phase_count": 4,
+    "phases": [
+      {
+        "phase_id": "PHASE-1",
+        "name": "Repair the authority root",
+        "objective": "Resolve the missing YAML lineage and establish the formal authored authority before canonical enrichment or cutover.",
+        "tasks": [
+          {
+            "task_id": "P1-T01",
+            "action": "Search repository history, branches, tags, archives, release artifacts, and prior commits for both missing YAML files."
+          },
+          {
+            "task_id": "P1-T02",
+            "action": "Attempt SHA-256 verification against the stored generated_from_sha256 value for any recovered candidate."
+          },
+          {
+            "task_id": "P1-T03",
+            "action": "Document the current authority chain among the missing YAML files, process_step_catalog.json, process_registry.jsonl, updated_trading_process_aligned.json, generated process views, and source-grounded draft."
+          },
+          {
+            "task_id": "P1-T04",
+            "action": "Choose and formally approve one authority outcome.",
+            "options": [
+              {
+                "option_id": "P1-A",
+                "name": "Recover original YAML authority",
+                "condition": "The exact source is recovered and its hash and lineage can be verified.",
+                "result": "Recovered YAML remains or becomes the governed authored source, with registries and projections regenerated from it."
+              },
+              {
+                "option_id": "P1-B",
+                "name": "Formally re-root to process_registry.jsonl",
+                "condition": "The YAML source is unrecoverable, obsolete, or cannot be verified.",
+                "result": "process_registry.jsonl becomes the authored process authority; the prior YAML lineage is marked broken and historical."
+              }
+            ]
+          },
+          {
+            "task_id": "P1-T05",
+            "action": "Create a governance decision record containing the selected authority root, effective commit, authored-versus-generated status of every process artifact, and treatment of the missing lineage."
+          },
+          {
+            "task_id": "P1-T06",
+            "action": "Update document authority and routing records only after the decision is approved."
+          }
+        ],
+        "deliverables": [
+          "process_authority_lineage_report.md",
+          "process_authority_decision.json",
+          "missing_source_recovery_report.json",
+          "process_artifact_authorship_matrix.json"
+        ],
+        "gate": {
+          "gate_id": "GATE-P1",
+          "pass_conditions": [
+            "One authored process authority is formally identified.",
+            "The missing YAML lineage is either verified or formally retired.",
+            "Every process artifact is classified as authored, generated, supporting, draft, or archived.",
+            "No unregistered supersession claim remains."
+          ]
+        }
+      },
+      {
+        "phase_id": "PHASE-2",
+        "name": "Validate the settled 26-step spine",
+        "objective": "Machine-verify the existing S01-S26 identity, sequence, phase, module, dependency, and contract alignment without rediscovering the process from narrative documents.",
+        "tasks": [
+          {
+            "task_id": "P2-T01",
+            "action": "Compare all 26 records across process_registry.jsonl and process_step_catalog.json."
+          },
+          {
+            "task_id": "P2-T02",
+            "action": "Validate step_id, step_code, step_number, step_name, phase_id, owner module ID, module symbol, dependency_step_ids, input contract IDs, and output contract IDs."
+          },
+          {
+            "task_id": "P2-T03",
+            "action": "Validate all owner module IDs and symbols against the canonical 34-module catalog."
+          },
+          {
+            "task_id": "P2-T04",
+            "action": "Check for stale aliases, especially the Flow Orchestrator F1 versus F4 locator mismatch."
+          },
+          {
+            "task_id": "P2-T05",
+            "action": "Compare the 26-step spine against updated_trading_process_aligned.json and classify all differences as generated drift, stale source lineage, data loss, or expected projection differences."
+          },
+          {
+            "task_id": "P2-T06",
+            "action": "Validate the existing ATONIC crosswalk and preserve its one-to-many and partial mappings."
+          },
+          {
+            "task_id": "P2-T07",
+            "action": "Create a machine-readable drift report and block later cutover if any step identity remains unresolved."
+          }
+        ],
+        "deliverables": [
+          "process_spine_validation_report.json",
+          "process_registry_catalog_drift_report.json",
+          "process_module_resolution_report.json",
+          "atonic_crosswalk_validation_report.json"
+        ],
+        "gate": {
+          "gate_id": "GATE-P2",
+          "pass_conditions": [
+            "Exactly 26 unique process steps resolve.",
+            "S01-S26 codes are complete and unique.",
+            "All step IDs are unique.",
+            "All owner module IDs resolve to the canonical module catalog.",
+            "All phase assignments resolve.",
+            "All differences among registry, catalog, aligned JSON, and crosswalk are explicitly classified."
+          ]
+        }
+      },
+      {
+        "phase_id": "PHASE-3",
+        "name": "Populate behavior, evidence, and gap fields",
+        "objective": "Enrich the existing process registry using targeted review of gap-annotated, subsystem, implementation, contract, test, and runbook sources.",
+        "source_priority": [
+          "PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md and its GAP annotations",
+          "process_step_catalog.json validation and failure fields",
+          "atonic to canonical crosswalk.csv",
+          "trade placement flow",
+          "reentry technical specification and process flow",
+          "calendar process and integration documents",
+          "MT4 bridge and execution documents",
+          "risk and OMS process documents",
+          "module manifests",
+          "current implementation",
+          "tests and contracts",
+          "operations and recovery runbooks"
+        ],
+        "tasks": [
+          {
+            "task_id": "P3-T01",
+            "action": "Inventory all GAP annotations and map each to one or more S01-S26 records."
+          },
+          {
+            "task_id": "P3-T02",
+            "action": "For each step, populate or validate trigger, preconditions, branches, terminal outcomes, supporting module IDs, source hashes, evidence references, dependencies, contracts, failure controls, implementation status, and gap IDs."
+          },
+          {
+            "task_id": "P3-T03",
+            "action": "Classify every harvested statement.",
+            "classifications": [
+              "registry_field_enrichment",
+              "child_activity",
+              "branch",
+              "failure_path",
+              "retry_or_timeout",
+              "terminal_outcome",
+              "implementation_evidence",
+              "specification_only_requirement",
+              "conflict",
+              "obsolete",
+              "non_process_context"
+            ]
+          },
+          {
+            "task_id": "P3-T04",
+            "action": "Preserve granularity by attaching detailed activities to existing steps unless evidence proves that a new top-level process step is required."
+          },
+          {
+            "task_id": "P3-T05",
+            "action": "Do not automatically convert GAP annotations into new process steps."
+          },
+          {
+            "task_id": "P3-T06",
+            "action": "Validate each entrypoint file against current repository content and classify it as confirmed, stale, wrong service, planned, missing, compatibility-only, or archived."
+          },
+          {
+            "task_id": "P3-T07",
+            "action": "Split confidence by evidence dimension where schema governance allows.",
+            "confidence_dimensions": [
+              "identity_confidence",
+              "sequence_confidence",
+              "responsibility_confidence",
+              "implementation_confidence",
+              "contract_confidence"
+            ]
+          },
+          {
+            "task_id": "P3-T08",
+            "action": "Downgrade or qualify blanket high-confidence claims that rely only on legacy sources or lack evidence references."
+          },
+          {
+            "task_id": "P3-T09",
+            "action": "Create conflict records for incompatible ownership, entrypoints, contracts, identifier formats, runtime behavior, or sequence."
+          },
+          {
+            "task_id": "P3-T10",
+            "action": "Resolve the draft document's supersession claim through an explicit governance decision rather than by accepting its declaration."
+          }
+        ],
+        "required_step_statuses": [
+          "verified_current",
+          "specified_current",
+          "partially_implemented",
+          "planned",
+          "legacy_current",
+          "obsolete",
+          "unverified",
+          "conflicting"
+        ],
+        "deliverables": [
+          "process_gap_harvest_register.json",
+          "process_registry_enrichment_patch.json",
+          "process_entrypoint_validation_report.json",
+          "process_conflict_register.json",
+          "process_evidence_register.jsonl",
+          "process_confidence_reassessment_report.json",
+          "process_supersession_decisions.jsonl"
+        ],
+        "gate": {
+          "gate_id": "GATE-P3",
+          "pass_conditions": [
+            "Every GAP annotation is mapped, classified, and dispositioned.",
+            "Every S01-S26 record has an explicit implementation status.",
+            "Every step has evidence or an explicit evidence gap.",
+            "Every empty behavioral field is either populated or justified as not applicable.",
+            "Every conflict has a decision, waiver, or unresolved blocker status.",
+            "No new top-level step is added without evidence that the 26-step spine is structurally incomplete."
+          ]
+        }
+      },
+      {
+        "phase_id": "PHASE-4",
+        "name": "Generate projections, cut over authority, and enforce drift controls",
+        "objective": "Generate all process representations from the approved authority, retire manual duplicates, and add CI controls preventing future divergence.",
+        "tasks": [
+          {
+            "task_id": "P4-T01",
+            "action": "Finalize and approve the enriched process registry."
+          },
+          {
+            "task_id": "P4-T02",
+            "action": "Define authored fields, derived fields, and projection rules."
+          },
+          {
+            "task_id": "P4-T03",
+            "action": "Build or update one reusable process generator."
+          },
+          {
+            "task_id": "P4-T04",
+            "action": "Generate the process step catalog, aligned process JSON, human-readable end-to-end specification, module views, subsystem views, diagrams, and crosswalks."
+          },
+          {
+            "task_id": "P4-T05",
+            "action": "Add generated-file headers containing source path, generator ID, source hash, and do-not-edit notice."
+          },
+          {
+            "task_id": "P4-T06",
+            "action": "Compare generated outputs against all existing process documents and verify that no substantive source statement is lost."
+          },
+          {
+            "task_id": "P4-T07",
+            "action": "Archive superseded authored process documents with supersession notices and crosswalk references."
+          },
+          {
+            "task_id": "P4-T08",
+            "action": "Exclude superseded documents from normal AI routing."
+          },
+          {
+            "task_id": "P4-T09",
+            "action": "Add CI checks for schema, references, graph integrity, source coverage, generator determinism, and generated drift."
+          }
+        ],
+        "generated_outputs": [
+          "process_step_catalog.generated.json",
+          "updated_trading_process_aligned.generated.json",
+          "EAFIX_CANONICAL_PROCESS.generated.md",
+          "process_module_swimlanes.generated.mmd",
+          "process_decision_paths.generated.mmd",
+          "process_failure_recovery.generated.mmd",
+          "module_process_crosswalk.generated.json",
+          "contract_process_crosswalk.generated.json",
+          "process_implementation_status.generated.md",
+          "process_gap_report.generated.md"
+        ],
+        "ci_checks": [
+          "validate-process-registry-schema",
+          "validate-step-id-uniqueness",
+          "validate-phase-references",
+          "validate-module-references",
+          "validate-contract-references",
+          "validate-process-graph",
+          "validate-gap-dispositions",
+          "validate-source-evidence",
+          "generate-process-projections",
+          "detect-generated-drift",
+          "block-manual-generated-edits"
+        ],
+        "gate": {
+          "gate_id": "GATE-P4",
+          "pass_conditions": [
+            "One authored process authority is active.",
+            "All generated outputs reproduce from the approved source.",
+            "All source statements are reconciled.",
+            "No manually maintained duplicate process authority remains.",
+            "Archived documents are excluded from normal routing.",
+            "CI blocks stale or inconsistent projections."
+          ]
+        }
+      }
+    ]
+  },
+  "reconciliation_rules": {
+    "source_statement_outcomes": [
+      "adopted",
+      "merged_into_existing_step",
+      "represented_as_child_activity",
+      "represented_as_branch",
+      "represented_as_failure_path",
+      "represented_as_retry_or_timeout",
+      "represented_as_terminal_outcome",
+      "classified_as_specification_only",
+      "classified_as_obsolete",
+      "rejected_with_evidence",
+      "classified_as_non_process"
+    ],
+    "new_top_level_step_rule": "A new top-level step may be added only when evidence shows that the S01-S26 spine cannot represent a distinct process responsibility through an existing step, child activity, branch, failure path, loop, or supporting module relationship.",
+    "generated_artifact_rule": "Generated artifacts may not be used as independent corroboration of content that already originates from the same authority source."
+  },
+  "schema_change_policy": {
+    "default": "Prefer populating existing fields before changing schema.",
+    "schema_revision_required_when": [
+      "The current confidence field cannot represent evidence-specific confidence.",
+      "The current record cannot represent child activities or branch structure without ambiguity.",
+      "Authored and derived fields cannot be distinguished.",
+      "Source provenance cannot be attached at field level."
+    ],
+    "required_controls": [
+      "schema version increment",
+      "migration script",
+      "backward compatibility assessment",
+      "registry validation update",
+      "generated projection update",
+      "decision record"
+    ]
+  },
+  "pull_request_sequence": [
+    {
+      "pr": 1,
+      "name": "Authority lineage repair",
+      "scope": [
+        "missing YAML recovery search",
+        "authority decision",
+        "artifact authorship matrix",
+        "routing impact assessment"
+      ]
+    },
+    {
+      "pr": 2,
+      "name": "26-step spine validation",
+      "scope": [
+        "registry versus catalog validation",
+        "module and phase resolution",
+        "ATONIC crosswalk validation",
+        "drift reports"
+      ]
+    },
+    {
+      "pr": 3,
+      "name": "Gap and evidence harvest",
+      "scope": [
+        "GAP annotation inventory",
+        "entrypoint validation",
+        "evidence register",
+        "conflict register",
+        "confidence reassessment"
+      ]
+    },
+    {
+      "pr": 4,
+      "name": "Registry enrichment",
+      "scope": [
+        "populate missing behavioral fields",
+        "record child activities and branches",
+        "resolve supersession decisions",
+        "schema changes only if required"
+      ]
+    },
+    {
+      "pr": 5,
+      "name": "Projection generation",
+      "scope": [
+        "generator",
+        "templates",
+        "generated catalogs",
+        "human-readable process",
+        "diagrams",
+        "crosswalks"
+      ]
+    },
+    {
+      "pr": 6,
+      "name": "Authority cutover and archival",
+      "scope": [
+        "activate authority",
+        "update routing",
+        "archive superseded documents",
+        "add CI enforcement",
+        "publish completion report"
+      ]
+    }
+  ],
+  "acceptance_criteria": {
+    "authority": [
+      "One authored process authority is formally approved.",
+      "The missing YAML lineage is either verified or retired through a decision record.",
+      "All process artifacts have explicit authored or generated status."
+    ],
+    "spine_integrity": [
+      "Exactly 26 canonical steps are validated unless a formally approved change modifies the spine.",
+      "All stable IDs, step codes, phases, and owner module references resolve.",
+      "The ATONIC crosswalk remains preserved and valid."
+    ],
+    "behavioral_completeness": [
+      "All applicable triggers, preconditions, branches, failure paths, terminal outcomes, dependencies, and supporting modules are populated.",
+      "All GAP annotations are dispositioned.",
+      "All implementation claims have evidence or are marked planned, partial, missing, or conflicting."
+    ],
+    "traceability": [
+      "Every enriched field has source provenance where applicable.",
+      "Every supersession decision has a decision record.",
+      "Every rejected or obsolete statement has a reason."
+    ],
+    "generation": [
+      "All human, machine, and visual forms regenerate deterministically.",
+      "Generated outputs use the same stable step IDs.",
+      "Generated files are protected from manual edits."
+    ],
+    "governance": [
+      "Superseded documents are archived rather than deleted.",
+      "Archived documents are excluded from normal AI routing.",
+      "CI blocks schema, reference, graph, evidence, and projection drift."
+    ]
+  },
+  "risks": [
+    {
+      "risk_id": "RISK-01",
+      "risk": "Re-rooting process authority without formal governance creates another implicit supersession.",
+      "control": "Require an approved authority decision record before cutover."
+    },
+    {
+      "risk_id": "RISK-02",
+      "risk": "Gap annotations are mistaken for new top-level process steps.",
+      "control": "Classify each item first as field enrichment, child activity, branch, failure path, evidence gap, or conflict."
+    },
+    {
+      "risk_id": "RISK-03",
+      "risk": "Uniform confidence values conceal implementation uncertainty.",
+      "control": "Use evidence-specific confidence dimensions or a governed schema revision."
+    },
+    {
+      "risk_id": "RISK-04",
+      "risk": "Generated files are treated as independent confirmation.",
+      "control": "Track generation lineage and exclude generated duplicates from corroboration counts."
+    },
+    {
+      "risk_id": "RISK-05",
+      "risk": "Existing subsystem details are lost during projection.",
+      "control": "Require source-statement reconciliation coverage before archival."
+    },
+    {
+      "risk_id": "RISK-06",
+      "risk": "The 26-step spine contains hidden ownership or locator defects.",
+      "control": "Validate every owner against the current 34-module catalog before enrichment."
+    }
+  ],
+  "definition_of_done": [
+    "The authority root is formally resolved.",
+    "The S01-S26 spine is machine-validated.",
+    "The process registry contains populated behavioral and evidence fields.",
+    "All GAP annotations and subsystem process statements are reconciled.",
+    "All supersession claims are governed.",
+    "All other process representations are generated from the approved authority.",
+    "Superseded documents are archived and removed from normal routing.",
+    "CI prevents process drift from returning."
+  ],
+  "security_note": {
+    "issue": "A GitHub personal access token was exposed in plaintext in the conversation context.",
+    "required_action": "Revoke and rotate the token, then remove it from prompts, logs, notes, scripts, and repository content where it may have been copied."
+  }
+}
