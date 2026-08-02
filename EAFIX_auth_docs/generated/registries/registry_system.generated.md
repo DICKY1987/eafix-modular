@@ -14,4 +14,4 @@ This generated view summarizes the candidate registry system. It is **not yet th
 - operational_control: 52 records
 - operator: 7 records
 - reuse: 12 records
-- decision: 7 records
+- decision: 10 records
