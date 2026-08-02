@@ -2,7 +2,7 @@
   "schema_version": "1.0.0",
   "document_type": "project_knowledge_reference_routing_instructions",
   "project_id": "HUEY_P_EAFIX_MODULAR",
-  "generated_at_utc": "2026-05-11T19:42:53Z",
+  "generated_at_utc": "2026-08-02T04:49:34Z",
   "purpose": "Machine-optimized routing instructions that tell an AI which project knowledge documents to reference when specific subjects, tasks, keywords, modules, contracts, channels, files, or UI areas are encountered.",
   "matching_policy": {
     "match_order": [
@@ -42,7 +42,7 @@
     },
     {
       "rank": 4,
-      "rule": "Process step IDs, step codes, handoff contracts, and dependency_step_ids are governed by DOC_PROCESS_STEP_CATALOG. Phase grouping and validation/failure contract IDs are governed by DOC_ALIGNED_PROCESS."
+      "rule": "Process facts, step sequencing, behavior fields, and lifecycle are governed by DOC_PROCESS_REGISTRY. DOC_PROCESS_STEP_CATALOG is a supporting legacy compatibility reference and DOC_ALIGNED_PROCESS is supporting phase context."
     },
     {
       "rank": 5,
@@ -136,7 +136,7 @@
       "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
       "format": "json",
       "document_type": "process_step_catalog",
-      "authority_level": "canonical",
+      "authority_level": "supporting_reference",
       "authority_scope": [
         "canonical process steps",
         "step IDs",
@@ -205,7 +205,7 @@
         "The task asks what output from one module becomes input to the next.",
         "The task mentions process step IDs, S-numbers, validation, failure handling, or dependency order."
       ],
-      "conflict_role": "wins for step IDs, step codes, basic handoff contracts, responsible component names, and direct dependency_step_ids.",
+      "conflict_role": "supporting legacy compatibility reference for step identity and file bindings; it does not override process_registry.jsonl after process cutover.",
       "companion_documents": [
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG",
@@ -218,7 +218,7 @@
       "path": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
       "format": "json",
       "document_type": "aligned_process_contract",
-      "authority_level": "canonical",
+      "authority_level": "supporting_reference",
       "authority_scope": [
         "phase grouping",
         "phase-to-step mapping",
@@ -265,7 +265,7 @@
         "The task asks for the current aligned process, phase sequence, validation contract, or failure contract.",
         "The task converts or validates YAML/JSON process representations."
       ],
-      "conflict_role": "wins for phase grouping and explicit validation_contract/failure_contract identifiers in the aligned v2 process representation.",
+      "conflict_role": "supporting reference for phase grouping and legacy orchestration context; process_registry.jsonl remains the current process authority.",
       "companion_documents": [
         "DOC_PROCESS_STEP_CATALOG",
         "DOC_MODULE_CATALOG",
@@ -275,7 +275,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_MODULE_MAP": {
-      "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/EAFIX-Modular — End-to-End Module Map.txt",
+      "path": "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/EAFIX-Modular \u2014 End-to-End Module Map.txt",
       "format": "text",
       "document_type": "human_readable_module_map",
       "authority_level": "reference",
@@ -535,7 +535,7 @@
       "trigger_keywords": [
         "communication channel",
         "MT4 Python",
-        "MT4 ↔ Python",
+        "MT4 \u2194 Python",
         "DDE",
         "WebRequest",
         "REST",
@@ -1278,6 +1278,57 @@
       ],
       "sha256": "4ed5933311738f0c76710beae7a8db74af30dfeb96580210daf585292768b058",
       "exists_in_current_project_files": true
+    },
+    "DOC_PROCESS_REGISTRY": {
+      "path": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+      "format": "jsonl",
+      "document_type": "process_registry",
+      "authority_level": "canonical",
+      "authority_scope": [
+        "canonical process authority",
+        "process step identity",
+        "step codes",
+        "process order",
+        "behavior fields",
+        "process relationships",
+        "process-specific provenance and lifecycle"
+      ],
+      "primary_subjects": [
+        "end-to-end process authority",
+        "process behavior",
+        "step sequencing",
+        "process ownership",
+        "process lifecycle"
+      ],
+      "trigger_keywords": [
+        "process_registry",
+        "process authority",
+        "S01",
+        "S26",
+        "trigger",
+        "preconditions",
+        "terminal_outcomes",
+        "branches"
+      ],
+      "trigger_task_types": [
+        "define handoff",
+        "validate process sequence",
+        "review process authority",
+        "debug broken pipeline stage",
+        "plan implementation order"
+      ],
+      "must_reference_when": [
+        "The task asks for the current canonical process authority or process behavior.",
+        "The task changes process sequencing, step behavior, or process lifecycle metadata."
+      ],
+      "conflict_role": "wins for process facts, behavior fields, lifecycle, and step sequencing after the approved consolidation cutover.",
+      "companion_documents": [
+        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_ALIGNED_PROCESS",
+        "DOC_MODULE_CATALOG"
+      ],
+      "sha256": "4bd5e50f9e4d548b3d411a8d39d809625d14fa69db7a109b2b38df2970dfaa2a",
+      "exists_in_current_project_files": true
     }
   },
   "subject_routes": [
@@ -1343,7 +1394,7 @@
           "communication channel",
           "bridge",
           "MT4 Python",
-          "MT4 ↔ Python",
+          "MT4 \u2194 Python",
           "DDE",
           "HTTP REST",
           "WebRequest",
@@ -1438,7 +1489,7 @@
         ]
       },
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -1447,7 +1498,7 @@
         "DOC_MODULE_MAP"
       ],
       "authority_order": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG",
         "DOC_ATOMIC_LIFECYCLE_MD",
@@ -1517,7 +1568,7 @@
       ],
       "authority_order": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_FILE_MODULE_MAPPING",
         "DOC_MODULE_MAP",
         "DOC_SERVICES_AI_REFERENCE"
@@ -1560,7 +1611,7 @@
       },
       "required_documents": [
         "DOC_CAL_DES_RULES",
-        "DOC_PROCESS_STEP_CATALOG"
+        "DOC_PROCESS_REGISTRY"
       ],
       "companion_documents": [
         "DOC_ECON_CAL_TECH_ANALYSIS",
@@ -1572,7 +1623,7 @@
       ],
       "authority_order": [
         "DOC_CAL_DES_RULES",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_ECON_CAL_TECH_ANALYSIS",
         "DOC_ECON_CAL_ENHANCEMENT_PLAN",
@@ -1705,7 +1756,7 @@
       },
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -1716,7 +1767,7 @@
       ],
       "authority_order": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_CAL_DES_RULES",
         "DOC_UI_CATALOG",
@@ -1758,7 +1809,7 @@
         ]
       },
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_MODULE_CATALOG",
         "DOC_MT4_AUTHORITATIVE_REF"
       ],
@@ -1769,7 +1820,7 @@
         "DOC_FILE_MODULE_MAPPING"
       ],
       "authority_order": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_MODULE_CATALOG",
         "DOC_MT4_AUTHORITATIVE_REF",
         "DOC_COMM_CHANNELS",
@@ -1845,7 +1896,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -1880,7 +1931,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -1916,7 +1967,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -1971,7 +2022,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2025,7 +2076,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2080,7 +2131,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2135,7 +2186,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2187,7 +2238,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2223,7 +2274,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2267,7 +2318,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2305,7 +2356,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2345,7 +2396,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2383,7 +2434,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2425,7 +2476,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2476,7 +2527,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2527,7 +2578,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2579,7 +2630,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2624,7 +2675,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2667,7 +2718,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2704,7 +2755,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2741,7 +2792,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2792,7 +2843,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2849,7 +2900,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2901,7 +2952,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2952,7 +3003,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -2989,7 +3040,7 @@
       ],
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS"
       ],
       "companion_documents": [
@@ -3063,7 +3114,7 @@
       ],
       "required_documents": [
         "DOC_ALIGNED_PROCESS",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_MODULE_CATALOG"
       ],
       "companion_documents": [
@@ -3094,7 +3145,7 @@
       ],
       "required_documents": [
         "DOC_ALIGNED_PROCESS",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_MODULE_CATALOG"
       ],
       "companion_documents": [
@@ -3125,7 +3176,7 @@
       ],
       "required_documents": [
         "DOC_ALIGNED_PROCESS",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_MODULE_CATALOG"
       ],
       "companion_documents": [
@@ -3151,7 +3202,7 @@
       ],
       "required_documents": [
         "DOC_ALIGNED_PROCESS",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_MODULE_CATALOG"
       ],
       "companion_documents": [
@@ -3179,7 +3230,7 @@
       ],
       "required_documents": [
         "DOC_ALIGNED_PROCESS",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_MODULE_CATALOG"
       ],
       "companion_documents": [
@@ -3205,7 +3256,7 @@
       ],
       "required_documents": [
         "DOC_ALIGNED_PROCESS",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_MODULE_CATALOG"
       ],
       "companion_documents": [
@@ -3233,7 +3284,7 @@
       ],
       "required_documents": [
         "DOC_ALIGNED_PROCESS",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_MODULE_CATALOG"
       ],
       "companion_documents": [
@@ -3259,7 +3310,7 @@
       ],
       "required_documents": [
         "DOC_ALIGNED_PROCESS",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_MODULE_CATALOG"
       ],
       "companion_documents": [
@@ -3293,7 +3344,7 @@
       ],
       "required_documents": [
         "DOC_ALIGNED_PROCESS",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_MODULE_CATALOG"
       ],
       "companion_documents": [
@@ -3324,7 +3375,7 @@
       ],
       "required_documents": [
         "DOC_ALIGNED_PROCESS",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_MODULE_CATALOG"
       ],
       "companion_documents": [
@@ -3844,7 +3895,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -3864,7 +3915,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -3890,7 +3941,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -3916,7 +3967,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -3942,7 +3993,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -3962,7 +4013,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4000,7 +4051,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4026,7 +4077,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4046,7 +4097,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4072,7 +4123,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4092,7 +4143,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4112,7 +4163,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4132,7 +4183,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4152,7 +4203,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4178,7 +4229,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4198,7 +4249,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4224,7 +4275,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4238,7 +4289,7 @@
       "related_process_bindings": [],
       "required_documents": [
         "DOC_COMM_CHANNELS",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4264,7 +4315,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4284,7 +4335,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4310,7 +4361,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4336,7 +4387,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4362,7 +4413,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4382,7 +4433,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4402,7 +4453,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4428,7 +4479,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4442,7 +4493,7 @@
       "related_process_bindings": [],
       "required_documents": [
         "DOC_COMM_CHANNELS",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4462,7 +4513,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4494,7 +4545,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4514,7 +4565,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4540,7 +4591,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4560,7 +4611,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4580,7 +4631,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4594,7 +4645,7 @@
       "related_process_bindings": [],
       "required_documents": [
         "DOC_COMM_CHANNELS",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4614,7 +4665,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4634,7 +4685,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4654,7 +4705,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4800,7 +4851,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4826,7 +4877,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4846,7 +4897,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4884,7 +4935,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4916,7 +4967,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4942,7 +4993,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4962,7 +5013,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4982,7 +5033,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -4996,7 +5047,7 @@
       "related_process_bindings": [],
       "required_documents": [
         "DOC_COMM_CHANNELS",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -5022,7 +5073,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -5048,7 +5099,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -5086,7 +5137,7 @@
         }
       ],
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -5777,7 +5828,7 @@
       "task_type": "architecture_review",
       "required_documents": [
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_MAP"
       ],
@@ -5795,7 +5846,7 @@
     {
       "task_type": "implementation_planning",
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_MODULE_CATALOG",
         "DOC_FILE_MODULE_MAPPING",
         "DOC_SERVICES_AI_REFERENCE",
@@ -5816,7 +5867,7 @@
       "required_documents": [
         "DOC_FILE_MODULE_MAPPING",
         "DOC_MODULE_CATALOG",
-        "DOC_PROCESS_STEP_CATALOG"
+        "DOC_PROCESS_REGISTRY"
       ],
       "also_reference_if_service_work": [
         "DOC_SERVICES_AI_REFERENCE",
@@ -5832,7 +5883,7 @@
     {
       "task_type": "debugging_runtime_flow",
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_FILE_MODULE_MAPPING"
       ],
@@ -5852,7 +5903,7 @@
     {
       "task_type": "validation_or_test_design",
       "required_documents": [
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG"
       ],
@@ -5884,7 +5935,7 @@
       "task_type": "calendar_system_work",
       "required_documents": [
         "DOC_CAL_DES_RULES",
-        "DOC_PROCESS_STEP_CATALOG",
+        "DOC_PROCESS_REGISTRY",
         "DOC_MODULE_CATALOG"
       ],
       "companion_documents": [

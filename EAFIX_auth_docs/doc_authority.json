@@ -17,7 +17,8 @@
     "EAFIX_auth_docs/module_catalog.json",
     "EAFIX_auth_docs/process_step_catalog.json",
     "EAFIX_auth_docs/module_checklist.json",
-    "eafix_project_knowledge_reference_routing_instructions.json"
+    "eafix_project_knowledge_reference_routing_instructions.json",
+    "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl"
   ],
   "subject_authorities": [
     {
@@ -69,6 +70,18 @@
         "EAFIX_auth_docs/documentation_triage_matrix.json"
       ],
       "superseded": []
+    },
+    {
+      "subject": "process",
+      "active_authority": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+      "supporting": [
+        "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+        "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json"
+      ],
+      "superseded": [
+        "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
+        "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/source_grounded_trading_process_spec.md"
+      ]
     }
   ],
   "entries": [
@@ -85,10 +98,16 @@
       "description": "Single source of truth for module identity and canonical symbols."
     },
     {
-      "path": "EAFIX_auth_docs/process_step_catalog.json",
+      "path": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
       "classification": "canonical",
       "authority_level": 1,
-      "description": "Canonical process-step definitions and step handoff sequence."
+      "description": "Current canonical process authority after approved process consolidation cutover."
+    },
+    {
+      "path": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+      "classification": "supporting_reference",
+      "authority_level": 2,
+      "description": "Legacy compatibility and step-binding reference after process_registry.jsonl cutover."
     },
     {
       "path": "EAFIX_auth_docs/module_checklist.json",

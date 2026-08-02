@@ -1,6 +1,6 @@
 {
   "document_type": "generated_registry_snapshot",
-  "record_count": 7,
+  "record_count": 8,
   "records": [
     {
       "affected_registry_records": [],
@@ -302,9 +302,102 @@
       "status": "active",
       "superseded_by": [],
       "supersedes": []
+    },
+    {
+      "affected_registry_records": [
+        "60000000000000000001",
+        "60000000000000000002",
+        "60000000000000000003",
+        "60000000000000000004",
+        "60000000000000000005",
+        "60000000000000000006",
+        "60000000000000000007",
+        "60000000000000000008",
+        "60000000000000000009",
+        "60000000000000000010",
+        "60000000000000000011",
+        "60000000000000000012",
+        "60000000000000000013",
+        "60000000000000000014",
+        "60000000000000000015",
+        "60000000000000000016",
+        "60000000000000000017",
+        "60000000000000000018",
+        "60000000000000000019",
+        "60000000000000000020",
+        "60000000000000000021",
+        "60000000000000000022",
+        "60000000000000000023",
+        "60000000000000000024",
+        "60000000000000000025",
+        "60000000000000000026"
+      ],
+      "approval": {
+        "approval_scope": "process consolidation spine freeze and merge sequence; excludes canonical cutover",
+        "approval_status": "approved",
+        "approved_at_utc": "2026-08-02T03:09:53.4586571Z",
+        "approved_by": [
+          "@DICKY1987"
+        ],
+        "required_human_confirmation": true,
+        "required_predecessor_decision": "PROCESS-AUTHORITY-LINEAGE-DECISION"
+      },
+      "authority_status": "canonical_candidate",
+      "change_request_refs": [],
+      "compatibility_impact": "No authority cutover is authorized by this decision. The top-level spine is frozen only for this consolidation pass; linked child records and governed schema extensions remain permitted after approval.",
+      "confidence": "high",
+      "decision": "Freeze S01-S26 as the consolidation-pass top-level spine and use process_registry.jsonl as the sole registry enrichment target. No consolidation merge may add a top-level step directly. Evidence for a structurally missing step must enter a governed process change request. Human and visual process documents are generated projections, not independently authored authorities.",
+      "decision_id": "DEC-REG-022",
+      "decision_record_type": "architecture_decision",
+      "decision_status": "accepted_for_process_consolidation_execution",
+      "effective_date": "2026-08-02",
+      "effective_from_utc": null,
+      "last_verified_commit": "a5c950410bebee93f6a13632dbcb0ad4577d1d73",
+      "migration_required": true,
+      "options": [
+        "Author a new consolidated prose process document",
+        "Merge into the existing 26-record process registry and generate projections",
+        "Maintain multiple process documents with a routing layer"
+      ],
+      "problem": "Eight process documents assert overlapping process authority. A consolidation baseline is required before any of them can be superseded.",
+      "rationale": "A ninth authored narrative would become competitor nine. The 26-record spine already exists, matches process_step_catalog.json with zero module-binding drift, and carries a 39-field superset schema of which 23 fields are fully populated. Filling the existing spine preserves provenance and produces a single generated projection.",
+      "record_id": "DEC-REG-022",
+      "record_type": "decision",
+      "record_version": "1.1.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": "a5c950410bebee93f6a13632dbcb0ad4577d1d73",
+          "line_end": null,
+          "line_start": null,
+          "note": "26 authored records, S01-S26",
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+          "role": "merge_target"
+        },
+        {
+          "commit_sha": "a5c950410bebee93f6a13632dbcb0ad4577d1d73",
+          "line_end": null,
+          "line_start": null,
+          "note": "field superset and merge rules",
+          "path": "EAFIX_auth_docs/EAFIX_PROCESS_INFORMATION_CONSOLIDATION_SPEC_v1_0_0.md",
+          "role": "governing_specification"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "introduced by candidate decision revision 1.1.0",
+          "path": "EAFIX_auth_docs/EAFIX_PROCESS_CONSOLIDATION_RUNBOOK_v1_1_0.md",
+          "role": "execution_runbook"
+        }
+      ],
+      "status": "active",
+      "superseded_by": [],
+      "supersedes": []
     }
   ],
-  "records_sha256": "54aecf597e0e766495fe429d90f31d4d9771c974e42f3ade495d1fbf1aeeb3e0",
+  "records_sha256": "7bdab4f286f7ad0473516d7bb4b466a89ab98d4ca01fdee4a0337cd47c3b8be7",
   "registry_id": "REG-DECISION",
   "schema_version": "1.0.0",
   "source_path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl"

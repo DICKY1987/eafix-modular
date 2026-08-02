@@ -1,0 +1,128 @@
+{
+  "document_type": "process_field_adjudication",
+  "schema_version": "1.1.0",
+  "decision_id": "HD-PC-01",
+  "status": "APPROVED",
+  "allowed_dispositions": [
+    "required_for_baseline",
+    "deferred_with_gap_id",
+    "lifecycle_exempt",
+    "removed_from_schema",
+    "required_when_applicable",
+    "derived_at_build",
+    "lifecycle_event_only",
+    "required_at_cutover"
+  ],
+  "required_field_resolution_statuses": [
+    "populated",
+    "confirmed_none",
+    "not_applicable",
+    "deferred_gap",
+    "lifecycle_not_triggered",
+    "derived"
+  ],
+  "rules": {
+    "required_for_baseline": "Missing values fail STEP-06; gap IDs do not satisfy the requirement without a separate approved waiver.",
+    "deferred_with_gap_id": "Each missing (step, field) cell requires GAP::PROCESS::<STEP_CODE>::<FIELD>.",
+    "lifecycle_exempt": "Empty is valid until the relevant lifecycle event; no gap ID required.",
+    "removed_from_schema": "Requires governed schema change and migration before later gates.",
+    "required_when_applicable": "Populate when applicable; otherwise record confirmed_none or not_applicable with evidence.",
+    "derived_at_build": "Generate deterministically from authoritative provenance; do not maintain independently by hand.",
+    "lifecycle_event_only": "Empty is valid until the identified lifecycle event occurs; use lifecycle_not_triggered until then.",
+    "required_at_cutover": "May remain empty during consolidation but must be populated in the STEP-08 cutover commit."
+  },
+  "fields": [
+    {
+      "field": "branches",
+      "recommended_disposition": "required_when_applicable",
+      "selected_disposition": "required_when_applicable",
+      "reason": "Branching steps must enumerate decisions and linear steps must prove there are no branches.",
+      "applies_to": "all_records_unless_overrides",
+      "record_overrides": []
+    },
+    {
+      "field": "preconditions",
+      "recommended_disposition": "required_for_baseline",
+      "selected_disposition": "required_for_baseline",
+      "reason": "Every step must state what must already be true for implementation and testing.",
+      "applies_to": "all_records_unless_overrides",
+      "record_overrides": []
+    },
+    {
+      "field": "trigger",
+      "recommended_disposition": "required_for_baseline",
+      "selected_disposition": "required_for_baseline",
+      "reason": "Every step must identify the event, input, state transition, or dependency completion that starts it.",
+      "applies_to": "all_records_unless_overrides",
+      "record_overrides": []
+    },
+    {
+      "field": "terminal_outcomes",
+      "recommended_disposition": "required_for_baseline",
+      "selected_disposition": "required_for_baseline",
+      "reason": "Every step must declare successful, rejected, suppressed, failed, retry, or timeout outcomes as applicable.",
+      "applies_to": "all_records_unless_overrides",
+      "record_overrides": []
+    },
+    {
+      "field": "supporting_module_ids",
+      "recommended_disposition": "required_when_applicable",
+      "selected_disposition": "required_when_applicable",
+      "reason": "Supporting modules must be populated when present; sole-owner steps require explicit confirmed_none evidence.",
+      "applies_to": "all_records_unless_overrides",
+      "record_overrides": []
+    },
+    {
+      "field": "source_hashes",
+      "recommended_disposition": "derived_at_build",
+      "selected_disposition": "derived_at_build",
+      "reason": "Source hashes must be derived from field-level provenance and the frozen source manifest, not hand-maintained.",
+      "applies_to": "all_records_unless_overrides",
+      "record_overrides": []
+    },
+    {
+      "field": "integration_ids",
+      "recommended_disposition": "required_when_applicable",
+      "selected_disposition": "required_when_applicable",
+      "reason": "Boundary-crossing steps need integration links; internal-only steps must explicitly confirm none.",
+      "applies_to": "all_records_unless_overrides",
+      "record_overrides": []
+    },
+    {
+      "field": "supersedes",
+      "recommended_disposition": "lifecycle_event_only",
+      "selected_disposition": "lifecycle_event_only",
+      "reason": "Meaningful only after a supersession event occurs.",
+      "applies_to": "all_records_unless_overrides",
+      "record_overrides": []
+    },
+    {
+      "field": "superseded_by",
+      "recommended_disposition": "lifecycle_event_only",
+      "selected_disposition": "lifecycle_event_only",
+      "reason": "Meaningful only after a successor is approved.",
+      "applies_to": "all_records_unless_overrides",
+      "record_overrides": []
+    },
+    {
+      "field": "change_request_refs",
+      "recommended_disposition": "lifecycle_event_only",
+      "selected_disposition": "lifecycle_event_only",
+      "reason": "Meaningful only when a governed process change request affects the record.",
+      "applies_to": "all_records_unless_overrides",
+      "record_overrides": []
+    },
+    {
+      "field": "effective_from_utc",
+      "recommended_disposition": "required_at_cutover",
+      "selected_disposition": "required_at_cutover",
+      "reason": "Must match the actual authority-cutover timestamp and must not be invented earlier.",
+      "applies_to": "all_records_unless_overrides",
+      "record_overrides": []
+    }
+  ],
+  "approved_by": [
+    "@DICKY1987"
+  ],
+  "approved_at_utc": "2026-08-02T03:09:53.4586571Z"
+}

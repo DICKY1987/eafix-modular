@@ -68,6 +68,41 @@
       },
       "type": "array"
     },
+    "field_resolution": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence_refs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "enum": [
+              "populated",
+              "confirmed_none",
+              "not_applicable",
+              "deferred_gap",
+              "lifecycle_not_triggered",
+              "derived"
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "evidence_refs"
+        ],
+        "type": "object"
+      },
+      "type": "object"
+    },
     "failure_control_ids": {
       "items": {
         "type": "string"

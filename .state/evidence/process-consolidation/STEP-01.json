@@ -1,0 +1,147 @@
+{
+  "gate": "STEP-01",
+  "verdict": "PASS",
+  "record_count": 26,
+  "checks": [
+    {
+      "check_id": "SPINE-01-record-count",
+      "status": "PASS",
+      "detail": "expected 26, found 26"
+    },
+    {
+      "check_id": "SPINE-02-step-codes",
+      "status": "PASS",
+      "detail": "codes=['S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'S08', 'S09', 'S10', 'S11', 'S12', 'S13', 'S14', 'S15', 'S16', 'S17', 'S18', 'S19', 'S20', 'S21', 'S22', 'S23', 'S24', 'S25', 'S26']"
+    },
+    {
+      "check_id": "SPINE-03-unique-codes",
+      "status": "PASS",
+      "detail": "unique"
+    },
+    {
+      "check_id": "SPINE-04-unique-record-ids",
+      "status": "PASS",
+      "detail": "unique"
+    },
+    {
+      "check_id": "SPINE-05-id-binding",
+      "status": "PASS",
+      "detail": "violations=[]"
+    },
+    {
+      "check_id": "SPINE-06-process-order",
+      "status": "PASS",
+      "detail": "orders=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26]"
+    },
+    {
+      "check_id": "SPINE-07-module-binding-parity",
+      "status": "PASS",
+      "detail": "drift=[]"
+    },
+    {
+      "check_id": "AUTHROOT-01-decision-approved",
+      "status": "PASS",
+      "detail": "status=APPROVED approved_by=['@DICKY1987']"
+    },
+    {
+      "check_id": "AUTHROOT-02-option-selected",
+      "status": "PASS",
+      "detail": "selected=P1-C"
+    },
+    {
+      "check_id": "AUTHROOT-03-s25-resolved",
+      "status": "PASS",
+      "detail": "s25={'status': 'RESOLVED', 'classification': 'approved_ownership_decision', 'decision_ref': 'PROCESS-AUTHORITY-LINEAGE-DECISION', 'stable_owner_module_id': '50000000000000000025', 'interpretation': {'recovered_yaml_value': '(loop)', 'meaning': 'process-control notation, not a module owner'}, 'symbol_policy': {'canonical_symbol': 'resolve_from_ratified_module_identity_authority', 'expected_if_LOCKED_PASS_1_34_module_authority_is_active': 'F4_FLOW_ORCHESTRATOR', 'legacy_alias': 'F1_FLOW_ORCHESTRATOR', 'rule': 'The process registry stores the stable numeric owner ID; generated symbols are resolved from module authority.'}, 'required_decision_ref': 'Create or cite a module-governance decision/MCR that ratifies F4 and retains F1 as a deprecated alias.'}"
+    },
+    {
+      "check_id": "AUTHROOT-04-artifact-roles",
+      "status": "PASS",
+      "detail": "artifact_roles must classify every process artifact"
+    },
+    {
+      "check_id": "AUTHROOT-05-cutover-mode",
+      "status": "PASS",
+      "detail": "mode=staged_multi_registry_cutover"
+    },
+    {
+      "check_id": "MAN-00-present",
+      "status": "PASS",
+      "detail": "EAFIX_auth_docs/process_consolidation_source_manifest_v1_1_0.json"
+    },
+    {
+      "check_id": "MAN-01-source-count",
+      "status": "PASS",
+      "detail": "declared=11 actual=11"
+    },
+    {
+      "check_id": "MAN-02-unique-ids",
+      "status": "PASS",
+      "detail": "ids=['PCSRC-01', 'PCSRC-02', 'PCSRC-03', 'PCSRC-04', 'PCSRC-05', 'PCSRC-06', 'PCSRC-07', 'PCSRC-08', 'PCSRC-09', 'PCSRC-10', 'PCSRC-11']"
+    },
+    {
+      "check_id": "MAN-03-unique-paths",
+      "status": "PASS",
+      "detail": "active paths must be unique"
+    },
+    {
+      "check_id": "MAN-04-unique-extractions",
+      "status": "PASS",
+      "detail": "extraction paths must be unique"
+    },
+    {
+      "check_id": "MAN-05-contiguous-order",
+      "status": "PASS",
+      "detail": "orders=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]"
+    },
+    {
+      "check_id": "MAN-06-valid-hashes",
+      "status": "PASS",
+      "detail": "invalid=[]"
+    },
+    {
+      "check_id": "MAN-07-valid-sizes",
+      "status": "PASS",
+      "detail": "invalid=[]"
+    },
+    {
+      "check_id": "MAN-08-fact-class-completeness",
+      "status": "PASS",
+      "detail": "incomplete=[]"
+    },
+    {
+      "check_id": "BASE-01-bound",
+      "status": "PASS",
+      "detail": "binding_status=BOUND sha=3f982f501cc808bc76791079426675d26914947a643d500bb6401d44b9e6e6ab size=46293"
+    },
+    {
+      "check_id": "BASE-02-registry-unchanged",
+      "status": "PASS",
+      "detail": "expected=3f982f501cc808bc76791079426675d26914947a643d500bb6401d44b9e6e6ab actual=3f982f501cc808bc76791079426675d26914947a643d500bb6401d44b9e6e6ab"
+    },
+    {
+      "check_id": "BASE-03-registry-size",
+      "status": "PASS",
+      "detail": "expected=46293 actual=46293"
+    },
+    {
+      "check_id": "BALLOT-01-approved",
+      "status": "PASS",
+      "detail": "status=APPROVED approved_by=['@DICKY1987']"
+    },
+    {
+      "check_id": "BALLOT-02-complete",
+      "status": "PASS",
+      "detail": "unresolved=[]"
+    },
+    {
+      "check_id": "BALLOT-03-resolution-statuses",
+      "status": "PASS",
+      "detail": "statuses=['populated', 'confirmed_none', 'not_applicable', 'deferred_gap', 'lifecycle_not_triggered', 'derived']"
+    },
+    {
+      "check_id": "CONF-01-readable",
+      "status": "PASS",
+      "detail": "total=11 material=0 unresolved_material=0"
+    }
+  ]
+}

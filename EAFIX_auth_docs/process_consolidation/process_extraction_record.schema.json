@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eafix.local/schemas/process_extraction_record.schema.json",
+  "title": "ProcessExtractionRecord",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "extraction_id",
+    "source_id",
+    "source_path",
+    "source_sha256",
+    "target_step_code",
+    "target_record_type",
+    "target_field",
+    "extracted_value",
+    "anchor",
+    "fact_class",
+    "evidence_class",
+    "confidence",
+    "disposition"
+  ],
+  "properties": {
+    "extraction_id": {
+      "type": "string",
+      "pattern": "^EXT-[A-Z0-9._:-]+$"
+    },
+    "source_id": {
+      "type": "string",
+      "pattern": "^PCSRC-[0-9]{2}$"
+    },
+    "source_path": {
+      "type": "string"
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "target_step_code": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^S(0[1-9]|1[0-9]|2[0-6])$"
+    },
+    "target_record_type": {
+      "enum": [
+        "process_step",
+        "child_activity",
+        "decision",
+        "decision_rule",
+        "state",
+        "state_transition",
+        "failure_mode",
+        "retry_policy",
+        "scenario",
+        "process_variant",
+        "schema_extension_candidate",
+        "process_change_candidate",
+        "non_process"
+      ]
+    },
+    "target_field": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "extracted_value": {},
+    "fact_class": {
+      "type": "string"
+    },
+    "anchor": {
+      "type": "object",
+      "required": [
+        "locator_type",
+        "locator"
+      ],
+      "properties": {
+        "locator_type": {
+          "enum": [
+            "line_range",
+            "json_pointer",
+            "csv_row",
+            "section",
+            "git_blob"
+          ]
+        },
+        "locator": {
+          "type": "string"
+        }
+      }
+    },
+    "evidence_class": {
+      "enum": [
+        "E1_CODE",
+        "E2_STRUCTURED",
+        "E3_AUTHORITY",
+        "E4_HISTORICAL"
+      ]
+    },
+    "confidence": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "verbatim_support": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 500
+    },
+    "extractor_note": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "disposition": {
+      "enum": [
+        "candidate_mutation",
+        "candidate_linked_record",
+        "candidate_schema_extension",
+        "candidate_process_change",
+        "candidate_conflict",
+        "non_process"
+      ]
+    }
+  }
+}
