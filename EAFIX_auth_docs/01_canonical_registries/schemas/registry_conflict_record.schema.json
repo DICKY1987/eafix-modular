@@ -1,0 +1,224 @@
+{
+  "$id": "registry_conflict.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Registry conflict record",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "authority_rank": {
+      "type": "string"
+    },
+    "authority_status": {
+      "enum": [
+        "canonical",
+        "canonical_candidate",
+        "generated",
+        "supporting_evidence",
+        "implementation_evidence",
+        "legacy_source",
+        "needs_review"
+      ]
+    },
+    "blocking_scope": {
+      "type": "string"
+    },
+    "candidate_values": {
+      "type": "array",
+      "items": {}
+    },
+    "change_request_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "confidence": {
+      "enum": [
+        "high",
+        "medium",
+        "low",
+        "unknown"
+      ]
+    },
+    "conflict_id": {
+      "type": "string"
+    },
+    "decision_reference": {
+      "type": "string"
+    },
+    "effective_from_utc": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "field": {
+      "type": "string"
+    },
+    "impact": {
+      "type": "string"
+    },
+    "last_verified_commit": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "migration_action": {
+      "type": "string"
+    },
+    "process_material": {
+      "type": "boolean"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "recommended_value": {},
+    "record_id": {
+      "type": "string"
+    },
+    "record_type": {
+      "const": "registry_conflict"
+    },
+    "record_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "type": "string"
+    },
+    "resolution_state": {
+      "enum": [
+        "unresolved",
+        "accepted_blocking_pending_migration",
+        "accepted_nonblocking_pending_migration",
+        "accepted_migrated",
+        "accepted_cutover_waiver"
+      ]
+    },
+    "review_decision": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "source_hashes": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "commit_sha": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "line_end": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "line_start": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "path",
+          "role",
+          "commit_sha"
+        ]
+      }
+    },
+    "status": {
+      "enum": [
+        "candidate",
+        "active",
+        "canonical",
+        "planned",
+        "partial",
+        "conflicted",
+        "deprecated",
+        "superseded",
+        "retired",
+        "archived"
+      ]
+    },
+    "superseded_by": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "supersedes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "validation_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "record_type",
+    "record_id",
+    "schema_version",
+    "record_version",
+    "status",
+    "authority_status",
+    "source_refs",
+    "source_hashes",
+    "confidence",
+    "effective_from_utc",
+    "supersedes",
+    "superseded_by",
+    "change_request_refs",
+    "last_verified_commit",
+    "conflict_id",
+    "field",
+    "impact",
+    "candidate_values",
+    "recommended_value",
+    "reason",
+    "review_decision",
+    "process_material",
+    "blocking_scope",
+    "migration_action",
+    "decision_reference",
+    "validation_evidence",
+    "resolution_state"
+  ]
+}
