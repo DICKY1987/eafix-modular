@@ -7,7 +7,7 @@
       "atomic_activities": [
         "Resolve configuration snapshot"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S01-B01",
@@ -18,7 +18,7 @@
       "confidence": "high",
       "configuration_ids": [],
       "dependency_step_ids": [],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [],
       "failure_control_ids": [
         "CONTROL::FAILURE::S01"
@@ -164,9 +164,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S01",
       "step_id": "60000000000000000001",
       "step_name": "Resolve configuration snapshot",
@@ -190,7 +198,7 @@
       "atomic_activities": [
         "Emit schedule tick (calendar polling cadence)"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S02-B01",
@@ -205,7 +213,7 @@
       "dependency_step_ids": [
         "60000000000000000001"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [
         "services/calendar-ingestor/src/2099900093260118_main.py"
       ],
@@ -353,9 +361,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S02",
       "step_id": "60000000000000000002",
       "step_name": "Emit schedule tick (calendar polling cadence)",
@@ -379,7 +395,7 @@
       "atomic_activities": [
         "Poll calendar source(s)"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S03-B01",
@@ -396,7 +412,7 @@
       "dependency_step_ids": [
         "60000000000000000002"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [
         "services/calendar-ingestor/src/2099900093260118_main.py"
       ],
@@ -545,9 +561,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S03",
       "step_id": "60000000000000000003",
       "step_name": "Poll calendar source(s)",
@@ -571,7 +595,7 @@
       "atomic_activities": [
         "Normalize raw calendar entries"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S04-B01",
@@ -591,7 +615,7 @@
         "60000000000000000001",
         "60000000000000000003"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [
         "services/calendar-ingestor/src/2099900093260118_main.py"
       ],
@@ -740,9 +764,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S04",
       "step_id": "60000000000000000004",
       "step_name": "Normalize raw calendar entries",
@@ -766,7 +798,7 @@
       "atomic_activities": [
         "Persist calendar events (append-only)"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S05-B01",
@@ -779,7 +811,7 @@
       "dependency_step_ids": [
         "60000000000000000004"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [
         "services/calendar-ingestor/src/2099900093260118_main.py"
       ],
@@ -927,9 +959,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S05",
       "step_id": "60000000000000000005",
       "step_name": "Persist calendar events (append-only)",
@@ -953,7 +993,7 @@
       "atomic_activities": [
         "Build anticipation triggers from calendar"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S06-B01",
@@ -974,7 +1014,7 @@
         "60000000000000000002",
         "60000000000000000004"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [
         "services/calendar-ingestor/src/2099900093260118_main.py"
       ],
@@ -1124,9 +1164,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S06",
       "step_id": "60000000000000000006",
       "step_name": "Build anticipation triggers from calendar",
@@ -1150,7 +1198,7 @@
       "atomic_activities": [
         "Ingest market ticks"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S07-B01",
@@ -1165,7 +1213,7 @@
       "dependency_step_ids": [
         "60000000000000000001"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [
         "services/data-ingestor/src/2099900112260118_main.py"
       ],
@@ -1317,9 +1365,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S07",
       "step_id": "60000000000000000007",
       "step_name": "Ingest market ticks",
@@ -1341,7 +1397,7 @@
       "atomic_activities": [
         "Aggregate ticks into bars"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S08-B01",
@@ -1357,7 +1413,7 @@
         "60000000000000000001",
         "60000000000000000007"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [],
       "failure_control_ids": [
         "CONTROL::FAILURE::S08"
@@ -1504,9 +1560,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S08",
       "step_id": "60000000000000000008",
       "step_name": "Aggregate ticks into bars",
@@ -1530,7 +1594,7 @@
       "atomic_activities": [
         "Compute indicators"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S09-B01",
@@ -1550,7 +1614,7 @@
         "60000000000000000001",
         "60000000000000000008"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [
         "services/desktop-ui/2099900128260118_expiry_indicator_service.py"
       ],
@@ -1699,9 +1763,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S09",
       "step_id": "60000000000000000009",
       "step_name": "Compute indicators",
@@ -1723,7 +1795,7 @@
       "atomic_activities": [
         "Assemble strategy feature frame"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S10-B01",
@@ -1740,7 +1812,7 @@
         "60000000000000000006",
         "60000000000000000009"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [],
       "failure_control_ids": [
         "CONTROL::FAILURE::S10"
@@ -1888,9 +1960,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S10",
       "step_id": "60000000000000000010",
       "step_name": "Assemble strategy feature frame",
@@ -1914,7 +1994,7 @@
       "atomic_activities": [
         "Generate signal (or suppression)"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S11-B01",
@@ -1934,7 +2014,7 @@
         "60000000000000000001",
         "60000000000000000010"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [
         "compliance/auto-remediation/2099900012260118_remediation-engine.py"
       ],
@@ -2085,9 +2165,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S11",
       "step_id": "60000000000000000011",
       "step_name": "Generate signal (or suppression)",
@@ -2109,7 +2197,7 @@
       "atomic_activities": [
         "Convert signal to trade intent"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S12-B01",
@@ -2129,7 +2217,7 @@
         "60000000000000000001",
         "60000000000000000011"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [],
       "failure_control_ids": [
         "CONTROL::FAILURE::S12"
@@ -2276,9 +2364,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S12",
       "step_id": "60000000000000000012",
       "step_name": "Convert signal to trade intent",
@@ -2300,7 +2396,7 @@
       "atomic_activities": [
         "Evaluate risk and size"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S13-B01",
@@ -2320,7 +2416,7 @@
         "60000000000000000001",
         "60000000000000000012"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [],
       "failure_control_ids": [
         "CONTROL::FAILURE::S13"
@@ -2469,9 +2565,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S13",
       "step_id": "60000000000000000013",
       "step_name": "Evaluate risk and size",
@@ -2493,7 +2597,7 @@
       "atomic_activities": [
         "Compile order intent"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [],
       "change_request_refs": [],
       "confidence": "high",
@@ -2504,7 +2608,7 @@
         "60000000000000000001",
         "60000000000000000013"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [
         "services/transport-router/src/2099900199260118_main.py"
       ],
@@ -2655,9 +2759,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S14",
       "step_id": "60000000000000000014",
       "step_name": "Compile order intent",
@@ -2679,7 +2791,7 @@
       "atomic_activities": [
         "Route order to broker"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [],
       "change_request_refs": [],
       "confidence": "high",
@@ -2690,7 +2802,7 @@
         "60000000000000000001",
         "60000000000000000014"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [
         "services/transport-router/src/2099900199260118_main.py"
       ],
@@ -2840,9 +2952,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S15",
       "step_id": "60000000000000000015",
       "step_name": "Route order to broker",
@@ -2864,7 +2984,7 @@
       "atomic_activities": [
         "Serialize and send to MT4 adapter"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S16-B01",
@@ -2884,7 +3004,7 @@
         "60000000000000000001",
         "60000000000000000015"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [
         "services/transport-router/src/2099900199260118_main.py"
       ],
@@ -3037,9 +3157,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S16",
       "step_id": "60000000000000000016",
       "step_name": "Serialize and send to MT4 adapter",
@@ -3062,7 +3190,7 @@
       "atomic_activities": [
         "EA executes broker order"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [],
       "change_request_refs": [],
       "confidence": "high",
@@ -3070,7 +3198,7 @@
       "dependency_step_ids": [
         "60000000000000000016"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [
         "services/transport-router/src/2099900199260118_main.py"
       ],
@@ -3219,9 +3347,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S17",
       "step_id": "60000000000000000017",
       "step_name": "EA executes broker order",
@@ -3245,7 +3381,7 @@
       "atomic_activities": [
         "Normalize broker events to canonical reports"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [],
       "change_request_refs": [],
       "confidence": "high",
@@ -3256,7 +3392,7 @@
         "60000000000000000001",
         "60000000000000000017"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [
         "services/event-gateway/src/2099900141260118_main.py"
       ],
@@ -3408,9 +3544,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S18",
       "step_id": "60000000000000000018",
       "step_name": "Normalize broker events to canonical reports",
@@ -3433,7 +3577,7 @@
       "atomic_activities": [
         "Apply execution reports to OMS state"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [],
       "change_request_refs": [],
       "confidence": "high",
@@ -3445,7 +3589,7 @@
         "60000000000000000015",
         "60000000000000000018"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [],
       "failure_control_ids": [
         "CONTROL::FAILURE::S19"
@@ -3596,9 +3740,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S19",
       "step_id": "60000000000000000019",
       "step_name": "Apply execution reports to OMS state",
@@ -3621,7 +3773,7 @@
       "atomic_activities": [
         "Classify trade close and compute canonical PnL"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [],
       "change_request_refs": [],
       "confidence": "high",
@@ -3632,7 +3784,7 @@
         "60000000000000000001",
         "60000000000000000019"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [],
       "failure_control_ids": [
         "CONTROL::FAILURE::S20"
@@ -3779,9 +3931,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S20",
       "step_id": "60000000000000000020",
       "step_name": "Classify trade close and compute canonical PnL",
@@ -3803,7 +3963,7 @@
       "atomic_activities": [
         "Bucketize outcome"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S21-B01",
@@ -3823,7 +3983,7 @@
         "60000000000000000001",
         "60000000000000000020"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [],
       "failure_control_ids": [
         "CONTROL::FAILURE::S21"
@@ -3970,9 +4130,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S21",
       "step_id": "60000000000000000021",
       "step_name": "Bucketize outcome",
@@ -3996,7 +4164,7 @@
       "atomic_activities": [
         "Compute event proximity"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [],
       "change_request_refs": [],
       "confidence": "high",
@@ -4007,7 +4175,7 @@
         "60000000000000000001",
         "60000000000000000004"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [
         "services/event-gateway/src/2099900141260118_main.py"
       ],
@@ -4157,9 +4325,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S22",
       "step_id": "60000000000000000022",
       "step_name": "Compute event proximity",
@@ -4180,7 +4356,7 @@
       "atomic_activities": [
         "Lookup matrix decision"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S23-B01",
@@ -4201,7 +4377,7 @@
         "60000000000000000021",
         "60000000000000000022"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [
         "services/reentry-matrix-svc/src/2099900174260118_main.py"
       ],
@@ -4353,9 +4529,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S23",
       "step_id": "60000000000000000023",
       "step_name": "Lookup matrix decision",
@@ -4377,7 +4561,7 @@
       "atomic_activities": [
         "Build reentry trade intent (or suppress)"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S24-B01",
@@ -4397,7 +4581,7 @@
         "60000000000000000001",
         "60000000000000000023"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [
         "services/reentry-engine/src/2099900166260118_main.py"
       ],
@@ -4548,9 +4732,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S24",
       "step_id": "60000000000000000024",
       "step_name": "Build reentry trade intent (or suppress)",
@@ -4572,7 +4764,7 @@
       "atomic_activities": [
         "Loop: reentry intent follows same risk->order->route->transport->execute chain"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S25-B01",
@@ -4590,7 +4782,7 @@
         "60000000000000000012",
         "60000000000000000024"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [
         "services/transport-router/src/2099900199260118_main.py"
       ],
@@ -4749,9 +4941,17 @@
           "note": "S25 cutover migration removed Either from process contract fields per approved conflict decision.",
           "path": "EAFIX_auth_docs/01_canonical_registries/registry_conflict_queue.jsonl",
           "role": "conflict_resolution_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S25",
       "step_id": "60000000000000000025",
       "step_name": "Loop: reentry intent follows same risk->order->route->transport->execute chain",
@@ -4773,7 +4973,7 @@
       "atomic_activities": [
         "Health aggregation + SLO evaluation"
       ],
-      "authority_status": "canonical_candidate",
+      "authority_status": "canonical",
       "branches": [
         {
           "branch_id": "S26-B01",
@@ -4792,7 +4992,7 @@
       "dependency_step_ids": [
         "60000000000000000001"
       ],
-      "effective_from_utc": null,
+      "effective_from_utc": "2026-08-02T08:02:28Z",
       "evidence_refs": [
         "services/telemetry-daemon/src/2099900192260118_main.py"
       ],
@@ -4942,9 +5142,17 @@
           "note": "Behavioral step evidence for trigger, preconditions, branches, and terminal outcomes.",
           "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/PROCESS_SPEC_SOURCE_GROUNDED_v1.0.md",
           "role": "behavioral_process_evidence"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "DEC-REG-023 authorized the canonical process cutover after the staged content branch passed STEP-07.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "authority_cutover_decision"
         }
       ],
-      "status": "active",
+      "status": "canonical",
       "step_code": "S26",
       "step_id": "60000000000000000026",
       "step_name": "Health aggregation + SLO evaluation",
@@ -4962,7 +5170,7 @@
       ]
     }
   ],
-  "records_sha256": "b385edc574122d26097f5ce7f1e27472931956980e179b97c300443cf695c09d",
+  "records_sha256": "1b8a6f0b115258a4975bdabf2446ae233ab0db76aa41cdd27ed462e6c100d849",
   "registry_id": "REG-PROCESS",
   "schema_version": "1.0.0",
   "source_path": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl"

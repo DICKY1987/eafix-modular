@@ -1,6 +1,6 @@
 {
   "document_type": "generated_registry_snapshot",
-  "record_count": 10,
+  "record_count": 11,
   "records": [
     {
       "affected_registry_records": [],
@@ -393,8 +393,108 @@
         }
       ],
       "status": "active",
-      "superseded_by": [],
+      "superseded_by": [
+        "DEC-REG-023"
+      ],
       "supersedes": []
+    },
+    {
+      "affected_registry_records": [
+        "60000000000000000001",
+        "60000000000000000002",
+        "60000000000000000003",
+        "60000000000000000004",
+        "60000000000000000005",
+        "60000000000000000006",
+        "60000000000000000007",
+        "60000000000000000008",
+        "60000000000000000009",
+        "60000000000000000010",
+        "60000000000000000011",
+        "60000000000000000012",
+        "60000000000000000013",
+        "60000000000000000014",
+        "60000000000000000015",
+        "60000000000000000016",
+        "60000000000000000017",
+        "60000000000000000018",
+        "60000000000000000019",
+        "60000000000000000020",
+        "60000000000000000021",
+        "60000000000000000022",
+        "60000000000000000023",
+        "60000000000000000024",
+        "60000000000000000025",
+        "60000000000000000026",
+        "CONFLICT::CONTRACT::CALENDAREVENT",
+        "CONFLICT::CONTRACT::ORDERINTENT",
+        "CONFLICT::CONTRACT::REENTRYDECISION",
+        "CONFLICT::FLOW_ORCHESTRATOR_SYMBOL",
+        "CONFLICT::MODULE_UNIVERSE",
+        "CONFLICT::PROCESS_COVERAGE"
+      ],
+      "approval": {
+        "approval_scope": "canonical process authority cutover with explicit waivers for unresolved non-process migrations",
+        "approval_status": "approved",
+        "approved_at_utc": "2026-08-02T08:02:28Z",
+        "approved_by": [
+          "@DICKY1987"
+        ]
+      },
+      "authority_status": "canonical_candidate",
+      "change_request_refs": [],
+      "compatibility_impact": "Authorizes canonical cutover for process authority only. Residual contract and module-identity migrations remain tracked debt and are not resolved by this decision.",
+      "confidence": "high",
+      "decision": "Authorize the process-registry canonical cutover after STEP-04 through STEP-07 passed on the staged content branch, and waive the remaining process-cutover blockers only to the extent that they remain governed by non-process authorities or deferred downstream migrations.",
+      "decision_id": "DEC-REG-023",
+      "decision_record_type": "architecture_decision",
+      "decision_status": "accepted_for_process_cutover_execution",
+      "effective_date": "2026-08-02",
+      "effective_from_utc": "2026-08-02T08:02:28Z",
+      "last_verified_commit": "46fdf39cdd7fdd8db132c9b3a285e8c57cc9c19f",
+      "migration_required": true,
+      "options": [
+        "Keep DEC-REG-022 in force and forbid canonical cutover until every linked registry migration is complete.",
+        "Authorize process-only cutover now, with explicit waivers for residual non-process migrations and separate downstream remediation."
+      ],
+      "problem": "The content-stage process registry is ready for cutover, but several linked conflicts still represent downstream contract or module-authority migrations rather than unresolved process facts.",
+      "rationale": "The process cutover boundary was approved as staged and process-only. A governed waiver keeps the process authority move explicit while preserving the remaining migrations as tracked debt owned by their authoritative registries.",
+      "record_id": "DEC-REG-023",
+      "record_type": "decision",
+      "record_version": "1.0.0",
+      "schema_version": "1.0.0",
+      "source_hashes": [],
+      "source_refs": [
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "Registered lineage decision required for cutover authorization.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "cutover_prerequisite"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "Registered field-policy ballot required for cutover authorization.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl",
+          "role": "cutover_prerequisite"
+        },
+        {
+          "commit_sha": null,
+          "line_end": null,
+          "line_start": null,
+          "note": "Process conflict queue containing the waived downstream migrations.",
+          "path": "EAFIX_auth_docs/01_canonical_registries/registry_conflict_queue.jsonl",
+          "role": "cutover_prerequisite"
+        }
+      ],
+      "status": "active",
+      "superseded_by": [],
+      "supersedes": [
+        "DEC-REG-022"
+      ]
     },
     {
       "affected_registry_records": [
@@ -546,7 +646,7 @@
       "supersedes": []
     }
   ],
-  "records_sha256": "42a24b4ab99c4270e2158e05c492b1c71a6596a1acea9416a3247e79be1e46fc",
+  "records_sha256": "8399782af52d3661a81cb4533dbb0766b6cc1d41707bb57e71ecf050018e0da8",
   "registry_id": "REG-DECISION",
   "schema_version": "1.0.0",
   "source_path": "EAFIX_auth_docs/01_canonical_registries/decision_registry.jsonl"

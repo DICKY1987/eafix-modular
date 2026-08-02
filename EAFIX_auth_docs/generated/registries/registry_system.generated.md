@@ -1,9 +1,9 @@
 ---
 doc_id: DOC-REG-0005
 ---
-# EAFIX Registry System — Shadow Candidate
+# EAFIX Registry System — Process Cutover Active
 
-This generated view summarizes the candidate registry system. It is **not yet the canonical authority**. Registry-by-registry cutover requires parity approval, conflict resolution, routing updates, document-authority updates, and blocking CI in separate pull requests.
+This generated view summarizes the registry system. `process_registry.jsonl` is the canonical process authority, while non-process registries remain candidate until their own cutovers are separately approved.
 
 - module: 34 records
 - artifact: 40 records
@@ -14,4 +14,4 @@ This generated view summarizes the candidate registry system. It is **not yet th
 - operational_control: 52 records
 - operator: 7 records
 - reuse: 12 records
-- decision: 10 records
+- decision: 11 records
