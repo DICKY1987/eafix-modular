@@ -10,6 +10,7 @@ except ImportError:
 ROOT=Path(__file__).resolve().parents[2]
 REG_ROOT=ROOT/'EAFIX_auth_docs/01_canonical_registries'
 GEN_ROOT=ROOT/'EAFIX_auth_docs/generated/registries'
+TEXT_HASH_SUFFIXES={'.json','.jsonl','.md','.mmd','.py','.csv','.txt','.yaml','.yml'}
 
 # authority_status -> status values that are a valid combination for that authority state.
 # Calibrated against the current dataset (see registry_core.run) plus the natural
@@ -41,6 +42,12 @@ def write_json(path:Path,data:Any):
     path.write_text(json.dumps(data,indent=2,sort_keys=True,ensure_ascii=False)+'\n',encoding='utf-8',newline='\n')
 def write_text(path:Path,text:str):
     path.parent.mkdir(parents=True,exist_ok=True); path.write_text(text,encoding='utf-8',newline='\n')
+def normalized_file_sha(path:Path)->str:
+    if path.suffix.lower() in TEXT_HASH_SUFFIXES:
+        data=path.read_text(encoding='utf-8').replace('\r\n','\n').replace('\r','\n').encode('utf-8')
+    else:
+        data=path.read_bytes()
+    return hashlib.sha256(data).hexdigest()
 def load_index(): return read_json(REG_ROOT/'registry_index.json')
 def load_all():
     idx=load_index(); out={}
@@ -164,7 +171,12 @@ def views(all_records):
     docs['process_catalog.generated.md']='---\ndoc_id: DOC-REG-0002\n---\n# Generated Process Catalog\n\n> Generated from `process_registry.jsonl`. Do not edit manually.\n\n'+ '\n'.join(f"- `{r['step_code']}` {r['step_name']} — owner `{r['owner_module_id']}`" for r in sorted(all_records['process'],key=lambda x:x['step_number']))+'\n'
     docs['contract_catalog.generated.md']='---\ndoc_id: DOC-REG-0003\n---\n# Generated Contract Catalog\n\n> Generated from `contract_registry.jsonl`. Do not edit manually.\n\n'+ '\n'.join(f"- `{r['contract_id']}` — {r['implementation_status']}" for r in all_records['contract'])+'\n'
     docs['operational_catalog.generated.md']='---\ndoc_id: DOC-REG-0004\n---\n# Generated Operational Catalog\n\n> Generated from the configuration, operational-control, operator, and reuse registries. Do not edit manually.\n\n'+f"- Configuration records: {len(all_records['configuration'])}\n- Operational controls: {len(all_records['operational_control'])}\n- Operator records: {len(all_records['operator'])}\n- Reuse records: {len(all_records['reuse'])}\n"
-    docs['registry_system.generated.md']='---\ndoc_id: DOC-REG-0005\n---\n# EAFIX Registry System — Shadow Candidate\n\nThis generated view summarizes the candidate registry system. It is **not yet the canonical authority**. Registry-by-registry cutover requires parity approval, conflict resolution, routing updates, document-authority updates, and blocking CI in separate pull requests.\n\n'+ '\n'.join(f"- {k}: {len(v)} records" for k,v in all_records.items())+'\n'
+    process_cutover_active=all(r['status']=='canonical' and r['authority_status']=='canonical' for r in all_records['process'])
+    title='EAFIX Registry System — Process Cutover Active' if process_cutover_active else 'EAFIX Registry System — Shadow Candidate'
+    intro=('This generated view summarizes the registry system. `process_registry.jsonl` is the canonical process authority, while non-process registries remain candidate until their own cutovers are separately approved.'
+           if process_cutover_active else
+           'This generated view summarizes the candidate registry system. It is **not yet the canonical authority**. Registry-by-registry cutover requires parity approval, conflict resolution, routing updates, document-authority updates, and blocking CI in separate pull requests.')
+    docs['registry_system.generated.md']=f"---\ndoc_id: DOC-REG-0005\n---\n# {title}\n\n{intro}\n\n"+ '\n'.join(f"- {k}: {len(v)} records" for k,v in all_records.items())+'\n'
     return docs
 def run(check=False,report_only=False):
     idx,all_records=load_all(); errors=[]
@@ -175,7 +187,7 @@ def run(check=False,report_only=False):
         for n,d in reports(idx,all_records,errors).items(): write_json(GEN_ROOT/n,d)
         write_text(GEN_ROOT/'registry_dependency_graph.mmd',mermaid(all_records))
         for n,t in views(all_records).items(): write_text(GEN_ROOT/n,t)
-        manifest={'schema_version':'1.0.0','document_type':'registry_build_manifest','input_hashes':{r['path']:hashlib.sha256((ROOT/r['path']).read_bytes()).hexdigest() for r in idx['registries']},'output_hashes':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(GEN_ROOT.glob('*')) if p.is_file()}}
+        manifest={'schema_version':'1.0.0','document_type':'registry_build_manifest','input_hashes':{r['path']:normalized_file_sha(ROOT/r['path']) for r in idx['registries']},'output_hashes':{p.relative_to(ROOT).as_posix():normalized_file_sha(p) for p in sorted(GEN_ROOT.glob('*')) if p.is_file()}}
         write_json(GEN_ROOT/'registry_build_manifest.json',manifest)
     else:
         if changed: errors += [f'generated output differs or missing: {x}' for x in changed]

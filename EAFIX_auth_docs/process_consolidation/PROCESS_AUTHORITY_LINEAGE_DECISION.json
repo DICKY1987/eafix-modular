@@ -1,0 +1,143 @@
+{
+  "document_type": "process_authority_lineage_decision",
+  "schema_version": "1.0.0",
+  "decision_id": "PROCESS-AUTHORITY-LINEAGE-DECISION",
+  "status": "APPROVED",
+  "baseline_commit": "a5c950410bebee93f6a13632dbcb0ad4577d1d73",
+  "evidence_summary": {
+    "declared_missing_sources": [
+      "updated_trading_process_aligned.yaml",
+      "2026012201113002_updated_trading_process_v2.yaml"
+    ],
+    "recovered_candidates": [
+      {
+        "evidence_id": "LINEAGE-YAML-01",
+        "historical_path": "Directory management system/DOD_modules_contracts/updated_trading_process_aligned.yaml",
+        "recovered_at_commit": "b4935d2",
+        "observed_sha256_prefix": "1f7ca617",
+        "declared_hash_match": false,
+        "role": "historical_lineage_evidence_only"
+      },
+      {
+        "evidence_id": "LINEAGE-YAML-02",
+        "historical_path": "Directory management system/DOD_modules_contracts/2026012201113002_updated_trading_process_v2.yaml",
+        "recovered_at_commit": "eab9ed3",
+        "observed_sha256_prefix": "09cd4606",
+        "declared_hash_match": false,
+        "role": "historical_lineage_evidence_only"
+      }
+    ],
+    "declared_generated_from_sha256_prefix": "d1036403",
+    "exact_hash_lineage_verified": false,
+    "semantic_step_name_alignment": "26/26",
+    "known_divergence": "S25 owner is (loop) in recovered YAML and F1_FLOW_ORCHESTRATOR in process_registry.jsonl"
+  },
+  "options": [
+    {
+      "option_id": "P1-A",
+      "name": "Recover exact original YAML authority",
+      "condition": "Exact source and declared hash lineage verified."
+    },
+    {
+      "option_id": "P1-B",
+      "name": "Re-root directly to process_registry.jsonl",
+      "condition": "Registry approved as authored authority and recovered YAMLs classified as non-authoritative history."
+    },
+    {
+      "option_id": "P1-C",
+      "name": "Retain recovered YAMLs as historical evidence and formally re-root authority",
+      "condition": "Semantic lineage is useful but declared hash lineage cannot be verified.",
+      "recommended": true
+    }
+  ],
+  "selected_option_id": "P1-C",
+  "artifact_roles": [
+    {
+      "artifact": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+      "role_before_step_08": "authored_process_authority_candidate",
+      "role_after_step_08": "canonical_authored_process_authority",
+      "authority_for": [
+        "process step identity",
+        "process order",
+        "process behavior fields",
+        "process relationships",
+        "process-specific provenance and lifecycle"
+      ]
+    },
+    {
+      "artifact": "EAFIX_auth_docs/generated/registries/process_registry.current.json",
+      "role": "generated_machine_projection",
+      "manual_edit_allowed": false
+    },
+    {
+      "artifact": "EAFIX_auth_docs/generated/registries/process_catalog.generated.md",
+      "role": "generated_human_projection",
+      "manual_edit_allowed": false
+    },
+    {
+      "artifact": "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+      "role": "legacy_compatibility_and_identity_reference",
+      "authority_after_cutover": "not_process_authority",
+      "retention": "retain_live_until_all_consumers_migrate"
+    },
+    {
+      "artifact": "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+      "role": "legacy_structured_source_and_supporting_evidence",
+      "authority_after_cutover": "not_process_authority"
+    },
+    {
+      "artifact": "recovered YAML candidates",
+      "role": "historical_lineage_evidence_only",
+      "routing": "archive_or_evidence_path_do_not_route_as_current_authority"
+    },
+    {
+      "artifact": "module identity authority",
+      "role": "subject_authority_for_module_ids_symbols_and_aliases"
+    },
+    {
+      "artifact": "contract registry and versioned schemas",
+      "role": "subject_authority_for_contract_definitions"
+    },
+    {
+      "artifact": "communication_channels.json",
+      "role": "subject_authority_for_integration_and_channel_identity"
+    }
+  ],
+  "s25_disposition": {
+    "status": "RESOLVED",
+    "classification": "approved_ownership_decision",
+    "decision_ref": "PROCESS-AUTHORITY-LINEAGE-DECISION",
+    "stable_owner_module_id": "50000000000000000025",
+    "interpretation": {
+      "recovered_yaml_value": "(loop)",
+      "meaning": "process-control notation, not a module owner"
+    },
+    "symbol_policy": {
+      "canonical_symbol": "resolve_from_ratified_module_identity_authority",
+      "expected_if_LOCKED_PASS_1_34_module_authority_is_active": "F4_FLOW_ORCHESTRATOR",
+      "legacy_alias": "F1_FLOW_ORCHESTRATOR",
+      "rule": "The process registry stores the stable numeric owner ID; generated symbols are resolved from module authority."
+    },
+    "required_decision_ref": "Create or cite a module-governance decision/MCR that ratifies F4 and retains F1 as a deprecated alias."
+  },
+  "ssot_cutover_mode": "staged_multi_registry_cutover",
+  "allowed_cutover_modes": [
+    "independent_process_cutover",
+    "staged_multi_registry_cutover",
+    "defer_until_full_registry_cutover"
+  ],
+  "cutover_boundary": {
+    "process_registry_may_become_canonical_for": "process facts",
+    "must_not_claim_authority_for": [
+      "module identity",
+      "contract schemas",
+      "communication channels",
+      "implementation truth"
+    ],
+    "reason": "Independent process cutover would overstate authority, while waiting for every registry would create unnecessary indefinite coupling."
+  },
+  "approved_by": [
+    "@DICKY1987"
+  ],
+  "approved_at_utc": "2026-08-02T03:09:53.4586571Z"
+}
