@@ -2,7 +2,6 @@
   "schema_version": "1.0.0",
   "document_type": "project_knowledge_reference_routing_instructions",
   "project_id": "HUEY_P_EAFIX_MODULAR",
-  "generated_at_utc": "2026-05-11T19:42:53Z",
   "purpose": "Machine-optimized routing instructions that tell an AI which project knowledge documents to reference when specific subjects, tasks, keywords, modules, contracts, channels, files, or UI areas are encountered.",
   "matching_policy": {
     "match_order": [
@@ -25,7 +24,7 @@
       "EAFIX_auth_docs/90_cleanup_tasks_pr_notes_and_working_artifacts",
       "EAFIX_auth_docs/99_archive_superseded_do_not_route"
     ],
-    "default_excluded_paths_override": "Only include excluded paths when the user explicitly requests cleanup history or archived/superseded material."
+    "default_excluded_paths_override": "Only include excluded paths when the user explicitly requests cleanup history, or when a live authority or routing record directly cites an archived provenance source."
   },
   "global_conflict_resolution": [
     {
@@ -845,7 +844,7 @@
       "exists_in_current_project_files": true
     },
     "DOC_ATOMIC_LIFECYCLE_MD": {
-      "path": "EAFIX_auth_docs/03_process_lifecycle_and_crosswalks/EAFIX_ATONIC_ End-to-End Trading Lifecycle Process.md",
+      "path": "EAFIX_auth_docs/99_archive_superseded_do_not_route/EAFIX_ATONIC_ End-to-End Trading Lifecycle Process.md",
       "format": "markdown",
       "document_type": "atomic_lifecycle_blueprint",
       "authority_level": "reference",
@@ -5919,5 +5918,7 @@
         "DOC_MODULE_CATALOG"
       ]
     }
-  ]
+  ],
+  "updated_at_utc": "2026-08-02T08:02:28Z",
+  "provenance_status": "manually_maintained_cutover_authority"
 }
