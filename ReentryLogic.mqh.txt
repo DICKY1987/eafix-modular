@@ -1,0 +1,196 @@
+//+------------------------------------------------------------------+
+//| ReentryLogic.mqh                                                 |
+//| Die Roll Logic Implementation for HUEY_P                         |
+//| Copyright 2025, HUEY_P Trading Systems                           |
+//| https://hueyp-trading.com                                        |
+//+------------------------------------------------------------------+
+#property copyright "Copyright 2025, HUEY_P Trading Systems"
+#property link      "https://hueyp-trading.com"
+#property strict
+
+// --- Shared Data Structures ---
+// These structs are required for communication with the main EA.
+// In a final architecture, they might reside in a common types header.
+struct TradeResult {
+    int    ticket;
+    double openPrice;
+    double closePrice;
+    double stopLoss;
+    double takeProfit;
+    double profit;
+    int    direction; // OP_BUY or OP_SELL
+};
+
+// --- Reentry Enumerations and Structs (per blueprint) ---
+enum ENUM_REENTRY_TYPE {
+    REENTRY_NO_ACTION,
+    REENTRY_WAIT_SIGNAL,
+    REENTRY_SAME_TRADE,
+    REENTRY_REVERSE,
+    REENTRY_REDUCE_SIZE,
+    REENTRY_INCREASE_SIZE
+};
+
+struct ReentryAction {
+    int               actionNumber;         // 1-6
+    ENUM_REENTRY_TYPE type;                 // Action type
+    double            sizeMultiplier;       // Position size multiplier
+    int               delaySeconds;         // Delay before execution
+    double            confidenceAdjustment; // Risk adjustment factor
+    string            parameters;           // Additional parameters
+};
+
+//+------------------------------------------------------------------+
+//| Class: CReentryLogic                                             |
+//| Purpose: Implements the die roll logic for adaptive trading.     |
+//+------------------------------------------------------------------+
+class CReentryLogic {
+private:
+    ReentryAction m_actions[7];      // Index 0 unused, 1-6 for die rolls
+    bool          m_enabled;
+    string        m_profileName;
+    string        m_symbol;
+    int           m_outcomeCounts[7];
+    
+public:
+                  CReentryLogic();
+                 ~CReentryLogic();
+    
+    bool          Initialize(string symbol, string profilePath);
+    int           DetermineOutcome(double R, double PnL, double balance);
+    ReentryAction GetAction(int dieRoll);
+    
+private:
+    bool          LoadProfile(string filePath);
+    double        CalculateRValue(const TradeResult &result);
+    void          LogOutcome(int dieRoll, double R, double PnL, double balance);
+    void          UpdateStatistics(int dieRoll, double PnL);
+    ENUM_REENTRY_TYPE StringToReentryType(string str);
+};
+
+//+------------------------------------------------------------------+
+//| Constructor                                                      |
+//+------------------------------------------------------------------+
+CReentryLogic::CReentryLogic() {
+    m_enabled = false;
+    m_symbol = "";
+    m_profileName = "";
+    ArrayInitialize(m_outcomeCounts, 0);
+}
+
+//+------------------------------------------------------------------+
+//| Destructor                                                       |
+//+------------------------------------------------------------------+
+CReentryLogic::~CReentryLogic() {
+}
+
+//+------------------------------------------------------------------+
+//| Initialize                                                       |
+//+------------------------------------------------------------------+
+bool CReentryLogic::Initialize(string symbol, string profilePath) {
+    m_symbol = symbol;
+    m_enabled = LoadProfile(profilePath);
+    return(m_enabled);
+}
+
+//+------------------------------------------------------------------+
+//| DetermineOutcome (Die Roll Logic)                                |
+//+------------------------------------------------------------------+
+int CReentryLogic::DetermineOutcome(double R, double PnL, double balance) {
+    // Implementation per "Step 2: Implement Die Roll Calculation Logic" [cite: 109-119]
+    if(!m_enabled) return 0;
+
+    int dieRoll = 0;
+    if(R <= -1.0)                      { dieRoll = 1; } // Stop Loss Hit
+    else if(R > -1.0 && R <= -0.5)     { dieRoll = 2; } // Partial Loss
+    else if(R > -0.5 && R < 0.5)       { dieRoll = 3; } // Breakeven
+    else if(R >= 0.5 && R < 1.0)       { dieRoll = 4; } // Partial Profit
+    else if(R >= 1.0 && R < 1.5)       { dieRoll = 5; } // Take Profit Hit
+    else if(R >= 1.5)                  { dieRoll = 6; } // Beyond Take Profit
+    
+    LogOutcome(dieRoll, R, PnL, balance);
+    UpdateStatistics(dieRoll, PnL);
+    return dieRoll;
+}
+
+//+------------------------------------------------------------------+
+//| GetAction                                                        |
+//+------------------------------------------------------------------+
+ReentryAction CReentryLogic::GetAction(int dieRoll) {
+    if(dieRoll < 1 || dieRoll > 6) {
+        // Return a default "no action" struct
+        ReentryAction no_action;
+        no_action.type = REENTRY_NO_ACTION;
+        return(no_action);
+    }
+    return(m_actions[dieRoll]);
+}
+
+//+------------------------------------------------------------------+
+//| LoadProfile (CSV Parser)                                         |
+//+------------------------------------------------------------------+
+bool CReentryLogic::LoadProfile(string filePath) {
+    // Implementation per "Step 3: Implement Profile Loading System" [cite: 125-135]
+    int fileHandle = FileOpen(filePath, FILE_READ|FILE_CSV|FILE_ANSI, ',');
+    if(fileHandle == INVALID_HANDLE) {
+        Print("Failed to open reentry profile: ", filePath, ", Error: ", GetLastError());
+        return false;
+    }
+    
+    // Skip header row
+    if(FileIsEnding(fileHandle) || StringLen(FileReadString(fileHandle)) == 0) {
+        Print("Reentry profile is empty or has no header: ", filePath);
+        FileClose(fileHandle);
+        return false;
+    }
+    
+    while(!FileIsEnding(fileHandle)) {
+        string fields[6];
+        if(StringSplit(FileReadString(fileHandle), ',', fields) < 6) continue;
+        
+        int actionNum = (int)StringToInteger(fields[0]);
+        if(actionNum < 1 || actionNum > 6) continue;
+        
+        m_actions[actionNum].actionNumber         = actionNum;
+        m_actions[actionNum].type                 = StringToReentryType(fields[1]);
+        m_actions[actionNum].sizeMultiplier       = StringToDouble(fields[2]);
+        m_actions[actionNum].delaySeconds         = (int)StringToInteger(fields[3]);
+        m_actions[actionNum].confidenceAdjustment = StringToDouble(fields[4]);
+        m_actions[actionNum].parameters           = fields[5];
+    }
+    
+    FileClose(fileHandle);
+    m_profileName = filePath;
+    Print("Loaded reentry profile: ", m_profileName);
+    return true;
+}
+
+// --- Private Helper Stubs and Implementations ---
+
+double CReentryLogic::CalculateRValue(const TradeResult &result) {
+    // Stub. To be implemented in the main EA file as it requires access to order history.
+    return(0.0);
+}
+
+void CReentryLogic::LogOutcome(int dieRoll, double R, double PnL, double balance) {
+    // Stub. Logic for this would be in the CLogger class.
+}
+
+void CReentryLogic::UpdateStatistics(int dieRoll, double PnL) {
+    // Stub. This would update internal statistical counters.
+    if(dieRoll > 0 && dieRoll < 7) {
+        m_outcomeCounts[dieRoll]++;
+    }
+}
+
+ENUM_REENTRY_TYPE CReentryLogic::StringToReentryType(string str) {
+    // The blueprint does not specify the implementation for this helper function.
+    // This is a logical implementation based on the CSV format provided.
+    if(str == "NO_ACTION" || str == "NO_REENTRY") return(REENTRY_NO_ACTION);
+    if(str == "WAIT_SIGNAL") return(REENTRY_WAIT_SIGNAL);
+    if(str == "SAME_TRADE") return(REENTRY_SAME_TRADE);
+    if(str == "REVERSE") return(REENTRY_REVERSE);
+    if(str == "REDUCE_SIZE") return(REENTRY_REDUCE_SIZE);
+    if(str == "INCREASE_SIZE") return(REENTRY_INCREASE_SIZE);
+    return(REENTRY_NO_ACTION); // Default case
+}

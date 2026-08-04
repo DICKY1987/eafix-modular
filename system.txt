@@ -1,0 +1,262 @@
+system
+Custom Gem
+
+Show thinking
+Based on the detailed assessment, here are the technical specifications for the high-priority standards documents required to address the identified gaps.
+
+Priority 1: Critical Standards Documents
+1. HUEY_P_STANDARDS_cpp_coding.md - Technical Specification
+Document Title: C++ Coding Standards for HUEY_P Trading System
+
+Audience: C++ Developers, System Integrators
+
+Scope: Governs the development of SocketBridge.dll and any future C++ components.
+
+Section
+
+Rule
+
+Specification
+
+1. Naming & Formatting
+
+Mandatory
+
+Variables: camelCase (e.g., clientSocket, messageQueue).<br>Functions: PascalCase (e.g., StartServer, GetNextSignal).<br>Constants: k prefix followed by PascalCase (e.g., kMaxBufferSize).<br>Braces: Allman style (braces on new lines).
+
+2. Memory Management
+
+Mandatory
+
+RAII Principle: Resource acquisition MUST be tied to object lifetime. Use classes to manage resources like sockets or handles.
+Smart Pointers: Use std::unique_ptr for exclusive ownership and std::shared_ptr for shared ownership. Raw new and delete are forbidden for owned resources.
+
+3. Thread Safety
+
+Mandatory
+
+Mutexes: Any data shared between threads (e.g., the signal queue) MUST be protected by a std::mutex.<br>Locking: Use std::lock_guard or std::unique_lock for idiomatic, exception-safe locking.<br>Condition Variables: Use std::condition_variable to signal between threads instead of busy-waiting.
+
+4. DLL Interface
+
+Mandatory
+
+
+Export Convention: All functions exported for MQL4 MUST use __declspec(dllexport) and the __stdcall calling convention.
+
+
+C-Style Interface: The public API MUST be extern "C" to prevent C++ name mangling.
+
+5. Windows API
+
+Mandatory
+
+Error Handling: EVERY Windows API call that can fail MUST have its return value checked immediately. Use WSAGetLastError() for socket errors.<br>Handles: API handles (e.g., SOCKET, HANDLE) MUST be wrapped in RAII classes to ensure they are always closed.
+
+6. Error & Exception Handling
+
+Mandatory
+
+Exceptions: Exceptions should not cross the DLL boundary into MQL4. All exceptions 
+
+MUST be caught within the exported C-style functions and converted to an integer error code return value.
+
+
+
+Export to Sheets
+2. HUEY_P_STANDARDS_testing.md - Technical Specification
+Document Title: Testing & Quality Assurance Framework
+
+Audience: All Developers, QA Engineers
+
+Scope: Defines testing requirements for all system components.
+
+Section
+
+Rule
+
+Specification
+
+1. Unit Testing
+
+Mandatory
+
+Python: Use pytest. All external dependencies (network, database) MUST be mocked using unittest.mock. Minimum code coverage: 80%.
+
+MQL4: Use a dedicated test EA (.mq4 script) that calls public functions from .mqh files and uses Assert() helper functions (which use Print() internally) to validate outputs.
+
+
+C++: Use a lightweight testing framework like Google Test to test internal logic.
+
+2. Integration Testing
+
+Mandatory
+
+
+Python <-> DLL: A pytest script will start the Python BridgeService and a lightweight C++ client to assert that signals are transmitted and received correctly through the DLL .
+
+
+DLL <-> MQL4: An MQL4 test script will call DLL functions while a lightweight Python script acts as a mock server, asserting that signals and error codes are handled correctly .
+
+
+Service <-> Database: Tests MUST verify that services can correctly write to and read from an in-memory SQLite database, respecting all schemas.
+
+
+3. End-to-End (E2E) Testing
+
+Mandatory
+
+
+Workflow: Tests MUST validate the entire signal-to-trade lifecycle on a demo account. This involves a mock data feed triggering a Python signal, which results in an 
+
+OrderSend() call in MT4 .
+
+
+Validation: Tests MUST assert that the resulting trade has the correct symbol, volume, SL/TP, and Magic Number.
+
+4. Performance Testing
+
+Mandatory
+
+
+Latency Standard: The Python backend's signal processing time (from data reception to sending to the bridge) MUST be under 100ms .
+
+
+DLL Latency: The SocketBridge.dll internal processing time MUST be under 1ms.
+
+5. Test Data Management
+
+Mandatory
+
+Mock Data: Use static data files (e.g., CSV, JSON) or data generation libraries for predictable test inputs.
+Production Data: Use of production data for testing is strictly forbidden.
+
+
+Export to Sheets
+3. HUEY_P_STANDARDS_security.md - Technical Specification
+Document Title: System Security Standards
+
+Audience: All Project Stakeholders
+
+Scope: Defines mandatory security practices to protect system integrity and data.
+
+Section
+
+Rule
+
+Specification
+
+1. Credential Management
+
+Mandatory
+
+Storage: API keys, database credentials, and other secrets MUST NOT be stored in source code or configuration files. They 
+
+MUST be loaded from environment variables or a secure vault service.
+Example: The production.yaml file should reference secrets like this: api_key: "env_var:LIVE_DATA_API_KEY".
+
+2. Input Validation
+
+Mandatory
+
+Signal Fields: The C++ DLL and MQL4 EA MUST validate all incoming signal fields for correct format and plausible values before processing.
+Configuration: All parameters loaded from YAML/CSV files MUST be validated against a schema or range-checked upon loading.
+
+3. Data Encryption
+
+Recommended
+
+At Rest: The SQLite database file containing sensitive trade history should be encrypted using a filesystem-level or database-specific encryption extension.
+In Transit: If the system is deployed across different machines, the TCP socket communication between Python and the C++ bridge MUST be secured with TLS/SSL.
+
+4. Secure Coding
+
+Mandatory
+
+
+Buffer Overflows: The GetNextSignal function in the C++ DLL MUST check the MQL4-provided buffer size to prevent buffer overflows.
+
+
+Least Privilege: The user account running the MT4 terminal and Docker services should have the minimum necessary permissions.
+
+5. Code Review
+
+Mandatory
+
+Security Checklist: All code reviews MUST include a security checklist, verifying that no hardcoded credentials exist, all inputs are validated, and error handling does not leak sensitive information.
+
+
+Export to Sheets
+4. HUEY_P_STANDARDS_trading_specific.md - Technical Specification
+Document Title: Trading Logic & System-Specific Standards
+
+Audience: Python and MQL4 Developers
+
+Scope: Governs the core patterns unique to the trading system's logic.
+
+Section
+
+Rule
+
+Specification
+
+1. Signal & API Contract
+
+Mandatory
+
+
+Single Source of Truth: The 06_API_Contract_Documentation.md is the single source of truth for all message formats .
+
+
+Format: All signal messages MUST adhere to the specified semicolon-delimited string format or JSON schema.
+
+
+Signal Routing: The MQL4 EA MUST filter incoming signals from the shared queue by comparing the signal's Symbol field to the EA's chart symbol.
+
+2. Risk Management
+
+Mandatory
+
+
+Pre-Trade Validation: The Python RiskService is the central gatekeeper for pre-trade checks. MQL4 EAs perform final sanity checks (e.g., spread, slippage) but do not duplicate core risk logic .
+
+
+
+
+Lot Sizing: Lot size calculation MUST only occur in the Python RiskService based on account equity and risk parameters.
+
+3. Position & Order Mgt.
+
+Mandatory
+
+
+Magic Number: Every order placed by an EA MUST be assigned a unique Magic Number, configured via EA inputs, to distinguish it from other trades .
+
+
+
+Order Handling: The ExecutionEngine.mqh MUST be the sole module responsible for OrderSend() calls and handling common trade errors like requotes and invalid stops.
+
+
+4. Timestamp Sync
+
+Mandatory
+
+
+UTC Standard: All timestamps generated in the Python backend and stored in the database MUST be in ISO 8601 UTC format.
+
+
+
+Server Time: All time-based logic within MQL4 (e.g., checking for trading sessions) MUST use the broker's server time (TimeCurrent()), not the local machine time (TimeLocal()).
+
+5. Fallback Protocol
+
+Mandatory
+
+
+Hierarchy: The communication fallback mechanism MUST follow the strict order: Sockets -> Named Pipes -> File I/O .
+
+
+
+
+
+Atomic Writes: When using the file-based fallback, the Python service MUST write to a temporary file first and then perform an atomic rename to prevent the EA from reading a partially written file.

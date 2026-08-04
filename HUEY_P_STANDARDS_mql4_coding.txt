@@ -1,0 +1,207 @@
+
+HUEY_P_STANDARDS_mql4_coding.md
+Markdown
+
+# MQL4 Coding Standards for HUEY_P Trading System
+
+**Version**: 1.0
+**Last Updated**: 2025-07-02
+**Maintainer**: MQL4 Development Team
+**Compatibility**: MT4 Build 600+
+
+---
+
+## **Quick Reference Card**
+
+| Category | Standard | Example |
+|---|---|---|
+| **Input Parameters** | `PascalCase` | `extern int MaxSpread = 5;` |
+| **Global Variables** | `g_` prefix + `camelCase` | `datetime g_lastSignalTime;` |
+| **Local Variables** | `camelCase` | `int ticketNumber = 0;` |
+| **Function Names** | `PascalCase` | `int ProcessSignal() { ... }` |
+| **Constants (`#define`)**| `UPPER_SNAKE_CASE` | `#define MAX_RETRIES 3` |
+| **Error Handling** | Check return value + `GetLastError()` | `if(!OrderSend(...)) { CheckError(); }` |
+| **Core Functions** | `init()`, `start()`, `deinit()` | [cite_start]`int start() { // Main logic }` [cite: 242] |
+| **Includes** | Grouped at top after properties | `#include <WinUser32.mqh>` |
+| **Magic Numbers** | Use defined constants | `#define BUY_MAGIC_NUMBER 1001` |
+
+---
+
+## **1. Code Organization Structure**
+
+All MQL4 source files (`.mq4`, `.mqh`) **MUST** follow a strict structural order to ensure consistency and readability.
+
+### **File Header Order**
+
+The top of every `.mq4` file **MUST** be organized in this exact sequence:
+
+1.  **`#property` directives**: Copyright, link, description, version, etc.
+2.  **`#include` statements**: All include files must be grouped here.
+3.  **`#define` constants**: All global constants.
+4.  **`input` (formerly `extern`) parameters**: All user-configurable inputs.
+5.  **Global variable declarations**: All script-level global variables.
+6.  **Special Functions**: `init()`, `start()`, `deinit()`.
+7.  **Custom Function implementations**: All other helper functions.
+
+### **Include File Organization**
+
+-   **Location**: All `#include` statements must be at the top of the file, immediately after `#property` directives.
+-   **Header Guards**: To prevent multiple inclusion errors, every `.mqh` file **MUST** start with a header guard.
+-   **Documentation**: Every `.mqh` file must begin with a comment block explaining its purpose and the functions it provides.
+
+```mql4
+// ✅ Good .mqh file structure
+//+------------------------------------------------------------------+
+//|                                                   MyHelpers.mqh  |
+//|                   Copyright 2025, HUEY_P Trading System          |
+//|          This file contains utility functions for math.          |
+//+------------------------------------------------------------------+
+#property copyright "HUEY_P Trading System"
+
+#ifndef MY_HELPERS_MQH
+#define MY_HELPERS_MQH
+
+//--- Function declarations
+double NormalizeValue(double value);
+
+//--- Function implementations
+double NormalizeValue(double value)
+{
+  // ... implementation
+}
+
+#endif // MY_HELPERS_MQH
+2. Naming Conventions (Strict)
+Variables
+Input Parameters (input / extern): MUST use PascalCase.
+
+Global Variables: MUST use the g_ prefix followed by camelCase. This makes their scope immediately clear.
+
+Local Variables: MUST use camelCase.
+
+Code snippet
+
+// ✅ Good Variable Naming
+input int MaxSpread = 5;
+datetime g_lastTradeTime;
+
+void OnTick()
+{
+    int ticketNumber = 0;
+    double currentPrice = Bid;
+}
+
+// ❌ Avoid
+extern int max_spread; // Incorrect case for inputs
+datetime LastTradeTime;  // Missing 'g_' prefix for global
+int Ticket_Number;       // Incorrect case for local
+Functions
+Function Names: MUST use PascalCase.
+
+Code snippet
+
+// ✅ Good
+void ProcessNewSignal() { ... }
+bool IsTradeAllowed() { ... }
+
+// ❌ Avoid
+void process_new_signal() { ... }
+Constants
+#define: MUST be used for all magic numbers, error codes, and fixed parameters. Names must be UPPER_SNAKE_CASE.
+
+Magic Number Literals: Using numeric literals directly in trading functions (e.g., OrderSend) is strictly forbidden.
+
+Code snippet
+
+// ✅ Good
+#define MA_PERIOD_FAST 14
+#define MAGIC_NUMBER_EURUSD_BUY 1001
+
+// ❌ Avoid
+int period = 14; // Should be a #define constant
+OrderSend(Symbol(), OP_BUY, 1.0, Ask, 3, 0, 0, "", 12345); // Magic number literal is forbidden
+3. Error Handling Patterns
+Robust error handling is critical for trading applications.
+
+Trading Function Validation
+Return Value Check: The return value of EVERY trading function (OrderSend, OrderClose, OrderModify, etc.) MUST be checked immediately.
+
+GetLastError(): If a trading function fails (returns < 0 or false), GetLastError() MUST be called immediately to retrieve the error code.
+
+Code snippet
+
+// ✅ Good
+int ticket = OrderSend(Symbol(), OP_BUY, 0.1, Ask, 3, 0, 0);
+if (ticket < 0)
+{
+    int errorCode = GetLastError();
+    Print("OrderSend failed with error: ", errorCode);
+    ProcessTradeError(errorCode); // Handle the error
+}
+
+// ❌ Avoid: Ignoring potential failures
+OrderSend(Symbol(), OP_BUY, 0.1, Ask, 3, 0, 0); // No error checking!
+Retry Mechanisms
+For recoverable network or server errors (e.g., 
+
+ERR_SERVER_BUSY , 
+
+ERR_REQUOTE ), the system 
+
+MUST implement a retry mechanism.
+
+Do not use simple loops for retries; implement a short pause (e.g., Sleep(500)) between attempts to avoid overloading the server.
+
+Error Logging
+Error messages MUST be descriptive and provide context.
+
+Logs should include the function name where the error occurred, the error code, and the error description.
+
+4. Memory Management and Performance
+OnTick() / start() Optimization
+The start() (or OnTick()) function is executed on every tick, so it MUST be highly optimized.
+
+Avoid placing heavy calculations, file operations, or complex loops directly inside start(). Use the OnTimer() event for periodic, non-critical tasks.
+
+Array and String Management
+Array Resizing: When an array is no longer needed, its memory should be freed using ArrayResize(array_name, 0).
+
+
+String Concatenation: For complex string building, use StringConcatenate() instead of the + operator for better performance. 
+
+Global Variables
+Minimize the use of global variables. Prefer passing data as parameters to functions. This improves code clarity and reduces the risk of unintended side effects.
+
+5. Trading-Specific Standards
+Position and Order Management
+Magic Number: Every order placed by an EA MUST be assigned a unique Magic Number defined as a constant. This is essential for distinguishing EA-managed trades from manual trades or trades from other EAs.
+
+Ticket Handling: The ticket number returned by OrderSend() is the only reliable way to reference an order. It MUST be stored and used for all subsequent OrderSelect(), OrderModify(), or OrderClose() calls.
+
+Pre-Trade Validation
+Before sending any trade request, the EA MUST perform pre-trade sanity checks:
+
+Spread Check: Ensure the current spread (Ask - Bid) is within the acceptable range defined by input int MaxSpread.
+
+Margin Check: Use AccountFreeMarginCheck() to ensure sufficient funds are available.
+
+Time Check: Verify that trading is allowed at the current server time.
+
+Price and Symbol Normalization
+Prices: All stop-loss, take-profit, and pending order prices MUST be normalized to the correct number of digits for the symbol using NormalizeDouble().
+
+
+Digits: Use the predefined variable Digits for price normalization. 
+
+
+Point: Use the predefined variable Point for calculations involving pips. 
+
+Symbol: Use Symbol() to refer to the current chart's symbol, ensuring the EA is portable.
+
+Time Handling
+All time-based logic 
+
+MUST use the broker's server time (TimeCurrent()). 
+
+
+NEVER use the local computer's time (TimeLocal()), as it can differ from the server and cause inconsistent behavior. 

@@ -1,0 +1,1405 @@
+Development Blueprint: MQL4 Execution Engine
+Component Metadata
+yamlcomponent_metadata:
+  name: "HUEY_P_ExecutionEngine_EA"
+  type: "EA_Trading"
+  criticality: "Mission_Critical"
+  technology_stack: "MQL4"
+  deployment_target: "MT4_Platform"
+  version: "1.0.0"
+  dependencies:
+    - "Configuration Management System"
+    - "Reentry Logic System"
+    - "Signal Processing Bridge"
+  interfaces:
+    - "MT4 Trading API"
+    - "File-based signal reception"
+    - "Socket communication (optional)"
+Functional Specification
+yamlpurpose_statement:
+  primary_function: "Execute automated straddle trades based on economic calendar events and manage positions using die roll reentry logic"
+  business_value: "Enables automated trading with sophisticated risk management and adaptive position management"
+  integration_role: "Core execution component that interfaces with MT4 platform and processes signals from calendar system"
+
+dependencies:
+  upstream_components:
+    - "Economic Calendar System (VBA)"
+    - "Signal Processing Bridge"
+    - "Configuration Files (YAML/CSV)"
+  downstream_components:
+    - "Trade Analytics Database"
+    - "Performance Monitoring System"
+  external_systems:
+    - "MetaTrader 4 Platform"
+    - "Broker Trading Server"
+  data_sources:
+    - "signals/ directory for JSON signals"
+    - "Config/SYMBOL.yaml configuration"
+    - "Config/SYMBOL_reentry_profile.csv"
+    
+interfaces:
+  input_specifications:
+    - format: "JSON signal files"
+      structure: |
+        {
+          "symbol": "EURUSD",
+          "order_type": "buy|sell|both",
+          "lot_size": 0.01,
+          "stop_loss": 20,
+          "take_profit": 40,
+          "magic_number": 12345,
+          "comment": "Economic_Event_NFP"
+        }
+      validation_rules:
+        - "Symbol must match EA's attached chart"
+        - "Lot size must be within broker limits"
+        - "Stop loss/take profit > minimum distance"
+    - format: "YAML configuration"
+      validation_rules:
+        - "All required fields present"
+        - "Values within defined ranges"
+        - "Valid profile references"
+        
+  output_specifications:
+    - format: "Trade execution results"
+      success_criteria:
+        - "Order placement within 500ms"
+        - "Accurate position sizing"
+        - "Proper state transitions"
+    - format: "Log files"
+      location: "MQL4/Logs/HUEY_P_[DATE].log"
+    - format: "Global Variables"
+      purpose: "State persistence across restarts"
+Implementation Blueprint
+Pre-Development Setup
+bash# Environment Preparation
+1. "Install MetaTrader 4 platform version 4.00 build 1353 or higher"
+2. "Configure MT4 for Expert Advisor development:"
+   - Enable "Allow automated trading" in Tools > Options > Expert Advisors
+   - Enable "Allow DLL imports" if using socket communication
+   - Set up development folder structure:
+     /MQL4/
+       /Experts/
+         /HUEY_P/
+       /Include/
+         /HUEY_P/
+       /Files/
+         /signals/
+         /responses/
+         /Config/
+3. "Install MetaEditor and configure with project standards"
+4. "Set up test account with demo broker for development"
+5. "Create Git repository following branch strategy"
+Implementation Steps
+Step 1: Create Core EA Structure
+yamlaction: "Create main EA file with proper structure"
+deliverable: "HUEY_P_ExecutionEngine.mq4"
+implementation:
+  - file_location: "MQL4/Experts/HUEY_P/HUEY_P_ExecutionEngine.mq4"
+  - structure: |
+      //+------------------------------------------------------------------+
+      //| HUEY_P_ExecutionEngine.mq4                                      |
+      //| Copyright 2025, HUEY_P Trading Systems                          |
+      //| Hybrid Event-Based & Outcome-Based Trading System               |
+      //+------------------------------------------------------------------+
+      #property copyright "Copyright 2025, HUEY_P Trading Systems"
+      #property link      "https://hueyp-trading.com"
+      #property version   "1.00"
+      #property strict
+
+      // Include files
+      #include <HUEY_P/ConfigurationManager.mqh>
+      #include <HUEY_P/StateManager.mqh>
+      #include <HUEY_P/ReentryLogic.mqh>
+      #include <HUEY_P/SignalProcessor.mqh>
+      #include <HUEY_P/RiskManager.mqh>
+      #include <HUEY_P/Logger.mqh>
+
+      // Input parameters
+      input string  ConfigFile = "EURUSD.yaml";
+      input int     MagicNumberBase = 12345;
+      input double  DefaultRiskPercent = 2.0;
+      input int     DefaultStopLoss = 20;
+      input int     DefaultTakeProfit = 40;
+      input bool    EnableReentrySystem = true;
+      input string  ReentryProfile = "moderate";
+
+      // Global variables
+      CConfigurationManager g_ConfigManager;
+      CStateManager g_StateManager;
+      CReentryLogic g_ReentryLogic;
+      CSignalProcessor g_SignalProcessor;
+      CRiskManager g_RiskManager;
+      CLogger g_Logger;
+
+      // State enumeration
+      enum EAState {
+          STATE_IDLE,
+          STATE_ORDERS_PLACED,
+          STATE_TRADE_TRIGGERED,
+          STATE_PAUSED,
+          STATE_ERROR
+      };
+
+verification: "File compiles without errors in MetaEditor"
+Step 2: Implement Initialization Functions
+yamlaction: "Implement OnInit() with comprehensive initialization"
+code_requirements:
+  - function_signature: "int OnInit()"
+  - implementation: |
+      int OnInit() {
+          // Initialize logging system
+          if(!g_Logger.Initialize("HUEY_P", LOG_INFO)) {
+              Print("Failed to initialize logging system");
+              return INIT_FAILED;
+          }
+          
+          g_Logger.LogInfo("=== HUEY_P Execution Engine Starting ===");
+          g_Logger.LogInfo("Version: 1.0.0");
+          g_Logger.LogInfo("Symbol: " + Symbol());
+          
+          // Load configuration
+          string configPath = "Config/" + ConfigFile;
+          if(!g_ConfigManager.LoadConfiguration(configPath)) {
+              g_Logger.LogError("Failed to load configuration: " + configPath);
+              return INIT_FAILED;
+          }
+          
+          // Initialize state manager
+          if(!g_StateManager.Initialize(MagicNumberBase)) {
+              g_Logger.LogError("Failed to initialize state manager");
+              return INIT_FAILED;
+          }
+          
+          // Initialize reentry logic if enabled
+          if(EnableReentrySystem) {
+              string profilePath = "Config/" + Symbol() + "_reentry_" + ReentryProfile + ".csv";
+              if(!g_ReentryLogic.Initialize(Symbol(), profilePath)) {
+                  g_Logger.LogError("Failed to initialize reentry logic");
+                  return INIT_FAILED;
+              }
+          }
+          
+          // Initialize signal processor
+          if(!g_SignalProcessor.Initialize("signals/", Symbol())) {
+              g_Logger.LogError("Failed to initialize signal processor");
+              return INIT_FAILED;
+          }
+          
+          // Initialize risk manager
+          if(!g_RiskManager.Initialize(DefaultRiskPercent, g_ConfigManager)) {
+              g_Logger.LogError("Failed to initialize risk manager");
+              return INIT_FAILED;
+          }
+          
+          // Validate trading environment
+          if(!ValidateTradingEnvironment()) {
+              return INIT_FAILED;
+          }
+          
+          // Set timer for signal monitoring
+          EventSetTimer(5); // Check for signals every 5 seconds
+          
+          g_Logger.LogInfo("=== Initialization Complete ===");
+          return INIT_SUCCEEDED;
+      }
+
+verification: "All subsystems initialize successfully and EA attaches to chart"
+Step 3: Implement Core Trading Logic
+yamlaction: "Implement main trading loop and state machine"
+code_requirements:
+  - function_signature: "void OnTick()"
+  - implementation: |
+      void OnTick() {
+          // Update current market data
+          RefreshRates();
+          
+          // Check circuit breaker conditions
+          if(g_RiskManager.IsCircuitBreakerActive()) {
+              if(g_StateManager.GetCurrentState() != STATE_PAUSED) {
+                  g_StateManager.SetState(STATE_PAUSED);
+                  g_Logger.LogWarning("Circuit breaker activated - trading paused");
+              }
+              return;
+          }
+          
+          // Process based on current state
+          switch(g_StateManager.GetCurrentState()) {
+              case STATE_IDLE:
+                  ProcessIdleState();
+                  break;
+                  
+              case STATE_ORDERS_PLACED:
+                  ProcessOrdersPlacedState();
+                  break;
+                  
+              case STATE_TRADE_TRIGGERED:
+                  ProcessTradeTriggeredState();
+                  break;
+                  
+              case STATE_PAUSED:
+                  ProcessPausedState();
+                  break;
+                  
+              case STATE_ERROR:
+                  ProcessErrorState();
+                  break;
+          }
+          
+          // Monitor existing positions
+          MonitorActivePositions();
+          
+          // Update performance metrics
+          g_RiskManager.UpdateMetrics();
+      }
+      
+      void ProcessIdleState() {
+          // Check for new signals
+          SignalData signal;
+          if(g_SignalProcessor.GetNextSignal(signal)) {
+              if(ValidateSignal(signal)) {
+                  ExecuteSignal(signal);
+              }
+          }
+      }
+      
+      void ExecuteSignal(const SignalData& signal) {
+          // Calculate position size
+          double lotSize = g_RiskManager.CalculatePositionSize(
+              signal.stopLoss, 
+              signal.lotSize
+          );
+          
+          // Place straddle orders
+          int buyTicket = PlaceStopOrder(OP_BUYSTOP, lotSize, signal);
+          int sellTicket = PlaceStopOrder(OP_SELLSTOP, lotSize, signal);
+          
+          if(buyTicket > 0 && sellTicket > 0) {
+              g_StateManager.SetState(STATE_ORDERS_PLACED);
+              g_StateManager.SetPendingOrders(buyTicket, sellTicket);
+              g_Logger.LogInfo("Straddle orders placed successfully");
+          }
+      }
+
+verification: "State machine transitions correctly and orders are placed"
+Step 4: Implement Reentry Logic Integration
+yamlaction: "Integrate die roll reentry system"
+code_requirements:
+  - function_signature: "void ProcessClosedTrade(const TradeResult& result)"
+  - implementation: |
+      void ProcessClosedTrade(const TradeResult& result) {
+          // Calculate R-value
+          double R = CalculateRValue(result);
+          
+          // Get money loss/gain
+          double ML = result.profit < 0 ? MathAbs(result.profit) : 0;
+          double MG = result.profit > 0 ? result.profit : 0;
+          
+          // Get current balance
+          double B = AccountBalance();
+          
+          // Determine die roll outcome (1-6)
+          int dieRoll = g_ReentryLogic.DetermineOutcome(R, ML, MG, B);
+          
+          g_Logger.LogInfo(StringFormat(
+              "Trade closed - Die Roll: %d, R: %.2f, P/L: %.2f",
+              dieRoll, R, result.profit
+          ));
+          
+          // Execute reentry action if enabled
+          if(EnableReentrySystem && dieRoll > 0) {
+              ReentryAction action = g_ReentryLogic.GetAction(dieRoll);
+              ExecuteReentryAction(action, result);
+          }
+          
+          // Update state
+          g_StateManager.UpdateTradeHistory(result);
+          g_StateManager.SetState(STATE_IDLE);
+      }
+      
+      void ExecuteReentryAction(const ReentryAction& action, const TradeResult& original) {
+          switch(action.type) {
+              case REENTRY_NO_ACTION:
+                  g_Logger.LogInfo("No reentry action - waiting for next signal");
+                  break;
+                  
+              case REENTRY_WAIT_SIGNAL:
+                  g_StateManager.SetWaitUntil(TimeCurrent() + action.delaySeconds);
+                  break;
+                  
+              case REENTRY_SAME_TRADE:
+                  Sleep(action.delaySeconds * 1000);
+                  PlaceReentryTrade(original.direction, action.sizeMultiplier);
+                  break;
+                  
+              case REENTRY_REVERSE:
+                  Sleep(action.delaySeconds * 1000);
+                  int reverseDir = original.direction == OP_BUY ? OP_SELL : OP_BUY;
+                  PlaceReentryTrade(reverseDir, action.sizeMultiplier);
+                  break;
+                  
+              case REENTRY_REDUCE_SIZE:
+                  g_RiskManager.AdjustRiskPercent(action.confidenceAdjustment);
+                  break;
+                  
+              case REENTRY_INCREASE_SIZE:
+                  g_RiskManager.AdjustRiskPercent(action.confidenceAdjustment);
+                  PlaceReentryTrade(original.direction, action.sizeMultiplier);
+                  break;
+          }
+      }
+
+verification: "Reentry actions execute correctly based on die roll outcomes"
+Step 5: Implement Error Handling and Recovery
+yamlaction: "Implement comprehensive error handling"
+code_requirements:
+  - error_handling_strategy: |
+      // Error code definitions
+      #define ERR_CONFIGURATION_LOAD    5001
+      #define ERR_SIGNAL_PARSE         5002
+      #define ERR_ORDER_PLACEMENT      5003
+      #define ERR_STATE_CORRUPTION     5004
+      #define ERR_RISK_LIMIT_EXCEEDED  5005
+      
+      bool HandleError(int errorCode, string context) {
+          g_Logger.LogError(StringFormat("Error %d in %s: %s", 
+              errorCode, context, ErrorDescription(errorCode)));
+          
+          switch(errorCode) {
+              case ERR_TRADE_TIMEOUT:
+              case ERR_REQUOTE:
+              case ERR_PRICE_CHANGED:
+                  return true; // Recoverable - retry
+                  
+              case ERR_MARKET_CLOSED:
+              case ERR_TRADE_DISABLED:
+                  g_StateManager.SetState(STATE_PAUSED);
+                  return false;
+                  
+              case ERR_NOT_ENOUGH_MONEY:
+              case ERR_RISK_LIMIT_EXCEEDED:
+                  g_RiskManager.ActivateCircuitBreaker();
+                  return false;
+                  
+              default:
+                  if(errorCode >= 5000) { // Custom errors
+                      g_StateManager.SetState(STATE_ERROR);
+                  }
+                  return false;
+          }
+      }
+      
+      void OnDeinit(const int reason) {
+          // Save state before shutdown
+          g_StateManager.SaveState();
+          
+          // Close any pending orders
+          CloseAllPendingOrders();
+          
+          // Final logging
+          g_Logger.LogInfo("EA Shutdown - Reason: " + GetUninitReasonText(reason));
+          
+          // Cleanup
+          EventKillTimer();
+      }
+
+verification: "Error scenarios handled gracefully with proper logging"
+Quality Assurance Plan
+yamltesting_framework:
+  unit_tests:
+    coverage_target: "95% of all functions"
+    test_scenarios:
+      - "Configuration loading with valid/invalid files"
+      - "Signal parsing and validation"
+      - "Position sizing calculations"
+      - "State transitions"
+      - "Reentry logic die roll calculations"
+      - "Error handling for all error codes"
+    
+  integration_tests:
+    - scenario: "Complete trading cycle"
+      steps:
+        1. "Load configuration"
+        2. "Receive signal"
+        3. "Place straddle orders"
+        4. "Trigger one side"
+        5. "Close trade with profit/loss"
+        6. "Execute reentry action"
+      verification: "All state transitions occur correctly"
+      
+    - scenario: "Circuit breaker activation"
+      steps:
+        1. "Simulate consecutive losses"
+        2. "Verify circuit breaker triggers"
+        3. "Confirm trading halts"
+        4. "Test manual reset"
+      
+  strategy_tests:
+    - test: "Backtest on 2 years historical data"
+      metrics:
+        - "Win rate > 40%"
+        - "Profit factor > 1.2"
+        - "Maximum drawdown < 20%"
+        - "Recovery factor > 2.0"
+    
+  performance_tests:
+    - metric: "Order execution latency"
+      target: "< 500ms from signal to order placement"
+    - metric: "Tick processing time"
+      target: "< 50ms per tick"
+    - metric: "Memory usage"
+      target: "< 100MB during normal operation"
+Documentation Requirements
+yamlcode_documentation:
+  format: "MQL4 standard with extended comments"
+  requirements:
+    - "File header with copyright and description"
+    - "Function headers with parameters and return values"
+    - "Inline comments for complex logic"
+    - "Error code documentation"
+    
+user_documentation:
+  - document: "HUEY_P_EA_Installation_Guide.pdf"
+    contents:
+      - "System requirements"
+      - "Installation steps"
+      - "Configuration guide"
+      - "First run checklist"
+      
+  - document: "HUEY_P_EA_User_Manual.pdf"
+    contents:
+      - "Feature overview"
+      - "Parameter descriptions"
+      - "Trading strategies"
+      - "Troubleshooting guide"
+      
+technical_documentation:
+  - document: "HUEY_P_EA_Technical_Reference.md"
+    contents:
+      - "Architecture overview"
+      - "State machine diagram"
+      - "API reference"
+      - "Integration points"
+Integration Points
+yamlcalendar_system_integration:
+  protocol: "File-based JSON signals"
+  directory: "MQL4/Files/signals/"
+  format: "JSON with predefined schema"
+  polling_interval: "5 seconds"
+  
+database_integration:
+  method: "File export to CSV"
+  frequency: "After each trade closes"
+  location: "MQL4/Files/trades/"
+  format: "CSV with trade details"
+  
+monitoring_integration:
+  global_variables:
+    - "HUEY_P_State"
+    - "HUEY_P_ActiveTicket"
+    - "HUEY_P_HealthScore"
+    - "HUEY_P_LastSignal"
+  update_frequency: "Every tick"
+Deployment Instructions
+yamldeployment_steps:
+  1_preparation:
+    - "Compile EA in Release mode"
+    - "Run full test suite"
+    - "Verify all dependencies"
+    
+  2_staging_deployment:
+    - "Deploy to demo account"
+    - "Configure with production parameters"
+    - "Run 24-hour stability test"
+    - "Verify all integrations"
+    
+  3_production_deployment:
+    - "Create backup of current EA"
+    - "Deploy during market close"
+    - "Load saved state if exists"
+    - "Verify configuration loaded"
+    - "Monitor first signal cycle"
+    
+  4_validation:
+    - "Confirm state persistence works"
+    - "Test emergency stop button"
+    - "Verify logging active"
+    - "Check performance metrics"
+Maintenance Procedures
+yamldaily_maintenance:
+  - "Review trade logs for anomalies"
+  - "Check health score metrics"
+  - "Verify configuration up to date"
+  - "Monitor error frequency"
+  
+weekly_maintenance:
+  - "Analyze reentry system performance"
+  - "Review and adjust risk parameters"
+  - "Clean up old log files"
+  - "Update economic calendar events"
+  
+monthly_maintenance:
+  - "Full system performance review"
+  - "Backtest parameter optimization"
+  - "Update reentry profiles if needed"
+  - "Database cleanup and optimization"
+
+Development Blueprint: Reentry Logic System
+Component Metadata
+yamlcomponent_metadata:
+  name: "HUEY_P_ReentryLogic"
+  type: "EA_Trading"
+  criticality: "Mission_Critical"
+  technology_stack: "MQL4"
+  deployment_target: "MT4_Platform"
+  version: "1.0.0"
+  integration_type: "Library Module"
+Functional Specification
+yamlpurpose_statement:
+  primary_function: "Implement die roll logic to classify trade outcomes into 6 categories and execute corresponding reentry actions"
+  business_value: "Provides adaptive position management that responds to trade outcomes, improving overall system profitability"
+  integration_role: "Core decision engine for post-trade actions within the EA"
+
+dependencies:
+  upstream_components:
+    - "Trade result data from EA"
+    - "Reentry profile configuration (CSV)"
+  downstream_components:
+    - "Order execution functions"
+    - "Risk management system"
+  
+interfaces:
+  input_specifications:
+    - name: "Trade Result"
+      format: |
+        struct TradeResult {
+            int ticket;
+            double openPrice;
+            double closePrice;
+            double stopLoss;
+            double takeProfit;
+            double profit;
+            double commission;
+            double swap;
+            int direction; // OP_BUY or OP_SELL
+            datetime openTime;
+            datetime closeTime;
+            string comment;
+        };
+    - name: "Reentry Profile"
+      format: "CSV file with action definitions"
+      
+  output_specifications:
+    - name: "Die Roll Outcome"
+      range: "1-6 (integer)"
+      mapping:
+        1: "Stop Loss Hit"
+        2: "Partial Loss"
+        3: "Breakeven"
+        4: "Partial Profit"
+        5: "Take Profit Hit"
+        6: "Beyond Take Profit"
+    - name: "Reentry Action"
+      format: "ReentryAction structure with execution parameters"
+Implementation Blueprint
+Implementation Steps
+Step 1: Create Reentry Logic Class Structure
+yamlaction: "Create CReentryLogic class in Include folder"
+deliverable: "MQL4/Include/HUEY_P/ReentryLogic.mqh"
+implementation:
+  code: |
+    //+------------------------------------------------------------------+
+    //| ReentryLogic.mqh                                                |
+    //| Die Roll Logic Implementation for HUEY_P                        |
+    //+------------------------------------------------------------------+
+    #property copyright "Copyright 2025, HUEY_P Trading Systems"
+    #property link      "https://hueyp-trading.com"
+    #property strict
+
+    // Reentry action types
+    enum ENUM_REENTRY_TYPE {
+        REENTRY_NO_ACTION,
+        REENTRY_WAIT_SIGNAL,
+        REENTRY_SAME_TRADE,
+        REENTRY_REVERSE,
+        REENTRY_REDUCE_SIZE,
+        REENTRY_INCREASE_SIZE,
+        REENTRY_AGGRESSIVE
+    };
+
+    // Reentry action structure
+    struct ReentryAction {
+        int actionNumber;           // 1-6
+        ENUM_REENTRY_TYPE type;     // Action type
+        double sizeMultiplier;      // Position size multiplier
+        int delaySeconds;           // Delay before execution
+        double confidenceAdjustment; // Risk adjustment factor
+        string parameters;          // Additional parameters
+    };
+
+    class CReentryLogic {
+    private:
+        ReentryAction m_actions[7]; // Index 0 unused, 1-6 for die rolls
+        bool m_enabled;
+        string m_profileName;
+        string m_symbol;
+        
+        // Outcome calculation variables
+        double m_rValueThreshold;
+        double m_breakevenRange;
+        
+        // Statistics
+        int m_outcomeCounts[7];
+        double m_totalProfit[7];
+        
+    public:
+        CReentryLogic();
+        ~CReentryLogic();
+        
+        bool Initialize(string symbol, string profilePath);
+        int DetermineOutcome(double R, double ML, double MG, double B);
+        ReentryAction GetAction(int dieRoll);
+        bool LoadProfile(string filePath);
+        void UpdateStatistics(int outcome, double profit);
+        string GetStatisticsReport();
+        
+    private:
+        int CalculateDieRoll(double rValue, double closePrice, 
+                           double stopLoss, double takeProfit);
+        bool ParseCSVLine(string line, ReentryAction &action);
+        double CalculateRValue(const TradeResult &result);
+    };
+
+verification: "Class compiles without errors"
+Step 2: Implement Die Roll Calculation Logic
+yamlaction: "Implement core die roll determination algorithm"
+code_requirements:
+  - function: "DetermineOutcome"
+  - algorithm: |
+      int CReentryLogic::DetermineOutcome(double R, double ML, double MG, double B) {
+          // Validate inputs
+          if(!m_enabled) return 0;
+          
+          // Die Roll Logic based on R value
+          int dieRoll = 0;
+          
+          if(R <= -1.0) {
+              // Stop loss hit or worse
+              dieRoll = 1;
+          }
+          else if(R > -1.0 && R <= -0.5) {
+              // Partial loss (50% to stop loss)
+              dieRoll = 2;
+          }
+          else if(R > -0.5 && R < 0.5) {
+              // Breakeven range (-50% to +50% of risk)
+              dieRoll = 3;
+          }
+          else if(R >= 0.5 && R < 1.0) {
+              // Partial profit (50% to take profit)
+              dieRoll = 4;
+          }
+          else if(R >= 1.0 && R < 1.5) {
+              // Take profit hit
+              dieRoll = 5;
+          }
+          else if(R >= 1.5) {
+              // Beyond take profit
+              dieRoll = 6;
+          }
+          
+          // Log the outcome
+          LogOutcome(dieRoll, R, ML, MG, B);
+          
+          // Update statistics
+          UpdateStatistics(dieRoll, MG - ML);
+          
+          return dieRoll;
+      }
+      
+      double CReentryLogic::CalculateRValue(const TradeResult &result) {
+          double risk = MathAbs(result.openPrice - result.stopLoss);
+          if(risk == 0) return 0;
+          
+          double profit = result.closePrice - result.openPrice;
+          if(result.direction == OP_SELL) {
+              profit = result.openPrice - result.closePrice;
+          }
+          
+          return profit / risk;
+      }
+
+verification: "Die roll calculations produce values 1-6 for all scenarios"
+Step 3: Implement Profile Loading System
+yamlaction: "Create CSV profile parser for reentry configurations"
+code_requirements:
+  - function: "LoadProfile"
+  - csv_format: |
+      Action,Type,SizeMultiplier,DelaySeconds,ConfidenceAdjustment,Parameters
+      1,NO_REENTRY,0.0,0,1.0,"Stop loss hit"
+      2,WAIT_SIGNAL,0.0,300,1.0,"Wait 5 minutes"
+      3,REDUCE_SIZE,0.5,60,0.9,"Reduce position"
+      4,SAME_TRADE,1.0,30,1.0,"Same direction"
+      5,SAME_TRADE,1.0,15,1.0,"Repeat success"
+      6,INCREASE_SIZE,1.5,10,1.1,"Ride momentum"
+      
+  - implementation: |
+      bool CReentryLogic::LoadProfile(string filePath) {
+          // Open CSV file
+          int fileHandle = FileOpen(filePath, FILE_READ|FILE_CSV|FILE_ANSI, ',');
+          if(fileHandle == INVALID_HANDLE) {
+              Print("Failed to open reentry profile: ", filePath);
+              return false;
+          }
+          
+          // Skip header row
+          if(!FileReadString(fileHandle)) {
+              FileClose(fileHandle);
+              return false;
+          }
+          
+          // Read action configurations
+          while(!FileIsEnding(fileHandle)) {
+              string line = FileReadString(fileHandle);
+              if(StringLen(line) == 0) continue;
+              
+              // Parse CSV line
+              string fields[];
+              int fieldCount = StringSplit(line, ',', fields);
+              if(fieldCount < 6) continue;
+              
+              int actionNum = (int)StringToInteger(fields[0]);
+              if(actionNum < 1 || actionNum > 6) continue;
+              
+              // Populate action structure
+              m_actions[actionNum].actionNumber = actionNum;
+              m_actions[actionNum].type = StringToReentryType(fields[1]);
+              m_actions[actionNum].sizeMultiplier = StringToDouble(fields[2]);
+              m_actions[actionNum].delaySeconds = (int)StringToInteger(fields[3]);
+              m_actions[actionNum].confidenceAdjustment = StringToDouble(fields[4]);
+              m_actions[actionNum].parameters = fields[5];
+          }
+          
+          FileClose(fileHandle);
+          m_profileName = filePath;
+          Print("Loaded reentry profile: ", m_profileName);
+          return true;
+      }
+
+verification: "Profile loads correctly and actions are properly configured"
+Quality Assurance Plan
+yamltesting_framework:
+  unit_tests:
+    - test: "Die roll calculation accuracy"
+      scenarios:
+        - "R = -1.5 → Die Roll = 1"
+        - "R = -0.7 → Die Roll = 2"
+        - "R = 0.0 → Die Roll = 3"
+        - "R = 0.7 → Die Roll = 4"
+        - "R = 1.2 → Die Roll = 5"
+        - "R = 2.0 → Die Roll = 6"
+        
+    - test: "Profile loading"
+      scenarios:
+        - "Valid CSV loads successfully"
+        - "Invalid CSV handles gracefully"
+        - "Missing file returns error"
+        
+    - test: "Action execution"
+      verify:
+        - "Correct action type returned"
+        - "Size multipliers applied"
+        - "Delays respected"
+        
+  integration_tests:
+    - test: "EA integration"
+      steps:
+        1. "Close trade with known outcome"
+        2. "Verify correct die roll"
+        3. "Confirm action execution"
+        4. "Check statistics update"
+
+Development Blueprint: Economic Calendar System
+Component Metadata
+yamlcomponent_metadata:
+  name: "HUEY_P_EconomicCalendarProcessor"
+  type: "Backend_Service"
+  criticality: "Mission_Critical"
+  technology_stack: "VBA"
+  deployment_target: "Excel_Application"
+  version: "1.0.0"
+  dependencies:
+    - "Excel 2016 or higher"
+    - "Windows Script Host"
+    - "File system access"
+Functional Specification
+yamlpurpose_statement:
+  primary_function: "Import, process, and transform economic calendar data into actionable trading signals"
+  business_value: "Enables proactive positioning before high-impact economic events"
+  integration_role: "Signal generation component that feeds the MT4 execution engine"
+
+dependencies:
+  upstream_components:
+    - "Economic calendar data sources (CSV/API)"
+    - "Currency impact mappings"
+  downstream_components:
+    - "Signal files for MT4 EA"
+    - "Trade analytics database"
+  
+interfaces:
+  input_specifications:
+    - name: "Economic Calendar Data"
+      format: "CSV or API response"
+      fields:
+        - "Date"
+        - "Time"
+        - "Currency"
+        - "Event"
+        - "Impact (High/Medium/Low)"
+        - "Previous"
+        - "Forecast"
+        - "Actual"
+        
+  output_specifications:
+    - name: "Trading Signal"
+      format: "JSON file"
+      location: "signals/[timestamp]_[event].json"
+      schema: |
+        {
+          "timestamp": "2025-01-15T14:30:00",
+          "event": "US_NFP",
+          "currency": "USD",
+          "impact": "HIGH",
+          "symbol": "EURUSD",
+          "order_type": "both",
+          "lot_size": 0.01,
+          "stop_loss": 30,
+          "take_profit": 60,
+          "magic_number": 12345,
+          "comment": "NFP_20250115",
+          "expires": 3600
+        }
+Implementation Blueprint
+Implementation Steps
+Step 1: Create VBA Project Structure
+yamlaction: "Set up Excel VBA project with modular architecture"
+deliverable: "HUEY_P_Calendar_System.xlsm"
+modules:
+  - name: "modMain"
+    purpose: "Entry point and orchestration"
+  - name: "modCalendarImport"
+    purpose: "Data import functions"
+  - name: "modSignalGeneration"
+    purpose: "Signal creation logic"
+  - name: "modFileOperations"
+    purpose: "File I/O handling"
+  - name: "modConfiguration"
+    purpose: "System configuration"
+  - name: "clsEconomicEvent"
+    purpose: "Event data class"
+  - name: "clsSignal"
+    purpose: "Trading signal class"
+    
+implementation: |
+  '=== modMain ===
+  Option Explicit
+  
+  Public Const SYSTEM_VERSION As String = "1.0.0"
+  Public Const SIGNAL_PATH As String = "C:\MT4\MQL4\Files\signals\"
+  
+  Public g_Config As New clsConfiguration
+  Public g_Events As Collection
+  Public g_ActiveSignals As Collection
+  
+  Public Sub Initialize()
+      On Error GoTo ErrorHandler
+      
+      ' Load configuration
+      If Not g_Config.LoadConfiguration() Then
+          MsgBox "Failed to load configuration", vbCritical
+          Exit Sub
+      End If
+      
+      ' Initialize collections
+      Set g_Events = New Collection
+      Set g_ActiveSignals = New Collection
+      
+      ' Set up scheduled tasks
+      Application.OnTime Now + TimeValue("00:05:00"), "ProcessCalendarUpdate"
+      
+      Debug.Print "Calendar system initialized - Version " & SYSTEM_VERSION
+      Exit Sub
+      
+  ErrorHandler:
+      LogError "Initialize", Err.Description
+  End Sub
+
+verification: "VBA project structure created and compiles"
+Step 2: Implement Calendar Import Logic
+yamlaction: "Create robust calendar data import system"
+code_requirements:
+  - function: "ImportCalendarData"
+  - implementation: |
+      '=== modCalendarImport ===
+      Public Function ImportCalendarData(sourcePath As String) As Boolean
+          Dim ws As Worksheet
+          Dim lastRow As Long
+          Dim i As Long
+          Dim evt As clsEconomicEvent
+          
+          On Error GoTo ErrorHandler
+          
+          ' Clear existing events
+          Set g_Events = New Collection
+          
+          ' Open CSV file
+          Workbooks.Open sourcePath, ReadOnly:=True
+          Set ws = ActiveWorkbook.Sheets(1)
+          
+          ' Find last row
+          lastRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row
+          
+          ' Import events (skip header)
+          For i = 2 To lastRow
+              Set evt = New clsEconomicEvent
+              
+              With evt
+                  .EventDate = CDate(ws.Cells(i, 1).Value)
+                  .EventTime = TimeValue(ws.Cells(i, 2).Value)
+                  .Currency = UCase(Trim(ws.Cells(i, 3).Value))
+                  .EventName = Trim(ws.Cells(i, 4).Value)
+                  .Impact = UCase(Trim(ws.Cells(i, 5).Value))
+                  .Previous = ws.Cells(i, 6).Value
+                  .Forecast = ws.Cells(i, 7).Value
+                  .EventID = GenerateEventID(evt)
+                  
+                  ' Validate event
+                  If .Validate() Then
+                      g_Events.Add evt, .EventID
+                  End If
+              End With
+          Next i
+          
+          ' Close source file
+          ActiveWorkbook.Close SaveChanges:=False
+          
+          Debug.Print "Imported " & g_Events.Count & " events"
+          ImportCalendarData = True
+          Exit Function
+          
+      ErrorHandler:
+          LogError "ImportCalendarData", Err.Description
+          ImportCalendarData = False
+      End Function
+
+verification: "Calendar data imports correctly from CSV"
+Step 3: Implement Signal Generation Logic
+yamlaction: "Create signal generation based on calendar events"
+code_requirements:
+  - function: "GenerateTradingSignals"
+  - implementation: |
+      '=== modSignalGeneration ===
+      Public Sub GenerateTradingSignals()
+          Dim evt As clsEconomicEvent
+          Dim sig As clsSignal
+          Dim symbols As Variant
+          Dim i As Integer
+          
+          On Error GoTo ErrorHandler
+          
+          ' Process each event
+          For Each evt In g_Events
+              ' Check if event needs signal
+              If ShouldGenerateSignal(evt) Then
+                  ' Get affected symbols
+                  symbols = GetAffectedSymbols(evt.Currency)
+                  
+                  ' Create signal for each symbol
+                  For i = 0 To UBound(symbols)
+                      Set sig = New clsSignal
+                      
+                      With sig
+                          .Symbol = symbols(i)
+                          .EventID = evt.EventID
+                          .SignalTime = DateAdd("n", -g_Config.MinutesBeforeEvent, _
+                                              evt.EventDate + evt.EventTime)
+                          .OrderType = "both"  ' Straddle
+                          .LotSize = CalculateLotSize(evt.Impact)
+                          .StopLoss = g_Config.GetStopLoss(evt.Impact)
+                          .TakeProfit = g_Config.GetTakeProfit(evt.Impact)
+                          .MagicNumber = g_Config.BaseMagicNumber + i
+                          .Comment = evt.Currency & "_" & evt.EventName & "_" & _
+                                    Format(evt.EventDate, "YYYYMMDD")
+                          .Expires = g_Config.SignalExpirySeconds
+                          
+                          ' Generate JSON file
+                          If .SaveToFile(SIGNAL_PATH) Then
+                              g_ActiveSignals.Add sig, .SignalID
+                              LogSignal sig
+                          End If
+                      End With
+                  Next i
+              End If
+          Next evt
+          
+          Debug.Print "Generated " & g_ActiveSignals.Count & " signals"
+          Exit Sub
+          
+      ErrorHandler:
+          LogError "GenerateTradingSignals", Err.Description
+      End Sub
+      
+      Private Function GetAffectedSymbols(currency As String) As Variant
+          ' Map currency to trading symbols
+          Select Case currency
+              Case "USD"
+                  GetAffectedSymbols = Array("EURUSD", "GBPUSD", "USDJPY", _
+                                           "USDCHF", "USDCAD")
+              Case "EUR"
+                  GetAffectedSymbols = Array("EURUSD", "EURJPY", "EURGBP", _
+                                           "EURCHF", "EURAUD")
+              Case "GBP"
+                  GetAffectedSymbols = Array("GBPUSD", "EURGBP", "GBPJPY", _
+                                           "GBPCHF", "GBPAUD")
+              Case Else
+                  GetAffectedSymbols = Array() ' No symbols
+          End Select
+      End Function
+
+verification: "Signals generated correctly for calendar events"
+Quality Assurance Plan
+yamltesting_framework:
+  unit_tests:
+    - test: "Event import validation"
+      verify:
+        - "All fields parsed correctly"
+        - "Invalid data rejected"
+        - "Duplicates handled"
+        
+    - test: "Signal generation rules"
+      verify:
+        - "High impact → larger position"
+        - "Correct symbol mapping"
+        - "Timing calculations accurate"
+        
+    - test: "File operations"
+      verify:
+        - "JSON files created"
+        - "Correct file naming"
+        - "Path handling robust"
+        
+  integration_tests:
+    - test: "End-to-end signal flow"
+      steps:
+        1. "Import calendar CSV"
+        2. "Generate signals"
+        3. "Verify JSON files created"
+        4. "Confirm EA picks up signals"
+
+Development Blueprint: Signal Processing Bridge
+Component Metadata
+yamlcomponent_metadata:
+  name: "HUEY_P_SignalBridge"
+  type: "Bridge_DLL"
+  criticality: "High"
+  technology_stack: "C++"
+  deployment_target: "Windows_Service"
+  version: "1.0.0"
+  architecture: "Multi-threaded signal router"
+Functional Specification
+yamlpurpose_statement:
+  primary_function: "High-performance bridge for signal routing between calendar system and MT4 EA"
+  business_value: "Ensures reliable, low-latency signal delivery with failover capabilities"
+  integration_role: "Communication layer between VBA calendar system and MQL4 execution engine"
+
+dependencies:
+  upstream_components:
+    - "Economic Calendar System (VBA)"
+    - "External signal providers (optional)"
+  downstream_components:
+    - "MT4 Execution Engine"
+    - "Monitoring system"
+    
+interfaces:
+  input_specifications:
+    - name: "File Monitor"
+      path: "C:/Signals/Input/"
+      format: "JSON signal files"
+      polling: "100ms"
+      
+    - name: "Socket Server"
+      port: 5555
+      protocol: "TCP"
+      format: "JSON messages"
+      
+  output_specifications:
+    - name: "MT4 Signal Files"
+      path: "C:/MT4/MQL4/Files/signals/"
+      format: "JSON"
+      
+    - name: "Response Files"
+      path: "C:/Signals/Responses/"
+      format: "JSON with execution status"
+Implementation Blueprint
+Implementation Steps
+Step 1: Create DLL Project Structure
+yamlaction: "Set up C++ DLL project with CMake"
+deliverable: "HUEY_P_SignalBridge.dll"
+project_structure:
+  - CMakeLists.txt
+  - src/
+    - main.cpp
+    - SignalBridge.h
+    - SignalBridge.cpp
+    - FileMonitor.h
+    - FileMonitor.cpp
+    - SocketServer.h
+    - SocketServer.cpp
+    - SignalValidator.h
+    - SignalValidator.cpp
+    - Logger.h
+    - Logger.cpp
+  - include/
+    - json.hpp
+    - thread_pool.hpp
+  - config/
+    - bridge_config.yaml
+
+cmake_configuration: |
+  cmake_minimum_required(VERSION 3.16)
+  project(HUEY_P_SignalBridge VERSION 1.0.0)
+  
+  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+  
+  # Find packages
+  find_package(Threads REQUIRED)
+  find_package(Boost REQUIRED COMPONENTS system filesystem)
+  
+  # Add library
+  add_library(HUEY_P_SignalBridge SHARED
+      src/main.cpp
+      src/SignalBridge.cpp
+      src/FileMonitor.cpp
+      src/SocketServer.cpp
+      src/SignalValidator.cpp
+      src/Logger.cpp
+  )
+  
+  # Include directories
+  target_include_directories(HUEY_P_SignalBridge
+      PUBLIC include
+      PRIVATE src
+  )
+  
+  # Link libraries
+  target_link_libraries(HUEY_P_SignalBridge
+      PRIVATE Threads::Threads
+      PRIVATE Boost::system
+      PRIVATE Boost::filesystem
+  )
+
+verification: "Project builds successfully with CMake"
+Step 2: Implement Core Signal Bridge
+yamlaction: "Create main signal routing engine"
+code_requirements:
+  - class: "SignalBridge"
+  - implementation: |
+      // SignalBridge.h
+      #pragma once
+      #include <memory>
+      #include <atomic>
+      #include <thread>
+      #include <queue>
+      #include <mutex>
+      #include "FileMonitor.h"
+      #include "SocketServer.h"
+      #include "SignalValidator.h"
+      
+      class SignalBridge {
+      public:
+          SignalBridge();
+          ~SignalBridge();
+          
+          bool Initialize(const std::string& configPath);
+          bool Start();
+          void Stop();
+          bool IsRunning() const { return m_running.load(); }
+          
+      private:
+          // Core components
+          std::unique_ptr<FileMonitor> m_fileMonitor;
+          std::unique_ptr<SocketServer> m_socketServer;
+          std::unique_ptr<SignalValidator> m_validator;
+          
+          // Threading
+          std::atomic<bool> m_running{false};
+          std::thread m_processingThread;
+          
+          // Signal queue
+          std::queue<Signal> m_signalQueue;
+          std::mutex m_queueMutex;
+          std::condition_variable m_queueCV;
+          
+          // Configuration
+          struct Config {
+              std::string inputPath;
+              std::string outputPath;
+              std::string responsePath;
+              int socketPort;
+              int maxQueueSize;
+              int processingIntervalMs;
+          } m_config;
+          
+          // Methods
+          void ProcessingLoop();
+          bool ProcessSignal(const Signal& signal);
+          bool WriteSignalToMT4(const Signal& signal);
+          void SendResponse(const Signal& signal, bool success);
+      };
+      
+      // SignalBridge.cpp
+      bool SignalBridge::Initialize(const std::string& configPath) {
+          try {
+              // Load configuration
+              LoadConfiguration(configPath, m_config);
+              
+              // Initialize components
+              m_fileMonitor = std::make_unique<FileMonitor>();
+              m_fileMonitor->Initialize(m_config.inputPath,
+                  [this](const std::string& filePath) {
+                      OnNewSignalFile(filePath);
+                  });
+              
+              m_socketServer = std::make_unique<SocketServer>();
+              m_socketServer->Initialize(m_config.socketPort,
+                  [this](const std::string& message) {
+                      OnSocketMessage(message);
+                  });
+              
+              m_validator = std::make_unique<SignalValidator>();
+              m_validator->LoadRules("config/validation_rules.yaml");
+              
+              LOG_INFO("Signal Bridge initialized successfully");
+              return true;
+          }
+          catch (const std::exception& e) {
+              LOG_ERROR("Initialization failed: " + std::string(e.what()));
+              return false;
+          }
+      }
+
+verification: "Signal bridge initializes all components"
+Step 3: Implement High-Performance File Monitor
+yamlaction: "Create file monitoring system with minimal latency"
+code_requirements:
+  - class: "FileMonitor"
+  - features:
+    - "Directory watching"
+    - "File change detection"
+    - "Atomic file operations"
+  - implementation: |
+      // FileMonitor.cpp
+      #include "FileMonitor.h"
+      #include <boost/filesystem.hpp>
+      #include <chrono>
+      
+      namespace fs = boost::filesystem;
+      
+      void FileMonitor::MonitoringLoop() {
+          std::unordered_map<std::string, std::time_t> fileTimestamps;
+          
+          while (m_running.load()) {
+              try {
+                  // Scan directory
+                  for (const auto& entry : fs::directory_iterator(m_watchPath)) {
+                      if (fs::is_regular_file(entry.path()) &&
+                          entry.path().extension() == ".json") {
+                          
+                          std::string filePath = entry.path().string();
+                          std::time_t modTime = fs::last_write_time(entry.path());
+                          
+                          // Check if new or modified
+                          auto it = fileTimestamps.find(filePath);
+                          if (it == fileTimestamps.end() || it->second < modTime) {
+                              fileTimestamps[filePath] = modTime;
+                              
+                              // Process new signal file
+                              if (m_callback) {
+                                  m_callback(filePath);
+                              }
+                              
+                              // Move to processed folder
+                              MoveToProcessed(filePath);
+                          }
+                      }
+                  }
+              }
+              catch (const std::exception& e) {
+                  LOG_ERROR("File monitoring error: " + std::string(e.what()));
+              }
+              
+              // Sleep for polling interval
+              std::this_thread::sleep_for(
+                  std::chrono::milliseconds(m_pollingIntervalMs));
+          }
+      }
+
+verification: "File monitor detects new files within 100ms"
+Quality Assurance Plan
+yamltesting_framework:
+  unit_tests:
+    - test: "Signal validation"
+      scenarios:
+        - "Valid signal passes"
+        - "Invalid JSON rejected"
+        - "Missing fields caught"
+        - "Out-of-range values"
+        
+    - test: "Queue management"
+      verify:
+        - "FIFO ordering maintained"
+        - "Queue overflow handled"
+        - "Thread safety verified"
+        
+  performance_tests:
+    - test: "Latency measurement"
+      requirement: "< 10ms from file detection to MT4 delivery"
+      load: "100 signals/second"
+      
+    - test: "Throughput test"
+      requirement: "> 1000 signals/second sustained"
+      duration: "60 minutes"
+      
+  stress_tests:
+    - test: "Component failure"
+      scenarios:
+        - "Socket server crash"
+        - "File system full"
+        - "MT4 folder locked"
+      verify: "Graceful degradation and recovery"
+Deployment Instructions
+yamldeployment_steps:
+  1_build:
+    - "Run CMake build in Release mode"
+    - "Run full test suite"
+    - "Generate deployment package"
+    
+  2_install:
+    - "Copy DLL to C:/HUEY_P/Bridge/"
+    - "Install as Windows Service"
+    - "Configure auto-start on boot"
+    - "Set up log rotation"
+    
+  3_configuration:
+    - "Deploy bridge_config.yaml"
+    - "Set folder permissions"
+    - "Configure firewall for socket"
+    
+  4_validation:
+    - "Verify service running"
+    - "Test file monitoring"
+    - "Confirm MT4 connectivity"
+    - "Check performance metrics"
+

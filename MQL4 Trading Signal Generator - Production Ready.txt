@@ -1,0 +1,1201 @@
+//+------------------------------------------------------------------+
+//| Professional Trading Signal Generator - MQL4 Compatible Only    |
+//| Production-ready module with comprehensive risk management      |
+//| Version: 3.0 - Optimized for VPS deployment                    |
+//+------------------------------------------------------------------+
+#property copyright "Trading System Pro"
+#property version   "3.00"
+#property strict
+
+//--- Input Parameters (User Configurable)
+input double RiskPercentPerTrade = 2.0;      // Risk percentage per trade
+input double MinSignalConfidence = 0.75;     // Minimum confidence level (0.0-1.0)
+input int SignalCooldownSeconds = 300;       // Minimum time between signals
+input bool EnableAdvancedLogging = true;     // Enable detailed logging
+input string SignalFilePath = "signals\\";   // Signal CSV file directory
+input int MagicNumberBase = 20000;           // Base magic number for trades
+input double MaxSpreadPips = 3.5;            // Maximum allowed spread
+input bool EnableRiskManagement = true;      // Enable comprehensive risk controls
+input double MaxDailyLossPercent = 5.0;      // Maximum daily loss percentage
+input double StopLossATRMultiplier = 2.5;    // Stop loss distance (ATR multiplier)
+input double TakeProfitATRMultiplier = 4.0;  // Take profit distance (ATR multiplier)
+input int MaxTradesPerDay = 8;               // Maximum trades per trading day
+input double ConfidenceBoostFactor = 1.2;    // Confidence boost for strong signals
+input bool EnableMultiTimeframeAnalysis = true; // Enable HTF confirmation
+
+//--- Global State Variables
+string g_CurrentSymbol;
+string g_SignalCSVFile;
+string g_ResponseCSVFile;
+datetime g_LastSignalTime = 0;
+datetime g_LastDayReset = 0;
+int g_UniqueMagicNumber;
+double g_DailyStartingBalance = 0;
+int g_TodaySignalCount = 0;
+int g_TodayTradeCount = 0;
+bool g_SystemInitialized = false;
+
+//--- Technical Analysis Structures
+struct MarketConditions {
+    double price_current;
+    double ma_fast_h1;
+    double ma_slow_h1;
+    double ma_fast_h4;
+    double ma_slow_h4;
+    double rsi_value;
+    double atr_current;
+    double spread_pips;
+    double volatility_ratio;
+    bool trend_bullish;
+    bool trend_bearish;
+    bool momentum_strong;
+    int trading_session;
+};
+
+struct TradingSignalData {
+    string unique_id;
+    string symbol_pair;
+    string trade_direction;
+    double confidence_score;
+    string generation_time;
+    string strategy_used;
+    string technical_data;
+    bool is_valid;
+};
+
+struct TradeExecutionData {
+    string signal_reference;
+    string order_reference;
+    string execution_result;
+    double fill_price;
+    string execution_time;
+    string error_details;
+    double position_size;
+    int magic_reference;
+    double slippage_points;
+};
+
+//+------------------------------------------------------------------+
+//| Initialize signal generator for specific trading pair           |
+//+------------------------------------------------------------------+
+int InitializeSignalGenerator(string trading_pair, int magic_base = 0) {
+    // Set symbol and file paths
+    g_CurrentSymbol = trading_pair;
+    
+    // Generate unique magic number
+    int symbol_hash = 0;
+    for(int i = 0; i < StringLen(trading_pair); i++) {
+        symbol_hash += StringGetChar(trading_pair, i);
+    }
+    
+    if(magic_base == 0) magic_base = MagicNumberBase;
+    g_UniqueMagicNumber = magic_base + (symbol_hash % 9999);
+    
+    // Set CSV file paths
+    g_SignalCSVFile = SignalFilePath + trading_pair + "_signals.csv";
+    g_ResponseCSVFile = StringReplace(g_SignalCSVFile, "signals", "responses");
+    g_ResponseCSVFile = StringReplace(g_ResponseCSVFile, "_signals.csv", "_responses.csv");
+    
+    // Initialize daily tracking
+    ResetDailyCountersIfNewDay();
+    
+    // Create CSV headers if needed
+    if(!CreateSignalFileHeader()) {
+        Print("CRITICAL ERROR: Cannot initialize signal file for ", trading_pair);
+        return -1;
+    }
+    
+    if(!CreateResponseFileHeader()) {
+        Print("CRITICAL ERROR: Cannot initialize response file for ", trading_pair);
+        return -1;
+    }
+    
+    g_SystemInitialized = true;
+    
+    if(EnableAdvancedLogging) {
+        Print("=== SIGNAL GENERATOR INITIALIZED ===");
+        Print("Symbol: ", trading_pair);
+        Print("Magic Number: ", g_UniqueMagicNumber);
+        Print("Signal File: ", g_SignalCSVFile);
+        Print("Response File: ", g_ResponseCSVFile);
+        Print("Risk Per Trade: ", RiskPercentPerTrade, "%");
+        Print("Min Confidence: ", MinSignalConfidence);
+        Print("=====================================");
+    }
+    
+    return 0;
+}
+
+//+------------------------------------------------------------------+
+//| Reset daily counters at start of new trading day               |
+//+------------------------------------------------------------------+
+void ResetDailyCountersIfNewDay() {
+    datetime current_day = iTime(Symbol(), PERIOD_D1, 0);
+    
+    if(current_day != g_LastDayReset) {
+        g_DailyStartingBalance = AccountBalance();
+        g_LastDayReset = current_day;
+        g_TodaySignalCount = 0;
+        g_TodayTradeCount = 0;
+        
+        if(EnableAdvancedLogging) {
+            Print("=== NEW TRADING DAY ===");
+            Print("Date: ", TimeToString(current_day, TIME_DATE));
+            Print("Starting Balance: $", DoubleToString(g_DailyStartingBalance, 2));
+            Print("Counters Reset: Signals=0, Trades=0");
+            Print("=======================");
+        }
+    }
+}
+
+//+------------------------------------------------------------------+
+//| Create signal CSV file with proper headers                      |
+//+------------------------------------------------------------------+
+bool CreateSignalFileHeader() {
+    // Check if file exists and has content
+    int file_handle = FileOpen(g_SignalCSVFile, FILE_READ|FILE_CSV);
+    if(file_handle != INVALID_HANDLE) {
+        if(FileSize(file_handle) > 100) { // Has meaningful content
+            FileClose(file_handle);
+            return true;
+        }
+        FileClose(file_handle);
+    }
+    
+    // Create new file with headers
+    file_handle = FileOpen(g_SignalCSVFile, FILE_WRITE|FILE_CSV);
+    if(file_handle == INVALID_HANDLE) {
+        Print("ERROR: Cannot create signal file: ", g_SignalCSVFile);
+        Print("Error Code: ", GetLastError());
+        return false;
+    }
+    
+    // Write CSV headers
+    FileWrite(file_handle, "signal_id", "symbol", "direction", "confidence",
+              "timestamp", "strategy", "metadata");
+    FileClose(file_handle);
+    
+    return true;
+}
+
+//+------------------------------------------------------------------+
+//| Create response CSV file with proper headers                    |
+//+------------------------------------------------------------------+
+bool CreateResponseFileHeader() {
+    // Check if file exists and has content
+    int file_handle = FileOpen(g_ResponseCSVFile, FILE_READ|FILE_CSV);
+    if(file_handle != INVALID_HANDLE) {
+        if(FileSize(file_handle) > 100) { // Has meaningful content
+            FileClose(file_handle);
+            return true;
+        }
+        FileClose(file_handle);
+    }
+    
+    // Create new file with headers
+    file_handle = FileOpen(g_ResponseCSVFile, FILE_WRITE|FILE_CSV);
+    if(file_handle == INVALID_HANDLE) {
+        Print("ERROR: Cannot create response file: ", g_ResponseCSVFile);
+        Print("Error Code: ", GetLastError());
+        return false;
+    }
+    
+    // Write CSV headers
+    FileWrite(file_handle, "signal_id", "order_ticket", "status", "price",
+              "timestamp", "error_msg", "lot_size", "magic_num", "slippage");
+    FileClose(file_handle);
+    
+    return true;
+}
+
+//+------------------------------------------------------------------+
+//| Get comprehensive market analysis                               |
+//+------------------------------------------------------------------+
+MarketConditions AnalyzeMarketConditions() {
+    MarketConditions market;
+    
+    // Current price and spread
+    market.price_current = iClose(g_CurrentSymbol, PERIOD_H1, 0);
+    market.spread_pips = (Ask - Bid) / Point;
+    
+    // Moving averages for trend analysis
+    market.ma_fast_h1 = iMA(g_CurrentSymbol, PERIOD_H1, 21, 0, MODE_EMA, PRICE_CLOSE, 0);
+    market.ma_slow_h1 = iMA(g_CurrentSymbol, PERIOD_H1, 55, 0, MODE_EMA, PRICE_CLOSE, 0);
+    market.ma_fast_h4 = iMA(g_CurrentSymbol, PERIOD_H4, 21, 0, MODE_EMA, PRICE_CLOSE, 0);
+    market.ma_slow_h4 = iMA(g_CurrentSymbol, PERIOD_H4, 55, 0, MODE_EMA, PRICE_CLOSE, 0);
+    
+    // Momentum indicators
+    market.rsi_value = iRSI(g_CurrentSymbol, PERIOD_H1, 14, PRICE_CLOSE, 0);
+    market.atr_current = iATR(g_CurrentSymbol, PERIOD_H1, 14, 0);
+    
+    // Volatility analysis
+    if(market.price_current > 0) {
+        market.volatility_ratio = market.atr_current / market.price_current;
+    } else {
+        market.volatility_ratio = 0;
+    }
+    
+    // Trend determination
+    market.trend_bullish = (market.ma_fast_h1 > market.ma_slow_h1) && 
+                          (market.price_current > market.ma_fast_h1);
+    market.trend_bearish = (market.ma_fast_h1 < market.ma_slow_h1) && 
+                          (market.price_current < market.ma_fast_h1);
+    
+    // Momentum strength analysis
+    market.momentum_strong = false;
+    if(market.trend_bullish && market.rsi_value > 55 && market.rsi_value < 75) {
+        market.momentum_strong = true;
+    } else if(market.trend_bearish && market.rsi_value < 45 && market.rsi_value > 25) {
+        market.momentum_strong = true;
+    }
+    
+    // Trading session identification
+    int current_hour = TimeHour(TimeCurrent());
+    if(current_hour >= 2 && current_hour < 8) {
+        market.trading_session = 1; // Asian session
+    } else if(current_hour >= 8 && current_hour < 16) {
+        market.trading_session = 2; // European session
+    } else if(current_hour >= 16 && current_hour < 22) {
+        market.trading_session = 3; // US session
+    } else {
+        market.trading_session = 0; // Quiet period
+    }
+    
+    return market;
+}
+
+//+------------------------------------------------------------------+
+//| Generate trading signal with advanced analysis                  |
+//+------------------------------------------------------------------+
+TradingSignalData GenerateTradingSignal(string strategy_name = "ema_rsi_momentum") {
+    TradingSignalData signal;
+    
+    // Initialize signal with defaults
+    signal.unique_id = "";
+    signal.symbol_pair = g_CurrentSymbol;
+    signal.trade_direction = "HOLD";
+    signal.confidence_score = 0.0;
+    signal.generation_time = TimeToString(TimeCurrent(), TIME_DATE|TIME_SECONDS);
+    signal.strategy_used = strategy_name;
+    signal.technical_data = "";
+    signal.is_valid = false;
+    
+    // Check system initialization
+    if(!g_SystemInitialized) {
+        return signal;
+    }
+    
+    // Reset daily counters if new day
+    ResetDailyCountersIfNewDay();
+    
+    // Check signal cooldown period
+    if(TimeCurrent() - g_LastSignalTime < SignalCooldownSeconds) {
+        return signal; // Too soon for new signal
+    }
+    
+    // Validate market conditions
+    if(!ValidateMarketConditions()) {
+        return signal; // Market not suitable for trading
+    }
+    
+    // Get market analysis
+    MarketConditions market = AnalyzeMarketConditions();
+    
+    // Check spread condition
+    if(market.spread_pips > MaxSpreadPips) {
+        if(EnableAdvancedLogging) {
+            Print("Signal blocked: Spread too wide (", 
+                  DoubleToString(market.spread_pips, 1), " > ", 
+                  DoubleToString(MaxSpreadPips, 1), " pips)");
+        }
+        return signal;
+    }
+    
+    // Generate signal based on strategy
+    string direction = "HOLD";
+    double confidence = 0.0;
+    
+    // EMA + RSI + Momentum Strategy
+    if(market.trend_bullish && market.momentum_strong && 
+       market.rsi_value >= 45 && market.rsi_value <= 70) {
+        direction = "BUY";
+        confidence = CalculateSignalConfidence(market, true);
+    } else if(market.trend_bearish && market.momentum_strong && 
+              market.rsi_value <= 55 && market.rsi_value >= 30) {
+        direction = "SELL";
+        confidence = CalculateSignalConfidence(market, false);
+    }
+    
+    // Multi-timeframe confirmation
+    if(direction != "HOLD" && EnableMultiTimeframeAnalysis) {
+        if(!ConfirmWithHigherTimeframes(direction)) {
+            if(EnableAdvancedLogging) {
+                Print("Signal filtered: Higher timeframe not aligned");
+            }
+            return signal;
+        }
+    }
+    
+    // Validate confidence threshold
+    if(confidence >= MinSignalConfidence && direction != "HOLD") {
+        // Create valid signal
+        signal.unique_id = g_CurrentSymbol + "_" + 
+                          IntegerToString(TimeCurrent()) + "_" + 
+                          IntegerToString(g_TodaySignalCount + 1);
+        signal.trade_direction = direction;
+        signal.confidence_score = confidence;
+        signal.is_valid = true;
+        
+        // Build technical metadata
+        signal.technical_data = StringConcatenate(
+            "EMA_Fast:", DoubleToString(market.ma_fast_h1, 5),
+            ";EMA_Slow:", DoubleToString(market.ma_slow_h1, 5),
+            ";RSI:", DoubleToString(market.rsi_value, 2),
+            ";ATR:", DoubleToString(market.atr_current, 5),
+            ";Spread:", DoubleToString(market.spread_pips, 1),
+            ";Session:", IntegerToString(market.trading_session),
+            ";Volatility:", DoubleToString(market.volatility_ratio, 6)
+        );
+        
+        // Update tracking
+        g_LastSignalTime = TimeCurrent();
+        g_TodaySignalCount++;
+        
+        if(EnableAdvancedLogging) {
+            Print("=== TRADING SIGNAL GENERATED ===");
+            Print("Signal ID: ", signal.unique_id);
+            Print("Direction: ", direction);
+            Print("Confidence: ", DoubleToString(confidence, 3));
+            Print("Strategy: ", strategy_name);
+            Print("================================");
+        }
+    }
+    
+    return signal;
+}
+
+//+------------------------------------------------------------------+
+//| Calculate advanced signal confidence score                      |
+//+------------------------------------------------------------------+
+double CalculateSignalConfidence(MarketConditions &market, bool is_bullish_signal) {
+    double base_confidence = 0.6; // Starting confidence level
+    
+    // Factor 1: Trend strength (EMA separation)
+    double ema_separation = MathAbs(market.ma_fast_h1 - market.ma_slow_h1) / market.ma_slow_h1;
+    base_confidence += MathMin(ema_separation * 4.0, 0.15); // Max 0.15 boost
+    
+    // Factor 2: RSI position analysis
+    if(is_bullish_signal) {
+        if(market.rsi_value >= 45 && market.rsi_value <= 60) {
+            base_confidence += 0.12; // Optimal buy zone
+        } else if(market.rsi_value > 60 && market.rsi_value <= 70) {
+            base_confidence += 0.08; // Still acceptable
+        } else if(market.rsi_value > 70) {
+            base_confidence -= 0.10; // Overbought warning
+        }
+    } else {
+        if(market.rsi_value <= 55 && market.rsi_value >= 40) {
+            base_confidence += 0.12; // Optimal sell zone
+        } else if(market.rsi_value < 40 && market.rsi_value >= 30) {
+            base_confidence += 0.08; // Still acceptable
+        } else if(market.rsi_value < 30) {
+            base_confidence -= 0.10; // Oversold warning
+        }
+    }
+    
+    // Factor 3: Volatility assessment
+    if(market.volatility_ratio > 0.0008 && market.volatility_ratio < 0.004) {
+        base_confidence += 0.08; // Good volatility for trading
+    } else if(market.volatility_ratio >= 0.004) {
+        base_confidence -= 0.12; // Too volatile
+    } else if(market.volatility_ratio <= 0.0008) {
+        base_confidence -= 0.05; // Too quiet
+    }
+    
+    // Factor 4: Spread quality
+    if(market.spread_pips <= 2.0) {
+        base_confidence += 0.05; // Excellent spread
+    } else if(market.spread_pips > 3.0) {
+        base_confidence -= 0.08; // Poor spread
+    }
+    
+    // Factor 5: Trading session bonus
+    if(market.trading_session == 2 || market.trading_session == 3) {
+        base_confidence += 0.04; // Active trading sessions
+    } else if(market.trading_session == 0) {
+        base_confidence -= 0.08; // Quiet session
+    }
+    
+    // Factor 6: Momentum confirmation
+    if(market.momentum_strong) {
+        base_confidence += 0.06; // Strong momentum bonus
+    }
+    
+    // Apply confidence boost for exceptional signals
+    if(base_confidence > 0.85) {
+        base_confidence *= ConfidenceBoostFactor;
+    }
+    
+    // Ensure confidence stays within bounds
+    if(base_confidence > 1.0) base_confidence = 1.0;
+    if(base_confidence < 0.0) base_confidence = 0.0;
+    
+    return base_confidence;
+}
+
+//+------------------------------------------------------------------+
+//| Confirm signal with higher timeframes                          |
+//+------------------------------------------------------------------+
+bool ConfirmWithHigherTimeframes(string signal_direction) {
+    // H4 timeframe analysis
+    double ema_fast_h4 = iMA(g_CurrentSymbol, PERIOD_H4, 21, 0, MODE_EMA, PRICE_CLOSE, 0);
+    double ema_slow_h4 = iMA(g_CurrentSymbol, PERIOD_H4, 55, 0, MODE_EMA, PRICE_CLOSE, 0);
+    double price_h4 = iClose(g_CurrentSymbol, PERIOD_H4, 0);
+    
+    // Daily timeframe analysis
+    double ema_fast_d1 = iMA(g_CurrentSymbol, PERIOD_D1, 21, 0, MODE_EMA, PRICE_CLOSE, 0);
+    double ema_slow_d1 = iMA(g_CurrentSymbol, PERIOD_D1, 55, 0, MODE_EMA, PRICE_CLOSE, 0);
+    double price_d1 = iClose(g_CurrentSymbol, PERIOD_D1, 0);
+    
+    bool h4_bullish = (ema_fast_h4 > ema_slow_h4) && (price_h4 > ema_fast_h4);
+    bool h4_bearish = (ema_fast_h4 < ema_slow_h4) && (price_h4 < ema_fast_h4);
+    
+    bool d1_bullish = (ema_fast_d1 > ema_slow_d1) && (price_d1 > ema_fast_d1);
+    bool d1_bearish = (ema_fast_d1 < ema_slow_d1) && (price_d1 < ema_fast_d1);
+    
+    // Check alignment
+    if(signal_direction == "BUY") {
+        return h4_bullish && d1_bullish; // All timeframes bullish
+    } else if(signal_direction == "SELL") {
+        return h4_bearish && d1_bearish; // All timeframes bearish
+    }
+    
+    return false;
+}
+
+//+------------------------------------------------------------------+
+//| Validate current market conditions for trading                  |
+//+------------------------------------------------------------------+
+bool ValidateMarketConditions() {
+    // Check market hours
+    if(!IsMarketActiveForTrading()) return false;
+    
+    // Check connection status
+    if(!IsConnected()) return false;
+    
+    // Check trading context
+    if(IsTradeContextBusy()) return false;
+    
+    // Check daily loss limits
+    if(EnableRiskManagement && HasExceededDailyLossLimit()) return false;
+    
+    // Check daily trade limits
+    if(g_TodayTradeCount >= MaxTradesPerDay) {
+        if(EnableAdvancedLogging) {
+            Print("Daily trade limit reached: ", g_TodayTradeCount, "/", MaxTradesPerDay);
+        }
+        return false;
+    }
+    
+    // Check high impact news periods
+    if(IsHighImpactNewsTime()) return false;
+    
+    return true;
+}
+
+//+------------------------------------------------------------------+
+//| Check if market is active for trading                          |
+//+------------------------------------------------------------------+
+bool IsMarketActiveForTrading() {
+    datetime current_time = TimeCurrent();
+    int day_of_week = TimeDayOfWeek(current_time);
+    int hour = TimeHour(current_time);
+    
+    // Weekend check
+    if(day_of_week == 0 || day_of_week == 6) return false;
+    
+    // Friday evening close
+    if(day_of_week == 5 && hour >= 22) return false;
+    
+    // Sunday/Monday opening
+    if(day_of_week == 1 && hour < 1) return false;
+    
+    return true;
+}
+
+//+------------------------------------------------------------------+
+//| Check if daily loss limit exceeded                             |
+//+------------------------------------------------------------------+
+bool HasExceededDailyLossLimit() {
+    if(g_DailyStartingBalance <= 0) return false;
+    
+    double current_balance = AccountBalance();
+    double daily_loss_percent = (g_DailyStartingBalance - current_balance) / g_DailyStartingBalance * 100;
+    
+    if(daily_loss_percent > MaxDailyLossPercent) {
+        if(EnableAdvancedLogging) {
+            Print("RISK ALERT: Daily loss limit exceeded");
+            Print("Loss: ", DoubleToString(daily_loss_percent, 2), "% (Max: ", MaxDailyLossPercent, "%)");
+            Print("Trading suspended for remainder of day");
+        }
+        return true;
+    }
+    
+    return false;
+}
+
+//+------------------------------------------------------------------+
+//| Check for high impact news periods                             |
+//+------------------------------------------------------------------+
+bool IsHighImpactNewsTime() {
+    datetime current_time = TimeCurrent();
+    int day_of_week = TimeDayOfWeek(current_time);
+    int day_of_month = TimeDay(current_time);
+    int hour = TimeHour(current_time);
+    int minute = TimeMinute(current_time);
+    
+    // NFP Friday (first Friday of month)
+    if(day_of_week == 5 && day_of_month <= 7) {
+        if((hour == 13 && minute >= 25 && minute <= 35) || // 8:30 EST
+           (hour == 15 && minute >= 25 && minute <= 35)) { // 10:00 EST
+            return true;
+        }
+    }
+    
+    // FOMC announcements (2nd Wednesday, approximate)
+    if(day_of_week == 3 && day_of_month >= 8 && day_of_month <= 14) {
+        if(hour == 19 && minute >= 0 && minute <= 30) { // 2:00 PM EST
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+//+------------------------------------------------------------------+
+//| Write signal data to CSV file                                  |
+//+------------------------------------------------------------------+
+bool WriteSignalToCSV(TradingSignalData &signal) {
+    if(!signal.is_valid) return true; // Skip invalid signals
+    
+    int file_handle = FileOpen(g_SignalCSVFile, FILE_READ|FILE_WRITE|FILE_CSV);
+    if(file_handle == INVALID_HANDLE) {
+        Print("ERROR: Cannot open signal file: ", g_SignalCSVFile);
+        Print("Error Code: ", GetLastError());
+        return false;
+    }
+    
+    // Move to end for append
+    FileSeek(file_handle, 0, SEEK_END);
+    
+    // Write signal data
+    FileWrite(file_handle, 
+              signal.unique_id,
+              signal.symbol_pair,
+              signal.trade_direction,
+              DoubleToString(signal.confidence_score, 4),
+              signal.generation_time,
+              signal.strategy_used,
+              signal.technical_data);
+    
+    FileClose(file_handle);
+    
+    if(EnableAdvancedLogging) {
+        Print("Signal written to CSV: ", signal.unique_id);
+    }
+    
+    return true;
+}
+
+//+------------------------------------------------------------------+
+//| Write response data to CSV file                                |
+//+------------------------------------------------------------------+
+bool WriteResponseToCSV(TradeExecutionData &response) {
+    int file_handle = FileOpen(g_ResponseCSVFile, FILE_READ|FILE_WRITE|FILE_CSV);
+    if(file_handle == INVALID_HANDLE) {
+        Print("ERROR: Cannot open response file: ", g_ResponseCSVFile);
+        Print("Error Code: ", GetLastError());
+        return false;
+    }
+    
+    // Move to end for append
+    FileSeek(file_handle, 0, SEEK_END);
+    
+    // Write response data
+    FileWrite(file_handle,
+              response.signal_reference,
+              response.order_reference,
+              response.execution_result,
+              DoubleToString(response.fill_price, 5),
+              response.execution_time,
+              response.error_details,
+              DoubleToString(response.position_size, 2),
+              IntegerToString(response.magic_reference),
+              DoubleToString(response.slippage_points, 1));
+    
+    FileClose(file_handle);
+    
+    if(EnableAdvancedLogging) {
+        Print("Response written to CSV: ", response.signal_reference);
+    }
+    
+    return true;
+}
+
+//+------------------------------------------------------------------+
+//| Execute trade from signal with comprehensive risk management    |
+//+------------------------------------------------------------------+
+TradeExecutionData ExecuteTradeFromSignal(TradingSignalData &signal) {
+    TradeExecutionData execution;
+    
+    // Initialize execution data
+    execution.signal_reference = signal.unique_id;
+    execution.order_reference = "";
+    execution.execution_result = "FAILED";
+    execution.fill_price = 0.0;
+    execution.execution_time = TimeToString(TimeCurrent(), TIME_DATE|TIME_SECONDS);
+    execution.error_details = "";
+    execution.position_size = 0.0;
+    execution.magic_reference = g_UniqueMagicNumber;
+    execution.slippage_points = 3.0;
+    
+    // Validate signal
+    if(!signal.is_valid || signal.trade_direction == "HOLD") {
+        execution.error_details = "Invalid or HOLD signal";
+        return execution;
+    }
+    
+    // Check trading permissions
+    if(!IsTradeAllowed()) {
+        execution.error_details = "Trading not allowed by broker";
+        return execution;
+    }
+    
+    // Calculate position size
+    double lot_size = CalculateOptimalPositionSize(signal);
+    execution.position_size = lot_size;
+    
+    if(lot_size <= 0) {
+        execution.error_details = "Invalid position size calculation";
+        return execution;
+    }
+    
+    // Determine order parameters
+    int order_type = (signal.trade_direction == "BUY") ? OP_BUY : OP_SELL;
+    double entry_price = (signal.trade_direction == "BUY") ? Ask : Bid;
+    
+    // Calculate stop loss and take profit
+    double stop_loss = 0;
+    double take_profit = 0;
+    CalculateStopLevels(signal.trade_direction, entry_price, stop_loss, take_profit);
+    
+    // Create order comment
+    string order_comment = StringConcatenate("SIG_", signal.unique_id);
+    if(StringLen(order_comment) > 31) {
+        order_comment = StringSubstr(order_comment, 0, 31);
+    }
+    
+    // Execute the trade
+    int ticket = OrderSend(g_CurrentSymbol, order_type, lot_size, entry_price,
+                          (int)execution.slippage_points, stop_loss, take_profit,
+                          order_comment, g_UniqueMagicNumber, 0, clrNONE);
+    
+    if(ticket > 0) {
+        execution.order_reference = IntegerToString(ticket);
+        execution.execution_result = "EXECUTED";
+        execution.fill_price = entry_price;
+        execution.error_details = "Trade executed successfully";
+        g_TodayTradeCount++;
+        
+        if(EnableAdvancedLogging) {
+            Print("=== TRADE EXECUTED ===");
+            Print("Ticket: #", ticket);
+            Print("Direction: ", signal.trade_direction);
+            Print("Price: ", DoubleToString(entry_price, 5));
+            Print("Lot Size: ", DoubleToString(lot_size, 2));
+            Print("Stop Loss: ", DoubleToString(stop_loss, 5));
+            Print("Take Profit: ", DoubleToString(take_profit, 5));
+            Print("Confidence: ", DoubleToString(signal.confidence_score, 3));
+            Print("======================");
+        }
+    } else {
+        int error_code = GetLastError();
+        execution.error_details = StringConcatenate("Order failed - Error: ", 
+                                                   IntegerToString(error_code), 
+                                                   " - ", GetErrorDescription(error_code));
+        
+        if(EnableAdvancedLogging) {
+            Print("TRADE EXECUTION FAILED: ", execution.error_details);
+        }
+    }
+    
+    return execution;
+}
+
+//+------------------------------------------------------------------+
+//| Calculate optimal position size with advanced risk management   |
+//+------------------------------------------------------------------+
+double CalculateOptimalPositionSize(TradingSignalData &signal) {
+    double account_balance = AccountBalance();
+    double risk_amount = account_balance * (RiskPercentPerTrade / 100.0);
+    
+    // Get market information
+    double tick_size = MarketInfo(g_CurrentSymbol, MODE_TICKSIZE);
+    double tick_value = MarketInfo(g_CurrentSymbol, MODE_TICKVALUE);
+    double min_lot = MarketInfo(g_CurrentSymbol, MODE_MINLOT);
+    double max_lot = MarketInfo(g_CurrentSymbol, MODE_MAXLOT);
+    double lot_step = MarketInfo(g_CurrentSymbol, MODE_LOTSTEP);
+    
+    // Validate market info
+    if(tick_value <= 0) tick_value = 1.0;
+    if(tick_size <= 0) tick_size = Point;
+    
+    // Calculate stop loss distance in points
+    double atr = iATR(g_CurrentSymbol, PERIOD_H1, 14, 0);
+    double stop_distance = atr * StopLossATRMultiplier;
+    double stop_points = stop_distance / Point;
+    
+    // Calculate lot size based on risk
+    double point_value = tick_value * (Point / tick_size);
+    double calculated_lot_size = risk_amount / (stop_points * point_value);
+    
+    // Apply confidence scaling
+    calculated_lot_size = calculated_lot_size * signal.confidence_score;
+    
+    // Apply broker constraints
+    if(calculated_lot_size < min_lot) calculated_lot_size = min_lot;
+    if(calculated_lot_size > max_lot) calculated_lot_size = max_lot;
+    
+    // Round to lot step
+    calculated_lot_size = MathRound(calculated_lot_size / lot_step) * lot_step;
+    
+    // Safety limit - maximum 15% of balance risk
+    double max_safe_lot = (account_balance * 0.15) / (stop_points * point_value);
+    if(calculated_lot_size > max_safe_lot) {
+        calculated_lot_size = max_safe_lot;
+        calculated_lot_size = MathRound(calculated_lot_size / lot_step) * lot_step;
+    }
+    
+    // Final validation
+    if(calculated_lot_size < min_lot) calculated_lot_size = min_lot;
+    if(calculated_lot_size > max_lot) calculated_lot_size = max_lot;
+    
+    return calculated_lot_size;
+}
+
+//+------------------------------------------------------------------+
+//| Calculate stop loss and take profit levels                     |
+//+------------------------------------------------------------------+
+void CalculateStopLevels(string trade_direction, double entry_price, double &stop_loss, double &take_profit) {
+    double atr = iATR(g_CurrentSymbol, PERIOD_H1, 14, 0);
+    double stop_distance = atr * StopLossATRMultiplier;
+    double profit_distance = atr * TakeProfitATRMultiplier;
+    
+    if(trade_direction == "BUY") {
+        stop_loss = entry_price - stop_distance;
+        take_profit = entry_price + profit_distance;
+    } else if(trade_direction == "SELL") {
+        stop_loss = entry_price + stop_distance;
+        take_profit = entry_price - profit_distance;
+    }
+    
+    // Ensure minimum distance from current price
+    double min_stop_level = MarketInfo(g_CurrentSymbol, MODE_STOPLEVEL) * Point;
+    
+    if(trade_direction == "BUY") {
+        if(stop_loss > entry_price - min_stop_level) {
+            stop_loss = entry_price - min_stop_level;
+        }
+        if(take_profit < entry_price + min_stop_level) {
+            take_profit = entry_price + min_stop_level;
+        }
+    } else {
+        if(stop_loss < entry_price + min_stop_level) {
+            stop_loss = entry_price + min_stop_level;
+        }
+        if(take_profit > entry_price - min_stop_level) {
+            take_profit = entry_price - min_stop_level;
+        }
+    }
+}
+
+//+------------------------------------------------------------------+
+//| Get descriptive error message                                   |
+//+------------------------------------------------------------------+
+string GetErrorDescription(int error_code) {
+    string error_text;
+    
+    switch(error_code) {
+        case 0:    error_text = "No error"; break;
+        case 1:    error_text = "No error returned"; break;
+        case 2:    error_text = "Common error"; break;
+        case 3:    error_text = "Invalid trade parameters"; break;
+        case 4:    error_text = "Trade server busy"; break;
+        case 5:    error_text = "Old terminal version"; break;
+        case 6:    error_text = "No connection to trade server"; break;
+        case 7:    error_text = "Not enough rights"; break;
+        case 8:    error_text = "Too frequent requests"; break;
+        case 9:    error_text = "Malfunctional trade operation"; break;
+        case 64:   error_text = "Account disabled"; break;
+        case 65:   error_text = "Invalid account"; break;
+        case 128:  error_text = "Trade timeout"; break;
+        case 129:  error_text = "Invalid price"; break;
+        case 130:  error_text = "Invalid stops"; break;
+        case 131:  error_text = "Invalid trade volume"; break;
+        case 132:  error_text = "Market closed"; break;
+        case 133:  error_text = "Trade disabled"; break;
+        case 134:  error_text = "Not enough money"; break;
+        case 135:  error_text = "Price changed"; break;
+        case 136:  error_text = "Off quotes"; break;
+        case 137:  error_text = "Broker busy"; break;
+        case 138:  error_text = "Requote"; break;
+        case 139:  error_text = "Order locked"; break;
+        case 140:  error_text = "Long positions only"; break;
+        case 141:  error_text = "Too many requests"; break;
+        case 145:  error_text = "Modification denied - too close to market"; break;
+        case 146:  error_text = "Trade context busy"; break;
+        case 147:  error_text = "Expirations denied"; break;
+        case 148:  error_text = "Too many open orders"; break;
+        default:   error_text = "Unknown error " + IntegerToString(error_code);
+    }
+    
+    return error_text;
+}
+
+//+------------------------------------------------------------------+
+//| Main signal processing function - call from EA OnTick()        |
+//+------------------------------------------------------------------+
+int ProcessTradingSignals(string strategy_type = "ema_rsi_momentum") {
+    // Check system initialization
+    if(!g_SystemInitialized) {
+        Print("ERROR: Signal generator not initialized. Call InitializeSignalGenerator() first.");
+        return -1;
+    }
+    
+    // Update daily tracking
+    ResetDailyCountersIfNewDay();
+    
+    // Generate trading signal
+    TradingSignalData signal = GenerateTradingSignal(strategy_type);
+    
+    // Process valid signals
+    if(signal.is_valid) {
+        // Write signal to CSV
+        if(!WriteSignalToCSV(signal)) {
+            Print("ERROR: Failed to write signal to CSV file");
+            return -1;
+        }
+        
+        // Execute trade and record response
+        TradeExecutionData execution = ExecuteTradeFromSignal(signal);
+        if(!WriteResponseToCSV(execution)) {
+            Print("ERROR: Failed to write execution response to CSV file");
+            return -1;
+        }
+        
+        return 1; // Signal processed successfully
+    }
+    
+    return 0; // No signal generated (normal condition)
+}
+
+//+------------------------------------------------------------------+
+//| Get comprehensive trading statistics                            |
+//+------------------------------------------------------------------+
+string GetDetailedTradingStats() {
+    string stats = StringConcatenate(
+        "=== TRADING STATISTICS FOR ", g_CurrentSymbol, " ===\n",
+        "System Status: ", (g_SystemInitialized ? "ACTIVE" : "INACTIVE"), "\n",
+        "Last Signal: ", TimeToString(g_LastSignalTime, TIME_DATE|TIME_SECONDS), "\n",
+        "Magic Number: ", IntegerToString(g_UniqueMagicNumber), "\n",
+        "Today Signals: ", IntegerToString(g_TodaySignalCount), "\n",
+        "Today Trades: ", IntegerToString(g_TodayTradeCount), "\n",
+        "Max Daily Trades: ", IntegerToString(MaxTradesPerDay), "\n"
+    );
+    
+    // Account information
+    double current_balance = AccountBalance();
+    double daily_pnl = current_balance - g_DailyStartingBalance;
+    double daily_pnl_percent = 0;
+    if(g_DailyStartingBalance > 0) {
+        daily_pnl_percent = (daily_pnl / g_DailyStartingBalance) * 100;
+    }
+    
+    stats = StringConcatenate(stats,
+        "Starting Balance: $", DoubleToString(g_DailyStartingBalance, 2), "\n",
+        "Current Balance: $", DoubleToString(current_balance, 2), "\n",
+        "Daily P&L: $", DoubleToString(daily_pnl, 2), 
+        " (", DoubleToString(daily_pnl_percent, 2), "%)\n"
+    );
+    
+    // Risk parameters
+    stats = StringConcatenate(stats,
+        "Risk Per Trade: ", DoubleToString(RiskPercentPerTrade, 1), "%\n",
+        "Min Confidence: ", DoubleToString(MinSignalConfidence, 2), "\n",
+        "Max Spread: ", DoubleToString(MaxSpreadPips, 1), " pips\n",
+        "Max Daily Loss: ", DoubleToString(MaxDailyLossPercent, 1), "%\n",
+        "Risk Management: ", (EnableRiskManagement ? "ENABLED" : "DISABLED"), "\n",
+        "Advanced Logging: ", (EnableAdvancedLogging ? "ENABLED" : "DISABLED")
+    );
+    
+    return stats;
+}
+
+//+------------------------------------------------------------------+
+//| Get current market analysis for monitoring                     |
+//+------------------------------------------------------------------+
+string GetMarketAnalysisReport() {
+    MarketConditions market = AnalyzeMarketConditions();
+    
+    string report = StringConcatenate(
+        "=== MARKET ANALYSIS FOR ", g_CurrentSymbol, " ===\n",
+        "Current Price: ", DoubleToString(market.price_current, 5), "\n",
+        "Spread: ", DoubleToString(market.spread_pips, 1), " pips\n",
+        "EMA Fast (21): ", DoubleToString(market.ma_fast_h1, 5), "\n",
+        "EMA Slow (55): ", DoubleToString(market.ma_slow_h1, 5), "\n",
+        "RSI (14): ", DoubleToString(market.rsi_value, 2), "\n",
+        "ATR (14): ", DoubleToString(market.atr_current, 5), "\n",
+        "Volatility Ratio: ", DoubleToString(market.volatility_ratio, 6), "\n"
+    );
+    
+    report = StringConcatenate(report,
+        "Trend Bullish: ", (market.trend_bullish ? "YES" : "NO"), "\n",
+        "Trend Bearish: ", (market.trend_bearish ? "YES" : "NO"), "\n",
+        "Strong Momentum: ", (market.momentum_strong ? "YES" : "NO"), "\n",
+        "Trading Session: ", IntegerToString(market.trading_session), 
+        " (0=Quiet, 1=Asian, 2=European, 3=US)\n"
+    );
+    
+    report = StringConcatenate(report,
+        "Market Active: ", (IsMarketActiveForTrading() ? "YES" : "NO"), "\n",
+        "Trade Allowed: ", (IsTradeAllowed() ? "YES" : "NO"), "\n",
+        "Connection: ", (IsConnected() ? "CONNECTED" : "DISCONNECTED"), "\n",
+        "Context Busy: ", (IsTradeContextBusy() ? "YES" : "NO")
+    );
+    
+    return report;
+}
+
+//+------------------------------------------------------------------+
+//| Portfolio risk assessment                                       |
+//+------------------------------------------------------------------+
+bool AssessPortfolioRisk() {
+    if(!EnableRiskManagement) return true;
+    
+    double total_exposure = 0;
+    double total_risk = 0;
+    int open_positions = 0;
+    
+    // Calculate total exposure and risk
+    for(int i = 0; i < OrdersTotal(); i++) {
+        if(OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) {
+            if(OrderMagicNumber() >= MagicNumberBase && 
+               OrderMagicNumber() < MagicNumberBase + 10000) {
+                total_exposure += OrderLots();
+                total_risk += MathAbs(OrderProfit() + OrderSwap() + OrderCommission());
+                open_positions++;
+            }
+        }
+    }
+    
+    double account_balance = AccountBalance();
+    double exposure_percent = (total_exposure * 100000 * 0.0001) / account_balance * 100; // Rough calculation
+    
+    // Portfolio limits
+    if(open_positions >= 10) {
+        if(EnableAdvancedLogging) {
+            Print("PORTFOLIO ALERT: Too many open positions (", open_positions, "/10)");
+        }
+        return false;
+    }
+    
+    if(exposure_percent > 25.0) {
+        if(EnableAdvancedLogging) {
+            Print("PORTFOLIO ALERT: Exposure too high (", DoubleToString(exposure_percent, 1), "%)");
+        }
+        return false;
+    }
+    
+    return true;
+}
+
+//+------------------------------------------------------------------+
+//| Performance metrics calculation                                 |
+//+------------------------------------------------------------------+
+double CalculateWinRate() {
+    int total_trades = 0;
+    int winning_trades = 0;
+    
+    for(int i = 0; i < OrdersHistoryTotal(); i++) {
+        if(OrderSelect(i, SELECT_BY_POS, MODE_HISTORY)) {
+            if(OrderMagicNumber() == g_UniqueMagicNumber && 
+               OrderSymbol() == g_CurrentSymbol &&
+               (OrderType() == OP_BUY || OrderType() == OP_SELL)) {
+                total_trades++;
+                if(OrderProfit() > 0) {
+                    winning_trades++;
+                }
+            }
+        }
+    }
+    
+    if(total_trades > 0) {
+        return (double)winning_trades / total_trades * 100.0;
+    }
+    
+    return 0.0;
+}
+
+double CalculateAverageProfit() {
+    double total_profit = 0;
+    int trade_count = 0;
+    
+    for(int i = 0; i < OrdersHistoryTotal(); i++) {
+        if(OrderSelect(i, SELECT_BY_POS, MODE_HISTORY)) {
+            if(OrderMagicNumber() == g_UniqueMagicNumber && 
+               OrderSymbol() == g_CurrentSymbol &&
+               (OrderType() == OP_BUY || OrderType() == OP_SELL)) {
+                total_profit += OrderProfit() + OrderSwap() + OrderCommission();
+                trade_count++;
+            }
+        }
+    }
+    
+    if(trade_count > 0) {
+        return total_profit / trade_count;
+    }
+    
+    return 0.0;
+}
+
+//+------------------------------------------------------------------+
+//| System health check                                            |
+//+------------------------------------------------------------------+
+bool IsSignalGeneratorHealthy() {
+    // Check file access
+    int test_handle = FileOpen(g_SignalCSVFile, FILE_READ|FILE_WRITE);
+    if(test_handle == INVALID_HANDLE) {
+        Print("HEALTH CHECK FAILED: Cannot access signal file");
+        return false;
+    }
+    FileClose(test_handle);
+    
+    test_handle = FileOpen(g_ResponseCSVFile, FILE_READ|FILE_WRITE);
+    if(test_handle == INVALID_HANDLE) {
+        Print("HEALTH CHECK FAILED: Cannot access response file");
+        return false;
+    }
+    FileClose(test_handle);
+    
+    // Check account status
+    if(AccountBalance() <= 0) {
+        Print("HEALTH CHECK FAILED: Account balance is zero or negative");
+        return false;
+    }
+    
+    // Check symbol data
+    if(MarketInfo(g_CurrentSymbol, MODE_POINT) <= 0) {
+        Print("HEALTH CHECK FAILED: Symbol data not available for ", g_CurrentSymbol);
+        return false;
+    }
+    
+    // Check initialization
+    if(!g_SystemInitialized) {
+        Print("HEALTH CHECK FAILED: System not properly initialized");
+        return false;
+    }
+    
+    return true;
+}
+
+//+------------------------------------------------------------------+
+//| Cleanup function - call from EA OnDeinit()                     |
+//+------------------------------------------------------------------+
+void CleanupSignalGenerator() {
+    if(EnableAdvancedLogging) {
+        Print("=== SIGNAL GENERATOR CLEANUP ===");
+        Print("Final Statistics:");
+        Print(GetDetailedTradingStats());
+        Print("Performance Metrics:");
+        Print("Win Rate: ", DoubleToString(CalculateWinRate(), 1), "%");
+        Print("Average Profit: $", DoubleToString(CalculateAverageProfit(), 2));
+        Print("================================");
+        Print("Signal generator cleanup completed for ", g_CurrentSymbol);
+    }
+    
+    g_SystemInitialized = false;
+}
+
+//+------------------------------------------------------------------+
+//| EXAMPLE EA INTEGRATION                                          |
+//+------------------------------------------------------------------+
+/*
+=== HOW TO USE THIS MODULE IN YOUR EA ===
+
+1. Include this file in your EA:
+   #include <YourSignalGeneratorFileName.mqh>
+
+2. In OnInit() function:
+   int OnInit() {
+       if(InitializeSignalGenerator(Symbol(), 20000) != 0) {
+           Print("Signal generator initialization failed");
+           return INIT_FAILED;
+       }
+       
+       EventSetTimer(60); // Check signals every minute
+       return INIT_SUCCEEDED;
+   }
+
+3. In OnTick() or OnTimer() function:
+   void OnTimer() {
+       int result = ProcessTradingSignals("ema_rsi_momentum");
+       
+       if(result > 0) {
+           Print("New signal processed and trade executed");
+       } else if(result < 0) {
+           Print("Error processing signal");
+       }
+       // result == 0 means no signal (normal)
+   }
+
+4. In OnDeinit() function:
+   void OnDeinit(const int reason) {
+       CleanupSignalGenerator();
+   }
+
+5. Optional status monitoring:
+   void OnTimer() {
+       static int status_counter = 0;
+       status_counter++;
+       
+       // Print status every 10 minutes
+       if(status_counter >= 10) {
+           Print(GetDetailedTradingStats());
+           Print(GetMarketAnalysisReport());
+           status_counter = 0;
+       }
+       
+       // Process signals
+       ProcessTradingSignals();
+   }
+
+CONFIGURATION TIPS:
+- Adjust RiskPercentPerTrade based on your risk tolerance (1-3% recommended)
+- Set MinSignalConfidence between 0.70-0.85 for good signal quality
+- Use different MagicNumberBase for each symbol/strategy
+- Enable EnableAdvancedLogging for debugging, disable for production
+- Monitor MaxDailyLossPercent and MaxTradesPerDay carefully
+
+IMPORTANT NOTES:
+- This module is 100% MQL4 compatible (no MQL5 syntax)
+- All file operations use proper MQL4 file handling
+- Risk management is built-in and configurable
+- Works with any broker that supports standard MQL4 functions
+- CSV files are created automatically in MT4's Files directory
+*/
+
+//+------------------------------------------------------------------+
+//| End of MQL4 Signal Generator Module                            |
+//| Version 3.0 - Production Ready                                 |
+//| Compatible with MetaTrader 4 only                              |
+//+------------------------------------------------------------------+

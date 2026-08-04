@@ -1,0 +1,1959 @@
+//+------------------------------------------------------------------+
+//|       HUEY_P_EA_ExecutionEngine_v6.1_DualSignals.mq4            |
+//|    Hybrid EA with CSV + DLL Signal Management & Priority System |
+//|               Copyright 2025, HUEY_P Trading Systems             |
+//+------------------------------------------------------------------+
+//| CHANGELOG v6.1                                                   |
+//|------------------------------------------------------------------|
+//| - FEATURE: Added CSV signal file reading and execution          |
+//| - FEATURE: Implemented time-based signal scheduling             |
+//| - FEATURE: Created priority system (DLL over CSV signals)       |
+//| - FEATURE: Added independent toggle controls for signal types   |
+//| - FEATURE: Implemented hot CSV file reloading capability        |
+//| - FEATURE: Enhanced signal queue management system              |
+//| - FEATURE: Added comprehensive signal monitoring & logging      |
+//| - FEATURE: Integrated signal conflict resolution logic          |
+//+------------------------------------------------------------------+
+#property copyright "Copyright 2025, HUEY_P Trading Systems"
+#property link      "https://github.com/HUEY-P"
+#property version   "6.10"
+#property strict
+#property show_inputs
+
+//--- DLL Imports for Socket Communication
+#include <WinUser32.mqh>
+
+#import "MQL4SocketBridge.dll"
+   int  StartServer(int port, int hWnd, int messageId);
+   void StopServer();
+   int  GetLastMessage(char &buffer[], int maxSize);
+#import
+
+//--- Debugging Macro
+#define DEBUG_MODE true
+#define DBG_PRINT(context, msg) if(DEBUG_MODE && VerboseLogging) Print("[", #context, "] ", msg)
+
+//+------------------------------------------------------------------+
+//| SECTION 1: USER-CONFIGURABLE PARAMETERS                          |
+//+------------------------------------------------------------------+
+input group "--- Core Operation Mode ---"
+input bool   AutonomousMode = true;      // true = EA trades on its own. false = EA listens for external signals.
+
+input group "--- Signal Management System ---"
+input bool   EnableDLLSignals = true;    // Enable/disable DLL socket signal reception
+input bool   EnableCSVSignals = false;   // Enable/disable CSV file signal execution
+input int    ListenPort = 5555;          // Port for external DLL signals
+input string CSVSignalFile = "trading_signals.csv"; // CSV file with scheduled signals
+input int    CSVCheckIntervalSeconds = 30; // How often to check CSV file for updates
+input int    SignalExecutionToleranceSeconds = 30; // Time tolerance for CSV signal execution
+
+input group "--- General Trading Settings ---"
+input string EAIdentifier = "HUEY_P_Straddle"; // Base name for comments and logs.
+input int    MagicNumber = 9001;         // Base Magic Number for identifying EA's trades.
+input bool   UseUniqueChartID = false;   // Generate unique magic per chart
+input int    Slippage = 3;               // Max allowed slippage in points.
+input int    MaxSpreadPips = 5;          // Max spread in pips to allow a new trade.
+input int    BiasDirection = 0;          // Trading bias (-1=bearish, 0=neutral, 1=bullish)
+
+input group "--- Risk Management Settings ---"
+input bool   UseDynamicLotSize = true;   // Enable/disable risk-based position sizing
+input double RiskPercent = 1.0;          // Percentage of account equity to risk per trade
+input double FixedLotSize = 0.01;        // Fixed lot size when dynamic sizing is disabled
+input double MaxLotSize = 1.0;           // Maximum allowed lot size cap
+input double SafeMarginPercentage = 50.0; // Maximum percentage of free margin to use
+input double MaxLossMultiplier = 2.0;    // Multiplier for risk percent to determine max loss
+
+input group "--- Stop Loss & Take Profit ---"
+input double StopLoss = 20.0;            // Default stop loss distance in pips
+input double BuyStopLoss = 20.0;         // Buy-specific stop loss in pips
+input double SellStopLoss = 20.0;        // Sell-specific stop loss in pips
+input double TakeProfit = 60.0;          // Default take profit distance in pips
+input double BuyTakeProfit = 60.0;       // Buy-specific take profit in pips
+input double SellTakeProfit = 60.0;      // Sell-specific take profit in pips
+
+input group "--- Trailing Stop Settings ---"
+input bool   UseTrailingStop = true;     // Enable/disable trailing stop functionality
+input double TrailingStop = 15.0;        // Default trailing stop distance in pips
+input double BuyTrailingStop = 15.0;     // Buy-specific trailing stop in pips
+input double SellTrailingStop = 15.0;    // Sell-specific trailing stop in pips
+input bool   TrailPendingOrder = false;  // Enable/disable trailing of pending orders
+input double InitialTrail = 10.0;        // Initial trailing stop distance
+input double AdjustedTrail = 8.0;        // Trailing stop distance after profit threshold
+input double TrailingStepPips = 5.0;     // Pips to step the trailing stop
+
+input group "--- Pending Order Settings ---"
+input double PendingOrderDistance = 15.0; // Default distance from current price
+input double BuyPendingDistance = 15.0;   // Buy stop distance from current price
+input double SellPendingDistance = 15.0;  // Sell stop distance from current price
+input int    InactivityTimeoutMinutes = 60; // Minutes to wait before closing untriggered pending orders
+
+input group "--- Time-Based Trading ---"
+input bool   UseDayManagement = false;   // Enable day-of-week trading filters
+input bool   TradeMonday = true;         // Enable trading on Monday
+input bool   TradeTuesday = true;        // Enable trading on Tuesday
+input bool   TradeWednesday = true;      // Enable trading on Wednesday
+input bool   TradeThursday = true;       // Enable trading on Thursday
+input bool   TradeFriday = true;         // Enable trading on Friday
+input string FirstTradeTime = "08:00";   // First scheduled trading time (HH:MM)
+input string SecondTradeTime = "14:00";  // Second scheduled trading time (HH:MM)
+input int    TradeWindowMinutes = 30;    // Time window around scheduled trading times
+
+input group "--- Economic Calendar Settings ---"
+input bool   UseEconomicCalendar = true; // Enable economic event trading
+input bool   AvoidTradeBeforeEvent = true; // Avoid trading before major events
+input int    HoursBeforeEvent = 2;       // Hours before event to avoid trading
+input string NewsFileName = "NewsCalendar.csv"; // File with news events
+input int    MinutesBeforeNews = 30;     // Do not trade X minutes before news
+input int    MinutesAfterNews = 30;      // Do not trade X minutes after news
+input string TimeFilterFile = "TimeFilters.csv"; // File with trading blackout rules
+
+input group "--- Advanced Risk Control ---"
+input bool   EnableAdvancedRiskChecks = true; // Master switch for advanced checks
+input double MaxDailyDrawdownPercent = 5.0;   // Max daily loss percentage before halting trades
+input double MinEquityStopLevel = 1000.0;     // Halt trading if equity falls below this value
+input double MaxTotalLotsOpen = 1.0;          // Maximum combined lots across all open trades
+input int    MaxOpenTradesTotal = 5;          // Maximum number of concurrent open trades
+input int    MaxConsecutiveLosses = 5;        // Max consecutive losses before pausing EA
+input int    MaxConsecutiveWins = 20;         // Max consecutive wins before pausing EA
+input int    MaxTradingCycles = 25;           // Max number of trades before pausing
+input bool   RestartAfterClose = true;        // Automatically place new straddle after trade cycle
+
+input group "--- Adaptive Logic Controls ---"
+input bool   UseOutcomeBasedAdjustments = true; // Master switch for parameter adaptation
+input double RiskAdjustmentStep = 0.25;       // Risk % to add on win / subtract on loss
+input double SLAdjustmentStep = 2.0;          // Pips to adjust SL by
+input double TPAdjustmentStep = 5.0;          // Pips to adjust TP by
+
+input group "--- Category-Based Adjustments ---"
+input bool   UseCategoryBasedAdjustments = false; // Enable advanced category system
+input double Cat1_RiskPercentAdjustment = 0.0;    // Category 1 risk adjustment
+input double Cat1_PendingDistanceAdjustment = 0.0; // Category 1 distance adjustment
+input double Cat2_RiskPercentAdjustment = 5.0;    // Category 2 risk adjustment
+input double Cat2_PendingDistanceAdjustment = 10.0; // Category 2 distance adjustment
+input double Cat3_RiskPercentAdjustment = -10.0;  // Category 3 risk adjustment
+input double Cat3_PendingDistanceAdjustment = -5.0; // Category 3 distance adjustment
+input double Cat4_RiskPercentAdjustment = 15.0;   // Category 4 risk adjustment
+input double Cat4_PendingDistanceAdjustment = 20.0; // Category 4 distance adjustment
+input double Cat5_RiskPercentAdjustment = -20.0;  // Category 5 risk adjustment
+input double Cat5_PendingDistanceAdjustment = -10.0; // Category 5 distance adjustment
+input double Cat6_RiskPercentAdjustment = -30.0;  // Category 6 risk adjustment
+input double Cat6_PendingDistanceAdjustment = -15.0; // Category 6 distance adjustment
+
+input group "--- Performance & System ---"
+input int    PerformanceMode = 1;         // Performance level (0=Full, 1=Standard, 2=Optimized, 3=Minimal)
+input bool   EnableAutoRecovery = true;   // Enable automatic recovery from errors
+input int    TimerIntervalSeconds = 15;   // How often OnTimer() runs for management tasks
+
+input group "--- Logging & Debugging ---"
+input bool   VerboseLogging = true;       // Enable detailed logging
+input bool   LogToFile = false;           // Enable file logging
+input bool   EnableLogFile = false;       // Enable logging to file
+input string LogFileName = "HUEY_P_Log.txt"; // Log file name
+
+input group "--- Sound Alerts ---"
+input bool   UseSoundAlerts = true;
+input string SoundInitialization = "ok.wav";
+input string OrderTriggeredSound = "expert.wav";
+input string TakeProfitSound = "news.wav";
+input string SoundStopLossProfit = "alert.wav";
+input string SoundStopLossLoss = "stop.wav";
+input string LossStopSound = "stop.wav";
+input string SoundError = "timeout.wav";
+input string SoundCriticalError = "Bzrrr.wav";
+
+//+------------------------------------------------------------------+
+//| SECTION 2: ENUMERATIONS, STRUCTURES & GLOBAL VARIABLES           |
+//+------------------------------------------------------------------+
+
+//--- System States
+enum EAState { STATE_IDLE, STATE_ORDERS_PLACED, STATE_TRADE_TRIGGERED, STATE_PAUSED };
+enum ENUM_RECOVERY_STATE { RECOVERY_STATE_NORMAL, RECOVERY_STATE_DEGRADED, RECOVERY_STATE_EMERGENCY };
+enum OrderSetupType { ORDER_TYPE_STRADDLE, ORDER_TYPE_BUYSTOP, ORDER_TYPE_SELLSTOP };
+enum SignalSource { SIGNAL_SOURCE_AUTONOMOUS, SIGNAL_SOURCE_DLL, SIGNAL_SOURCE_CSV };
+
+//--- Data Structures
+struct NewsEvent { datetime eventTime; };
+struct TimeBlockRule { int dayOfWeek; int blockStartMinutes; int blockEndMinutes; };
+struct ScheduledTime { int hour; int minute; };
+struct TradeOutcome { 
+    int category; 
+    double profit; 
+    datetime closeTime; 
+    bool wasWin; 
+};
+
+//--- CSV Signal Structure
+struct CSVSignal {
+    datetime executionTime;
+    string symbol;
+    int orderType;        // OP_BUY, OP_SELL
+    double lotSize;
+    double stopLoss;
+    double takeProfit;
+    string comment;
+    bool executed;
+    bool valid;
+};
+
+//--- Forward declarations
+class StateManager;
+class SoundManager;
+class LogManager;
+class CategoryManager;
+class SignalManager;
+
+//--- Global Variables
+StateManager   g_stateManager;
+SoundManager   g_soundManager;
+LogManager     g_logManager;
+CategoryManager g_categoryManager;
+SignalManager  g_signalManager;
+int            g_lastHistoryTotal = 0;
+double         g_dailyPeakEquity = 0;
+int            g_lastTradeDay = 0;
+int            g_actualMagicNumber = 0;
+
+//--- Global Error Handling State
+ENUM_RECOVERY_STATE g_recoveryState = RECOVERY_STATE_NORMAL;
+int                 g_consecutiveErrors = 0;
+datetime            g_circuitBreakerTrippedTime = 0;
+
+//--- Global Time Filter Data
+NewsEvent     g_newsEvents[200];
+int           g_newsEventCount = 0;
+TimeBlockRule g_timeFilters[50];
+int           g_timeFilterCount = 0;
+ScheduledTime g_scheduledTimes[2];
+int           g_scheduledTimeCount = 0;
+
+//--- Global Performance Variables
+int g_tickCounter = 0;
+datetime g_lastPerformanceCheck = 0;
+
+//--- Signal Processing State
+bool g_dllSignalProcessing = false;
+datetime g_lastCSVCheck = 0;
+datetime g_csvFileModTime = 0;
+
+//+------------------------------------------------------------------+
+//| SECTION 3: HELPER FUNCTIONS & CLASSES                            |
+//+------------------------------------------------------------------+
+
+//--- Helper to convert EAState enum to a string for display
+string StateToString(EAState state)
+{
+    switch(state)
+    {
+        case STATE_IDLE:            return("Idle");
+        case STATE_ORDERS_PLACED:   return("Orders Placed");
+        case STATE_TRADE_TRIGGERED: return("Trade Active");
+        case STATE_PAUSED:          return("Paused");
+        default:                    return("Unknown");
+    }
+}
+
+//--- Helper to convert ENUM_RECOVERY_STATE enum to a string for display
+string RecoveryToString(ENUM_RECOVERY_STATE state)
+{
+    switch(state)
+    {
+        case RECOVERY_STATE_NORMAL:     return("Normal");
+        case RECOVERY_STATE_DEGRADED:   return("Degraded");
+        case RECOVERY_STATE_EMERGENCY:  return("HALTED");
+        default:                        return("Unknown");
+    }
+}
+
+//--- Helper to convert SignalSource enum to string
+string SignalSourceToString(SignalSource source)
+{
+    switch(source)
+    {
+        case SIGNAL_SOURCE_AUTONOMOUS: return("AUTO");
+        case SIGNAL_SOURCE_DLL:        return("DLL");
+        case SIGNAL_SOURCE_CSV:        return("CSV");
+        default:                       return("UNK");
+    }
+}
+
+//--- Error Description Helper Function
+string ErrorDescription(int error_code)
+{
+   switch(error_code)
+   {
+      case 0:   return("No error");
+      case 1:   return("No error, trade conditions not changed");
+      case 2:   return("Common error");
+      case 3:   return("Invalid trade parameters");
+      case 4:   return("Trade server is busy");
+      case 5:   return("Old version of the client terminal");
+      case 6:   return("No connection with trade server");
+      case 7:   return("Not enough rights");
+      case 8:   return("Too frequent requests");
+      case 9:   return("Malfunctional trade operation");
+      case 64:  return("Account disabled");
+      case 65:  return("Invalid account");
+      case 128: return("Trade timeout");
+      case 129: return("Invalid price");
+      case 130: return("Invalid stops");
+      case 131: return("Invalid trade volume");
+      case 132: return("Market is closed");
+      case 133: return("Trade is disabled");
+      case 134: return("Not enough money");
+      case 135: return("Price changed");
+      case 136: return("Off quotes");
+      case 137: return("Broker is busy");
+      case 138: return("Requote");
+      case 139: return("Order is locked");
+      case 140: return("Long positions only allowed");
+      case 141: return("Too many requests");
+      case 145: return("Modification denied because order is too close to market");
+      case 146: return("Trade context is busy");
+      case 147: return("Expirations are denied by broker");
+      case 148: return("Amount of open and pending orders has reached the limit");
+      case 149: return("Hedging is prohibited");
+      case 150: return("Prohibited by FIFO rules");
+      default:  return("Unknown error");
+   }
+}
+
+//--- Manages logging functionality
+class LogManager
+{
+private:
+    int m_fileHandle;
+    bool m_fileOpened;
+
+public:
+    LogManager() : m_fileHandle(-1), m_fileOpened(false) {}
+    
+    void Initialize()
+    {
+        if(LogToFile && EnableLogFile)
+        {
+            m_fileHandle = FileOpen(LogFileName, FILE_WRITE|FILE_TXT);
+            if(m_fileHandle != INVALID_HANDLE)
+            {
+                m_fileOpened = true;
+                WriteLog("Log system initialized at " + TimeToString(TimeCurrent()));
+            }
+        }
+    }
+    
+    void WriteLog(string message)
+    {
+        string logEntry = TimeToString(TimeCurrent()) + " [" + EAIdentifier + "] " + message;
+        
+        if(VerboseLogging) Print(logEntry);
+        
+        if(m_fileOpened && m_fileHandle != INVALID_HANDLE)
+        {
+            FileWrite(m_fileHandle, logEntry);
+            FileFlush(m_fileHandle);
+        }
+    }
+    
+    void WriteSignalLog(string message, SignalSource source)
+    {
+        string signalEntry = "[" + SignalSourceToString(source) + "] " + message;
+        WriteLog(signalEntry);
+    }
+    
+    void Close()
+    {
+        if(m_fileOpened && m_fileHandle != INVALID_HANDLE)
+        {
+            WriteLog("Log system closing");
+            FileClose(m_fileHandle);
+            m_fileOpened = false;
+        }
+    }
+};
+
+//--- Manages all sound alerts
+class SoundManager
+{
+public:
+   void PlayInitSound()      { if(UseSoundAlerts) PlaySound(SoundInitialization); }
+   void PlayTriggerSound()   { if(UseSoundAlerts) PlaySound(OrderTriggeredSound); }
+   void PlayTPSound()        { if(UseSoundAlerts) PlaySound(TakeProfitSound); }
+   void PlaySLProfitSound()  { if(UseSoundAlerts) PlaySound(SoundStopLossProfit); }
+   void PlaySLLossSound()    { if(UseSoundAlerts) PlaySound(LossStopSound); }
+   void PlayErrorSound()     { if(UseSoundAlerts) PlaySound(SoundError); }
+   void PlayCriticalError()  { if(UseSoundAlerts) PlaySound(SoundCriticalError); }
+};
+
+//--- Manages category-based adjustments
+class CategoryManager
+{
+public:
+    int DetermineCategory(double profit, int duration, bool wasWin)
+    {
+        if(!UseCategoryBasedAdjustments) return 1;
+        
+        // Category logic based on trade outcome
+        if(wasWin)
+        {
+            if(profit > 50) return 1; // Big win
+            if(profit > 20) return 2; // Good win
+            return 3; // Small win
+        }
+        else
+        {
+            if(profit < -50) return 6; // Big loss
+            if(profit < -20) return 5; // Bad loss
+            return 4; // Small loss
+        }
+    }
+    
+    void ApplyCategoryAdjustments(int category, StateManager& stateManager)
+    {
+        if(!UseCategoryBasedAdjustments) return;
+        
+        double riskAdj = 0, distAdj = 0;
+        
+        switch(category)
+        {
+            case 1: riskAdj = Cat1_RiskPercentAdjustment; distAdj = Cat1_PendingDistanceAdjustment; break;
+            case 2: riskAdj = Cat2_RiskPercentAdjustment; distAdj = Cat2_PendingDistanceAdjustment; break;
+            case 3: riskAdj = Cat3_RiskPercentAdjustment; distAdj = Cat3_PendingDistanceAdjustment; break;
+            case 4: riskAdj = Cat4_RiskPercentAdjustment; distAdj = Cat4_PendingDistanceAdjustment; break;
+            case 5: riskAdj = Cat5_RiskPercentAdjustment; distAdj = Cat5_PendingDistanceAdjustment; break;
+            case 6: riskAdj = Cat6_RiskPercentAdjustment; distAdj = Cat6_PendingDistanceAdjustment; break;
+        }
+        
+        // Apply adjustments (in addition to normal adaptive logic)
+        stateManager.DynamicRiskPercent *= (1.0 + riskAdj/100.0);
+        stateManager.DynamicPendingDistance *= (1.0 + distAdj/100.0);
+        
+        g_logManager.WriteLog("Category " + IntegerToString(category) + " adjustments applied");
+    }
+};
+
+//--- Manages dual signal system (CSV + DLL)
+class SignalManager
+{
+private:
+    CSVSignal m_csvSignals[1000];
+    int m_csvSignalCount;
+    SignalSource m_lastSignalSource;
+    
+public:
+    SignalManager() : m_csvSignalCount(0), m_lastSignalSource(SIGNAL_SOURCE_AUTONOMOUS) {}
+    
+    //--- Initialize signal management
+    void Initialize()
+    {
+        m_csvSignalCount = 0;
+        if(EnableCSVSignals)
+        {
+            LoadCSVSignals();
+        }
+        g_logManager.WriteLog("Signal Manager initialized - DLL:" + 
+                             (EnableDLLSignals ? "ON" : "OFF") + " CSV:" + 
+                             (EnableCSVSignals ? "ON" : "OFF"));
+    }
+    
+    //--- Load CSV signals from file
+    void LoadCSVSignals()
+    {
+        m_csvSignalCount = 0;
+        
+        int handle = FileOpen(CSVSignalFile, FILE_READ | FILE_CSV, ',');
+        if(handle < 0)
+        {
+            g_logManager.WriteLog("CSV signal file not found: " + CSVSignalFile);
+            return;
+        }
+        
+        // Get file modification time for hot reloading
+        g_csvFileModTime = FileGetInteger(handle, FILE_MODIFY_DATE);
+        
+        // Skip header line
+        FileReadString(handle);
+        
+        datetime currentTime = TimeCurrent();
+        int loadedCount = 0;
+        
+        while(!FileIsEnding(handle) && m_csvSignalCount < ArraySize(m_csvSignals))
+        {
+            string dateTimeStr = FileReadString(handle);
+            string symbolStr = FileReadString(handle);
+            string orderTypeStr = FileReadString(handle);
+            double lotSize = FileReadNumber(handle);
+            double stopLoss = FileReadNumber(handle);
+            double takeProfit = FileReadNumber(handle);
+            string comment = FileReadString(handle);
+            
+            // Parse signal
+            CSVSignal signal;
+            signal.executionTime = StrToTime(dateTimeStr);
+            signal.symbol = symbolStr;
+            signal.lotSize = lotSize;
+            signal.stopLoss = stopLoss;
+            signal.takeProfit = takeProfit;
+            signal.comment = comment;
+            signal.executed = false;
+            signal.valid = true;
+            
+            // Determine order type
+            if(orderTypeStr == "buy" || orderTypeStr == "BUY") signal.orderType = OP_BUY;
+            else if(orderTypeStr == "sell" || orderTypeStr == "SELL") signal.orderType = OP_SELL;
+            else signal.valid = false;
+            
+            // Only load future signals
+            if(signal.executionTime > currentTime && signal.valid && signal.symbol == Symbol())
+            {
+                m_csvSignals[m_csvSignalCount] = signal;
+                m_csvSignalCount++;
+                loadedCount++;
+            }
+        }
+        
+        FileClose(handle);
+        
+        // Sort signals by execution time
+        SortCSVSignalsByTime();
+        
+        g_logManager.WriteSignalLog("Loaded " + IntegerToString(loadedCount) + " future CSV signals", SIGNAL_SOURCE_CSV);
+    }
+    
+    //--- Check if CSV file has been updated and reload if necessary
+    void CheckCSVFileUpdate()
+    {
+        if(!EnableCSVSignals) return;
+        
+        int handle = FileOpen(CSVSignalFile, FILE_READ | FILE_CSV, ',');
+        if(handle < 0) return;
+        
+        datetime fileModTime = FileGetInteger(handle, FILE_MODIFY_DATE);
+        FileClose(handle);
+        
+        if(fileModTime > g_csvFileModTime)
+        {
+            g_logManager.WriteSignalLog("CSV file updated - reloading signals", SIGNAL_SOURCE_CSV);
+            LoadCSVSignals();
+        }
+    }
+    
+    //--- Sort CSV signals by execution time (simple bubble sort)
+    void SortCSVSignalsByTime()
+    {
+        for(int i = 0; i < m_csvSignalCount - 1; i++)
+        {
+            for(int j = 0; j < m_csvSignalCount - i - 1; j++)
+            {
+                if(m_csvSignals[j].executionTime > m_csvSignals[j + 1].executionTime)
+                {
+                    CSVSignal temp = m_csvSignals[j];
+                    m_csvSignals[j] = m_csvSignals[j + 1];
+                    m_csvSignals[j + 1] = temp;
+                }
+            }
+        }
+    }
+    
+    //--- Check for due CSV signals and execute them
+    void ProcessCSVSignals()
+    {
+        if(!EnableCSVSignals || g_dllSignalProcessing) return;
+        
+        datetime currentTime = TimeCurrent();
+        
+        for(int i = 0; i < m_csvSignalCount; i++)
+        {
+            if(m_csvSignals[i].executed || !m_csvSignals[i].valid) continue;
+            
+            // Check if signal is due for execution
+            long timeDiff = currentTime - m_csvSignals[i].executionTime;
+            
+            if(timeDiff >= 0 && timeDiff <= SignalExecutionToleranceSeconds)
+            {
+                // Execute the signal
+                if(ExecuteCSVSignal(i))
+                {
+                    m_csvSignals[i].executed = true;
+                    m_lastSignalSource = SIGNAL_SOURCE_CSV;
+                }
+            }
+            else if(timeDiff > SignalExecutionToleranceSeconds)
+            {
+                // Mark expired signals as executed to skip them
+                m_csvSignals[i].executed = true;
+                g_logManager.WriteSignalLog("CSV signal expired: " + TimeToString(m_csvSignals[i].executionTime), SIGNAL_SOURCE_CSV);
+            }
+        }
+    }
+    
+    //--- Execute a specific CSV signal
+    bool ExecuteCSVSignal(int index)
+    {
+        if(index < 0 || index >= m_csvSignalCount) return false;
+        
+        CSVSignal& signal = m_csvSignals[index];
+        
+        if(!IsTradingAllowedNow()) 
+        {
+            g_logManager.WriteSignalLog("CSV signal blocked by trading filters", SIGNAL_SOURCE_CSV);
+            return false;
+        }
+        
+        RefreshRates();
+        double price = (signal.orderType == OP_BUY) ? Ask : Bid;
+        
+        int ticket = SafeOrderSend(signal.symbol, signal.orderType, signal.lotSize, 
+                                  price, Slippage, signal.stopLoss, signal.takeProfit, 
+                                  signal.comment + "_CSV", g_actualMagicNumber);
+        
+        if(ticket > 0)
+        {
+            g_logManager.WriteSignalLog("CSV signal executed - Ticket: " + IntegerToString(ticket) + 
+                                       " Type: " + (signal.orderType == OP_BUY ? "BUY" : "SELL") + 
+                                       " Lots: " + DoubleToString(signal.lotSize, 2), SIGNAL_SOURCE_CSV);
+            g_soundManager.PlayTriggerSound();
+            return true;
+        }
+        
+        return false;
+    }
+    
+    //--- Execute DLL signal (with priority)
+    bool ExecuteDLLSignal(string json)
+    {
+        g_dllSignalProcessing = true;
+        m_lastSignalSource = SIGNAL_SOURCE_DLL;
+        
+        bool result = ProcessJsonSignal(json);
+        
+        g_dllSignalProcessing = false;
+        return result;
+    }
+    
+    //--- Get count of pending CSV signals
+    int GetPendingCSVSignalCount()
+    {
+        int count = 0;
+        for(int i = 0; i < m_csvSignalCount; i++)
+        {
+            if(!m_csvSignals[i].executed && m_csvSignals[i].valid)
+                count++;
+        }
+        return count;
+    }
+    
+    //--- Get next CSV signal execution time
+    datetime GetNextCSVSignalTime()
+    {
+        for(int i = 0; i < m_csvSignalCount; i++)
+        {
+            if(!m_csvSignals[i].executed && m_csvSignals[i].valid)
+                return m_csvSignals[i].executionTime;
+        }
+        return 0;
+    }
+    
+    //--- Get last signal source
+    SignalSource GetLastSignalSource() { return m_lastSignalSource; }
+    
+    //--- Set last signal source
+    void SetLastSignalSource(SignalSource source) { m_lastSignalSource = source; }
+};
+
+//--- Manages the EA's state and dynamic parameters
+class StateManager
+{
+public:
+   EAState  CurrentState;
+   double   DynamicRiskPercent;
+   double   DynamicStopLossPips;
+   double   DynamicTakeProfitPips;
+   double   DynamicPendingDistance;
+   datetime OrdersPlacedTime;
+   int      ActiveTradeTicket;
+   int      ConsecutiveWins;
+   int      ConsecutiveLosses;
+   int      TradingCycles;
+   string   m_keyPrefix;
+
+   //--- Initialize StateManager and restore saved state
+   void Initialize(string eaId)
+   {
+      m_keyPrefix = eaId + "_" + Symbol() + "_" + IntegerToString(Period()) + "_" + IntegerToString(AccountNumber());
+      if(UseUniqueChartID)
+      {
+          m_keyPrefix += "_" + IntegerToString(ChartID());
+      }
+      RestoreState();
+   }
+
+   //--- Save the current dynamic state to Global Variables
+   void SaveState()
+   {
+      GlobalVariableSet(m_keyPrefix + "_State", CurrentState);
+      GlobalVariableSet(m_keyPrefix + "_Risk", DynamicRiskPercent);
+      GlobalVariableSet(m_keyPrefix + "_SL",   DynamicStopLossPips);
+      GlobalVariableSet(m_keyPrefix + "_TP",   DynamicTakeProfitPips);
+      GlobalVariableSet(m_keyPrefix + "_Dist", DynamicPendingDistance);
+      GlobalVariableSet(m_keyPrefix + "_Wins", ConsecutiveWins);
+      GlobalVariableSet(m_keyPrefix + "_Loss", ConsecutiveLosses);
+      GlobalVariableSet(m_keyPrefix + "_Cycl", TradingCycles);
+      DBG_PRINT(StateManager, "State saved.");
+   }
+
+   //--- Restore state from Global Variables, or use defaults
+   void RestoreState()
+   {
+      if(GlobalVariableCheck(m_keyPrefix + "_State"))
+      {
+         CurrentState           = (EAState)GlobalVariableGet(m_keyPrefix + "_State");
+         DynamicRiskPercent     = GlobalVariableGet(m_keyPrefix + "_Risk");
+         DynamicStopLossPips    = GlobalVariableGet(m_keyPrefix + "_SL");
+         DynamicTakeProfitPips  = GlobalVariableGet(m_keyPrefix + "_TP");
+         DynamicPendingDistance = GlobalVariableGet(m_keyPrefix + "_Dist");
+         ConsecutiveWins        = (int)GlobalVariableGet(m_keyPrefix + "_Wins");
+         ConsecutiveLosses      = (int)GlobalVariableGet(m_keyPrefix + "_Loss");
+         TradingCycles          = (int)GlobalVariableGet(m_keyPrefix + "_Cycl");
+         DBG_PRINT(StateManager, "State restored from Global Variables.");
+      }
+      else
+      {
+         ResetToDefaults();
+         DBG_PRINT(StateManager, "No saved state found. Initializing with defaults.");
+      }
+   }
+
+   //--- Reset all dynamic parameters to their initial values
+   void ResetToDefaults()
+   {
+      CurrentState           = STATE_IDLE;
+      DynamicRiskPercent     = RiskPercent;
+      DynamicStopLossPips    = StopLoss;
+      DynamicTakeProfitPips  = TakeProfit;
+      DynamicPendingDistance = PendingOrderDistance;
+      ConsecutiveWins        = 0;
+      ConsecutiveLosses      = 0;
+      TradingCycles          = 0;
+   }
+   
+   //--- Adjusts dynamic parameters based on the outcome of the last trade
+   void ApplyOutcome(bool wasWin, double profit)
+   {
+      // Determine category if using category system
+      int category = g_categoryManager.DetermineCategory(profit, 0, wasWin);
+      
+      if (wasWin) {
+         ConsecutiveWins++;
+         ConsecutiveLosses = 0;
+         
+         // Check for max consecutive wins
+         if (MaxConsecutiveWins > 0 && ConsecutiveWins >= MaxConsecutiveWins) {
+            CurrentState = STATE_PAUSED;
+            string reason = EAIdentifier + " paused due to reaching max consecutive wins (" + IntegerToString(MaxConsecutiveWins) + ").";
+            Print(reason);
+            g_logManager.WriteLog(reason);
+            SendMail(EAIdentifier + " Paused", reason);
+            g_soundManager.PlayCriticalError();
+            SaveState();
+            return;
+         }
+         
+         if (UseOutcomeBasedAdjustments) {
+             DynamicRiskPercent += RiskAdjustmentStep;
+             DynamicStopLossPips -= SLAdjustmentStep;
+             DynamicTakeProfitPips += TPAdjustmentStep;
+             DBG_PRINT(StateManager, "Adapting for WIN. New Risk: " + DoubleToString(DynamicRiskPercent, 2));
+         }
+      } else {
+         ConsecutiveLosses++;
+         ConsecutiveWins = 0;
+         
+         if (UseOutcomeBasedAdjustments) {
+            DynamicRiskPercent -= RiskAdjustmentStep;
+            DynamicStopLossPips += SLAdjustmentStep;
+            DynamicTakeProfitPips -= TPAdjustmentStep;
+            DBG_PRINT(StateManager, "Adapting for LOSS. New Risk: " + DoubleToString(DynamicRiskPercent, 2));
+         }
+         
+         //--- Shutdown condition for consecutive losses
+         if (MaxConsecutiveLosses > 0 && ConsecutiveLosses >= MaxConsecutiveLosses) {
+            CurrentState = STATE_PAUSED;
+            string reason = EAIdentifier + " paused due to reaching max consecutive losses (" + IntegerToString(MaxConsecutiveLosses) + ").";
+            Print(reason);
+            g_logManager.WriteLog(reason);
+            SendMail(EAIdentifier + " Paused", reason);
+            g_soundManager.PlayCriticalError();
+            SaveState();
+            return;
+         }
+      }
+      
+      // Apply category adjustments
+      g_categoryManager.ApplyCategoryAdjustments(category, this);
+      
+      //--- Apply sanity checks to prevent extreme values
+      if (UseOutcomeBasedAdjustments) {
+         DynamicRiskPercent = MathMax(0.1, MathMin(DynamicRiskPercent, 10.0));
+         DynamicStopLossPips = MathMax(5.0, DynamicStopLossPips);
+         DynamicTakeProfitPips = MathMax(10.0, DynamicTakeProfitPips);
+         DynamicPendingDistance = MathMax(2.0, DynamicPendingDistance);
+      }
+      
+      SaveState();
+   }
+};
+
+//+------------------------------------------------------------------+
+//| SECTION 4: CORE MQL4 EVENT FUNCTIONS                             |
+//+------------------------------------------------------------------+
+
+//--- Initialization Function ---
+int init()
+{
+   Print("Initializing HUEY_P Execution Engine v6.1 Dual Signals for ", Symbol());
+   
+   // Initialize magic number
+   g_actualMagicNumber = MagicNumber;
+   if(UseUniqueChartID)
+   {
+       g_actualMagicNumber = MagicNumber + (int)(ChartID() % 10000);
+   }
+   
+   // Initialize managers
+   g_logManager.Initialize();
+   g_stateManager.Initialize(EAIdentifier);
+   g_signalManager.Initialize();
+   g_soundManager.PlayInitSound();
+   g_lastHistoryTotal = OrdersHistoryTotal();
+   
+   //--- Load external data files for filters
+   if (UseEconomicCalendar)
+   {
+       LoadNewsData();
+       LoadTimeFilterData();
+   }
+   
+   //--- Parse scheduled trading times
+   ParseScheduledTimes();
+
+   //--- Start the socket server if DLL signals are enabled
+   if(EnableDLLSignals && !AutonomousMode)
+   {
+      int hWnd = WindowHandle(Symbol(), Period());
+      if(StartServer(ListenPort, hWnd, CHARTEVENT_CUSTOM+1) == 1)
+      {
+         Print("Socket server started successfully on port ", ListenPort);
+         g_logManager.WriteSignalLog("DLL socket server started on port " + IntegerToString(ListenPort), SIGNAL_SOURCE_DLL);
+      }
+      else
+      {
+         Print("ERROR: Failed to start socket server on port ", ListenPort);
+         g_logManager.WriteLog("CRITICAL: Failed to start DLL socket server");
+         g_soundManager.PlayErrorSound();
+         return(INIT_FAILED);
+      }
+   }
+   
+   EventSetTimer(TimerIntervalSeconds);
+   g_logManager.WriteLog("EA initialized successfully - Signal modes: DLL=" + 
+                        (EnableDLLSignals ? "ON" : "OFF") + " CSV=" + 
+                        (EnableCSVSignals ? "ON" : "OFF"));
+   return(INIT_SUCCEEDED);
+}
+
+//--- Deinitialization Function ---
+void deinit()
+{
+   int reason = UninitializeReason();
+   Print("Deinitializing HUEY_P Engine. Reason code: ", reason);
+   g_logManager.WriteLog("EA deinitializing with reason: " + IntegerToString(reason));
+   g_stateManager.SaveState();
+   EventKillTimer();
+   
+   if(EnableDLLSignals && !AutonomousMode) StopServer();
+   
+   ObjectDelete(0, "HUEY_P_Dashboard");
+   Comment("");
+   g_logManager.Close();
+}
+
+//--- Timer Function (for periodic tasks) ---
+void OnTimer()
+{
+   // Performance optimization
+   if(PerformanceMode >= 2 && g_tickCounter % 3 != 0) return;
+   
+   //--- Reset circuit breaker after 5 minutes
+   if(g_recoveryState == RECOVERY_STATE_EMERGENCY && TimeCurrent() - g_circuitBreakerTrippedTime >= 300)
+   {
+       g_recoveryState = RECOVERY_STATE_NORMAL;
+       g_consecutiveErrors = 0;
+       Print("Circuit breaker reset. Resuming normal operations.");
+       g_logManager.WriteLog("Circuit breaker reset - resuming operations");
+       
+       if(EnableAutoRecovery)
+       {
+           g_stateManager.CurrentState = STATE_IDLE;
+           g_stateManager.SaveState();
+       }
+   }
+   
+   //--- CSV Signal Management
+   if(EnableCSVSignals)
+   {
+       // Check for CSV file updates
+       if(TimeCurrent() - g_lastCSVCheck >= CSVCheckIntervalSeconds)
+       {
+           g_signalManager.CheckCSVFileUpdate();
+           g_lastCSVCheck = TimeCurrent();
+       }
+       
+       // Process pending CSV signals
+       g_signalManager.ProcessCSVSignals();
+   }
+   
+   //--- Inactivity timeout for pending orders
+   if(g_stateManager.CurrentState == STATE_ORDERS_PLACED &&
+      TimeCurrent() - g_stateManager.OrdersPlacedTime >= InactivityTimeoutMinutes * 60)
+   {
+       DBG_PRINT(OnTimer, "Inactivity timeout reached. Deleting pending orders.");
+       g_logManager.WriteLog("Inactivity timeout - deleting pending orders");
+       DeleteAllPendingOrders();
+       g_stateManager.CurrentState = STATE_IDLE;
+       g_stateManager.SaveState();
+   }
+   
+   // Trail pending orders if enabled
+   if(TrailPendingOrder && g_stateManager.CurrentState == STATE_ORDERS_PLACED)
+   {
+       ApplyPendingOrderTrailing();
+   }
+   
+   if(PerformanceMode <= 1) DrawDashboard();
+}
+
+//--- Main trading logic function ---
+int start()
+{
+   g_tickCounter++;
+   
+   // Performance optimization
+   if(PerformanceMode == 3 && g_tickCounter % 10 != 0) return(0);
+   if(PerformanceMode == 2 && g_tickCounter % 5 != 0) return(0);
+   
+   //--- Check for circuit breaker or paused state
+   if(g_stateManager.CurrentState == STATE_PAUSED || g_recoveryState == RECOVERY_STATE_EMERGENCY) 
+   {
+       if(PerformanceMode <= 1)
+       {
+           Comment("Trading is currently HALTED. State: " + StateToString(g_stateManager.CurrentState) + 
+                   " | Recovery: " + RecoveryToString(g_recoveryState));
+       }
+       return(0);
+   }
+
+   //--- Check for recently closed trades to apply adaptive logic
+   CheckForClosedTrades();
+   
+   //--- Manage active trades (trailing stop)
+   if(g_stateManager.CurrentState == STATE_TRADE_TRIGGERED)
+   {
+      ApplyTrailingStop();
+   }
+
+   //--- Autonomous Mode Logic (only if no external signals are active)
+   if(AutonomousMode && !EnableDLLSignals && !EnableCSVSignals)
+   {
+      //--- If idle, check conditions and place a new straddle
+      if(g_stateManager.CurrentState == STATE_IDLE)
+      {
+         if(IsTradingAllowedNow())
+         {
+            PlaceStraddleOrders();
+            g_signalManager.SetLastSignalSource(SIGNAL_SOURCE_AUTONOMOUS);
+         }
+      }
+      //--- If pending orders are placed, check if one has been triggered
+      else if(g_stateManager.CurrentState == STATE_ORDERS_PLACED)
+      {
+         if(CheckForActiveTrade())
+         {
+            g_stateManager.CurrentState = STATE_TRADE_TRIGGERED;
+            g_soundManager.PlayTriggerSound();
+            g_logManager.WriteLog("Autonomous trade triggered - ticket: " + IntegerToString(g_stateManager.ActiveTradeTicket));
+            DeleteOpposingPendingOrder();
+            g_stateManager.SaveState();
+         }
+      }
+   }
+   return(0);
+}
+
+//--- Chart Event Function (for DLL communication) ---
+void OnChartEvent(const int id, const long &lparam, const double &dparam, const string &sparam)
+{
+   if (id == CHARTEVENT_CUSTOM+1 && EnableDLLSignals)
+   {
+      char buffer[4096];
+      if (GetLastMessage(buffer, ArraySize(buffer)) > 0)
+      {
+         string msg = CharArrayToString(buffer, 0, StringLen(CharArrayToString(buffer)));
+         DBG_PRINT(OnChartEvent, "Received DLL signal: " + msg);
+         g_logManager.WriteSignalLog("DLL signal received: " + msg, SIGNAL_SOURCE_DLL);
+         g_signalManager.ExecuteDLLSignal(msg);
+      }
+   }
+}
+
+//+------------------------------------------------------------------+
+//| SECTION 5: TRADING AND MANAGEMENT FUNCTIONS                      |
+//+------------------------------------------------------------------+
+
+//--- Places the initial Buy Stop and Sell Stop orders ---
+void PlaceStraddleOrders()
+{
+   DBG_PRINT(PlaceStraddleOrders, "Attempting to place new straddle.");
+   g_logManager.WriteLog("Placing new straddle orders");
+   
+   // Get direction-specific parameters
+   double buyStopLossPoints = (UseDynamicLotSize ? g_stateManager.DynamicStopLossPips : BuyStopLoss) * Point;
+   double sellStopLossPoints = (UseDynamicLotSize ? g_stateManager.DynamicStopLossPips : SellStopLoss) * Point;
+   
+   double buyLotSize = CalculateLotSize(buyStopLossPoints, true);
+   double sellLotSize = CalculateLotSize(sellStopLossPoints, false);
+   
+   if(buyLotSize <= 0 || sellLotSize <= 0)
+   {
+      Print("Error: Calculated lot size is zero or negative. Check risk settings and account balance.");
+      g_logManager.WriteLog("ERROR: Invalid lot size calculation");
+      g_soundManager.PlayErrorSound();
+      return;
+   }
+
+   double buyDistance = (UseDynamicLotSize ? g_stateManager.DynamicPendingDistance : BuyPendingDistance) * Point;
+   double sellDistance = (UseDynamicLotSize ? g_stateManager.DynamicPendingDistance : SellPendingDistance) * Point;
+   
+   double buyTakeProfitPoints = (UseDynamicLotSize ? g_stateManager.DynamicTakeProfitPips : BuyTakeProfit) * Point;
+   double sellTakeProfitPoints = (UseDynamicLotSize ? g_stateManager.DynamicTakeProfitPips : SellTakeProfit) * Point;
+
+   // Apply bias direction
+   if(BiasDirection == 1) sellLotSize *= 0.5; // Reduce bearish position
+   if(BiasDirection == -1) buyLotSize *= 0.5; // Reduce bullish position
+
+   //--- Loop to handle retries for recoverable errors
+   for(int i=0; i<3; i++)
+   {
+       RefreshRates();
+       double buyStopPrice = NormalizeDouble(Ask + buyDistance, Digits);
+       double buySL = NormalizeDouble(buyStopPrice - buyStopLossPoints, Digits);
+       double buyTP = NormalizeDouble(buyStopPrice + buyTakeProfitPoints, Digits);
+    
+       double sellStopPrice = NormalizeDouble(Bid - sellDistance, Digits);
+       double sellSL = NormalizeDouble(sellStopPrice + sellStopLossPoints, Digits);
+       double sellTP = NormalizeDouble(sellStopPrice - sellTakeProfitPoints, Digits);
+    
+       int buyTicket = -1, sellTicket = -1;
+       
+       // Place orders based on bias or both
+       if(BiasDirection >= 0)
+       {
+           buyTicket = SafeOrderSend(Symbol(), OP_BUYSTOP, buyLotSize, buyStopPrice, Slippage, buySL, buyTP, "HUEY_P_BuyStop");
+       }
+       
+       if(BiasDirection <= 0)
+       {
+           sellTicket = SafeOrderSend(Symbol(), OP_SELLSTOP, sellLotSize, sellStopPrice, Slippage, sellSL, sellTP, "HUEY_P_SellStop");
+       }
+    
+       if(buyTicket < 0 && BiasDirection >= 0 && HandleTradeError(GetLastError(), "PlaceBuyStop") == false) break;
+       if(sellTicket < 0 && BiasDirection <= 0 && HandleTradeError(GetLastError(), "PlaceSellStop") == false) 
+       {
+           if(buyTicket > 0) OrderDelete(buyTicket);
+           break;
+       }
+    
+       if ((BiasDirection >= 0 && buyTicket > 0) || (BiasDirection <= 0 && sellTicket > 0) || 
+           (BiasDirection == 0 && buyTicket > 0 && sellTicket > 0))
+       {
+          DBG_PRINT(PlaceStraddleOrders, "Straddle orders placed successfully.");
+          g_logManager.WriteLog("Straddle placed - Buy:" + IntegerToString(buyTicket) + " Sell:" + IntegerToString(sellTicket));
+          g_stateManager.OrdersPlacedTime = TimeCurrent();
+          g_stateManager.CurrentState = STATE_ORDERS_PLACED;
+          g_stateManager.SaveState();
+          return;
+       }
+       Sleep(500);
+   }
+   
+   Print("CRITICAL: Failed to place straddle orders after all attempts.");
+   g_logManager.WriteLog("CRITICAL: Straddle placement failed after all attempts");
+   g_soundManager.PlayCriticalError();
+}
+
+//--- Manages the trailing stop for any open trade ---
+void ApplyTrailingStop()
+{
+   if (!UseTrailingStop) return;
+
+   for (int i = OrdersTotal() - 1; i >= 0; i--)
+   {
+      if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES) && 
+          OrderSymbol() == Symbol() && 
+          OrderMagicNumber() == g_actualMagicNumber &&
+          (OrderType() == OP_BUY || OrderType() == OP_SELL))
+      {
+         double newSL = 0;
+         double trailingDistance, trailingStep;
+         
+         // Use direction-specific trailing or default
+         if(OrderType() == OP_BUY)
+         {
+             trailingDistance = BuyTrailingStop * Point;
+         }
+         else
+         {
+             trailingDistance = SellTrailingStop * Point;
+         }
+         
+         // Check for profit threshold to use adjusted trail
+         double currentProfit = OrderProfit();
+         if(currentProfit > InitialTrail * Point * OrderLots() * MarketInfo(Symbol(), MODE_TICKVALUE))
+         {
+             trailingDistance = AdjustedTrail * Point;
+         }
+         
+         trailingStep = TrailingStepPips * Point;
+
+         RefreshRates();
+         if (OrderType() == OP_BUY)
+         {
+            if (Bid - OrderOpenPrice() > trailingDistance)
+            {
+               newSL = NormalizeDouble(Bid - trailingStep, Digits);
+               if (OrderStopLoss() < newSL)
+               {
+                  if(!OrderModify(OrderTicket(), OrderOpenPrice(), newSL, OrderTakeProfit(), 0))
+                     HandleTradeError(GetLastError(), "ApplyTrailingStop-Buy");
+                  else
+                  {
+                     DBG_PRINT(ApplyTrailingStop, "Trailing stop updated for BUY ticket " + IntegerToString(OrderTicket()));
+                     g_logManager.WriteLog("Trailing stop updated for BUY #" + IntegerToString(OrderTicket()) + " to " + DoubleToString(newSL, Digits));
+                  }
+               }
+            }
+         }
+         else // OP_SELL
+         {
+            if (OrderOpenPrice() - Ask > trailingDistance)
+            {
+               newSL = NormalizeDouble(Ask + trailingStep, Digits);
+               if (OrderStopLoss() > newSL || OrderStopLoss() == 0)
+               {
+                  if(!OrderModify(OrderTicket(), OrderOpenPrice(), newSL, OrderTakeProfit(), 0))
+                     HandleTradeError(GetLastError(), "ApplyTrailingStop-Sell");
+                  else
+                  {
+                     DBG_PRINT(ApplyTrailingStop, "Trailing stop updated for SELL ticket " + IntegerToString(OrderTicket()));
+                     g_logManager.WriteLog("Trailing stop updated for SELL #" + IntegerToString(OrderTicket()) + " to " + DoubleToString(newSL, Digits));
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+//--- Trails pending orders based on price movement
+void ApplyPendingOrderTrailing()
+{
+    if(!TrailPendingOrder) return;
+    
+    for(int i = OrdersTotal() - 1; i >= 0; i--)
+    {
+        if(OrderSelect(i, SELECT_BY_POS, MODE_TRADES) && 
+           OrderSymbol() == Symbol() && 
+           OrderMagicNumber() == g_actualMagicNumber &&
+           (OrderType() == OP_BUYSTOP || OrderType() == OP_SELLSTOP))
+        {
+            RefreshRates();
+            double newPrice = 0;
+            double distance = PendingOrderDistance * Point;
+            
+            if(OrderType() == OP_BUYSTOP)
+            {
+                newPrice = NormalizeDouble(Ask + distance, Digits);
+                if(newPrice < OrderOpenPrice()) // Only trail down
+                {
+                    double newSL = NormalizeDouble(newPrice - BuyStopLoss * Point, Digits);
+                    double newTP = NormalizeDouble(newPrice + BuyTakeProfit * Point, Digits);
+                    
+                    if(!OrderModify(OrderTicket(), newPrice, newSL, newTP, 0))
+                    {
+                        HandleTradeError(GetLastError(), "TrailPendingBuy");
+                    }
+                    else
+                    {
+                        g_logManager.WriteLog("Trailed BuyStop #" + IntegerToString(OrderTicket()) + " to " + DoubleToString(newPrice, Digits));
+                    }
+                }
+            }
+            else if(OrderType() == OP_SELLSTOP)
+            {
+                newPrice = NormalizeDouble(Bid - distance, Digits);
+                if(newPrice > OrderOpenPrice()) // Only trail up
+                {
+                    double newSL = NormalizeDouble(newPrice + SellStopLoss * Point, Digits);
+                    double newTP = NormalizeDouble(newPrice - SellTakeProfit * Point, Digits);
+                    
+                    if(!OrderModify(OrderTicket(), newPrice, newSL, newTP, 0))
+                    {
+                        HandleTradeError(GetLastError(), "TrailPendingSell");
+                    }
+                    else
+                    {
+                        g_logManager.WriteLog("Trailed SellStop #" + IntegerToString(OrderTicket()) + " to " + DoubleToString(newPrice, Digits));
+                    }
+                }
+            }
+        }
+    }
+}
+
+//--- Checks history for closed trades and applies adaptive logic ---
+void CheckForClosedTrades()
+{
+   if(OrdersHistoryTotal() > g_lastHistoryTotal)
+   {
+      for(int i = OrdersHistoryTotal() - 1; i >= g_lastHistoryTotal; i--)
+      {
+         if(OrderSelect(i, SELECT_BY_POS, MODE_HISTORY) && OrderMagicNumber() == g_actualMagicNumber && OrderSymbol() == Symbol())
+         {
+            bool wasWin = OrderProfit() >= 0;
+            double profit = OrderProfit();
+            
+            DBG_PRINT(CheckForClosedTrades, "Trade " + IntegerToString(OrderTicket()) + " closed. Profit: " + DoubleToString(OrderProfit(), 2));
+            g_logManager.WriteLog("Trade closed #" + IntegerToString(OrderTicket()) + " P&L: " + DoubleToString(profit, 2) + 
+                                 " Source: " + SignalSourceToString(g_signalManager.GetLastSignalSource()));
+            
+            //--- Play appropriate sound
+            if(wasWin) {
+                if (MathAbs(OrderClosePrice() - OrderTakeProfit()) < Point) g_soundManager.PlayTPSound();
+                else g_soundManager.PlaySLProfitSound();
+            } else {
+                g_soundManager.PlaySLLossSound();
+            }
+            
+            g_stateManager.ApplyOutcome(wasWin, profit);
+            
+            //--- Decide whether to restart or pause (only for autonomous mode)
+            if(g_stateManager.CurrentState != STATE_PAUSED && AutonomousMode && !EnableDLLSignals && !EnableCSVSignals)
+            {
+                if(RestartAfterClose && g_stateManager.TradingCycles < MaxTradingCycles)
+                {
+                   g_stateManager.CurrentState = STATE_IDLE;
+                }
+                else
+                {
+                   g_stateManager.CurrentState = STATE_PAUSED;
+                   string pauseReason = "EA paused. Max trading cycles reached or RestartAfterClose is false.";
+                   Print(pauseReason);
+                   g_logManager.WriteLog(pauseReason);
+                }
+                g_stateManager.TradingCycles++;
+            }
+            g_stateManager.SaveState();
+         }
+      }
+      g_lastHistoryTotal = OrdersHistoryTotal();
+   }
+}
+
+//+------------------------------------------------------------------+
+//| SECTION 6: RISK, TIME, AND UTILITY FUNCTIONS                     |
+//+------------------------------------------------------------------+
+
+//--- Main validation function called before placing any trade ---
+bool IsTradingAllowedNow()
+{
+    //--- Simple pre-flight checks
+    if (!IsTradeAllowed() || IsStopped()) return(false);
+    if (MarketInfo(Symbol(), MODE_SPREAD) > MaxSpreadPips * Point)
+    {
+        DBG_PRINT(IsTradingAllowedNow, "Trade blocked by spread: " + DoubleToString(MarketInfo(Symbol(), MODE_SPREAD)/Point,1) + " pips.");
+        return(false);
+    }
+    
+    //--- Day of week management
+    if(UseDayManagement && !IsTradingDayAllowed())
+    {
+        DBG_PRINT(IsTradingAllowedNow, "Trade blocked by day filter");
+        return(false);
+    }
+    
+    //--- Scheduled time checking
+    if(g_scheduledTimeCount > 0 && !IsScheduledTradingTime())
+    {
+        DBG_PRINT(IsTradingAllowedNow, "Trade blocked - outside scheduled time window");
+        return(false);
+    }
+    
+    //--- Advanced Risk Management Checks
+    if (EnableAdvancedRiskChecks)
+    {
+        // Check Equity Stop
+        if (MinEquityStopLevel > 0 && AccountEquity() < MinEquityStopLevel) {
+            Print("CRITICAL: Trading halted. Equity below stop level of ", MinEquityStopLevel);
+            g_logManager.WriteLog("CRITICAL: Equity stop level breached");
+            g_stateManager.CurrentState = STATE_PAUSED;
+            return(false);
+        }
+        
+        // Check Daily Drawdown
+        if (MaxDailyDrawdownPercent > 0 && CheckDailyDrawdown(MaxDailyDrawdownPercent)) {
+            Print("CRITICAL: Trading halted. Max daily drawdown of ", MaxDailyDrawdownPercent, "% reached.");
+            g_logManager.WriteLog("CRITICAL: Daily drawdown limit exceeded");
+            g_stateManager.CurrentState = STATE_PAUSED;
+            return(false);
+        }
+
+        // Check Max Open Trades
+        if (MaxOpenTradesTotal > 0 && GetOpenPositionsCount() >= MaxOpenTradesTotal) {
+            DBG_PRINT(IsTradingAllowedNow, "Trade blocked. Max open trades (" + IntegerToString(MaxOpenTradesTotal) + ") reached.");
+            return(false);
+        }
+        
+        // Check Safe Margin Percentage
+        if(SafeMarginPercentage > 0 && !CheckMarginSafety())
+        {
+            DBG_PRINT(IsTradingAllowedNow, "Trade blocked by margin safety check");
+            return(false);
+        }
+    }
+    
+    //--- Time and News Filter Checks
+    if (UseEconomicCalendar)
+    {
+        if (IsTradingBlockedByTimeFilter()) return(false);
+        if (IsDuringNewsEmbargo()) return(false);
+    }
+
+    g_consecutiveErrors = 0; // Reset error count if we are clear to trade
+    return(true);
+}
+
+//--- Check if current day is allowed for trading
+bool IsTradingDayAllowed()
+{
+    int currentDay = TimeDayOfWeek(TimeCurrent());
+    switch(currentDay)
+    {
+        case 1: return TradeMonday;
+        case 2: return TradeTuesday;
+        case 3: return TradeWednesday;
+        case 4: return TradeThursday;
+        case 5: return TradeFriday;
+        default: return false; // Weekend
+    }
+}
+
+//--- Check if current time is within scheduled trading windows
+bool IsScheduledTradingTime()
+{
+    if(g_scheduledTimeCount == 0) return true; // No schedule = always allowed
+    
+    datetime now = TimeCurrent();
+    int currentHour = TimeHour(now);
+    int currentMinute = TimeMinute(now);
+    
+    for(int i = 0; i < g_scheduledTimeCount; i++)
+    {
+        int startMinutes = g_scheduledTimes[i].hour * 60 + g_scheduledTimes[i].minute - TradeWindowMinutes;
+        int endMinutes = g_scheduledTimes[i].hour * 60 + g_scheduledTimes[i].minute + TradeWindowMinutes;
+        int currentMinutes = currentHour * 60 + currentMinute;
+        
+        if(currentMinutes >= startMinutes && currentMinutes <= endMinutes)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+//--- Check margin safety before placing orders
+bool CheckMarginSafety()
+{
+    double requiredMargin = MarketInfo(Symbol(), MODE_MARGINREQUIRED) * (UseDynamicLotSize ? CalculateLotSize(StopLoss * Point, true) : FixedLotSize);
+    double availableMargin = AccountFreeMargin();
+    double marginUsagePercent = (requiredMargin / availableMargin) * 100.0;
+    
+    return (marginUsagePercent <= SafeMarginPercentage);
+}
+
+//--- Calculates lot size based on risk percentage and stop loss ---
+double CalculateLotSize(double stopLossInPoints, bool isBuy = true)
+{
+   if(!UseDynamicLotSize) 
+   {
+       double fixedLot = FixedLotSize;
+       if(MaxLotSize > 0) fixedLot = MathMin(fixedLot, MaxLotSize);
+       return fixedLot;
+   }
+   
+   if(stopLossInPoints <= 0) return 0.01;
+   
+   double accountBalance = AccountBalance();
+   double riskAmount = accountBalance * (g_stateManager.DynamicRiskPercent / 100.0);
+   
+   // Apply max loss multiplier
+   double maxLossAmount = accountBalance * (RiskPercent * MaxLossMultiplier / 100.0);
+   riskAmount = MathMin(riskAmount, maxLossAmount);
+   
+   double tickValue = MarketInfo(Symbol(), MODE_TICKVALUE);
+   
+   if(tickValue <= 0 || stopLossInPoints <=0) return 0.01;
+   
+   double lotSize = riskAmount / (stopLossInPoints * tickValue);
+   
+   double lotStep = MarketInfo(Symbol(), MODE_LOTSTEP);
+   lotSize = MathFloor(lotSize / lotStep) * lotStep;
+   
+   double minLot = MarketInfo(Symbol(), MODE_MINLOT);
+   double maxLot = MarketInfo(Symbol(), MODE_MAXLOT);
+   
+   // Apply MaxLotSize parameter
+   if(MaxLotSize > 0) maxLot = MathMin(maxLot, MaxLotSize);
+   
+   lotSize = MathMax(minLot, MathMin(lotSize, maxLot));
+
+   // Final risk check against max total lots
+   if(EnableAdvancedRiskChecks && MaxTotalLotsOpen > 0)
+   {
+       if(GetTotalOpenLots() + lotSize > MaxTotalLotsOpen)
+       {
+           DBG_PRINT(CalculateLotSize, "Lot size reduced to conform to MaxTotalLotsOpen limit.");
+           lotSize = MaxTotalLotsOpen - GetTotalOpenLots();
+           lotSize = MathFloor(lotSize / lotStep) * lotStep;
+       }
+   }
+   
+   return(lotSize < minLot ? 0.0 : lotSize);
+}
+
+//--- Deletes all pending orders managed by this EA ---
+void DeleteAllPendingOrders()
+{
+   for(int i = OrdersTotal() - 1; i >= 0; i--)
+   {
+      if(OrderSelect(i, SELECT_BY_POS, MODE_TRADES) && OrderMagicNumber() == g_actualMagicNumber && OrderSymbol() == Symbol())
+      {
+         if(OrderType() == OP_BUYSTOP || OrderType() == OP_SELLSTOP)
+         {
+            if(!OrderDelete(OrderTicket()))
+            {
+               HandleTradeError(GetLastError(), "DeleteAllPending");
+            }
+            else
+            {
+               g_logManager.WriteLog("Deleted pending order #" + IntegerToString(OrderTicket()));
+            }
+         }
+      }
+   }
+}
+
+//--- Deletes the opposing pending order after one is triggered ---
+void DeleteOpposingPendingOrder()
+{
+    int activeType = -1;
+    if(g_stateManager.ActiveTradeTicket > 0)
+    {
+       if(OrderSelect(g_stateManager.ActiveTradeTicket, SELECT_BY_TICKET))
+       {
+          activeType = OrderType();
+       }
+    } else { return; }
+
+    for(int i = OrdersTotal() - 1; i >= 0; i--)
+    {
+       if(OrderSelect(i, SELECT_BY_POS, MODE_TRADES) && OrderMagicNumber() == g_actualMagicNumber && OrderSymbol() == Symbol())
+       {
+          int pendingType = OrderType();
+          if((activeType == OP_SELL && pendingType == OP_BUYSTOP) || (activeType == OP_BUY && pendingType == OP_SELLSTOP))
+          {
+             if(!OrderDelete(OrderTicket()))
+             {
+                HandleTradeError(GetLastError(), "DeleteOpposing");
+             }
+             else
+             {
+                DBG_PRINT(DeleteOpposingPendingOrder, "Deleted opposing pending order.");
+                g_logManager.WriteLog("Deleted opposing pending order #" + IntegerToString(OrderTicket()));
+             }
+             return;
+          }
+       }
+    }
+}
+
+//--- Checks if an active market order exists ---
+bool CheckForActiveTrade()
+{
+    for(int i = OrdersTotal() - 1; i >= 0; i--)
+    {
+        if(OrderSelect(i, SELECT_BY_POS, MODE_TRADES) && OrderMagicNumber() == g_actualMagicNumber && OrderSymbol() == Symbol())
+        {
+            if(OrderType() == OP_BUY || OrderType() == OP_SELL)
+            {
+                g_stateManager.ActiveTradeTicket = OrderTicket();
+                return(true);
+            }
+        }
+    }
+    g_stateManager.ActiveTradeTicket = 0;
+    return(false);
+}
+
+//--- Draws the informational dashboard on the chart ---
+void DrawDashboard()
+{
+    if(PerformanceMode >= 3) return; // Skip dashboard in minimal mode
+    
+    string text = "";
+    
+    text += "--- HUEY_P Engine v6.1 Dual Signals [" + EAIdentifier + "] ---\n";
+    text += "Mode: " + (AutonomousMode ? "AUTO" : "SIGNAL") + " | Recovery: " + RecoveryToString(g_recoveryState) + "\n";
+    text += "Signals: DLL=" + (EnableDLLSignals ? "ON" : "OFF") + " CSV=" + (EnableCSVSignals ? "ON" : "OFF") + 
+            " | Last: " + SignalSourceToString(g_signalManager.GetLastSignalSource()) + "\n";
+    text += "State: " + StateToString(g_stateManager.CurrentState) + " | Magic: " + IntegerToString(g_actualMagicNumber) + "\n";
+    text += "Risk: " + DoubleToString(g_stateManager.DynamicRiskPercent, 2) + "% | ";
+    text += "SL/TP: " + DoubleToString(g_stateManager.DynamicStopLossPips,1) + "/" + DoubleToString(g_stateManager.DynamicTakeProfitPips,1) + " pips\n";
+    text += "Consecutive W/L: " + IntegerToString(g_stateManager.ConsecutiveWins) + "/" + IntegerToString(g_stateManager.ConsecutiveLosses);
+    text += " | Cycles: " + IntegerToString(g_stateManager.TradingCycles) + "/" + IntegerToString(MaxTradingCycles) + "\n";
+    
+    // CSV Signal Information
+    if(EnableCSVSignals)
+    {
+        int pendingSignals = g_signalManager.GetPendingCSVSignalCount();
+        datetime nextSignalTime = g_signalManager.GetNextCSVSignalTime();
+        text += "CSV Signals: " + IntegerToString(pendingSignals) + " pending";
+        if(nextSignalTime > 0)
+        {
+            text += " | Next: " + TimeToString(nextSignalTime, TIME_DATE|TIME_MINUTES);
+        }
+        text += "\n";
+    }
+    
+    text += "Daily DD: " + DoubleToString(CalculateDailyDrawdown(), 2) + "% | ";
+    text += "Equity: " + DoubleToString(AccountEquity(), 2) + "\n";
+    
+    if(UseDayManagement)
+    {
+        text += "Day Filter: " + (IsTradingDayAllowed() ? "ALLOWED" : "BLOCKED") + " | ";
+    }
+    
+    if(g_scheduledTimeCount > 0)
+    {
+        text += "Time Window: " + (IsScheduledTradingTime() ? "OPEN" : "CLOSED") + "\n";
+    }
+    
+    if(BiasDirection != 0)
+    {
+        text += "Bias: " + (BiasDirection > 0 ? "BULLISH" : "BEARISH") + " | ";
+    }
+    
+    text += "Performance: " + IntegerToString(PerformanceMode) + " | ";
+    text += "Spread: " + DoubleToString(MarketInfo(Symbol(), MODE_SPREAD)/Point, 1) + " pips";
+    
+    Comment(text);
+}
+
+//+------------------------------------------------------------------+
+//| SECTION 7: ADVANCED FILTER & ERROR HANDLING FUNCTIONS            |
+//+------------------------------------------------------------------+
+
+//--- Time Filter: Checks if trading is blocked by a rule in TimeFilters.csv ---
+bool IsTradingBlockedByTimeFilter()
+{
+    if (g_timeFilterCount == 0) return(false);
+
+    datetime now = TimeCurrent();
+    int currentDay = TimeDayOfWeek(now);
+    int currentMinutes = TimeHour(now) * 60 + TimeMinute(now);
+    
+    for (int i = 0; i < g_timeFilterCount; i++)
+    {
+        if (g_timeFilters[i].dayOfWeek == currentDay)
+        {
+            if (currentMinutes >= g_timeFilters[i].blockStartMinutes && currentMinutes < g_timeFilters[i].blockEndMinutes)
+            {
+                DBG_PRINT(TimeFilter, "Trade blocked by global time rule.");
+                return(true);
+            }
+        }
+    }
+    
+    return(false);
+}
+
+//--- News Filter: Checks if trading is blocked by an upcoming news event ---
+bool IsDuringNewsEmbargo()
+{
+    if (g_newsEventCount == 0) return(false);
+    
+    datetime now = TimeCurrent();
+    for (int i = 0; i < g_newsEventCount; i++)
+    {
+        long diff = g_newsEvents[i].eventTime - now;
+        
+        // Check hours before event if AvoidTradeBeforeEvent is enabled
+        if(AvoidTradeBeforeEvent && diff > 0 && diff <= HoursBeforeEvent * 3600)
+        {
+            DBG_PRINT(NewsFilter, "Trade blocked by upcoming news event (hours filter).");
+            return(true);
+        }
+        
+        // Standard minutes-based filter
+        if (diff > 0 && diff <= MinutesBeforeNews * 60)
+        {
+            DBG_PRINT(NewsFilter, "Trade blocked by upcoming news event.");
+            return(true);
+        }
+        if (diff < 0 && MathAbs(diff) <= MinutesAfterNews * 60)
+        {
+            DBG_PRINT(NewsFilter, "Trade blocked by recent news event.");
+            return(true);
+        }
+    }
+    return(false);
+}
+
+//--- Risk Filter: Checks for daily drawdown breach ---
+bool CheckDailyDrawdown(double maxDD)
+{
+    int currentDay = TimeDay();
+    if (currentDay != g_lastTradeDay)
+    {
+        g_lastTradeDay = currentDay;
+        g_dailyPeakEquity = AccountEquity();
+        return(false);
+    }
+    
+    if (AccountEquity() > g_dailyPeakEquity)
+    {
+        g_dailyPeakEquity = AccountEquity();
+        return(false);
+    }
+    
+    double drawdown = (g_dailyPeakEquity - AccountEquity()) / g_dailyPeakEquity * 100.0;
+    return (drawdown >= maxDD);
+}
+
+double CalculateDailyDrawdown()
+{
+    if (g_dailyPeakEquity > 0)
+       return((g_dailyPeakEquity - AccountEquity()) / g_dailyPeakEquity * 100.0);
+    return(0.0);
+}
+
+//--- Main Error Handling Function ---
+bool HandleTradeError(int error, string context)
+{
+   if(error == 0) return(true);
+
+   g_consecutiveErrors++;
+   
+   string errorMsg = "ERROR in " + context + ": Code " + IntegerToString(error) + " - " + ErrorDescription(error);
+   Print(errorMsg);
+   g_logManager.WriteLog(errorMsg);
+   g_soundManager.PlayErrorSound();
+   
+   //--- Assess recovery state
+   if(g_consecutiveErrors > 5) g_recoveryState = RECOVERY_STATE_DEGRADED;
+   if(g_consecutiveErrors > 10) 
+   {
+       g_recoveryState = RECOVERY_STATE_EMERGENCY;
+       g_circuitBreakerTrippedTime = TimeCurrent();
+       string criticalMsg = "CRITICAL: Circuit breaker tripped due to too many consecutive errors. Trading halted for 5 minutes.";
+       Print(criticalMsg);
+       g_logManager.WriteLog(criticalMsg);
+       g_soundManager.PlayCriticalError();
+       return(false);
+   }
+
+   //--- Decide if error is recoverable
+   switch(error)
+   {
+      case 135: // Price changed
+      case 136: // No prices
+      case 137: // Broker busy
+      case 146: // Trade context busy
+         DBG_PRINT(HandleTradeError, "Recoverable error. Retrying...");
+         return(true); // Retry is possible
+      
+      default:
+         DBG_PRINT(HandleTradeError, "Unrecoverable error. Halting operation.");
+         return(false); // Critical, stop trying
+   }
+}
+
+//+------------------------------------------------------------------+
+//| SECTION 8: DATA LOADING AND PARSING FUNCTIONS                    |
+//+------------------------------------------------------------------+
+
+//--- Loads news data from CSV ---
+void LoadNewsData()
+{
+    g_newsEventCount = 0;
+    int handle = FileOpen(NewsFileName, FILE_READ | FILE_CSV, ',');
+    if(handle < 0)
+    {
+        Print("Warning: ", NewsFileName, " not found.");
+        g_logManager.WriteLog("Warning: News file not found - " + NewsFileName);
+        return;
+    }
+    
+    FileReadString(handle); // Skip header
+    while(!FileIsEnding(handle) && g_newsEventCount < ArraySize(g_newsEvents))
+    {
+        string dt_str = FileReadString(handle);
+        g_newsEvents[g_newsEventCount].eventTime = StrToTime(dt_str);
+        g_newsEventCount++;
+        FileReadString(handle); // Skip other columns
+    }
+    FileClose(handle);
+    Print("Loaded ", g_newsEventCount, " news events.");
+    g_logManager.WriteLog("Loaded " + IntegerToString(g_newsEventCount) + " news events");
+}
+
+//--- Loads time filter rules from CSV ---
+void LoadTimeFilterData()
+{
+    g_timeFilterCount = 0;
+    int handle = FileOpen(TimeFilterFile, FILE_READ | FILE_CSV, ',');
+    if(handle < 0)
+    {
+        Print("Warning: ", TimeFilterFile, " not found.");
+        g_logManager.WriteLog("Warning: Time filter file not found - " + TimeFilterFile);
+        return;
+    }
+    
+    FileReadString(handle); // Skip header
+    while(!FileIsEnding(handle) && g_timeFilterCount < ArraySize(g_timeFilters))
+    {
+        int day = (int)FileReadNumber(handle);
+        string startStr = FileReadString(handle);
+        string endStr = FileReadString(handle);
+
+        g_timeFilters[g_timeFilterCount].dayOfWeek = day;
+        if (StringLen(startStr) == 4)
+            g_timeFilters[g_timeFilterCount].blockStartMinutes = (int)StringToInteger(StringSubstr(startStr, 0, 2)) * 60 + (int)StringToInteger(StringSubstr(startStr, 2, 2));
+        if (StringLen(endStr) == 4)
+            g_timeFilters[g_timeFilterCount].blockEndMinutes   = (int)StringToInteger(StringSubstr(endStr, 0, 2)) * 60 + (int)StringToInteger(StringSubstr(endStr, 2, 2));
+
+        g_timeFilterCount++;
+    }
+    FileClose(handle);
+    Print("Loaded ", g_timeFilterCount, " time filter rules.");
+    g_logManager.WriteLog("Loaded " + IntegerToString(g_timeFilterCount) + " time filter rules");
+}
+
+//--- Parse scheduled trading times from input strings
+void ParseScheduledTimes()
+{
+    g_scheduledTimeCount = 0;
+    
+    // Parse FirstTradeTime
+    if(StringLen(FirstTradeTime) == 5)
+    {
+        int colonPos = StringFind(FirstTradeTime, ":");
+        if(colonPos == 2)
+        {
+            g_scheduledTimes[g_scheduledTimeCount].hour = (int)StringToInteger(StringSubstr(FirstTradeTime, 0, 2));
+            g_scheduledTimes[g_scheduledTimeCount].minute = (int)StringToInteger(StringSubstr(FirstTradeTime, 3, 2));
+            g_scheduledTimeCount++;
+        }
+    }
+    
+    // Parse SecondTradeTime
+    if(StringLen(SecondTradeTime) == 5 && SecondTradeTime != FirstTradeTime)
+    {
+        int colonPos = StringFind(SecondTradeTime, ":");
+        if(colonPos == 2)
+        {
+            g_scheduledTimes[g_scheduledTimeCount].hour = (int)StringToInteger(StringSubstr(SecondTradeTime, 0, 2));
+            g_scheduledTimes[g_scheduledTimeCount].minute = (int)StringToInteger(StringSubstr(SecondTradeTime, 3, 2));
+            g_scheduledTimeCount++;
+        }
+    }
+    
+    if(g_scheduledTimeCount > 0)
+    {
+        g_logManager.WriteLog("Parsed " + IntegerToString(g_scheduledTimeCount) + " scheduled trading times");
+    }
+}
+
+//--- Processes JSON signal string from DLL backend ---
+bool ProcessJsonSignal(string json)
+{
+    string p_symbol     = ParseJsonValue(json, "symbol");
+    string p_type       = ParseJsonValue(json, "order_type");
+    double p_lots       = StrToDouble(ParseJsonValue(json, "lot_size"));
+    double p_sl         = StrToDouble(ParseJsonValue(json, "stop_loss"));
+    double p_tp         = StrToDouble(ParseJsonValue(json, "take_profit"));
+    int    p_magic      = StringToInteger(ParseJsonValue(json, "magic_number"));
+    string p_comment    = ParseJsonValue(json, "comment");
+
+    if (p_symbol != Symbol())
+    {
+       Print("DLL Signal ignored. Symbol mismatch: ", p_symbol);
+       g_logManager.WriteSignalLog("Signal ignored - symbol mismatch: " + p_symbol, SIGNAL_SOURCE_DLL);
+       return false;
+    }
+    
+    int cmd = -1;
+    if (p_type == "buy") cmd = OP_BUY;
+    if (p_type == "sell") cmd = OP_SELL;
+    
+    if (cmd != -1 && p_lots > 0)
+    {
+        if(IsTradingAllowedNow())
+        {
+            RefreshRates();
+            int ticket = SafeOrderSend(p_symbol, cmd, p_lots, (cmd == OP_BUY ? Ask:Bid), Slippage, p_sl, p_tp, 
+                                      p_comment + "_DLL", (p_magic > 0 ? p_magic : g_actualMagicNumber));
+            if(ticket > 0)
+            {
+                g_logManager.WriteSignalLog("DLL signal executed - Ticket: " + IntegerToString(ticket) + 
+                                           " Type: " + (cmd == OP_BUY ? "BUY" : "SELL") + 
+                                           " Lots: " + DoubleToString(p_lots, 2), SIGNAL_SOURCE_DLL);
+                g_soundManager.PlayTriggerSound();
+                return true;
+            }
+        }
+        else
+        {
+            g_logManager.WriteSignalLog("DLL signal rejected - trading conditions not met", SIGNAL_SOURCE_DLL);
+        }
+    }
+    return false;
+}
+
+//--- Lightweight function to parse a value from a JSON string ---
+string ParseJsonValue(string json, string key)
+{
+    string search_key = "\"" + key + "\":";
+    int key_pos = StringFind(json, search_key, 0);
+    if (key_pos == -1) return "";
+
+    int value_start = key_pos + StringLen(search_key);
+    
+    // Trim leading whitespace
+    while(StringGetChar(json, value_start) == ' ' || StringGetChar(json, value_start) == '\n') value_start++;
+
+    int value_end;
+    if (StringGetChar(json, value_start) == '"') // It's a string
+    {
+        value_start++;
+        value_end = StringFind(json, "\"", value_start);
+    }
+    else // It's a number or boolean
+    {
+        value_end = StringFind(json, ",", value_start);
+        if(value_end == -1) value_end = StringFind(json, "}", value_start);
+    }
+
+    if (value_end == -1) return "";
+
+    return StringSubstr(json, value_start, value_end - value_start);
+}
+
+//+------------------------------------------------------------------+
+//| SECTION 9: POSITION MANAGEMENT HELPER FUNCTIONS                  |
+//+------------------------------------------------------------------+
+
+//--- Calculates total lots for currently open positions ---
+double GetTotalOpenLots()
+{
+    double totalLots = 0;
+    for (int i=0; i < OrdersTotal(); i++)
+    {
+        if(OrderSelect(i, SELECT_BY_POS, MODE_TRADES) && OrderMagicNumber() == g_actualMagicNumber && OrderSymbol() == Symbol())
+            totalLots += OrderLots();
+    }
+    return(totalLots);
+}
+
+//--- Counts the number of open market positions ---
+int GetOpenPositionsCount()
+{
+    int count = 0;
+    for (int i = 0; i < OrdersTotal(); i++)
+    {
+        if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES) && OrderMagicNumber() == g_actualMagicNumber && OrderSymbol() == Symbol())
+            count++;
+    }
+    return(count);
+}
+
+//--- Calculates the net position (longs - shorts) ---
+double GetNetPositionLots() 
+{
+    double net_lots = 0.0;
+    for (int i = OrdersTotal() - 1; i >= 0; i--) {
+        if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && OrderMagicNumber() == g_actualMagicNumber)
+        {
+            if (OrderType() == OP_BUY)  net_lots += OrderLots();
+            if (OrderType() == OP_SELL) net_lots -= OrderLots();
+        }
+    }
+    return(net_lots);
+}
+
+//--- Closes all open market positions ---
+int CloseAllPositions() 
+{
+    int closed_count = 0;
+    for (int i = OrdersTotal() - 1; i >= 0; i--) {
+        if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES) && OrderSymbol() == Symbol() && OrderMagicNumber() == g_actualMagicNumber) 
+        {
+            RefreshRates();
+            if (OrderClose(OrderTicket(), OrderLots(), (OrderType()==OP_BUY?Bid:Ask), Slippage))
+            {
+               closed_count++;
+               g_logManager.WriteLog("Closed position #" + IntegerToString(OrderTicket()));
+            }
+            else
+            {
+               HandleTradeError(GetLastError(), "CloseAllPositions");
+            }
+        }
+    }
+    return(closed_count);
+}
+
+//--- Safe wrapper for OrderSend with error logging ---
+int SafeOrderSend(string symbol, int cmd, double volume, double price, int slippage, double sl, double tp, string comment, int magic = -1)
+{
+   if(magic == -1) magic = g_actualMagicNumber;
+   
+   // Final lot size validation
+   double minLot = MarketInfo(symbol, MODE_MINLOT);
+   double maxLot = MarketInfo(symbol, MODE_MAXLOT);
+   if(MaxLotSize > 0) maxLot = MathMin(maxLot, MaxLotSize);
+   
+   volume = MathMax(minLot, MathMin(volume, maxLot));
+   
+   int ticket = OrderSend(symbol, cmd, volume, price, slippage, sl, tp, comment, magic, 0, (cmd==OP_BUY||cmd==OP_BUYSTOP?clrBlue:clrRed));
+   if(ticket < 0)
+   {
+      HandleTradeError(GetLastError(), "SafeOrderSend");
+   }
+   else
+   {
+      g_consecutiveErrors = 0;
+      g_recoveryState = RECOVERY_STATE_NORMAL;
+      string orderMsg = "Order placed - Type: " + IntegerToString(cmd) + " Volume: " + DoubleToString(volume, 2) + " Price: " + DoubleToString(price, Digits);
+      g_logManager.WriteLog(orderMsg);
+   }
+   return ticket;
+}
+//+------------------------------------------------------------------+

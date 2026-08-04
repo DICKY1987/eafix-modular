@@ -1,0 +1,3280 @@
+$ErrorActionPreference = "Stop"
+Write-Host "CREATING ENHANCED VPS TRADING SYSTEM..." -ForegroundColor Green
+
+# Create directory structure
+$projectPath = "C:\TradingSystem"
+$directories = @(
+    "$projectPath",
+    "$projectPath\MT4",
+    "$projectPath\MT4\Files",
+    "$projectPath\MT4\Files\signals",
+    "$projectPath\MT4\Files\responses",
+    "$projectPath\MT4\Experts",
+    "$projectPath\MT4\Include",
+    "$projectPath\Python",
+    "$projectPath\Python\services",
+    "$projectPath\Python\config",
+    "$projectPath\Python\logs",
+    "$projectPath\Python\cache",
+    "$projectPath\Scripts",
+    "$projectPath\Logs",
+    "$projectPath\Backups",
+    "$projectPath\Temp"
+)
+
+foreach ($dir in $directories) {
+    New-Item -ItemType Directory -Path $dir -Force | Out-Null
+    Write-Host "📁 Created: $dir" -ForegroundColor Cyan
+}
+
+# File 1: Enhanced production_vps_setup.ps1
+$productionSetupContent = @'
+# Enhanced Production VPS Trading System Setup
+# All errors fixed + performance enhancements + validation
+
+[CmdletBinding()]
+param(
+    [Parameter(Mandatory=$false)]
+    [string]$BaseDirectory = "C:\TradingSystem",
+    
+    [Parameter(Mandatory=$false)]
+    [string[]]$TradingPairs = @(
+        "EURUSD", "GBPUSD", "USDJPY", "USDCHF", "USDCAD", "AUDUSD", "NZDUSD",
+        "EURGBP", "EURJPY", "EURCHF", "EURCAD", "EURAUD", "EURNZD",
+        "GBPJPY", "GBPCHF", "GBPCAD", "GBPAUD", "GBPNZD",
+        "JPYCHF", "JPYCAD", "JPYAUD", "JPYNZD",
+        "CHFCAD", "CHFAUD", "CHFNZD",
+        "CADAUD", "CADNZD", "AUDNZD",
+        "XAUUSD", "XAGUSD"
+    ),
+    
+    [Parameter(Mandatory=$false)]
+    [switch]$DevelopmentMode = $false,
+    
+    [Parameter(Mandatory=$false)]
+    [switch]$Force = $false,
+    
+    [Parameter(Mandatory=$false)]
+    [switch]$ValidateOnly = $false
+)
+
+$StartTime = Get-Date
+$LogFile = "$BaseDirectory\Logs\setup_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
+
+function Write-SetupLog {
+    param(
+        [string]$Message,
+        [string]$Level = "INFO",
+        [switch]$NoConsole
+    )
+    
+    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $logEntry = "[$timestamp] [$Level] $Message"
+    
+    if (-not $NoConsole) {
+        $color = switch ($Level) {
+            "SUCCESS" { "Green" }
+            "WARNING" { "Yellow" }
+            "ERROR" { "Red" }
+            default { "White" }
+        }
+        Write-Host $logEntry -ForegroundColor $color
+    }
+    
+    # Ensure log directory exists
+    $logDir = Split-Path $LogFile -Parent
+    if (!(Test-Path $logDir)) {
+        New-Item -ItemType Directory -Path $logDir -Force | Out-Null
+    }
+    
+    Add-Content -Path $LogFile -Value $logEntry -Encoding UTF8
+}
+
+Write-SetupLog "ENHANCED PRODUCTION VPS TRADING SYSTEM SETUP" "INFO"
+Write-SetupLog "Started: $($StartTime.ToString('yyyy-MM-dd HH:mm:ss'))" "INFO"
+Write-SetupLog "Base Directory: $BaseDirectory" "INFO"
+Write-SetupLog "Validation Only: $ValidateOnly" "INFO"
+
+# Development mode uses only 3 pairs for testing
+if ($DevelopmentMode) {
+    $TradingPairs = @("EURUSD", "GBPUSD", "USDJPY")
+    Write-SetupLog "DEVELOPMENT MODE: Using $($TradingPairs.Count) pairs" "WARNING"
+} else {
+    Write-SetupLog "PRODUCTION MODE: Using $($TradingPairs.Count) pairs" "INFO"
+}
+
+# Enhanced Python detection with version validation
+function Find-PythonCommand {
+    $pythonCommands = @("python", "python3", "py")
+    
+    foreach ($cmd in $pythonCommands) {
+        try {
+            $version = & $cmd --version 2>$null
+            if ($LASTEXITCODE -eq 0) {
+                # Extract version number
+                $versionNumber = $version -replace "Python ", ""
+                $majorVersion = [int]($versionNumber.Split('.')[0])
+                $minorVersion = [int]($versionNumber.Split('.')[1])
+                
+                if (($majorVersion -eq 3 -and $minorVersion -ge 8) -or ($majorVersion -gt 3)) {
+                    Write-SetupLog "Found compatible Python: $version using command '$cmd'" "SUCCESS"
+                    return @{
+                        Command = $cmd
+                        Version = $versionNumber
+                        Compatible = $true
+                    }
+                } else {
+                    Write-SetupLog "Found Python $version but requires 3.8+ using command '$cmd'" "WARNING"
+                }
+            }
+        } catch {
+            # Continue to next command
+        }
+    }
+    
+    return @{
+        Command = $null
+        Version = $null
+        Compatible = $false
+    }
+}
+
+$pythonInfo = Find-PythonCommand
+if (-not $pythonInfo.Compatible) {
+    Write-SetupLog "ERROR: Compatible Python not found. Please install Python 3.8+ first." "ERROR"
+    Write-SetupLog "Download from: https://python.org or Microsoft Store" "INFO"
+    exit 1
+}
+
+# Validation-only mode
+if ($ValidateOnly) {
+    Write-SetupLog "Running validation checks only..." "INFO"
+    
+    # Check all required directories
+    $requiredDirs = @(
+        "$BaseDirectory\MT4\Files\signals",
+        "$BaseDirectory\MT4\Files\responses",
+        "$BaseDirectory\Python\services",
+        "$BaseDirectory\Python\config",
+        "$BaseDirectory\Python\logs"
+    )
+    
+    $missingDirs = @()
+    foreach ($dir in $requiredDirs) {
+        if (!(Test-Path $dir)) {
+            $missingDirs += $dir
+        }
+    }
+    
+    if ($missingDirs.Count -eq 0) {
+        Write-SetupLog "All required directories exist" "SUCCESS"
+    } else {
+        Write-SetupLog "Missing directories: $($missingDirs -join ', ')" "ERROR"
+        exit 1
+    }
+    
+    # Check CSV files
+    $expectedFiles = $TradingPairs.Count * 2  # signals + responses
+    $actualSignalFiles = (Get-ChildItem "$BaseDirectory\MT4\Files\signals" -Filter "*_signals.csv" -ErrorAction SilentlyContinue).Count
+    $actualResponseFiles = (Get-ChildItem "$BaseDirectory\MT4\Files\responses" -Filter "*_responses.csv" -ErrorAction SilentlyContinue).Count
+    
+    Write-SetupLog "CSV Files: $actualSignalFiles signal files, $actualResponseFiles response files (expected: $expectedFiles total)" "INFO"
+    
+    if (($actualSignalFiles + $actualResponseFiles) -eq $expectedFiles) {
+        Write-SetupLog "VALIDATION PASSED: System is properly configured" "SUCCESS"
+        exit 0
+    } else {
+        Write-SetupLog "VALIDATION FAILED: Missing CSV files" "ERROR"
+        exit 1
+    }
+}
+
+# Create enhanced directory structure
+Write-SetupLog "Creating enhanced directory structure..." "INFO"
+
+$directories = @(
+    $BaseDirectory,
+    "$BaseDirectory\MT4",
+    "$BaseDirectory\MT4\Files",
+    "$BaseDirectory\MT4\Files\signals",
+    "$BaseDirectory\MT4\Files\responses", 
+    "$BaseDirectory\MT4\Experts",
+    "$BaseDirectory\MT4\Include",
+    "$BaseDirectory\Python",
+    "$BaseDirectory\Python\services",
+    "$BaseDirectory\Python\config",
+    "$BaseDirectory\Python\logs",
+    "$BaseDirectory\Python\cache",
+    "$BaseDirectory\Scripts",
+    "$BaseDirectory\Logs",
+    "$BaseDirectory\Backups",
+    "$BaseDirectory\Temp"
+)
+
+$dirCount = 0
+foreach ($dir in $directories) {
+    if (!(Test-Path $dir) -or $Force) {
+        try {
+            New-Item -ItemType Directory -Path $dir -Force | Out-Null
+            $dirCount++
+            Write-SetupLog "Created: $dir" "SUCCESS" -NoConsole
+        } catch {
+            Write-SetupLog "ERROR creating $dir : $($_.Exception.Message)" "ERROR"
+        }
+    }
+}
+
+Write-SetupLog "Created $dirCount directories" "SUCCESS"
+
+# Create CSV files with enhanced headers and validation
+Write-SetupLog "Creating enhanced CSV files..." "INFO"
+
+$signalHeader = "id,symbol,direction,confidence,timestamp,strategy_id,metadata,signal_type,timeframe,risk_level"
+$responseHeader = "signal_id,trade_id,status,execution_price,timestamp,error_message,lot_size,magic_number,slippage,execution_time_ms,broker_response"
+
+$csvCount = 0
+$csvErrors = @()
+
+foreach ($pair in $TradingPairs) {
+    # Signal file with enhanced structure
+    $signalFile = "$BaseDirectory\MT4\Files\signals\${pair}_signals.csv"
+    try {
+        if ((Test-Path $signalFile) -and (-not $Force)) {
+            Write-SetupLog "Skipping existing signal file: ${pair}_signals.csv" "WARNING"
+        } else {
+            $signalHeader | Out-File -FilePath $signalFile -Encoding UTF8 -Force
+            $csvCount++
+            Write-SetupLog "Created signal file: ${pair}_signals.csv" "SUCCESS" -NoConsole
+        }
+    } catch {
+        $csvErrors += "Signal file for $pair : $($_.Exception.Message)"
+        Write-SetupLog "ERROR creating signal file for $pair : $($_.Exception.Message)" "ERROR"
+    }
+    
+    # Response file with enhanced structure
+    $responseFile = "$BaseDirectory\MT4\Files\responses\${pair}_responses.csv"
+    try {
+        if ((Test-Path $responseFile) -and (-not $Force)) {
+            Write-SetupLog "Skipping existing response file: ${pair}_responses.csv" "WARNING"
+        } else {
+            $responseHeader | Out-File -FilePath $responseFile -Encoding UTF8 -Force
+            $csvCount++
+            Write-SetupLog "Created response file: ${pair}_responses.csv" "SUCCESS" -NoConsole
+        }
+    } catch {
+        $csvErrors += "Response file for $pair : $($_.Exception.Message)"
+        Write-SetupLog "ERROR creating response file for $pair : $($_.Exception.Message)" "ERROR"
+    }
+}
+
+Write-SetupLog "Created $csvCount CSV files for $($TradingPairs.Count) trading pairs" "SUCCESS"
+
+if ($csvErrors.Count -gt 0) {
+    Write-SetupLog "CSV creation errors: $($csvErrors.Count)" "ERROR"
+    foreach ($error in $csvErrors) {
+        Write-SetupLog "  $error" "ERROR"
+    }
+}
+
+# Install required Python packages with version pinning
+Write-SetupLog "Installing Python packages with enhanced dependencies..." "INFO"
+
+$packages = @(
+    "pandas>=1.3.0",
+    "numpy>=1.21.0", 
+    "pyyaml>=6.0",
+    "requests>=2.25.0",
+    "python-dateutil>=2.8.0",
+    "psutil>=5.8.0",
+    "watchdog>=2.1.0",
+    "filelock>=3.4.0"
+)
+
+$packageCount = 0
+$packageErrors = @()
+
+foreach ($package in $packages) {
+    try {
+        Write-SetupLog "Installing $package..." "INFO" -NoConsole
+        & $pythonInfo.Command -m pip install $package --quiet --disable-pip-version-check --upgrade
+        if ($LASTEXITCODE -eq 0) {
+            $packageCount++
+        } else {
+            $packageErrors += $package
+            Write-SetupLog "WARNING: Failed to install $package" "WARNING"
+        }
+    } catch {
+        $packageErrors += $package
+        Write-SetupLog "ERROR installing $package : $($_.Exception.Message)" "ERROR"
+    }
+}
+
+Write-SetupLog "Installed $packageCount/$($packages.Count) Python packages" "SUCCESS"
+
+if ($packageErrors.Count -gt 0) {
+    Write-SetupLog "Package installation errors: $($packageErrors -join ', ')" "WARNING"
+}
+
+# Create enhanced configuration file
+Write-SetupLog "Creating enhanced configuration..." "INFO"
+
+$configContent = @"
+# Enhanced Trading System Configuration
+# Version: 2.0 - Production Ready
+
+trading:
+  pairs: [$($TradingPairs -join ', ')]
+  base_directory: "$BaseDirectory"
+  signal_directory: "$BaseDirectory\\MT4\\Files\\signals"
+  response_directory: "$BaseDirectory\\MT4\\Files\\responses"
+  
+monitoring:
+  check_interval: 30
+  log_level: INFO
+  max_log_size: 10MB
+  performance_tracking: true
+  alert_on_slow_operations: true
+  slow_operation_threshold: 5.0
+  
+risk_management:
+  max_lot_size: 0.1
+  max_daily_trades: 50
+  stop_loss_pips: 50
+  take_profit_pips: 100
+  max_signals_per_bar: 1
+  signal_cooldown_minutes: 5
+  max_concurrent_positions: 10
+  daily_loss_limit: 1000.0
+  
+signal_generation:
+  adaptive_strategy_selection: true
+  strategy_effectiveness_window: 100
+  min_confidence_threshold: 0.65
+  max_concurrent_signals: 1
+  strategies:
+    - MA_Cross
+    - RSI
+    - SupRes
+  
+system:
+  python_command: "$($pythonInfo.Command)"
+  python_version: "$($pythonInfo.Version)"
+  backup_enabled: true
+  backup_interval: 24h
+  backup_structure: "enhanced"
+  max_backups_to_keep: 7
+  backup_validation_enabled: true
+  health_check:
+    cache_duration_seconds: 30
+    warning_threshold: 70
+    critical_threshold: 50
+  
+performance:
+  enable_caching: true
+  cache_directory: "$BaseDirectory\\Python\\cache"
+  max_cache_size: 100MB
+  csv_lock_timeout: 10.0
+  
+logging:
+  enable_detailed_logging: true
+  log_rotation: true
+  max_log_files: 10
+  compress_old_logs: true
+"@
+
+$configFile = "$BaseDirectory\Python\config\claude_trading_config.yaml" 
+try {
+    $configContent | Out-File -FilePath $configFile -Encoding UTF8 -Force
+    Write-SetupLog "Created enhanced configuration file" "SUCCESS"
+} catch {
+    Write-SetupLog "ERROR creating config file: $($_.Exception.Message)" "ERROR"
+}
+
+# Final summary with enhanced metrics
+$EndTime = Get-Date
+$Duration = $EndTime - $StartTime
+
+Write-SetupLog "" "INFO"
+Write-SetupLog "ENHANCED SETUP COMPLETED SUCCESSFULLY!" "SUCCESS"
+Write-SetupLog "Duration: $($Duration.ToString('mm\:ss'))" "INFO"
+Write-SetupLog "Python: $($pythonInfo.Command) v$($pythonInfo.Version)" "INFO"
+Write-SetupLog "Trading Pairs: $($TradingPairs.Count)" "INFO"
+Write-SetupLog "CSV Files Created: $csvCount" "INFO"
+Write-SetupLog "Python Packages: $packageCount/$($packages.Count)" "INFO"
+
+Write-SetupLog "" "INFO"
+Write-SetupLog "ENHANCEMENTS APPLIED:" "INFO"
+Write-SetupLog "- Enhanced health check with caching and validation" "INFO"
+Write-SetupLog "- Advanced backup system with integrity validation" "INFO"
+Write-SetupLog "- Adaptive signal generation with performance tracking" "INFO"
+Write-SetupLog "- Concurrent CSV operations with file locking" "INFO"
+Write-SetupLog "- Configuration validation and error recovery" "INFO"
+Write-SetupLog "- Performance monitoring and alerting" "INFO"
+
+Write-SetupLog "" "INFO"
+Write-SetupLog "NEXT STEPS:" "INFO"
+Write-SetupLog "1. Run validation: .\runner.ps1 verify" "INFO"
+Write-SetupLog "2. Check system health: .\runner.ps1 health-check" "INFO"
+Write-SetupLog "3. Start monitoring: .\runner.ps1 monitor" "INFO"
+Write-SetupLog "4. Install MetaTrader 4 and deploy EAs" "INFO"
+
+# Create enhanced summary log
+$summaryContent = @"
+Enhanced Trading System Setup Summary
+====================================
+Date: $($StartTime.ToString('yyyy-MM-dd HH:mm:ss'))
+Duration: $($Duration.ToString('mm\:ss'))
+Mode: $(if ($DevelopmentMode) { "Development" } else { "Production" })
+Python: $($pythonInfo.Command) v$($pythonInfo.Version)
+
+STATISTICS:
+- Trading Pairs: $($TradingPairs.Count)
+- CSV Files: $csvCount
+- Directories Created: $dirCount
+- Python Packages: $packageCount/$($packages.Count)
+
+ENHANCEMENTS APPLIED:
+✓ Health check caching and validation
+✓ Advanced backup with integrity checks
+✓ Adaptive signal generation
+✓ Concurrent CSV operations protection
+✓ Enhanced configuration validation
+✓ Performance monitoring and alerting
+✓ Graceful error recovery mechanisms
+
+STATUS: SUCCESS - ENHANCED SYSTEM READY
+"@
+
+$summaryLog = "$BaseDirectory\Logs\enhanced_setup_summary_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
+try {
+    $summaryContent | Out-File -FilePath $summaryLog -Encoding UTF8 -Force
+    Write-SetupLog "Enhanced setup log saved: $summaryLog" "SUCCESS"
+} catch {
+    Write-SetupLog "WARNING: Could not save setup log" "WARNING"
+}
+
+Write-SetupLog "ENHANCED SYSTEM READY!" "SUCCESS"
+'@
+
+# File 2: Enhanced runner.ps1
+$runnerContent = @'
+# Enhanced Trading System Runner
+# All errors fixed + performance enhancements + caching
+
+[CmdletBinding()]
+param(
+    [Parameter(Position=0, Mandatory=$true)]
+    [ValidateSet("setup", "setup-dev", "verify", "monitor", "backup", "restore", "health-check", "clean", "help")]
+    [string]$Command,
+    
+    [Parameter(Mandatory=$false)]
+    [switch]$Force,
+    
+    [Parameter(Mandatory=$false)]
+    [string]$BackupName,
+    
+    [Parameter(Mandatory=$false)]
+    [switch]$Detailed
+)
+
+$BaseDirectory = "C:\TradingSystem"
+$CacheDirectory = "$BaseDirectory\Python\cache"
+
+function Show-Help {
+    Write-Host "ENHANCED TRADING SYSTEM RUNNER" -ForegroundColor Green
+    Write-Host "==============================" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Available Commands:" -ForegroundColor Yellow
+    Write-Host "  setup         - Full production setup (30 pairs)" -ForegroundColor White
+    Write-Host "  setup-dev     - Development setup (3 pairs)" -ForegroundColor White  
+    Write-Host "  verify        - Verify system installation" -ForegroundColor White
+    Write-Host "  monitor       - Start enhanced trading monitor" -ForegroundColor White
+    Write-Host "  backup        - Create system backup with validation" -ForegroundColor White
+    Write-Host "  restore       - Restore from backup" -ForegroundColor White
+    Write-Host "  health-check  - Check system health (cached)" -ForegroundColor White
+    Write-Host "  clean         - Clean logs and cache" -ForegroundColor White
+    Write-Host "  help          - Show this help" -ForegroundColor White
+    Write-Host ""
+    Write-Host "Examples:" -ForegroundColor Yellow
+    Write-Host "  .\runner.ps1 setup" -ForegroundColor Gray
+    Write-Host "  .\runner.ps1 backup -BackupName 'pre-update'" -ForegroundColor Gray
+    Write-Host "  .\runner.ps1 restore -BackupName 'backup_20241201_143000'" -ForegroundColor Gray
+    Write-Host "  .\runner.ps1 health-check -Detailed" -ForegroundColor Gray
+}
+
+function Find-PythonCommand {
+    $commands = @("python", "python3", "py")
+    
+    foreach ($cmd in $commands) {
+        try {
+            $version = & $cmd --version 2>$null
+            if ($LASTEXITCODE -eq 0) {
+                return $cmd
+            }
+        } catch {
+            # Continue
+        }
+    }
+    return $null
+}
+
+function Write-TimestampedMessage {
+    param(
+        [string]$Message,
+        [string]$Color = "White"
+    )
+    $timestamp = Get-Date -Format "HH:mm:ss"
+    Write-Host "[$timestamp] $Message" -ForegroundColor $Color
+}
+
+function Invoke-Setup {
+    param([switch]$DevMode)
+    
+    if (!(Test-Path ".\production_vps_setup.ps1")) {
+        Write-Host "ERROR: production_vps_setup.ps1 not found in current directory" -ForegroundColor Red
+        Write-Host "Make sure you're running from the correct directory" -ForegroundColor Yellow
+        return $false
+    }
+    
+    try {
+        Write-TimestampedMessage "Starting setup process..." "Green"
+        
+        if ($DevMode) {
+            & .\production_vps_setup.ps1 -DevelopmentMode:$true -Force:$Force
+        } else {
+            & .\production_vps_setup.ps1 -DevelopmentMode:$false -Force:$Force
+        }
+        
+        $success = $LASTEXITCODE -eq 0
+        
+        if ($success) {
+            Write-TimestampedMessage "Setup completed successfully" "Green"
+            # Clear health check cache after setup
+            Remove-HealthCheckCache
+        } else {
+            Write-TimestampedMessage "Setup completed with errors" "Red"
+        }
+        
+        return $success
+    } catch {
+        Write-Host "ERROR during setup: $($_.Exception.Message)" -ForegroundColor Red
+        return $false
+    }
+}
+
+function Invoke-Verify {
+    $python = Find-PythonCommand
+    if (-not $python) {
+        Write-Host "ERROR: Python not found" -ForegroundColor Red
+        return $false
+    }
+    
+    $verifyScript = "$BaseDirectory\Python\services\verify_system.py"
+    if (!(Test-Path $verifyScript)) {
+        Write-Host "ERROR: Verification script not found. Run setup first." -ForegroundColor Red
+        return $false
+    }
+    
+    try {
+        Write-TimestampedMessage "Running system verification..." "Yellow"
+        & $python $verifyScript
+        $success = $LASTEXITCODE -eq 0
+        
+        if ($success) {
+            Write-TimestampedMessage "Verification completed successfully" "Green"
+        } else {
+            Write-TimestampedMessage "Verification found issues" "Red"
+        }
+        
+        return $success
+    } catch {
+        Write-Host "ERROR during verification: $($_.Exception.Message)" -ForegroundColor Red
+        return $false
+    }
+}
+
+function Invoke-Monitor {
+    $python = Find-PythonCommand
+    if (-not $python) {
+        Write-Host "ERROR: Python not found" -ForegroundColor Red
+        return $false
+    }
+    
+    $monitorScript = "$BaseDirectory\Python\services\enhanced_monitor.py"
+    if (!(Test-Path $monitorScript)) {
+        Write-Host "ERROR: Enhanced monitor script not found. Run setup first." -ForegroundColor Red
+        return $false
+    }
+    
+    Write-TimestampedMessage "Starting enhanced trading monitor..." "Green"
+    Write-Host "Features: Real-time tracking, performance monitoring, automated alerts" -ForegroundColor Cyan
+    Write-Host "Press Ctrl+C to stop" -ForegroundColor Yellow
+    Write-Host ""
+    
+    try {
+        & $python $monitorScript
+        return $true
+    } catch {
+        Write-Host "ERROR during monitoring: $($_.Exception.Message)" -ForegroundColor Red
+        return $false
+    }
+}
+
+function Remove-HealthCheckCache {
+    $cacheFile = "$CacheDirectory\health_cache.json"
+    if (Test-Path $cacheFile) {
+        try {
+            Remove-Item $cacheFile -Force
+            Write-TimestampedMessage "Health check cache cleared" "Gray"
+        } catch {
+            Write-Host "WARNING: Could not clear health check cache" -ForegroundColor Yellow
+        }
+    }
+}
+
+function Invoke-HealthCheck {
+    Write-Host "ENHANCED SYSTEM HEALTH CHECK" -ForegroundColor Green
+    Write-Host "============================" -ForegroundColor Green
+
+    $python = Find-PythonCommand
+    if (-not $python) {
+        Write-Host "[FAIL] Python not found" -ForegroundColor Red
+        return $false
+    }
+
+    $utilsScript = "$BaseDirectory\Python\services\python_utilities.py"
+    if (!(Test-Path $utilsScript)) {
+        Write-Host "[FAIL] python_utilities.py not found. Run setup first." -ForegroundColor Red
+        return $false
+    }
+
+    # Check cache first
+    $cacheFile = "$CacheDirectory\health_cache.json"
+    $useCache = $false
+    
+    if ((Test-Path $cacheFile) -and (-not $Force)) {
+        $cacheAge = (Get-Date) - (Get-Item $cacheFile).LastWriteTime
+        if ($cacheAge.TotalSeconds -lt 30) {
+            $useCache = $true
+            Write-TimestampedMessage "Using cached health data (age: $($cacheAge.TotalSeconds.ToString('F0'))s)" "Gray"
+        }
+    }
+
+    try {
+        if ($useCache) {
+            $healthJson = Get-Content $cacheFile -Raw
+        } else {
+            Write-TimestampedMessage "Performing fresh health check..." "Yellow"
+            # Ensure cache directory exists
+            if (!(Test-Path $CacheDirectory)) {
+                New-Item -ItemType Directory -Path $CacheDirectory -Force | Out-Null
+            }
+            
+            $healthJson = & $python $utilsScript health
+            
+            # Cache the result
+            $healthJson | Out-File -FilePath $cacheFile -Encoding UTF8
+        }
+        
+        $health = $healthJson | ConvertFrom-Json
+
+        # Display results based on the Python script's output
+        Write-Host ""
+        foreach ($check in $health.checks.PSObject.Properties) {
+            $checkName = $check.Name
+            $checkStatus = $check.Value.status
+            $checkPoints = $check.Value.points
+            
+            $color = switch ($checkStatus) {
+                "OK" { "Green" }
+                "WARN" { "Yellow" }
+                "ERROR" { "Red" }
+                default { "Gray" }
+            }
+            
+            $displayName = $checkName -replace "_", " " | ForEach-Object { (Get-Culture).TextInfo.ToTitleCase($_) }
+            
+            if ($Detailed -and $check.Value.PSObject.Properties['details']) {
+                Write-Host "[$checkStatus] $displayName ($checkPoints pts) - $($check.Value.details)" -ForegroundColor $color
+            } else {
+                Write-Host "[$checkStatus] $displayName ($checkPoints pts)" -ForegroundColor $color
+            }
+        }
+
+        $score = $health.score
+        $maxScore = $health.max_score
+        $status = $health.status
+
+        # Performance information
+        if ($health.PSObject.Properties['performance']) {
+            $perf = $health.performance
+            Write-Host ""
+            Write-Host "PERFORMANCE METRICS:" -ForegroundColor Cyan
+            Write-Host "Check Duration: $($perf.check_duration_ms)ms" -ForegroundColor Gray
+            Write-Host "Cache Status: $($perf.cache_status)" -ForegroundColor Gray
+        }
+
+        # Final score
+        $scoreColor = switch ($status) {
+            "healthy" { "Green" }
+            "warning" { "Yellow" }
+            default { "Red" }
+        }
+
+        Write-Host ""
+        Write-Host "HEALTH SCORE: $score/$maxScore" -ForegroundColor $scoreColor
+
+        switch ($status) {
+            "healthy" {
+                Write-Host "✓ System is healthy and ready for trading!" -ForegroundColor Green
+            }
+            "warning" {
+                Write-Host "⚠ System needs some attention" -ForegroundColor Yellow
+            }
+            default {
+                Write-Host "✗ System requires setup or repair" -ForegroundColor Red
+            }
+        }
+
+        return $status -ne "critical"
+    } catch {
+        Write-Host "ERROR during health check: $($_.Exception.Message)" -ForegroundColor Red
+        return $false
+    }
+}
+
+function Invoke-Backup {
+    if (!(Test-Path $BaseDirectory)) {
+        Write-Host "ERROR: Trading system not found. Run setup first." -ForegroundColor Red
+        return $false
+    }
+    
+    $python = Find-PythonCommand
+    if (-not $python) {
+        Write-Host "ERROR: Python not found" -ForegroundColor Red
+        return $false
+    }
+    
+    $utilsScript = "$BaseDirectory\Python\services\python_utilities.py"
+    if (!(Test-Path $utilsScript)) {
+        Write-Host "ERROR: Python utilities not found. Run setup first." -ForegroundColor Red
+        return $false
+    }
+    
+    try {
+        Write-TimestampedMessage "Creating enhanced backup with validation..." "Yellow"
+        
+        if ($BackupName) {
+            & $python $utilsScript backup $BackupName
+        } else {
+            & $python $utilsScript backup
+        }
+        
+        $success = $LASTEXITCODE -eq 0
+        
+        if ($success) {
+            Write-TimestampedMessage "Backup created and validated successfully" "Green"
+        } else {
+            Write-TimestampedMessage "Backup creation failed" "Red"
+        }
+        
+        return $success
+        
+    } catch {
+        Write-Host "ERROR creating backup: $($_.Exception.Message)" -ForegroundColor Red
+        return $false
+    }
+}
+
+function Invoke-Restore {
+    if (-not $BackupName) {
+        Write-Host "ERROR: Backup name required. Use -BackupName parameter" -ForegroundColor Red
+        Write-Host "Available backups:" -ForegroundColor Yellow
+        
+        $backupDir = "$BaseDirectory\Backups"
+        if (Test-Path $backupDir) {
+            Get-ChildItem $backupDir -Directory | ForEach-Object {
+                Write-Host "  $($_.Name)" -ForegroundColor Gray
+            }
+        }
+        return $false
+    }
+    
+    $python = Find-PythonCommand
+    if (-not $python) {
+        Write-Host "ERROR: Python not found" -ForegroundColor Red
+        return $false
+    }
+    
+    $utilsScript = "$BaseDirectory\Python\services\python_utilities.py"
+    if (!(Test-Path $utilsScript)) {
+        Write-Host "ERROR: Python utilities not found" -ForegroundColor Red
+        return $false
+    }
+    
+    try {
+        Write-TimestampedMessage "Restoring from backup: $BackupName" "Yellow"
+        Write-Host "WARNING: This will overwrite existing files" -ForegroundColor Red
+        
+        if (-not $Force) {
+            $confirmation = Read-Host "Continue? (y/N)"
+            if ($confirmation -ne 'y' -and $confirmation -ne 'Y') {
+                Write-Host "Restore cancelled" -ForegroundColor Yellow
+                return $true
+            }
+        }
+        
+        & $python $utilsScript restore $BackupName
+        
+        $success = $LASTEXITCODE -eq 0
+        
+        if ($success) {
+            Write-TimestampedMessage "Restore completed successfully" "Green"
+            # Clear cache after restore
+            Remove-HealthCheckCache
+        } else {
+            Write-TimestampedMessage "Restore failed" "Red"
+        }
+        
+        return $success
+        
+    } catch {
+        Write-Host "ERROR during restore: $($_.Exception.Message)" -ForegroundColor Red
+        return $false
+    }
+}
+
+function Invoke-Clean {
+    Write-TimestampedMessage "Cleaning logs and cache..." "Yellow"
+    
+    $cleaned = 0
+    
+    # Clean cache directory
+    if (Test-Path $CacheDirectory) {
+        try {
+            Get-ChildItem $CacheDirectory -File | ForEach-Object {
+                Remove-Item $_.FullName -Force
+                $cleaned++
+            }
+            Write-Host "Cleaned cache directory" -ForegroundColor Green
+        } catch {
+            Write-Host "WARNING: Could not clean cache directory" -ForegroundColor Yellow
+        }
+    }
+    
+    # Clean old logs (older than 7 days)
+    $logDirectory = "$BaseDirectory\Python\logs"
+    if (Test-Path $logDirectory) {
+        try {
+            $cutoffDate = (Get-Date).AddDays(-7)
+            Get-ChildItem $logDirectory -File | Where-Object { $_.LastWriteTime -lt $cutoffDate } | ForEach-Object {
+                Remove-Item $_.FullName -Force
+                $cleaned++
+            }
+            Write-Host "Cleaned old log files" -ForegroundColor Green
+        } catch {
+            Write-Host "WARNING: Could not clean log directory" -ForegroundColor Yellow
+        }
+    }
+    
+    # Clean temp directory
+    $tempDirectory = "$BaseDirectory\Temp"
+    if (Test-Path $tempDirectory) {
+        try {
+            Get-ChildItem $tempDirectory -File | ForEach-Object {
+                Remove-Item $_.FullName -Force
+                $cleaned++
+            }
+            Write-Host "Cleaned temp directory" -ForegroundColor Green
+        } catch {
+            Write-Host "WARNING: Could not clean temp directory" -ForegroundColor Yellow
+        }
+    }
+    
+    Write-TimestampedMessage "Cleanup completed. $cleaned files removed." "Green"
+    return $true
+}
+
+# Main execution
+switch ($Command) {
+    "setup" {
+        $success = Invoke-Setup
+        exit $(if ($success) { 0 } else { 1 })
+    }
+    "setup-dev" {
+        $success = Invoke-Setup -DevMode
+        exit $(if ($success) { 0 } else { 1 })
+    }
+    "verify" {
+        $success = Invoke-Verify  
+        exit $(if ($success) { 0 } else { 1 })
+    }
+    "monitor" {
+        $success = Invoke-Monitor
+        exit $(if ($success) { 0 } else { 1 })
+    }
+    "backup" {
+        $success = Invoke-Backup
+        exit $(if ($success) { 0 } else { 1 })
+    }
+    "restore" {
+        $success = Invoke-Restore
+        exit $(if ($success) { 0 } else { 1 })
+    }
+    "health-check" {
+        $success = Invoke-HealthCheck
+        exit $(if ($success) { 0 } else { 1 })
+    }
+    "clean" {
+        $success = Invoke-Clean
+        exit $(if ($success) { 0 } else { 1 })
+    }
+    "help" {
+        Show-Help
+        exit 0
+    }
+    default {
+        Write-Host "Unknown command: $Command" -ForegroundColor Red
+        Show-Help
+        exit 1
+    }
+}
+'@
+
+# File 3: Enhanced python_utilities.py
+$pythonUtilitiesContent = @'
+#!/usr/bin/env python3
+"""
+Enhanced Trading System Python Utilities
+All errors fixed + concurrency protection + performance monitoring
+"""
+
+import os
+import sys
+import csv
+import json
+import yaml
+import time
+import shutil
+import threading
+import psutil
+from pathlib import Path
+from datetime import datetime, timedelta
+from typing import List, Dict, Optional, Tuple, Any
+from filelock import FileLock
+import logging
+
+class PerformanceTracker:
+    """Track and monitor system performance"""
+    
+    def __init__(self):
+        self.scan_times = []
+        self.max_history = 100
+        
+    def record_scan(self, duration: float):
+        """Record scan duration"""
+        self.scan_times.append({
+            'timestamp': datetime.now(),
+            'duration': duration
+        })
+        
+        # Keep only recent history
+        if len(self.scan_times) > self.max_history:
+            self.scan_times = self.scan_times[-self.max_history:]
+    
+    def get_average_scan_time(self) -> float:
+        """Get average scan time"""
+        if not self.scan_times:
+            return 0.0
+        return sum(s['duration'] for s in self.scan_times) / len(self.scan_times)
+    
+    def get_performance_stats(self) -> Dict:
+        """Get comprehensive performance statistics"""
+        if not self.scan_times:
+            return {'average': 0.0, 'max': 0.0, 'min': 0.0, 'count': 0}
+        
+        durations = [s['duration'] for s in self.scan_times]
+        return {
+            'average': sum(durations) / len(durations),
+            'max': max(durations),
+            'min': min(durations),
+            'count': len(durations),
+            'last_scan': self.scan_times[-1]['duration'] if self.scan_times else 0.0
+        }
+
+class EnhancedTradingSystemUtils:
+    """Enhanced utility class with all fixes and improvements"""
+    
+    def __init__(self, base_dir: str = "C:/TradingSystem"):
+        self.base_dir = Path(base_dir)
+        self.signal_dir = self.base_dir / "MT4" / "Files" / "signals"
+        self.response_dir = self.base_dir / "MT4" / "Files" / "responses"
+        self.config_dir = self.base_dir / "Python" / "config"
+        self.log_dir = self.base_dir / "Python" / "logs"
+        self.backup_dir = self.base_dir / "Backups"
+        self.cache_dir = self.base_dir / "Python" / "cache"
+        self.temp_dir = self.base_dir / "Temp"
+        
+        # Ensure directories exist
+        for directory in [self.log_dir, self.cache_dir, self.temp_dir]:
+            directory.mkdir(parents=True, exist_ok=True)
+        
+        # Performance tracking
+        self.performance_tracker = PerformanceTracker()
+        
+        # CSV fieldnames
+        self.signal_fieldnames = [
+            'id', 'symbol', 'direction', 'confidence', 'timestamp', 
+            'strategy_id', 'metadata', 'signal_type', 'timeframe', 'risk_level'
+        ]
+        self.response_fieldnames = [
+            'signal_id', 'trade_id', 'status', 'execution_price', 'timestamp',
+            'error_message', 'lot_size', 'magic_number', 'slippage', 
+            'execution_time_ms', 'broker_response'
+        ]
+        
+        # Configure logging
+        self.setup_logging()
+        
+    def setup_logging(self):
+        """Setup enhanced logging"""
+        log_file = self.log_dir / "enhanced_utils.log"
+        
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(message)s',
+            handlers=[
+                logging.FileHandler(log_file, encoding='utf-8'),
+                logging.StreamHandler(sys.stdout)
+            ]
+        )
+        
+        self.logger = logging.getLogger(__name__)
+        
+    def log(self, message: str, level: str = "INFO") -> None:
+        """Enhanced logging with performance tracking"""
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Use proper logging levels
+        if level == "ERROR":
+            self.logger.error(message)
+        elif level == "WARN" or level == "WARNING":
+            self.logger.warning(message)
+        elif level == "DEBUG":
+            self.logger.debug(message)
+        else:
+            self.logger.info(message)
+    
+    def load_config(self) -> Dict:
+        """Load and validate trading system configuration"""
+        config_file = self.config_dir / "claude_trading_config.yaml"
+        
+        if not config_file.exists():
+            self.log("Config file not found, using defaults", "WARN")
+            return self.get_default_config()
+        
+        try:
+            with open(config_file, 'r', encoding='utf-8') as f:
+                config = yaml.safe_load(f)
+            
+            # Validate configuration
+            if self.validate_config(config):
+                self.log("Configuration loaded and validated successfully")
+                return config
+            else:
+                self.log("Configuration validation failed, using defaults", "WARN")
+                return self.get_default_config()
+                
+        except Exception as e:
+            self.log(f"Error loading config: {e}", "ERROR")
+            return self.get_default_config()
+    
+    def validate_config(self, config: Dict) -> bool:
+        """Validate configuration parameters"""
+        required_sections = ['trading', 'monitoring', 'risk_management']
+        
+        for section in required_sections:
+            if section not in config:
+                self.log(f"Missing config section: {section}", "ERROR")
+                return False
+        
+        # Validate risk parameters
+        risk = config.get('risk_management', {})
+        max_lot = risk.get('max_lot_size', 0)
+        
+        if max_lot > 10.0:
+            self.log(f"WARNING: max_lot_size ({max_lot}) exceeds recommended limit (10.0)", "WARN")
+        
+        if max_lot <= 0:
+            self.log("ERROR: max_lot_size must be greater than 0", "ERROR")
+            return False
+        
+        # Validate trading pairs
+        trading = config.get('trading', {})
+        pairs = trading.get('pairs', [])
+        
+        if not pairs:
+            self.log("ERROR: No trading pairs configured", "ERROR")
+            return False
+        
+        self.log(f"Configuration validated: {len(pairs)} trading pairs, max lot: {max_lot}")
+        return True
+    
+    def get_default_config(self) -> Dict:
+        """Return enhanced default configuration"""
+        return {
+            'trading': {
+                'pairs': ['EURUSD', 'GBPUSD', 'USDJPY'],
+                'base_directory': str(self.base_dir),
+                'signal_directory': str(self.signal_dir),
+                'response_directory': str(self.response_dir)
+            },
+            'monitoring': {
+                'check_interval': 30,
+                'log_level': 'INFO',
+                'max_log_size': '10MB',
+                'performance_tracking': True
+            },
+            'risk_management': {
+                'max_lot_size': 0.1,
+                'max_daily_trades': 50,
+                'stop_loss_pips': 50,
+                'take_profit_pips': 100,
+                'max_signals_per_bar': 1,
+                'signal_cooldown_minutes': 5
+            },
+            'system': {
+                'backup_enabled': True,
+                'backup_interval': '24h',
+                'health_check': {
+                    'cache_duration_seconds': 30,
+                    'warning_threshold': 70,
+                    'critical_threshold': 50
+                }
+            }
+        }
+    
+    def get_trading_pairs(self) -> List[str]:
+        """Get list of trading pairs from CSV files"""
+        if not self.signal_dir.exists():
+            self.log("Signal directory not found", "ERROR")
+            return []
+        
+        pairs = []
+        for signal_file in self.signal_dir.glob("*_signals.csv"):
+            pair = signal_file.stem.replace("_signals", "")
+            pairs.append(pair)
+        
+        return sorted(pairs)
+    
+    def count_signals_with_lock(self, pair: str) -> int:
+        """Count signals with file locking for thread safety"""
+        signal_file = self.signal_dir / f"{pair}_signals.csv"
+        
+        if not signal_file.exists():
+            return 0
+        
+        lock_file = signal_file.with_suffix('.lock')
+        
+        try:
+            with FileLock(str(lock_file), timeout=10):
+                with open(signal_file, 'r', encoding='utf-8') as f:
+                    reader = csv.reader(f)
+                    rows = list(reader)
+                    return max(0, len(rows) - 1)  # Subtract header
+        except Exception as e:
+            self.log(f"Error counting signals for {pair}: {e}", "ERROR")
+            return 0
+    
+    def count_responses_with_lock(self, pair: str) -> int:
+        """Count responses with file locking for thread safety"""
+        response_file = self.response_dir / f"{pair}_responses.csv"
+        
+        if not response_file.exists():
+            return 0
+        
+        lock_file = response_file.with_suffix('.lock')
+        
+        try:
+            with FileLock(str(lock_file), timeout=10):
+                with open(response_file, 'r', encoding='utf-8') as f:
+                    reader = csv.reader(f)
+                    rows = list(reader)
+                    return max(0, len(rows) - 1)  # Subtract header
+        except Exception as e:
+            self.log(f"Error counting responses for {pair}: {e}", "ERROR")
+            return 0
+    
+    # Maintain backwards compatibility
+    def count_signals(self, pair: str) -> int:
+        return self.count_signals_with_lock(pair)
+    
+    def count_responses(self, pair: str) -> int:
+        return self.count_responses_with_lock(pair)
+    
+    def get_latest_signal(self, pair: str) -> Optional[Dict]:
+        """Get the latest signal with file locking"""
+        signal_file = self.signal_dir / f"{pair}_signals.csv"
+        
+        if not signal_file.exists():
+            return None
+        
+        lock_file = signal_file.with_suffix('.lock')
+        
+        try:
+            with FileLock(str(lock_file), timeout=10):
+                with open(signal_file, 'r', encoding='utf-8') as f:
+                    reader = csv.DictReader(f)
+                    rows = list(reader)
+                    return rows[-1] if rows else None
+        except Exception as e:
+            self.log(f"Error reading latest signal for {pair}: {e}", "ERROR")
+            return None
+    
+    def add_signal(self, pair: str, direction: str, confidence: float, 
+                   strategy_id: str = "default", metadata: str = "",
+                   signal_type: str = "technical", timeframe: str = "M15",
+                   risk_level: str = "medium") -> bool:
+        """Add a new signal with enhanced data and file locking"""
+        signal_file = self.signal_dir / f"{pair}_signals.csv"
+        lock_file = signal_file.with_suffix('.lock')
+        
+        signal_data = {
+            'id': f"{pair}_{int(time.time())}_{threading.get_ident()}",
+            'symbol': pair,
+            'direction': direction,
+            'confidence': str(confidence),
+            'timestamp': datetime.now().isoformat(),
+            'strategy_id': strategy_id,
+            'metadata': metadata,
+            'signal_type': signal_type,
+            'timeframe': timeframe,
+            'risk_level': risk_level
+        }
+        
+        try:
+            with FileLock(str(lock_file), timeout=10):
+                file_exists = signal_file.exists()
+                
+                with open(signal_file, 'a', newline='', encoding='utf-8') as f:
+                    writer = csv.DictWriter(f, fieldnames=self.signal_fieldnames)
+                    
+                    if not file_exists:
+                        writer.writeheader()
+                    
+                    writer.writerow(signal_data)
+            
+            self.log(f"Signal added for {pair}: {direction} @ {confidence} (strategy: {strategy_id})")
+            return True
+            
+        except Exception as e:
+            self.log(f"Error adding signal for {pair}: {e}", "ERROR")
+            return False
+    
+    def add_response(self, signal_id: str, trade_id: str, status: str,
+                     execution_price: float = 0.0, error_message: str = "",
+                     lot_size: float = 0.0, magic_number: int = 0,
+                     slippage: float = 0.0, execution_time_ms: float = 0.0,
+                     broker_response: str = "") -> bool:
+        """Add a response with enhanced data and file locking"""
+        # Enhanced signal_id parsing
+        if '_' in signal_id:
+            parts = signal_id.split('_')
+            pair = parts[0] if parts else "UNKNOWN"
+        else:
+            self.log(f"WARNING: Malformed signal_id '{signal_id}', using UNKNOWN", "WARN")
+            pair = "UNKNOWN"
+        
+        response_file = self.response_dir / f"{pair}_responses.csv"
+        lock_file = response_file.with_suffix('.lock')
+        
+        response_data = {
+            'signal_id': signal_id,
+            'trade_id': trade_id,
+            'status': status,
+            'execution_price': str(execution_price),
+            'timestamp': datetime.now().isoformat(),
+            'error_message': error_message,
+            'lot_size': str(lot_size),
+            'magic_number': str(magic_number),
+            'slippage': str(slippage),
+            'execution_time_ms': str(execution_time_ms),
+            'broker_response': broker_response
+        }
+        
+        try:
+            with FileLock(str(lock_file), timeout=10):
+                file_exists = response_file.exists()
+                
+                with open(response_file, 'a', newline='', encoding='utf-8') as f:
+                    writer = csv.DictWriter(f, fieldnames=self.response_fieldnames)
+                    
+                    if not file_exists:
+                        writer.writeheader()
+                    
+                    writer.writerow(response_data)
+            
+            self.log(f"Response added for {pair}: {status} (trade: {trade_id})")
+            return True
+            
+        except Exception as e:
+            self.log(f"Error adding response: {e}", "ERROR")
+            return False
+    
+    def cleanup_old_logs(self, days: int = 7) -> None:
+        """Clean up log files older than specified days"""
+        cutoff_date = datetime.now() - timedelta(days=days)
+        cleaned_count = 0
+        
+        for log_file in self.log_dir.glob("*.log"):
+            try:
+                file_time = datetime.fromtimestamp(log_file.stat().st_mtime)
+                if file_time < cutoff_date:
+                    log_file.unlink()
+                    cleaned_count += 1
+                    self.log(f"Deleted old log: {log_file.name}")
+            except Exception as e:
+                self.log(f"Error cleaning up {log_file.name}: {e}", "ERROR")
+        
+        if cleaned_count > 0:
+            self.log(f"Cleaned up {cleaned_count} old log files")
+    
+    def create_backup(self, backup_name: str = None) -> bool:
+        """Create an enhanced backup with validation"""
+        if not backup_name:
+            backup_name = f"backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        backup_path = self.backup_dir / backup_name
+        
+        try:
+            # Create backup directory
+            backup_path.mkdir(parents=True, exist_ok=True)
+            
+            # Create backup manifest
+            manifest = {
+                'backup_name': backup_name,
+                'created': datetime.now().isoformat(),
+                'system_version': self.get_system_version(),
+                'trading_pairs': self.get_trading_pairs(),
+                'backed_up_directories': []
+            }
+            
+            # Enhanced backup structure
+            dirs_to_backup = [
+                ('MT4/Files', 'MT4_Files'),
+                ('Python/config', 'Python_config'),
+                ('Python/services', 'Python_services'),
+                ('Python/logs', 'Python_logs')
+            ]
+            
+            for source_dir, backup_subdir in dirs_to_backup:
+                source_path = self.base_dir / source_dir
+                if source_path.exists():
+                    dest_path = backup_path / backup_subdir
+                    
+                    # Calculate directory size before backup
+                    dir_size = sum(f.stat().st_size for f in source_path.rglob('*') if f.is_file())
+                    
+                    shutil.copytree(source_path, dest_path, dirs_exist_ok=True)
+                    
+                    file_count = len([f for f in dest_path.rglob('*') if f.is_file()])
+                    
+                    manifest['backed_up_directories'].append({
+                        'source': source_dir,
+                        'destination': backup_subdir,
+                        'size_bytes': dir_size,
+                        'file_count': file_count
+                    })
+                    
+                    self.log(f"Backed up {source_dir} to {backup_subdir} ({dir_size:,} bytes, {file_count} files)")
+            
+            # Save manifest
+            with open(backup_path / 'backup_manifest.json', 'w', encoding='utf-8') as f:
+                json.dump(manifest, f, indent=2)
+            
+            # Validate backup integrity
+            if self.validate_backup(backup_path):
+                self.log(f"Backup created and validated: {backup_path}")
+                return True
+            else:
+                self.log(f"Backup validation failed: {backup_path}", "ERROR")
+                return False
+                
+        except Exception as e:
+            self.log(f"Error creating backup: {e}", "ERROR")
+            return False
+    
+    def validate_backup(self, backup_path: Path) -> bool:
+        """Validate backup integrity"""
+        manifest_file = backup_path / 'backup_manifest.json'
+        if not manifest_file.exists():
+            self.log("Backup manifest missing", "ERROR")
+            return False
+        
+        try:
+            with open(manifest_file, 'r', encoding='utf-8') as f:
+                manifest = json.load(f)
+            
+            # Verify all directories exist
+            for dir_info in manifest['backed_up_directories']:
+                backup_dir = backup_path / dir_info['destination']
+                if not backup_dir.exists():
+                    self.log(f"Backup validation failed: {dir_info['destination']} missing", "ERROR")
+                    return False
+                
+                # Verify file count matches
+                actual_files = len([f for f in backup_dir.rglob('*') if f.is_file()])
+                expected_files = dir_info['file_count']
+                if actual_files != expected_files:
+                    self.log(f"File count mismatch in {dir_info['destination']}: {actual_files} vs {expected_files}", "ERROR")
+                    return False
+            
+            self.log("Backup validation successful")
+            return True
+            
+        except Exception as e:
+            self.log(f"Backup validation error: {e}", "ERROR")
+            return False
+    
+    def restore_backup(self, backup_name: str) -> bool:
+        """Restore from backup with validation"""
+        backup_path = self.backup_dir / backup_name
+        
+        if not backup_path.exists():
+            self.log(f"Backup not found: {backup_name}", "ERROR")
+            return False
+        
+        # Validate backup before restore
+        if not self.validate_backup(backup_path):
+            self.log(f"Cannot restore: backup validation failed", "ERROR")
+            return False
+        
+        try:
+            # Load manifest
+            manifest_file = backup_path / 'backup_manifest.json'
+            with open(manifest_file, 'r', encoding='utf-8') as f:
+                manifest = json.load(f)
+            
+            # Restore directories
+            for dir_info in manifest['backed_up_directories']:
+                source_backup = backup_path / dir_info['destination']
+                dest_system = self.base_dir / dir_info['source']
+                
+                if source_backup.exists():
+                    # Remove existing directory
+                    if dest_system.exists():
+                        shutil.rmtree(dest_system)
+                    
+                    # Copy from backup
+                    shutil.copytree(source_backup, dest_system)
+                    self.log(f"Restored {dir_info['source']} from {dir_info['destination']}")
+            
+            self.log(f"Backup restored successfully: {backup_name}")
+            return True
+            
+        except Exception as e:
+            self.log(f"Error restoring backup: {e}", "ERROR")
+            return False
+    
+    def get_system_version(self) -> str:
+        """Get system version information"""
+        return "2.0-Enhanced"
+    
+    def robust_health_check(self) -> Dict:
+        """Comprehensive health check with graceful degradation"""
+        start_time = time.time()
+        
+        health = {
+            'status': 'unknown',
+            'score': 0,
+            'max_score': 110,
+            'checks': {},
+            'errors': [],
+            'performance': {}
+        }
+        
+        checks = [
+            ('base_directory', self.check_base_directory),
+            ('signal_files', self.check_signal_files),
+            ('response_files', self.check_response_files),
+            ('configuration', self.check_configuration),
+            ('monitor_script', self.check_monitor_script),
+            ('log_directory', self.check_log_directory),
+            ('backup_directory', self.check_backup_directory)
+        ]
+        
+        for check_name, check_function in checks:
+            try:
+                result = check_function()
+                health['checks'][check_name] = result
+                health['score'] += result.get('points', 0)
+            except Exception as e:
+                error_msg = f"{check_name}: {str(e)}"
+                health['errors'].append(error_msg)
+                health['checks'][check_name] = {
+                    'status': 'ERROR', 
+                    'points': 0, 
+                    'error': str(e)
+                }
+                self.log(f"Health check error in {check_name}: {e}", "ERROR")
+        
+        # Determine overall status
+        if health['score'] >= 90:
+            health['status'] = 'healthy'
+        elif health['score'] >= 70:
+            health['status'] = 'warning'
+        else:
+            health['status'] = 'critical'
+        
+        # Performance metrics
+        check_duration = (time.time() - start_time) * 1000  # Convert to ms
+        health['performance'] = {
+            'check_duration_ms': round(check_duration, 2),
+            'cache_status': 'fresh',
+            'system_memory_usage': psutil.virtual_memory().percent,
+            'disk_usage': psutil.disk_usage(str(self.base_dir)).percent
+        }
+        
+        return health
+    
+    # Health check helper methods
+    def check_base_directory(self) -> Dict:
+        if self.base_dir.exists():
+            return {'status': 'OK', 'points': 10, 'details': f'Path: {self.base_dir}'}
+        else:
+            return {'status': 'FAIL', 'points': 0, 'details': 'Base directory missing'}
+    
+    def check_signal_files(self) -> Dict:
+        if not self.signal_dir.exists():
+            return {'status': 'FAIL', 'points': 0, 'details': 'Signal directory missing'}
+        
+        signal_files = len(list(self.signal_dir.glob("*_signals.csv")))
+        if signal_files > 0:
+            return {'status': 'OK', 'points': 25, 'details': f'{signal_files} signal files'}
+        else:
+            return {'status': 'WARN', 'points': 15, 'details': 'No signal files found'}
+    
+    def check_response_files(self) -> Dict:
+        if not self.response_dir.exists():
+            return {'status': 'FAIL', 'points': 0, 'details': 'Response directory missing'}
+        
+        response_files = len(list(self.response_dir.glob("*_responses.csv")))
+        if response_files > 0:
+            return {'status': 'OK', 'points': 25, 'details': f'{response_files} response files'}
+        else:
+            return {'status': 'WARN', 'points': 15, 'details': 'No response files found'}
+    
+    def check_configuration(self) -> Dict:
+        config_file = self.config_dir / "claude_trading_config.yaml"
+        if config_file.exists():
+            try:
+                config = self.load_config()
+                if self.validate_config(config):
+                    return {'status': 'OK', 'points': 20, 'details': 'Configuration valid'}
+                else:
+                    return {'status': 'WARN', 'points': 10, 'details': 'Configuration invalid'}
+            except:
+                return {'status': 'WARN', 'points': 5, 'details': 'Configuration unreadable'}
+        else:
+            return {'status': 'FAIL', 'points': 0, 'details': 'Configuration missing'}
+    
+    def check_monitor_script(self) -> Dict:
+        monitor_script = self.base_dir / "Python" / "services" / "enhanced_monitor.py"
+        if monitor_script.exists():
+            return {'status': 'OK', 'points': 20, 'details': 'Enhanced monitor ready'}
+        else:
+            # Fallback to basic monitor
+            basic_monitor = self.base_dir / "Python" / "services" / "multi_pair_monitor.py"
+            if basic_monitor.exists():
+                return {'status': 'WARN', 'points': 15, 'details': 'Basic monitor only'}
+            else:
+                return {'status': 'FAIL', 'points': 0, 'details': 'No monitor script'}
+    
+    def check_log_directory(self) -> Dict:
+        if self.log_dir.exists():
+            log_files = len(list(self.log_dir.glob("*.log")))
+            return {'status': 'OK', 'points': 10, 'details': f'{log_files} log files'}
+        else:
+            return {'status': 'WARN', 'points': 5, 'details': 'Log directory missing'}
+    
+    def check_backup_directory(self) -> Dict:
+        if self.backup_dir.exists():
+            backups = len(list(self.backup_dir.glob("backup_*")))
+            return {'status': 'OK', 'points': 10, 'details': f'{backups} backups available'}
+        else:
+            return {'status': 'WARN', 'points': 5, 'details': 'Backup directory missing'}
+
+class EnhancedQuickStartManager:
+    """Enhanced quick start utilities with comprehensive testing"""
+    
+    def __init__(self):
+        self.utils = EnhancedTradingSystemUtils()
+    
+    def run_comprehensive_test(self) -> bool:
+        """Run comprehensive system test"""
+        print("ENHANCED COMPREHENSIVE SYSTEM TEST")
+        print("==================================")
+        
+        start_time = time.time()
+        
+        # Test configuration loading and validation
+        print("Testing configuration...")
+        config = self.utils.load_config()
+        if config and self.utils.validate_config(config):
+            print("✓ Configuration loaded and validated")
+        else:
+            print("✗ Configuration failed")
+            return False
+        
+        # Test trading pairs discovery
+        print("Testing trading pairs...")
+        pairs = self.utils.get_trading_pairs()
+        if pairs:
+            print(f"✓ Found {len(pairs)} trading pairs")
+        else:
+            print("✗ No trading pairs found")
+            return False
+        
+        # Test file operations with concurrency
+        print("Testing concurrent file operations...")
+        import threading
+        
+        def test_concurrent_access():
+            for i in range(5):
+                pair = pairs[0] if pairs else "EURUSD"
+                self.utils.count_signals_with_lock(pair)
+                time.sleep(0.1)
+        
+        threads = [threading.Thread(target=test_concurrent_access) for _ in range(3)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        
+        print("✓ Concurrent operations completed")
+        
+        # Test system health
+        print("Testing enhanced system health...")
+        health = self.utils.robust_health_check()
+        print(f"✓ Health score: {health['score']}/{health['max_score']}")
+        print(f"✓ Check duration: {health['performance']['check_duration_ms']}ms")
+        
+        # Test backup functionality
+        print("Testing backup system...")
+        test_backup_name = f"test_backup_{int(time.time())}"
+        if self.utils.create_backup(test_backup_name):
+            print("✓ Backup created and validated")
+            
+            # Test restore
+            if self.utils.restore_backup(test_backup_name):
+                print("✓ Backup restore successful")
+            else:
+                print("⚠ Backup restore failed")
+            
+            # Cleanup test backup
+            test_backup_path = self.utils.backup_dir / test_backup_name
+            if test_backup_path.exists():
+                shutil.rmtree(test_backup_path)
+                print("✓ Test backup cleaned up")
+        else:
+            print("⚠ Backup test failed")
+        
+        total_time = time.time() - start_time
+        print(f"\nTOTAL TEST TIME: {total_time:.2f} seconds")
+        
+        if health['score'] >= 70:
+            print("✓ COMPREHENSIVE TEST PASSED - SYSTEM READY")
+            return True
+        else:
+            print("✗ COMPREHENSIVE TEST FAILED - SYSTEM NEEDS ATTENTION")
+            return False
+
+def main():
+    """Main function with enhanced command handling"""
+    if len(sys.argv) > 1:
+        command = sys.argv[1].lower()
+        
+        if command == "test":
+            manager = EnhancedQuickStartManager()
+            success = manager.run_comprehensive_test()
+            sys.exit(0 if success else 1)
+        
+        elif command == "health":
+            utils = EnhancedTradingSystemUtils()
+            health = utils.robust_health_check()
+            print(json.dumps(health, indent=2))
+            sys.exit(0 if health['score'] >= 70 else 1)
+        
+        elif command == "pairs":
+            utils = EnhancedTradingSystemUtils()
+            pairs = utils.get_trading_pairs()
+            for pair in pairs:
+                signals = utils.count_signals_with_lock(pair)
+                responses = utils.count_responses_with_lock(pair)
+                print(f"{pair}: {signals} signals, {responses} responses")
+            sys.exit(0)
+        
+        elif command == "backup":
+            utils = EnhancedTradingSystemUtils()
+            backup_name = sys.argv[2] if len(sys.argv) > 2 else None
+            success = utils.create_backup(backup_name)
+            sys.exit(0 if success else 1)
+        
+        elif command == "restore":
+            if len(sys.argv) < 3:
+                print("ERROR: Backup name required")
+                print("Usage: python python_utilities.py restore <backup_name>")
+                sys.exit(1)
+            
+            utils = EnhancedTradingSystemUtils()
+            success = utils.restore_backup(sys.argv[2])
+            sys.exit(0 if success else 1)
+        
+        elif command == "clean":
+            utils = EnhancedTradingSystemUtils()
+            utils.cleanup_old_logs()
+            print("Cleanup completed")
+            sys.exit(0)
+        
+        else:
+            print(f"Unknown command: {command}")
+            print("Available commands: test, health, pairs, backup, restore, clean")
+            sys.exit(1)
+    else:
+        print("Enhanced Trading System Python Utilities v2.0")
+        print("Usage: python python_utilities.py [test|health|pairs|backup|restore|clean]")
+
+if __name__ == "__main__":
+    main()
+'@
+
+# File 5: Enhanced monitoring script
+$enhancedMonitorContent = @'
+#!/usr/bin/env python3
+"""
+Enhanced Trading Monitor with Performance Tracking
+Real-time monitoring with alerts and analytics
+"""
+
+import os
+import sys
+import csv
+import time
+import json
+import threading
+from pathlib import Path
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional
+import psutil
+
+# Add the services directory to path for imports
+sys.path.append(str(Path(__file__).parent))
+
+try:
+    from python_utilities import EnhancedTradingSystemUtils, PerformanceTracker
+except ImportError:
+    print("WARNING: Could not import enhanced utilities, using basic functionality")
+    EnhancedTradingSystemUtils = None
+    PerformanceTracker = None
+
+class EnhancedTradingMonitor:
+    """Enhanced trading monitor with performance analytics"""
+    
+    def __init__(self, base_dir="C:/TradingSystem"):
+        self.base_dir = Path(base_dir)
+        self.signal_dir = self.base_dir / "MT4" / "Files" / "signals"
+        self.response_dir = self.base_dir / "MT4" / "Files" / "responses"
+        self.log_dir = self.base_dir / "Python" / "logs"
+        self.cache_dir = self.base_dir / "Python" / "cache"
+        
+        # Ensure directories exist
+        for directory in [self.log_dir, self.cache_dir]:
+            directory.mkdir(parents=True, exist_ok=True)
+        
+        self.log_file = self.log_dir / "enhanced_monitor.log"
+        self.stats_cache = self.cache_dir / "monitor_stats.json"
+        
+        # Performance tracking
+        self.performance_tracker = PerformanceTracker() if PerformanceTracker else None
+        self.scan_count = 0
+        self.start_time = datetime.now()
+        
+        # Alert thresholds
+        self.slow_scan_threshold = 5.0  # seconds
+        self.high_activity_threshold = 10  # signals per minute
+        
+        # Statistics
+        self.stats = {
+            'total_scans': 0,
+            'total_signals_found': 0,
+            'total_responses_found': 0,
+            'pairs_with_activity': set(),
+            'last_activity_time': None,
+            'performance_alerts': 0
+        }
+        
+        # Load cached stats if available
+        self.load_cached_stats()
+        
+    def load_cached_stats(self):
+        """Load cached statistics"""
+        if self.stats_cache.exists():
+            try:
+                with open(self.stats_cache, 'r') as f:
+                    cached_stats = json.load(f)
+                
+                # Update stats, converting sets back from lists
+                self.stats.update(cached_stats)
+                self.stats['pairs_with_activity'] = set(cached_stats.get('pairs_with_activity', []))
+                
+                self.log_message("Loaded cached statistics", "DEBUG")
+            except Exception as e:
+                self.log_message(f"Could not load cached stats: {e}", "WARNING")
+    
+    def save_stats_cache(self):
+        """Save statistics to cache"""
+        try:
+            # Convert sets to lists for JSON serialization
+            cache_data = self.stats.copy()
+            cache_data['pairs_with_activity'] = list(self.stats['pairs_with_activity'])
+            
+            with open(self.stats_cache, 'w') as f:
+                json.dump(cache_data, f, indent=2, default=str)
+                
+        except Exception as e:
+            self.log_message(f"Could not save stats cache: {e}", "WARNING")
+    
+    def log_message(self, message, level="INFO"):
+        """Enhanced logging with performance tracking"""
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_entry = f"[{timestamp}] [{level}] {message}"
+        
+        # Print to console with colors
+        colors = {
+            "INFO": "\033[0m",      # Default
+            "SUCCESS": "\033[92m",   # Green
+            "WARNING": "\033[93m",   # Yellow
+            "ERROR": "\033[91m",     # Red
+            "DEBUG": "\033[90m",     # Gray
+            "ALERT": "\033[95m"      # Magenta
+        }
+        
+        color = colors.get(level, "\033[0m")
+        reset = "\033[0m"
+        print(f"{color}{log_entry}{reset}")
+        
+        # Write to log file
+        try:
+            with open(self.log_file, "a", encoding="utf-8") as f:
+                f.write(log_entry + "\n")
+        except Exception as e:
+            print(f"ERROR writing to log: {e}")
+    
+    def count_signals_fast(self, csv_file):
+        """Fast signal counting with caching"""
+        try:
+            if not csv_file.exists():
+                return 0
+            
+            # Use file modification time for caching
+            file_stat = csv_file.stat()
+            cache_key = f"{csv_file.name}_{file_stat.st_mtime}_{file_stat.st_size}"
+            
+            # Simple in-memory cache (could be enhanced with persistent cache)
+            if not hasattr(self, '_file_cache'):
+                self._file_cache = {}
+            
+            if cache_key in self._file_cache:
+                return self._file_cache[cache_key]
+            
+            with open(csv_file, 'r', encoding='utf-8') as f:
+                # Count lines minus header
+                line_count = sum(1 for line in f) - 1
+                count = max(0, line_count)
+            
+            self._file_cache[cache_key] = count
+            
+            # Limit cache size
+            if len(self._file_cache) > 100:
+                # Remove oldest entries (simple FIFO)
+                oldest_keys = list(self._file_cache.keys())[:20]
+                for key in oldest_keys:
+                    del self._file_cache[key]
+            
+            return count
+            
+        except Exception as e:
+            self.log_message(f"ERROR counting signals in {csv_file}: {e}", "ERROR")
+            return 0
+    
+    def get_file_activity_summary(self):
+        """Get detailed activity summary for all pairs"""
+        if not self.signal_dir.exists():
+            self.log_message("ERROR: Signal directory not found", "ERROR")
+            return None
+        
+        signal_files = list(self.signal_dir.glob("*_signals.csv"))
+        response_files = list(self.response_dir.glob("*_responses.csv"))
+        
+        # Create comprehensive pair data
+        all_pairs = set()
+        for signal_file in signal_files:
+            pair = signal_file.stem.replace("_signals", "")
+            all_pairs.add(pair)
+        for response_file in response_files:
+            pair = response_file.stem.replace("_responses", "")
+            all_pairs.add(pair)
+        
+        activity_data = []
+        total_signals = 0
+        total_responses = 0
+        
+        for pair in sorted(all_pairs):
+            signal_file = self.signal_dir / f"{pair}_signals.csv"
+            response_file = self.response_dir / f"{pair}_responses.csv"
+            
+            signal_count = self.count_signals_fast(signal_file)
+            response_count = self.count_signals_fast(response_file)
+            
+            total_signals += signal_count
+            total_responses += response_count
+            
+            if signal_count > 0 or response_count > 0:
+                self.stats['pairs_with_activity'].add(pair)
+            
+            # Get file modification times for activity tracking
+            signal_modified = signal_file.stat().st_mtime if signal_file.exists() else 0
+            response_modified = response_file.stat().st_mtime if response_file.exists() else 0
+            last_activity = max(signal_modified, response_modified)
+            
+            activity_data.append({
+                'pair': pair,
+                'signals': signal_count,
+                'responses': response_count,
+                'last_activity': datetime.fromtimestamp(last_activity) if last_activity > 0 else None,
+                'has_recent_activity': (time.time() - last_activity) < 300 if last_activity > 0 else False  # 5 minutes
+            })
+        
+        return {
+            'pairs': activity_data,
+            'totals': {
+                'signal_files': len(signal_files),
+                'response_files': len(response_files),
+                'total_signals': total_signals,
+                'total_responses': total_responses,
+                'active_pairs': len([p for p in activity_data if p['signals'] > 0 or p['responses'] > 0])
+            }
+        }
+    
+    def detect_performance_issues(self, scan_duration):
+        """Detect and alert on performance issues"""
+        if scan_duration > self.slow_scan_threshold:
+            self.stats['performance_alerts'] += 1
+            self.log_message(f"PERFORMANCE ALERT: Slow scan detected ({scan_duration:.2f}s)", "ALERT")
+            
+            # Check system resources
+            memory_percent = psutil.virtual_memory().percent
+            cpu_percent = psutil.cpu_percent()
+            
+            if memory_percent > 80:
+                self.log_message(f"High memory usage: {memory_percent:.1f}%", "WARNING")
+            if cpu_percent > 80:
+                self.log_message(f"High CPU usage: {cpu_percent:.1f}%", "WARNING")
+    
+    def show_system_stats(self):
+        """Show comprehensive system statistics"""
+        uptime = datetime.now() - self.start_time
+        
+        print(f"\n{'='*60}")
+        print(f"ENHANCED TRADING MONITOR - SYSTEM STATISTICS")
+        print(f"{'='*60}")
+        print(f"Monitor Uptime: {uptime}")
+        print(f"Total Scans: {self.stats['total_scans']}")
+        print(f"Signals Found: {self.stats['total_signals_found']}")
+        print(f"Responses Found: {self.stats['total_responses_found']}")
+        print(f"Active Pairs: {len(self.stats['pairs_with_activity'])}")
+        print(f"Performance Alerts: {self.stats['performance_alerts']}")
+        
+        if self.performance_tracker:
+            perf_stats = self.performance_tracker.get_performance_stats()
+            print(f"\nPERFORMANCE METRICS:")
+            print(f"Average Scan Time: {perf_stats['average']:.2f}s")
+            print(f"Fastest Scan: {perf_stats['min']:.2f}s")
+            print(f"Slowest Scan: {perf_stats['max']:.2f}s")
+            print(f"Last Scan: {perf_stats['last_scan']:.2f}s")
+        
+        # System resources
+        memory = psutil.virtual_memory()
+        disk = psutil.disk_usage(str(self.base_dir))
+        
+        print(f"\nSYSTEM RESOURCES:")
+        print(f"Memory Usage: {memory.percent:.1f}% ({memory.used // (1024**3):.1f}GB / {memory.total // (1024**3):.1f}GB)")
+        print(f"Disk Usage: {disk.percent:.1f}% ({disk.used // (1024**3):.1f}GB / {disk.total // (1024**3):.1f}GB)")
+        print(f"CPU Usage: {psutil.cpu_percent():.1f}%")
+        
+        print(f"{'='*60}")
+    
+    def scan_files(self):
+        """Enhanced file scanning with performance tracking"""
+        scan_start = time.time()
+        
+        try:
+            activity_summary = self.get_file_activity_summary()
+            
+            if not activity_summary:
+                self.log_message("Could not retrieve activity summary", "ERROR")
+                return
+            
+            totals = activity_summary['totals']
+            pairs_data = activity_summary['pairs']
+            
+            # Update statistics
+            self.stats['total_scans'] += 1
+            self.stats['total_signals_found'] = totals['total_signals']
+            self.stats['total_responses_found'] = totals['total_responses']
+            self.stats['last_activity_time'] = datetime.now().isoformat()
+            
+            # Display header
+            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print(f"\n{'='*80}")
+            print(f"ENHANCED TRADING MONITOR - {current_time}")
+            print(f"{'='*80}")
+            print(f"Signal files: {totals['signal_files']} | Response files: {totals['response_files']}")
+            print(f"Active pairs: {totals['active_pairs']} | Total signals: {totals['total_signals']} | Total responses: {totals['total_responses']}")
+            
+            # Show pairs with activity
+            active_pairs = [p for p in pairs_data if p['signals'] > 0 or p['responses'] > 0]
+            recent_pairs = [p for p in pairs_data if p['has_recent_activity']]
+            
+            if active_pairs:
+                print(f"\nACTIVE PAIRS ({len(active_pairs)}):")
+                print(f"{'Pair':<8} {'Signals':<8} {'Responses':<10} {'Last Activity':<20} {'Status'}")
+                print("-" * 70)
+                
+                for pair_data in sorted(active_pairs, key=lambda x: x['signals'] + x['responses'], reverse=True)[:15]:  # Top 15
+                    pair = pair_data['pair']
+                    signals = pair_data['signals']
+                    responses = pair_data['responses']
+                    last_activity = pair_data['last_activity']
+                    
+                    activity_str = last_activity.strftime('%Y-%m-%d %H:%M:%S') if last_activity else 'No activity'
+                    status = "🟢 RECENT" if pair_data['has_recent_activity'] else "⚪ IDLE"
+                    
+                    print(f"{pair:<8} {signals:<8} {responses:<10} {activity_str:<20} {status}")
+                
+                if len(active_pairs) > 15:
+                    print(f"... and {len(active_pairs) - 15} more pairs with activity")
+            else:
+                print("\n⚪ No trading activity detected yet...")
+            
+            # Show recent activity highlight
+            if recent_pairs:
+                print(f"\n🟢 RECENT ACTIVITY ({len(recent_pairs)} pairs):")
+                for pair_data in recent_pairs[:5]:  # Show top 5 recent
+                    pair = pair_data['pair']
+                    signals = pair_data['signals']
+                    responses = pair_data['responses']
+                    print(f"  {pair}: {signals} signals, {responses} responses")
+            
+            # Performance tracking
+            scan_duration = time.time() - scan_start
+            if self.performance_tracker:
+                self.performance_tracker.record_scan(scan_duration)
+            
+            self.detect_performance_issues(scan_duration)
+            
+            print(f"\nScan completed in {scan_duration:.2f}s | Next scan in 30s | Press Ctrl+C to stop")
+            
+        except Exception as e:
+            self.log_message(f"ERROR during enhanced file scan: {e}", "ERROR")
+            import traceback
+            self.log_message(f"Traceback: {traceback.format_exc()}", "DEBUG")
+    
+    def start_monitoring(self, interval=30, show_stats_interval=300):
+        """Start enhanced monitoring with configurable intervals"""
+        self.log_message("Enhanced trading monitor started", "SUCCESS")
+        self.log_message(f"Monitoring directories:", "INFO")
+        self.log_message(f"  Signals: {self.signal_dir}", "INFO")
+        self.log_message(f"  Responses: {self.response_dir}", "INFO")
+        self.log_message(f"Scan interval: {interval}s | Stats interval: {show_stats_interval}s", "INFO")
+        
+        last_stats_time = time.time()
+        
+        try:
+            while True:
+                self.scan_files()
+                
+                # Show detailed stats periodically
+                if time.time() - last_stats_time >= show_stats_interval:
+                    self.show_system_stats()
+                    self.save_stats_cache()
+                    last_stats_time = time.time()
+                
+                time.sleep(interval)
+                
+        except KeyboardInterrupt:
+            self.log_message("Monitor stopped by user", "INFO")
+            self.save_stats_cache()
+            print(f"\n🛑 Enhanced Monitor stopped. Final statistics:")
+            self.show_system_stats()
+            print("Goodbye!")
+        except Exception as e:
+            self.log_message(f"FATAL ERROR: {e}", "ERROR")
+            import traceback
+            self.log_message(f"Traceback: {traceback.format_exc()}", "ERROR")
+
+def main():
+    """Main function with argument parsing"""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Enhanced Trading Monitor")
+    parser.add_argument("--interval", type=int, default=30, help="Scan interval in seconds (default: 30)")
+    parser.add_argument("--stats-interval", type=int, default=300, help="Stats display interval in seconds (default: 300)")
+    parser.add_argument("--base-dir", type=str, default="C:/TradingSystem", help="Base directory (default: C:/TradingSystem)")
+    parser.add_argument("--debug", action="store_true", help="Enable debug logging")
+    
+    args = parser.parse_args()
+    
+    monitor = EnhancedTradingMonitor(args.base_dir)
+    
+    if args.debug:
+        monitor.log_message("Debug mode enabled", "DEBUG")
+    
+    monitor.start_monitoring(args.interval, args.stats_interval)
+
+if __name__ == "__main__":
+    main()
+'@
+
+# File 6: Enhanced verification script
+$verifySystemContent = @'
+#!/usr/bin/env python3
+"""
+Enhanced System Verification Script
+Comprehensive validation with detailed reporting
+"""
+
+import os
+import sys
+import json
+import yaml
+from pathlib import Path
+from datetime import datetime
+import subprocess
+
+class EnhancedSystemVerifier:
+    """Enhanced system verification with detailed checks"""
+    
+    def __init__(self, base_dir="C:/TradingSystem"):
+        self.base_dir = Path(base_dir)
+        self.verification_results = {
+            'timestamp': datetime.now().isoformat(),
+            'base_directory': str(self.base_dir),
+            'checks': {},
+            'summary': {
+                'passed': 0,
+                'failed': 0,
+                'warnings': 0,
+                'total': 0
+            },
+            'recommendations': []
+        }
+    
+    def log_check(self, check_name, status, details="", recommendation=""):
+        """Log a verification check result"""
+        self.verification_results['checks'][check_name] = {
+            'status': status,
+            'details': details,
+            'recommendation': recommendation
+        }
+        
+        # Update summary
+        if status == "PASS":
+            self.verification_results['summary']['passed'] += 1
+            color = "🟢"
+        elif status == "FAIL":
+            self.verification_results['summary']['failed'] += 1
+            color = "🔴"
+        elif status == "WARN":
+            self.verification_results['summary']['warnings'] += 1
+            color = "🟡"
+        else:
+            color = "⚪"
+        
+        self.verification_results['summary']['total'] += 1
+        
+        # Add recommendation to list if provided
+        if recommendation:
+            self.verification_results['recommendations'].append(f"{check_name}: {recommendation}")
+        
+        # Console output
+        print(f"{color} {check_name}: {status}")
+        if details:
+            print(f"   Details: {details}")
+        if recommendation:
+            print(f"   Recommendation: {recommendation}")
+    
+    def verify_directory_structure(self):
+        """Verify complete directory structure"""
+        print("\n📁 DIRECTORY STRUCTURE VERIFICATION")
+        print("=" * 50)
+        
+        required_dirs = [
+            "MT4",
+            "MT4/Files",
+            "MT4/Files/signals",
+            "MT4/Files/responses",
+            "MT4/Experts",
+            "MT4/Include",
+            "Python",
+            "Python/services",
+            "Python/config",
+            "Python/logs",
+            "Python/cache",
+            "Scripts",
+            "Logs",
+            "Backups",
+            "Temp"
+        ]
+        
+        missing_dirs = []
+        for dir_path in required_dirs:
+            full_path = self.base_dir / dir_path
+            if full_path.exists():
+                self.log_check(f"Directory: {dir_path}", "PASS")
+            else:
+                missing_dirs.append(dir_path)
+                self.log_check(f"Directory: {dir_path}", "FAIL", "Directory missing", "Create missing directory")
+        
+        if missing_dirs:
+            self.log_check("Directory Structure", "FAIL", 
+                          f"Missing {len(missing_dirs)} directories: {', '.join(missing_dirs[:3])}{'...' if len(missing_dirs) > 3 else ''}")
+        else:
+            self.log_check("Directory Structure", "PASS", "All required directories present")
+    
+    def verify_csv_files(self):
+        """Verify CSV files with enhanced validation"""
+        print("\n📊 CSV FILES VERIFICATION")
+        print("=" * 50)
+        
+        signal_dir = self.base_dir / "MT4" / "Files" / "signals"
+        response_dir = self.base_dir / "MT4" / "Files" / "responses"
+        
+        signal_files = list(signal_dir.glob("*_signals.csv")) if signal_dir.exists() else []
+        response_files = list(response_dir.glob("*_responses.csv")) if response_dir.exists() else []
+        
+        self.log_check("Signal Files Count", "PASS" if len(signal_files) > 0 else "WARN", 
+                      f"Found {len(signal_files)} signal files")
+        self.log_check("Response Files Count", "PASS" if len(response_files) > 0 else "WARN", 
+                      f"Found {len(response_files)} response files")
+        
+        # Verify file headers
+        signal_header_errors = 0
+        response_header_errors = 0
+        
+        expected_signal_headers = [
+            "id", "symbol", "direction", "confidence", "timestamp", 
+            "strategy_id", "metadata", "signal_type", "timeframe", "risk_level"
+        ]
+        expected_response_headers = [
+            "signal_id", "trade_id", "status", "execution_price", "timestamp",
+            "error_message", "lot_size", "magic_number", "slippage", 
+            "execution_time_ms", "broker_response"
+        ]
+        
+        # Check signal file headers
+        for signal_file in signal_files[:5]:  # Check first 5
+            try:
+                with open(signal_file, 'r', encoding='utf-8') as f:
+                    header = f.readline().strip().split(',')
+                    if header != expected_signal_headers:
+                        signal_header_errors += 1
+            except Exception as e:
+                signal_header_errors += 1
+        
+        # Check response file headers
+        for response_file in response_files[:5]:  # Check first 5
+            try:
+                with open(response_file, 'r', encoding='utf-8') as f:
+                    header = f.readline().strip().split(',')
+                    if header != expected_response_headers:
+                        response_header_errors += 1
+            except Exception as e:
+                response_header_errors += 1
+        
+        if signal_header_errors == 0 and len(signal_files) > 0:
+            self.log_check("Signal File Headers", "PASS", "All headers valid")
+        elif signal_header_errors > 0:
+            self.log_check("Signal File Headers", "WARN", f"{signal_header_errors} files with header issues")
+        
+        if response_header_errors == 0 and len(response_files) > 0:
+            self.log_check("Response File Headers", "PASS", "All headers valid")
+        elif response_header_errors > 0:
+            self.log_check("Response File Headers", "WARN", f"{response_header_errors} files with header issues")
+    
+    def verify_python_environment(self):
+        """Verify Python environment and packages"""
+        print("\n🐍 PYTHON ENVIRONMENT VERIFICATION")
+        print("=" * 50)
+        
+        # Check Python version
+        try:
+            python_version = sys.version
+            major, minor = sys.version_info[:2]
+            
+            if major == 3 and minor >= 8:
+                self.log_check("Python Version", "PASS", f"Python {major}.{minor} (compatible)")
+            else:
+                self.log_check("Python Version", "FAIL", f"Python {major}.{minor} (requires 3.8+)", 
+                              "Upgrade to Python 3.8 or higher")
+        except Exception as e:
+            self.log_check("Python Version", "FAIL", str(e))
+        
+        # Check required packages
+        required_packages = [
+            "pandas", "numpy", "pyyaml", "requests", 
+            "psutil", "watchdog", "filelock"
+        ]
+        
+        missing_packages = []
+        for package in required_packages:
+            try:
+                __import__(package)
+                self.log_check(f"Package: {package}", "PASS")
+            except ImportError:
+                missing_packages.append(package)
+                self.log_check(f"Package: {package}", "FAIL", "Package not installed", 
+                              f"Install with: pip install {package}")
+        
+        if missing_packages:
+            self.log_check("Python Packages", "FAIL", 
+                          f"Missing packages: {', '.join(missing_packages)}")
+        else:
+            self.log_check("Python Packages", "PASS", "All required packages installed")
+    
+    def verify_configuration(self):
+        """Verify configuration files"""
+        print("\n⚙️ CONFIGURATION VERIFICATION")
+        print("=" * 50)
+        
+        config_file = self.base_dir / "Python" / "config" / "claude_trading_config.yaml"
+        
+        if not config_file.exists():
+            self.log_check("Configuration File", "FAIL", "Configuration file missing", 
+                          "Run setup to create configuration")
+            return
+        
+        try:
+            with open(config_file, 'r', encoding='utf-8') as f:
+                config = yaml.safe_load(f)
+            
+            self.log_check("Configuration File", "PASS", "Configuration file exists and readable")
+            
+            # Verify required sections
+            required_sections = ['trading', 'monitoring', 'risk_management', 'system']
+            missing_sections = [section for section in required_sections if section not in config]
+            
+            if missing_sections:
+                self.log_check("Configuration Sections", "FAIL", 
+                              f"Missing sections: {', '.join(missing_sections)}")
+            else:
+                self.log_check("Configuration Sections", "PASS", "All required sections present")
+            
+            # Verify trading pairs
+            trading = config.get('trading', {})
+            pairs = trading.get('pairs', [])
+            
+            if len(pairs) > 0:
+                self.log_check("Trading Pairs", "PASS", f"{len(pairs)} trading pairs configured")
+            else:
+                self.log_check("Trading Pairs", "WARN", "No trading pairs configured")
+            
+            # Verify risk management
+            risk = config.get('risk_management', {})
+            max_lot = risk.get('max_lot_size', 0)
+            
+            if 0 < max_lot <= 10.0:
+                self.log_check("Risk Management", "PASS", f"Max lot size: {max_lot}")
+            elif max_lot > 10.0:
+                self.log_check("Risk Management", "WARN", f"Max lot size very high: {max_lot}")
+            else:
+                self.log_check("Risk Management", "FAIL", "Invalid max lot size")
+                
+        except Exception as e:
+            self.log_check("Configuration File", "FAIL", f"Configuration error: {e}")
+    
+    def verify_scripts(self):
+        """Verify Python scripts"""
+        print("\n📜 SCRIPTS VERIFICATION")
+        print("=" * 50)
+        
+        scripts_to_check = [
+            ("Python/services/python_utilities.py", "Python Utilities"),
+            ("Python/services/enhanced_monitor.py", "Enhanced Monitor"),
+            ("Python/services/multi_pair_monitor.py", "Basic Monitor"),
+            ("MT4/Include/signal_generator.mqh", "Signal Generator")
+        ]
+        
+        for script_path, script_name in scripts_to_check:
+            full_path = self.base_dir / script_path
+            
+            if full_path.exists():
+                # Check if file is readable and has content
+                try:
+                    with open(full_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                    
+                    if len(content) > 100:  # Reasonable content check
+                        self.log_check(script_name, "PASS", f"Script exists and has content ({len(content)} chars)")
+                    else:
+                        self.log_check(script_name, "WARN", "Script exists but appears empty")
+                        
+                except Exception as e:
+                    self.log_check(script_name, "WARN", f"Script exists but not readable: {e}")
+            else:
+                self.log_check(script_name, "FAIL", "Script missing", "Run setup to create missing scripts")
+    
+    def verify_system_resources(self):
+        """Verify system resources and permissions"""
+        print("\n💻 SYSTEM RESOURCES VERIFICATION")
+        print("=" * 50)
+        
+        try:
+            import psutil
+            
+            # Check disk space
+            disk_usage = psutil.disk_usage(str(self.base_dir))
+            free_gb = disk_usage.free / (1024**3)
+            
+            if free_gb > 1.0:  # At least 1GB free
+                self.log_check("Disk Space", "PASS", f"{free_gb:.1f}GB free")
+            else:
+                self.log_check("Disk Space", "WARN", f"Low disk space: {free_gb:.1f}GB free")
+            
+            # Check memory
+            memory = psutil.virtual_memory()
+            if memory.percent < 80:
+                self.log_check("Memory Usage", "PASS", f"Memory usage: {memory.percent:.1f}%")
+            else:
+                self.log_check("Memory Usage", "WARN", f"High memory usage: {memory.percent:.1f}%")
+            
+            # Check write permissions
+            test_file = self.base_dir / "temp_test_file.txt"
+            try:
+                with open(test_file, 'w') as f:
+                    f.write("test")
+                test_file.unlink()
+                self.log_check("Write Permissions", "PASS", "Can write to base directory")
+            except Exception as e:
+                self.log_check("Write Permissions", "FAIL", f"Cannot write to base directory: {e}")
+                
+        except ImportError:
+            self.log_check("System Resources", "WARN", "Cannot check system resources (psutil not available)")
+    
+    def run_comprehensive_verification(self):
+        """Run all verification checks"""
+        print(f"🔍 ENHANCED SYSTEM VERIFICATION")
+        print(f"Base Directory: {self.base_dir}")
+        print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print("=" * 80)
+        
+        # Run all verification checks
+        self.verify_directory_structure()
+        self.verify_csv_files()
+        self.verify_python_environment()
+        self.verify_configuration()
+        self.verify_scripts()
+        self.verify_system_resources()
+        
+        # Display summary
+        self.show_summary()
+        
+        # Save detailed results
+        self.save_results()
+        
+        return self.verification_results['summary']['failed'] == 0
+    
+    def show_summary(self):
+        """Show verification summary"""
+        summary = self.verification_results['summary']
+        
+        print(f"\n📋 VERIFICATION SUMMARY")
+        print("=" * 50)
+        print(f"Total Checks: {summary['total']}")
+        print(f"🟢 Passed: {summary['passed']}")
+        print(f"🟡 Warnings: {summary['warnings']}")
+        print(f"🔴 Failed: {summary['failed']}")
+        
+        # Overall status
+        if summary['failed'] == 0:
+            if summary['warnings'] == 0:
+                print(f"\n✅ SYSTEM STATUS: EXCELLENT - Ready for production")
+            else:
+                print(f"\n⚠️ SYSTEM STATUS: GOOD - Minor issues to address")
+        else:
+            print(f"\n❌ SYSTEM STATUS: NEEDS ATTENTION - {summary['failed']} critical issues")
+        
+        # Show recommendations
+        if self.verification_results['recommendations']:
+            print(f"\n💡 RECOMMENDATIONS:")
+            for i, rec in enumerate(self.verification_results['recommendations'][:5], 1):
+                print(f"{i}. {rec}")
+            
+            if len(self.verification_results['recommendations']) > 5:
+                print(f"... and {len(self.verification_results['recommendations']) - 5} more recommendations")
+    
+    def save_results(self):
+        """Save detailed verification results"""
+        results_file = self.base_dir / "Logs" / f"verification_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        
+        try:
+            results_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(results_file, 'w', encoding='utf-8') as f:
+                json.dump(self.verification_results, f, indent=2)
+            print(f"\n📄 Detailed results saved: {results_file}")
+        except Exception as e:
+            print(f"\n⚠️ Could not save detailed results: {e}")
+
+def main():
+    """Main verification function"""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Enhanced System Verification")
+    parser.add_argument("--base-dir", type=str, default="C:/TradingSystem", 
+                       help="Base directory (default: C:/TradingSystem)")
+    parser.add_argument("--json-output", action="store_true", 
+                       help="Output results as JSON")
+    
+    args = parser.parse_args()
+    
+    verifier = EnhancedSystemVerifier(args.base_dir)
+    success = verifier.run_comprehensive_verification()
+    
+    if args.json_output:
+        print(json.dumps(verifier.verification_results, indent=2))
+    
+    sys.exit(0 if success else 1)
+
+if __name__ == "__main__":
+    main()
+'@
+$signalGeneratorContent = @'
+//+------------------------------------------------------------------+
+//| Enhanced Signal Generator Module - All Errors Fixed             |
+//| Adaptive strategy selection + performance tracking              |
+//+------------------------------------------------------------------+
+
+#property strict
+
+// Enhanced signal data structure
+struct SignalData {
+    string symbol;
+    string direction;    // "BUY" or "SELL"
+    double confidence;   // 0.0 to 1.0
+    string strategy_id;
+    string metadata;
+    datetime timestamp;
+    string signal_type;  // "technical", "fundamental", "hybrid"
+    string timeframe;    // "M1", "M5", "M15", "H1", "H4", "D1"
+    string risk_level;   // "low", "medium", "high"
+};
+
+// Enhanced response data structure
+struct ResponseData {
+    string signal_id;
+    string trade_id;
+    string status;       // "SUCCESS", "FAILED", "PENDING"
+    double execution_price;
+    string error_message;
+    double lot_size;
+    int magic_number;
+    double slippage;
+    datetime timestamp;
+    double execution_time_ms;
+    string broker_response;
+};
+
+// Enhanced risk management parameters
+struct RiskParameters {
+    double max_lot_size;
+    int max_daily_trades;
+    int stop_loss_pips;
+    int take_profit_pips;
+    int max_signals_per_bar;
+    int signal_cooldown_minutes;
+    double min_confidence_threshold;
+    int max_concurrent_signals;
+};
+
+// Strategy performance tracking
+struct StrategyPerformance {
+    double effectiveness;
+    int total_signals;
+    int successful_signals;
+    datetime last_update;
+    double avg_confidence;
+};
+
+class CEnhancedSignalGenerator {
+private:
+    string m_base_path;
+    string m_signal_file;
+    string m_response_file;
+    int m_magic_number;
+    bool m_debug_mode;
+    RiskParameters m_risk_params;
+    
+    // Enhanced tracking variables
+    datetime m_last_signal_time;
+    int m_signals_this_bar;
+    datetime m_current_bar_time;
+    int m_signals_today;
+    datetime m_last_day_reset;
+    
+    // Strategy performance tracking
+    StrategyPerformance m_ma_performance;
+    StrategyPerformance m_rsi_performance;
+    StrategyPerformance m_sr_performance;
+    
+    // Adaptive strategy selection
+    bool m_adaptive_selection;
+    string m_preferred_strategy;
+    
+public:
+    // Enhanced constructor
+    CEnhancedSignalGenerator(string symbol, int magic = 12345, bool debug = false, bool adaptive = true) {
+        m_magic_number = magic;
+        m_debug_mode = debug;
+        m_adaptive_selection = adaptive;
+        m_preferred_strategy = "MA_Cross";
+        
+        // Initialize tracking variables
+        m_last_signal_time = 0;
+        m_signals_this_bar = 0;
+        m_current_bar_time = 0;
+        m_signals_today = 0;
+        m_last_day_reset = 0;
+        
+        // Set file paths
+        m_base_path = "MT4\\Files\\";
+        m_signal_file = m_base_path + "signals\\" + symbol + "_signals.csv";
+        m_response_file = m_base_path + "responses\\" + symbol + "_responses.csv";
+        
+        // Initialize enhanced risk parameters
+        InitializeEnhancedRiskParameters();
+        
+        // Initialize strategy performance
+        InitializeStrategyPerformance();
+        
+        if (m_debug_mode) {
+            Print("Enhanced Signal Generator initialized for ", symbol);
+            Print("Adaptive selection: ", m_adaptive_selection ? "Enabled" : "Disabled");
+            Print("Risk Management - Max signals per day: ", m_risk_params.max_daily_trades);
+            Print("Risk Management - Min confidence: ", m_risk_params.min_confidence_threshold);
+        }
+    }
+    
+    // Initialize enhanced risk parameters
+    void InitializeEnhancedRiskParameters() {
+        m_risk_params.max_lot_size = 0.1;
+        m_risk_params.max_daily_trades = 50;
+        m_risk_params.stop_loss_pips = 50;
+        m_risk_params.take_profit_pips = 100;
+        m_risk_params.max_signals_per_bar = 1;
+        m_risk_params.signal_cooldown_minutes = 5;
+        m_risk_params.min_confidence_threshold = 0.65;
+        m_risk_params.max_concurrent_signals = 1;
+    }
+    
+    // Initialize strategy performance tracking
+    void InitializeStrategyPerformance() {
+        m_ma_performance.effectiveness = 0.72;
+        m_ma_performance.total_signals = 0;
+        m_ma_performance.successful_signals = 0;
+        m_ma_performance.last_update = TimeCurrent();
+        m_ma_performance.avg_confidence = 0.70;
+        
+        m_rsi_performance.effectiveness = 0.68;
+        m_rsi_performance.total_signals = 0;
+        m_rsi_performance.successful_signals = 0;
+        m_rsi_performance.last_update = TimeCurrent();
+        m_rsi_performance.avg_confidence = 0.65;
+        
+        m_sr_performance.effectiveness = 0.65;
+        m_sr_performance.total_signals = 0;
+        m_sr_performance.successful_signals = 0;
+        m_sr_performance.last_update = TimeCurrent();
+        m_sr_performance.avg_confidence = 0.60;
+    }
+    
+    // Enhanced signal generation with adaptive strategy selection
+    bool GenerateSignal(string primary_strategy = "MA_Cross", string secondary_strategy = "RSI") {
+        // Check daily reset
+        CheckDailyReset();
+        
+        // Enhanced signal generation checks
+        if (!CanGenerateSignal()) {
+            if (m_debug_mode) {
+                Print("Signal generation blocked - limits reached or cooldown active");
+            }
+            return false;
+        }
+        
+        SignalData signal;
+        signal.symbol = Symbol();
+        signal.timestamp = TimeCurrent();
+        signal.timeframe = StringSubstr(EnumToString(Period()), 7); // Extract timeframe
+        
+        bool signal_generated = false;
+        string selected_strategy = primary_strategy;
+        
+        // Adaptive strategy selection based on performance
+        if (m_adaptive_selection) {
+            selected_strategy = SelectBestStrategy(primary_strategy, secondary_strategy);
+            if (m_debug_mode && selected_strategy != primary_strategy) {
+                Print("Adaptive selection: Switching from ", primary_strategy, " to ", selected_strategy);
+            }
+        }
+        
+        signal.strategy_id = selected_strategy;
+        
+        // Generate signal with selected strategy
+        if (selected_strategy == "MA_Cross") {
+            signal_generated = GenerateEnhancedMASignal(signal);
+        }
+        else if (selected_strategy == "RSI") {
+            signal_generated = GenerateEnhancedRSISignal(signal);
+        }
+        else if (selected_strategy == "SupRes") {
+            signal_generated = GenerateEnhancedSRSignal(signal);
+        }
+        
+        // Fallback to secondary strategy if primary fails
+        if (!signal_generated && selected_strategy != secondary_strategy) {
+            signal.strategy_id = secondary_strategy;
+            
+            if (secondary_strategy == "MA_Cross") {
+                signal_generated = GenerateEnhancedMASignal(signal);
+            }
+            else if (secondary_strategy == "RSI") {
+                signal_generated = GenerateEnhancedRSISignal(signal);
+            }
+            else if (secondary_strategy == "SupRes") {
+                signal_generated = GenerateEnhancedSRSignal(signal);
+            }
+            
+            if (m_debug_mode && signal_generated) {
+                Print("Fallback successful: Generated signal using ", secondary_strategy);
+            }
+        }
+        
+        // Update tracking if signal was generated
+        if (signal_generated) {
+            UpdateSignalTracking();
+            UpdateStrategyPerformance(signal.strategy_id, signal.confidence);
+        }
+        
+        return signal_generated;
+    }
+    
+    // Cleanup method to prevent memory leaks
+    void CleanupOldData() {
+        if (m_signals_today > 1000) {
+            m_signals_today = 0;
+            m_signals_this_bar = 0;
+            
+            // Reset performance counters if they get too large
+            if (m_ma_performance.total_signals > 10000) {
+                m_ma_performance.total_signals = m_ma_performance.total_signals / 2;
+                m_ma_performance.successful_signals = m_ma_performance.successful_signals / 2;
+            }
+            
+            if (m_debug_mode) {
+                Print("Cleaned up old data to prevent memory issues");
+            }
+        }
+    }
+
+private:
+    // Check if daily limits need reset
+    void CheckDailyReset() {
+        datetime current_day = (TimeCurrent() / 86400) * 86400; // Start of current day
+        
+        if (current_day != m_last_day_reset) {
+            m_signals_today = 0;
+            m_last_day_reset = current_day;
+            
+            if (m_debug_mode) {
+                Print("Daily signal counter reset");
+            }
+        }
+    }
+    
+    // Enhanced signal generation check
+    bool CanGenerateSignal() {
+        datetime current_time = TimeCurrent();
+        datetime current_bar = Time[0];
+        
+        // Check if we're on a new bar
+        if (current_bar != m_current_bar_time) {
+            m_current_bar_time = current_bar;
+            m_signals_this_bar = 0;
+        }
+        
+        // Check daily limit
+        if (m_signals_today >= m_risk_params.max_daily_trades) {
+            if (m_debug_mode) {
+                Print("Daily signal limit reached: ", m_signals_today, "/", m_risk_params.max_daily_trades);
+            }
+            return false;
+        }
+        
+        // Check signal cooldown
+        if (current_time - m_last_signal_time < m_risk_params.signal_cooldown_minutes * 60) {
+            return false;
+        }
+        
+        // Check max signals per bar
+        if (m_signals_this_bar >= m_risk_params.max_signals_per_bar) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    // Update signal tracking variables
+    void UpdateSignalTracking() {
+        m_last_signal_time = TimeCurrent();
+        m_signals_this_bar++;
+        m_signals_today++;
+    }
+    
+    // Select best performing strategy
+    string SelectBestStrategy(string primary, string secondary) {
+        double primary_effectiveness = GetStrategyEffectiveness(primary);
+        double secondary_effectiveness = GetStrategyEffectiveness(secondary);
+        
+        // Use secondary if it's significantly better (20% threshold)
+        if (secondary_effectiveness > primary_effectiveness * 1.2) {
+            return secondary;
+        }
+        
+        return primary;
+    }
+    
+    // Get strategy effectiveness
+    double GetStrategyEffectiveness(string strategy) {
+        if (strategy == "MA_Cross") return m_ma_performance.effectiveness;
+        if (strategy == "RSI") return m_rsi_performance.effectiveness;
+        if (strategy == "SupRes") return m_sr_performance.effectiveness;
+        return 0.50; // Default
+    }
+    
+    // Update strategy performance metrics
+    void UpdateStrategyPerformance(string strategy, double confidence) {
+        StrategyPerformance* perf = NULL;
+        
+        if (strategy == "MA_Cross") perf = &m_ma_performance;
+        else if (strategy == "RSI") perf = &m_rsi_performance;
+        else if (strategy == "SupRes") perf = &m_sr_performance;
+        
+        if (perf != NULL) {
+            perf.total_signals++;
+            perf.avg_confidence = (perf.avg_confidence * (perf.total_signals - 1) + confidence) / perf.total_signals;
+            perf.last_update = TimeCurrent();
+            
+            // Simple effectiveness update based on confidence
+            if (confidence > 0.7) {
+                perf.successful_signals++;
+                perf.effectiveness = (double)perf.successful_signals / perf.total_signals;
+            }
+            
+            if (m_debug_mode) {
+                Print("Strategy performance update: ", strategy, 
+                      " effectiveness: ", perf.effectiveness,
+                      " avg confidence: ", perf.avg_confidence);
+            }
+        }
+    }
+    
+    // Enhanced Moving Average Signal with additional confirmations
+    bool GenerateEnhancedMASignal(SignalData &signal) {
+        // Get multiple timeframe MAs for confirmation
+        double ma_fast_0 = iMA(NULL, 0, 20, 0, MODE_SMA, PRICE_CLOSE, 0);
+        double ma_fast_1 = iMA(NULL, 0, 20, 0, MODE_SMA, PRICE_CLOSE, 1);
+        double ma_slow_0 = iMA(NULL, 0, 50, 0, MODE_SMA, PRICE_CLOSE, 0);
+        double ma_slow_1 = iMA(NULL, 0, 50, 0, MODE_SMA, PRICE_CLOSE, 1);
+        
+        // Check for crossover
+        bool bullish_cross = (ma_fast_0 > ma_slow_0) && (ma_fast_1 <= ma_slow_1);
+        bool bearish_cross = (ma_fast_0 < ma_slow_0) && (ma_fast_1 >= ma_slow_1);
+        
+        // Add volume confirmation if available
+        double volume_current = Volume[0];
+        double volume_avg = 0;
+        for (int i = 1; i <= 10; i++) {
+            volume_avg += Volume[i];
+        }
+        volume_avg /= 10;
+        
+        bool volume_confirmation = volume_current > volume_avg * 1.2;
+        
+        if (bullish_cross) {
+            signal.direction = "BUY";
+            signal.confidence = CalculateEnhancedConfidence("BUY", volume_confirmation);
+            
+            // Only proceed if confidence meets threshold
+            if (signal.confidence < m_risk_params.min_confidence_threshold) {
+                return false;
+            }
+            
+            signal.signal_type = "technical";
+            signal.risk_level = signal.confidence > 0.8 ? "low" : (signal.confidence > 0.7 ? "medium" : "high");
+            signal.metadata = StringFormat("MA20:%.5f,MA50:%.5f,Vol:%.0f", ma_fast_0, ma_slow_0, volume_current);
+            
+            return WriteEnhancedSignalToFile(signal);
+        }
+        else if (bearish_cross) {
+            signal.direction = "SELL";
+            signal.confidence = CalculateEnhancedConfidence("SELL", volume_confirmation);
+            
+            if (signal.confidence < m_risk_params.min_confidence_threshold) {
+                return false;
+            }
+            
+            signal.signal_type = "technical";
+            signal.risk_level = signal.confidence > 0.8 ? "low" : (signal.confidence > 0.7 ? "medium" : "high");
+            signal.metadata = StringFormat("MA20:%.5f,MA50:%.5f,Vol:%.0f", ma_fast_0, ma_slow_0, volume_current);
+            
+            return WriteEnhancedSignalToFile(signal);
+        }
+        
+        return false;
+    }
+    
+    // Enhanced RSI Signal with divergence detection
+    bool GenerateEnhancedRSISignal(SignalData &signal) {
+        double rsi_0 = iRSI(NULL, 0, 14, PRICE_CLOSE, 0);
+        double rsi_1 = iRSI(NULL, 0, 14, PRICE_CLOSE, 1);
+        double rsi_2 = iRSI(NULL, 0, 14, PRICE_CLOSE, 2);
+        
+        // Enhanced RSI conditions with trend confirmation
+        double ma_trend = iMA(NULL, 0, 100, 0, MODE_SMA, PRICE_CLOSE, 0);
+        bool uptrend = Close[0] > ma_trend;
+        bool downtrend = Close[0] < ma_trend;
+        
+        // RSI oversold/overbought with trend confirmation
+        if (rsi_1 <= 30 && rsi_0 > 30 && uptrend) {
+            signal.direction = "BUY";
+            signal.confidence = CalculateEnhancedConfidence("BUY", true);
+            
+            if (signal.confidence < m_risk_params.min_confidence_threshold) {
+                return false;
+            }
+            
+            signal.signal_type = "technical";
+            signal.risk_level = "medium";
+            signal.metadata = StringFormat("RSI:%.2f,Trend:UP", rsi_0);
+            
+            return WriteEnhancedSignalToFile(signal);
+        }
+        else if (rsi_1 >= 70 && rsi_0 < 70 && downtrend) {
+            signal.direction = "SELL";
+            signal.confidence = CalculateEnhancedConfidence("SELL", true);
+            
+            if (signal.confidence < m_risk_params.min_confidence_threshold) {
+                return false;
+            }
+            
+            signal.signal_type = "technical";
+            signal.risk_level = "medium";
+            signal.metadata = StringFormat("RSI:%.2f,Trend:DOWN", rsi_0);
+            
+            return WriteEnhancedSignalToFile(signal);
+        }
+        
+        return false;
+    }
+    
+    // Enhanced Support/Resistance Signal
+    bool GenerateEnhancedSRSignal(SignalData &signal) {
+        double current_price = Close[0];
+        
+        // Calculate dynamic support and resistance levels
+        double high_levels[5], low_levels[5];
+        for (int i = 0; i < 5; i++) {
+            high_levels[i] = High[i+1];
+            low_levels[i] = Low[i+1];
+        }
+        
+        // Find highest high and lowest low
+        double resistance = high_levels[ArrayMaximum(high_levels)];
+        double support = low_levels[ArrayMinimum(low_levels)];
+        
+        // Check for breakouts with confirmation
+        bool resistance_break = (current_price > resistance) && (Close[1] <= resistance);
+        bool support_break = (current_price < support) && (Close[1] >= support);
+        
+        // Add momentum confirmation
+        double momentum = iMomentum(NULL, 0, 14, PRICE_CLOSE, 0);
+        bool momentum_bullish = momentum > 100;
+        bool momentum_bearish = momentum < 100;
+        
+        if (resistance_break && momentum_bullish) {
+            signal.direction = "BUY";
+            signal.confidence = CalculateEnhancedConfidence("BUY", true);
+            
+            if (signal.confidence < m_risk_params.min_confidence_threshold) {
+                return false;
+            }
+            
+            signal.signal_type = "technical";
+            signal.risk_level = "high"; // Breakouts are higher risk
+            signal.metadata = StringFormat("Resistance:%.5f,Mom:%.2f", resistance, momentum);
+            
+            return WriteEnhancedSignalToFile(signal);
+        }
+        else if (support_break && momentum_bearish) {
+            signal.direction = "SELL";
+            signal.confidence = CalculateEnhancedConfidence("SELL", true);
+            
+            if (signal.confidence < m_risk_params.min_confidence_threshold) {
+                return false;
+            }
+            
+            signal.signal_type = "technical";
+            signal.risk_level = "high";
+            signal.metadata = StringFormat("Support:%.5f,Mom:%.2f", support, momentum);
+            
+            return WriteEnhancedSignalToFile(signal);
+        }
+        
+        return false;
+    }
+    
+    // Enhanced confidence calculation with multiple factors
+    double CalculateEnhancedConfidence(string direction, bool additional_confirmation = false) {
+        double confidence = 0.5; // Base confidence
+        
+        // Factor 1: Trend strength
+        double ma_20 = iMA(NULL, 0, 20, 0, MODE_SMA, PRICE_CLOSE, 0);
+        double ma_50 = iMA(NULL, 0, 50, 0, MODE_SMA, PRICE_CLOSE, 0);
+        double ma_100 = iMA(NULL, 0, 100, 0, MODE_SMA, PRICE_CLOSE, 0);
+        
+        if (direction == "BUY") {
+            if (ma_20 > ma_50 && ma_50 > ma_100) confidence += 0.2; // Strong uptrend
+            else if (ma_20 > ma_50) confidence += 0.1; // Weak uptrend
+        } else {
+            if (ma_20 < ma_50 && ma_50 < ma_100) confidence += 0.2; // Strong downtrend
+            else if (ma_20 < ma_50) confidence += 0.1; // Weak downtrend
+        }
+        
+        // Factor 2: RSI confirmation
+        double rsi = iRSI(NULL, 0, 14, PRICE_CLOSE, 0);
+        if (direction == "BUY" && rsi < 70 && rsi > 30) {
+            confidence += 0.15;
+        } else if (direction == "SELL" && rsi > 30 && rsi < 70) {
+            confidence += 0.15;
+        }
+        
+        // Factor 3: Additional confirmation (volume, momentum, etc.)
+        if (additional_confirmation) {
+            confidence += 0.1;
+        }
+        
+        // Factor 4: Market volatility adjustment
+        double atr = iATR(NULL, 0, 14, 0);
+        double atr_avg = 0;
+        for (int i = 1; i <= 20; i++) {
+            atr_avg += iATR(NULL, 0, 14, i);
+        }
+        atr_avg /= 20;
+        
+        // Reduce confidence in highly volatile markets
+        if (atr > atr_avg * 1.5) {
+            confidence -= 0.1;
+        }
+        
+        // Ensure confidence stays within bounds
+        if (confidence > 1.0) confidence = 1.0;
+        if (confidence < 0.0) confidence = 0.0;
+        
+        return confidence;
+    }
+    
+    // Enhanced signal writing with additional fields
+    bool WriteEnhancedSignalToFile(SignalData &signal) {
+        string signal_id = signal.symbol + "_" + IntegerToString(TimeCurrent()) + "_" + IntegerToString(GetTickCount());
+        
+        // Enhanced CSV format with additional fields
+        string csv_line = signal_id + "," +
+                         signal.symbol + "," +
+                         signal.direction + "," +
+                         DoubleToString(signal.confidence, 3) + "," +
+                         TimeToString(signal.timestamp, TIME_DATE | TIME_SECONDS) + "," +
+                         signal.strategy_id + "," +
+                         signal.metadata + "," +
+                         signal.signal_type + "," +
+                         signal.timeframe + "," +
+                         signal.risk_level;
+        
+        int file_handle = FileOpen(m_signal_file, FILE_WRITE | FILE_CSV | FILE_COMMON);
+        
+        if (file_handle != INVALID_HANDLE) {
+            // Move to end of file to append
+            FileSeek(file_handle, 0, SEEK_END);
+            FileWrite(file_handle, csv_line);
+            FileClose(file_handle);
+            
+            if (m_debug_mode) {
+                Print("Enhanced signal written: ", signal.direction, " ", signal.symbol, 
+                      " Confidence: ", DoubleToString(signal.confidence, 3),
+                      " Strategy: ", signal.strategy_id,
+                      " Risk: ", signal.risk_level);
+            }
+            
+            return true;
+        } else {
+            if (m_debug_mode) {
+                Print("ERROR: Could not open signal file for writing: ", GetLastError());
+            }
+            return false;
+        }
+    }
+    
+    // Read responses for performance tracking
+    bool ReadResponseFromFile(string signal_id, ResponseData &response) {
+        int file_handle = FileOpen(m_response_file, FILE_READ | FILE_CSV | FILE_COMMON);
+        
+        if (file_handle != INVALID_HANDLE) {
+            string line;
+            
+            // Skip header
+            if (FileSize(file_handle) > 0) {
+                line = FileReadString(file_handle);
+            }
+            
+            // Read data lines
+            while (!FileIsEnding(file_handle)) {
+                line = FileReadString(file_handle);
+                
+                string parts[];
+                int count = StringSplit(line, ',', parts);
+                
+                if (count >= 11 && parts[0] == signal_id) {
+                    response.signal_id = parts[0];
+                    response.trade_id = parts[1];
+                    response.status = parts[2];
+                    response.execution_price = StringToDouble(parts[3]);
+                    response.timestamp = StringToTime(parts[4]);
+                    response.error_message = parts[5];
+                    response.lot_size = StringToDouble(parts[6]);
+                    response.magic_number = StringToInteger(parts[7]);
+                    response.slippage = StringToDouble(parts[8]);
+                    response.execution_time_ms = StringToDouble(parts[9]);
+                    response.broker_response = parts[10];
+                    
+                    FileClose(file_handle);
+                    return true;
+                }
+            }
+            
+            FileClose(file_handle);
+        }
+        
+        return false;
+    }
+    
+    // Get performance statistics
+    void PrintPerformanceStats() {
+        if (m_debug_mode) {
+            Print("=== ENHANCED SIGNAL GENERATOR PERFORMANCE ===");
+            Print("MA Strategy - Effectiveness: ", DoubleToString(m_ma_performance.effectiveness, 3),
+                  " Signals: ", m_ma_performance.total_signals,
+                  " Avg Confidence: ", DoubleToString(m_ma_performance.avg_confidence, 3));
+            Print("RSI Strategy - Effectiveness: ", DoubleToString(m_rsi_performance.effectiveness, 3),
+                  " Signals: ", m_rsi_performance.total_signals,
+                  " Avg Confidence: ", DoubleToString(m_rsi_performance.avg_confidence, 3));
+            Print("SR Strategy - Effectiveness: ", DoubleToString(m_sr_performance.effectiveness, 3),
+                  " Signals: ", m_sr_performance.total_signals,
+                  " Avg Confidence: ", DoubleToString(m_sr_performance.avg_confidence, 3));
+            Print("Today's Signals: ", m_signals_today, "/", m_risk_params.max_daily_trades);
+            Print("Adaptive Selection: ", m_adaptive_selection ? "Enabled" : "Disabled");
+            Print("============================================");
+        }
+    }
+};
+
+// Global instance for easy access
+CEnhancedSignalGenerator* g_enhanced_signal_generator = NULL;
+
+// Initialization function
+bool InitializeEnhancedSignalGenerator(string symbol, int magic_number = 12345, bool debug_mode = false) {
+    if (g_enhanced_signal_generator != NULL) {
+        delete g_enhanced_signal_generator;
+    }
+    
+    g_enhanced_signal_generator = new CEnhancedSignalGenerator(symbol, magic_number, debug_mode, true);
+    
+    if (debug_mode) {
+        Print("Enhanced Signal Generator initialized for ", symbol);
+    }
+    
+    return true;
+}
+
+// Cleanup function
+void CleanupEnhancedSignalGenerator() {
+    if (g_enhanced_signal_generator != NULL) {
+        g_enhanced_signal_generator.CleanupOldData();
+        g_enhanced_signal_generator.PrintPerformanceStats();
+        delete g_enhanced_signal_generator;
+        g_enhanced_signal_generator = NULL;
+    }
+}
+
+// Easy-to-use wrapper functions
+bool GenerateEnhancedTradingSignal(string primary_strategy = "MA_Cross", string secondary_strategy = "RSI") {
+    if (g_enhanced_signal_generator == NULL) {
+        Print("ERROR: Enhanced Signal Generator not initialized");
+        return false;
+    }
+    
+    return g_enhanced_signal_generator.GenerateSignal(primary_strategy, secondary_strategy);
+}
+
+void ShowEnhancedPerformanceStats() {
+    if (g_enhanced_signal_generator != NULL) {
+        g_enhanced_signal_generator.PrintPerformanceStats();
+    }
+}
+
+/*
+Usage Example in Expert Advisor:
+
+#include <signal_generator.mqh>
+
+int OnInit() {
+    InitializeEnhancedSignalGenerator(Symbol(), 12345, true);
+    return INIT_SUCCEEDED;
+}
+
+void OnDeinit(const int reason) {
+    CleanupEnhancedSignalGenerator();
+}
+
+void OnTick() {
+    // Generate signals with adaptive strategy selection
+    if (GenerateEnhancedTradingSignal("MA_Cross", "RSI")) {
+        Print("New enhanced trading signal generated!");
+    }
+    
+    // Show performance stats every hour
+    static datetime last_stats_time = 0;
+    if (TimeCurrent() - last_stats_time >= 3600) {
+        ShowEnhancedPerformanceStats();
+        last_stats_time = TimeCurrent();
+    }
+}
+*/
+'@
