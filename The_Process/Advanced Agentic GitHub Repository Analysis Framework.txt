@@ -1,0 +1,368 @@
+Technical Execution Processes for Each GitHub
+Workspace Solution
+This document translates the high‑level mapping from the previous report into concrete technical
+processes for implementing each part of a phase‑process template in GitHub Projects. Where possible it
+references existing documented workflows (docs or sample repositories) and then extends them with
+custom procedures. The goal is to enable an autonomous execution flow: issues and pull requests are
+automatically created, triaged, progressed through phases, gated by CI checks and visualised via roadmaps
+and charts.
+1. Mapping Phases to a Project Field or Milestones
+1.1 Add a Phase field to your project (single‑select)
+GitHub Projects support custom single‑select fields. To create a phase field:
+1.
+2.
+3.
+Open your project in table view, click Add field, then New field and enter a name like Phase or
+Process Stage . Select Single select and add options (PH‑00, PH‑01, etc.) with colors and
+1
+descriptions .
+Save the field; it appears as a new column in the project. You can filter and group by this field in
+2
+board or roadmap views .
+When new items enter the project they default to Todo status. Configure built‑in workflows to set the
+Phase field to the initial phase (PH‑00) using the GraphQL API (see Section 8).
+Alternative: Use milestones as phases
+Milestones track groups of issues/PRs, display a description, due date and completion percentage 3
+can appear as vertical markers on the roadmap. Create a milestone per phase (e.g., PH‑01 . They
+– Design ) and
+assign issues to the appropriate milestone. Use the Phase field for filtering while milestones provide
+due‑date tracking and progress metrics.
+1.2 Create a milestone
+1.
+Navigate to Issues → Milestones. Click New milestone, give it a title (e.g., PH‑01 – Design ) and
+3
+optional description. Set a due date to define the timeframe .
+2. 4
+Assign issues to the milestone. Drag them within the milestone page to prioritise .
+3.
+Milestone progress updates automatically as issues are closed; this can be visualised on roadmaps
+(vertical markers) and insights charts.
+1
+2. Mapping Step Contracts to Issues and Sub‑issues
+2.1 Create issues for each step contract
+1.
+2.
+3.
+For each step in your process, create an issue using templates that capture metadata: Phase field
+(default value: current phase), Step ID, Effort estimate, target date and gate requirements. Use issue
+forms or issue fields so values are typed and mandatory.
+When a contract is complex, create sub‑issues for sub‑steps. GitHub allows up to 100 sub‑issues per
+issue and eight levels of nesting 5
+. Sub‑issues display their relationship to the parent issue and
+6
+their progress contributes to the parent’s Sub‑issue progress field .
+Use the Parent issue field in the project to group items by their parent. You can filter by parent issue
+6
+ID (e.g., parent‑issue:"owner/repo#123" ) .
+2.2 Automate creation of issues and sub‑issues
+An example from an open‑source repository ( ohmyzsh ) demonstrates how to add issues or pull requests
+to a project via the GraphQL API:
+# .github/workflows/project.yml (excerpt)
+- name: Read project data
+run: |
+gh api graphql -f query='query($org: String!, $number: Int!)
+{ organization(login: $org){ projectV2(number: $number) { id fields(first:20)
+{ nodes { ... on ProjectV2Field { id name } } } } } }' -f org=$ORGANIZATION -F
+number=$PROJECT_NUMBER > project_data.json
+cat >> $GITHUB_ENV <<EOF
+PROJECT_ID=$(jq '.data.organization.projectV2.id' project_data.json)
+EOF
+- name: Add to project
+env:
+ISSUE_OR_PR_ID: ${{ github.event.issue.node_id ||
+github.event.pull_request.node_id }}
+run: |
+item_id="$(gh api graphql -f query='mutation($project: ID!, $content: ID!)
+{ addProjectV2ItemById(input: {projectId: $project, contentId: $content}) { item
+{ id } } }' -f project=$PROJECT_ID -f content=$ISSUE_OR_PR_ID --jq
+'.data.addProjectV2ItemById.item.id')"
+echo "ITEM_ID=$item_id" >> $GITHUB_ENV
+This workflow retrieves the project ID, then adds an issue or PR to the project using the
+addProjectV2ItemById mutation 7
+. You can extend this script to create a new issue via the GitHub
+API and immediately add it to the project.
+2
+2.3 Assign fields to the new item
+After adding an item, set its fields (Phase, Effort, etc.) using the updateProjectV2ItemFieldValue
+mutation. The ohmyzsh workflow shows how to set text fields (e.g., Plugin, Theme ) by specifying the
+field ID and value:
+- name: Fill Pull Request fields in project
+run: |
+gh api graphql -f query='mutation ( $project: ID!, $item: ID!,
+$plugin_field: ID!, $plugin_value: String!, $theme_field: ID!, $theme_value:
+String! ) { set_plugin: updateProjectV2ItemFieldValue(input: { projectId:
+$project, itemId: $item, fieldId: $plugin_field, value: { text:
+$plugin_value } }) { projectV2Item { id } } set_theme:
+updateProjectV2ItemFieldValue(input: { projectId: $project, itemId: $item,
+fieldId: $theme_field, value: { text: $theme_value } }) { projectV2Item
+{ id } } }' -f project=$PROJECT_ID -f item=$ITEM_ID -f
+plugin_field=$PLUGIN_FIELD_ID -f plugin_value=$PLUGIN -f
+theme_field=$THEME_FIELD_ID -f theme_value=$THEME --silent
+Lines 168‑200 of the workflow illustrate updating multiple fields on the project item use value: { singleSelectOptionId: $phase_option_id } instead of a text value.
+7
+. For a phase field,
+3. Mapping Gates to CI Checks and Required Status Checks
+3.1 Implement gate checks in GitHub Actions
+1.
+2.
+3.
+For each gate (e.g., design review, unit tests, security scan), create a separate job in a GitHub Actions
+workflow. Each job runs the relevant validation and should fail if the gate is not satisfied.
+Jobs produce status checks. When status checks are required for a branch, the pull request cannot
+8
+merge until they pass .
+Optionally publish gate results to the associated issue via the Checks API or comment. You can also
+update a custom field (e.g., Gate status ) in the project via GraphQL.
+3.2 Configure branch protection rules
+1.
+2.
+Go to Repository Settings → Branches. Under Branch protection rules, select the base branch
+(e.g., main ) and enable Require status checks to pass before merging.
+Choose the checks corresponding to your gate workflows. Only commit statuses that have
+8
+completed successfully in the last week can be selected .
+3.3 Update project gate field after checks
+Use a post‑CI step to update the gate status in the project. For example, after tests pass, run a command similar to Section 2.3 to set the Gate field to Passed or Failed .
+gh
+3
+4. Mapping Execution to Pull Requests and Linking Issues
+4.1 Link pull requests to issues
+1.
+2.
+In the pull request body, include Closes #<issue_number> or Fixes #<issue_number> to
+automatically close the issue upon merge.
+Alternatively, use GitHub’s Link PR feature on the issue page. The PR will appear under Linked pull
+requests.
+4.2 Automatically add PRs to the project and set initial fields
+The official GitHub doc provides an example workflow that triggers when a pull request is marked ready for
+review. It retrieves the project and field IDs via the GraphQL API, adds the PR to the project and sets the
+9
+Status to Todo and Date posted to the current date . The workflow:
+• 9
+Uses gh api graphql to fetch the project and field IDs and parse them with jq extend this query to fetch your custom Phase field.
+• 9
+Adds the PR to the project via addProjectV2ItemById.
+• 9
+Calls updateProjectV2ItemFieldValue twice to set the status and date .
+. You can
+Modify the status_value variable to reference your Phase option (e.g., In Progress or
+Implementation ).
+4.3 Set issue status when PR is opened/merged
+Built‑in workflows automatically set the Status field to Todo when an item is added and Done when its
+underlying issue is closed or pull request is merged 10
+. Configure these automations in the project settings
+so that issues and PRs transition automatically without manual updates.
+5. Tracking Completion and Progress
+5.1 Closing issues and milestones
+•
+When a pull request merges or an issue is resolved, the corresponding issue closes. The built‑in
+workflows will update the project’s Status field to Done 10
+and automatically archive or move the
+item if an auto‑archive workflow is configured.
+• 3
+Milestones show completion percentage and counts of open/closed items . Use milestone
+progress to decide when to move to the next phase.
+5.2 Use Sub‑issue progress and charts
+•
+•
+Enable the Sub‑issue progress field to display the fraction of sub‑issues completed for each parent
+6
+.
+Create burn‑up charts in the Insights tab of the project to show open, completed and not‑planned
+work over time 11
+. Filter by Phase or milestone to visualise progress at each stage.
+4
+6. Planning and Scheduling with Date and Iteration Fields
+6.1 Add and configure date fields
+1.
+Create a Start date and Target date field (type: date). These fields capture when work should begin
+2.
+and finish.
+On the roadmap layout, items appear as bars positioned between their start and target dates. You
+can drag the bars to adjust dates; vertical markers highlight iterations, milestones and item dates
+12
+.
+6.2 Use iteration fields for sprints
+1.
+Create an Iteration field. When created, it automatically generates three iterations; you can add
+13
+more and set durations .
+2.
+3.
+Group items by iteration on boards or roadmaps to see the current sprint. Use filter values such as
+13
+@current or @next to focus on work planned for the current or next iteration .
+Roadmaps display iterations as colored blocks; you can drag items between iterations.
+6.3 Bulk move items between iterations
+GitHub allows moving all items to the next iteration in bulk (March 5 2026 update). Use the project’s …
+14
+menu → Move items to next iteration to shift unfinished work .
+7. Metadata and Priority with Issue Fields
+7.1 Enable organization‑wide issue fields
+Issue fields (in public preview) provide typed metadata like Priority, Effort, Start date and Target date. They
+are defined at the organization level and available across all repositories. You can search, filter and report
+on these fields and integrate them into project views 15
+. Issue field values can be edited directly in the
+16 17
+project table and are synced back to the underlying issues .
+7.2 Using custom number and text fields
+Add number fields to track story points, complexity or risk. Text fields can capture references or notes.
+18
+These fields support filters and range queries .
+7.3 Set default values for fields
+GitHub’s April 9 2026 update allows default values for text, number and single‑select fields. Define defaults
+19
+(e.g., Phase defaults to PH‑00 , Priority defaults to Medium ) so new items inherit baseline metadata .
+5
+8. Autonomous Flow: Built‑in Automations, Actions and GraphQL
+8.1 Configure built‑in workflows
+In the project settings → Automations, enable workflows:
+•
+•
+Status change – sets Status to Todo when an item is added and Done when the issue closes or
+10
+pull request merges .
+• 20
+Auto‑archive – automatically archives items that match criteria (state, reason, date) .
+Auto‑add – automatically adds new issues/PRs from specified repositories based on filters such as
+labels, assignee or reason 21
+. Configure multiple rules for different triage streams.
+8.2 Use the actions/add-to-project GitHub Action
+This action adds issues or pull requests to a project when they are opened, labeled or reopened. The
+README shows how to filter by labels:
+name: Add bugs to bugs project
+on:
+issues:
+types: [opened]
+jobs:
+add-to-project:
+runs-on: ubuntu-latest
+steps:
+- uses: actions/add-to-project@RELEASE_VERSION
+with:
+project-url: https://github.com/orgs/<orgName>/projects/
+<projectNumber>
+github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+labeled: bug, needs-triage
+label-operator: OR
+22
+This workflow adds issues labeled bug or needs‑triage to the specified project . The action also
+supports NOT to exclude labels and can target pull requests. You need a personal access token with
+23
+repo and project scopes .
+8.3 Combine GitHub Actions and GraphQL for custom automation
+1.
+2.
+3.
+Use gh api graphql or Octokit to query the project for field IDs (Phase, Status, Priority) and
+9
+option IDs (e.g., In Review ) .
+Add the issue or PR to the project via addProjectV2ItemById and capture the returned item ID
+9
+.
+Call updateProjectV2ItemFieldValue to set fields such as Phase, Status and Dates. For
+9 7
+single‑select fields, specify the singleSelectOptionId ; for text fields, specify text ; for
+9
+dates, specify date .
+6
+4.
+5.
+Trigger this workflow on events like issues.opened, pull_request.ready_for_review,
+pull_request.closed or custom labels to drive the autonomous flow.
+Optionally update the Phase field when gates pass or fail: after a CI job completes, run a GraphQL
+mutation to set Phase to the next stage.
+8.4 Auto‑archive completed items
+20
+Create an auto‑archive workflow that archives items when they are closed or marked as not planned .
+This removes clutter from the active views while preserving data for reporting.
+9. Putting It All Together
+By following these technical processes, you can implement a self‑driving project board aligned with your
+phase‑process template:
+1.
+2.
+3.
+4.
+5.
+6.
+Create the project with custom fields for Phase, Priority, Effort, Start/Target date and a Gate status.
+Define milestones for each phase and set up iterations for sprints.
+Standardise issue templates that include fields for phase, step ID and gating requirements. Use
+sub‑issues to decompose complex steps.
+Automate intake: use built‑in auto‑add rules and actions/add-to-project to capture new
+issues and PRs into the project and set default fields.
+Drive progression: configure CI workflows as gates; require their status checks to pass before
+merging. Use GraphQL actions to update the Phase field and gate status when conditions are met.
+Track and visualise: close issues to complete steps; use milestone and sub‑issue progress, burn‑up
+charts and roadmaps to monitor progress across phases.
+Refine automation: iterate on rules and scripts to improve triage, field updates and gating. Use
+19
+default field values and issue fields to reduce manual data entry .
+These processes enable a GitHub project to mirror your phase‑process template, drive work autonomously
+via automations and CI checks, and provide high‑level visibility through roadmaps and insights.
+1 2
+About single select fields - GitHub Docs
+https://docs.github.com/en/issues/planning-and-tracking-with-projects/understanding-fields/about-single-select-fields
+3 4
+About milestones - GitHub Docs
+https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/about-milestones
+5
+Adding sub-issues - GitHub Docs
+https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/adding-sub-issues
+6
+About parent issue and sub-issue progress fields - GitHub Docs
+https://docs.github.com/en/issues/planning-and-tracking-with-projects/understanding-fields/about-parent-issue-and-sub-issue-
+progress-fields
+7
+ohmyzsh/.github/workflows/project.yml at b0bffcaf865434711d98b63eddd0aa52be0fbeb1 - linux/
+ohmyzsh - git.gc4.at
+https://git.gc4.at/linux/ohmyzsh/src/commit/b0bffcaf865434711d98b63eddd0aa52be0fbeb1/.github/workflows/project.yml
+7
+8
+Troubleshooting required status checks - GitHub Docs
+https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-
+features/troubleshooting-required-status-checks
+9
+Automating Projects using Actions - GitHub Enterprise Server 3.16 Docs
+https://docs.github.com/en/enterprise-server@3.16/issues/planning-and-tracking-with-projects/automating-your-project/
+automating-projects-using-actions
+10
+Using the built-in automations - GitHub Docs
+https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/using-the-built-in-automations
+11
+About insights for Projects - GitHub Docs
+https://docs.github.com/en/issues/planning-and-tracking-with-projects/viewing-insights-from-your-project/about-insights-for-
+projects
+12
+Customizing the roadmap layout - GitHub Docs
+https://docs.github.com/en/issues/planning-and-tracking-with-projects/customizing-views-in-your-project/customizing-the-
+roadmap-layout
+13
+About iteration fields - GitHub Docs
+https://docs.github.com/en/issues/planning-and-tracking-with-projects/understanding-fields/about-iteration-fields
+14
+Hierarchy view improvements and file uploads in issue forms - GitHub Changelog
+https://github.blog/changelog/2026-03-05-hierarchy-view-improvements-and-file-uploads-in-issue-forms/
+15
+Issue fields: Structured issue metadata is in public preview - GitHub Changelog
+https://github.blog/changelog/2026-03-12-issue-fields-structured-issue-metadata-is-in-public-preview/
+16 17
+About issue fields in projects - GitHub Docs
+https://docs.github.com/en/issues/planning-and-tracking-with-projects/understanding-fields/about-issue-fields
+18
+About text and number fields - GitHub Docs
+https://docs.github.com/en/issues/planning-and-tracking-with-projects/understanding-fields/about-text-and-number-fields
+19
+Release information in issue sidebar and default values for project fields - GitHub Changelog
+https://github.blog/changelog/2026-04-09-release-info-in-issue-sidebar-and-project-defaults/
+20
+Archiving items automatically - GitHub Docs
+https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/archiving-items-automatically
+21
+Adding items automatically - GitHub Docs
+https://docs.github.com/en/issues/planning-and-tracking-with-projects/automating-your-project/adding-items-automatically
+22 23
+GitHub - actions/add-to-project: Automate adding issues and pull requests to GitHub projects ·
+GitHub
+https://github.com/actions/add-to-project
+8
