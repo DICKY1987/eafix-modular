@@ -16,6 +16,22 @@ from doc_id_subsystem.core.doc_id_scanner import scan_repository  # noqa: E402
 KNOWN_FILE = Path(__file__).with_name("known_duplicates.json")
 
 
+def _load_known_duplicates(path: Path) -> dict[str, list[str]]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        duplicates = payload["duplicates"]
+        if not isinstance(duplicates, dict):
+            raise TypeError("duplicates must be an object")
+        for doc_id, paths in duplicates.items():
+            if not isinstance(doc_id, str) or not isinstance(paths, list):
+                raise TypeError("duplicates entries must map strings to lists")
+            if any(not isinstance(item, str) for item in paths):
+                raise TypeError("duplicate paths must be strings")
+        return duplicates
+    except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
+        raise ValueError(f"invalid duplicate baseline: {path}") from exc
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", type=Path, default=REPO_ROOT)
@@ -24,7 +40,12 @@ def main() -> int:
         print(f"FAIL: committed duplicate baseline is missing: {KNOWN_FILE}", file=sys.stderr)
         return 2
 
-    known = json.loads(KNOWN_FILE.read_text(encoding="utf-8"))["duplicates"]
+    try:
+        known = _load_known_duplicates(KNOWN_FILE)
+    except ValueError as exc:
+        print(f"FAIL: {exc}", file=sys.stderr)
+        return 2
+
     current = scan_repository(args.repo_root).duplicate_ids
     new_or_expanded = {
         doc_id: paths
