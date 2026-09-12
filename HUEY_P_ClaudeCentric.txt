@@ -1,0 +1,205 @@
+HUEY_P_ClaudeCentric/
+│
+├── Bridge/
+│   ├── src/
+│   │   ├── HUEY_P_CPP_FileBridge.cpp
+│   │   ├── HUEY_P_CPP_NamedPipes.cpp
+│   │   └── HUEY_P_CPP_SocketBridge.cpp
+│   │
+│   ├── include/
+│   │   ├── HUEY_P_H_BridgeInterface.h
+│   │   └── HUEY_P_H_MessageProtocol.h
+│   │
+│   └── build/
+│       └── HUEY_P_DLL_SocketBridge.dll
+│
+├── Config/
+│   ├── HUEY_P_YAML_MlConfig.yaml
+│   ├── HUEY_P_YAML_RiskConfig.yaml
+│   ├── HUEY_P_YAML_SystemConfig.yaml
+│   │
+│   ├── environments/
+│   │   ├── HUEY_P_YAML_Development.yaml
+│   │   ├── HUEY_P_YAML_Production.yaml
+│   │   └── HUEY_P_YAML_Testing.yaml
+│   │
+│   └── pairs/
+│       ├── HUEY_P_YAML_AUDCAD_Config.yaml
+│       ├── HUEY_P_YAML_AUDCHF_Config.yaml
+│       ├── HUEY_P_YAML_AUDJPY_Config.yaml
+│       ├── HUEY_P_YAML_AUDNZD_Config.yaml
+│       ├── HUEY_P_YAML_AUDUSD_Config.yaml
+│       ├── HUEY_P_YAML_CADCHF_Config.yaml
+│       ├── HUEY_P_YAML_CADJPY_Config.yaml
+│       ├── HUEY_P_YAML_CHFJPY_Config.yaml
+│       ├── HUEY_P_YAML_EURAUD_Config.yaml
+│       ├── HUEY_P_YAML_EURCAD_Config.yaml
+│       ├── HUEY_P_YAML_EURCHF_Config.yaml
+│       ├── HUEY_P_YAML_EURGBP_Config.yaml
+│       ├── HUEY_P_YAML_EURJPY_Config.yaml
+│       ├── HUEY_P_YAML_EURNZD_Config.yaml
+│       ├── HUEY_P_YAML_EURUSD_Config.yaml
+│       ├── HUEY_P_YAML_GBPAUD_Config.yaml
+│       ├── HUEY_P_YAML_GBPCAD_Config.yaml
+│       ├── HUEY_P_YAML_GBPCHF_Config.yaml
+│       ├── HUEY_P_YAML_GBPJPY_Config.yaml
+│       ├── HUEY_P_YAML_GBPNZD_Config.yaml
+│       ├── HUEY_P_YAML_GBPUSD_Config.yaml
+│       ├── HUEY_P_YAML_NZDCAD_Config.yaml
+│       ├── HUEY_P_YAML_NZDCHF_Config.yaml
+│       ├── HUEY_P_YAML_NZDJPY_Config.yaml
+│       ├── HUEY_P_YAML_NZDUSD_Config.yaml
+│       ├── HUEY_P_YAML_USDCAD_Config.yaml
+│       ├── HUEY_P_YAML_USDCHF_Config.yaml
+│       ├── HUEY_P_YAML_USDJPY_Config.yaml
+│       ├── HUEY_P_YAML_XAGUSD_Config.yaml
+│       └── HUEY_P_YAML_XAUUSD_Config.yaml
+│
+├── Database/
+│   ├── HUEY_P_DB_TradingSystem.db
+│   ├── HUEY_P_SQL_Migrations.sql
+│   ├── HUEY_P_SQL_Schema.sql
+│   ├── HUEY_P_SQL_SeedData.sql
+│   └── backups/
+│       ├── HUEY_P_DB_Backup_Daily.db
+│       └── HUEY_P_DB_Backup_Weekly.db
+│
+├── Docker/
+│   ├── .dockerignore
+│   ├── HUEY_P_DOCKERFILE_Python
+│   └── HUEY_P_YML_DockerCompose.yml
+│
+├── Documentation/
+│   ├── HUEY_P_MD_ApiReference.md
+│   ├── HUEY_P_MD_DeploymentGuide.md
+│   ├── HUEY_P_MD_SystemSpecification.md
+│   └── diagrams/
+│       └── HUEY_P_PNG_SystemArchitecture.png
+│
+├── Logs/
+│   ├── mt4/
+│   │   ├── experts/
+│   │   └── journal/
+│   │
+│   ├── python/
+│   │   ├── HUEY_P_LOG_AnalyticsService.log
+│   │   └── HUEY_P_LOG_SignalService.log
+│   │
+│   └── system/
+│       └── HUEY_P_LOG_Monitoring.log
+│
+├── MT4/
+│   ├── Experts/
+│   │   ├── HUEY_P_MQL4_AUDCAD_EA.mq4
+│   │   ├── HUEY_P_MQL4_AUDCHF_EA.mq4
+│   │   ├── HUEY_P_MQL4_AUDJPY_EA.mq4
+│   │   ├── HUEY_P_MQL4_AUDNZD_EA.mq4
+│   │   ├── HUEY_P_MQL4_AUDUSD_EA.mq4
+│   │   ├── HUEY_P_MQL4_CADCHF_EA.mq4
+│   │   ├── HUEY_P_MQL4_CADJPY_EA.mq4
+│   │   ├── HUEY_P_MQL4_CHFJPY_EA.mq4
+│   │   ├── HUEY_P_MQL4_EURAUD_EA.mq4
+│   │   ├── HUEY_P_MQL4_EURCAD_EA.mq4
+│   │   ├── HUEY_P_MQL4_EURCHF_EA.mq4
+│   │   ├── HUEY_P_MQL4_EURGBP_EA.mq4
+│   │   ├── HUEY_P_MQL4_EURJPY_EA.mq4
+│   │   ├── HUEY_P_MQL4_EURNZD_EA.mq4
+│   │   ├── HUEY_P_MQL4_EURUSD_EA.mq4
+│   │   ├── HUEY_P_MQL4_GBPAUD_EA.mq4
+│   │   ├── HUEY_P_MQL4_GBPCAD_EA.mq4
+│   │   ├── HUEY_P_MQL4_GBPCHF_EA.mq4
+│   │   ├── HUEY_P_MQL4_GBPJPY_EA.mq4
+│   │   ├── HUEY_P_MQL4_GBPNZD_EA.mq4
+│   │   ├── HUEY_P_MQL4_GBPUSD_EA.mq4
+│   │   ├── HUEY_P_MQL4_NZDCAD_EA.mq4
+│   │   ├── HUEY_P_MQL4_NZDCHF_EA.mq4
+│   │   ├── HUEY_P_MQL4_NZDJPY_EA.mq4
+│   │   ├── HUEY_P_MQL4_NZDUSD_EA.mq4
+│   │   ├── HUEY_P_MQL4_USDCAD_EA.mq4
+│   │   ├── HUEY_P_MQL4_USDCHF_EA.mq4
+│   │   ├── HUEY_P_MQL4_USDJPY_EA.mq4
+│   │   ├── HUEY_P_MQL4_XAGUSD_EA.mq4
+│   │   └── HUEY_P_MQL4_XAUUSD_EA.mq4
+│   │
+│   ├── Files/
+│   │   ├── HUEY_P_CSV_CurrentSignal.csv
+│   │   ├── HUEY_P_CSV_ParameterSets.csv
+│   │   ├── HUEY_P_CSV_ReentryMapping.csv
+│   │   └── HUEY_P_CSV_SignalMapping.csv
+│   │
+│   ├── Include/
+│   │   ├── HUEY_P_MQH_Bridge.mqh
+│   │   ├── HUEY_P_MQH_Core.mqh
+│   │   ├── HUEY_P_MQH_ErrorRecovery.mqh
+│   │   ├── HUEY_P_MQH_ExecutionEngine.mqh
+│   │   ├── HUEY_P_MQH_Logging.mqh
+│   │   ├── HUEY_P_MQH_Reentry.mqh
+│   │   ├── HUEY_P_MQH_TimeManager.mqh
+│   │   └── HUEY_P_MQH_Utils.mqh
+│   │
+│   └── Libraries/
+│       └── HUEY_P_DLL_SocketBridge.dll
+│
+├── Python/
+│   ├── src/
+│   │   ├── ml/
+│   │   │   ├── HUEY_P_PY_EnsembleModel.py
+│   │   │   ├── HUEY_P_PY_FeatureEngine.py
+│   │   │   ├── HUEY_P_PY_ModelTrainer.py
+│   │   │   └── models/
+│   │   │       ├── HUEY_P_PKL_ConfidenceRegressor.pkl
+│   │   │       ├── HUEY_P_PKL_RiskPredictor.pkl
+│   │   │       └── HUEY_P_PKL_SignalClassifier.pkl
+│   │   │
+│   │   ├── models/
+│   │   │   ├── HUEY_P_PY_MarketModels.py
+│   │   │   ├── HUEY_P_PY_MlModels.py
+│   │   │   ├── HUEY_P_PY_SignalModels.py
+│   │   │   └── HUEY_P_PY_TradeModels.py
+│   │   │
+│   │   ├── services/
+│   │   │   ├── HUEY_P_PY_AnalyticsService.py
+│   │   │   ├── HUEY_P_PY_BridgeService.py
+│   │   │   ├── HUEY_P_PY_CommunicationService.py
+│   │   │   ├── HUEY_P_PY_ConfigurationService.py
+│   │   │   ├── HUEY_P_PY_MarketDataService.py
+│   │   │   ├── HUEY_P_PY_MonitoringService.py
+│   │   │   ├── HUEY_P_PY_RiskService.py
+│   │   │   └── HUEY_P_PY_SignalService.py
+│   │   │
+│   │   └── utils/
+│   │       ├── HUEY_P_PY_ConfigManager.py
+│   │       ├── HUEY_P_PY_Database.py
+│   │       ├── HUEY_P_PY_Logger.py
+│   │       └── HUEY_P_PY_Metrics.py
+│   │
+│   ├── tests/
+│   │   ├── fixtures/
+│   │   │   └── HUEY_P_CSV_TestMarketData.csv
+│   │   │
+│   │   ├── integration/
+│   │   │   └── HUEY_P_PY_TestE2E.py
+│   │   │
+│   │   └── unit/
+│   │       └── HUEY_P_PY_TestSignals.py
+│   │
+│   ├── HUEY_P_MD_PythonReadme.md
+│   ├── HUEY_P_PY_Setup.py
+│   └── HUEY_P_TXT_Requirements.txt
+│
+├── Scripts/
+│   ├── deployment/
+│   │   ├── HUEY_P_PS1_DeployAll.ps1
+│   │   └── HUEY_P_PS1_Rollback.ps1
+│   │
+│   ├── maintenance/
+│   │   ├── HUEY_P_PS1_BackupDatabase.ps1
+│   │   └── HUEY_P_PS1_HealthCheck.ps1
+│   │
+│   └── startup/
+│       ├── HUEY_P_BAT_StartServices.bat
+│       └── HUEY_P_PS1_StartPython.ps1
+│
+├── .env
+├── .gitignore
+└── README.md

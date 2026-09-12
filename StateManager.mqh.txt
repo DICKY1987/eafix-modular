@@ -1,0 +1,174 @@
+//+------------------------------------------------------------------+
+//| StateManager.mqh                                                 |
+//| Manages the operational state of the HUEY_P EA.                  |
+//| Copyright 2025, HUEY_P Trading Systems                           |
+//| https://hueyp-trading.com                                        |
+//+------------------------------------------------------------------+
+#property copyright "Copyright 2025, HUEY_P Trading Systems"
+#property link      "https://hueyp-trading.com"
+#property strict
+
+// Forward declaration of EAState to be used within the class
+enum EAState;
+
+//+------------------------------------------------------------------+
+//| Class: CStateManager                                             |
+//| Purpose: Central hub for all state-related data and transitions. |
+//+------------------------------------------------------------------+
+class CStateManager {
+private:
+    // --- Member Variables ---
+    EAState  m_currentState;      // The current operational state of the EA
+    int      m_magicNumber;       // Base magic number for this EA instance
+    int      m_buyTicket;         // Ticket for the pending BUYSTOP order
+    int      m_sellTicket;        // Ticket for the pending SELLSTOP order
+    int      m_activeTicket;      // Ticket for the triggered, active trade
+    datetime m_waitUntil;         // Timestamp for the PAUSED state cool-down
+    bool     m_errorNotified;     // Flag to ensure the ERROR state message is logged only once
+
+    // --- Private Methods ---
+    bool     LoadState();         // Load persisted state on startup
+
+public:
+             CStateManager();
+            ~CStateManager();
+
+    bool     Initialize(int magicBase);
+    void     SaveState();         // Persist state on shutdown
+
+    // --- State Management ---
+    void     SetState(EAState newState);
+    EAState  GetCurrentState();
+
+    // --- Order Ticket Management ---
+    void     SetPendingOrders(int buyTicket, int sellTicket);
+    int      GetBuyTicket();
+    int      GetSellTicket();
+    void     SetActiveTrade(int ticket, int type, double openPrice, double sl, double tp);
+    int      GetActiveTicket();
+    
+    // --- Timed Pause Management ---
+    void     SetWaitUntil(datetime time);
+    datetime GetWaitUntil();
+
+    // --- Error State Management ---
+    void     SetErrorStateNotified(bool notified);
+    bool     IsErrorStateNotified();
+};
+
+//+------------------------------------------------------------------+
+//| Constructor                                                      |
+//+------------------------------------------------------------------+
+CStateManager::CStateManager() {
+    m_currentState = STATE_IDLE;
+    m_magicNumber = 0;
+    m_buyTicket = 0;
+    m_sellTicket = 0;
+    m_activeTicket = 0;
+    m_waitUntil = 0;
+    m_errorNotified = false;
+}
+
+//+------------------------------------------------------------------+
+//| Destructor                                                       |
+//+------------------------------------------------------------------+
+CStateManager::~CStateManager() {
+}
+
+//+------------------------------------------------------------------+
+//| Initialize                                                       |
+//+------------------------------------------------------------------+
+bool CStateManager::Initialize(int magicBase) {
+    m_magicNumber = magicBase;
+    m_currentState = STATE_IDLE; // Default to IDLE
+    LoadState(); // Attempt to restore previous state
+    return(true);
+}
+
+//+------------------------------------------------------------------+
+//| SaveState (uses MT4 Global Variables for persistence)            |
+//+------------------------------------------------------------------+
+void CStateManager::SaveState() {
+    // This implementation follows the pattern from mql4_state_management.yaml
+    string prefix = "EA_" + (string)m_magicNumber + "_";
+    GlobalVariableSet(prefix + "ActiveTicket", m_activeTicket);
+    GlobalVariableSet(prefix + "CurrentState", m_currentState);
+    Print("EA state saved.");
+}
+
+//+------------------------------------------------------------------+
+//| LoadState (restores state from MT4 Global Variables)             |
+//+------------------------------------------------------------------+
+bool CStateManager::LoadState() {
+    string prefix = "EA_" + (string)m_magicNumber + "_";
+    // Check if a persisted state exists
+    if(GlobalVariableCheck(prefix + "CurrentState")) {
+        m_currentState = (EAState)GlobalVariableGet(prefix + "CurrentState");
+        m_activeTicket = (int)GlobalVariableGet(prefix + "ActiveTicket");
+        Print("EA state loaded. Current State: ", EnumToString(m_currentState), ", Active Ticket: ", m_activeTicket);
+        
+        // If we load and find we were in a trade, we need to validate it.
+        // For now, we transition to TRADE_TRIGGERED to allow the main logic to handle it.
+        if (m_activeTicket > 0) {
+           m_currentState = STATE_TRADE_TRIGGERED;
+        }
+        return(true);
+    }
+    return(false);
+}
+
+
+// --- Public Getters and Setters ---
+
+void CStateManager::SetState(EAState newState) {
+    if (m_currentState != newState) {
+        m_currentState = newState;
+        // Reset the error notification flag if we are moving out of the error state
+        if (newState != STATE_ERROR) {
+            m_errorNotified = false;
+        }
+    }
+}
+
+EAState CStateManager::GetCurrentState() {
+    return(m_currentState);
+}
+
+void CStateManager::SetPendingOrders(int buyTicket, int sellTicket) {
+    m_buyTicket = buyTicket;
+    m_sellTicket = sellTicket;
+}
+
+int CStateManager::GetBuyTicket() {
+    return(m_buyTicket);
+}
+
+int CStateManager::GetSellTicket() {
+    return(m_sellTicket);
+}
+
+void CStateManager::SetActiveTrade(int ticket, int type, double openPrice, double sl, double tp) {
+    m_activeTicket = ticket;
+    m_buyTicket = 0;
+    m_sellTicket = 0;
+}
+
+int CStateManager::GetActiveTicket() {
+    return(m_activeTicket);
+}
+
+void CStateManager::SetWaitUntil(datetime time) {
+    m_waitUntil = time;
+}
+
+datetime CStateManager::GetWaitUntil() {
+    return(m_waitUntil);
+}
+
+void CStateManager::SetErrorStateNotified(bool notified) {
+    m_errorNotified = notified;
+}
+
+bool CStateManager::IsErrorStateNotified() {
+    return(m_errorNotified);
+}

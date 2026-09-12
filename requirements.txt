@@ -1,30 +1,30 @@
 # Core Framework Dependencies
-crewai>=1.15.5
+crewai>=1.15.7
 langgraph>=1.2.9
 langchain>=1.3.11
 langchain-anthropic>=1.5.1
-langchain-google-genai>=0.1.0
+langchain-google-genai>=4.3.2
 langchain-community>=0.1.0
 
 # Data Management
 sqlmodel>=0.0.39
 redis>=8.0.1
-pydantic>=2.13.4
+pydantic>=2.11.9,<2.13
 
 # API and CLI
-fastapi>=0.139.2
+fastapi>=0.140.9
 uvicorn[standard]>=0.51.0
 typer[all]>=0.27.0
-rich>=15.0.0
+rich>=13.7.1,<15
 
 # Monitoring and Observability  
-prometheus-client>=0.25.0
+prometheus-client>=0.26.0
 structlog>=26.1.0
 
 # Development and Testing
 pytest>=7.4.0
 pytest-asyncio>=1.4.0
-pytest-cov>=4.1.0
+pytest-cov>=7.1.0
 nox>=2026.7.11
 
 # Optional Dependencies
@@ -39,7 +39,7 @@ radon
 pytest
 coverage
 hypothesis
-semgrep
+semgrep; sys_platform != "win32"
 pip-audit
 pip-licenses
 PyYAML>=6.0

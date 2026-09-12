@@ -64,9 +64,132 @@
     },
     "evidence_refs": {
       "items": {
-        "type": "string"
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "commit_sha": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "line_end": {
+                "minimum": 1,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "line_start": {
+                "minimum": 1,
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "note": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "path": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "commit_sha"
+            ],
+            "type": "object"
+          }
+        ]
       },
       "type": "array"
+    },
+    "field_resolution": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence_refs": {
+            "items": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "commit_sha": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "line_end": {
+                      "minimum": 1,
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "line_start": {
+                      "minimum": 1,
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "note": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "path": {
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "path",
+                    "commit_sha"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            "type": "array"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "enum": [
+              "populated",
+              "confirmed_none",
+              "not_applicable",
+              "deferred_gap",
+              "lifecycle_not_triggered",
+              "derived"
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "evidence_refs"
+        ],
+        "type": "object"
+      },
+      "type": "object"
     },
     "failure_control_ids": {
       "items": {

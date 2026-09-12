@@ -1,0 +1,1224 @@
+
+
+### **File: `README.md`**
+
+# HUEY\_P\_ClaudeCentric Trading System
+
+**Version:** 1.0.0
+**Last Updated:** 2025-06-28
+**Audience:** All Project Stakeholders (Developers, Operators, Administrators)
+
+## 1\. Overview
+
+The HUEY\_P\_ClaudeCentric Trading System is a sophisticated, multi-language automated trading platform designed for the MetaTrader 4 (MT4) environment. It leverages an intelligent Python backend for ML-driven signal generation and risk management, connected to MQL4 Expert Advisors via a high-performance C++ communication bridge.
+
+The system is engineered for production use with real capital, featuring a hierarchical communication protocol for resilience, comprehensive configuration management, and robust operational procedures.
+
+## 2\. Core Technologies
+
+  * **Trading Frontend:** MetaTrader 4 (MQL4)
+  * **Backend Intelligence:** Python 3.9+ (Asyncio, Pandas, Scikit-learn)
+  * **Communication Bridge:** C++ (Windows Sockets API)
+  * **Configuration:** YAML & CSV
+  * **Database:** SQLite
+  * **Deployment:** PowerShell & Docker
+  * **Operational Scripts:** PowerShell
+
+## 3\. Quick Start Guide
+
+1.  **Configure System:** Set up all required paths, API keys, and trading parameters in the `/Config` directory, starting with `system_config.yaml`.
+2.  **Deploy Database:** Run the `Initialize-Database.ps1` script to create and seed the SQLite database.
+3.  **Build DLL:** Execute the `build_dll.bat` script to compile `SocketBridge.dll`.
+4.  **Deploy MT4 Files:** Copy the compiled EA, library, include, and data files to the appropriate MT4 terminal directories.
+5.  **Deploy Python Services:** Run the `docker_deploy.ps1` script to build and launch the containerized Python backend.
+6.  **Activate EAs:** Attach each Expert Advisor to its designated currency pair chart in the MT4 terminal.
+
+## 4\. Documentation Index
+
+For complete details on system architecture, development, and operations, please refer to the full documentation suite located in the `/Documentation` directory.
+
+  * [00\_System\_Overview.md](https://www.google.com/search?q=./Documentation/00_System_Overview.md)
+  * [01\_MQL4\_Subsystem.md](https://www.google.com/search?q=./Documentation/01_MQL4_Subsystem.md)
+  * [02\_Bridge\_DLL.md](https://www.google.com/search?q=./Documentation/02_Bridge_DLL.md)
+  * [03\_Python\_Backend.md](https://www.google.com/search?q=./Documentation/03_Python_Backend.md)
+  * [04\_Configuration.md](https://www.google.com/search?q=./Documentation/04_Configuration.md)
+  * [05\_Deployment\_And\_Operations.md](https://www.google.com/search?q=./Documentation/05_Deployment_And_Operations.md)
+  * [06\_API\_Contract\_Documentation.md](https://www.google.com/search?q=./Documentation/06_API_Contract_Documentation.md)
+  * [STYLE\_GUIDE.md](https://www.google.com/search?q=./Documentation/STYLE_GUIDE.md)
+  * [TESTING\_STRATEGY.md](https://www.google.com/search?q=./Documentation/TESTING_STRATEGY.md)
+  * [BACKUP\_AND\_RECOVERY.md](https://www.google.com/search?q=./Documentation/BACKUP_AND_RECOVERY.md)
+
+-----
+
+-----
+
+### **File: `00_System_Overview.md`**
+
+# 00\. System Overview
+
+**Version:** 1.0.0
+**Last Updated:** 2025-06-28
+**Audience:** All Project Stakeholders
+
+## Table of Contents
+
+1.  [Purpose](https://www.google.com/search?q=%231-purpose)
+2.  [Core Architectural Principles](https://www.google.com/search?q=%232-core-architectural-principles)
+3.  [High-Level Architecture Diagram](https://www.google.com/search?q=%233-high-level-architecture-diagram)
+4.  [Component Descriptions](https://www.google.com/search?q=%234-component-descriptions)
+5.  [Data Flow Diagram: Signal to Execution](https://www.google.com/search?q=%235-data-flow-diagram-signal-to-execution)
+6.  [References](https://www.google.com/search?q=%236-references)
+
+## 1\. Purpose
+
+This document provides a high-level overview of the HUEY\_P\_ClaudeCentric Trading System's architecture. It is intended to give all stakeholders a foundational understanding of the system's components, their responsibilities, and how they interact to achieve automated trading.
+
+## 2\. Core Architectural Principles
+
+The system is built upon three core principles:
+
+  * **Decoupling & Modularity:** Each primary component (MQL4, C++, Python) operates independently. This allows for modular updates and maintenance without causing system-wide failures. For example, the Python signal generation logic can be updated without recompiling the MQL4 EAs.
+  * **Redundancy & Resilience:** The communication system is designed with a hierarchical fallback mechanism (Socket → Named Pipes → Files). This ensures that trading signals can be delivered even if the primary communication channel fails, a critical feature for a live trading environment.
+  * **Flexibility & Control:** The system is heavily parameter-driven through YAML and CSV configuration files. This allows operators to change trading strategies, risk parameters, and system behavior without altering the source code.
+
+## 3\. High-Level Architecture Diagram
+
+```
++--------------------------------+      +--------------------------------+      +--------------------------------+
+|       PYTHON BACKEND           |      |          C++ BRIDGE            |      |         MT4 FRONTEND           |
+|      (Docker Container)        |      |      (SocketBridge.dll)        |      |      (Windows Terminal)        |
++--------------------------------+      +--------------------------------+      +--------------------------------+
+| - Signal Generation Service    |<---->| - Socket/Named Pipe Server     |<---->| - 30x Expert Advisors (EAs)    |
+| - Risk Management Service      |      | - Message Queue & Formatting   |      |   - HUEY_P_MQL4_EURUSD_EA.mq4  |
+| - ML Model Inference           |      | - Signal Marshalling           |      |   - HUEY_P_MQL4_GBPUSD_EA.mq4  |
+| - SQLite Database              |      +--------------------------------+      |   - ...                        |
+| - Configuration Service        |                                              |                                |
++--------------------------------+                                              | - Include Files (*.mqh)        |
+           ^                                                                    | - Data Files (*.csv)           |
+           |                                                                    +--------------------------------+
+           |
++--------------------------------+
+|       OPERATIONS & DEPLOYMENT  |
++--------------------------------+
+| - PowerShell Scripts           |
+| - Docker                       |
+| - YAML/CSV Config Files        |
++--------------------------------+
+```
+
+## 4\. Component Descriptions
+
+  * **Python Backend:** The "brain" of the system. It runs as a set of containerized services responsible for market analysis, machine learning model inference, signal generation, and pre-trade risk validation.
+  * **C++ Bridge (SocketBridge.dll):** A high-performance, low-level Windows DLL that acts as the communication intermediary. Its sole purpose is to efficiently and reliably transfer messages between the Python backend and the MQL4 EAs.
+  * **MT4 Frontend:** The MetaTrader 4 terminal hosts 30 individual Expert Advisors (EAs), one for each traded currency pair. The EAs are lightweight, receiving signals from the bridge and executing trades based on parameters defined in shared `.mqh` and `.csv` files.
+  * **Operations & Deployment:** A collection of PowerShell scripts, Docker files, and configuration files that manage the entire system lifecycle, from initial setup and deployment to monitoring and maintenance.
+
+## 5\. Data Flow Diagram: Signal to Execution
+
+This diagram illustrates the lifecycle of a single trading signal.
+
+```
+(START)
+   |
+   V
+[Python: Market Data Analysis] --> [Python: ML Model Predicts Opportunity]
+   |
+   V
+[Python: Signal Generated (e.g., BUY EURUSD)]
+   |
+   V
+[Python: Risk Manager Validates Trade (Lot size, exposure)]
+   |
+   V
+[Python: Signal formatted and sent to C++ Bridge via Socket]
+   |
+   V
+[C++ Bridge: Receives signal, places in queue]
+   |
+   V
+[MQL4 EA: Polls C++ Bridge for new signal via GetNextSignal()]
+   |
+   V
+[MQL4 EA: Receives signal string for its pair (EURUSD)]
+   |
+   V
+[MQL4 EA: Parses signal, loads parameters from *.csv files]
+   |
+   V
+[MQL4 EA: Performs final checks (spread, slippage)]
+   |
+   V
+[MQL4 EA: Executes OrderSend() trade command]
+   |
+   V
+(END)
+```
+
+## 6\. References
+
+  * [06\_API\_Contract\_Documentation.md](https://www.google.com/search?q=./06_API_Contract_Documentation.md)
+  * [01\_MQL4\_Subsystem.md](https://www.google.com/search?q=./01_MQL4_Subsystem.md)
+  * [02\_Bridge\_DLL.md](https://www.google.com/search?q=./02_Bridge_DLL.md)
+  * [03\_Python\_Backend.md](https://www.google.com/search?q=./03_Python_Backend.md)
+
+-----
+
+-----
+
+### **File: `01_MQL4_Subsystem.md`**
+
+# 01\. MQL4 Subsystem
+
+**Version:** 1.0.0
+**Last Updated:** 2025-06-28
+**Audience:** MQL4 Developers, System Integrators
+
+## Table of Contents
+
+1.  [Overview](https://www.google.com/search?q=%231-overview)
+2.  [Expert Advisors (EAs)](https://www.google.com/search?q=%232-expert-advisors-eas)
+3.  [Include Files (`/MQL4/Include`)](https://www.google.com/search?q=%233-include-files-mql4include)
+4.  [Data Files (`/MQL4/Files`)](https://www.google.com/search?q=%234-data-files-mql4files)
+5.  [Key Functions & Logic Flow](https://www.google.com/search?q=%235-key-functions--logic-flow)
+6.  [Error Handling](https://www.google.com/search?q=%236-error-handling)
+7.  [Performance Characteristics](https://www.google.com/search?q=%237-performance-characteristics)
+8.  [References](https://www.google.com/search?q=%238-references)
+
+## 1\. Overview
+
+The MQL4 Subsystem consists of all components operating within the MetaTrader 4 terminal. Its primary role is trade execution and management. It acts as the "hands" of the trading system, receiving high-level commands from the Python backend and translating them into trade orders.
+
+## 2\. Expert Advisors (EAs)
+
+The system employs 30 individual EAs, one for each currency pair (e.g., `HUEY_P_MQL4_EURUSD_EA.mq4`).
+
+  * **Architecture:** While there are 30 `.mq4` files, they all contain nearly identical boilerplate code. The core trading logic is abstracted into the shared `.mqh` include files.
+  * **Purpose:** Each EA is responsible for the trading activity of a single currency pair. It initializes communication with the bridge, polls for signals relevant to its pair, executes trades, and manages open positions for that pair only. This design isolates risk and simplifies debugging.
+  * **Configuration:** Key EA parameters like `MagicNumber`, `MaxSpread`, and file paths are configured via the `Inputs` tab when the EA is attached to a chart.
+
+## 3\. Include Files (`/MQL4/Include`)
+
+These files contain the shared logic used by all EAs, promoting code reuse and consistency.
+
+  * **`CommunicationManager.mqh`:** Manages all interaction with the `SocketBridge.dll`. It handles importing DLL functions, establishing connections, and retrieving signals.
+  * **`TradingCore.mqh`:** The heart of the trading logic. It receives a processed signal and a parameter set, then performs the necessary pre-flight checks (e.g., verifying spread) before passing the trade to the execution engine.
+  * **`ExecutionEngine.mqh`:** A low-level module responsible for the `OrderSend()` function. It includes logic for retrying failed orders due to requotes or other transient broker errors.
+  * **`FileManager.mqh`:** Provides functions for loading and parsing the various `.csv` configuration files from the `/MQL4/Files` directory.
+  * **`TimeManager.mqh`:** Handles time-based trading rules, such as preventing trades around major news events by reading a `NewsCalendar.csv`.
+  * **`ErrorRecovery.mqh`:** A state machine for handling system errors, such as a prolonged loss of communication with the backend.
+  * **`Logging.mqh`:** Provides standardized logging functions for writing messages to the Experts log file.
+
+## 4\. Data Files (`/MQL4/Files`)
+
+These CSV files provide runtime configuration, allowing trading behavior to be modified without recompiling the EAs.
+
+  * **`all_10_parameter_sets.csv`:** Defines multiple sets of trading parameters (e.g., Stop Loss, Take Profit, Risk Percentage).
+  * **`signal_id_mapping.csv`:** Maps an incoming signal's `strategy_id` to a specific parameter set from the file above.
+  * **`reentry_close_result_mapping.csv`:** Contains rules for adjusting behavior based on the result of the last trade (the "DIE 1-6" strategy).
+  * **`current_signal.csv`:** The fallback communication file, used only if Socket and Named Pipe connections fail.
+
+## 5\. Key Functions & Logic Flow
+
+The core logic resides in three main MT4 event handlers:
+
+1.  **`OnInit()`:**
+
+      * Initializes all global variables.
+      * Calls `LoadParameterSets()`, `LoadSignalMappings()`, etc., to load data from CSV files.
+      * Calls `CommunicationManager` to establish a connection with the `SocketBridge.dll`.
+      * Logs success or failure of initialization.
+
+2.  **`OnDeinit()`:**
+
+      * Called on shutdown.
+      * Calls `CommunicationManager` to gracefully close the connection to the bridge.
+      * Logs shutdown reason.
+
+3.  **`OnTick()`:**
+
+      * This function is kept lightweight. Its primary job is to execute on a cadence (e.g., once every few seconds, not on every tick).
+      * Calls `CommunicationManager.GetNextSignal()` to poll for a new trading signal.
+      * If a valid signal for the EA's pair is received:
+          * It passes the signal to `TradingCore.ProcessSignal()`.
+          * `TradingCore` then uses the mapping files to select the correct parameter set and passes all information to `ExecutionEngine.ExecuteTrade()`.
+      * Manages trailing stops for open positions managed by this EA.
+
+## 6\. Error Handling
+
+  * **Trade Errors:** The `ExecutionEngine.mqh` handles standard MT4 trade errors (e.g., error 130 - invalid stops, error 136 - no prices) with a retry mechanism.
+  * **Communication Errors:** `CommunicationManager.mqh` detects failed connections to the bridge. After a set number of failures, `ErrorRecovery.mqh` transitions the system state to `DEGRADED` and attempts to use the fallback communication method.
+  * **Configuration Errors:** If CSV files are missing or malformed, the EA will fail during `OnInit()` and log a critical error, preventing it from trading.
+
+## 7\. Performance Characteristics
+
+  * **Latency:** The MQL4 subsystem adds minimal latency. The `OnTick()` loop is designed to be non-blocking. Most latency is dependent on the network connection to the trade server.
+  * **Resource Usage:** The EAs are lightweight and consume minimal CPU and memory, as the heavy analytical processing is offloaded to the Python backend.
+
+## 8\. References
+
+  * [06\_API\_Contract\_Documentation.md](https://www.google.com/search?q=./06_API_Contract_Documentation.md)
+  * [00\_System\_Overview.md](https://www.google.com/search?q=./00_System_Overview.md)
+  * [STYLE\_GUIDE.md](https://www.google.com/search?q=./STYLE_GUIDE.md)
+
+-----
+
+-----
+
+### **File: `02_Bridge_DLL.md`**
+
+# 02\. C++ Bridge DLL
+
+**Version:** 1.0.0
+**Last Updated:** 2025-06-28
+**Audience:** C++ Developers, System Integrators
+
+## Table of Contents
+
+1.  [Overview](https://www.google.com/search?q=%231-overview)
+2.  [Purpose and Role](https://www.google.com/search?q=%232-purpose-and-role)
+3.  [Dependencies](https://www.google.com/search?q=%233-dependencies)
+4.  [Architecture](https://www.google.com/search?q=%234-architecture)
+5.  [Interfaces](https://www.google.com/search?q=%235-interfaces)
+6.  [Data Structures](https://www.google.com/search?q=%236-data-structures)
+7.  [Error Handling](https://www.google.com/search?q=%237-error-handling)
+8.  [Performance Characteristics](https://www.google.com/search?q=%238-performance-characteristics)
+9.  [Build Instructions](https://www.google.com/search?q=%239-build-instructions)
+10. [References](https://www.google.com/search?q=%2310-references)
+
+## 1\. Overview
+
+The C++ Bridge, compiled as `SocketBridge.dll`, is a crucial middleware component that enables high-speed, reliable communication between the Python backend and the MQL4 frontend. It is written in C++ using the native Windows API for maximum performance and minimum latency.
+
+## 2\. Purpose and Role
+
+The primary responsibility of the DLL is to act as a **protocol and language translator**.
+
+  * It listens for incoming TCP/IP socket connections from the Python backend.
+  * It receives signal messages, validates their basic format, and places them into a thread-safe queue.
+  * It exposes a simple, clean C-style interface for the MQL4 environment to poll for these messages.
+  * This decouples the Python and MQL4 environments, so neither needs to know the implementation details of the other.
+
+## 3\. Dependencies
+
+  * **Libraries:** `ws2_32.lib` (Windows Socket API 2).
+  * **Operating System:** Windows 7 or higher.
+  * **Build Environment:** Visual Studio (with C++ Desktop Development workload) or compatible C++ compiler toolchain (e.g., MinGW).
+
+## 4\. Architecture
+
+The DLL is multi-threaded to ensure non-blocking operations.
+
+  * **Listener Thread:** A dedicated thread is spawned when `StartServer()` is called. This thread's sole responsibility is to listen for and accept incoming socket connections from the Python backend.
+  * **Worker Thread(s):** Upon connection, a new thread may be created to handle receiving data from that specific client. This thread reads incoming signal messages, performs basic validation, and pushes them into the central message queue.
+  * **Message Queue:** A thread-safe, FIFO (First-In, First-Out) queue (e.g., `std::queue` protected by a `std::mutex`). This queue acts as the buffer between the network-facing threads and the MQL4-facing functions.
+  * **Main DLL Thread:** The MQL4 calls (`GetNextSignal`) are handled by the main thread, which simply locks the queue, dequeues a message if available, and returns it.
+
+## 5\. Interfaces
+
+The public interface of the DLL consists of functions exported for use by MQL4.
+
+  * `int StartServer(int port)`: Initializes Winsock, creates the listening socket on the specified port, and starts the listener thread.
+  * `void StopServer()`: Signals all threads to terminate, closes sockets, and cleans up resources.
+  * `int GetNextSignal(wchar_t* buffer, int bufferSize)`: Retrieves the next signal message from the queue. Copies the wide character string into the MQL4-provided buffer.
+  * `int GetStatus()`: Returns the current status of the bridge (e.g., disconnected, listening, connected).
+
+For detailed function signatures and message formats, see the API Contract.
+
+## 6\. Data Structures
+
+  * **Internal Message Queue:** `std::queue<std::wstring>` protected by a `std::mutex` and a `std::condition_variable` to manage thread-safe access.
+  * **Signal Format:** The DLL internally treats signals as wide character strings (`std::wstring`) to be compatible with MQL4's `string` type, which is UTF-16 LE on Windows.
+
+## 7\. Error Handling
+
+  * **Initialization Failure:** If `StartServer` fails (e.g., port is already in use), it returns a specific error code and logs the error using `OutputDebugString`.
+  * **Network Errors:** The listener and worker threads handle network errors gracefully (e.g., client disconnects).
+  * **Buffer Overflow:** The `GetNextSignal` function checks the provided MQL4 buffer size. If a message is too large to fit, it returns an error code and discards the message to prevent buffer overflows.
+
+## 8\. Performance Characteristics
+
+  * **Latency:** The DLL itself adds negligible latency (\<1ms). The design prioritizes immediate handoff of messages to and from the queue.
+  * **Throughput:** Capable of handling thousands of messages per second, far exceeding the requirements of the trading system.
+  * **Resource Usage:** Memory usage is minimal, primarily determined by the maximum size of the message queue. CPU usage is very low, as threads are typically idle waiting for network events or MQL4 calls.
+
+## 9\. Build Instructions
+
+1.  Open the solution file in Visual Studio.
+2.  Ensure the project is configured to build a `.dll` for the target architecture (x86 for 32-bit MT4, x64 for 64-bit MT4).
+3.  Link against the `ws2_32.lib` library in the project's Linker settings.
+4.  Build the solution. The `SocketBridge.dll` will be generated in the output directory.
+5.  Alternatively, run the provided `build_dll.bat` script, which automates the command-line build process.
+
+## 10\. References
+
+  * [06\_API\_Contract\_Documentation.md](https://www.google.com/search?q=./06_API_Contract_Documentation.md)
+  * [01\_MQL4\_Subsystem.md](https://www.google.com/search?q=./01_MQL4_Subsystem.md)
+
+-----
+
+-----
+
+### **File: `03_Python_Backend.md`**
+
+# 03\. Python Backend
+
+**Version:** 1.0.0
+**Last Updated:** 2025-06-28
+**Audience:** Python Developers, Data Scientists
+
+## Table of Contents
+
+1.  [Overview](https://www.google.com/search?q=%231-overview)
+2.  [Architecture](https://www.google.com/search?q=%232-architecture)
+3.  [Core Services](https://www.google.com/search?q=%233-core-services)
+4.  [Machine Learning (ML) Components](https://www.google.com/search?q=%234-machine-learning-ml-components)
+5.  [Database](https://www.google.com/search?q=%235-database)
+6.  [Dependencies](https://www.google.com/search?q=%236-dependencies)
+7.  [Error Handling and Logging](https://www.google.com/search?q=%237-error-handling-and-logging)
+8.  [Performance Characteristics](https://www.google.com/search?q=%238-performance-characteristics)
+9.  [References](https://www.google.com/search?q=%239-references)
+
+## 1\. Overview
+
+The Python Backend is the intelligent core of the trading system. It operates as a suite of asynchronous services within a Docker container. Its responsibilities include market data analysis, signal generation via machine learning models, configuration management, and robust risk assessment.
+
+## 2\. Architecture
+
+The backend is built on Python's `asyncio` library, enabling high-performance, concurrent I/O operations without the overhead of multi-threading. This is ideal for managing network connections (to data sources and the C++ bridge) and other I/O-bound tasks. The system is designed as a set of cooperating services that communicate via internal async queues.
+
+## 3\. Core Services
+
+  * **`MarketDataService`:**
+
+      * **Purpose:** Connects to external market data APIs (e.g., a broker's FIX/API or a third-party provider) to stream real-time and historical price data.
+      * **Functionality:** Normalizes data from different sources into a consistent internal format and distributes it to other services.
+
+  * **`SignalService` (`signal_generator.py`):**
+
+      * **Purpose:** The primary signal generation engine.
+      * **Functionality:** Consumes market data, preprocesses it into features, and feeds these features into the ML models. When a model predicts a high-probability trading opportunity, this service constructs a formal signal message.
+
+  * **`RiskService` (`risk_manager.py`):**
+
+      * **Purpose:** Acts as a centralized pre-trade gatekeeper to enforce risk management rules.
+      * **Functionality:** Before a signal is sent to the C++ bridge, it is validated by this service. Checks include:
+          * Maximum drawdown limits.
+          * Maximum concurrent open positions.
+          * Correlation checks to avoid over-exposure to a single currency.
+          * Calculates the appropriate lot size based on `riskPercent` and account equity.
+
+  * **`BridgeService` (`trading_server.py`):**
+
+      * **Purpose:** Manages the TCP/IP socket connection to the `SocketBridge.dll`.
+      * **Functionality:** It takes validated signals from the `RiskService`, formats them according to the API contract, and transmits them to the C++ bridge. It also handles connection logic, heartbeating, and retries.
+
+  * **`ConfigurationService`:**
+
+      * **Purpose:** Loads and provides system-wide access to all YAML configuration files.
+      * **Functionality:** It parses the hierarchical configuration and exposes a simple interface for other services to query parameters. It can also watch for file changes to enable hot-reloading of certain settings.
+
+## 4\. Machine Learning (ML) Components
+
+  * **`FeatureEngine.py`:** A collection of functions for transforming raw market data (prices, volumes) into meaningful features for the models (e.g., rolling averages, RSI, volatility metrics).
+  * **`ModelTrainer.py`:** An offline script used to train, evaluate, and serialize the ML models. This is not part of the live runtime.
+  * **`models/` directory:** Contains the serialized, pre-trained model files (e.g., using `joblib` or `pickle`). The `SignalService` loads these models on startup for inference. The models might include:
+      * A classifier to predict market direction (Buy/Sell/Hold).
+      * A regressor to predict the confidence or potential magnitude of a move.
+
+## 5\. Database
+
+  * **Technology:** SQLite is used for its simplicity and file-based nature, which is ideal for a self-contained containerized application.
+  * **Purpose:**
+      * To log every signal generated.
+      * To record every trade execution confirmation received from the frontend.
+      * To store historical performance metrics for analysis.
+  * **Schema:** The database schema defines tables for `signals`, `trades`, and `system_logs`. See the API Contract for the full DDL.
+
+## 6\. Dependencies
+
+All required Python packages are listed in `requirements.txt`. Key dependencies include:
+
+  * `asyncio`: Core concurrency framework.
+  * `pandas`: Data manipulation and analysis.
+  * `numpy`: Numerical operations.
+  * `scikit-learn`: Machine learning model inference.
+  * `PyYAML`: For parsing YAML configuration files.
+  * `sqlalchemy`: For database interaction (Core or ORM).
+
+## 7\. Error Handling and Logging
+
+  * **Logging:** A centralized `Logger` utility is used by all services. Logs are written to standard output (for Docker to capture) and optionally to a rotating file log. Log levels are configurable.
+  * **Error Handling:** Asynchronous tasks are wrapped in `try...except` blocks. Critical failures (e.g., inability to connect to the C++ bridge after multiple retries) will trigger a system shutdown alert and log a critical error.
+
+## 8\. Performance Characteristics
+
+  * **Latency:** The `asyncio` architecture ensures that signal processing is highly efficient. The primary latency bottleneck is the ML model inference time, which should be optimized to be well under 100ms per signal.
+  * **Resource Usage:** Memory usage is primarily determined by the size of the dataframes held in memory by `pandas`. CPU usage will spike during feature calculation and model inference.
+
+## 9\. References
+
+  * [06\_API\_Contract\_Documentation.md](https://www.google.com/search?q=./06_API_Contract_Documentation.md)
+  * [04\_Configuration.md](https://www.google.com/search?q=./04_Configuration.md)
+  * [STYLE\_GUIDE.md](https://www.google.com/search?q=./STYLE_GUIDE.md)
+
+-----
+
+-----
+
+### **File: `04_Configuration.md`**
+
+# 04\. Configuration Management
+
+**Version:** 1.0.0
+**Last Updated:** 2025-06-28
+**Audience:** Developers, Operators, System Administrators
+
+## Table of Contents
+
+1.  [Overview](https://www.google.com/search?q=%231-overview)
+2.  [Configuration Hierarchy](https://www.google.com/search?q=%232-configuration-hierarchy)
+3.  [File Formats](https://www.google.com/search?q=%233-file-formats)
+4.  [Core Configuration Files](https://www.google.com/search?q=%234-core-configuration-files)
+5.  [Environment-Specific Configuration](https://www.google.com/search?q=%235-environment-specific-configuration)
+6.  [Pair-Specific Configuration](https://www.google.com/search?q=%236-pair-specific-configuration)
+7.  [Configuration Loading Process](https://www.google.com/search?q=%237-configuration-loading-process)
+8.  [Example Configuration](https://www.google.com/search?q=%238-example-configuration)
+9.  [References](https://www.google.com/search?q=%239-references)
+
+## 1\. Overview
+
+This document describes the configuration management system for the HUEY\_P\_ClaudeCentric Trading System. The system uses a hierarchical structure of YAML and CSV files to provide a high degree of flexibility and control over its behavior without requiring code changes.
+
+## 2\. Configuration Hierarchy
+
+Configuration is loaded in a specific order of precedence, where settings from later files override those from earlier files. This allows for a clean separation of base settings, environment settings, and highly specific overrides.
+
+1.  **Base Configuration (`system_config.yaml`, `risk_config.yaml`):** Contains default values for all parameters.
+2.  **Environment Configuration (`/environments/*.yaml`):** Overrides base settings for a specific environment (e.g., `production.yaml` might have more conservative risk settings than `development.yaml`).
+3.  **Pair-Specific Configuration (`/pairs/*.yaml`):** The most specific level. Overrides any of the above settings for a single currency pair (e.g., `EURUSD_Config.yaml` could define a unique trading strategy).
+
+## 3\. File Formats
+
+  * **YAML (`.yaml`):** Used for all primary configuration due to its human-readability and ability to represent hierarchical data structures.
+  * **CSV (`.csv`):** Used exclusively for large, tabular data sets that are read by the MQL4 EAs, such as parameter sets and mappings.
+
+## 4\. Core Configuration Files
+
+  * **`system_config.yaml`:**
+      * **Purpose:** Defines global system settings.
+      * **Contents:** Communication bridge settings (host, port), database file path, global logging level, API keys for data sources.
+  * **`risk_config.yaml`:**
+      * **Purpose:** Defines default risk management parameters.
+      * **Contents:** `max_account_drawdown`, `max_concurrent_trades`, default `risk_percent_per_trade`, `max_exposure_per_currency`.
+  * **`ml_config.yaml`:**
+      * **Purpose:** Configures the machine learning components.
+      * **Contents:** Paths to serialized model files, feature engineering settings, confidence thresholds for signal generation.
+
+## 5\. Environment-Specific Configuration
+
+Located in the `/Config/environments/` directory.
+
+  * **`development.yaml`:** Settings for local development and testing. Typically includes verbose logging, lower risk, and connections to mock services or demo accounts.
+  * **`production.yaml`:** Hardened settings for live trading. Includes `INFO` or `WARN` logging, strict risk parameters, and connections to live data feeds and brokerage accounts.
+
+## 6\. Pair-Specific Configuration
+
+Located in the `/Config/pairs/` directory.
+
+  * **Example: `EURUSD_Config.yaml`**
+      * **Purpose:** To define settings that apply *only* to the EUR/USD pair.
+      * **Contents:** Can override any setting, such as `risk_percent_per_trade`, or specify a unique `strategy_id` to be used for this pair only. This allows for fine-tuning the system's behavior on a per-instrument basis.
+
+## 7\. Configuration Loading Process
+
+The Python `ConfigurationService` performs the following steps on startup:
+
+1.  Loads the base `system_config.yaml` and `risk_config.yaml` into a dictionary.
+2.  Identifies the current environment (e.g., from an environment variable `TRADING_ENV=production`).
+3.  Loads the corresponding `environments/production.yaml` and recursively merges it into the configuration dictionary, overwriting any duplicate keys.
+4.  For each pair defined in the system, it loads the corresponding `pairs/PAIR_Config.yaml` and merges it, creating a separate configuration profile for each trading pair.
+5.  The final, fully resolved configuration objects are then made available to all other services.
+
+## 8\. Example Configuration
+
+Below is a simplified example of a `production.yaml` file, demonstrating how it overrides base settings.
+
+```yaml
+# File: /Config/environments/production.yaml
+
+# Overrides settings from system_config.yaml
+bridge:
+  host: "127.0.0.1" # Connect to localhost where MT4 is running
+  primary_port: 9999
+  heartbeat_interval: 15 # Seconds
+
+logging:
+  level: "INFO" # Less verbose than DEBUG
+
+# Overrides settings from risk_config.yaml
+risk_management:
+  max_account_drawdown: 0.10 # 10% max total drawdown
+  risk_percent_per_trade: 0.005 # 0.5% risk per trade
+
+# Production-specific settings
+data_source:
+  api_key: "env_var:LIVE_DATA_API_KEY" # Load sensitive data from environment variables
+  endpoint: "https://api.live-data-provider.com/v2/stream"
+
+```
+
+## 9\. References
+
+  * [06\_API\_Contract\_Documentation.md](https://www.google.com/search?q=./06_API_Contract_Documentation.md) (for detailed schemas)
+  * [03\_Python\_Backend.md](https://www.google.com/search?q=./03_Python_Backend.md)
+
+-----
+
+-----
+
+### **File: `05_Deployment_And_Operations.md`**
+
+# 05\. Deployment and Operations
+
+**Version:** 1.0.0
+**Last Updated:** 2025-06-28
+**Audience:** Operators, System Administrators, DevOps
+
+## Table of Contents
+
+1.  [Overview](https://www.google.com/search?q=%231-overview)
+2.  [Prerequisites](https://www.google.com/search?q=%232-prerequisites)
+3.  [First-Time Deployment Procedure](https://www.google.com/search?q=%233-first-time-deployment-procedure)
+4.  [Routine Operations](https://www.google.com/search?q=%234-routine-operations)
+5.  [Monitoring](https://www.google.com/search?q=%235-monitoring)
+6.  [Troubleshooting](https://www.google.com/search?q=%236-troubleshooting)
+7.  [References](https://www.google.com/search?q=%237-references)
+
+## 1\. Overview
+
+This document provides instructions for the deployment, operation, and monitoring of the HUEY\_P\_ClaudeCentric Trading System. It is intended as a practical, step-by-step guide for system operators.
+
+## 2\. Prerequisites
+
+  * A dedicated Windows machine or VM for running the MT4 terminal.
+  * MetaTrader 4 terminal installed.
+  * Docker Desktop installed on the same machine or a networked machine.
+  * PowerShell 5.1 or higher.
+  * Git, with access to the project repository.
+  * C++ Build Tools (e.g., Visual Studio Build Tools).
+
+## 3\. First-Time Deployment Procedure
+
+This procedure covers setting up the system from a clean state.
+
+**Step 1: Clone the Repository**
+
+```powershell
+git clone <repository_url>
+cd HUEY_P_ClaudeCentric
+```
+
+**Step 2: Initialize Paths**
+The `PathManager.psm1` module relies on a `paths_config.yaml` file. If this file does not exist, run the initialization script.
+
+```powershell
+./Scripts/initialize_paths.ps1
+```
+
+Follow the prompts to confirm the location of your MT4 terminal data folder. This will generate the `paths_config.yaml`.
+
+**Step 3: Configure the System**
+
+  * Navigate to the `/Config` directory.
+  * Edit `system_config.yaml`, `risk_config.yaml`, and any other necessary configuration files. Pay special attention to ports, file paths, and API keys.
+
+**Step 4: Initialize the Database**
+This script creates the SQLite database file and sets up the required schema.
+
+```powershell
+./Scripts/initialize_database.ps1
+```
+
+**Step 5: Build the C++ Bridge DLL**
+This compiles the C++ source code into `SocketBridge.dll`.
+
+```powershell
+./Source/DLL/SocketBridge/build_dll.bat
+```
+
+**Step 6: Deploy System Files**
+This master script copies all the necessary files to their operational locations. It reads `paths_config.yaml` to know the destination directories.
+
+```powershell
+./Scripts/deployment/Deploy-All.ps1
+```
+
+This script will:
+
+  * Copy `SocketBridge.dll` to `/MQL4/Libraries`.
+  * Copy all `.mq4` and `.mqh` files to `/MQL4/Experts` and `/MQL4/Include`.
+  * Copy all `.csv` files to `/MQL4/Files`.
+
+**Step 7: Deploy the Python Backend**
+This script builds the Docker image and starts the containerized services.
+
+```powershell
+./Scripts/docker_deploy.ps1 -Action "deploy"
+```
+
+**Step 8: Launch and Attach EAs**
+
+1.  Start the MetaTrader 4 terminal.
+2.  Ensure "Allow DLL imports" is checked in `Tools > Options > Expert Advisors`.
+3.  Open a chart for each of the 30 currency pairs.
+4.  Drag the corresponding EA (e.g., `HUEY_P_MQL4_EURUSD_EA`) onto its chart.
+5.  Confirm the input parameters and click OK. A smiley face in the top-right corner of the chart indicates the EA is running.
+
+## 4\. Routine Operations
+
+  * **Starting the System:**
+
+    1.  `./Scripts/docker_deploy.ps1 -Action "start"`
+    2.  Start the MT4 terminal (EAs will start automatically).
+
+  * **Stopping the System:**
+
+    1.  Run `./Scripts/stop_system.ps1`. This gracefully stops the Docker containers.
+    2.  Close the MT4 terminal or remove the EAs from the charts.
+
+  * **Checking Status:**
+
+      * `./Scripts/docker_deploy.ps1 -Action "status"` (for Python backend status)
+      * `./Scripts/maintenance/HealthCheck.ps1` (for overall system health)
+
+  * **Viewing Logs:**
+
+      * `./Scripts/docker_deploy.ps1 -Action "logs"` (for Python backend logs)
+      * Logs for the MQL4 EAs are found in the `Experts` tab within the MT4 terminal and in the `/MQL4/Logs/` directory.
+
+## 5\. Monitoring
+
+  * **System Health:** The `monitor_system.ps1` script provides a comprehensive health check, verifying CPU/memory usage, disk space, network connectivity, and the status of the Docker container.
+  * **EA Status:** Inside MT4, a "smiley face" on each EA chart indicates it is running and ticking. A sad face indicates an issue. Check the `Experts` log for details.
+  * **Bridge Connection:** The EA logs will indicate the status of the connection to the C++ bridge. "Successfully connected to bridge" should appear during `OnInit`.
+
+## 6\. Troubleshooting
+
+  * **EA does not trade:**
+      * Check the `Experts` and `Journal` tabs in MT4 for errors.
+      * Ensure "Allow DLL imports" and "Allow live trading" are enabled.
+      * Verify the EA has a smiley face icon.
+  * **EA cannot connect to bridge:**
+      * Ensure the Python backend Docker container is running (`docker_deploy.ps1 -Action "status"`).
+      * Check for firewall rules blocking the configured port.
+      * Verify the port in `system_config.yaml` matches the `port` input parameter on the EA.
+
+## 7\. References
+
+  * [BACKUP\_AND\_RECOVERY.md](https://www.google.com/search?q=./BACKUP_AND_RECOVERY.md)
+  * [04\_Configuration.md](https://www.google.com/search?q=./04_Configuration.md)
+  * troubleshooting\_guide.txt (From project knowledge)
+
+-----
+
+-----
+
+### **File: `06_API_Contract_Documentation.md`**
+
+# 06\. API Contract Documentation
+
+**Version:** 1.0.0
+**Last Updated:** 2025-06-28
+**Audience:** All Developers (MQL4, C++, Python)
+
+## Table of Contents
+
+1.  [Overview](https://www.google.com/search?q=%231-overview)
+2.  [Part 1: Communication Bridge API](https://www.google.com/search?q=%23part-1-communication-bridge-api)
+3.  [Part 2: Data Model Contracts](https://www.google.com/search?q=%23part-2-data-model-contracts)
+4.  [Part 3: Interface Definitions](https://www.google.com/search?q=%23part-3-interface-definitions)
+5.  [Part 4: Cross-Language Type Mappings](https://www.google.com/search?q=%23part-4-cross-language-type-mappings)
+
+## 1\. Overview
+
+This document is the **single source of truth** for all data formats, schemas, and interfaces that connect the various components of the trading system. Adherence to these contracts is mandatory to ensure system integrity and interoperability.
+
+-----
+
+## Part 1: Communication Bridge API
+
+### 1.1. DLL Function Signatures (`SocketBridge.dll`)
+
+These are the C++ functions exported by the DLL and imported by the MQL4 `CommunicationManager.mqh`.
+
+```cpp
+// Starts the server, binds to a port, and begins listening.
+// Returns 0 on success, negative value on error.
+__declspec(dllexport) int __stdcall StartServer(int port);
+
+// Signals all threads to stop, closes sockets, and cleans up resources.
+__declspec(dllexport) void __stdcall StopServer();
+
+// Retrieves the next available signal from the internal queue.
+// The MQL4 side provides a buffer.
+// Returns the number of characters copied, or 0 if no signal, or a negative value on error.
+__declspec(dllexport) int __stdcall GetNextSignal(wchar_t* buffer, int bufferSize);
+
+// Returns the current status of the bridge as an integer code.
+__declspec(dllexport) int __stdcall GetStatus();
+```
+
+### 1.2. Signal Message Format (Socket/Named Pipe)
+
+Signals are transmitted as UTF-8 encoded, semicolon-delimited strings. The C++ DLL converts this to a UTF-16 wide string for MQL4.
+
+**Format:**
+`SignalID;Timestamp;Symbol;Command;Confidence;StrategyID;SL_Points;TP_Points`
+
+**Example:**
+`"12345;2025-06-28T10:30:00Z;EURUSD;BUY;0.85;Strategy-A5;150;300"`
+
+| Field          | Type    | Description                                       |
+|----------------|---------|---------------------------------------------------|
+| `SignalID`     | String  | Unique identifier for this signal.                |
+| `Timestamp`    | String  | ISO 8601 UTC timestamp of signal generation.      |
+| `Symbol`       | String  | The currency pair, e.g., "EURUSD".                 |
+| `Command`      | String  | Trading command: "BUY", "SELL", "CLOSE".           |
+| `Confidence`   | Float   | ML model's confidence in the signal (0.0 to 1.0). |
+| `StrategyID`   | String  | Identifier for the generating strategy.           |
+| `SL_Points`    | Integer | Suggested Stop Loss in integer points.            |
+| `TP_Points`    | Integer | Suggested Take Profit in integer points.          |
+
+### 1.3. Error and Status Code Definitions
+
+The DLL functions return integer codes to MQL4.
+
+| Code | Constant                | Meaning                                               |
+|------|-------------------------|-------------------------------------------------------|
+| 1    | `STATUS_CONNECTED`      | Connected to a client (Python backend).               |
+| 0    | `STATUS_LISTENING`      | Server is running and listening, but no client.       |
+| -1   | `STATUS_STOPPED`        | Server is not running.                                |
+| -2   | `ERROR_WINSOCK_FAIL`    | Failed to initialize Windows Sockets.                 |
+| -3   | `ERROR_SOCKET_FAIL`     | Failed to create the listening socket.                |
+| -4   | `ERROR_BIND_FAIL`       | Failed to bind the socket to the specified port.      |
+| -10  | `ERROR_NO_SIGNAL`       | Returned by `GetNextSignal` when the queue is empty.  |
+| -11  | `ERROR_BUFFER_TOO_SMALL`| The MQL4 buffer is too small for the signal message.  |
+
+-----
+
+## Part 2: Data Model Contracts
+
+### 2.1. CSV File Schemas (`/MQL4/Files/`)
+
+**`all_10_parameter_sets.csv`**
+
+  * **Purpose:** Defines reusable sets of trading parameters.
+  * **Schema:**
+
+| ColumnName          | DataType | Description                                  | Example     |
+|---------------------|----------|----------------------------------------------|-------------|
+| id                  | string   | Unique identifier for the parameter set.     | " aggressive" |
+| stopLoss            | int      | Stop loss in points.                         | 200         |
+| takeProfit          | int      | Take profit in points.                       | 400         |
+| trailingStop        | int      | Trailing stop activation points.             | 50          |
+| riskPercent         | double   | Risk per trade as a percentage of equity.    | 1.5         |
+| maxPositions        | int      | Max concurrent positions for this strategy.  | 2           |
+| useTrailing         | bool     | `true` to enable trailing stop.              | true        |
+| description         | string   | Human-readable description.                  | "High risk" |
+
+**`signal_id_mapping.csv`**
+
+  * **Purpose:** Maps a `StrategyID` from a signal to a parameter set `id`.
+  * **Schema:**
+
+| ColumnName     | DataType | Description                          | Example      |
+|----------------|----------|--------------------------------------|--------------|
+| strategyId     | string   | The ID from the signal message.      | "Strategy-A5"|
+| parameterSetId | string   | The `id` from `all_10_parameter_sets.csv`. | "aggressive" |
+| description    | string   | Human-readable description.          | "Map A5..."  |
+
+**`reentry_close_result_mapping.csv`**
+
+  * **Purpose:** Maps the result of a closed trade to a new parameter set for reentry.
+  * **Schema:**
+
+| ColumnName     | DataType | Description                                    | Example    |
+|----------------|----------|------------------------------------------------|------------|
+| closeResult    | string   | Result of the last trade: "SL", "TP", "BE", "MANUAL". | "SL"       |
+| parameterSetId | string   | The new parameter set `id` to use for the next trade. | "cautious" |
+| description    | string   | Human-readable description.                    | "On SL..." |
+
+### 2.2. YAML Configuration Schema (Simplified)
+
+  * **Purpose:** Defines the structure for core YAML configuration files.
+
+<!-- end list -->
+
+```yaml
+# system_config.yaml
+bridge:
+  host: string # Required
+  primary_port: int # Required, 1024-65535
+  # ... other fields
+database:
+  path: string # Required
+
+# risk_config.yaml
+risk_management:
+  max_account_drawdown: float # Required, 0.0-1.0
+  # ... other fields
+```
+
+### 2.3. Database Table Definitions (SQL DDL)
+
+```sql
+-- Table to log every signal generated by the Python backend
+CREATE TABLE IF NOT EXISTS signals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    signal_id TEXT NOT NULL UNIQUE,
+    timestamp TEXT NOT NULL,
+    symbol TEXT NOT NULL,
+    command TEXT NOT NULL,
+    confidence REAL NOT NULL,
+    strategy_id TEXT NOT NULL,
+    sl_points INTEGER,
+    tp_points INTEGER,
+    sent_to_bridge_at TEXT
+);
+
+-- Table to log every trade executed by the MQL4 frontend
+CREATE TABLE IF NOT EXISTS trades (
+    ticket INTEGER PRIMARY KEY,
+    signal_id TEXT,
+    symbol TEXT NOT NULL,
+    open_time TEXT NOT NULL,
+    trade_type TEXT NOT NULL, -- BUY, SELL
+    volume REAL NOT NULL,
+    open_price REAL NOT NULL,
+    sl_price REAL,
+    tp_price REAL,
+    close_time TEXT,
+    close_price REAL,
+    profit REAL,
+    FOREIGN KEY (signal_id) REFERENCES signals (signal_id)
+);
+```
+
+-----
+
+## Part 3: Interface Definitions
+
+### 3.1. Socket Protocol
+
+  * **Transport:** TCP/IP.
+  * **Role:** Primary communication channel.
+  * **Behavior:** The Python backend acts as the client and initiates the connection to the C++ DLL server. If the connection is lost, the client will attempt to reconnect every 5 seconds for 3 minutes before failing over.
+  * **Message Framing:** Messages are delimited by a newline character (`\n`).
+
+### 3.2. Named Pipe Specifications
+
+  * **Role:** Secondary (fallback) communication channel.
+  * **Pipe Name:** `\\.\pipe\HUEY_P_ClaudeCentric_SignalPipe`
+  * **Behavior:** If a socket connection cannot be established, the system will attempt to use a Windows Named Pipe. The message format is identical to the socket protocol.
+
+### 3.3. File-Based Communication
+
+  * **Role:** Tertiary (last resort) communication channel.
+  * **File:** `/MQL4/Files/current_signal.csv`.
+  * **Behavior:**
+    1.  The Python backend writes the signal to a temporary file, e.g., `current_signal.tmp`.
+    2.  Once the write is complete, it performs an atomic rename of `current_signal.tmp` to `current_signal.csv`.
+    3.  The MQL4 EA periodically checks the modification time of `current_signal.csv`. If it has changed, it opens the file, reads the signal, and then clears the file content to signify it has been processed. This prevents reprocessing the same signal.
+
+-----
+
+## Part 4: Cross-Language Type Mappings
+
+| MQL4          | C++ (DLL Interface) | Python                | Notes                                            |
+|---------------|---------------------|-----------------------|--------------------------------------------------|
+| `string`      | `wchar_t*`          | `str`                 | MQL4 `string` is UTF-16. Python uses UTF-8.      |
+| `int`         | `int`               | `int`                 | Standard 32-bit integer.                         |
+| `double`      | `double`            | `float`               | Standard 64-bit double-precision float.          |
+| `bool`        | `int` or `bool`     | `bool`                | Often passed as `0` or `1` for C compatibility.  |
+| `datetime`    | `long`              | `str` (ISO 8601)      | MQL4 datetime is a Unix timestamp (seconds).     |
+
+-----
+
+-----
+
+### **File: `STYLE_GUIDE.md`**
+
+# Style Guide
+
+**Version:** 1.0.0
+**Last Updated:** 2025-06-28
+**Audience:** All Developers
+
+## Table of Contents
+
+1.  [Core Philosophy](https://www.google.com/search?q=%231-core-philosophy)
+2.  [Git Commit Messages](https://www.google.com/search?q=%232-git-commit-messages)
+3.  [MQL4 Style](https://www.google.com/search?q=%233-mql4-style)
+4.  [Python Style](https://www.google.com/search?q=%234-python-style)
+5.  [C++ Style](https://www.google.com/search?q=%235-c-style)
+6.  [PowerShell Style](https://www.google.com/search?q=%236-powershell-style)
+7.  [Configuration File Style](https://www.google.com/search?q=%237-configuration-file-style)
+
+## 1\. Core Philosophy
+
+  * **Clarity over cleverness:** Write code that is easy for others to read and understand.
+  * **Consistency is key:** Adhering to the style guide is not optional. Consistent codebases are easier to maintain.
+  * **Comment the "why," not the "what":** The code should explain what it's doing. Comments should explain why it's doing it that way.
+
+## 2\. Git Commit Messages
+
+  * **Format:** Use the Conventional Commits specification.
+  * **Structure:** `<type>: <subject>`
+      * `feat`: A new feature.
+      * `fix`: A bug fix.
+      * `docs`: Documentation only changes.
+      * `style`: Changes that do not affect the meaning of the code (white-space, formatting).
+      * `refactor`: A code change that neither fixes a bug nor adds a feature.
+      * `test`: Adding missing tests or correcting existing tests.
+      * `chore`: Changes to the build process or auxiliary tools.
+  * **Example:** `feat: Add trailing stop loss logic to TradingCore`
+
+## 3\. MQL4 Style
+
+  * **Naming Conventions:**
+      * `input` parameters: `PascalCase` (e.g., `MaxSpread`).
+      * Global variables: `g_` prefix followed by `camelCase` (e.g., `g_isConnected`).
+      * Local variables: `camelCase` (e.g., `ticketNumber`).
+      * Function names: `PascalCase` (e.g., `ProcessSignal`).
+      * `#define` constants: `UPPER_SNAKE_CASE` (e.g., `ERROR_NO_SIGNAL`).
+  * **Magic Numbers:** Prohibited. Any constant value (e.g., error codes, order types) must be defined with `#define` or as a constant variable.
+  * **Includes:** All `#include` statements must be at the top of the file, immediately after the `#property` directives.
+  * **Braces:** Use the Allman style (braces on a new line).
+  * **Comments:** Use `//` for single-line comments and `/* */` for multi-line blocks. Document every function's purpose, parameters, and return value in a header block.
+
+## 4\. Python Style
+
+  * **Compliance:** All Python code **must** be compliant with **PEP 8**.
+  * **Formatting:** Use the `Black` auto-formatter with a line length of 88 characters. This is non-negotiable and will be enforced by pre-commit hooks.
+  * **Type Hinting:** All functions and methods **must** include type hints for all arguments and return values.
+  * **Docstrings:** All modules, classes, and functions **must** have docstrings following the Google Style.
+  * **Naming:** `snake_case` for variables and functions, `PascalCase` for classes.
+  * **Async/Await:** Use `async def` for all I/O-bound operations. Avoid blocking the event loop at all costs.
+
+## 5\. C++ Style
+
+  * **Naming Conventions:**
+      * Functions: `PascalCase` (e.g., `StartServer`).
+      * Variables: `camelCase` (e.g., `socketHandle`).
+      * Classes/Structs: `PascalCase`.
+      * Constants: `k` prefix followed by `PascalCase` (e.g., `kMaxBufferSize`).
+  * **Header Guards:** Use `#pragma once` in all header files.
+  * **Memory Management:** Use smart pointers (`std::unique_ptr`, `std::shared_ptr`) wherever possible to manage dynamic memory. Avoid raw `new` and `delete`.
+  * **Windows API:** All Windows API types should be used as-is (e.g., `SOCKET`, `HANDLE`).
+  * **DLL Exports:** Use `__declspec(dllexport)` and `__stdcall` for all functions exposed to MQL4.
+
+## 6\. PowerShell Style
+
+  * **Naming:** All functions must follow the `Verb-Noun` convention (e.g., `Get-SystemStatus`, `Invoke-Deployment`). Approved verbs only.
+  * **Error Handling:** Use `try`/`catch`/`finally` blocks for terminating errors. Set `$ErrorActionPreference = "Stop"` at the beginning of scripts.
+  * **Modules:** All reusable functions should be placed in PowerShell Modules (`.psm1`).
+  * **Comments:** Use `#` for single-line comments and `<# ... #>` for block comments and function help.
+
+## 7\. Configuration File Style
+
+  * **YAML:**
+      * Indentation: 2 spaces. No tabs.
+      * Keys: `snake_case`.
+      * Comments: Use `#` to document the purpose of non-obvious settings.
+  * **CSV:**
+      * Delimiter: Comma (`,`).
+      * Header: All CSV files must have a header row.
+      * Column Names: `camelCase`.
+      * Strings: Enclose strings containing commas in double quotes.
+
+-----
+
+-----
+
+### **File: `TESTING_STRATEGY.md`**
+
+# Testing Strategy
+
+**Version:** 1.0.0
+**Last Updated:** 2025-06-28
+**Audience:** Developers, QA Engineers
+
+## Table of Contents
+
+1.  [Overview](https://www.google.com/search?q=%231-overview)
+2.  [Testing Pyramid](https://www.google.com/search?q=%232-testing-pyramid)
+3.  [Unit Testing](https://www.google.com/search?q=%233-unit-testing)
+4.  [Integration Testing](https://www.google.com/search?q=%234-integration-testing)
+5.  [End-to-End (E2E) Testing](https://www.google.com/search?q=%235-end-to-end-e2e-testing)
+6.  [Backtesting](https://www.google.com/search?q=%236-backtesting)
+7.  [Tools and Frameworks](https://www.google.com/search?q=%237-tools-and-frameworks)
+8.  [Test Execution Policy](https://www.google.com/search?q=%238-test-execution-policy)
+
+## 1\. Overview
+
+This document defines the quality assurance and validation approach for the trading system. Given the financial risk involved, a multi-layered and rigorous testing strategy is mandatory. The goal is to ensure correctness, reliability, and robustness at all levels of the system.
+
+## 2\. Testing Pyramid
+
+Our strategy follows the testing pyramid model, emphasizing a large base of fast unit tests, a smaller number of slower integration tests, and a very selective set of comprehensive E2E tests.
+
+```
+      / \
+     /E2E\
+    /-----\
+   /Integration\
+  /-------------\
+ /   Unit Tests  \
+/-----------------\
+```
+
+## 3\. Unit Testing
+
+  * **Scope:** Testing individual functions or classes in isolation.
+  * **Purpose:** To verify that the smallest units of code behave as expected.
+  * **Python (`/Python/tests/unit`):**
+      * **Examples:**
+          * Test the `RiskService`'s lot size calculation with various inputs.
+          * Test the `FeatureEngine`'s RSI calculation against known values.
+          * Test the signal string formatting function.
+      * **Methodology:** All external dependencies (like network calls or database connections) must be mocked.
+  * **MQL4:**
+      * **Challenge:** MQL4 lacks a native unit testing framework.
+      * **Methodology:** Create dedicated test scripts (`.mq4`) that call public functions from `.mqh` files with predefined inputs and use `Print()` or `Alert()` to assert the outputs. These are run manually during development.
+
+## 4\. Integration Testing
+
+  * **Scope:** Testing the interaction between two or more components.
+  * **Purpose:** To find errors in the interfaces and communication between modules.
+  * **Examples:**
+      * **Python \<\> C++ Bridge:** A test script that starts the Python `BridgeService` and a lightweight C++ client that mimics MQL4. The test asserts that a signal sent from Python can be successfully received and correctly formatted by the C++ client via the DLL.
+      * **C++ Bridge \<\> MQL4:** An MQL4 test script that calls the `SocketBridge.dll` functions. A lightweight Python script acts as the server. The test asserts that the MQL4 script can connect, receive a signal, and correctly interpret the error codes.
+      * **Python Service \<\> Database:** Tests that verify a service can correctly write to and read from the SQLite database, respecting all schemas and constraints.
+
+## 5\. End-to-End (E2E) Testing
+
+  * **Scope:** Testing the entire system workflow, from signal generation to trade execution.
+  * **Purpose:** To simulate a real-world scenario and validate the full operational flow.
+  * **Methodology:**
+    1.  A dedicated test environment is used, connected to a broker's **demo account**.
+    2.  The full system is deployed using the standard deployment scripts.
+    3.  A "market replay" service or a mock data generator feeds specific data to the Python backend to trigger a known signal.
+    4.  The test asserts that a trade is opened in the MT4 demo account with the correct parameters (symbol, volume, SL/TP).
+    5.  The test then triggers a market move to hit the SL or TP and asserts that the position is closed correctly.
+  * **Execution:** E2E tests are run sparingly due to their complexity and duration. They are mandatory before any production release.
+
+## 6\. Backtesting
+
+  * **Scope:** Validating the profitability and risk characteristics of a trading strategy using historical market data.
+  * **Purpose:** To evaluate ML models and parameter sets before they are considered for live deployment.
+  * **Methodology:**
+      * The Python backend contains a dedicated backtesting engine that simulates the `TradingCore.mqh` logic.
+      * It uses historical data to generate signals and simulates trade executions, accounting for spread, commissions, and slippage.
+      * The primary output is a detailed performance report including metrics like Sharpe ratio, max drawdown, and profit factor.
+  * **Requirement:** No new ML model or major strategy change can be deployed to production without a successful backtest report that meets predefined performance criteria.
+
+## 7\. Tools and Frameworks
+
+  * **Python:** `pytest` (for unit and integration tests), `pytest-asyncio`, `unittest.mock`.
+  * **Database:** In-memory SQLite databases will be used for test isolation.
+  * **CI/CD:** A continuous integration server (e.g., Jenkins, GitHub Actions) will be configured to automatically run all unit and integration tests on every commit.
+
+## 8\. Test Execution Policy
+
+  * All new code contributions (pull requests) **must** include corresponding unit tests.
+  * The entire test suite **must** pass before a branch can be merged into the main development branch.
+  * A full E2E test and a regression backtest **must** be performed and signed off before a new version is deployed to production.
+
+-----
+
+-----
+
+### **File: `BACKUP_AND_RECOVERY.md`**
+
+# Backup and Recovery Plan
+
+**Version:** 1.0.0
+**Last Updated:** 2025-06-28
+**Audience:** Operators, System Administrators
+
+## Table of Contents
+
+1.  [Overview](https://www.google.com/search?q=%231-overview)
+2.  [Part 1: Backup Procedure](https://www.google.com/search?q=%23part-1-backup-procedure)
+3.  [Part 2: Disaster Recovery Procedure](https://www.google.com/search?q=%23part-2-disaster-recovery-procedure)
+4.  [Recovery Time Objective (RTO)](https://www.google.com/search?q=%234-recovery-time-objective-rto)
+
+## 1\. Overview
+
+This document outlines the procedures for backing up critical system components and for recovering the system from a critical failure. This plan is essential for business continuity and minimizing downtime and financial risk.
+
+## Part 1: Backup Procedure
+
+The `maintenance/Backup-Database.ps1` script is the primary tool for automated backups.
+
+### 1.1. What is Backed Up?
+
+The following components are considered critical and must be backed up:
+
+  * **Trading Database (`TradingSystem.db`):** Contains all historical signal and trade data. This is the highest priority.
+  * **Configuration Files (`/Config` directory):** The entire directory, including all sub-folders, which defines all system behavior.
+  * **Serialized ML Models (`/Python/src/ml/models`):** The trained `.pkl` files.
+  * **MT4 Data Files (`/MQL4/Files`):** All `.csv` files containing parameter sets and mappings.
+
+### 1.2. Backup Schedule and Location
+
+  * **Frequency:** Backups are performed automatically on a schedule:
+      * **Daily:** A full backup is performed every day at 22:00 UTC.
+      * **Weekly:** The last backup of the week (Saturday) is promoted to a weekly archive.
+  * **Location:**
+      * Backups are first created locally in the `/Backups` directory of the project structure.
+      * The backup script then copies the compressed archive to a secure, off-site cloud storage location (e.g., AWS S3 bucket, Azure Blob Storage).
+  * **Retention Policy:**
+      * Daily backups are retained for 7 days.
+      * Weekly backups are retained for 4 weeks.
+      * The last backup of each month is retained for 12 months.
+
+## Part 2: Disaster Recovery Procedure
+
+This procedure assumes a **total system failure** where the primary server is unrecoverable, and the system must be rebuilt on a new machine.
+
+**Phase 1: Environment Preparation**
+
+1.  Provision a new Windows server instance that meets the system prerequisites.
+2.  Install all required software: Git, Docker Desktop, MT4, C++ Build Tools, PowerShell.
+3.  Configure all necessary firewall rules to allow communication on the configured ports.
+
+**Phase 2: Restore System Files**
+4\.  Clone a fresh copy of the project repository from Git: `git clone <repository_url>`.
+5\.  Access the secure off-site cloud storage.
+6\.  Download the **most recent daily or weekly backup** archive.
+7\.  Extract the archive.
+8\.  **CRITICAL:** Restore the backed-up components to their correct locations in the fresh Git repository:
+\* Copy the restored `TradingSystem.db` to its designated path.
+\* Overwrite the entire `/Config` directory with the backed-up version.
+\* Overwrite the `/Python/src/ml/models` directory.
+\* Overwrite the MQL4 `/MQL4/Files` directory.
+
+**Phase 3: System Deployment**
+9\.  Run the first-time deployment procedure as outlined in `05_Deployment_And_Operations.md`.
+\* Run `initialize_paths.ps1` to ensure path configurations are correct for the new machine.
+\* Run `build_dll.bat`.
+\* Run `Deploy-All.ps1`.
+\* Run `docker_deploy.ps1 -Action "deploy"`.
+
+**Phase 4: Final Validation**
+10\. Launch the MT4 terminal.
+11\. Attach **one** EA (e.g., EURUSD) to its chart.
+12\. Check the `Experts` log for successful initialization and connection to the C++ bridge.
+13\. Manually verify that the system is receiving market data and that the Python backend logs show normal activity.
+14\. Once validated, attach the remaining 29 EAs to their respective charts.
+15\. Closely monitor the system for the next several hours for any abnormal behavior.
+
+## 4\. Recovery Time Objective (RTO)
+
+  * The target RTO for a full system rebuild is **2 hours**. This is the maximum acceptable time from declaration of a disaster to the point where the system is fully operational and trading again.

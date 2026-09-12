@@ -1,0 +1,210 @@
+ Python Coding Standards for HUEY_P Trading System
+
+**Version**: 1.0
+**Last Updated**: 2025-07-02
+**Maintainer**: Python Development Team
+**Python Version**: 3.8+
+
+---
+
+## **Quick Reference Summary**
+
+| Category              | Standard                                                                 |
+| --------------------- | ------------------------------------------------------------------------ |
+| **Formatting** | `black` with line length of 88 characters                                |
+| **Imports** | `isort` compliant: standard, third-party, local; alphabetized            |
+| **Naming** | `snake_case` for variables/functions, `PascalCase` for classes, `UPPER_SNAKE_CASE` for constants |
+| **Type Hints** | Mandatory on all functions, methods, and class attributes; `mypy --strict` |
+| **Docstrings** | Mandatory Google-style docstrings for all public modules, classes, and functions |
+| **Async/Await** | Use `async def` for all I/O-bound operations; no blocking calls          |
+| **Error Handling** | Use specific, custom exceptions; avoid generic `except Exception:`       |
+| **Testing** | `pytest` framework; mirror source structure                              |
+
+---
+
+## **1. PEP 8 + Black Formatter Configuration**
+
+All Python code **MUST** conform to PEP 8, enforced by the `black` code formatter to ensure uniformity and eliminate debates over style.
+
+- **Line Length**: 88 characters. [cite_start]This is non-negotiable and enforced by `black`. [cite: 2091, 2095]
+- **Indentation**: 4 spaces per indentation level. [cite_start]Tabs are forbidden. [cite: 2083]
+- [cite_start]**Quotes**: Use double quotes (`"`) as the primary string delimiter. Use single quotes (`'`) only within a string that already contains double quotes to avoid escapes. [cite: 2091, 2095]
+- **Trailing Commas**: Required in multi-line lists, dictionaries, and function calls. [cite_start]This produces cleaner `git` diffs and allows `black` to format one item per line. [cite: 2087]
+- **Whitespace**: No trailing whitespace. Files must use Unix-style line endings (LF).
+
+---
+
+## **2. Black and isort Configuration**
+
+Code formatting and import sorting are not optional. All code **MUST** be formatted using the tools and configuration below, preferably via pre-commit hooks.
+
+### **`pyproject.toml` Configuration**
+
+This configuration block **MUST** be present in the root `pyproject.toml` file for the project.
+
+```toml
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310']
+skip-string-normalization = false
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+````
+
+### **Import Organization**
+
+Imports **MUST** be organized into three distinct groups, separated by a blank line:
+
+1.  **Standard Library Imports** (`import os`, `from pathlib import Path`)
+2.  **Third-Party Imports** (`import pandas as pd`, `import requests`)
+3.  **Local Application Imports** (`from huey_p.utils import helper_function`)
+
+[cite\_start]Within each group, imports **MUST** be sorted alphabetically. [cite: 2083, 2095]
+
+```python
+# ✅ Good
+import os
+import sys
+from pathlib import Path
+
+import pandas as pd
+import requests
+
+from huey_p.services import api_client
+from huey_p.utils import data_processor
+
+# ❌ Avoid: Incorrect grouping and ordering
+import pandas as pd
+from huey_p.utils import data_processor
+import os
+import requests
+```
+
+-----
+
+## **3. Type Hinting Requirements (mypy)**
+
+  - **Mandatory Type Hints**: All function and method signatures, including arguments and return values, **MUST** have type hints. [cite\_start]All class attributes **MUST** also be typed. [cite: 2097]
+  - **`mypy` Configuration**: The project **MUST** use `mypy` in `strict` mode to enforce type safety.
+  - **Return Types**: All functions must declare a return type. [cite\_start]For functions that do not return a value, explicitly use `-> None`. [cite: 2097]
+  - **Generics**: Use generic types from `typing` (e.g., `List`, `Dict`, `Optional`, `Union`, `Sequence`, `Mapping`). [cite\_start]For Python 3.9+, prefer built-in generics (`list`, `dict`). [cite: 2097, 2194]
+  - [cite\_start]**Protocols**: Use `typing.Protocol` for defining interfaces to support structural subtyping (duck typing). [cite: 2097]
+
+<!-- end list -->
+
+```python
+from typing import Any, Dict, List, Optional
+
+# ✅ Good: Clear, explicit, and complete type hints
+def process_data(
+    records: List[Dict[str, Any]],
+    user_id: int,
+    is_active: bool,
+    filter_key: Optional[str] = None
+) -> None:
+    """Processes records for a given user."""
+    # ... function logic ...
+
+# ❌ Avoid: Missing and incomplete type hints
+def process_data(records, user_id, is_active, filter_key=None):
+    # ... function logic ...
+```
+
+-----
+
+## **4. Google-Style Docstring Standards**
+
+[cite\_start]All public modules, functions, classes, and methods **MUST** have docstrings that follow the Google Python Style Guide. [cite: 2191] Docstrings are essential for code maintainability and for auto-generating project documentation with tools like Sphinx.
+
+### **Docstring Format**
+
+```python
+"""A one-line summary of the module, terminated by a period."""
+
+# A blank line separates the summary from the details.
+
+def process_signals(signals: List[Dict[str, Any]], connection_retries: int = 3) -> bool:
+    """Processes a batch of trading signals and sends them to the execution engine.
+
+    This function validates each signal, calculates the appropriate risk parameters,
+    and forwards the resulting trade instructions.
+
+    Args:
+        signals: A list of signal dictionaries to be processed.
+        connection_retries: The number of times to retry a connection if it fails.
+
+    Returns:
+        True if all signals were processed successfully, False otherwise.
+
+    Raises:
+        ValueError: If the `signals` list is empty.
+        ConnectionError: If the connection to the execution engine fails after
+            all retries.
+    """
+    if not signals:
+        raise ValueError("Input signals list cannot be empty.")
+    # ... implementation ...
+```
+
+-----
+
+## **5. Async/Await Best Practices**
+
+To ensure high performance and prevent blocking, all I/O-bound operations **MUST** use `async`/`await` syntax and the `asyncio` library.
+
+  - **Async Functions**: All functions performing network I/O (API calls, database connections) or file I/O **MUST** be defined with `async def`.
+  - **No Blocking Calls**: Never call blocking functions (e.g., `requests.get()`, `time.sleep()`) inside an `async def` function. Use `aiohttp` and `asyncio.sleep()` instead.
+  - **Task Creation**: Use `asyncio.create_task()` to run coroutines concurrently.
+  - **Context Managers**: **MUST** use `async with` for managing the lifecycle of async resources like database connections or API sessions.
+  - **Threading**: Avoid using the `threading` module. Use `asyncio`'s `run_in_executor` for CPU-bound work that must be run in a separate process.
+
+-----
+
+## **6. Project-Specific Conventions**
+
+### **File Naming**
+
+  - All Python script files **MUST** follow the pattern: `[PROJECT]_[TYPE]_[DESCRIPTION].py`.
+  - Example: `HUEY_P_SERVICE_RiskManager.py`, `HUEY_P_UTIL_DataCleaner.py`
+
+### **Naming Conventions**
+
+  - **Classes**: `PascalCase` (e.g., `RiskManager`, `SignalValidator`).
+  - [cite\_start]**Functions & Variables**: `snake_case` (e.g., `calculate_volatility`, `trade_id`). [cite: 2095]
+  - [cite\_start]**Constants**: `UPPER_SNAKE_CASE` (e.g., `MAX_SPREAD`, `API_ENDPOINT`). [cite: 2095]
+  - **Private Members**: Use a single leading underscore `_` for internal-use methods or attributes. [cite\_start]Do not use double underscores (`__`). [cite: 2191]
+
+### **Logging**
+
+  - All services and utilities **MUST** use the central `logging` module.
+  - Logs should be structured (e.g., JSON format) to include a timestamp, log level, service name, and a descriptive message.
+  - **NEVER** log sensitive information like API keys or passwords.
+
+### **Error Handling**
+
+  - Define custom exception classes that inherit from Python's base `Exception` for different error domains (e.g., `RiskCalculationError`, `ApiConnectionError`).
+  - [cite\_start]Exception messages **MUST** be clear, concise, and provide context to aid in debugging. [cite: 2191]
+
+-----
+
+## **7. Tool Integration and Enforcement**
+
+Adherence to these standards will be enforced automatically.
+
+  - **Pre-commit Hooks**: A `pre-commit-config.yaml` file **MUST** be used to run `black`, `isort`, and `mypy` on every commit.
+  - **CI/CD Pipeline**: The Continuous Integration pipeline **MUST** run all formatters, linters, type checkers, and tests. A build will fail if any standard is violated.
+  - **Code Review Checklist**: Reviewers **MUST** verify:
+      - All new code adheres to naming and formatting standards.
+      - All public APIs are fully type-hinted and documented with Google-style docstrings.
+      - Error handling is robust and uses specific exceptions.
+      - No hardcoded secrets or configuration values are present.
+      - New dependencies are justified and added to `pyproject.toml`.
+
+<!-- end list -->
+
+```
+```

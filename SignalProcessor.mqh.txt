@@ -1,0 +1,86 @@
+//+------------------------------------------------------------------+
+//| SignalProcessor.mqh                                              |
+//| Processes incoming trade signals from the file system.           |
+//| Copyright 2025, HUEY_P Trading Systems                           |
+//| https://hueyp-trading.com                                        |
+//+------------------------------------------------------------------+
+#property copyright "Copyright 2025, HUEY_P Trading Systems"
+#property link      "https://hueyp-trading.com"
+#property strict
+
+// Forward declaration of SignalData struct
+struct SignalData;
+
+//+------------------------------------------------------------------+
+//| Class: CSignalProcessor                                          |
+//| Purpose: Reads and parses JSON signal files.                     |
+//+------------------------------------------------------------------+
+class CSignalProcessor {
+private:
+    // --- Member Variables ---
+    string m_signal_path;
+    string m_symbol;
+    bool   m_test_signal_provided; // Flag for the development stub
+
+public:
+           CSignalProcessor();
+          ~CSignalProcessor();
+
+    bool   Initialize(string path, string symbol);
+    bool   GetNextSignal(SignalData &signal); // Pass by reference to populate
+};
+
+//+------------------------------------------------------------------+
+//| Constructor                                                      |
+//+------------------------------------------------------------------+
+CSignalProcessor::CSignalProcessor() {
+    m_test_signal_provided = false;
+}
+
+//+------------------------------------------------------------------+
+//| Destructor                                                       |
+//+------------------------------------------------------------------+
+CSignalProcessor::~CSignalProcessor() {
+}
+
+//+------------------------------------------------------------------+
+//| Initialize                                                       |
+//+------------------------------------------------------------------+
+bool CSignalProcessor::Initialize(string path, string symbol) {
+    m_signal_path = path;
+    m_symbol = symbol;
+    Print("CSignalProcessor: Initialized for symbol '", m_symbol, "' at path '", MQL4InfoString(MQL4_FILES_PATH) + m_signal_path, "'.");
+    return(true);
+}
+
+//+------------------------------------------------------------------+
+//| GetNextSignal                                                    |
+//+------------------------------------------------------------------+
+bool CSignalProcessor::GetNextSignal(SignalData &signal) {
+    // BLUEPRINT COMPLIANCE NOTE:
+    // The Development Blueprint specifies that this function reads and parses
+    // JSON signal files. MQL4 cannot parse JSON natively and requires a C++ DLL.
+    //
+    // This function is implemented as a development stub that returns a single,
+    // hard-coded test signal upon the first call. This allows for testing
+    // the EA's logic flow without the external dependency. On subsequent calls,
+    // it returns false.
+
+    if (m_test_signal_provided) {
+        return(false); // Only provide the test signal once
+    }
+
+    // Populate the signal struct with a test signal
+    [cite_start]// The format is based on the 'output_specifications' from the blueprint. [cite: 4, 141]
+    signal.symbol       = m_symbol;
+    signal.order_type   = "both"; // Straddle
+    signal.lot_size     = 0.01;
+    signal.stop_loss    = 20;     // In pips
+    signal.take_profit  = 40;     // In pips
+    signal.magic_number = 12345;
+    signal.comment      = "Test_Signal_NFP";
+
+    Print("CSignalProcessor: Providing hard-coded test signal.");
+    m_test_signal_provided = true; // Mark the signal as provided
+    return(true);
+}

@@ -1,0 +1,3893 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "physical_file_migration_map",
+  "title": "EAFIX Approved Physical File Migration Map",
+  "repository": "DICKY1987/eafix-modular",
+  "repository_root": ".",
+  "pinned_base_commit": "963ff6df522b3aac421e1b55115548009849141a",
+  "generated_at_utc": "2026-07-31T00:48:00+00:00",
+  "purpose": "Machine-oriented execution map for an agent to relocate, regenerate, merge, split, or retire the 86 files that already received content-validated ownership decisions.",
+  "scope_guard": {
+    "authorized_source_record_count": 86,
+    "actionable_source_record_count": 59,
+    "reference_only_source_record_count": 27,
+    "compound_operation_count": 42,
+    "rule": "The agent may act only on source paths explicitly listed in operations. Candidate matches from the larger name/path analysis are not authorized physical moves.",
+    "out_of_scope": [
+      "All unresolved or unmatched repository files.",
+      "All name-only candidate mappings that do not appear in the 86-file approved decision set.",
+      "Any new path introduced after the pinned commit unless separately revalidated."
+    ]
+  },
+  "authoritative_inputs": [
+    {
+      "file_name": "EAFIX_86_module_location_action_manifest(1).json",
+      "sha256": "a2cca6e82b8689e9c2b97e27a80397aa93da6a1263115425e7fbd29806de1656",
+      "role": "Approved source/target action manifest for 86 reviewed files."
+    },
+    {
+      "file_name": "EAFIX_86_file_module_location_decisions(1).json",
+      "sha256": "4f941f9d5962bc059c1935827ecdc22478cd40b875ba814f4ee650908b000d25",
+      "role": "Detailed ownership, evidence, transformation, and validation decisions."
+    },
+    {
+      "file_name": "MODULE_LIST.txt",
+      "sha256": "7f15d57338a0e75c2bc8cdf47072eedcbe465b694ec7a793b4f820a73519ee56",
+      "role": "Canonical 34-module root list."
+    }
+  ],
+  "execution_contract": {
+    "required_workflow": [
+      "Create a dedicated migration branch from the pinned base commit.",
+      "Require a clean working tree before every phase.",
+      "Run operations in phase order and honor depends_on links.",
+      "Stop immediately on missing sources, unexpected target collisions, parse failures, test failures, or unresolved reference updates.",
+      "Use git mv for mechanically direct relocations; never use copy-and-delete for those operations.",
+      "For transforms, write and validate canonical outputs before removing or replacing sources.",
+      "Never overwrite an existing target silently.",
+      "Never duplicate a global contract into a module folder.",
+      "Never move an unlisted file based solely on a filename or folder-name match.",
+      "Produce a machine-readable execution report keyed by operation_id."
+    ],
+    "collision_policy": "fail_closed",
+    "missing_source_policy": "fail_closed_and_revalidate_mapping",
+    "unexpected_content_divergence_policy": "stop_and_request_ownership_review",
+    "preserve_git_history": true,
+    "stop_on_first_failure": true,
+    "commit_strategy": "one commit per phase, except code consolidation and split/rewrite operations should use one focused commit per operation",
+    "required_final_checks": [
+      "Repository JSON and YAML validation.",
+      "Python compile/import validation.",
+      "Relevant focused tests followed by the full test suite.",
+      "Contract tests.",
+      "Services CI.",
+      "Smoke end-to-end tests.",
+      "Registry validation.",
+      "Document-ID/path validation.",
+      "Stale-path scan for every removed source path.",
+      "git diff --check."
+    ],
+    "evidence_report_required_fields": [
+      "operation_id",
+      "status",
+      "source_paths",
+      "output_paths",
+      "commit_sha",
+      "references_updated",
+      "validations_run",
+      "validation_results",
+      "deviations",
+      "rollback_performed"
+    ]
+  },
+  "summary": {
+    "decision_records": 86,
+    "reference_only_records": 27,
+    "actionable_source_records": 59,
+    "compound_operations": 42,
+    "mechanically_automatable_operations": 13,
+    "transformation_or_review_operations": 29,
+    "destructive_or_eventually_destructive_operations": 29,
+    "operations_by_phase": {
+      "P10_DIRECT_RELOCATIONS": 13,
+      "P20_REGENERATION_AND_RECLASSIFICATION": 6,
+      "P30_SOURCE_CONSOLIDATION": 3,
+      "P40_UI_WORKCELL_CANONICALIZATION": 11,
+      "P50_SPLIT_AND_REWRITE": 3,
+      "P60_VALIDATED_CLEANUP": 4,
+      "P70_COMPATIBILITY_RETIREMENT": 2
+    },
+    "operations_by_type": {
+      "archive_or_delete_after_validation": 1,
+      "delete_after_validation": 3,
+      "generate_projection_replace_source": 1,
+      "git_mv": 12,
+      "git_mv_rename": 1,
+      "merge_regenerate_remove_duplicate_records": 11,
+      "merge_sources_into_canonical_module_source": 3,
+      "reclassify_then_relocate": 2,
+      "regenerate_then_relocate": 3,
+      "retain_then_remove_compatibility_layer": 2,
+      "rewrite_split_and_relocate_test": 1,
+      "split_source_into_module_outputs": 2
+    },
+    "operations_by_readiness": {
+      "blocked_until_reference_and_replacement_validation": 1,
+      "blocked_until_validation_passes": 3,
+      "deferred_until_import_migration_complete": 2,
+      "ready_after_preflight": 13,
+      "requires_code_merge": 3,
+      "requires_content_split": 2,
+      "requires_duplicate_merge_and_regeneration": 11,
+      "requires_generator_update": 1,
+      "requires_identity_reclassification": 2,
+      "requires_semantic_regeneration": 3,
+      "requires_test_architecture_rewrite": 1
+    }
+  },
+  "phase_order": [
+    {
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "purpose": "Execute approved one-source/one-target moves and the single approved global rename.",
+      "commit_boundary": "Commit after all direct relocations and reference updates pass."
+    },
+    {
+      "phase": "P20_REGENERATION_AND_RECLASSIFICATION",
+      "purpose": "Regenerate projections/work-cell records and reclassify legacy identities before relocation.",
+      "commit_boundary": "Commit regenerated and reclassified records separately from direct moves."
+    },
+    {
+      "phase": "P30_SOURCE_CONSOLIDATION",
+      "purpose": "Merge ID-prefixed implementations with corrected wrappers into canonical module code while creating temporary re-export shims.",
+      "commit_boundary": "Commit each canonical implementation pair independently after focused tests pass."
+    },
+    {
+      "phase": "P40_UI_WORKCELL_CANONICALIZATION",
+      "purpose": "Replace duplicate service-level UI work-cell bindings with one generated U4 canonical record per work-cell identity.",
+      "commit_boundary": "Commit the full UI canonicalization set after UI catalog validation."
+    },
+    {
+      "phase": "P50_SPLIT_AND_REWRITE",
+      "purpose": "Split mixed-responsibility configuration/CLI files and rewrite stale cross-module tests.",
+      "commit_boundary": "Commit each split or rewrite independently."
+    },
+    {
+      "phase": "P60_VALIDATED_CLEANUP",
+      "purpose": "Delete or archive only artifacts proven inactive, duplicated, malformed, or superseded.",
+      "commit_boundary": "Use a dedicated cleanup commit containing evidence references."
+    },
+    {
+      "phase": "P70_COMPATIBILITY_RETIREMENT",
+      "purpose": "Remove compatibility facades only after all consumers have migrated.",
+      "commit_boundary": "Execute in a later deprecation-exit commit, not during initial relocation."
+    }
+  ],
+  "module_registry": [
+    {
+      "module_short_id": "m0001",
+      "stable_module_id": "50000000000000000001",
+      "locator": "F1",
+      "canonical_name": "config-preferences",
+      "canonical_root": "m0001-f1-config-preferences",
+      "canonical_containers": {
+        "source": "m0001-f1-config-preferences/m0001-src",
+        "tests": "m0001-f1-config-preferences/m0001-tests",
+        "docs": "m0001-f1-config-preferences/m0001-docs",
+        "schemas": "m0001-f1-config-preferences/m0001-schemas",
+        "config": "m0001-f1-config-preferences/m0001-config",
+        "scripts": "m0001-f1-config-preferences/m0001-scripts",
+        "context": "m0001-f1-config-preferences/m0001-context",
+        "state": "m0001-f1-config-preferences/.m0001-state"
+      }
+    },
+    {
+      "module_short_id": "m0002",
+      "stable_module_id": "50000000000000000002",
+      "locator": "F3",
+      "canonical_name": "clock-scheduler",
+      "canonical_root": "m0002-f3-clock-scheduler",
+      "canonical_containers": {
+        "source": "m0002-f3-clock-scheduler/m0002-src",
+        "tests": "m0002-f3-clock-scheduler/m0002-tests",
+        "docs": "m0002-f3-clock-scheduler/m0002-docs",
+        "schemas": "m0002-f3-clock-scheduler/m0002-schemas",
+        "config": "m0002-f3-clock-scheduler/m0002-config",
+        "scripts": "m0002-f3-clock-scheduler/m0002-scripts",
+        "context": "m0002-f3-clock-scheduler/m0002-context",
+        "state": "m0002-f3-clock-scheduler/.m0002-state"
+      }
+    },
+    {
+      "module_short_id": "m0003",
+      "stable_module_id": "50000000000000000003",
+      "locator": "D2",
+      "canonical_name": "calendar-source-adapter",
+      "canonical_root": "m0003-d2-calendar-source-adapter",
+      "canonical_containers": {
+        "source": "m0003-d2-calendar-source-adapter/m0003-src",
+        "tests": "m0003-d2-calendar-source-adapter/m0003-tests",
+        "docs": "m0003-d2-calendar-source-adapter/m0003-docs",
+        "schemas": "m0003-d2-calendar-source-adapter/m0003-schemas",
+        "config": "m0003-d2-calendar-source-adapter/m0003-config",
+        "scripts": "m0003-d2-calendar-source-adapter/m0003-scripts",
+        "context": "m0003-d2-calendar-source-adapter/m0003-context",
+        "state": "m0003-d2-calendar-source-adapter/.m0003-state"
+      }
+    },
+    {
+      "module_short_id": "m0004",
+      "stable_module_id": "50000000000000000004",
+      "locator": "D3",
+      "canonical_name": "calendar-normalizer",
+      "canonical_root": "m0004-d3-calendar-normalizer",
+      "canonical_containers": {
+        "source": "m0004-d3-calendar-normalizer/m0004-src",
+        "tests": "m0004-d3-calendar-normalizer/m0004-tests",
+        "docs": "m0004-d3-calendar-normalizer/m0004-docs",
+        "schemas": "m0004-d3-calendar-normalizer/m0004-schemas",
+        "config": "m0004-d3-calendar-normalizer/m0004-config",
+        "scripts": "m0004-d3-calendar-normalizer/m0004-scripts",
+        "context": "m0004-d3-calendar-normalizer/m0004-context",
+        "state": "m0004-d3-calendar-normalizer/.m0004-state"
+      }
+    },
+    {
+      "module_short_id": "m0005",
+      "stable_module_id": "50000000000000000005",
+      "locator": "F2",
+      "canonical_name": "event-log",
+      "canonical_root": "m0005-f2-event-log",
+      "canonical_containers": {
+        "source": "m0005-f2-event-log/m0005-src",
+        "tests": "m0005-f2-event-log/m0005-tests",
+        "docs": "m0005-f2-event-log/m0005-docs",
+        "schemas": "m0005-f2-event-log/m0005-schemas",
+        "config": "m0005-f2-event-log/m0005-config",
+        "scripts": "m0005-f2-event-log/m0005-scripts",
+        "context": "m0005-f2-event-log/m0005-context",
+        "state": "m0005-f2-event-log/.m0005-state"
+      }
+    },
+    {
+      "module_short_id": "m0006",
+      "stable_module_id": "50000000000000000006",
+      "locator": "D4",
+      "canonical_name": "calendar-trigger-builder",
+      "canonical_root": "m0006-d4-calendar-trigger-builder",
+      "canonical_containers": {
+        "source": "m0006-d4-calendar-trigger-builder/m0006-src",
+        "tests": "m0006-d4-calendar-trigger-builder/m0006-tests",
+        "docs": "m0006-d4-calendar-trigger-builder/m0006-docs",
+        "schemas": "m0006-d4-calendar-trigger-builder/m0006-schemas",
+        "config": "m0006-d4-calendar-trigger-builder/m0006-config",
+        "scripts": "m0006-d4-calendar-trigger-builder/m0006-scripts",
+        "context": "m0006-d4-calendar-trigger-builder/m0006-context",
+        "state": "m0006-d4-calendar-trigger-builder/.m0006-state"
+      }
+    },
+    {
+      "module_short_id": "m0007",
+      "stable_module_id": "50000000000000000007",
+      "locator": "D1",
+      "canonical_name": "market-feed-adapter",
+      "canonical_root": "m0007-d1-market-feed-adapter",
+      "canonical_containers": {
+        "source": "m0007-d1-market-feed-adapter/m0007-src",
+        "tests": "m0007-d1-market-feed-adapter/m0007-tests",
+        "docs": "m0007-d1-market-feed-adapter/m0007-docs",
+        "schemas": "m0007-d1-market-feed-adapter/m0007-schemas",
+        "config": "m0007-d1-market-feed-adapter/m0007-config",
+        "scripts": "m0007-d1-market-feed-adapter/m0007-scripts",
+        "context": "m0007-d1-market-feed-adapter/m0007-context",
+        "state": "m0007-d1-market-feed-adapter/.m0007-state"
+      }
+    },
+    {
+      "module_short_id": "m0008",
+      "stable_module_id": "50000000000000000008",
+      "locator": "C1",
+      "canonical_name": "bar-builder",
+      "canonical_root": "m0008-c1-bar-builder",
+      "canonical_containers": {
+        "source": "m0008-c1-bar-builder/m0008-src",
+        "tests": "m0008-c1-bar-builder/m0008-tests",
+        "docs": "m0008-c1-bar-builder/m0008-docs",
+        "schemas": "m0008-c1-bar-builder/m0008-schemas",
+        "config": "m0008-c1-bar-builder/m0008-config",
+        "scripts": "m0008-c1-bar-builder/m0008-scripts",
+        "context": "m0008-c1-bar-builder/m0008-context",
+        "state": "m0008-c1-bar-builder/.m0008-state"
+      }
+    },
+    {
+      "module_short_id": "m0009",
+      "stable_module_id": "50000000000000000009",
+      "locator": "C2",
+      "canonical_name": "indicator-engine",
+      "canonical_root": "m0009-c2-indicator-engine",
+      "canonical_containers": {
+        "source": "m0009-c2-indicator-engine/m0009-src",
+        "tests": "m0009-c2-indicator-engine/m0009-tests",
+        "docs": "m0009-c2-indicator-engine/m0009-docs",
+        "schemas": "m0009-c2-indicator-engine/m0009-schemas",
+        "config": "m0009-c2-indicator-engine/m0009-config",
+        "scripts": "m0009-c2-indicator-engine/m0009-scripts",
+        "context": "m0009-c2-indicator-engine/m0009-context",
+        "state": "m0009-c2-indicator-engine/.m0009-state"
+      }
+    },
+    {
+      "module_short_id": "m0010",
+      "stable_module_id": "50000000000000000010",
+      "locator": "C3",
+      "canonical_name": "feature-packager",
+      "canonical_root": "m0010-c3-feature-packager",
+      "canonical_containers": {
+        "source": "m0010-c3-feature-packager/m0010-src",
+        "tests": "m0010-c3-feature-packager/m0010-tests",
+        "docs": "m0010-c3-feature-packager/m0010-docs",
+        "schemas": "m0010-c3-feature-packager/m0010-schemas",
+        "config": "m0010-c3-feature-packager/m0010-config",
+        "scripts": "m0010-c3-feature-packager/m0010-scripts",
+        "context": "m0010-c3-feature-packager/m0010-context",
+        "state": "m0010-c3-feature-packager/.m0010-state"
+      }
+    },
+    {
+      "module_short_id": "m0011",
+      "stable_module_id": "50000000000000000011",
+      "locator": "S1",
+      "canonical_name": "signal-engine",
+      "canonical_root": "m0011-s1-signal-engine",
+      "canonical_containers": {
+        "source": "m0011-s1-signal-engine/m0011-src",
+        "tests": "m0011-s1-signal-engine/m0011-tests",
+        "docs": "m0011-s1-signal-engine/m0011-docs",
+        "schemas": "m0011-s1-signal-engine/m0011-schemas",
+        "config": "m0011-s1-signal-engine/m0011-config",
+        "scripts": "m0011-s1-signal-engine/m0011-scripts",
+        "context": "m0011-s1-signal-engine/m0011-context",
+        "state": "m0011-s1-signal-engine/.m0011-state"
+      }
+    },
+    {
+      "module_short_id": "m0012",
+      "stable_module_id": "50000000000000000012",
+      "locator": "S2",
+      "canonical_name": "intent-builder",
+      "canonical_root": "m0012-s2-intent-builder",
+      "canonical_containers": {
+        "source": "m0012-s2-intent-builder/m0012-src",
+        "tests": "m0012-s2-intent-builder/m0012-tests",
+        "docs": "m0012-s2-intent-builder/m0012-docs",
+        "schemas": "m0012-s2-intent-builder/m0012-schemas",
+        "config": "m0012-s2-intent-builder/m0012-config",
+        "scripts": "m0012-s2-intent-builder/m0012-scripts",
+        "context": "m0012-s2-intent-builder/m0012-context",
+        "state": "m0012-s2-intent-builder/.m0012-state"
+      }
+    },
+    {
+      "module_short_id": "m0013",
+      "stable_module_id": "50000000000000000013",
+      "locator": "R1",
+      "canonical_name": "risk-evaluator",
+      "canonical_root": "m0013-r1-risk-evaluator",
+      "canonical_containers": {
+        "source": "m0013-r1-risk-evaluator/m0013-src",
+        "tests": "m0013-r1-risk-evaluator/m0013-tests",
+        "docs": "m0013-r1-risk-evaluator/m0013-docs",
+        "schemas": "m0013-r1-risk-evaluator/m0013-schemas",
+        "config": "m0013-r1-risk-evaluator/m0013-config",
+        "scripts": "m0013-r1-risk-evaluator/m0013-scripts",
+        "context": "m0013-r1-risk-evaluator/m0013-context",
+        "state": "m0013-r1-risk-evaluator/.m0013-state"
+      }
+    },
+    {
+      "module_short_id": "m0014",
+      "stable_module_id": "50000000000000000014",
+      "locator": "R2",
+      "canonical_name": "order-intent-compiler",
+      "canonical_root": "m0014-r2-order-intent-compiler",
+      "canonical_containers": {
+        "source": "m0014-r2-order-intent-compiler/m0014-src",
+        "tests": "m0014-r2-order-intent-compiler/m0014-tests",
+        "docs": "m0014-r2-order-intent-compiler/m0014-docs",
+        "schemas": "m0014-r2-order-intent-compiler/m0014-schemas",
+        "config": "m0014-r2-order-intent-compiler/m0014-config",
+        "scripts": "m0014-r2-order-intent-compiler/m0014-scripts",
+        "context": "m0014-r2-order-intent-compiler/m0014-context",
+        "state": "m0014-r2-order-intent-compiler/.m0014-state"
+      }
+    },
+    {
+      "module_short_id": "m0015",
+      "stable_module_id": "50000000000000000015",
+      "locator": "O1",
+      "canonical_name": "order-router",
+      "canonical_root": "m0015-o1-order-router",
+      "canonical_containers": {
+        "source": "m0015-o1-order-router/m0015-src",
+        "tests": "m0015-o1-order-router/m0015-tests",
+        "docs": "m0015-o1-order-router/m0015-docs",
+        "schemas": "m0015-o1-order-router/m0015-schemas",
+        "config": "m0015-o1-order-router/m0015-config",
+        "scripts": "m0015-o1-order-router/m0015-scripts",
+        "context": "m0015-o1-order-router/m0015-context",
+        "state": "m0015-o1-order-router/.m0015-state"
+      }
+    },
+    {
+      "module_short_id": "m0016",
+      "stable_module_id": "50000000000000000016",
+      "locator": "B1",
+      "canonical_name": "mt4-adapter-transport",
+      "canonical_root": "m0016-b1-mt4-adapter-transport",
+      "canonical_containers": {
+        "source": "m0016-b1-mt4-adapter-transport/m0016-src",
+        "tests": "m0016-b1-mt4-adapter-transport/m0016-tests",
+        "docs": "m0016-b1-mt4-adapter-transport/m0016-docs",
+        "schemas": "m0016-b1-mt4-adapter-transport/m0016-schemas",
+        "config": "m0016-b1-mt4-adapter-transport/m0016-config",
+        "scripts": "m0016-b1-mt4-adapter-transport/m0016-scripts",
+        "context": "m0016-b1-mt4-adapter-transport/m0016-context",
+        "state": "m0016-b1-mt4-adapter-transport/.m0016-state"
+      }
+    },
+    {
+      "module_short_id": "m0017",
+      "stable_module_id": "50000000000000000017",
+      "locator": "B2",
+      "canonical_name": "mt4-ea-executor",
+      "canonical_root": "m0017-b2-mt4-ea-executor",
+      "canonical_containers": {
+        "source": "m0017-b2-mt4-ea-executor/m0017-src",
+        "tests": "m0017-b2-mt4-ea-executor/m0017-tests",
+        "docs": "m0017-b2-mt4-ea-executor/m0017-docs",
+        "schemas": "m0017-b2-mt4-ea-executor/m0017-schemas",
+        "config": "m0017-b2-mt4-ea-executor/m0017-config",
+        "scripts": "m0017-b2-mt4-ea-executor/m0017-scripts",
+        "context": "m0017-b2-mt4-ea-executor/m0017-context",
+        "state": "m0017-b2-mt4-ea-executor/.m0017-state"
+      }
+    },
+    {
+      "module_short_id": "m0018",
+      "stable_module_id": "50000000000000000018",
+      "locator": "B3",
+      "canonical_name": "exec-event-normalizer",
+      "canonical_root": "m0018-b3-exec-event-normalizer",
+      "canonical_containers": {
+        "source": "m0018-b3-exec-event-normalizer/m0018-src",
+        "tests": "m0018-b3-exec-event-normalizer/m0018-tests",
+        "docs": "m0018-b3-exec-event-normalizer/m0018-docs",
+        "schemas": "m0018-b3-exec-event-normalizer/m0018-schemas",
+        "config": "m0018-b3-exec-event-normalizer/m0018-config",
+        "scripts": "m0018-b3-exec-event-normalizer/m0018-scripts",
+        "context": "m0018-b3-exec-event-normalizer/m0018-context",
+        "state": "m0018-b3-exec-event-normalizer/.m0018-state"
+      }
+    },
+    {
+      "module_short_id": "m0019",
+      "stable_module_id": "50000000000000000019",
+      "locator": "O2",
+      "canonical_name": "oms-state-machine",
+      "canonical_root": "m0019-o2-oms-state-machine",
+      "canonical_containers": {
+        "source": "m0019-o2-oms-state-machine/m0019-src",
+        "tests": "m0019-o2-oms-state-machine/m0019-tests",
+        "docs": "m0019-o2-oms-state-machine/m0019-docs",
+        "schemas": "m0019-o2-oms-state-machine/m0019-schemas",
+        "config": "m0019-o2-oms-state-machine/m0019-config",
+        "scripts": "m0019-o2-oms-state-machine/m0019-scripts",
+        "context": "m0019-o2-oms-state-machine/m0019-context",
+        "state": "m0019-o2-oms-state-machine/.m0019-state"
+      }
+    },
+    {
+      "module_short_id": "m0020",
+      "stable_module_id": "50000000000000000020",
+      "locator": "O3",
+      "canonical_name": "trade-close-classifier",
+      "canonical_root": "m0020-o3-trade-close-classifier",
+      "canonical_containers": {
+        "source": "m0020-o3-trade-close-classifier/m0020-src",
+        "tests": "m0020-o3-trade-close-classifier/m0020-tests",
+        "docs": "m0020-o3-trade-close-classifier/m0020-docs",
+        "schemas": "m0020-o3-trade-close-classifier/m0020-schemas",
+        "config": "m0020-o3-trade-close-classifier/m0020-config",
+        "scripts": "m0020-o3-trade-close-classifier/m0020-scripts",
+        "context": "m0020-o3-trade-close-classifier/m0020-context",
+        "state": "m0020-o3-trade-close-classifier/.m0020-state"
+      }
+    },
+    {
+      "module_short_id": "m0021",
+      "stable_module_id": "50000000000000000021",
+      "locator": "E1",
+      "canonical_name": "outcome-bucketizer",
+      "canonical_root": "m0021-e1-outcome-bucketizer",
+      "canonical_containers": {
+        "source": "m0021-e1-outcome-bucketizer/m0021-src",
+        "tests": "m0021-e1-outcome-bucketizer/m0021-tests",
+        "docs": "m0021-e1-outcome-bucketizer/m0021-docs",
+        "schemas": "m0021-e1-outcome-bucketizer/m0021-schemas",
+        "config": "m0021-e1-outcome-bucketizer/m0021-config",
+        "scripts": "m0021-e1-outcome-bucketizer/m0021-scripts",
+        "context": "m0021-e1-outcome-bucketizer/m0021-context",
+        "state": "m0021-e1-outcome-bucketizer/.m0021-state"
+      }
+    },
+    {
+      "module_short_id": "m0022",
+      "stable_module_id": "50000000000000000022",
+      "locator": "E2",
+      "canonical_name": "proximity-evaluator",
+      "canonical_root": "m0022-e2-proximity-evaluator",
+      "canonical_containers": {
+        "source": "m0022-e2-proximity-evaluator/m0022-src",
+        "tests": "m0022-e2-proximity-evaluator/m0022-tests",
+        "docs": "m0022-e2-proximity-evaluator/m0022-docs",
+        "schemas": "m0022-e2-proximity-evaluator/m0022-schemas",
+        "config": "m0022-e2-proximity-evaluator/m0022-config",
+        "scripts": "m0022-e2-proximity-evaluator/m0022-scripts",
+        "context": "m0022-e2-proximity-evaluator/m0022-context",
+        "state": "m0022-e2-proximity-evaluator/.m0022-state"
+      }
+    },
+    {
+      "module_short_id": "m0023",
+      "stable_module_id": "50000000000000000023",
+      "locator": "E3",
+      "canonical_name": "matrix-lookup",
+      "canonical_root": "m0023-e3-matrix-lookup",
+      "canonical_containers": {
+        "source": "m0023-e3-matrix-lookup/m0023-src",
+        "tests": "m0023-e3-matrix-lookup/m0023-tests",
+        "docs": "m0023-e3-matrix-lookup/m0023-docs",
+        "schemas": "m0023-e3-matrix-lookup/m0023-schemas",
+        "config": "m0023-e3-matrix-lookup/m0023-config",
+        "scripts": "m0023-e3-matrix-lookup/m0023-scripts",
+        "context": "m0023-e3-matrix-lookup/m0023-context",
+        "state": "m0023-e3-matrix-lookup/.m0023-state"
+      }
+    },
+    {
+      "module_short_id": "m0024",
+      "stable_module_id": "50000000000000000024",
+      "locator": "E4",
+      "canonical_name": "reentry-intent-builder",
+      "canonical_root": "m0024-e4-reentry-intent-builder",
+      "canonical_containers": {
+        "source": "m0024-e4-reentry-intent-builder/m0024-src",
+        "tests": "m0024-e4-reentry-intent-builder/m0024-tests",
+        "docs": "m0024-e4-reentry-intent-builder/m0024-docs",
+        "schemas": "m0024-e4-reentry-intent-builder/m0024-schemas",
+        "config": "m0024-e4-reentry-intent-builder/m0024-config",
+        "scripts": "m0024-e4-reentry-intent-builder/m0024-scripts",
+        "context": "m0024-e4-reentry-intent-builder/m0024-context",
+        "state": "m0024-e4-reentry-intent-builder/.m0024-state"
+      }
+    },
+    {
+      "module_short_id": "m0025",
+      "stable_module_id": "50000000000000000025",
+      "locator": "F4",
+      "canonical_name": "flow-orchestrator",
+      "canonical_root": "m0025-f4-flow-orchestrator",
+      "canonical_containers": {
+        "source": "m0025-f4-flow-orchestrator/m0025-src",
+        "tests": "m0025-f4-flow-orchestrator/m0025-tests",
+        "docs": "m0025-f4-flow-orchestrator/m0025-docs",
+        "schemas": "m0025-f4-flow-orchestrator/m0025-schemas",
+        "config": "m0025-f4-flow-orchestrator/m0025-config",
+        "scripts": "m0025-f4-flow-orchestrator/m0025-scripts",
+        "context": "m0025-f4-flow-orchestrator/m0025-context",
+        "state": "m0025-f4-flow-orchestrator/.m0025-state"
+      }
+    },
+    {
+      "module_short_id": "m0026",
+      "stable_module_id": "50000000000000000026",
+      "locator": "P1",
+      "canonical_name": "health-aggregator",
+      "canonical_root": "m0026-p1-health-aggregator",
+      "canonical_containers": {
+        "source": "m0026-p1-health-aggregator/m0026-src",
+        "tests": "m0026-p1-health-aggregator/m0026-tests",
+        "docs": "m0026-p1-health-aggregator/m0026-docs",
+        "schemas": "m0026-p1-health-aggregator/m0026-schemas",
+        "config": "m0026-p1-health-aggregator/m0026-config",
+        "scripts": "m0026-p1-health-aggregator/m0026-scripts",
+        "context": "m0026-p1-health-aggregator/m0026-context",
+        "state": "m0026-p1-health-aggregator/.m0026-state"
+      }
+    },
+    {
+      "module_short_id": "m0027",
+      "stable_module_id": "50000000000000000027",
+      "locator": "R3",
+      "canonical_name": "correlation-guard",
+      "canonical_root": "m0027-r3-correlation-guard",
+      "canonical_containers": {
+        "source": "m0027-r3-correlation-guard/m0027-src",
+        "tests": "m0027-r3-correlation-guard/m0027-tests",
+        "docs": "m0027-r3-correlation-guard/m0027-docs",
+        "schemas": "m0027-r3-correlation-guard/m0027-schemas",
+        "config": "m0027-r3-correlation-guard/m0027-config",
+        "scripts": "m0027-r3-correlation-guard/m0027-scripts",
+        "context": "m0027-r3-correlation-guard/m0027-context",
+        "state": "m0027-r3-correlation-guard/.m0027-state"
+      }
+    },
+    {
+      "module_short_id": "m0028",
+      "stable_module_id": "50000000000000000028",
+      "locator": "U1",
+      "canonical_name": "dashboard-backend",
+      "canonical_root": "m0028-u1-dashboard-backend",
+      "canonical_containers": {
+        "source": "m0028-u1-dashboard-backend/m0028-src",
+        "tests": "m0028-u1-dashboard-backend/m0028-tests",
+        "docs": "m0028-u1-dashboard-backend/m0028-docs",
+        "schemas": "m0028-u1-dashboard-backend/m0028-schemas",
+        "config": "m0028-u1-dashboard-backend/m0028-config",
+        "scripts": "m0028-u1-dashboard-backend/m0028-scripts",
+        "context": "m0028-u1-dashboard-backend/m0028-context",
+        "state": "m0028-u1-dashboard-backend/.m0028-state"
+      }
+    },
+    {
+      "module_short_id": "m0029",
+      "stable_module_id": "50000000000000000029",
+      "locator": "U2",
+      "canonical_name": "gui-gateway",
+      "canonical_root": "m0029-u2-gui-gateway",
+      "canonical_containers": {
+        "source": "m0029-u2-gui-gateway/m0029-src",
+        "tests": "m0029-u2-gui-gateway/m0029-tests",
+        "docs": "m0029-u2-gui-gateway/m0029-docs",
+        "schemas": "m0029-u2-gui-gateway/m0029-schemas",
+        "config": "m0029-u2-gui-gateway/m0029-config",
+        "scripts": "m0029-u2-gui-gateway/m0029-scripts",
+        "context": "m0029-u2-gui-gateway/m0029-context",
+        "state": "m0029-u2-gui-gateway/.m0029-state"
+      }
+    },
+    {
+      "module_short_id": "m0030",
+      "stable_module_id": "50000000000000000030",
+      "locator": "U3",
+      "canonical_name": "mt4-expiry-overlay",
+      "canonical_root": "m0030-u3-mt4-expiry-overlay",
+      "canonical_containers": {
+        "source": "m0030-u3-mt4-expiry-overlay/m0030-src",
+        "tests": "m0030-u3-mt4-expiry-overlay/m0030-tests",
+        "docs": "m0030-u3-mt4-expiry-overlay/m0030-docs",
+        "schemas": "m0030-u3-mt4-expiry-overlay/m0030-schemas",
+        "config": "m0030-u3-mt4-expiry-overlay/m0030-config",
+        "scripts": "m0030-u3-mt4-expiry-overlay/m0030-scripts",
+        "context": "m0030-u3-mt4-expiry-overlay/m0030-context",
+        "state": "m0030-u3-mt4-expiry-overlay/.m0030-state"
+      }
+    },
+    {
+      "module_short_id": "m0031",
+      "stable_module_id": "50000000000000000031",
+      "locator": "U4",
+      "canonical_name": "desktop-operator",
+      "canonical_root": "m0031-u4-desktop-operator",
+      "canonical_containers": {
+        "source": "m0031-u4-desktop-operator/m0031-src",
+        "tests": "m0031-u4-desktop-operator/m0031-tests",
+        "docs": "m0031-u4-desktop-operator/m0031-docs",
+        "schemas": "m0031-u4-desktop-operator/m0031-schemas",
+        "config": "m0031-u4-desktop-operator/m0031-config",
+        "scripts": "m0031-u4-desktop-operator/m0031-scripts",
+        "context": "m0031-u4-desktop-operator/m0031-context",
+        "state": "m0031-u4-desktop-operator/.m0031-state"
+      }
+    },
+    {
+      "module_short_id": "m0032",
+      "stable_module_id": "50000000000000000032",
+      "locator": "P2",
+      "canonical_name": "reporter",
+      "canonical_root": "m0032-p2-reporter",
+      "canonical_containers": {
+        "source": "m0032-p2-reporter/m0032-src",
+        "tests": "m0032-p2-reporter/m0032-tests",
+        "docs": "m0032-p2-reporter/m0032-docs",
+        "schemas": "m0032-p2-reporter/m0032-schemas",
+        "config": "m0032-p2-reporter/m0032-config",
+        "scripts": "m0032-p2-reporter/m0032-scripts",
+        "context": "m0032-p2-reporter/m0032-context",
+        "state": "m0032-p2-reporter/.m0032-state"
+      }
+    },
+    {
+      "module_short_id": "m0033",
+      "stable_module_id": "50000000000000000033",
+      "locator": "SK1",
+      "canonical_name": "plugin-interface",
+      "canonical_root": "m0033-sk1-plugin-interface",
+      "canonical_containers": {
+        "source": "m0033-sk1-plugin-interface/m0033-src",
+        "tests": "m0033-sk1-plugin-interface/m0033-tests",
+        "docs": "m0033-sk1-plugin-interface/m0033-docs",
+        "schemas": "m0033-sk1-plugin-interface/m0033-schemas",
+        "config": "m0033-sk1-plugin-interface/m0033-config",
+        "scripts": "m0033-sk1-plugin-interface/m0033-scripts",
+        "context": "m0033-sk1-plugin-interface/m0033-context",
+        "state": "m0033-sk1-plugin-interface/.m0033-state"
+      }
+    },
+    {
+      "module_short_id": "m0034",
+      "stable_module_id": "50000000000000000034",
+      "locator": "SK2",
+      "canonical_name": "idempotency",
+      "canonical_root": "m0034-sk2-idempotency",
+      "canonical_containers": {
+        "source": "m0034-sk2-idempotency/m0034-src",
+        "tests": "m0034-sk2-idempotency/m0034-tests",
+        "docs": "m0034-sk2-idempotency/m0034-docs",
+        "schemas": "m0034-sk2-idempotency/m0034-schemas",
+        "config": "m0034-sk2-idempotency/m0034-config",
+        "scripts": "m0034-sk2-idempotency/m0034-scripts",
+        "context": "m0034-sk2-idempotency/m0034-context",
+        "state": "m0034-sk2-idempotency/.m0034-state"
+      }
+    }
+  ],
+  "reference_only_sources": [
+    {
+      "source_record_id": "SRC-0001",
+      "source_path": ".claude/1199900001260118_settings.local.json",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "Content configures .claude permissions and tools, not runtime trading configuration.",
+      "supporting_modules": [],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": [
+        "confirm no module-local assumptions"
+      ]
+    },
+    {
+      "source_record_id": "SRC-0002",
+      "source_path": "CLI_PY_GUI/gui/Operator_Guide.md",
+      "approved_disposition": "retain_tool_scope",
+      "approved_owner_type": "tool",
+      "reason": "Document describes PTY terminals, merge queue, developer tabs, and plan visualization.",
+      "supporting_modules": [],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0003",
+      "source_path": "CLI_PY_GUI/gui_terminal/src/gui_terminal/config/settings.py",
+      "approved_disposition": "retain_tool_scope",
+      "approved_owner_type": "tool",
+      "reason": "Settings cover terminal, security, platform integration, UI, plugins, and performance for CLI_PY_GUI.",
+      "supporting_modules": [],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0004",
+      "source_path": "EAFIX_auth_docs/04_mt4_bridge_and_execution/MT4_Python communication channels.txt",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "Covers D1 DDE, B1 transport, B2/MT4 execution, desktop UI, Redis, CSV, JSONL, and sockets.",
+      "supporting_modules": [
+        "m0007",
+        "m0016",
+        "m0017",
+        "m0030",
+        "m0031"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0005",
+      "source_path": "EAFIX_auth_docs/05_calendar_system/0110000079260118_econ_spec_standardized.md",
+      "approved_disposition": "retain_global_supporting_reference",
+      "approved_owner_type": "global",
+      "reason": "The document explicitly affects multiple subsystems and is not limited to calendar normalization.",
+      "supporting_modules": [
+        "m0003",
+        "m0004",
+        "m0006",
+        "m0013",
+        "m0021",
+        "m0022",
+        "m0023",
+        "m0024"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0006",
+      "source_path": "EAFIX_auth_docs/05_calendar_system/0199900001260118_Economic Calendar Integration Framework.md",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "Scope spans D2, D3, D4, event persistence, matrix lookup, reentry, and transport.",
+      "supporting_modules": [
+        "m0003",
+        "m0004",
+        "m0005",
+        "m0006",
+        "m0021",
+        "m0022",
+        "m0023",
+        "m0024"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0008",
+      "source_path": "EAFIX_auth_docs/08_operations_runbooks_and_incidents/0110000048260118_market-open-close.md",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "Runbook is system-wide and invokes numerous modules; time references do not make it F3-owned.",
+      "supporting_modules": [
+        "m0002",
+        "m0013",
+        "m0025",
+        "m0026",
+        "m0032"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0009",
+      "source_path": "EAFIX_auth_docs/08_operations_runbooks_and_incidents/0110000051260118_service-health.md",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "Covers health of many services; P1 aggregates health but does not exclusively own the operations runbook.",
+      "supporting_modules": [
+        "m0026"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0011",
+      "source_path": "contracts/events/1199900006260118_OrderIntent@1.2.json",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "Cross-module boundary contract; producer steward is R2 and consumers include O1/B1.",
+      "supporting_modules": [
+        "m0014",
+        "m0015",
+        "m0016"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0012",
+      "source_path": "contracts/events/1199900009260118_Signal@1.0.json",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "S1 produces the contract and S2 consumes it; it is a canonical boundary schema.",
+      "supporting_modules": [
+        "m0011",
+        "m0012"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0013",
+      "source_path": "contracts/identifiers/0199900023260118_cal5_legacy.md",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "Identifier crosses module boundaries; D3 is the semantic producer/steward.",
+      "supporting_modules": [
+        "m0004",
+        "m0006",
+        "m0023"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0014",
+      "source_path": "contracts/identifiers/0199900024260118_cal8.md",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "Identifier is generated during calendar normalization and consumed by triggers/reentry; D3 is steward.",
+      "supporting_modules": [
+        "m0004",
+        "m0006",
+        "m0023"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0015",
+      "source_path": "contracts/identifiers/0199900025260118_hybrid_id.md",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "The identifier joins outputs from several E-series modules and is used as an E3 lookup key.",
+      "supporting_modules": [
+        "m0021",
+        "m0022",
+        "m0023",
+        "m0024"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0016",
+      "source_path": "contracts/identifiers/decision_id.md",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "E4 produces the identifier, but it is consumed by telemetry/reporting and belongs to the shared contract authority.",
+      "supporting_modules": [
+        "m0024",
+        "m0023"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0017",
+      "source_path": "contracts/identifiers/strategy_id.md",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "The identifier is produced by D3 and carried across multiple module boundaries.",
+      "supporting_modules": [
+        "m0004",
+        "m0006",
+        "m0011",
+        "m0012",
+        "m0013",
+        "m0024"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0018",
+      "source_path": "contracts/schemas/csv/0199900027260118_active_calendar_signals.csv.md",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "D4 produces the row contract; F2 persists it and signal/reentry modules consume it.",
+      "supporting_modules": [
+        "m0006",
+        "m0005",
+        "m0011",
+        "m0022"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0019",
+      "source_path": "contracts/schemas/csv/0199900028260118_health_metrics.csv.md",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "P1 is producer/steward, but the schema is consumed system-wide.",
+      "supporting_modules": [
+        "m0026"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0020",
+      "source_path": "contracts/schemas/csv/0199900029260118_reentry_decisions.csv.md",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "E4 produces the final reentry intent/decision row using E3 output.",
+      "supporting_modules": [
+        "m0023",
+        "m0024"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0021",
+      "source_path": "contracts/schemas/csv/0199900030260118_trade_results.csv.md",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "The contract spans EA execution feedback, normalization, close classification, and outcome bucketing.",
+      "supporting_modules": [
+        "m0017",
+        "m0018",
+        "m0020",
+        "m0021"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0024",
+      "source_path": "contracts/schemas/json/1199900012260118_orders_in.schema.json",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "B2 produces raw execution data and B3 normalizes it; it is an external-boundary contract.",
+      "supporting_modules": [
+        "m0017",
+        "m0018"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0025",
+      "source_path": "contracts/schemas/json/1199900013260118_orders_out.schema.json",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "B1 produces the transport row and B2 consumes it.",
+      "supporting_modules": [
+        "m0016",
+        "m0017"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0026",
+      "source_path": "docs/bridge_contracts.md",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "It is a repository-wide contract index, not a B1 module document.",
+      "supporting_modules": [],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0079",
+      "source_path": "tests/contracts/fixtures/1099900002260118_active_calendar_signals_valid.csv",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "Fixture validates a cross-module canonical CSV contract.",
+      "supporting_modules": [
+        "m0006",
+        "m0005",
+        "m0011"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0080",
+      "source_path": "tests/contracts/fixtures/1099900003260118_reentry_decisions_valid.csv",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "Fixture validates the global E3/E4 boundary contract.",
+      "supporting_modules": [
+        "m0023",
+        "m0024"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0081",
+      "source_path": "tests/contracts/fixtures/1199900032260118_hybrid_id_valid.json",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "Fixture validates a cross-module identifier contract.",
+      "supporting_modules": [
+        "m0021",
+        "m0022",
+        "m0023",
+        "m0024"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0083",
+      "source_path": "tests/contracts/fixtures/1199900034260118_orders_in_valid.json",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "Fixture validates the B2\u2192B3 external boundary contract.",
+      "supporting_modules": [
+        "m0017",
+        "m0018"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    },
+    {
+      "source_record_id": "SRC-0084",
+      "source_path": "tests/contracts/fixtures/1199900035260118_orders_out_valid.json",
+      "approved_disposition": "retain_global",
+      "approved_owner_type": "global",
+      "reason": "Fixture validates the B1\u2192B2 external boundary contract.",
+      "supporting_modules": [
+        "m0016",
+        "m0017"
+      ],
+      "agent_action": "DO_NOT_MOVE",
+      "validation_required": []
+    }
+  ],
+  "operations": [
+    {
+      "operation_id": "MIG-0001",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "operation_type": "git_mv",
+      "title": "Move 0110000074260118_06_signal_model_mapping.md to its approved location",
+      "status": "approved_not_executed",
+      "execution_readiness": "ready_after_preflight",
+      "agent_may_execute": true,
+      "mechanically_automatable": true,
+      "destructive": false,
+      "owner_module_short_id": "m0023",
+      "owner_module_root": "m0023-e3-matrix-lookup",
+      "source_decision_ids": [
+        "SRC-0007"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0007",
+          "path": "EAFIX_auth_docs/06_strategy_signal_risk_reentry_oms/0110000074260118_06_signal_model_mapping.md",
+          "artifact_type": "module_architecture_document",
+          "primary_function": "Defines hybrid-context dimensions and tiered mapping from signal context to parameter-set decisions.",
+          "disposition_after_success": "removed_by_git_mv"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0023-e3-matrix-lookup/m0023-docs/architecture/0110000074260118_06_signal_model_mapping.md",
+          "path_status": "exact",
+          "output_role": "canonical_output",
+          "owner_module_short_id": "m0023"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Create the target parent directory if it does not exist.",
+        "Move the file with git mv to preserve history.",
+        "Update imports, links, fixtures, registries, and documentation references affected by the path change.",
+        "Run operation-specific validation before committing."
+      ],
+      "validation_required": [
+        "update documentation links",
+        "verify no canonical global authority conflict",
+        "Update and validate documentation links and repository path references."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "preflight_checks_only",
+      "depends_on": [],
+      "command_templates": [
+        "mkdir -p -- \"$(dirname -- 'm0023-e3-matrix-lookup/m0023-docs/architecture/0110000074260118_06_signal_model_mapping.md')\"",
+        "git mv -- 'EAFIX_auth_docs/06_strategy_signal_risk_reentry_oms/0110000074260118_06_signal_model_mapping.md' 'm0023-e3-matrix-lookup/m0023-docs/architecture/0110000074260118_06_signal_model_mapping.md'"
+      ]
+    },
+    {
+      "operation_id": "MIG-0002",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "operation_type": "git_mv",
+      "title": "Move 0110000076260118_07_transport_bridge_contracts.md to its approved location",
+      "status": "approved_not_executed",
+      "execution_readiness": "ready_after_preflight",
+      "agent_may_execute": true,
+      "mechanically_automatable": true,
+      "destructive": false,
+      "owner_module_short_id": "m0016",
+      "owner_module_root": "m0016-b1-mt4-adapter-transport",
+      "source_decision_ids": [
+        "SRC-0010"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0010",
+          "path": "EAFIX_auth_docs/09_product_requirements_and_design/0110000076260118_07_transport_bridge_contracts.md",
+          "artifact_type": "module_architecture_document",
+          "primary_function": "Defines CSV/socket bridge contracts, failover, timing, and Python-to-MT4 transport behavior.",
+          "disposition_after_success": "removed_by_git_mv"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0016-b1-mt4-adapter-transport/m0016-docs/architecture/0110000076260118_07_transport_bridge_contracts.md",
+          "path_status": "exact",
+          "output_role": "canonical_output",
+          "owner_module_short_id": "m0016"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Create the target parent directory if it does not exist.",
+        "Move the file with git mv to preserve history.",
+        "Update imports, links, fixtures, registries, and documentation references affected by the path change.",
+        "Run operation-specific validation before committing."
+      ],
+      "validation_required": [
+        "update links",
+        "verify contract references remain global",
+        "Update and validate documentation links and repository path references."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "preflight_checks_only",
+      "depends_on": [],
+      "command_templates": [
+        "mkdir -p -- \"$(dirname -- 'm0016-b1-mt4-adapter-transport/m0016-docs/architecture/0110000076260118_07_transport_bridge_contracts.md')\"",
+        "git mv -- 'EAFIX_auth_docs/09_product_requirements_and_design/0110000076260118_07_transport_bridge_contracts.md' 'm0016-b1-mt4-adapter-transport/m0016-docs/architecture/0110000076260118_07_transport_bridge_contracts.md'"
+      ]
+    },
+    {
+      "operation_id": "MIG-0003",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "operation_type": "git_mv_rename",
+      "title": "Rename 1199900010260118_hybrid_id.schema.json to remove semantic collision",
+      "status": "approved_not_executed",
+      "execution_readiness": "ready_after_preflight",
+      "agent_may_execute": true,
+      "mechanically_automatable": true,
+      "destructive": false,
+      "owner_module_short_id": null,
+      "owner_module_root": null,
+      "source_decision_ids": [
+        "SRC-0022"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0022",
+          "path": "contracts/schemas/json/1199900010260118_hybrid_id.schema.json",
+          "artifact_type": "canonical_external_boundary_schema",
+          "primary_function": "Defines the MQL4-style reentry_key/comment format, despite being named hybrid_id.",
+          "disposition_after_success": "removed_by_git_mv"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "contracts/schemas/json/1199900010260118_reentry_key.schema.json",
+          "path_status": "exact",
+          "output_role": "renamed_global_authority",
+          "owner_module_short_id": null
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Rename the global schema using git mv.",
+        "Update every schema reference and documentation mention.",
+        "Verify the renamed schema still describes the MQL4 reentry-key boundary and does not claim canonical Python hybrid-ID semantics."
+      ],
+      "validation_required": [
+        "update schema refs",
+        "run contract tests",
+        "verify MQL4 compatibility",
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "preflight_checks_only",
+      "depends_on": [],
+      "notes": "Rename to prevent semantic collision; B1 is boundary steward.",
+      "command_templates": [
+        "mkdir -p -- \"$(dirname -- 'contracts/schemas/json/1199900010260118_reentry_key.schema.json')\"",
+        "git mv -- 'contracts/schemas/json/1199900010260118_hybrid_id.schema.json' 'contracts/schemas/json/1199900010260118_reentry_key.schema.json'"
+      ]
+    },
+    {
+      "operation_id": "MIG-0004",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "operation_type": "git_mv",
+      "title": "Move 1199900011260118_indicator_record.schema.json to its approved location",
+      "status": "approved_not_executed",
+      "execution_readiness": "ready_after_preflight",
+      "agent_may_execute": true,
+      "mechanically_automatable": true,
+      "destructive": false,
+      "owner_module_short_id": "m0009",
+      "owner_module_root": "m0009-c2-indicator-engine",
+      "source_decision_ids": [
+        "SRC-0023"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0023",
+          "path": "contracts/schemas/json/1199900011260118_indicator_record.schema.json",
+          "artifact_type": "module_private_input_schema",
+          "primary_function": "Defines indicator-definition records consumed by the indicator engine.",
+          "disposition_after_success": "removed_by_git_mv"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0009-c2-indicator-engine/m0009-schemas/inputs/1199900011260118_indicator_record.schema.json",
+          "path_status": "exact",
+          "output_role": "canonical_output",
+          "owner_module_short_id": "m0009"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Create the target parent directory if it does not exist.",
+        "Move the file with git mv to preserve history.",
+        "Update imports, links, fixtures, registries, and documentation references affected by the path change.",
+        "Run operation-specific validation before committing."
+      ],
+      "validation_required": [
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "preflight_checks_only",
+      "depends_on": [],
+      "command_templates": [
+        "mkdir -p -- \"$(dirname -- 'm0009-c2-indicator-engine/m0009-schemas/inputs/1199900011260118_indicator_record.schema.json')\"",
+        "git mv -- 'contracts/schemas/json/1199900011260118_indicator_record.schema.json' 'm0009-c2-indicator-engine/m0009-schemas/inputs/1199900011260118_indicator_record.schema.json'"
+      ]
+    },
+    {
+      "operation_id": "MIG-0005",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "operation_type": "git_mv",
+      "title": "Move 1110000004260118_indicator_records_full.json to its approved location",
+      "status": "approved_not_executed",
+      "execution_readiness": "ready_after_preflight",
+      "agent_may_execute": true,
+      "mechanically_automatable": true,
+      "destructive": false,
+      "owner_module_short_id": "m0009",
+      "owner_module_root": "m0009-c2-indicator-engine",
+      "source_decision_ids": [
+        "SRC-0028"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0028",
+          "path": "docs/reference/1110000004260118_indicator_records_full.json",
+          "artifact_type": "module_configuration_catalog",
+          "primary_function": "Contains the full catalog of indicator definitions and thresholds.",
+          "disposition_after_success": "removed_by_git_mv"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0009-c2-indicator-engine/m0009-config/indicator_records_full.json",
+          "path_status": "exact",
+          "output_role": "canonical_output",
+          "owner_module_short_id": "m0009"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Create the target parent directory if it does not exist.",
+        "Move the file with git mv to preserve history.",
+        "Update imports, links, fixtures, registries, and documentation references affected by the path change.",
+        "Run operation-specific validation before committing."
+      ],
+      "validation_required": [
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "preflight_checks_only",
+      "depends_on": [],
+      "command_templates": [
+        "mkdir -p -- \"$(dirname -- 'm0009-c2-indicator-engine/m0009-config/indicator_records_full.json')\"",
+        "git mv -- 'docs/reference/1110000004260118_indicator_records_full.json' 'm0009-c2-indicator-engine/m0009-config/indicator_records_full.json'"
+      ]
+    },
+    {
+      "operation_id": "MIG-0006",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "operation_type": "git_mv",
+      "title": "Move 1110000005260118_indicator_records_sample.json to its approved location",
+      "status": "approved_not_executed",
+      "execution_readiness": "ready_after_preflight",
+      "agent_may_execute": true,
+      "mechanically_automatable": true,
+      "destructive": false,
+      "owner_module_short_id": "m0009",
+      "owner_module_root": "m0009-c2-indicator-engine",
+      "source_decision_ids": [
+        "SRC-0029"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0029",
+          "path": "docs/reference/1110000005260118_indicator_records_sample.json",
+          "artifact_type": "module_schema_example",
+          "primary_function": "Provides sample indicator-definition records.",
+          "disposition_after_success": "removed_by_git_mv"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0009-c2-indicator-engine/m0009-schemas/examples/indicator_records_sample.json",
+          "path_status": "exact",
+          "output_role": "canonical_output",
+          "owner_module_short_id": "m0009"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Create the target parent directory if it does not exist.",
+        "Move the file with git mv to preserve history.",
+        "Update imports, links, fixtures, registries, and documentation references affected by the path change.",
+        "Run operation-specific validation before committing."
+      ],
+      "validation_required": [
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "preflight_checks_only",
+      "depends_on": [],
+      "command_templates": [
+        "mkdir -p -- \"$(dirname -- 'm0009-c2-indicator-engine/m0009-schemas/examples/indicator_records_sample.json')\"",
+        "git mv -- 'docs/reference/1110000005260118_indicator_records_sample.json' 'm0009-c2-indicator-engine/m0009-schemas/examples/indicator_records_sample.json'"
+      ]
+    },
+    {
+      "operation_id": "MIG-0007",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "operation_type": "git_mv",
+      "title": "Move 2099900104260118_advanced_indicators.py to its approved location",
+      "status": "approved_not_executed",
+      "execution_readiness": "ready_after_preflight",
+      "agent_may_execute": true,
+      "mechanically_automatable": true,
+      "destructive": false,
+      "owner_module_short_id": "m0009",
+      "owner_module_root": "m0009-c2-indicator-engine",
+      "source_decision_ids": [
+        "SRC-0030"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0030",
+          "path": "services/dashboard-backend/src/2099900104260118_advanced_indicators.py",
+          "artifact_type": "implementation_source",
+          "primary_function": "Implements advanced technical indicators and currency-strength calculations.",
+          "disposition_after_success": "removed_by_git_mv"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0009-c2-indicator-engine/m0009-src/c2_indicator_engine/advanced_indicators.py",
+          "path_status": "exact",
+          "output_role": "canonical_output",
+          "owner_module_short_id": "m0009"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Create the target parent directory if it does not exist.",
+        "Move the file with git mv to preserve history.",
+        "Update imports, links, fixtures, registries, and documentation references affected by the path change.",
+        "Run operation-specific validation before committing."
+      ],
+      "validation_required": [
+        "update imports",
+        "run C2 and dashboard tests",
+        "Compile every Python output.",
+        "Run an import/reference scan and update all imports that point to removed source paths."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "preflight_checks_only",
+      "depends_on": [],
+      "command_templates": [
+        "mkdir -p -- \"$(dirname -- 'm0009-c2-indicator-engine/m0009-src/c2_indicator_engine/advanced_indicators.py')\"",
+        "git mv -- 'services/dashboard-backend/src/2099900104260118_advanced_indicators.py' 'm0009-c2-indicator-engine/m0009-src/c2_indicator_engine/advanced_indicators.py'"
+      ]
+    },
+    {
+      "operation_id": "MIG-0008",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "operation_type": "git_mv",
+      "title": "Move 2099900108260118_tkinter_dashboard_gui.py to its approved location",
+      "status": "approved_not_executed",
+      "execution_readiness": "ready_after_preflight",
+      "agent_may_execute": true,
+      "mechanically_automatable": true,
+      "destructive": false,
+      "owner_module_short_id": "m0031",
+      "owner_module_root": "m0031-u4-desktop-operator",
+      "source_decision_ids": [
+        "SRC-0031"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0031",
+          "path": "services/dashboard-backend/src/2099900108260118_tkinter_dashboard_gui.py",
+          "artifact_type": "desktop_ui_source",
+          "primary_function": "Implements Tkinter dashboard widgets, tabs, controls, rendering, and background refresh.",
+          "disposition_after_success": "removed_by_git_mv"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0031-u4-desktop-operator/m0031-src/frontend/tkinter_dashboard_gui.py",
+          "path_status": "exact",
+          "output_role": "canonical_output",
+          "owner_module_short_id": "m0031"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Create the target parent directory if it does not exist.",
+        "Move the file with git mv to preserve history.",
+        "Update imports, links, fixtures, registries, and documentation references affected by the path change.",
+        "Run operation-specific validation before committing."
+      ],
+      "validation_required": [
+        "Compile every Python output.",
+        "Run an import/reference scan and update all imports that point to removed source paths."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "preflight_checks_only",
+      "depends_on": [],
+      "command_templates": [
+        "mkdir -p -- \"$(dirname -- 'm0031-u4-desktop-operator/m0031-src/frontend/tkinter_dashboard_gui.py')\"",
+        "git mv -- 'services/dashboard-backend/src/2099900108260118_tkinter_dashboard_gui.py' 'm0031-u4-desktop-operator/m0031-src/frontend/tkinter_dashboard_gui.py'"
+      ]
+    },
+    {
+      "operation_id": "MIG-0009",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "operation_type": "git_mv",
+      "title": "Move E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json to its approved location",
+      "status": "approved_not_executed",
+      "execution_readiness": "ready_after_preflight",
+      "agent_may_execute": true,
+      "mechanically_automatable": true,
+      "destructive": false,
+      "owner_module_short_id": "m0024",
+      "owner_module_root": "m0024-e4-reentry-intent-builder",
+      "source_decision_ids": [
+        "SRC-0061"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0061",
+          "path": "services/reentry-engine/work_cells/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json",
+          "artifact_type": "work_cell_binding",
+          "primary_function": "Defines E4 chain-limit and suppression behavior for building a reentry intent.",
+          "disposition_after_success": "removed_by_git_mv"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0024-e4-reentry-intent-builder/m0024-context/work-cells/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json",
+          "path_status": "exact",
+          "output_role": "canonical_output",
+          "owner_module_short_id": "m0024"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Create the target parent directory if it does not exist.",
+        "Move the file with git mv to preserve history.",
+        "Update imports, links, fixtures, registries, and documentation references affected by the path change.",
+        "Run operation-specific validation before committing."
+      ],
+      "validation_required": [
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "preflight_checks_only",
+      "depends_on": [],
+      "command_templates": [
+        "mkdir -p -- \"$(dirname -- 'm0024-e4-reentry-intent-builder/m0024-context/work-cells/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json')\"",
+        "git mv -- 'services/reentry-engine/work_cells/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json' 'm0024-e4-reentry-intent-builder/m0024-context/work-cells/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json'"
+      ]
+    },
+    {
+      "operation_id": "MIG-0010",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "operation_type": "git_mv",
+      "title": "Move 1199900031260118_reentry_vocab.json to its approved location",
+      "status": "approved_not_executed",
+      "execution_readiness": "ready_after_preflight",
+      "agent_may_execute": true,
+      "mechanically_automatable": true,
+      "destructive": false,
+      "owner_module_short_id": "m0023",
+      "owner_module_root": "m0023-e3-matrix-lookup",
+      "source_decision_ids": [
+        "SRC-0064"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0064",
+          "path": "shared/reentry/1199900031260118_reentry_vocab.json",
+          "artifact_type": "module_configuration",
+          "primary_function": "Defines canonical outcome, duration, proximity, direction, and generation vocabulary for hybrid reentry keys.",
+          "disposition_after_success": "removed_by_git_mv"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0023-e3-matrix-lookup/m0023-config/reentry_vocab.json",
+          "path_status": "exact",
+          "output_role": "canonical_output",
+          "owner_module_short_id": "m0023"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Create the target parent directory if it does not exist.",
+        "Move the file with git mv to preserve history.",
+        "Update imports, links, fixtures, registries, and documentation references affected by the path change.",
+        "Run operation-specific validation before committing."
+      ],
+      "validation_required": [
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "preflight_checks_only",
+      "depends_on": [],
+      "notes": "Expose it as a versioned E3 public contract/configuration and reference it from other E modules.",
+      "command_templates": [
+        "mkdir -p -- \"$(dirname -- 'm0023-e3-matrix-lookup/m0023-config/reentry_vocab.json')\"",
+        "git mv -- 'shared/reentry/1199900031260118_reentry_vocab.json' 'm0023-e3-matrix-lookup/m0023-config/reentry_vocab.json'"
+      ]
+    },
+    {
+      "operation_id": "MIG-0011",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "operation_type": "git_mv",
+      "title": "Move 2099900223260118_test_plugin_system.py to its approved location",
+      "status": "approved_not_executed",
+      "execution_readiness": "ready_after_preflight",
+      "agent_may_execute": true,
+      "mechanically_automatable": true,
+      "destructive": false,
+      "owner_module_short_id": "m0033",
+      "owner_module_root": "m0033-sk1-plugin-interface",
+      "source_decision_ids": [
+        "SRC-0077"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0077",
+          "path": "tests/2099900223260118_test_plugin_system.py",
+          "artifact_type": "module_test",
+          "primary_function": "Tests plugin interface, lifecycle, context, registry, dependency ordering, health, and inter-plugin communication.",
+          "disposition_after_success": "removed_by_git_mv"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0033-sk1-plugin-interface/m0033-tests/unit/test_plugin_system.py",
+          "path_status": "exact",
+          "output_role": "canonical_output",
+          "owner_module_short_id": "m0033"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Create the target parent directory if it does not exist.",
+        "Move the file with git mv to preserve history.",
+        "Update imports, links, fixtures, registries, and documentation references affected by the path change.",
+        "Run operation-specific validation before committing."
+      ],
+      "validation_required": [
+        "Compile every Python output.",
+        "Run an import/reference scan and update all imports that point to removed source paths.",
+        "Run the moved or rewritten test directly before the full repository test suite."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "preflight_checks_only",
+      "depends_on": [],
+      "command_templates": [
+        "mkdir -p -- \"$(dirname -- 'm0033-sk1-plugin-interface/m0033-tests/unit/test_plugin_system.py')\"",
+        "git mv -- 'tests/2099900223260118_test_plugin_system.py' 'm0033-sk1-plugin-interface/m0033-tests/unit/test_plugin_system.py'"
+      ]
+    },
+    {
+      "operation_id": "MIG-0012",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "operation_type": "git_mv",
+      "title": "Move 1199900033260118_indicator_record_valid.json to its approved location",
+      "status": "approved_not_executed",
+      "execution_readiness": "ready_after_preflight",
+      "agent_may_execute": true,
+      "mechanically_automatable": true,
+      "destructive": false,
+      "owner_module_short_id": "m0009",
+      "owner_module_root": "m0009-c2-indicator-engine",
+      "source_decision_ids": [
+        "SRC-0082"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0082",
+          "path": "tests/contracts/fixtures/1199900033260118_indicator_record_valid.json",
+          "artifact_type": "module_contract_test_fixture",
+          "primary_function": "Provides a valid indicator-definition record for C2 schema and validator tests.",
+          "disposition_after_success": "removed_by_git_mv"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0009-c2-indicator-engine/m0009-tests/contract/fixtures/indicator_record_valid.json",
+          "path_status": "exact",
+          "output_role": "canonical_output",
+          "owner_module_short_id": "m0009"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Create the target parent directory if it does not exist.",
+        "Move the file with git mv to preserve history.",
+        "Update imports, links, fixtures, registries, and documentation references affected by the path change.",
+        "Run operation-specific validation before committing."
+      ],
+      "validation_required": [
+        "Parse every JSON output and validate it against its applicable schema when one exists.",
+        "Run the moved or rewritten test directly before the full repository test suite."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "preflight_checks_only",
+      "depends_on": [],
+      "command_templates": [
+        "mkdir -p -- \"$(dirname -- 'm0009-c2-indicator-engine/m0009-tests/contract/fixtures/indicator_record_valid.json')\"",
+        "git mv -- 'tests/contracts/fixtures/1199900033260118_indicator_record_valid.json' 'm0009-c2-indicator-engine/m0009-tests/contract/fixtures/indicator_record_valid.json'"
+      ]
+    },
+    {
+      "operation_id": "MIG-0013",
+      "phase": "P10_DIRECT_RELOCATIONS",
+      "operation_type": "git_mv",
+      "title": "Move test_hybrid_id_parity.py to its approved location",
+      "status": "approved_not_executed",
+      "execution_readiness": "ready_after_preflight",
+      "agent_may_execute": true,
+      "mechanically_automatable": true,
+      "destructive": false,
+      "owner_module_short_id": "m0023",
+      "owner_module_root": "m0023-e3-matrix-lookup",
+      "source_decision_ids": [
+        "SRC-0085"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0085",
+          "path": "tests/contracts/properties/test_hybrid_id_parity.py",
+          "artifact_type": "module_contract_test",
+          "primary_function": "Tests hybrid-ID round-trip, determinism, and Python/MQL4 field-order mapping.",
+          "disposition_after_success": "removed_by_git_mv"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0023-e3-matrix-lookup/m0023-tests/contract/test_hybrid_id_parity.py",
+          "path_status": "exact",
+          "output_role": "canonical_output",
+          "owner_module_short_id": "m0023"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Create the target parent directory if it does not exist.",
+        "Move the file with git mv to preserve history.",
+        "Update imports, links, fixtures, registries, and documentation references affected by the path change.",
+        "Run operation-specific validation before committing."
+      ],
+      "validation_required": [
+        "Compile every Python output.",
+        "Run an import/reference scan and update all imports that point to removed source paths.",
+        "Run the moved or rewritten test directly before the full repository test suite."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "preflight_checks_only",
+      "depends_on": [],
+      "command_templates": [
+        "mkdir -p -- \"$(dirname -- 'm0023-e3-matrix-lookup/m0023-tests/contract/test_hybrid_id_parity.py')\"",
+        "git mv -- 'tests/contracts/properties/test_hybrid_id_parity.py' 'm0023-e3-matrix-lookup/m0023-tests/contract/test_hybrid_id_parity.py'"
+      ]
+    },
+    {
+      "operation_id": "MIG-0014",
+      "phase": "P20_REGENERATION_AND_RECLASSIFICATION",
+      "operation_type": "generate_projection_replace_source",
+      "title": "Replace duplicate indicator schema authority with a generated documentation projection",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_generator_update",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": null,
+      "owner_module_root": null,
+      "source_decision_ids": [
+        "SRC-0027"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0027",
+          "path": "docs/reference/1110000003260118_indicator_record.schema.json",
+          "artifact_type": "duplicate_schema_projection",
+          "primary_function": "Duplicates the indicator-record schema in documentation reference space.",
+          "disposition_after_success": "remove_after_projection_validation"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "docs/reference/generated/indicator_record.schema.json",
+          "path_status": "exact",
+          "output_role": "generated_non_authoritative_projection",
+          "owner_module_short_id": null
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Use the C2 module-local indicator schema as the only authoritative source.",
+        "Update or create the projection generator so it writes the declared documentation target.",
+        "Generate the target deterministically and compare semantics with the old duplicate.",
+        "Mark the generated target as non-authoritative.",
+        "Remove the old duplicate source only after projection validation passes."
+      ],
+      "validation_required": [
+        "compare hashes/semantics",
+        "update generator",
+        "remove duplicate authority",
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "required_before_execution",
+      "depends_on": [
+        "MIG-0004"
+      ]
+    },
+    {
+      "operation_id": "MIG-0015",
+      "phase": "P20_REGENERATION_AND_RECLASSIFICATION",
+      "operation_type": "regenerate_then_relocate",
+      "title": "Regenerate and relocate UI_GATEWAY_REST_API_GATEWAY.json",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_semantic_regeneration",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0029",
+      "owner_module_root": "m0029-u2-gui-gateway",
+      "source_decision_ids": [
+        "SRC-0032"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0032",
+          "path": "services/dashboard-backend/work_cells/UI_GATEWAY_REST_API_GATEWAY.json",
+          "artifact_type": "work_cell_binding",
+          "primary_function": "Defines the REST API gateway work-cell boundary.",
+          "disposition_after_success": "remove_after_regenerated_output_validation"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0029-u2-gui-gateway/m0029-context/work-cells/UI_GATEWAY_REST_API_GATEWAY.json",
+          "path_status": "exact",
+          "output_role": "regenerated_canonical_record",
+          "owner_module_short_id": "m0029"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Treat the source as evidence, not as content to copy unchanged.",
+        "Regenerate module ownership, source-file references, test references, and identifiers from authoritative module metadata.",
+        "Write the regenerated canonical output to the target path.",
+        "Validate the regenerated record against the applicable work-cell schema and module catalog.",
+        "Remove the legacy source after the target validates."
+      ],
+      "validation_required": [
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "required_before_execution",
+      "depends_on": [],
+      "notes": "Regenerate source_files; the current dashboard-backend list is over-broad."
+    },
+    {
+      "operation_id": "MIG-0016",
+      "phase": "P20_REGENERATION_AND_RECLASSIFICATION",
+      "operation_type": "regenerate_then_relocate",
+      "title": "Regenerate and relocate UI_GATEWAY_WEBSOCKET_GATEWAY.json",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_semantic_regeneration",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0029",
+      "owner_module_root": "m0029-u2-gui-gateway",
+      "source_decision_ids": [
+        "SRC-0033"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0033",
+          "path": "services/dashboard-backend/work_cells/UI_GATEWAY_WEBSOCKET_GATEWAY.json",
+          "artifact_type": "work_cell_binding",
+          "primary_function": "Defines the WebSocket gateway work-cell boundary.",
+          "disposition_after_success": "remove_after_regenerated_output_validation"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0029-u2-gui-gateway/m0029-context/work-cells/UI_GATEWAY_WEBSOCKET_GATEWAY.json",
+          "path_status": "exact",
+          "output_role": "regenerated_canonical_record",
+          "owner_module_short_id": "m0029"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Treat the source as evidence, not as content to copy unchanged.",
+        "Regenerate module ownership, source-file references, test references, and identifiers from authoritative module metadata.",
+        "Write the regenerated canonical output to the target path.",
+        "Validate the regenerated record against the applicable work-cell schema and module catalog.",
+        "Remove the legacy source after the target validates."
+      ],
+      "validation_required": [
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "required_before_execution",
+      "depends_on": [],
+      "notes": "Regenerate source_files and tests."
+    },
+    {
+      "operation_id": "MIG-0017",
+      "phase": "P20_REGENERATION_AND_RECLASSIFICATION",
+      "operation_type": "regenerate_then_relocate",
+      "title": "Regenerate and relocate EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT.json",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_semantic_regeneration",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0017",
+      "owner_module_root": "m0017-b2-mt4-ea-executor",
+      "source_decision_ids": [
+        "SRC-0049"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0049",
+          "path": "services/execution-engine/work_cells/EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT.json",
+          "artifact_type": "work_cell_binding",
+          "primary_function": "Defines the EA-side MQL4 execution-feedback/order-result work cell.",
+          "disposition_after_success": "remove_after_regenerated_output_validation"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0017-b2-mt4-ea-executor/m0017-context/work-cells/EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT.json",
+          "path_status": "exact",
+          "output_role": "regenerated_canonical_record",
+          "owner_module_short_id": "m0017"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Treat the source as evidence, not as content to copy unchanged.",
+        "Regenerate module ownership, source-file references, test references, and identifiers from authoritative module metadata.",
+        "Write the regenerated canonical output to the target path.",
+        "Validate the regenerated record against the applicable work-cell schema and module catalog.",
+        "Remove the legacy source after the target validates."
+      ],
+      "validation_required": [
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "required_before_execution",
+      "depends_on": [],
+      "notes": "Regenerate source_files because the current binding lists only a Python plugin."
+    },
+    {
+      "operation_id": "MIG-0018",
+      "phase": "P20_REGENERATION_AND_RECLASSIFICATION",
+      "operation_type": "reclassify_then_relocate",
+      "title": "Reclassify legacy work cell and relocate R1_4_CORRELATION_GUARDS.json",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_identity_reclassification",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0027",
+      "owner_module_root": "m0027-r3-correlation-guard",
+      "source_decision_ids": [
+        "SRC-0062"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0062",
+          "path": "services/risk-manager/work_cells/R1_4_CORRELATION_GUARDS.json",
+          "artifact_type": "work_cell_binding",
+          "primary_function": "Defines correlation guard checks formerly nested as R1_4.",
+          "disposition_after_success": "remove_after_reclassified_output_validation"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0027-r3-correlation-guard/m0027-context/work-cells/R1_4_CORRELATION_GUARDS.json",
+          "path_status": "exact",
+          "output_role": "reclassified_canonical_work_cell",
+          "owner_module_short_id": "m0027"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Preserve the legacy work-cell identifier as alias metadata.",
+        "Replace the legacy owning-module classification with the approved canonical module identity.",
+        "Record the former module as a consumer when applicable.",
+        "Write and validate the reclassified target.",
+        "Remove the legacy source after validation."
+      ],
+      "validation_required": [
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "required_before_execution",
+      "depends_on": [],
+      "notes": "Preserve R1_4 as a legacy alias/work-cell ID or rename through governance."
+    },
+    {
+      "operation_id": "MIG-0019",
+      "phase": "P20_REGENERATION_AND_RECLASSIFICATION",
+      "operation_type": "reclassify_then_relocate",
+      "title": "Reclassify legacy work cell and relocate R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION.json",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_identity_reclassification",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0034",
+      "owner_module_root": "m0034-sk2-idempotency",
+      "source_decision_ids": [
+        "SRC-0063"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0063",
+          "path": "services/risk-manager/work_cells/R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION.json",
+          "artifact_type": "work_cell_binding",
+          "primary_function": "Defines duplicate-order prevention and idempotency checks formerly nested as R1_7.",
+          "disposition_after_success": "remove_after_reclassified_output_validation"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0034-sk2-idempotency/m0034-context/work-cells/R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION.json",
+          "path_status": "exact",
+          "output_role": "reclassified_canonical_work_cell",
+          "owner_module_short_id": "m0034"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Preserve the legacy work-cell identifier as alias metadata.",
+        "Replace the legacy owning-module classification with the approved canonical module identity.",
+        "Record the former module as a consumer when applicable.",
+        "Write and validate the reclassified target.",
+        "Remove the legacy source after validation."
+      ],
+      "validation_required": [
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "required_before_execution",
+      "depends_on": [],
+      "notes": "Preserve R1_7 as legacy identity metadata."
+    },
+    {
+      "operation_id": "MIG-0020",
+      "phase": "P30_SOURCE_CONSOLIDATION",
+      "operation_type": "merge_sources_into_canonical_module_source",
+      "title": "Consolidate legacy implementation and wrapper into m0009-c2-indicator-engine/m0009-src/c2_indicator_engine/indicator_validator.py",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_code_merge",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0009",
+      "owner_module_root": "m0009-c2-indicator-engine",
+      "source_decision_ids": [
+        "SRC-0066",
+        "SRC-0073"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0066",
+          "path": "shared/reentry/2099900219260118_indicator_validator.py",
+          "artifact_type": "implementation_source",
+          "primary_function": "Validates indicator-definition records against schema and business rules.",
+          "disposition_after_success": "remove_after_merge_validation"
+        },
+        {
+          "source_record_id": "SRC-0073",
+          "path": "shared/reentry/indicator_validator.py",
+          "artifact_type": "compatibility_wrapper_source",
+          "primary_function": "Provides a stable import name for the indicator validator.",
+          "disposition_after_success": "replace_with_temporary_reexport_shim"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0009-c2-indicator-engine/m0009-src/c2_indicator_engine/indicator_validator.py",
+          "path_status": "exact",
+          "output_role": "canonical_implementation",
+          "owner_module_short_id": "m0009"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Compare the ID-prefixed implementation and clean wrapper line by line.",
+        "Create one canonical implementation containing the complete behavior plus wrapper corrections.",
+        "Preserve the public API and expected exceptions, defaults, parsing behavior, and path resolution.",
+        "Write the canonical implementation to the declared module target.",
+        "Replace each clean old-path wrapper with a thin deprecation re-export to the canonical module implementation.",
+        "Remove each ID-prefixed implementation after tests pass.",
+        "Update direct imports to use the canonical module package while retaining the temporary old-path facade."
+      ],
+      "validation_required": [
+        "C2 schema tests",
+        "import scan",
+        "Compile every Python output.",
+        "Run an import/reference scan and update all imports that point to removed source paths."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "code_review_required",
+      "depends_on": [
+        "MIG-0004"
+      ],
+      "notes": "ID-prefixed inputs: ['shared/reentry/2099900219260118_indicator_validator.py']; temporary re-export shims: ['shared/reentry/indicator_validator.py']"
+    },
+    {
+      "operation_id": "MIG-0021",
+      "phase": "P30_SOURCE_CONSOLIDATION",
+      "operation_type": "merge_sources_into_canonical_module_source",
+      "title": "Consolidate legacy implementation and wrapper into m0023-e3-matrix-lookup/m0023-src/e3_matrix_lookup/hybrid_id.py",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_code_merge",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0023",
+      "owner_module_root": "m0023-e3-matrix-lookup",
+      "source_decision_ids": [
+        "SRC-0065",
+        "SRC-0072"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0065",
+          "path": "shared/reentry/2099900218260118_hybrid_id.py",
+          "artifact_type": "implementation_source",
+          "primary_function": "Composes, parses, validates, hashes, and abbreviates hybrid reentry IDs.",
+          "disposition_after_success": "remove_after_merge_validation"
+        },
+        {
+          "source_record_id": "SRC-0072",
+          "path": "shared/reentry/hybrid_id.py",
+          "artifact_type": "compatibility_wrapper_source",
+          "primary_function": "Provides the corrected stable hybrid-ID API over the ID-prefixed implementation.",
+          "disposition_after_success": "replace_with_temporary_reexport_shim"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0023-e3-matrix-lookup/m0023-src/e3_matrix_lookup/hybrid_id.py",
+          "path_status": "exact",
+          "output_role": "canonical_implementation",
+          "owner_module_short_id": "m0023"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Compare the ID-prefixed implementation and clean wrapper line by line.",
+        "Create one canonical implementation containing the complete behavior plus wrapper corrections.",
+        "Preserve the public API and expected exceptions, defaults, parsing behavior, and path resolution.",
+        "Write the canonical implementation to the declared module target.",
+        "Replace each clean old-path wrapper with a thin deprecation re-export to the canonical module implementation.",
+        "Remove each ID-prefixed implementation after tests pass.",
+        "Update direct imports to use the canonical module package while retaining the temporary old-path facade."
+      ],
+      "validation_required": [
+        "round-trip tests",
+        "cross-language parity tests",
+        "import scan",
+        "Compile every Python output.",
+        "Run an import/reference scan and update all imports that point to removed source paths."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "code_review_required",
+      "depends_on": [],
+      "notes": "ID-prefixed inputs: ['shared/reentry/2099900218260118_hybrid_id.py']; temporary re-export shims: ['shared/reentry/hybrid_id.py']"
+    },
+    {
+      "operation_id": "MIG-0022",
+      "phase": "P30_SOURCE_CONSOLIDATION",
+      "operation_type": "merge_sources_into_canonical_module_source",
+      "title": "Consolidate legacy implementation and wrapper into m0023-e3-matrix-lookup/m0023-src/e3_matrix_lookup/vocab.py",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_code_merge",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0023",
+      "owner_module_root": "m0023-e3-matrix-lookup",
+      "source_decision_ids": [
+        "SRC-0068",
+        "SRC-0074"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0068",
+          "path": "shared/reentry/2099900221260118_vocab.py",
+          "artifact_type": "implementation_source",
+          "primary_function": "Loads and validates the vocabulary used by hybrid reentry identifiers.",
+          "disposition_after_success": "remove_after_merge_validation"
+        },
+        {
+          "source_record_id": "SRC-0074",
+          "path": "shared/reentry/vocab.py",
+          "artifact_type": "compatibility_wrapper_source",
+          "primary_function": "Provides stable vocabulary loading and locates the ID-prefixed vocabulary JSON.",
+          "disposition_after_success": "replace_with_temporary_reexport_shim"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0023-e3-matrix-lookup/m0023-src/e3_matrix_lookup/vocab.py",
+          "path_status": "exact",
+          "output_role": "canonical_implementation",
+          "owner_module_short_id": "m0023"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Compare the ID-prefixed implementation and clean wrapper line by line.",
+        "Create one canonical implementation containing the complete behavior plus wrapper corrections.",
+        "Preserve the public API and expected exceptions, defaults, parsing behavior, and path resolution.",
+        "Write the canonical implementation to the declared module target.",
+        "Replace each clean old-path wrapper with a thin deprecation re-export to the canonical module implementation.",
+        "Remove each ID-prefixed implementation after tests pass.",
+        "Update direct imports to use the canonical module package while retaining the temporary old-path facade."
+      ],
+      "validation_required": [
+        "Compile every Python output.",
+        "Run an import/reference scan and update all imports that point to removed source paths."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "code_review_required",
+      "depends_on": [],
+      "notes": "ID-prefixed inputs: ['shared/reentry/2099900221260118_vocab.py']; temporary re-export shims: ['shared/reentry/vocab.py']"
+    },
+    {
+      "operation_id": "MIG-0023",
+      "phase": "P40_UI_WORKCELL_CANONICALIZATION",
+      "operation_type": "merge_regenerate_remove_duplicate_records",
+      "title": "Create one canonical U4 work-cell record for UI_UI_SCREEN_ALERTS",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_duplicate_merge_and_regeneration",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0031",
+      "owner_module_root": "m0031-u4-desktop-operator",
+      "source_decision_ids": [
+        "SRC-0034",
+        "SRC-0050"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0034",
+          "path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_ALERTS.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays and handles operator alerts.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        },
+        {
+          "source_record_id": "SRC-0050",
+          "path": "services/gui-gateway/work_cells/UI_UI_SCREEN_ALERTS.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays and handles operator alerts.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_ALERTS.json",
+          "path_status": "exact",
+          "output_role": "canonical_generated_work_cell",
+          "owner_module_short_id": "m0031"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Load every duplicate source listed by the operation.",
+        "Verify that all records represent the same stable work_cell_id and operator-screen responsibility.",
+        "Merge any unique non-conflicting metadata.",
+        "Regenerate source_files and test references from canonical U4 ownership rather than copying broad legacy service references.",
+        "Write exactly one canonical generated record at the declared target.",
+        "Validate UI catalog and context-packet linkage.",
+        "Remove all duplicate service-folder records after validation."
+      ],
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage",
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "required_before_execution",
+      "depends_on": [],
+      "canonicalization_group": "UI_UI_SCREEN_ALERTS",
+      "notes": "Do not choose one legacy copy as authoritative without comparison; the canonical record is regenerated from all evidence."
+    },
+    {
+      "operation_id": "MIG-0024",
+      "phase": "P40_UI_WORKCELL_CANONICALIZATION",
+      "operation_type": "merge_regenerate_remove_duplicate_records",
+      "title": "Create one canonical U4 work-cell record for UI_UI_SCREEN_CONFIGURATION",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_duplicate_merge_and_regeneration",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0031",
+      "owner_module_root": "m0031-u4-desktop-operator",
+      "source_decision_ids": [
+        "SRC-0035",
+        "SRC-0051"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0035",
+          "path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_CONFIGURATION.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays and edits operator-facing configuration.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        },
+        {
+          "source_record_id": "SRC-0051",
+          "path": "services/gui-gateway/work_cells/UI_UI_SCREEN_CONFIGURATION.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays and edits operator-facing configuration.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_CONFIGURATION.json",
+          "path_status": "exact",
+          "output_role": "canonical_generated_work_cell",
+          "owner_module_short_id": "m0031"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Load every duplicate source listed by the operation.",
+        "Verify that all records represent the same stable work_cell_id and operator-screen responsibility.",
+        "Merge any unique non-conflicting metadata.",
+        "Regenerate source_files and test references from canonical U4 ownership rather than copying broad legacy service references.",
+        "Write exactly one canonical generated record at the declared target.",
+        "Validate UI catalog and context-packet linkage.",
+        "Remove all duplicate service-folder records after validation."
+      ],
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage",
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "required_before_execution",
+      "depends_on": [],
+      "canonicalization_group": "UI_UI_SCREEN_CONFIGURATION",
+      "notes": "Do not choose one legacy copy as authoritative without comparison; the canonical record is regenerated from all evidence."
+    },
+    {
+      "operation_id": "MIG-0025",
+      "phase": "P40_UI_WORKCELL_CANONICALIZATION",
+      "operation_type": "merge_regenerate_remove_duplicate_records",
+      "title": "Create one canonical U4 work-cell record for UI_UI_SCREEN_DDE_PRICE_FEED",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_duplicate_merge_and_regeneration",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0031",
+      "owner_module_root": "m0031-u4-desktop-operator",
+      "source_decision_ids": [
+        "SRC-0036",
+        "SRC-0046",
+        "SRC-0052"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0036",
+          "path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_DDE_PRICE_FEED.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays DDE/market-feed status and data.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        },
+        {
+          "source_record_id": "SRC-0046",
+          "path": "services/desktop-ui/work_cells/UI_UI_SCREEN_DDE_PRICE_FEED.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays DDE/market-feed status and data.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        },
+        {
+          "source_record_id": "SRC-0052",
+          "path": "services/gui-gateway/work_cells/UI_UI_SCREEN_DDE_PRICE_FEED.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays DDE/market-feed status and data.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_DDE_PRICE_FEED.json",
+          "path_status": "exact",
+          "output_role": "canonical_generated_work_cell",
+          "owner_module_short_id": "m0031"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Load every duplicate source listed by the operation.",
+        "Verify that all records represent the same stable work_cell_id and operator-screen responsibility.",
+        "Merge any unique non-conflicting metadata.",
+        "Regenerate source_files and test references from canonical U4 ownership rather than copying broad legacy service references.",
+        "Write exactly one canonical generated record at the declared target.",
+        "Validate UI catalog and context-packet linkage.",
+        "Remove all duplicate service-folder records after validation."
+      ],
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage",
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "required_before_execution",
+      "depends_on": [],
+      "canonicalization_group": "UI_UI_SCREEN_DDE_PRICE_FEED",
+      "notes": "Do not choose one legacy copy as authoritative without comparison; the canonical record is regenerated from all evidence."
+    },
+    {
+      "operation_id": "MIG-0026",
+      "phase": "P40_UI_WORKCELL_CANONICALIZATION",
+      "operation_type": "merge_regenerate_remove_duplicate_records",
+      "title": "Create one canonical U4 work-cell record for UI_UI_SCREEN_ECONOMIC_CALENDAR",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_duplicate_merge_and_regeneration",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0031",
+      "owner_module_root": "m0031-u4-desktop-operator",
+      "source_decision_ids": [
+        "SRC-0037",
+        "SRC-0053"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0037",
+          "path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_ECONOMIC_CALENDAR.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays economic-calendar events and states.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        },
+        {
+          "source_record_id": "SRC-0053",
+          "path": "services/gui-gateway/work_cells/UI_UI_SCREEN_ECONOMIC_CALENDAR.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays economic-calendar events and states.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_ECONOMIC_CALENDAR.json",
+          "path_status": "exact",
+          "output_role": "canonical_generated_work_cell",
+          "owner_module_short_id": "m0031"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Load every duplicate source listed by the operation.",
+        "Verify that all records represent the same stable work_cell_id and operator-screen responsibility.",
+        "Merge any unique non-conflicting metadata.",
+        "Regenerate source_files and test references from canonical U4 ownership rather than copying broad legacy service references.",
+        "Write exactly one canonical generated record at the declared target.",
+        "Validate UI catalog and context-packet linkage.",
+        "Remove all duplicate service-folder records after validation."
+      ],
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage",
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "required_before_execution",
+      "depends_on": [],
+      "canonicalization_group": "UI_UI_SCREEN_ECONOMIC_CALENDAR",
+      "notes": "Do not choose one legacy copy as authoritative without comparison; the canonical record is regenerated from all evidence."
+    },
+    {
+      "operation_id": "MIG-0027",
+      "phase": "P40_UI_WORKCELL_CANONICALIZATION",
+      "operation_type": "merge_regenerate_remove_duplicate_records",
+      "title": "Create one canonical U4 work-cell record for UI_UI_SCREEN_EQUITY_RISK",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_duplicate_merge_and_regeneration",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0031",
+      "owner_module_root": "m0031-u4-desktop-operator",
+      "source_decision_ids": [
+        "SRC-0038",
+        "SRC-0054"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0038",
+          "path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_EQUITY_RISK.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays risk/equity state and controls.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        },
+        {
+          "source_record_id": "SRC-0054",
+          "path": "services/gui-gateway/work_cells/UI_UI_SCREEN_EQUITY_RISK.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays risk/equity state and controls.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_EQUITY_RISK.json",
+          "path_status": "exact",
+          "output_role": "canonical_generated_work_cell",
+          "owner_module_short_id": "m0031"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Load every duplicate source listed by the operation.",
+        "Verify that all records represent the same stable work_cell_id and operator-screen responsibility.",
+        "Merge any unique non-conflicting metadata.",
+        "Regenerate source_files and test references from canonical U4 ownership rather than copying broad legacy service references.",
+        "Write exactly one canonical generated record at the declared target.",
+        "Validate UI catalog and context-packet linkage.",
+        "Remove all duplicate service-folder records after validation."
+      ],
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage",
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "required_before_execution",
+      "depends_on": [],
+      "canonicalization_group": "UI_UI_SCREEN_EQUITY_RISK",
+      "notes": "Do not choose one legacy copy as authoritative without comparison; the canonical record is regenerated from all evidence."
+    },
+    {
+      "operation_id": "MIG-0028",
+      "phase": "P40_UI_WORKCELL_CANONICALIZATION",
+      "operation_type": "merge_regenerate_remove_duplicate_records",
+      "title": "Create one canonical U4 work-cell record for UI_UI_SCREEN_HISTORY_ANALYTICS",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_duplicate_merge_and_regeneration",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0031",
+      "owner_module_root": "m0031-u4-desktop-operator",
+      "source_decision_ids": [
+        "SRC-0039",
+        "SRC-0047",
+        "SRC-0055"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0039",
+          "path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_HISTORY_ANALYTICS.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays historical analytics.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        },
+        {
+          "source_record_id": "SRC-0047",
+          "path": "services/desktop-ui/work_cells/UI_UI_SCREEN_HISTORY_ANALYTICS.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays historical analytics.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        },
+        {
+          "source_record_id": "SRC-0055",
+          "path": "services/gui-gateway/work_cells/UI_UI_SCREEN_HISTORY_ANALYTICS.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays historical analytics.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_HISTORY_ANALYTICS.json",
+          "path_status": "exact",
+          "output_role": "canonical_generated_work_cell",
+          "owner_module_short_id": "m0031"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Load every duplicate source listed by the operation.",
+        "Verify that all records represent the same stable work_cell_id and operator-screen responsibility.",
+        "Merge any unique non-conflicting metadata.",
+        "Regenerate source_files and test references from canonical U4 ownership rather than copying broad legacy service references.",
+        "Write exactly one canonical generated record at the declared target.",
+        "Validate UI catalog and context-packet linkage.",
+        "Remove all duplicate service-folder records after validation."
+      ],
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage",
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "required_before_execution",
+      "depends_on": [],
+      "canonicalization_group": "UI_UI_SCREEN_HISTORY_ANALYTICS",
+      "notes": "Do not choose one legacy copy as authoritative without comparison; the canonical record is regenerated from all evidence."
+    },
+    {
+      "operation_id": "MIG-0029",
+      "phase": "P40_UI_WORKCELL_CANONICALIZATION",
+      "operation_type": "merge_regenerate_remove_duplicate_records",
+      "title": "Create one canonical U4 work-cell record for UI_UI_SCREEN_LIVE_TRADING",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_duplicate_merge_and_regeneration",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0031",
+      "owner_module_root": "m0031-u4-desktop-operator",
+      "source_decision_ids": [
+        "SRC-0040",
+        "SRC-0056"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0040",
+          "path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_LIVE_TRADING.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays live trading state and operator controls.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        },
+        {
+          "source_record_id": "SRC-0056",
+          "path": "services/gui-gateway/work_cells/UI_UI_SCREEN_LIVE_TRADING.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays live trading state and operator controls.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_LIVE_TRADING.json",
+          "path_status": "exact",
+          "output_role": "canonical_generated_work_cell",
+          "owner_module_short_id": "m0031"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Load every duplicate source listed by the operation.",
+        "Verify that all records represent the same stable work_cell_id and operator-screen responsibility.",
+        "Merge any unique non-conflicting metadata.",
+        "Regenerate source_files and test references from canonical U4 ownership rather than copying broad legacy service references.",
+        "Write exactly one canonical generated record at the declared target.",
+        "Validate UI catalog and context-packet linkage.",
+        "Remove all duplicate service-folder records after validation."
+      ],
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage",
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "required_before_execution",
+      "depends_on": [],
+      "canonicalization_group": "UI_UI_SCREEN_LIVE_TRADING",
+      "notes": "Do not choose one legacy copy as authoritative without comparison; the canonical record is regenerated from all evidence."
+    },
+    {
+      "operation_id": "MIG-0030",
+      "phase": "P40_UI_WORKCELL_CANONICALIZATION",
+      "operation_type": "merge_regenerate_remove_duplicate_records",
+      "title": "Create one canonical U4 work-cell record for UI_UI_SCREEN_REENTRY_MATRIX",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_duplicate_merge_and_regeneration",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0031",
+      "owner_module_root": "m0031-u4-desktop-operator",
+      "source_decision_ids": [
+        "SRC-0041",
+        "SRC-0048",
+        "SRC-0057"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0041",
+          "path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_REENTRY_MATRIX.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays matrix decisions and reentry state.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        },
+        {
+          "source_record_id": "SRC-0048",
+          "path": "services/desktop-ui/work_cells/UI_UI_SCREEN_REENTRY_MATRIX.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays matrix decisions and reentry state.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        },
+        {
+          "source_record_id": "SRC-0057",
+          "path": "services/gui-gateway/work_cells/UI_UI_SCREEN_REENTRY_MATRIX.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays matrix decisions and reentry state.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_REENTRY_MATRIX.json",
+          "path_status": "exact",
+          "output_role": "canonical_generated_work_cell",
+          "owner_module_short_id": "m0031"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Load every duplicate source listed by the operation.",
+        "Verify that all records represent the same stable work_cell_id and operator-screen responsibility.",
+        "Merge any unique non-conflicting metadata.",
+        "Regenerate source_files and test references from canonical U4 ownership rather than copying broad legacy service references.",
+        "Write exactly one canonical generated record at the declared target.",
+        "Validate UI catalog and context-packet linkage.",
+        "Remove all duplicate service-folder records after validation."
+      ],
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage",
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "required_before_execution",
+      "depends_on": [],
+      "canonicalization_group": "UI_UI_SCREEN_REENTRY_MATRIX",
+      "notes": "Do not choose one legacy copy as authoritative without comparison; the canonical record is regenerated from all evidence."
+    },
+    {
+      "operation_id": "MIG-0031",
+      "phase": "P40_UI_WORKCELL_CANONICALIZATION",
+      "operation_type": "merge_regenerate_remove_duplicate_records",
+      "title": "Create one canonical U4 work-cell record for UI_UI_SCREEN_SIGNALS_HISTORY",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_duplicate_merge_and_regeneration",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0031",
+      "owner_module_root": "m0031-u4-desktop-operator",
+      "source_decision_ids": [
+        "SRC-0042",
+        "SRC-0058"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0042",
+          "path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_SIGNALS_HISTORY.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays historical signals.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        },
+        {
+          "source_record_id": "SRC-0058",
+          "path": "services/gui-gateway/work_cells/UI_UI_SCREEN_SIGNALS_HISTORY.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays historical signals.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_SIGNALS_HISTORY.json",
+          "path_status": "exact",
+          "output_role": "canonical_generated_work_cell",
+          "owner_module_short_id": "m0031"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Load every duplicate source listed by the operation.",
+        "Verify that all records represent the same stable work_cell_id and operator-screen responsibility.",
+        "Merge any unique non-conflicting metadata.",
+        "Regenerate source_files and test references from canonical U4 ownership rather than copying broad legacy service references.",
+        "Write exactly one canonical generated record at the declared target.",
+        "Validate UI catalog and context-packet linkage.",
+        "Remove all duplicate service-folder records after validation."
+      ],
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage",
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "required_before_execution",
+      "depends_on": [],
+      "canonicalization_group": "UI_UI_SCREEN_SIGNALS_HISTORY",
+      "notes": "Do not choose one legacy copy as authoritative without comparison; the canonical record is regenerated from all evidence."
+    },
+    {
+      "operation_id": "MIG-0032",
+      "phase": "P40_UI_WORKCELL_CANONICALIZATION",
+      "operation_type": "merge_regenerate_remove_duplicate_records",
+      "title": "Create one canonical U4 work-cell record for UI_UI_SCREEN_SYSTEM_STATUS",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_duplicate_merge_and_regeneration",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0031",
+      "owner_module_root": "m0031-u4-desktop-operator",
+      "source_decision_ids": [
+        "SRC-0043",
+        "SRC-0059"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0043",
+          "path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_SYSTEM_STATUS.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays aggregated system health.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        },
+        {
+          "source_record_id": "SRC-0059",
+          "path": "services/gui-gateway/work_cells/UI_UI_SCREEN_SYSTEM_STATUS.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays aggregated system health.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_SYSTEM_STATUS.json",
+          "path_status": "exact",
+          "output_role": "canonical_generated_work_cell",
+          "owner_module_short_id": "m0031"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Load every duplicate source listed by the operation.",
+        "Verify that all records represent the same stable work_cell_id and operator-screen responsibility.",
+        "Merge any unique non-conflicting metadata.",
+        "Regenerate source_files and test references from canonical U4 ownership rather than copying broad legacy service references.",
+        "Write exactly one canonical generated record at the declared target.",
+        "Validate UI catalog and context-packet linkage.",
+        "Remove all duplicate service-folder records after validation."
+      ],
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage",
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "required_before_execution",
+      "depends_on": [],
+      "canonicalization_group": "UI_UI_SCREEN_SYSTEM_STATUS",
+      "notes": "Do not choose one legacy copy as authoritative without comparison; the canonical record is regenerated from all evidence."
+    },
+    {
+      "operation_id": "MIG-0033",
+      "phase": "P40_UI_WORKCELL_CANONICALIZATION",
+      "operation_type": "merge_regenerate_remove_duplicate_records",
+      "title": "Create one canonical U4 work-cell record for UI_UI_SCREEN_TRADE_HISTORY",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_duplicate_merge_and_regeneration",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0031",
+      "owner_module_root": "m0031-u4-desktop-operator",
+      "source_decision_ids": [
+        "SRC-0044",
+        "SRC-0060"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0044",
+          "path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_TRADE_HISTORY.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays historical trade results.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        },
+        {
+          "source_record_id": "SRC-0060",
+          "path": "services/gui-gateway/work_cells/UI_UI_SCREEN_TRADE_HISTORY.json",
+          "artifact_type": "generated_duplicate_work_cell_binding",
+          "primary_function": "Displays historical trade results.",
+          "disposition_after_success": "remove_after_canonical_record_validation"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_TRADE_HISTORY.json",
+          "path_status": "exact",
+          "output_role": "canonical_generated_work_cell",
+          "owner_module_short_id": "m0031"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Load every duplicate source listed by the operation.",
+        "Verify that all records represent the same stable work_cell_id and operator-screen responsibility.",
+        "Merge any unique non-conflicting metadata.",
+        "Regenerate source_files and test references from canonical U4 ownership rather than copying broad legacy service references.",
+        "Write exactly one canonical generated record at the declared target.",
+        "Validate UI catalog and context-packet linkage.",
+        "Remove all duplicate service-folder records after validation."
+      ],
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage",
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "required_before_execution",
+      "depends_on": [],
+      "canonicalization_group": "UI_UI_SCREEN_TRADE_HISTORY",
+      "notes": "Do not choose one legacy copy as authoritative without comparison; the canonical record is regenerated from all evidence."
+    },
+    {
+      "operation_id": "MIG-0034",
+      "phase": "P50_SPLIT_AND_REWRITE",
+      "operation_type": "split_source_into_module_outputs",
+      "title": "Split mixed-responsibility file 1199900030260118_settings.friday_move.overlay.json",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_content_split",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": null,
+      "owner_module_root": null,
+      "source_decision_ids": [
+        "SRC-0045"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0045",
+          "path": "services/desktop-ui/1199900030260118_settings.friday_move.overlay.json",
+          "artifact_type": "mixed_module_configuration",
+          "primary_function": "Configures the Friday-move indicator and its signal overlay behavior.",
+          "disposition_after_success": "remove_after_all_split_outputs_validate"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0009-c2-indicator-engine/m0009-config/indicators/friday_move.json",
+          "path_status": "exact",
+          "output_role": "indicator_configuration",
+          "owner_module_short_id": "m0009"
+        },
+        {
+          "path": "m0011-s1-signal-engine/m0011-config/signals/friday_move.json",
+          "path_status": "exact",
+          "output_role": "signal_configuration",
+          "owner_module_short_id": "m0011"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Define explicit schemas for the two output files.",
+        "Move indicator computation, threshold, and window fields to the C2 output.",
+        "Move signal enablement and overlay fields to the S1 output.",
+        "Keep the R1 risk-profile value as a reference only; do not duplicate the risk profile definition.",
+        "Update all consumers to load the new module-local configurations.",
+        "Validate behavioral equivalence before removing the mixed legacy file."
+      ],
+      "validation_required": [
+        "define split schema",
+        "update consumers",
+        "validate equivalent behavior",
+        "Parse every JSON output and validate it against its applicable schema when one exists."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "semantic_review_required",
+      "depends_on": [],
+      "notes": "Split indicator computation and threshold/window fields to m0009-c2-indicator-engine/m0009-config/indicators/friday_move.json; split signal enablement/overlay fields to m0011-s1-signal-engine/m0011-config/signals/friday_move.json. Retain only a reference to the R1-owned risk profile."
+    },
+    {
+      "operation_id": "MIG-0035",
+      "phase": "P50_SPLIT_AND_REWRITE",
+      "operation_type": "split_source_into_module_outputs",
+      "title": "Split mixed-responsibility file 2099900220260118_reentry_helpers_cli.py",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_content_split",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": null,
+      "owner_module_root": null,
+      "source_decision_ids": [
+        "SRC-0067"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0067",
+          "path": "shared/reentry/2099900220260118_reentry_helpers_cli.py",
+          "artifact_type": "mixed_module_cli_script",
+          "primary_function": "CLI for hybrid/reentry key operations plus indicator-record validation.",
+          "disposition_after_success": "remove_after_all_split_outputs_validate"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0023-e3-matrix-lookup/m0023-scripts/reentry_key_cli.py",
+          "path_status": "exact",
+          "output_role": "reentry_key_cli",
+          "owner_module_short_id": "m0023"
+        },
+        {
+          "path": "m0009-c2-indicator-engine/m0009-scripts/validate_indicator_records.py",
+          "path_status": "exact",
+          "output_role": "indicator_validation_cli",
+          "owner_module_short_id": "m0009"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Extract make/parse/validate reentry-key commands into the E3 script.",
+        "Extract indicator-record validation into the C2 script.",
+        "Preserve command names, exit codes, stdout/stderr behavior, and help text unless an approved compatibility note documents a change.",
+        "Update documentation and command invocations.",
+        "Remove stale imports and the mixed legacy CLI after both outputs pass compatibility tests."
+      ],
+      "validation_required": [
+        "CLI command compatibility",
+        "update documentation",
+        "remove stale reentry_helpers imports",
+        "Compile every Python output.",
+        "Run an import/reference scan and update all imports that point to removed source paths."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "semantic_review_required",
+      "depends_on": [],
+      "notes": "Move key commands to m0023-e3-matrix-lookup/m0023-scripts/reentry_key_cli.py; move indicator validation command to m0009-c2-indicator-engine/m0009-scripts/validate_indicator_records.py."
+    },
+    {
+      "operation_id": "MIG-0036",
+      "phase": "P50_SPLIT_AND_REWRITE",
+      "operation_type": "rewrite_split_and_relocate_test",
+      "title": "Rewrite the legacy signal-generator contract test to match canonical S1-to-S2-to-R1 boundaries",
+      "status": "approved_not_executed",
+      "execution_readiness": "requires_test_architecture_rewrite",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": "m0011",
+      "owner_module_root": "m0011-s1-signal-engine",
+      "source_decision_ids": [
+        "SRC-0078"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0078",
+          "path": "tests/contracts/consumer/2099900229260118_test_signal_generator_contracts.py",
+          "artifact_type": "legacy_cross_module_contract_test",
+          "primary_function": "Tests signal-generator contracts with risk, indicator, calendar, and message-bus services.",
+          "disposition_after_success": "remove_after_rewritten_outputs_validate"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "m0011-s1-signal-engine/m0011-tests/contract/test_signal_engine_contracts.py",
+          "path_status": "exact",
+          "output_role": "rewritten_primary_contract_test",
+          "owner_module_short_id": "m0011"
+        },
+        {
+          "path": null,
+          "path_status": "target_container_approved_filename_agent_selected",
+          "output_role": "extracted_intent_risk_boundary_tests",
+          "owner_module_short_id": "m0012",
+          "target_container": "m0012-s2-intent-builder/m0012-tests/contract",
+          "suggested_filename": "test_intent_risk_boundary_contracts.py"
+        }
+      ],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference.",
+        "Every exact target path is absent before execution unless this operation explicitly merges into that target."
+      ],
+      "execution_steps": [
+        "Rewrite S1 provider and consumer contract coverage into the exact primary target.",
+        "Extract direct intent/risk boundary cases into a new S2 contract test in the approved target container.",
+        "Remove tests that encode the obsolete direct S1-to-R1 call path.",
+        "Ensure new tests validate the canonical S1-to-S2-to-R1 flow and all required contracts.",
+        "Remove the legacy source only after both test outputs pass."
+      ],
+      "validation_required": [
+        "Compile every Python output.",
+        "Run an import/reference scan and update all imports that point to removed source paths.",
+        "Run the moved or rewritten test directly before the full repository test suite."
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "architecture_review_required",
+      "depends_on": [],
+      "notes": "Rewrite S1 provider/consumer contracts; move intent/risk boundary cases to S2 contract tests."
+    },
+    {
+      "operation_id": "MIG-0037",
+      "phase": "P60_VALIDATED_CLEANUP",
+      "operation_type": "delete_after_validation",
+      "title": "Delete inactive duplicate shared/reentry/2099900222260118___init__.py",
+      "status": "approved_not_executed",
+      "execution_readiness": "blocked_until_validation_passes",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": null,
+      "owner_module_root": null,
+      "source_decision_ids": [
+        "SRC-0069"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0069",
+          "path": "shared/reentry/2099900222260118___init__.py",
+          "artifact_type": "inactive_duplicate_package_initializer",
+          "primary_function": "Reexports hybrid ID, vocabulary, and indicator validator symbols from the ID-prefixed package.",
+          "disposition_after_success": "delete"
+        }
+      ],
+      "outputs": [],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference."
+      ],
+      "execution_steps": [
+        "Search the repository, packaging configuration, registries, generators, and dynamic loaders for references to the source.",
+        "Run the required validation and prove the source is inactive or duplicated.",
+        "Delete with git rm only after the evidence is recorded.",
+        "Disable or correct any generator that would recreate the deleted artifact."
+      ],
+      "validation_required": [
+        "repository reference search",
+        "document-ID registry update",
+        "import tests"
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "destructive_cleanup_review_required",
+      "depends_on": [
+        "MIG-0020",
+        "MIG-0021",
+        "MIG-0022"
+      ]
+    },
+    {
+      "operation_id": "MIG-0038",
+      "phase": "P60_VALIDATED_CLEANUP",
+      "operation_type": "delete_after_validation",
+      "title": "Delete inactive duplicate src/contracts/models/Orderintent.py",
+      "status": "approved_not_executed",
+      "execution_readiness": "blocked_until_validation_passes",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": null,
+      "owner_module_root": null,
+      "source_decision_ids": [
+        "SRC-0075"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0075",
+          "path": "src/contracts/models/Orderintent.py",
+          "artifact_type": "generated_empty_model_stub",
+          "primary_function": "Fieldless generated Pydantic placeholder named after the OrderIntent schema.",
+          "disposition_after_success": "delete"
+        }
+      ],
+      "outputs": [],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference."
+      ],
+      "execution_steps": [
+        "Search the repository, packaging configuration, registries, generators, and dynamic loaders for references to the source.",
+        "Run the required validation and prove the source is inactive or duplicated.",
+        "Delete with git rm only after the evidence is recorded.",
+        "Disable or correct any generator that would recreate the deleted artifact."
+      ],
+      "validation_required": [
+        "confirm no dynamic loaders or packaging inclusion",
+        "disable obsolete generator"
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "destructive_cleanup_review_required",
+      "depends_on": []
+    },
+    {
+      "operation_id": "MIG-0039",
+      "phase": "P60_VALIDATED_CLEANUP",
+      "operation_type": "delete_after_validation",
+      "title": "Delete inactive duplicate src/contracts/models/Signal.py",
+      "status": "approved_not_executed",
+      "execution_readiness": "blocked_until_validation_passes",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": null,
+      "owner_module_root": null,
+      "source_decision_ids": [
+        "SRC-0076"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0076",
+          "path": "src/contracts/models/Signal.py",
+          "artifact_type": "generated_empty_model_stub",
+          "primary_function": "Fieldless generated Pydantic placeholder named after the Signal schema.",
+          "disposition_after_success": "delete"
+        }
+      ],
+      "outputs": [],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference."
+      ],
+      "execution_steps": [
+        "Search the repository, packaging configuration, registries, generators, and dynamic loaders for references to the source.",
+        "Run the required validation and prove the source is inactive or duplicated.",
+        "Delete with git rm only after the evidence is recorded.",
+        "Disable or correct any generator that would recreate the deleted artifact."
+      ],
+      "validation_required": [
+        "confirm no dynamic loaders or packaging inclusion",
+        "disable obsolete generator"
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "destructive_cleanup_review_required",
+      "depends_on": []
+    },
+    {
+      "operation_id": "MIG-0040",
+      "phase": "P60_VALIDATED_CLEANUP",
+      "operation_type": "archive_or_delete_after_validation",
+      "title": "Resolve malformed legacy fixture tests/legacy/contracts/golden_fixtures/1199900036260118_price_ticks.json",
+      "status": "approved_not_executed",
+      "execution_readiness": "blocked_until_reference_and_replacement_validation",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": null,
+      "owner_module_root": null,
+      "source_decision_ids": [
+        "SRC-0086"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0086",
+          "path": "tests/legacy/contracts/golden_fixtures/1199900036260118_price_ticks.json",
+          "artifact_type": "malformed_legacy_contract_fixture",
+          "primary_function": "Intended to provide legacy PriceTick golden examples, but the JSON structure is invalid.",
+          "disposition_after_success": "archive_or_delete_based_on_reference_scan"
+        }
+      ],
+      "outputs": [],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference."
+      ],
+      "execution_steps": [
+        "Search for active and legacy test references.",
+        "Confirm a valid replacement fixture exists or repair the fixture only when an active compatibility test requires it.",
+        "If no active dependency exists, delete the malformed fixture.",
+        "If historical retention is required, move it to the repository-approved archive location and clearly mark it malformed/non-authoritative.",
+        "Do not migrate it into D1 as active module evidence."
+      ],
+      "validation_required": [
+        "search test references",
+        "confirm replacement fixture",
+        "remove or archive"
+      ],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "destructive_cleanup_review_required",
+      "depends_on": [],
+      "notes": "Do not move into D1 as active evidence. Repair only if an active legacy-compatibility test still requires it."
+    },
+    {
+      "operation_id": "MIG-0041",
+      "phase": "P70_COMPATIBILITY_RETIREMENT",
+      "operation_type": "retain_then_remove_compatibility_layer",
+      "title": "Retain and later remove compatibility layer shared/reentry/__init__.py",
+      "status": "approved_not_executed",
+      "execution_readiness": "deferred_until_import_migration_complete",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": null,
+      "owner_module_root": null,
+      "source_decision_ids": [
+        "SRC-0070"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0070",
+          "path": "shared/reentry/__init__.py",
+          "artifact_type": "compatibility_package_facade",
+          "primary_function": "Provides the stable shared.reentry import facade.",
+          "disposition_after_success": "retain_until_zero_consumers_then_delete"
+        }
+      ],
+      "outputs": [],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference."
+      ],
+      "execution_steps": [
+        "Keep the compatibility file during the migration window.",
+        "Update consumers to canonical module imports.",
+        "Add a deprecation notice and, where applicable, re-export the canonical implementations.",
+        "Prove that repository and downstream consumers no longer import the compatibility path.",
+        "Delete the compatibility file in a later cleanup commit."
+      ],
+      "validation_required": [],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "deprecation_exit_gate_required",
+      "depends_on": [
+        "MIG-0020",
+        "MIG-0021",
+        "MIG-0022"
+      ],
+      "notes": "After moving implementations, reexport from module packages during a deprecation window, then remove."
+    },
+    {
+      "operation_id": "MIG-0042",
+      "phase": "P70_COMPATIBILITY_RETIREMENT",
+      "operation_type": "retain_then_remove_compatibility_layer",
+      "title": "Retain and later remove compatibility layer shared/reentry/_id_loader.py",
+      "status": "approved_not_executed",
+      "execution_readiness": "deferred_until_import_migration_complete",
+      "agent_may_execute": true,
+      "mechanically_automatable": false,
+      "destructive": true,
+      "owner_module_short_id": null,
+      "owner_module_root": null,
+      "source_decision_ids": [
+        "SRC-0071"
+      ],
+      "sources": [
+        {
+          "source_record_id": "SRC-0071",
+          "path": "shared/reentry/_id_loader.py",
+          "artifact_type": "compatibility_loader",
+          "primary_function": "Dynamically loads ID-prefixed reentry implementation modules.",
+          "disposition_after_success": "retain_until_zero_consumers_then_delete"
+        }
+      ],
+      "outputs": [],
+      "preconditions": [
+        "Repository working tree is clean.",
+        "HEAD equals pinned base commit 963ff6df522b3aac421e1b55115548009849141a or the agent has revalidated every source and target against the current HEAD.",
+        "All source paths listed by this operation exist and are tracked by Git.",
+        "No unlisted repository path is modified by inference."
+      ],
+      "execution_steps": [
+        "Keep the compatibility file during the migration window.",
+        "Update consumers to canonical module imports.",
+        "Add a deprecation notice and, where applicable, re-export the canonical implementations.",
+        "Prove that repository and downstream consumers no longer import the compatibility path.",
+        "Delete the compatibility file in a later cleanup commit."
+      ],
+      "validation_required": [],
+      "postconditions": [
+        "All declared outputs exist and contain the intended behavior or content.",
+        "Every source marked remove is absent from the Git index and working tree.",
+        "No stale imports, links, schema references, work-cell references, or registry paths remain.",
+        "The operation is recorded in the migration evidence report with before/after paths and validation results."
+      ],
+      "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
+      "approval_gate": "deprecation_exit_gate_required",
+      "depends_on": [
+        "MIG-0020",
+        "MIG-0021",
+        "MIG-0022"
+      ],
+      "notes": "Remove after imports migrate and canonical module files no longer require dynamic loading."
+    }
+  ],
+  "completion_definition": [
+    "Every operation is marked completed, intentionally deferred, or blocked with evidence.",
+    "All exact outputs validate and all approved source removals are complete.",
+    "No removed legacy path remains in active imports, tests, configuration, registries, context packets, documentation links, or workflow references.",
+    "Temporary compatibility layers have explicit removal conditions and are not treated as permanent architecture.",
+    "The full repository validation suite passes on the final migration branch."
+  ]
+}

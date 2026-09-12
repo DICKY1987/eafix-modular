@@ -1,123 +1,107 @@
-#!/usr/bin/env python3
-"""
-doc_id_scanner.py — scan repository files for EAFIX document-ID prefixes.
-
-A "doc-ID-prefixed" filename matches the pattern:
-    <16 decimal digits>_<rest-of-name>
-for example: 1299900011260118_doc_id_validation.yml
-
-Usage
------
-    python doc_id_scanner.py --repo-root ../..
-    python doc_id_scanner.py --repo-root ../.. --output-json scan_result.json
-"""
+"""Deterministic scanner for EAFIX filename document identifiers."""
 
 from __future__ import annotations
 
-import argparse
-import json
-import os
 import re
-import sys
+import subprocess
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List
+from typing import Iterable, Sequence
 
-DOC_ID_PATTERN = re.compile(r"^(\d{16})_(.+)$")
-
-# Directories to always exclude from scanning
-EXCLUDE_DIRS: set[str] = {".git", "__pycache__", ".venv", "node_modules", ".mypy_cache"}
-
-
-def _iter_tracked_files(repo_root: Path):
-    """Yield every regular file under *repo_root* that is not in an excluded directory."""
-    for dirpath, dirnames, filenames in os.walk(repo_root):
-        # Prune excluded dirs in-place so os.walk skips them
-        dirnames[:] = [d for d in dirnames if d not in EXCLUDE_DIRS]
-        for fname in filenames:
-            yield Path(dirpath) / fname
+DOC_ID_PATTERN = re.compile(r"^(?:P_)?(\d{16,20})_(.+)$")
+DEFAULT_EXCLUDED_PREFIXES = (
+    ".git/",
+    ".venv/",
+    "venv/",
+    "node_modules/",
+    "build/",
+    "dist/",
+)
 
 
-def scan(repo_root: Path) -> Dict:
-    """Return a summary dict with all doc-ID-prefixed files and duplicate IDs."""
-    id_to_paths: Dict[str, List[str]] = {}
-    ungoverned: List[str] = []
-    total_files = 0
+@dataclass(frozen=True)
+class ScannedFile:
+    path: str
+    doc_id: str
+    basename: str
 
-    for fpath in _iter_tracked_files(repo_root):
-        total_files += 1
-        rel = str(fpath.relative_to(repo_root))
-        m = DOC_ID_PATTERN.match(fpath.name)
-        if m:
-            doc_id = m.group(1)
-            id_to_paths.setdefault(doc_id, []).append(rel)
-        else:
-            ungoverned.append(rel)
 
-    governed = {doc_id: paths for doc_id, paths in id_to_paths.items()}
-    duplicates = {doc_id: paths for doc_id, paths in id_to_paths.items() if len(paths) > 1}
+@dataclass
+class ScanResult:
+    root: str
+    total_files: int = 0
+    prefixed_files: list[ScannedFile] = field(default_factory=list)
+    unprefixed_files: list[str] = field(default_factory=list)
+    duplicate_ids: dict[str, list[str]] = field(default_factory=dict)
 
-    governed_count = sum(len(p) for p in governed.values())
-    coverage = governed_count / total_files if total_files else 0.0
+    @property
+    def coverage_ratio(self) -> float:
+        return len(self.prefixed_files) / self.total_files if self.total_files else 1.0
 
-    return {
-        "repo_root": str(repo_root),
-        "total_files": total_files,
-        "governed_count": governed_count,
-        "ungoverned_count": len(ungoverned),
-        "coverage": round(coverage, 6),
-        "duplicate_id_count": len(duplicates),
-        "duplicates": duplicates,
-        "governed": governed,
+    @property
+    def duplicate_count(self) -> int:
+        return sum(len(paths) for paths in self.duplicate_ids.values())
+
+
+def _tracked_paths(root: Path) -> list[str]:
+    completed = subprocess.run(
+        ["git", "-C", str(root), "ls-files", "-z"],
+        check=True,
+        capture_output=True,
+    )
+    return [
+        raw.decode("utf-8", errors="surrogateescape").replace("\\", "/")
+        for raw in completed.stdout.split(b"\0")
+        if raw
+    ]
+
+
+def _filesystem_paths(root: Path) -> list[str]:
+    return sorted(
+        path.relative_to(root).as_posix()
+        for path in root.rglob("*")
+        if path.is_file()
+        and not path.relative_to(root).as_posix().startswith(DEFAULT_EXCLUDED_PREFIXES)
+    )
+
+
+def scan_paths(root: str | Path, paths: Iterable[str]) -> ScanResult:
+    """Classify a supplied repository-relative path set."""
+    resolved = Path(root).resolve()
+    result = ScanResult(root=str(resolved))
+    by_id: dict[str, list[str]] = {}
+
+    for raw_path in sorted(set(paths)):
+        path = raw_path.replace("\\", "/")
+        if path.startswith(DEFAULT_EXCLUDED_PREFIXES):
+            continue
+        result.total_files += 1
+        match = DOC_ID_PATTERN.match(Path(path).name)
+        if not match:
+            result.unprefixed_files.append(path)
+            continue
+        scanned = ScannedFile(path=path, doc_id=match.group(1), basename=match.group(2))
+        result.prefixed_files.append(scanned)
+        by_id.setdefault(scanned.doc_id, []).append(path)
+
+    result.duplicate_ids = {
+        doc_id: sorted(found)
+        for doc_id, found in sorted(by_id.items())
+        if len(found) > 1
     }
+    return result
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Scan repo for doc-ID-prefixed files.")
-    parser.add_argument(
-        "--repo-root",
-        default="../..",
-        help="Path to the repository root (default: ../.. relative to this script).",
-    )
-    parser.add_argument(
-        "--output-json",
-        default="",
-        help="If set, write the full scan result to this JSON file.",
-    )
-    args = parser.parse_args()
-
-    script_dir = Path(__file__).parent
-    repo_root = (script_dir / args.repo_root).resolve()
-
-    if not repo_root.is_dir():
-        print(f"ERROR: repo-root does not exist: {repo_root}", file=sys.stderr)
-        return 1
-
-    result = scan(repo_root)
-
-    print(f"Repository root : {result['repo_root']}")
-    print(f"Total files     : {result['total_files']}")
-    print(f"Governed (with doc-ID prefix) : {result['governed_count']}")
-    print(f"Ungoverned                    : {result['ungoverned_count']}")
-    print(f"Coverage                      : {result['coverage']:.1%}")
-    print(f"Duplicate doc-IDs             : {result['duplicate_id_count']}")
-
-    if result["duplicate_id_count"]:
-        print("\nDuplicate doc-ID details:")
-        for doc_id, paths in sorted(result["duplicates"].items()):
-            print(f"  {doc_id}:")
-            for p in paths:
-                print(f"    {p}")
-
-    if args.output_json:
-        out_path = Path(args.output_json)
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-        # Omit the full ungoverned list in the JSON to keep it compact
-        compact = {k: v for k, v in result.items() if k != "governed"}
-        out_path.write_text(json.dumps(compact, indent=2))
-        print(f"\nScan result written to {out_path}")
-
-    return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())
+def scan_repository(
+    root: str | Path = ".",
+    extensions: Sequence[str] | None = None,
+    *,
+    tracked_only: bool = True,
+) -> ScanResult:
+    """Scan tracked files by default so local caches cannot change CI results."""
+    resolved = Path(root).resolve()
+    paths = _tracked_paths(resolved) if tracked_only else _filesystem_paths(resolved)
+    if extensions is not None:
+        normalized = {ext.lower() for ext in extensions}
+        paths = [path for path in paths if Path(path).suffix.lower() in normalized]
+    return scan_paths(resolved, paths)

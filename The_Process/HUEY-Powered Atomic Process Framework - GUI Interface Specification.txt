@@ -1,0 +1,193 @@
+
+HUEY-Powered Atomic Process Framework - GUI Interface Specification
+Main Application Window
+Layout Structure
+	•	Primary Layout: Horizontal split-pane design (70/30 ratio)
+	•	Left Panel: Process editor and visualization (primary workspace)
+	•	Right Panel: Plugin manager, properties, and analysis tools
+	•	Bottom Panel: Collapsible console/log output (200px height)
+	•	Top Menu Bar: Standard application menu with plugin-specific options
+Window Dimensions
+	•	Minimum Size: 1200x800 pixels
+	•	Default Size: 1400x900 pixels
+	•	Responsive: Panels resize proportionally, maintain minimum widths
+
+Left Panel - Process Workspace
+Tab Structure
+Tab 1: Visual Process Editor
+	•	Canvas Area: Zoomable/pannable diagram canvas (similar to Draw.io)
+	•	Node Types:
+	•	Process steps (rounded rectangles, color-coded by actor)
+	•	Decision points (diamond shapes)
+	•	Subprocess calls (double-border rectangles)
+	•	Start/end nodes (circles)
+	•	Connection Lines: Bezier curves with arrowheads showing flow direction
+	•	Toolbar:
+	•	Add step, decision, subprocess buttons
+	•	Zoom controls (fit, 100%, zoom in/out)
+	•	Layout algorithms (hierarchical, force-directed)
+	•	Grid toggle, snap-to-grid
+	•	Context Menus: Right-click on elements for edit/delete/duplicate
+Tab 2: YAML Source Editor
+	•	Syntax Highlighting: YAML-aware color coding
+	•	Line Numbers: Left gutter with step counting
+	•	Folding: Collapsible sections for large processes
+	•	Error Indicators: Red underlines for validation errors
+	•	Auto-completion: Dropdown suggestions for field names
+	•	Split View: Optional side-by-side with visual editor
+Tab 3: Generated Documentation Preview
+	•	Format Selector: Dropdown for Markdown, HTML, PDF preview
+	•	Live Preview: Updates automatically as YAML changes
+	•	Print Layout: WYSIWYG view for documentation output
+	•	Export Button: Direct export to selected format
+
+Right Panel - Tools & Properties
+Accordion-Style Sections (Collapsible)
+Section 1: Step Properties (300px height)
+	•	Step ID Field: Auto-generated, editable text input
+	•	Actor Dropdown: Service, User, System, External predefined options
+	•	Description: Multi-line text area with word count
+	•	Dependencies: Multi-select list with add/remove buttons
+	•	Timing: SLA milliseconds numeric input with validation
+	•	Variables: Two-column table (Input/Output) with add/delete rows
+Section 2: Plugin Manager (250px height)
+	•	Available Plugins List: Tree view with categories
+	•	Documentation Generators
+	•	Diagram Generators
+	•	Analysis Tools
+	•	Enterprise Features
+	•	Plugin Status: Icons showing loaded/disabled/error states
+	•	Configuration Button: Opens plugin-specific settings dialog
+	•	Install/Remove: Buttons for plugin management
+Section 3: Process Analysis (200px height)
+	•	Performance Metrics:
+	•	Total estimated time (prominent display)
+	•	Critical path visualization
+	•	Bottleneck indicator list
+	•	Quality Score: Progress bar with percentage
+	•	Complexity Metrics: Numeric displays with trend indicators
+	•	Refresh Button: Manual analysis trigger
+Section 4: Validation Results (150px height)
+	•	Error List: Red icon + description for each error
+	•	Warning List: Yellow icon + description for warnings
+	•	Success Indicator: Green checkmark when valid
+	•	Auto-validate Toggle: Real-time vs manual validation
+
+Menu System
+File Menu
+	•	New Process (Ctrl+N) → Template selection dialog
+	•	Open Process (Ctrl+O) → File browser with .yaml filter
+	•	Recent Files → Submenu with last 10 files
+	•	Save (Ctrl+S) / Save As (Ctrl+Shift+S)
+	•	Import → Submenu (JSON, CSV, Legacy formats)
+	•	Export → Submenu (All formats, specific format selection)
+	•	Exit
+Edit Menu
+	•	Undo/Redo (Ctrl+Z, Ctrl+Y)
+	•	Cut/Copy/Paste steps
+	•	Find/Replace (Ctrl+F, Ctrl+H)
+	•	Select All Steps
+	•	Duplicate Step/Section
+	•	Step Properties (Enter key)
+View Menu
+	•	Zoom (In/Out/Fit/Actual Size)
+	•	Show/Hide Panels (Right Panel, Console, Toolbar)
+	•	Layout Options (Hierarchical, Circular, Force-directed)
+	•	Grid Options (Show Grid, Snap to Grid)
+	•	Full Screen Mode (F11)
+Process Menu
+	•	Validate Process (F5)
+	•	Analyze Performance → Opens detailed analysis dialog
+	•	Optimize Sequence → Automatic step reordering
+	•	Generate Documentation → Format selection submenu
+	•	Sync Formats → Force synchronization
+	•	Add Subprocess → Subprocess creation wizard
+Plugins Menu
+	•	Plugin Manager → Opens dedicated plugin management window
+	•	Reload Plugins → Refresh plugin system
+	•	Plugin Development Tools → Opens dev console
+	•	Installed Plugins → List with quick enable/disable
+Tools Menu
+	•	Options/Preferences → Application settings dialog
+	•	Process Templates → Template management
+	•	Backup Manager → Backup/restore functionality
+	•	Developer Console → Plugin development interface
+Help Menu
+	•	Documentation → Opens help browser
+	•	Video Tutorials → Links to tutorial content
+	•	Keyboard Shortcuts → Reference dialog
+	•	About → Version and license information
+
+Specialized Dialogs
+Step Properties Dialog (Modal)
+	•	Size: 600x500 pixels
+	•	Layout: Form-based with tabbed sections
+	•	Basic Tab: ID, Actor, Description, SLA
+	•	Variables Tab: Input/Output variable management
+	•	Dependencies Tab: Visual dependency picker
+	•	Validation Tab: Rules and error codes
+	•	Notes Tab: Free-form documentation
+	•	Buttons: OK, Cancel, Apply, Help
+Plugin Configuration Dialog (Modal)
+	•	Size: 500x400 pixels
+	•	Dynamic Form: Generated from plugin’s configuration schema
+	•	Field Types: Text inputs, dropdowns, checkboxes, file pickers
+	•	Validation: Real-time field validation with error messages
+	•	Preview: Live preview of plugin output (if applicable)
+Process Analysis Report (Modeless)
+	•	Size: 800x600 pixels, resizable
+	•	Tabs: Performance, Quality, Complexity, Recommendations
+	•	Charts: Bar charts for timing, pie charts for actor distribution
+	•	Export Options: PDF, CSV, HTML report generation
+	•	Drill-down: Click metrics to see detailed breakdown
+Template Selection Dialog (Modal)
+	•	Size: 700x500 pixels
+	•	Gallery View: Large thumbnails with descriptions
+	•	Categories: Basic, Industry-specific, Advanced
+	•	Preview Panel: Shows template structure and sample output
+	•	Custom Templates: User-created template management
+
+Status and Feedback Elements
+Status Bar (Bottom)
+	•	Left Section: Current operation status, file save state
+	•	Center Section: Validation status (✓ Valid, ⚠ Warnings, ✗ Errors)
+	•	Right Section: Plugin count, process step count, total estimated time
+Progress Indicators
+	•	Analysis Progress: Modal dialog with progress bar and cancel option
+	•	File Operations: Non-blocking notifications for save/export
+	•	Plugin Loading: Splash screen with progress for initial load
+Notification System
+	•	Toast Messages: Slide-in notifications for completed operations
+	•	Error Alerts: Modal dialogs for critical errors requiring user action
+	•	Confirmation Dialogs: Yes/No prompts for destructive operations
+
+Accessibility & Usability
+Keyboard Navigation
+	•	Tab Order: Logical progression through all interface elements
+	•	Shortcut Keys: All major functions accessible via keyboard
+	•	Focus Indicators: Clear visual indication of keyboard focus
+	•	Screen Reader: ARIA labels and descriptions for all controls
+Visual Design
+	•	Color Scheme: Neutral base with semantic colors (red=error, green=success)
+	•	Typography: Sans-serif, minimum 12pt, scalable
+	•	Icons: Consistent icon set with tooltips
+	•	Contrast: WCAG AA compliance for text/background contrast
+Responsive Behavior
+	•	Panel Collapse: Automatic panel hiding on small screens
+	•	Toolbar Wrapping: Multi-row toolbar layout for narrow windows
+	•	Font Scaling: System font size respect with override options
+
+Technical Framework Recommendations
+Desktop Framework Options
+	1.	Electron + React: Cross-platform, web technology stack
+	2.	Qt/PyQt: Native performance, excellent widgets
+	3.	Tkinter: Python-native, minimal dependencies
+	4.	JavaFX: Cross-platform, good for complex layouts
+Required GUI Components
+	•	Diagram Canvas: Custom drawing component with zoom/pan
+	•	Code Editor: Syntax highlighting text component
+	•	Tree/List Views: For file management and plugin lists
+	•	Property Grids: Dynamic form generation capability
+	•	Splitter Panels: Resizable pane management
+	•	Tab Controls: Multiple document interface support
+This specification provides a complete blueprint for developing a professional, user-friendly GUI that makes the complex process engineering capabilities accessible to non-technical users while maintaining power-user functionality.

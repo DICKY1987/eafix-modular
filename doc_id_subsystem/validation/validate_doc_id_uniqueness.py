@@ -1,157 +1,43 @@
-#!/usr/bin/env python3
-"""
-validate_doc_id_uniqueness.py — detect duplicate document-ID prefixes.
-
-A doc-ID is the 16-digit numeric prefix in filenames of the form:
-    <16 decimal digits>_<rest-of-name>
-
-Two files are considered a "collision" when they share the same 16-digit
-prefix but live at different paths (same-name duplicates created by archiving
-a file to a superseded/ folder are flagged with a lower severity).
-
-Exit codes
-----------
-    0  No duplicate doc-IDs found (or all found duplicates match the
-       known-duplicates list in ``known_duplicates.json``).
-    1  One or more NEW duplicate doc-IDs detected that are not recorded in
-       ``known_duplicates.json``.
-    2  Usage error or repository not found.
-
-On the first run (no ``known_duplicates.json`` present) the script writes a
-snapshot of any currently-detected duplicates so that pre-existing collisions
-are not treated as new violations.  Subsequent runs compare against that
-snapshot.
-"""
+"""Fail when tracked files introduce a duplicate document identifier."""
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
 
-# Resolve paths so this script can be invoked from any working directory
-_HERE = Path(__file__).resolve().parent          # doc_id_subsystem/validation
-_CORE = _HERE.parent / "core"                    # doc_id_subsystem/core
-# Insert core directory so we can do a direct import without needing the package
-sys.path.insert(0, str(_CORE))
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
-from doc_id_scanner import scan  # noqa: E402
+from doc_id_subsystem.core.doc_id_scanner import scan_repository  # noqa: E402
 
-KNOWN_DUPLICATES_FILE = _HERE / "known_duplicates.json"
-
-
-def _load_known(path: Path) -> dict:
-    if path.exists():
-        try:
-            return json.loads(path.read_text())
-        except (json.JSONDecodeError, OSError):
-            return {}
-    return {}
-
-
-def _save_known(data: dict, path: Path) -> None:
-    path.write_text(json.dumps(data, indent=2))
+KNOWN_FILE = Path(__file__).with_name("known_duplicates.json")
 
 
 def main() -> int:
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description="Validate that no NEW duplicate doc-ID prefixes exist in the repository."
-    )
-    parser.add_argument(
-        "--repo-root",
-        default="../..",
-        help="Path to the repository root relative to this script (default: ../..).",
-    )
-    parser.add_argument(
-        "--update-known",
-        action="store_true",
-        help=(
-            "Update known_duplicates.json with the current set of duplicates "
-            "and exit 0.  Use this after deliberately resolving or accepting a duplicate."
-        ),
-    )
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--repo-root", type=Path, default=REPO_ROOT)
     args = parser.parse_args()
-
-    script_dir = Path(__file__).resolve().parent
-    repo_root = (script_dir / args.repo_root).resolve()
-
-    if not repo_root.is_dir():
-        print(f"ERROR: repository root not found: {repo_root}", file=sys.stderr)
+    if not KNOWN_FILE.is_file():
+        print(f"FAIL: committed duplicate baseline is missing: {KNOWN_FILE}", file=sys.stderr)
         return 2
 
-    result = scan(repo_root)
-    current_duplicates: dict[str, list[str]] = result["duplicates"]
-
-    print(f"Repository          : {repo_root}")
-    print(f"Total files scanned : {result['total_files']}")
-    print(f"Duplicate doc-IDs   : {len(current_duplicates)}")
-
-    if args.update_known:
-        _save_known(current_duplicates, KNOWN_DUPLICATES_FILE)
-        print(
-            f"\n[INFO] known_duplicates.json updated with {len(current_duplicates)} "
-            f"duplicate(s)."
-        )
-        return 0
-
-    known = _load_known(KNOWN_DUPLICATES_FILE)
-
-    if not known and current_duplicates:
-        # First run with duplicates present — record them so they are not
-        # treated as violations going forward.
-        _save_known(current_duplicates, KNOWN_DUPLICATES_FILE)
-        print(
-            f"\n[INFO] No previous known-duplicates snapshot found. "
-            f"Recording {len(current_duplicates)} pre-existing duplicate(s) as known."
-        )
-        for doc_id, paths in sorted(current_duplicates.items()):
-            print(f"  KNOWN-DUPLICATE  {doc_id}:")
-            for p in paths:
-                print(f"    {p}")
-        print("\nPASS — known duplicates snapshot established.")
-        return 0
-
-    new_duplicates = {
+    known = json.loads(KNOWN_FILE.read_text(encoding="utf-8"))["duplicates"]
+    current = scan_repository(args.repo_root).duplicate_ids
+    new_or_expanded = {
         doc_id: paths
-        for doc_id, paths in current_duplicates.items()
-        if doc_id not in known
+        for doc_id, paths in current.items()
+        if doc_id not in known or not set(paths).issubset(set(known[doc_id]))
     }
-
-    resolved_duplicates = {
-        doc_id: paths
-        for doc_id, paths in known.items()
-        if doc_id not in current_duplicates
-    }
-
-    if resolved_duplicates:
-        print(f"\n[INFO] {len(resolved_duplicates)} previously-known duplicate(s) resolved:")
-        for doc_id in sorted(resolved_duplicates):
-            print(f"  RESOLVED  {doc_id}")
-
-    if current_duplicates:
-        print(f"\n[WARN] {len(current_duplicates)} known duplicate(s) still present:")
-        for doc_id, paths in sorted(current_duplicates.items()):
-            tag = "KNOWN" if doc_id in known else "NEW"
-            print(f"  {tag}-DUPLICATE  {doc_id}:")
-            for p in paths:
-                print(f"    {p}")
-
-    if new_duplicates:
-        print(
-            f"\nFAIL — {len(new_duplicates)} NEW duplicate doc-ID(s) introduced:",
-            file=sys.stderr,
-        )
-        for doc_id, paths in sorted(new_duplicates.items()):
-            print(f"  {doc_id}:", file=sys.stderr)
-            for p in paths:
-                print(f"    {p}", file=sys.stderr)
+    if new_or_expanded:
+        print(json.dumps(new_or_expanded, indent=2), file=sys.stderr)
+        print("FAIL: new or expanded duplicate document IDs", file=sys.stderr)
         return 1
-
-    print("\nPASS — no new duplicate doc-IDs detected.")
+    print(f"PASS: no new duplicates ({len(current)} known duplicate IDs remain)")
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())

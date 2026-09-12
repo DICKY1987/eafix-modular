@@ -1,0 +1,282 @@
+//+------------------------------------------------------------------+
+//|                                           PythonPriceBridge.mq4   |
+//|                     Copyright 2025, HUEY_P Trading System         |
+//|                                                                   |
+//+------------------------------------------------------------------+
+#property copyright "Copyright 2025, HUEY_P Trading System"
+#property link      ""
+#property version   "1.00"
+#property strict
+
+// Socket library import (requires MT4 build 1280+ or custom DLL)
+#import "WinSock2.mqh"
+   int WSAStartup(int wVersionRequested, int& lpWSAData[]);
+   int WSACleanup();
+   int socket(int af, int type, int protocol);
+   int connect(int s, int& name[], int namelen);
+   int send(int s, string buf, int len, int flags);
+   int closesocket(int s);
+   int WSAGetLastError();
+#import
+
+// Input parameters
+input string PythonServerIP = "127.0.0.1";      // Python server IP
+input int    PythonServerPort = 8765;            // Python server port
+input int    SendIntervalMS = 100;               // Send interval in milliseconds
+input bool   SendOnTickOnly = true;              // Send only on new ticks
+input string MonitoredSymbols = "EURUSD,GBPUSD,USDJPY,USDCHF,AUDUSD,USDCAD,NZDUSD";
+
+// Global variables
+int python_socket = INVALID_HANDLE;
+datetime last_send_time = 0;
+string symbols_array[];
+int symbols_count = 0;
+bool socket_connected = false;
+
+//+------------------------------------------------------------------+
+//| Expert initialization function                                   |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+   Print("🚀 Initializing Python Price Bridge...");
+   
+   // Parse monitored symbols
+   ParseSymbolsString(MonitoredSymbols);
+   
+   // Initialize socket connection
+   if(!InitializePythonConnection())
+   {
+      Print("❌ Failed to initialize Python connection");
+      return(INIT_FAILED);
+   }
+   
+   Print("✅ Python Price Bridge initialized successfully");
+   Print("📡 Monitoring ", symbols_count, " symbols: ", MonitoredSymbols);
+   Print("🔗 Connected to Python server: ", PythonServerIP, ":", PythonServerPort);
+   
+   return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Expert deinitialization function                                |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+   Print("🛑 Stopping Python Price Bridge...");
+   
+   // Send disconnect message
+   if(socket_connected)
+   {
+      string disconnect_msg = "{\"type\":\"disconnect\",\"timestamp\":\"" + 
+                             TimeToString(TimeCurrent(), TIME_DATE|TIME_SECONDS) + "\"}";
+      SendToPython(disconnect_msg);
+   }
+   
+   // Cleanup socket
+   CleanupPythonConnection();
+   Print("✅ Python Price Bridge stopped");
+}
+
+//+------------------------------------------------------------------+
+//| Expert tick function                                             |
+//+------------------------------------------------------------------+
+void OnTick()
+{
+   // Check if we should send data
+   if(SendOnTickOnly || (TimeCurrent() - last_send_time >= SendIntervalMS/1000))
+   {
+      SendPriceDataToPython();
+      last_send_time = TimeCurrent();
+   }
+}
+
+//+------------------------------------------------------------------+
+//| Initialize Python socket connection                              |
+//+------------------------------------------------------------------+
+bool InitializePythonConnection()
+{
+   // Create socket
+   python_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+   if(python_socket == INVALID_HANDLE)
+   {
+      Print("❌ Failed to create socket. Error: ", WSAGetLastError());
+      return(false);
+   }
+   
+   // Prepare address structure
+   int addr[4];
+   addr[0] = AF_INET;                    // sin_family
+   addr[1] = htons(PythonServerPort);    // sin_port  
+   addr[2] = inet_addr(PythonServerIP);  // sin_addr
+   addr[3] = 0;                          // sin_zero
+   
+   // Connect to Python server
+   if(connect(python_socket, addr, 16) != 0)
+   {
+      Print("❌ Failed to connect to Python server. Error: ", WSAGetLastError());
+      closesocket(python_socket);
+      return(false);
+   }
+   
+   socket_connected = true;
+   
+   // Send initial connection message
+   string init_msg = "{\"type\":\"init\",\"ea_name\":\"PythonPriceBridge\",\"symbols\":[";
+   for(int i = 0; i < symbols_count; i++)
+   {
+      init_msg += "\"" + symbols_array[i] + "\"";
+      if(i < symbols_count - 1) init_msg += ",";
+   }
+   init_msg += "],\"timestamp\":\"" + TimeToString(TimeCurrent(), TIME_DATE|TIME_SECONDS) + "\"}";
+   
+   return(SendToPython(init_msg));
+}
+
+//+------------------------------------------------------------------+
+//| Send price data to Python                                       |
+//+------------------------------------------------------------------+
+void SendPriceDataToPython()
+{
+   if(!socket_connected) return;
+   
+   string json_data = "{\"type\":\"price_update\",\"timestamp\":\"" + 
+                     TimeToString(TimeCurrent(), TIME_DATE|TIME_SECONDS) + "\",\"data\":[";
+   
+   for(int i = 0; i < symbols_count; i++)
+   {
+      string symbol = symbols_array[i];
+      
+      // Get market info for symbol
+      double bid = MarketInfo(symbol, MODE_BID);
+      double ask = MarketInfo(symbol, MODE_ASK);
+      double spread = ask - bid;
+      int digits = (int)MarketInfo(symbol, MODE_DIGITS);
+      
+      // Add symbol data to JSON
+      json_data += "{";
+      json_data += "\"symbol\":\"" + symbol + "\",";
+      json_data += "\"bid\":" + DoubleToString(bid, digits) + ",";
+      json_data += "\"ask\":" + DoubleToString(ask, digits) + ",";
+      json_data += "\"spread\":" + DoubleToString(spread, digits) + ",";
+      json_data += "\"digits\":" + IntegerToString(digits) + ",";
+      json_data += "\"tick_time\":\"" + TimeToString(TimeCurrent(), TIME_DATE|TIME_SECONDS) + "\"";
+      json_data += "}";
+      
+      if(i < symbols_count - 1) json_data += ",";
+   }
+   
+   json_data += "]}";
+   
+   // Send to Python
+   SendToPython(json_data);
+}
+
+//+------------------------------------------------------------------+
+//| Send data to Python server                                      |
+//+------------------------------------------------------------------+
+bool SendToPython(string data)
+{
+   if(!socket_connected || python_socket == INVALID_HANDLE)
+      return(false);
+   
+   // Add newline delimiter
+   data += "\n";
+   
+   int result = send(python_socket, data, StringLen(data), 0);
+   if(result == SOCKET_ERROR)
+   {
+      Print("❌ Failed to send data to Python. Error: ", WSAGetLastError());
+      socket_connected = false;
+      
+      // Try to reconnect
+      CleanupPythonConnection();
+      Sleep(1000);
+      InitializePythonConnection();
+      
+      return(false);
+   }
+   
+   return(true);
+}
+
+//+------------------------------------------------------------------+
+//| Parse symbols string into array                                 |
+//+------------------------------------------------------------------+
+void ParseSymbolsString(string symbols_str)
+{
+   ArrayResize(symbols_array, 0);
+   symbols_count = 0;
+   
+   string delimiter = ",";
+   int pos = 0;
+   
+   while(pos >= 0)
+   {
+      int next_pos = StringFind(symbols_str, delimiter, pos);
+      string symbol;
+      
+      if(next_pos >= 0)
+      {
+         symbol = StringSubstr(symbols_str, pos, next_pos - pos);
+         pos = next_pos + 1;
+      }
+      else
+      {
+         symbol = StringSubstr(symbols_str, pos);
+         pos = -1;
+      }
+      
+      // Clean and add symbol
+      symbol = StringTrimLeft(StringTrimRight(symbol));
+      if(StringLen(symbol) > 0)
+      {
+         ArrayResize(symbols_array, symbols_count + 1);
+         symbols_array[symbols_count] = symbol;
+         symbols_count++;
+      }
+   }
+}
+
+//+------------------------------------------------------------------+
+//| Cleanup Python connection                                       |
+//+------------------------------------------------------------------+
+void CleanupPythonConnection()
+{
+   if(python_socket != INVALID_HANDLE)
+   {
+      closesocket(python_socket);
+      python_socket = INVALID_HANDLE;
+   }
+   socket_connected = false;
+   WSACleanup();
+}
+
+//+------------------------------------------------------------------+
+//| Helper functions for socket operations                          |
+//+------------------------------------------------------------------+
+int htons(int hostshort)
+{
+   return((hostshort >> 8) | (hostshort << 8));
+}
+
+int inet_addr(string ip)
+{
+   string parts[];
+   int count = StringSplit(ip, '.', parts);
+   if(count != 4) return(0);
+   
+   int addr = 0;
+   for(int i = 0; i < 4; i++)
+   {
+      int part = (int)StringToInteger(parts[i]);
+      addr |= (part << (i * 8));
+   }
+   return(addr);
+}
+
+// Constants for socket operations
+#define AF_INET 2
+#define SOCK_STREAM 1
+#define IPPROTO_TCP 6
+#define SOCKET_ERROR -1
+#define INVALID_HANDLE -1

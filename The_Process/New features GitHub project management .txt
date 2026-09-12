@@ -1,0 +1,51 @@
+Yes. GitHub project management has moved noticeably toward “AI-agent-managed work queues” in the last three months, especially around Issues, Projects, Copilot agents, OpenAI Codex, and Anthropic Claude.
+Main change
+GitHub is no longer just adding AI to code editing. It is adding AI directly into the project-management loop:
+issue → assign agent → agent works → status visible in issue/project → PR opened → review/iterate → merge
+GitHub now supports third-party coding agents alongside Copilot cloud agent. The currently supported third-party agents are Anthropic Claude and OpenAI Codex, and they can be assigned issues, launched from prompts, or mentioned in PR comments to make changes and open pull requests.  
+Most relevant new GitHub project-management features
+Date	Feature	Why it matters
+Mar. 12 / May 21, 2026	Issue fields	GitHub Issues now support structured org-wide metadata like Priority, Effort, dates, custom fields, search/filtering, APIs, webhooks, and project columns. This reduces messy label systems and makes issues more machine-manageable.
+Mar. 19, 2026	Hierarchy view in GitHub Projects GA	Projects can now show parent/sub-issue structure by default in new views. This is important for breaking large AI implementation plans into nested work units. It also added the ability to auto-assign Copilot through issue templates.
+Mar. 26, 2026	Agent activity in Issues and Projects	When Copilot, Claude, or Codex is assigned to an issue, its session appears under the assignee with live statuses like queued, working, waiting for review, or completed.
+Mar. 30, 2026	Create issues from Slack with Copilot	Teams can mention @GitHub in Slack and create structured GitHub issues, including sub-issues, titles, bodies, assignees, labels, and milestones.
+Apr. 2, 2026	Improved GitHub Issues search GA	Semantic/hybrid issue search is now generally available and exposed through REST/GraphQL, making issue discovery better for AI triage and planning tools.
+Apr. 9, 2026	Release info in issue sidebar + project field defaults	Issues now show release information when linked PRs ship, and Projects can apply default field values when new items are added.
+Apr. 23, 2026	Manage agent sessions directly from Issues and Projects	You can view, inspect logs, and steer agent sessions from issue/project side panels without leaving the project workflow.
+May 15, 2026	Timestamp fields in GitHub Projects	Projects now have built-in Created, Updated, and Closed fields for sorting/filtering work by age, recency, or completion.
+May 20, 2026	Semantic issue search in Copilot Chat	Copilot Chat on GitHub web can find, group, and analyze issues using natural language. It is generally available across Copilot plans.
+May 14, 2026	GitHub Copilot app technical preview	This is a major agent workspace: start from issues/PRs/prompts, isolate multiple sessions, automate routine work, review plans/diffs, validate changes, open PRs, and use Agent Merge to address review comments/failing checks before merge.
+Jun. 2, 2026	Copilot SDK GA	GitHub exposed the Copilot agent runtime programmatically: planning, tool calls, file edits, streaming, multi-turn sessions, MCP tools, prompt customization, and OpenTelemetry tracing. This matters if you want to build your own project-management automation layer around GitHub.
+Jun. 3, 2026	VS Code agent workflow upgrades	VS Code now has an Agents window preview, remote agents, session state protocol work, persistent session preferences, and Git-flow improvements for agent sessions across projects.
+OpenAI-specific developments
+OpenAI Codex is now integrated into GitHub’s agent system through Copilot. GitHub’s docs say OpenAI Codex is available for all paid Copilot plans, is currently in public preview, and can be powered by an existing Copilot subscription. Supported Codex models listed by GitHub include Auto, GPT-5.2-Codex, GPT-5.3-Codex, GPT-5.4, and GPT-5.4 nano.  
+OpenAI also has a GitHub connector for ChatGPT. It lets ChatGPT access connected repositories, read code/README/docs, reason over live repository data, and cite relevant snippets.  
+Practical meaning: Codex can now function as a GitHub-native implementation agent, while ChatGPT can function more as a repo-analysis, planning, documentation, and review assistant.
+Anthropic-specific developments
+Anthropic Claude is also integrated into GitHub as a Copilot-powered coding agent. GitHub’s docs say Anthropic Claude is available in paid Copilot plans, currently in public preview, and uses the Claude Agent SDK. Supported Claude models listed by GitHub include Auto, Claude Opus 4.5, Claude Opus 4.6, Claude Opus 4.7, Claude Sonnet 4.5, and Claude Sonnet 4.6.  
+Claude also has a GitHub integration outside GitHub Copilot: you can add repositories to Claude chats and Claude Projects, select specific files/folders, sync to the latest codebase, and add multiple repositories if they fit within context.  
+Anthropic also expanded Claude’s connector model in April 2026. Claude connectors can access apps/services, inherit user permissions, and work across Claude, Claude Desktop, Claude Code, and the API through MCP connectors. Examples include Linear, Slack, and Google Drive, which matters for project-management workflows outside GitHub.  
+Important caution
+Claude Code had documented quality regressions in March–April 2026 affecting Claude Code, Claude Agent SDK, and Claude Cowork, which Anthropic says were fixed by April 20, 2026. For production workflows, this argues for keeping validation gates, test runs, review requirements, and rollback rules in place.  
+Bottom line for your workflow
+For your kind of repo-driven, AI-assisted development system, the meaningful shift is this:
+GitHub Issues and Projects are becoming the control plane for AI agents.
+The best current pattern is:
+GitHub Project
+  → structured issue fields
+  → parent/sub-issue hierarchy
+  → issue templates auto-assigning Copilot/Codex/Claude
+  → agent sessions visible in Projects
+  → PRs created by agents
+  → automated checks/security review
+  → human review or Agent Merge
+For your EA modular trading-system work, this means your documentation/checklist system can map cleanly into GitHub as:
+Module → Epic issue
+Submodule → Parent issue
+Atomic task → Sub-issue
+Acceptance criteria → Issue body / field
+Priority / Effort / Target date → Issue fields
+Assigned AI executor → Copilot / Codex / Claude
+Validation → GitHub Actions + required checks
+Delivery → PR
+The biggest new capability is not one feature. It is the combination of structured issue metadata + hierarchy + agent assignment + visible agent sessions + PR automation.

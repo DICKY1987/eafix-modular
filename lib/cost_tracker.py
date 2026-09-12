@@ -46,10 +46,10 @@ def get_total_cost(task_id: str) -> float:
 
 
 def record_gdw_cost(workflow_id: str, step_id: str | None, amount: float) -> None:
+    """Convenience wrapper retained for legacy cost-ledger callers.
 
     Uses a synthetic task_id namespace "gdw:<workflow_id>" and action "gdw_step".
     """
     tid = f"gdw:{workflow_id}"
     action = "gdw_step" if step_id else "gdw"
     record_cost(task_id=tid, tool="gdw_runner", action=f"{action}:{step_id or 'all'}", tokens=None, amount=amount)
-

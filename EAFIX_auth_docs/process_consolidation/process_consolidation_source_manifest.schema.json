@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eafix.local/schemas/process_consolidation_source_manifest.schema.json",
+  "title": "ProcessConsolidationSourceManifest",
+  "type": "object",
+  "required": [
+    "document_type",
+    "schema_version",
+    "manifest_version",
+    "baseline_commit",
+    "merge_target_baseline",
+    "fact_classes",
+    "frozen_sources",
+    "source_count"
+  ],
+  "properties": {
+    "document_type": {
+      "const": "process_consolidation_source_manifest"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "manifest_version": {
+      "type": "string"
+    },
+    "baseline_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "merge_target_baseline": {
+      "type": "object",
+      "required": [
+        "path",
+        "commit",
+        "sha256",
+        "byte_size",
+        "binding_status"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "byte_size": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "binding_status": {
+          "enum": [
+            "UNBOUND",
+            "BOUND"
+          ]
+        }
+      }
+    },
+    "fact_classes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "frozen_sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "source_id",
+          "merge_order",
+          "active_path",
+          "sha256",
+          "byte_size",
+          "authority_by_fact_class",
+          "expected_location_by_stage"
+        ],
+        "properties": {
+          "source_id": {
+            "type": "string",
+            "pattern": "^PCSRC-[0-9]{2}$"
+          },
+          "merge_order": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "active_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "archive_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "byte_size": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "authority_by_fact_class": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "expected_location_by_stage": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  }
+}

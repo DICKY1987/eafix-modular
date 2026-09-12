@@ -1,0 +1,29 @@
+{
+  "document_type": "eafix_full_suite_baseline_closure_report",
+  "schema_version": "1.0.0",
+  "date": "2026-07-31",
+  "base_commit": "71ef833442038380a8e31f83c3ce3f7d1206aedc",
+  "branch": "fix/full-suite-baseline",
+  "review_remediation": "Independent review required retaining coverage for the still-tracked legacy EA-REG generator and validator. Their tests now assert explicit failure when retired authorities are absent, preventing false PASS results while the active registry framework remains authoritative.",
+  "removed_stale_test_files": [
+    {
+      "path": "tests/test_gui_terminal_core.py",
+      "reason": "Imports a deleted gui_terminal/src package and asserts a PluginManager API that does not match the separate CLI_PY_GUI implementation; it is not a valid test of any current importable package."
+    }
+  ],
+  "non_weakening_statement": "No active implementation or migration output was changed. The absent GUI package test was removed; the still-tracked legacy generator and validator retain focused coverage and must fail explicitly rather than claim success when their retired inputs are unavailable. Active registry and plugin tests remain in the suite.",
+  "required_validation": [
+    "clean-environment full pytest execution",
+    "document-ID coverage and uniqueness",
+    "registry framework tests",
+    "git diff --check"
+  ],
+  "validation_results": {
+    "clean_environment_full_pytest": "passed",
+    "document_id_coverage": "passed",
+    "document_id_uniqueness": "passed",
+    "registry_framework": "15 passed",
+    "git_diff_check": "passed"
+  },
+  "status": "passed"
+}

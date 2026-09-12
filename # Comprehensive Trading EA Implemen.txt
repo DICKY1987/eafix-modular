@@ -1,0 +1,1868 @@
+# Comprehensive Trading EA Implementation Guide
+## Complete Feature Set & Implementation Specifications
+
+---
+
+## Table of Contents
+1. [System Architecture Overview](#system-architecture-overview)
+2. [Core EA Framework](#core-ea-framework)
+3. [Parameter Management System](#parameter-management-system)
+4. [Communication Bridge System](#communication-bridge-system)
+5. [Reentry Logic Implementation](#reentry-logic-implementation)
+6. [Economic Calendar Integration](#economic-calendar-integration)
+7. [Excel Configuration System](#excel-configuration-system)
+8. [Risk Management & Watchdog](#risk-management--watchdog)
+9. [Database Integration](#database-integration)
+10. [Error Handling & Recovery](#error-handling--recovery)
+11. [Performance Analytics](#performance-analytics)
+12. [Implementation Roadmap](#implementation-roadmap)
+
+---
+
+## System Architecture Overview
+
+### Master System Design Philosophy
+The system is built on three core principles:
+1. **Decoupling & Modularity**: Logic separation for independent development
+2. **Redundancy & Resilience**: Multiple fail-safes for capital preservation
+3. **Flexibility & Control**: External configuration without code recompilation
+
+### High-Level Architecture
+```
+External Systems (Python/Excel) ←→ Communication Bridge ←→ Master EA ←→ MT4 Terminal
+                                           ↓
+                                    Database Layer
+                                           ↓
+                                    Configuration Files
+```
+
+### Component Integration Map
+```
+┌─ Communication Manager ────────┬─ Parameter Manager ─────────┐
+│ • Signal Reception             │ • 10 Parameter Sets         │
+│ • Bridge Interface             │ • Dynamic Selection         │
+│ • Protocol Handling           │ • Validation & Loading      │
+├─ Trading Core ─────────────────┼─ Reentry Logic ─────────────┤
+│ • Order Execution             │ • Outcome Classification    │
+│ • Position Management         │ • Chain Tracking           │
+│ • Risk Controls               │ • Dynamic Sizing            │
+├─ Calendar System ──────────────┼─ Risk Management ───────────┤
+│ • Economic Events             │ • Watchdog System           │
+│ • Auto Import                 │ • Drawdown Monitoring       │
+│ • Trigger Engine              │ • Emergency Controls        │
+└─ Analytics & Logging ─────────┴─ Excel Integration ─────────┘
+│ • Performance Tracking        │ • VBA Configuration         │
+│ • Database Storage            │ • Dynamic Validation        │
+│ • Error Management            │ • Code Generation           │
+└───────────────────────────────┴─────────────────────────────┘
+```
+
+---
+
+## Core EA Framework
+
+### Essential Include Files Structure
+
+#### 1. TradingEACore.mqh
+```cpp
+//+------------------------------------------------------------------+
+//| Core EA Framework - Complete Implementation Base                 |
+//+------------------------------------------------------------------+
+#property strict
+
+// Global Configuration Constants
+#define EA_VERSION "3.0"
+#define EA_MAGIC_BASE 12345
+#define MAX_RETRIES 5
+#define RETRY_DELAY_MS 100
+
+// Include Dependencies
+#include <BridgeInterface.mqh>
+#include <ParameterManager.mqh>
+#include <ReentryLogic.mqh>
+#include <CalendarSystem.mqh>
+#include <RiskManager.mqh>
+#include <DatabaseManager.mqh>
+#include <AnalyticsEngine.mqh>
+
+// Core EA State Management
+enum EA_STATE {
+    STATE_INITIALIZATION,
+    STATE_NORMAL_OPERATION,
+    STATE_EMERGENCY_HALT,
+    STATE_MAINTENANCE_MODE,
+    STATE_SHUTDOWN
+};
+
+// Signal Processing Structure
+struct SignalData {
+    string signal_id;
+    string symbol;
+    string direction;          // BUY/SELL
+    double lot_size;
+    double confidence;
+    string signal_type;        // NORMAL/REENTRY/CALENDAR
+    string source;             // PYTHON/CALENDAR/MANUAL
+    datetime signal_time;
+    int parameter_set_id;
+    string source_trade_id;    // For reentry signals
+    int reentry_action;        // 1-6 for reentry logic
+    string metadata;           // Additional signal data
+};
+
+// Trade Result Structure
+struct TradeResult {
+    string trade_id;
+    string signal_id;
+    string symbol;
+    string direction;
+    double lot_size;
+    double entry_price;
+    double exit_price;
+    double profit_loss;
+    datetime open_time;
+    datetime close_time;
+    string close_reason;
+    int outcome_action;        // 1-6 classification
+    bool is_reentry;
+    string source_trade_id;
+    int reentry_generation;
+    bool success;
+    string error_message;
+};
+
+// Core EA Class Definition
+class CTradingEACore {
+private:
+    EA_STATE m_current_state;
+    string m_symbol;
+    int m_magic_number;
+    bool m_initialized;
+    datetime m_last_heartbeat;
+    
+    // Component Managers
+    CBridgeInterface* m_bridge;
+    CParameterManager* m_parameters;
+    CReentryLogic* m_reentry;
+    CCalendarSystem* m_calendar;
+    CRiskManager* m_risk;
+    CDatabaseManager* m_database;
+    CAnalyticsEngine* m_analytics;
+
+public:
+    // Core Initialization
+    bool Initialize(string symbol, string config_path);
+    void Shutdown();
+    
+    // Main Processing Loop
+    void OnTick();
+    void OnTimer();
+    
+    // Signal Processing
+    bool ProcessSignal(const SignalData& signal);
+    TradeResult ExecuteTrade(const SignalData& signal, int magic_offset = 0);
+    
+    // Position Management
+    void ManageOpenPositions();
+    void UpdateTrailingStops();
+    
+    // State Management
+    void SetState(EA_STATE new_state);
+    EA_STATE GetState() const { return m_current_state; }
+    
+    // Health Monitoring
+    void SendHeartbeat();
+    bool PerformHealthCheck();
+};
+```
+
+#### 2. BridgeInterface.mqh
+```cpp
+//+------------------------------------------------------------------+
+//| Communication Bridge Interface                                   |
+//+------------------------------------------------------------------+
+
+// Communication Methods
+enum COMM_METHOD {
+    COMM_TCP_SOCKET,      // Primary: TCP/IP connection
+    COMM_NAMED_PIPE,      // Secondary: Named pipe
+    COMM_FILE_POLLING     // Tertiary: File-based communication
+};
+
+// Bridge Status
+enum BRIDGE_STATUS {
+    BRIDGE_DISCONNECTED,
+    BRIDGE_CONNECTING,
+    BRIDGE_CONNECTED,
+    BRIDGE_ERROR
+};
+
+class CBridgeInterface {
+private:
+    COMM_METHOD m_primary_method;
+    COMM_METHOD m_current_method;
+    BRIDGE_STATUS m_status;
+    string m_signal_file_path;
+    string m_response_file_path;
+    string m_pipe_name;
+    int m_tcp_port;
+    datetime m_last_message_time;
+    int m_connection_retries;
+
+public:
+    // Initialization
+    bool Initialize(string symbol, string signal_file, string response_file);
+    bool ConnectTCP(int port = 8888);
+    bool ConnectNamedPipe(string pipe_name);
+    bool InitializeFilePolling(string signal_path, string response_path);
+    
+    // Communication
+    bool HasNewSignal();
+    SignalData ReadSignal();
+    bool SendMessage(string message);
+    bool SendTradeResult(const TradeResult& result);
+    bool SendHeartbeat();
+    
+    // Connection Management
+    void Reconnect();
+    BRIDGE_STATUS GetStatus() const { return m_status; }
+    datetime GetLastMessageTime() const { return m_last_message_time; }
+    
+    // Failover Logic
+    void AttemptFailover();
+    bool TestConnection(COMM_METHOD method);
+};
+
+// Implementation Details for Bridge Interface
+bool CBridgeInterface::Initialize(string symbol, string signal_file, string response_file) {
+    m_signal_file_path = signal_file;
+    m_response_file_path = response_file;
+    m_pipe_name = "\\\\.\\pipe\\HUEY_P_ClaudeCentric_SignalPipe";
+    m_tcp_port = 8888;
+    m_connection_retries = 0;
+    
+    // Try primary connection method first
+    if (ConnectTCP(m_tcp_port)) {
+        m_current_method = COMM_TCP_SOCKET;
+        m_status = BRIDGE_CONNECTED;
+        return true;
+    }
+    
+    // Fallback to named pipe
+    if (ConnectNamedPipe(m_pipe_name)) {
+        m_current_method = COMM_NAMED_PIPE;
+        m_status = BRIDGE_CONNECTED;
+        return true;
+    }
+    
+    // Final fallback to file polling
+    if (InitializeFilePolling(m_signal_file_path, m_response_file_path)) {
+        m_current_method = COMM_FILE_POLLING;
+        m_status = BRIDGE_CONNECTED;
+        return true;
+    }
+    
+    m_status = BRIDGE_ERROR;
+    return false;
+}
+
+// Signal Reading Implementation
+SignalData CBridgeInterface::ReadSignal() {
+    SignalData signal;
+    
+    switch(m_current_method) {
+        case COMM_TCP_SOCKET:
+            return ReadSignalFromSocket();
+        case COMM_NAMED_PIPE:
+            return ReadSignalFromPipe();
+        case COMM_FILE_POLLING:
+            return ReadSignalFromFile();
+    }
+    
+    return signal; // Empty signal on failure
+}
+```
+
+---
+
+## Parameter Management System
+
+### Complete Parameter Set Implementation
+
+#### 1. ParameterManager.mqh
+```cpp
+//+------------------------------------------------------------------+
+//| 10 Parameter Set Management System                               |
+//+------------------------------------------------------------------+
+
+// Parameter Set Structure
+struct ParameterSet {
+    int id;                        // Parameter set ID (1-10)
+    double lot_size;               // Base lot size
+    double stop_loss;              // Stop loss in pips
+    double take_profit;            // Take profit in pips
+    double trailing_stop;          // Trailing stop in pips
+    double risk_percent;           // Risk percentage of account
+    int max_positions;             // Maximum concurrent positions
+    int entry_delay;               // Delay before entry (seconds)
+    double confidence_threshold;   // Minimum confidence required
+    bool use_trailing;             // Enable trailing stops
+    int buy_distance;              // Buy pending order distance (pips)
+    int sell_distance;             // Sell pending order distance (pips)
+    int expire_hours;              // Pending order expiration (hours)
+    double max_spread;             // Maximum spread allowed (pips)
+    string description;            // Parameter set description
+    
+    // Advanced Settings
+    bool use_dynamic_sizing;       // Dynamic lot size calculation
+    double volatility_multiplier;  // Volatility-based adjustments
+    int correlation_limit;         // Maximum correlated positions
+    bool enable_news_filter;       // News-based filtering
+    string currency_focus;         // Primary currency focus
+};
+
+class CParameterManager {
+private:
+    ParameterSet m_parameter_sets[10];  // 10 parameter sets
+    int m_current_set;
+    string m_config_file_path;
+    bool m_parameters_loaded;
+    datetime m_last_update;
+
+public:
+    // Initialization
+    bool Initialize(string config_file_path);
+    bool LoadParameterSets();
+    bool SaveParameterSets();
+    
+    // Parameter Set Management
+    ParameterSet GetParameterSet(int set_id);
+    ParameterSet GetCurrentParameterSet();
+    bool SetCurrentParameterSet(int set_id);
+    bool ValidateParameterSet(const ParameterSet& params);
+    
+    // Dynamic Selection
+    int SelectParameterSetBySignal(const SignalData& signal);
+    int SelectParameterSetByMarketCondition();
+    int SelectParameterSetSequential();
+    int SelectParameterSetByPerformance();
+    
+    // Configuration Management
+    bool UpdateParameterSet(int set_id, const ParameterSet& params);
+    void ResetToDefaults();
+    string GetParameterSetSummary(int set_id);
+};
+
+// Default Parameter Sets Configuration
+bool CParameterManager::LoadParameterSets() {
+    // Parameter Set 1: Ultra Conservative (Micro lot)
+    m_parameter_sets[0].id = 1;
+    m_parameter_sets[0].lot_size = 0.01;
+    m_parameter_sets[0].stop_loss = 15;
+    m_parameter_sets[0].take_profit = 30;
+    m_parameter_sets[0].trailing_stop = 10;
+    m_parameter_sets[0].risk_percent = 0.5;
+    m_parameter_sets[0].max_positions = 1;
+    m_parameter_sets[0].entry_delay = 60;
+    m_parameter_sets[0].confidence_threshold = 0.9;
+    m_parameter_sets[0].use_trailing = true;
+    m_parameter_sets[0].description = "Ultra Conservative - News Events";
+    
+    // Parameter Set 2: Conservative (Small lot)
+    m_parameter_sets[1].id = 2;
+    m_parameter_sets[1].lot_size = 0.02;
+    m_parameter_sets[1].stop_loss = 20;
+    m_parameter_sets[1].take_profit = 40;
+    m_parameter_sets[1].trailing_stop = 15;
+    m_parameter_sets[1].risk_percent = 1.0;
+    m_parameter_sets[1].max_positions = 2;
+    m_parameter_sets[1].entry_delay = 30;
+    m_parameter_sets[1].confidence_threshold = 0.8;
+    m_parameter_sets[1].use_trailing = true;
+    m_parameter_sets[1].description = "Conservative - Low Volatility";
+    
+    // Parameter Set 3: Balanced (Standard lot)
+    m_parameter_sets[2].id = 3;
+    m_parameter_sets[2].lot_size = 0.03;
+    m_parameter_sets[2].stop_loss = 25;
+    m_parameter_sets[2].take_profit = 50;
+    m_parameter_sets[2].trailing_stop = 20;
+    m_parameter_sets[2].risk_percent = 1.5;
+    m_parameter_sets[2].max_positions = 3;
+    m_parameter_sets[2].entry_delay = 15;
+    m_parameter_sets[2].confidence_threshold = 0.7;
+    m_parameter_sets[2].use_trailing = true;
+    m_parameter_sets[2].description = "Balanced - Normal Conditions";
+    
+    // Parameter Set 4: Moderate (Medium lot)
+    m_parameter_sets[3].id = 4;
+    m_parameter_sets[3].lot_size = 0.04;
+    m_parameter_sets[3].stop_loss = 30;
+    m_parameter_sets[3].take_profit = 60;
+    m_parameter_sets[3].trailing_stop = 25;
+    m_parameter_sets[3].risk_percent = 2.0;
+    m_parameter_sets[3].max_positions = 4;
+    m_parameter_sets[3].entry_delay = 10;
+    m_parameter_sets[3].confidence_threshold = 0.6;
+    m_parameter_sets[3].use_trailing = true;
+    m_parameter_sets[3].description = "Moderate - Medium Volatility";
+    
+    // Parameter Sets 5-10: Progressive scaling
+    // [Continue pattern with increasing risk/size]
+    
+    return LoadFromCSVFile();
+}
+
+// CSV File Format for Parameter Sets
+/*
+CSV Structure: all_10_parameter_sets.csv
+ID,LotSize,StopLoss,TakeProfit,TrailingStop,RiskPercent,MaxPositions,EntryDelay,ConfidenceThreshold,UseTrailing,Description
+1,0.01,15,30,10,0.5,1,60,0.9,true,"Ultra Conservative"
+2,0.02,20,40,15,1.0,2,30,0.8,true,"Conservative"
+3,0.03,25,50,20,1.5,3,15,0.7,true,"Balanced"
+4,0.04,30,60,25,2.0,4,10,0.6,true,"Moderate"
+5,0.05,35,70,30,2.5,5,5,0.5,true,"Aggressive"
+6,0.06,40,80,35,3.0,6,0,0.4,false,"Very Aggressive"
+7,0.07,45,90,40,3.5,7,0,0.3,false,"High Risk"
+8,0.08,50,100,45,4.0,8,0,0.2,false,"Maximum Risk"
+9,0.1,60,120,50,5.0,10,0,0.1,false,"Extreme Risk"
+10,0.15,80,160,60,7.5,15,0,0.05,false,"Emergency Override"
+*/
+```
+
+#### 2. Signal ID to Parameter Set Mapping System
+```cpp
+//+------------------------------------------------------------------+
+//| Signal Mapping Management                                        |
+//+------------------------------------------------------------------+
+
+// Signal Mapping Structure
+struct SignalMapping {
+    int strategy_id;           // External strategy identifier
+    int parameter_set_id;      // Mapped parameter set (1-10)
+    string signal_type;        // NORMAL/CALENDAR/REENTRY
+    double confidence_modifier; // Adjust confidence requirements
+    string description;        // Mapping description
+    bool enabled;              // Enable/disable mapping
+};
+
+class CSignalMapper {
+private:
+    SignalMapping m_mappings[50];  // Support up to 50 mappings
+    int m_mapping_count;
+    string m_mapping_file_path;
+
+public:
+    bool LoadSignalMappings(string file_path);
+    int GetParameterSetForSignal(const SignalData& signal);
+    bool AddSignalMapping(const SignalMapping& mapping);
+    bool UpdateSignalMapping(int strategy_id, int new_parameter_set);
+};
+
+// CSV File Format: signal_id_mapping.csv
+/*
+StrategyID,ParameterSetID,SignalType,ConfidenceModifier,Description,Enabled
+1,1,NORMAL,1.0,"Python ML Strategy 1",true
+2,2,NORMAL,0.9,"Python ML Strategy 2",true
+301,3,CALENDAR,1.1,"Economic Calendar Events",true
+401,4,REENTRY,0.8,"Reentry Logic Actions",true
+*/
+```
+
+---
+
+## Reentry Logic Implementation
+
+### Complete DIE 1-6 System
+
+#### 1. ReentryLogic.mqh
+```cpp
+//+------------------------------------------------------------------+
+//| Advanced Reentry Logic System                                    |
+//+------------------------------------------------------------------+
+
+// Reentry Action Types
+enum REENTRY_ACTION_TYPE {
+    ACTION_NO_REENTRY,     // 1: Stop loss - no further action
+    ACTION_REDUCE_SIZE,    // 2: Partial loss - reduce position
+    ACTION_SAME_TRADE,     // 3: Breakeven - same parameters
+    ACTION_INCREASE_SIZE,  // 4: Partial profit - increase size
+    ACTION_AGGRESSIVE,     // 5: Take profit - aggressive reentry
+    ACTION_REVERSE,        // 6: Beyond TP - reverse direction
+    ACTION_WAIT_SIGNAL     // Special: Wait for new signal
+};
+
+// Reentry Configuration
+struct ReentryAction {
+    int action_number;                // 1-6 die roll result
+    REENTRY_ACTION_TYPE action_type;  // Type of reentry action
+    double size_multiplier;           // Position size adjustment
+    int delay_seconds;                // Delay before reentry
+    double confidence_adjustment;     // Confidence modifier
+    string parameters;                // Additional parameters
+    bool enabled;                     // Enable/disable action
+};
+
+// Trade Chain Tracking
+struct TradeChain {
+    string chain_id;              // Unique chain identifier
+    string original_trade_id;     // First trade in chain
+    string current_trade_id;      // Current active trade
+    TradeResult trades[10];       // Trade history in chain
+    int trade_count;              // Number of trades in chain
+    int current_generation;       // Current reentry generation
+    int max_generation;           // Maximum allowed generation
+    double total_pnl;             // Chain profit/loss
+    string chain_status;          // ACTIVE/COMPLETED/STOPPED
+    datetime last_activity;       // Last chain activity
+};
+
+class CReentryLogic {
+private:
+    ReentryAction m_actions[7];       // Actions 1-6 (index 0 unused)
+    TradeChain m_active_chains[20];   // Track up to 20 active chains
+    int m_chain_count;
+    string m_config_file_path;
+    bool m_reentry_enabled;
+    int m_max_reentry_generations;
+    double m_chain_max_loss;
+
+public:
+    // Initialization
+    bool Initialize(string config_file);
+    bool LoadReentryConfiguration();
+    bool SaveReentryConfiguration();
+    
+    // Core Reentry Logic
+    int DetermineReentryAction(const TradeResult& closed_trade);
+    bool ExecuteReentryAction(const TradeResult& closed_trade, int action_number);
+    SignalData CreateReentrySignal(const TradeResult& source_trade, int action_number);
+    
+    // Trade Chain Management
+    string CreateTradeChain(const TradeResult& initial_trade);
+    bool AddTradeToChain(const string& chain_id, const TradeResult& trade);
+    TradeChain GetTradeChain(const string& chain_id);
+    bool CloseTradeChain(const string& chain_id, const string& reason);
+    
+    // Outcome Classification
+    int ClassifyTradeOutcome(const TradeResult& trade);
+    double CalculateOutcomeRatio(const TradeResult& trade);
+    
+    // Chain Analysis
+    double GetChainTotalPnL(const string& chain_id);
+    int GetChainGeneration(const string& chain_id);
+    bool ShouldContinueChain(const string& chain_id);
+};
+
+// Trade Outcome Classification Implementation
+int CReentryLogic::ClassifyTradeOutcome(const TradeResult& trade) {
+    // Get original trade parameters
+    double entry_price = trade.entry_price;
+    double exit_price = trade.exit_price;
+    
+    // Calculate theoretical SL and TP levels
+    double stop_loss_level, take_profit_level;
+    if (trade.direction == "BUY") {
+        // For buy trades, SL is below entry, TP above
+        stop_loss_level = entry_price - (m_current_params.stop_loss * Point * 10);
+        take_profit_level = entry_price + (m_current_params.take_profit * Point * 10);
+    } else {
+        // For sell trades, SL is above entry, TP below
+        stop_loss_level = entry_price + (m_current_params.stop_loss * Point * 10);
+        take_profit_level = entry_price - (m_current_params.take_profit * Point * 10);
+    }
+    
+    double breakeven_level = entry_price;
+    
+    // Classify based on exit price relative to key levels
+    double tolerance = Point * 5; // 5 point tolerance for level matching
+    
+    // Logic 1: Hit stop loss
+    if (MathAbs(exit_price - stop_loss_level) <= tolerance) {
+        return 1;
+    }
+    
+    // Logic 2: Between stop loss and breakeven (partial loss)
+    if ((trade.direction == "BUY" && exit_price > stop_loss_level && exit_price < breakeven_level) ||
+        (trade.direction == "SELL" && exit_price < stop_loss_level && exit_price > breakeven_level)) {
+        return 2;
+    }
+    
+    // Logic 3: At breakeven
+    if (MathAbs(exit_price - breakeven_level) <= tolerance) {
+        return 3;
+    }
+    
+    // Logic 4: Between breakeven and take profit (partial profit)
+    if ((trade.direction == "BUY" && exit_price > breakeven_level && exit_price < take_profit_level) ||
+        (trade.direction == "SELL" && exit_price < breakeven_level && exit_price > take_profit_level)) {
+        return 4;
+    }
+    
+    // Logic 5: At take profit
+    if (MathAbs(exit_price - take_profit_level) <= tolerance) {
+        return 5;
+    }
+    
+    // Logic 6: Beyond take profit (exceptional profit)
+    if ((trade.direction == "BUY" && exit_price > take_profit_level) ||
+        (trade.direction == "SELL" && exit_price < take_profit_level)) {
+        return 6;
+    }
+    
+    // Default: Classify as breakeven if unclear
+    return 3;
+}
+
+// Reentry Signal Generation
+SignalData CReentryLogic::CreateReentrySignal(const TradeResult& source_trade, int action_number) {
+    SignalData reentry_signal;
+    ReentryAction action = m_actions[action_number];
+    
+    // Basic signal properties
+    reentry_signal.signal_id = "REENTRY_" + source_trade.trade_id + "_" + IntegerToString(action_number);
+    reentry_signal.symbol = source_trade.symbol;
+    reentry_signal.signal_type = "REENTRY";
+    reentry_signal.source = "REENTRY_LOGIC";
+    reentry_signal.signal_time = TimeCurrent();
+    reentry_signal.source_trade_id = source_trade.trade_id;
+    reentry_signal.reentry_action = action_number;
+    
+    // Determine direction based on action type
+    switch(action.action_type) {
+        case ACTION_REVERSE:
+            reentry_signal.direction = (source_trade.direction == "BUY") ? "SELL" : "BUY";
+            break;
+        default:
+            reentry_signal.direction = source_trade.direction; // Same direction
+            break;
+    }
+    
+    // Calculate lot size adjustment
+    reentry_signal.lot_size = source_trade.lot_size * action.size_multiplier;
+    
+    // Adjust confidence
+    reentry_signal.confidence = 0.8 * action.confidence_adjustment; // Base reentry confidence
+    
+    // Set metadata
+    reentry_signal.metadata = StringFormat("Reentry Action %d: %s", 
+                                         action_number, 
+                                         EnumToString(action.action_type));
+    
+    return reentry_signal;
+}
+```
+
+#### 2. Reentry Configuration File Format
+```cpp
+// CSV Structure: reentry_config.csv
+/*
+Action,Type,SizeMultiplier,DelaySeconds,ConfidenceAdjustment,Enabled,Parameters
+1,NO_REENTRY,0.0,0,1.0,true,"Stop loss hit - no reentry"
+2,REDUCE_SIZE,0.5,30,0.8,true,"Partial loss - reduce position size"
+3,SAME_TRADE,1.0,15,1.0,true,"Breakeven - same trade parameters"
+4,INCREASE_SIZE,1.5,10,1.1,true,"Partial profit - increase confidence"
+5,SAME_TRADE,1.0,5,1.0,true,"Take profit hit - repeat success"
+6,AGGRESSIVE,2.0,0,1.2,true,"Beyond TP - strong signal confirmation"
+*/
+
+// Alternative Profiles
+// Conservative Profile: reentry_config_conservative.csv
+/*
+Action,Type,SizeMultiplier,DelaySeconds,ConfidenceAdjustment,Enabled,Parameters
+1,NO_REENTRY,0.0,0,1.0,true,"Stop loss - wait for better setup"
+2,WAIT_SIGNAL,0.0,300,1.0,true,"Partial loss - wait 5 minutes"
+3,REDUCE_SIZE,0.5,60,0.9,true,"Breakeven - smaller position"
+4,SAME_TRADE,0.8,30,1.0,true,"Partial profit - slightly smaller"
+5,SAME_TRADE,1.0,15,1.0,true,"Take profit - repeat"
+6,INCREASE_SIZE,1.2,10,1.1,true,"Beyond TP - modest increase"
+*/
+```
+
+---
+
+## Economic Calendar Integration
+
+### Complete Calendar System Implementation
+
+#### 1. CalendarSystem.mqh
+```cpp
+//+------------------------------------------------------------------+
+//| Economic Calendar Integration System                             |
+//+------------------------------------------------------------------+
+
+// Economic Event Structure
+struct EconomicEvent {
+    string event_id;           // Unique event identifier
+    string title;              // Event name
+    string country;            // Currency code (USD, EUR, etc.)
+    datetime event_time;       // Event time in CST
+    string impact;             // High/Medium/Low
+    string forecast;           // Expected value
+    string previous;           // Previous reading
+    string event_type;         // ECONOMIC/ANTICIPATION/EQUITY
+    int parameter_set_id;      // Assigned parameter set (1-4)
+    bool enabled;              // User toggle
+    datetime trigger_time;     // Calculated trigger time
+    string status;             // PENDING/TRIGGERED/COMPLETED/BLOCKED
+};
+
+// Calendar Configuration
+struct CalendarConfig {
+    bool auto_import_enabled;      // Auto import on Sunday 12 PM
+    string downloads_path;         // Downloads folder path
+    int anticipation_hours[3];     // Hours before event [1,2,4]
+    int trigger_offset_minutes;    // Minutes before event to trigger
+    bool process_anticipation;     // Generate anticipation events
+    int parameter_selection_method; // 0=Sequential, 1=Random, 2=Impact-based
+    int max_events_per_day;       // Daily event limit
+};
+
+class CCalendarSystem {
+private:
+    EconomicEvent m_events[200];   // Up to 200 events
+    int m_event_count;
+    CalendarConfig m_config;
+    datetime m_last_import;
+    datetime m_next_import;
+    bool m_system_enabled;
+    int m_last_parameter_set;
+
+public:
+    // System Initialization
+    bool Initialize(string config_file);
+    bool LoadCalendarConfiguration();
+    bool SaveCalendarConfiguration();
+    
+    // Calendar Import System
+    bool ExecuteCalendarImport(bool manual_trigger = false);
+    bool FindCalendarFile(string& file_path);
+    bool ParseCalendarCSV(const string& file_path);
+    bool ProcessCalendarData();
+    
+    // Event Management
+    bool AddEvent(const EconomicEvent& event);
+    EconomicEvent GetNextEvent();
+    bool UpdateEventStatus(const string& event_id, const string& status);
+    int GetActiveEventCount();
+    
+    // Anticipation Event Generation
+    bool GenerateAnticipationEvents();
+    EconomicEvent CreateAnticipationEvent(const EconomicEvent& original, int hours_offset);
+    bool ValidateAnticipationEvents();
+    
+    // Event Triggering
+    bool MonitorEvents();
+    bool TriggerEvent(const EconomicEvent& event);
+    SignalData CreateCalendarSignal(const EconomicEvent& event);
+    
+    // Parameter Set Selection
+    int SelectParameterSetForEvent(const EconomicEvent& event);
+    int GetNextSequentialParameterSet();
+    
+    // Import Scheduling
+    void ScheduleNextImport();
+    bool IsImportTime();
+    datetime GetNextSundayNoon();
+};
+
+// Calendar Import Implementation
+bool CCalendarSystem::ExecuteCalendarImport(bool manual_trigger) {
+    Print("Starting calendar import process...");
+    
+    string file_path;
+    if (!FindCalendarFile(file_path)) {
+        Print("No calendar file found in Downloads folder");
+        return false;
+    }
+    
+    Print("Found calendar file: ", file_path);
+    
+    if (!ParseCalendarCSV(file_path)) {
+        Print("Failed to parse calendar CSV file");
+        return false;
+    }
+    
+    if (!ProcessCalendarData()) {
+        Print("Failed to process calendar data");
+        return false;
+    }
+    
+    if (m_config.process_anticipation) {
+        if (!GenerateAnticipationEvents()) {
+            Print("Warning: Failed to generate anticipation events");
+        }
+    }
+    
+    m_last_import = TimeCurrent();
+    
+    // Archive processed file
+    string archive_path = StringFormat("%s\\archive\\%s_%d.csv", 
+                                     m_config.downloads_path,
+                                     "calendar",
+                                     (int)TimeCurrent());
+    
+    FileCopy(file_path, 0, archive_path, 0);
+    FileDelete(file_path, 0);
+    
+    Print("Calendar import completed successfully. Events loaded: ", m_event_count);
+    return true;
+}
+
+// File Detection Priority System
+bool CCalendarSystem::FindCalendarFile(string& file_path) {
+    string search_patterns[] = {
+        "ff_calendar*.csv",           // ForexFactory - highest priority
+        "*calendar*thisweek*.csv",    // This week calendars
+        "*economic*calendar*.csv",    // Economic calendar files
+        "*calendar*.csv",             // General calendar files
+        "*forex*.csv"                 // Forex calendar files
+    };
+    
+    for (int i = 0; i < ArraySize(search_patterns); i++) {
+        string pattern = search_patterns[i];
+        
+        // Search Downloads folder for files matching pattern
+        string file_name;
+        long search_handle = FileFindFirst(m_config.downloads_path + "\\" + pattern, file_name);
+        
+        if (search_handle != INVALID_HANDLE) {
+            file_path = m_config.downloads_path + "\\" + file_name;
+            FileFindClose(search_handle);
+            return true;
+        }
+    }
+    
+    return false; // No calendar file found
+}
+
+// Calendar Signal Generation
+SignalData CCalendarSystem::CreateCalendarSignal(const EconomicEvent& event) {
+    SignalData signal;
+    
+    signal.signal_id = "CAL_" + event.event_id + "_" + IntegerToString((int)TimeCurrent());
+    signal.symbol = "EURUSD"; // Default symbol for calendar signals
+    signal.signal_type = "CALENDAR";
+    signal.source = "CALENDAR_SYSTEM";
+    signal.signal_time = TimeCurrent();
+    signal.parameter_set_id = event.parameter_set_id;
+    
+    // Determine direction based on currency and event type
+    if (event.country == "USD") {
+        signal.direction = (event.impact == "High") ? "SELL" : "BUY"; // USD strength assumption
+    } else {
+        signal.direction = (event.impact == "High") ? "BUY" : "SELL";
+    }
+    
+    // Set confidence based on impact level
+    if (event.impact == "High") {
+        signal.confidence = 0.8;
+    } else if (event.impact == "Medium") {
+        signal.confidence = 0.6;
+    } else {
+        signal.confidence = 0.4;
+    }
+    
+    // Calculate lot size from parameter set
+    ParameterSet params = GetParameterSet(event.parameter_set_id);
+    signal.lot_size = params.lot_size;
+    
+    signal.metadata = StringFormat("Calendar Event: %s (%s %s)", 
+                                  event.title, 
+                                  event.country, 
+                                  event.impact);
+    
+    return signal;
+}
+```
+
+#### 2. Calendar Import File Formats
+```cpp
+// Expected CSV Format 1 (ForexFactory):
+/*
+File: ff_calendar_thisweek.csv
+Headers: Title,Country,Date,Time,Impact,Forecast,Previous,URL
+
+Sample Data:
+Non-Farm Employment Change,USD,12-05-2024,14:30,High,180K,150K,https://...
+Federal Reserve Chair Powell Speaks,USD,12-05-2024,16:00,High,,,https://...
+ADP Non-Farm Employment Change,USD,12-04-2024,14:15,Medium,150K,143K,https://...
+Consumer Price Index m/m,EUR,12-06-2024,11:00,High,0.3%,0.2%,https://...
+*/
+
+// Expected CSV Format 2 (Generic):
+/*
+File: economic_calendar_2024.csv
+Headers: Event,Currency,Date,Time,Importance,Expected,Previous,Link
+
+Sample Data:
+NFP,USD,2024-12-05,2:30 PM,High,180K,150K,
+ECB Rate Decision,EUR,2024-12-06,8:45 AM,High,4.50%,4.50%,
+PMI Manufacturing,GBP,2024-12-04,9:30 AM,Medium,52.1,51.8,
+*/
+```
+
+---
+
+## Excel Configuration System
+
+### Complete VBA Integration Framework
+
+#### 1. Excel VBA System Architecture
+```vba
+' ========================================
+' TradingSystemMain.bas - Master VBA Module
+' ========================================
+
+Option Explicit
+
+' System Configuration Constants
+Public Const SYSTEM_VERSION As String = "3.0"
+Public Const MAX_PARAMETER_SETS As Integer = 10
+Public Const REFRESH_INTERVAL_SECONDS As Integer = 15
+
+' System State Variables
+Public g_SystemInitialized As Boolean
+Public g_TimerActive As Boolean
+Public g_LastUpdate As Date
+Public g_MT4DataPath As String
+
+' Component Managers
+Public g_ParameterManager As Object
+Public g_CalendarManager As Object
+Public g_ValidationEngine As Object
+
+' ========================================
+' SYSTEM INITIALIZATION
+' ========================================
+
+Public Sub InitializeTradingSystem()
+    On Error GoTo ErrorHandler
+    
+    ' Initialize system components
+    Call InitializeSystemInfrastructure()
+    Call InitializeParameterManager()
+    Call InitializeCalendarSystem()
+    Call InitializeValidationEngine()
+    Call InitializeDashboards()
+    
+    ' Start system timer
+    Call StartSystemTimer()
+    
+    g_SystemInitialized = True
+    g_LastUpdate = Now
+    
+    MsgBox "Trading System initialized successfully!", vbInformation
+    
+    Exit Sub
+    
+ErrorHandler:
+    MsgBox "System initialization failed: " & Err.Description, vbCritical
+End Sub
+
+' ========================================
+' PARAMETER MANAGEMENT VBA
+' ========================================
+
+Public Sub UpdateParameterSet(setID As Integer)
+    On Error GoTo ErrorHandler
+    
+    Dim ws As Worksheet
+    Set ws = ThisWorkbook.Worksheets("ParameterConfig")
+    
+    ' Validate parameter set
+    If Not ValidateParameterSetData(ws, setID) Then
+        MsgBox "Parameter validation failed for Set " & setID, vbExclamation
+        Exit Sub
+    End If
+    
+    ' Update parameter set in memory
+    Call g_ParameterManager.UpdateParameterSet(setID, GetParameterSetFromSheet(ws, setID))
+    
+    ' Generate MQL4 code if needed
+    If ws.Range("AutoGenerateCode").Value = True Then
+        Call GenerateMQL4ParameterCode(setID)
+    End If
+    
+    ' Save to CSV file
+    Call ExportParameterSetToCSV(setID)
+    
+    MsgBox "Parameter Set " & setID & " updated successfully!", vbInformation
+    
+    Exit Sub
+    
+ErrorHandler:
+    MsgBox "Parameter update failed: " & Err.Description, vbCritical
+End Sub
+
+' ========================================
+' PARAMETER VALIDATION ENGINE
+' ========================================
+
+Public Function ValidateParameterSetData(ws As Worksheet, setID As Integer) As Boolean
+    On Error GoTo ErrorHandler
+    
+    Dim valid As Boolean: valid = True
+    Dim errorMsg As String: errorMsg = ""
+    
+    ' Validate lot size
+    Dim lotSize As Double
+    lotSize = ws.Range("LotSize_" & setID).Value
+    If lotSize <= 0 Or lotSize > 10 Then
+        valid = False
+        errorMsg = errorMsg & "Invalid lot size (must be 0-10)" & vbCrLf
+    End If
+    
+    ' Validate stop loss
+    Dim stopLoss As Integer
+    stopLoss = ws.Range("StopLoss_" & setID).Value
+    If stopLoss <= 0 Or stopLoss > 500 Then
+        valid = False
+        errorMsg = errorMsg & "Invalid stop loss (must be 1-500 pips)" & vbCrLf
+    End If
+    
+    ' Validate take profit
+    Dim takeProfit As Integer
+    takeProfit = ws.Range("TakeProfit_" & setID).Value
+    If takeProfit <= 0 Or takeProfit > 1000 Then
+        valid = False
+        errorMsg = errorMsg & "Invalid take profit (must be 1-1000 pips)" & vbCrLf
+    End If
+    
+    ' Validate risk percentage
+    Dim riskPercent As Double
+    riskPercent = ws.Range("RiskPercent_" & setID).Value
+    If riskPercent <= 0 Or riskPercent > 10 Then
+        valid = False
+        errorMsg = errorMsg & "Invalid risk percentage (must be 0-10%)" & vbCrLf
+    End If
+    
+    ' Check parameter relationships
+    If takeProfit <= stopLoss Then
+        valid = False
+        errorMsg = errorMsg & "Take profit must be greater than stop loss" & vbCrLf
+    End If
+    
+    If Not valid Then
+        MsgBox "Validation errors:" & vbCrLf & errorMsg, vbExclamation
+    End If
+    
+    ValidateParameterSetData = valid
+    Exit Function
+    
+ErrorHandler:
+    ValidateParameterSetData = False
+End Function
+
+' ========================================
+' MQL4 CODE GENERATION
+' ========================================
+
+Public Sub GenerateMQL4ParameterCode(setID As Integer)
+    On Error GoTo ErrorHandler
+    
+    Dim ws As Worksheet
+    Set ws = ThisWorkbook.Worksheets("ParameterConfig")
+    
+    ' Get parameter values
+    Dim params As String
+    params = "// Generated Parameter Set " & setID & vbCrLf
+    params = params & "// Generated: " & Format(Now, "yyyy-mm-dd hh:mm:ss") & vbCrLf & vbCrLf
+    
+    params = params & "input double LotSize_" & setID & " = " & ws.Range("LotSize_" & setID).Value & ";" & vbCrLf
+    params = params & "input int StopLoss_" & setID & " = " & ws.Range("StopLoss_" & setID).Value & ";" & vbCrLf
+    params = params & "input int TakeProfit_" & setID & " = " & ws.Range("TakeProfit_" & setID).Value & ";" & vbCrLf
+    params = params & "input double RiskPercent_" & setID & " = " & ws.Range("RiskPercent_" & setID).Value & ";" & vbCrLf
+    params = params & "input int MaxPositions_" & setID & " = " & ws.Range("MaxPositions_" & setID).Value & ";" & vbCrLf
+    params = params & "input bool UseTrailing_" & setID & " = " & LCase(ws.Range("UseTrailing_" & setID).Value) & ";" & vbCrLf
+    
+    ' Add parameter set structure
+    params = params & vbCrLf & "// Parameter Set Structure" & vbCrLf
+    params = params & "struct ParameterSet" & setID & " {" & vbCrLf
+    params = params & "    double lot_size = LotSize_" & setID & ";" & vbCrLf
+    params = params & "    int stop_loss = StopLoss_" & setID & ";" & vbCrLf
+    params = params & "    int take_profit = TakeProfit_" & setID & ";" & vbCrLf
+    params = params & "    double risk_percent = RiskPercent_" & setID & ";" & vbCrLf
+    params = params & "    int max_positions = MaxPositions_" & setID & ";" & vbCrLf
+    params = params & "    bool use_trailing = UseTrailing_" & setID & ";" & vbCrLf
+    params = params & "};" & vbCrLf
+    
+    ' Write to file
+    Dim filePath As String
+    filePath = g_MT4DataPath & "\Include\ParameterSet" & setID & "_Generated.mqh"
+    
+    Dim fileNum As Integer
+    fileNum = FreeFile
+    Open filePath For Output As fileNum
+    Print #fileNum, params
+    Close fileNum
+    
+    ' Update code generation log
+    ws.Range("LastCodeGeneration_" & setID).Value = Now
+    
+    Exit Sub
+    
+ErrorHandler:
+    MsgBox "Code generation failed: " & Err.Description, vbCritical
+End Sub
+
+' ========================================
+' CALENDAR INTEGRATION VBA
+' ========================================
+
+Public Sub ImportCalendarData()
+    On Error GoTo ErrorHandler
+    
+    ' Find calendar file in Downloads
+    Dim downloadsPath As String
+    downloadsPath = Environ("USERPROFILE") & "\Downloads"
+    
+    Dim calendarFile As String
+    calendarFile = FindCalendarFile(downloadsPath)
+    
+    If calendarFile = "" Then
+        MsgBox "No calendar file found in Downloads folder", vbExclamation
+        Exit Sub
+    End If
+    
+    ' Import and process calendar data
+    Call ProcessCalendarFile(calendarFile)
+    
+    ' Generate calendar signals if enabled
+    If Range("CalendarSignalsEnabled").Value = True Then
+        Call GenerateCalendarSignals()
+    End If
+    
+    MsgBox "Calendar data imported successfully!", vbInformation
+    
+    Exit Sub
+    
+ErrorHandler:
+    MsgBox "Calendar import failed: " & Err.Description, vbCritical
+End Sub
+
+Function FindCalendarFile(folderPath As String) As String
+    Dim fileName As String
+    Dim patterns As Variant
+    patterns = Array("ff_calendar*.csv", "*calendar*thisweek*.csv", "*economic*calendar*.csv")
+    
+    Dim i As Integer
+    For i = 0 To UBound(patterns)
+        fileName = Dir(folderPath & "\" & patterns(i))
+        If fileName <> "" Then
+            FindCalendarFile = folderPath & "\" & fileName
+            Exit Function
+        End If
+    Next i
+    
+    FindCalendarFile = ""
+End Function
+```
+
+#### 2. Excel Dashboard Layouts
+```vba
+' ========================================
+' Dashboard Creation and Management
+' ========================================
+
+Public Sub CreateTradingDashboard()
+    On Error GoTo ErrorHandler
+    
+    Dim ws As Worksheet
+    Set ws = ThisWorkbook.Worksheets.Add
+    ws.Name = "TradingDashboard"
+    
+    ' Setup dashboard grid (40 rows x 20 columns)
+    With ws
+        .Range("A1:T40").ColumnWidth = 6
+        .Range("A1:T40").RowHeight = 20
+        
+        ' Header section (Rows 1-3)
+        .Range("A1:T3").Merge
+        .Range("A1").Value = "TRADING SYSTEM DASHBOARD v" & SYSTEM_VERSION
+        .Range("A1").Font.Size = 16
+        .Range("A1").Font.Bold = True
+        .Range("A1").HorizontalAlignment = xlHAlignCenter
+        
+        ' Quadrant 1: Account Status (A4:J21)
+        Call CreateAccountStatusQuadrant(ws, "A4:J21")
+        
+        ' Quadrant 2: System Health (K4:T21)
+        Call CreateSystemHealthQuadrant(ws, "K4:T21")
+        
+        ' Quadrant 3: Active Trades (A22:J39)
+        Call CreateActiveTradesQuadrant(ws, "A22:J39")
+        
+        ' Quadrant 4: Performance (K22:T39)
+        Call CreatePerformanceQuadrant(ws, "K22:T39")
+        
+        ' Status bar (Row 40)
+        .Range("A40:T40").Merge
+        .Range("A40").Value = "Last Update: " & Format(Now, "yyyy-mm-dd hh:mm:ss")
+        .Range("A40").HorizontalAlignment = xlHAlignCenter
+    End With
+    
+    Exit Sub
+    
+ErrorHandler:
+    MsgBox "Dashboard creation failed: " & Err.Description, vbCritical
+End Sub
+
+' ========================================
+' EXCEL WORKSHEET STRUCTURES
+' ========================================
+
+' Worksheet: ParameterConfig
+' Layout:
+' A1: Parameter Set ID (1-10)
+' B1: Lot Size
+' C1: Stop Loss (pips)
+' D1: Take Profit (pips)
+' E1: Risk Percent
+' F1: Max Positions
+' G1: Trailing Stop
+' H1: Use Trailing (TRUE/FALSE)
+' I1: Confidence Threshold
+' J1: Description
+
+' Worksheet: CalendarEvents
+' Layout:
+' A1: Event Date
+' B1: Event Time
+' C1: Event Title
+' D1: Currency
+' E1: Impact (High/Medium/Low)
+' F1: Parameter Set ID
+' G1: Enabled (TRUE/FALSE)
+' H1: Status (PENDING/TRIGGERED/COMPLETED)
+
+' Worksheet: SignalHistory
+' Layout:
+' A1: Signal ID
+' B1: Timestamp
+' C1: Symbol
+' D1: Direction
+' E1: Lot Size
+' F1: Parameter Set Used
+' G1: Source (NORMAL/CALENDAR/REENTRY)
+' H1: Result (SUCCESS/FAILED)
+```
+
+---
+
+## Risk Management & Watchdog
+
+### Complete Risk Management Implementation
+
+#### 1. RiskManager.mqh
+```cpp
+//+------------------------------------------------------------------+
+//| Comprehensive Risk Management System                             |
+//+------------------------------------------------------------------+
+
+// Risk Alert Levels
+enum RISK_LEVEL {
+    RISK_NORMAL,          // Normal trading conditions
+    RISK_WARNING,         // Elevated risk - reduce activity
+    RISK_CRITICAL,        // High risk - minimal trading
+    RISK_EMERGENCY        // Emergency - halt all trading
+};
+
+// Risk Monitoring Structure
+struct RiskMetrics {
+    double account_balance;           // Current account balance
+    double account_equity;            // Current account equity
+    double peak_equity;               // Highest equity reached
+    double current_drawdown;          // Current drawdown amount
+    double max_drawdown_percent;      // Maximum allowed drawdown %
+    int consecutive_losses;           // Current consecutive loss count
+    int max_consecutive_losses;       // Maximum allowed consecutive losses
+    double daily_loss_amount;         // Today's total loss
+    double daily_loss_limit;          // Daily loss limit
+    datetime rapid_loss_start_time;   // Rapid loss detection start
+    double rapid_loss_amount;         // Loss amount in rapid window
+    int rapid_loss_timeframe_minutes; // Rapid loss detection window
+    double rapid_loss_percent_limit;  // Rapid loss percentage limit
+    RISK_LEVEL current_risk_level;    // Current risk assessment
+};
+
+// Emergency Actions
+enum EMERGENCY_ACTION {
+    ACTION_REDUCE_RISK,      // Reduce position sizes
+    ACTION_PAUSE_TRADING,    // Pause new trades
+    ACTION_CLOSE_LOSERS,     // Close losing positions
+    ACTION_CLOSE_ALL,        // Close all positions
+    ACTION_HALT_SYSTEM       // Complete system halt
+};
+
+class CRiskManager {
+private:
+    RiskMetrics m_metrics;
+    bool m_watchdog_active;
+    bool m_emergency_halt_active;
+    datetime m_last_check;
+    string m_halt_reason;
+    
+    // Risk thresholds
+    double m_max_drawdown_percent;
+    int m_max_consecutive_losses;
+    double m_daily_loss_limit_percent;
+    double m_rapid_loss_percent;
+    int m_rapid_loss_minutes;
+
+public:
+    // Initialization
+    bool Initialize(string config_file);
+    bool LoadRiskConfiguration();
+    
+    // Main Risk Monitoring
+    bool PerformRiskCheck();
+    RISK_LEVEL AssessRiskLevel();
+    bool CheckDrawdownLimit();
+    bool CheckConsecutiveLosses();
+    bool CheckDailyLossLimit();
+    bool CheckRapidLossDetection();
+    
+    // Emergency Actions
+    bool ExecuteEmergencyAction(EMERGENCY_ACTION action);
+    bool EmergencyHaltSystem(const string& reason);
+    bool CloseAllPositions();
+    bool CloseLossingPositions();
+    
+    // Risk Level Management
+    void UpdateRiskLevel(RISK_LEVEL new_level);
+    bool IsTradeAllowed(const SignalData& signal);
+    double CalculateAllowedLotSize(double requested_size);
+    
+    // Monitoring and Alerts
+    void SendRiskAlert(const string& message, RISK_LEVEL level);
+    void LogRiskEvent(const string& event, const RiskMetrics& metrics);
+    string GetRiskStatusReport();
+    
+    // State Management
+    void SetEmergencyHalt(bool active, const string& reason = "");
+    bool IsEmergencyHaltActive() const { return m_emergency_halt_active; }
+    string GetHaltReason() const { return m_halt_reason; }
+};
+
+// Risk Assessment Implementation
+RISK_LEVEL CRiskManager::AssessRiskLevel() {
+    UpdateRiskMetrics();
+    
+    // Emergency level checks
+    if (m_metrics.current_drawdown > m_max_drawdown_percent ||
+        m_metrics.consecutive_losses >= m_max_consecutive_losses ||
+        m_metrics.daily_loss_amount > m_metrics.daily_loss_limit) {
+        return RISK_EMERGENCY;
+    }
+    
+    // Critical level checks
+    if (m_metrics.current_drawdown > (m_max_drawdown_percent * 0.8) ||
+        m_metrics.consecutive_losses >= (m_max_consecutive_losses - 1) ||
+        m_metrics.daily_loss_amount > (m_metrics.daily_loss_limit * 0.8)) {
+        return RISK_CRITICAL;
+    }
+    
+    // Warning level checks
+    if (m_metrics.current_drawdown > (m_max_drawdown_percent * 0.6) ||
+        m_metrics.consecutive_losses >= (m_max_consecutive_losses - 2) ||
+        m_metrics.daily_loss_amount > (m_metrics.daily_loss_limit * 0.6)) {
+        return RISK_WARNING;
+    }
+    
+    return RISK_NORMAL;
+}
+
+// Emergency Halt Implementation
+bool CRiskManager::EmergencyHaltSystem(const string& reason) {
+    Print("EMERGENCY HALT TRIGGERED: ", reason);
+    
+    // Close all open positions
+    CloseAllPositions();
+    
+    // Set global halt flag
+    GlobalVariableSet("GVAR_TRADE_HALT", 1);
+    
+    // Set emergency state
+    SetEmergencyHalt(true, reason);
+    
+    // Send notifications
+    SendNotification("EMERGENCY HALT: " + reason);
+    Alert("TRADING SYSTEM EMERGENCY HALT: " + reason);
+    
+    // Log emergency event
+    LogRiskEvent("EMERGENCY_HALT", m_metrics);
+    
+    return true;
+}
+
+// Trade Permission Checking
+bool CRiskManager::IsTradeAllowed(const SignalData& signal) {
+    // Check if emergency halt is active
+    if (m_emergency_halt_active) {
+        return false;
+    }
+    
+    // Check global halt flag
+    if (GlobalVariableGet("GVAR_TRADE_HALT") > 0) {
+        return false;
+    }
+    
+    // Check risk level restrictions
+    RISK_LEVEL current_level = AssessRiskLevel();
+    
+    switch(current_level) {
+        case RISK_EMERGENCY:
+            return false; // No new trades allowed
+            
+        case RISK_CRITICAL:
+            // Only allow high confidence trades
+            return (signal.confidence >= 0.9);
+            
+        case RISK_WARNING:
+            // Only allow medium-high confidence trades
+            return (signal.confidence >= 0.7);
+            
+        case RISK_NORMAL:
+            // Normal trading allowed
+            return true;
+    }
+    
+    return false;
+}
+```
+
+#### 2. System Watchdog Implementation
+```cpp
+//+------------------------------------------------------------------+
+//| Independent System Watchdog                                      |
+//+------------------------------------------------------------------+
+
+class CSystemWatchdog {
+private:
+    bool m_watchdog_enabled;
+    datetime m_last_check;
+    double m_initial_balance;
+    double m_peak_equity;
+    int m_check_interval_seconds;
+    
+    // Watchdog thresholds
+    double m_max_drawdown_percent;
+    int m_max_consecutive_losses;
+    double m_rapid_loss_percent;
+    int m_rapid_loss_timeframe_minutes;
+
+public:
+    // Watchdog Initialization
+    bool Initialize();
+    bool LoadWatchdogConfiguration();
+    
+    // Main Watchdog Loop
+    void PerformWatchdogCheck();
+    bool CheckAccountSafety();
+    bool CheckSystemHealth();
+    
+    // Account Monitoring
+    bool MonitorDrawdown();
+    bool MonitorConsecutiveLosses();
+    bool MonitorRapidLoss();
+    bool MonitorEquityProgression();
+    
+    // System Actions
+    void TriggerEmergencyShutdown(const string& reason);
+    void SendWatchdogAlert(const string& message);
+    void LogWatchdogEvent(const string& event);
+    
+    // Status Reporting
+    string GetWatchdogStatus();
+    double GetCurrentDrawdown();
+    int GetConsecutiveLossCount();
+};
+
+// Watchdog Check Implementation
+void CSystemWatchdog::PerformWatchdogCheck() {
+    if (!m_watchdog_enabled) return;
+    
+    datetime current_time = TimeCurrent();
+    if (current_time - m_last_check < m_check_interval_seconds) return;
+    
+    // Update peak equity tracking
+    double current_equity = AccountEquity();
+    if (current_equity > m_peak_equity) {
+        m_peak_equity = current_equity;
+    }
+    
+    // Perform safety checks
+    if (!CheckAccountSafety()) {
+        TriggerEmergencyShutdown("Account safety check failed");
+        return;
+    }
+    
+    if (!CheckSystemHealth()) {
+        TriggerEmergencyShutdown("System health check failed");
+        return;
+    }
+    
+    m_last_check = current_time;
+    
+    // Update global variables for EA monitoring
+    GlobalVariableSet("GVAR_PEAK_EQUITY", m_peak_equity);
+    GlobalVariableSet("GVAR_CURRENT_DRAWDOWN", GetCurrentDrawdown());
+    GlobalVariableSet("GVAR_CONSECUTIVE_LOSSES", GetConsecutiveLossCount());
+}
+```
+
+---
+
+## Database Integration
+
+### Complete Database Management System
+
+#### 1. DatabaseManager.mqh
+```cpp
+//+------------------------------------------------------------------+
+//| Database Integration System                                      |
+//+------------------------------------------------------------------+
+
+// Database Configuration
+struct DatabaseConfig {
+    string connection_string;     // SQLite connection string
+    string database_path;         // Database file path
+    bool auto_backup_enabled;     // Auto backup feature
+    int backup_interval_hours;    // Backup frequency
+    int max_records_per_table;    // Table size limits
+    bool compression_enabled;     // Data compression
+};
+
+// Table Structures
+enum TABLE_TYPE {
+    TABLE_TRADES,           // Trade execution records
+    TABLE_SIGNALS,          // Signal history
+    TABLE_REENTRY_CHAINS,   // Reentry chain tracking
+    TABLE_CALENDAR_EVENTS,  // Calendar event log
+    TABLE_PERFORMANCE,      // Performance metrics
+    TABLE_RISK_EVENTS,      // Risk management events
+    TABLE_SYSTEM_LOG        // System event log
+};
+
+class CDatabaseManager {
+private:
+    DatabaseConfig m_config;
+    bool m_database_connected;
+    string m_connection_handle;
+    datetime m_last_backup;
+
+public:
+    // Database Initialization
+    bool Initialize(string config_file);
+    bool ConnectDatabase();
+    bool CreateTables();
+    bool VerifyDatabaseStructure();
+    
+    // Trade Data Management
+    bool LogTrade(const TradeResult& trade);
+    bool UpdateTrade(const string& trade_id, const TradeResult& updated_trade);
+    TradeResult GetTrade(const string& trade_id);
+    TradeResult GetTradeHistory(datetime start_date, datetime end_date);
+    
+    // Signal Data Management
+    bool LogSignal(const SignalData& signal);
+    bool UpdateSignalResult(const string& signal_id, const string& result);
+    SignalData GetSignalHistory(datetime start_date, datetime end_date);
+    
+    // Reentry Chain Management
+    bool CreateReentryChain(const string& chain_id, const string& original_trade_id);
+    bool AddTradeToChain(const string& chain_id, const string& trade_id);
+    bool UpdateChainStatus(const string& chain_id, const string& status);
+    string GetChainData(const string& chain_id);
+    
+    // Performance Analytics
+    bool LogPerformanceMetrics(datetime timestamp, const string& metrics_json);
+    string GetPerformanceData(datetime start_date, datetime end_date);
+    double CalculateWinRate(datetime start_date, datetime end_date);
+    double CalculateProfitFactor(datetime start_date, datetime end_date);
+    
+    // System Event Logging
+    bool LogSystemEvent(const string& event_type, const string& message);
+    bool LogRiskEvent(const string& event_type, const RiskMetrics& metrics);
+    string GetSystemLog(datetime start_date, datetime end_date);
+    
+    // Database Maintenance
+    bool BackupDatabase();
+    bool CompactDatabase();
+    bool CleanOldRecords(int days_to_keep);
+    bool RepairDatabase();
+};
+
+// Database Schema Definitions
+string CreateTradesTableSQL() {
+    return "CREATE TABLE IF NOT EXISTS trades ("
+           "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+           "trade_id TEXT UNIQUE NOT NULL,"
+           "signal_id TEXT,"
+           "symbol TEXT NOT NULL,"
+           "direction TEXT NOT NULL,"
+           "lot_size REAL NOT NULL,"
+           "entry_price REAL,"
+           "exit_price REAL,"
+           "profit_loss REAL,"
+           "open_time DATETIME,"
+           "close_time DATETIME,"
+           "close_reason TEXT,"
+           "parameter_set_id INTEGER,"
+           "is_reentry BOOLEAN DEFAULT FALSE,"
+           "source_trade_id TEXT,"
+           "reentry_action INTEGER,"
+           "reentry_generation INTEGER DEFAULT 0,"
+           "outcome_classification INTEGER,"
+           "chain_id TEXT,"
+           "success BOOLEAN,"
+           "error_message TEXT,"
+           "created_at DATETIME DEFAULT CURRENT_TIMESTAMP"
+           ");";
+}
+
+string CreateReentryChainsTableSQL() {
+    return "CREATE TABLE IF NOT EXISTS reentry_chains ("
+           "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+           "chain_id TEXT UNIQUE NOT NULL,"
+           "original_trade_id TEXT NOT NULL,"
+           "chain_trades TEXT," // JSON array of trade IDs
+           "total_pnl REAL DEFAULT 0.0,"
+           "chain_status TEXT DEFAULT 'ACTIVE',"
+           "max_generation INTEGER DEFAULT 0,"
+           "last_action INTEGER,"
+           "created_at DATETIME DEFAULT CURRENT_TIMESTAMP,"
+           "updated_at DATETIME DEFAULT CURRENT_TIMESTAMP"
+           ");";
+}
+
+string CreatePerformanceTableSQL() {
+    return "CREATE TABLE IF NOT EXISTS performance_metrics ("
+           "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+           "timestamp DATETIME NOT NULL,"
+           "total_trades INTEGER,"
+           "winning_trades INTEGER,"
+           "losing_trades INTEGER,"
+           "total_profit REAL,"
+           "total_loss REAL,"
+           "win_rate REAL,"
+           "profit_factor REAL,"
+           "max_drawdown REAL,"
+           "current_balance REAL,"
+           "current_equity REAL,"
+           "parameter_set_performance TEXT," // JSON object
+           "reentry_performance TEXT," // JSON object
+           "calendar_performance TEXT," // JSON object
+           "created_at DATETIME DEFAULT CURRENT_TIMESTAMP"
+           ");";
+}
+```
+
+#### 2. Performance Analytics Implementation
+```cpp
+//+------------------------------------------------------------------+
+//| Performance Analytics Engine                                     |
+//+------------------------------------------------------------------+
+
+class CAnalyticsEngine {
+private:
+    CDatabaseManager* m_database;
+    string m_analytics_cache;
+    datetime m_cache_timestamp;
+    int m_cache_duration_minutes;
+
+public:
+    // Analytics Initialization
+    bool Initialize(CDatabaseManager* database);
+    
+    // Performance Calculations
+    double CalculateWinRate(datetime start_date, datetime end_date);
+    double CalculateProfitFactor(datetime start_date, datetime end_date);
+    double CalculateMaxDrawdown(datetime start_date, datetime end_date);
+    double CalculateSharpeRatio(datetime start_date, datetime end_date);
+    string CalculateParameterSetPerformance();
+    string CalculateReentryPerformance();
+    string CalculateCalendarPerformance();
+    
+    // Advanced Analytics
+    string GeneratePerformanceReport(datetime start_date, datetime end_date);
+    string AnalyzeParameterSetEffectiveness();
+    string AnalyzeReentryChainSuccess();
+    string AnalyzeCalendarEventAccuracy();
+    
+    // Real-time Metrics
+    void UpdateLiveMetrics();
+    string GetCurrentPerformanceSnapshot();
+    
+    // Export Functions
+    bool ExportPerformanceToCSV(const string& file_path);
+    bool ExportAnalyticsToJSON(const string& file_path);
+};
+
+// Performance Report Generation
+string CAnalyticsEngine::GeneratePerformanceReport(datetime start_date, datetime end_date) {
+    string report = "TRADING SYSTEM PERFORMANCE REPORT\n";
+    report += "=====================================\n\n";
+    
+    // Basic Statistics
+    int total_trades = GetTradeCount(start_date, end_date);
+    int winning_trades = GetWinningTradeCount(start_date, end_date);
+    int losing_trades = total_trades - winning_trades;
+    
+    report += StringFormat("Period: %s to %s\n", 
+                          TimeToStr(start_date, TIME_DATE),
+                          TimeToStr(end_date, TIME_DATE));
+    report += StringFormat("Total Trades: %d\n", total_trades);
+    report += StringFormat("Winning Trades: %d (%.1f%%)\n", 
+                          winning_trades, 
+                          (double)winning_trades / total_trades * 100);
+    report += StringFormat("Losing Trades: %d (%.1f%%)\n", 
+                          losing_trades, 
+                          (double)losing_trades / total_trades * 100);
+    
+    // Profitability Metrics
+    double total_profit = GetTotalProfit(start_date, end_date);
+    double total_loss = GetTotalLoss(start_date, end_date);
+    double net_profit = total_profit + total_loss;
+    double profit_factor = (total_loss != 0) ? (total_profit / MathAbs(total_loss)) : 0;
+    
+    report += StringFormat("\nProfitability:\n");
+    report += StringFormat("Total Profit: %.2f\n", total_profit);
+    report += StringFormat("Total Loss: %.2f\n", total_loss);
+    report += StringFormat("Net Profit: %.2f\n", net_profit);
+    report += StringFormat("Profit Factor: %.2f\n", profit_factor);
+    
+    // Parameter Set Performance
+    report += "\nParameter Set Performance:\n";
+    for (int i = 1; i <= 10; i++) {
+        double set_profit = GetParameterSetProfit(i, start_date, end_date);
+        int set_trades = GetParameterSetTradeCount(i, start_date, end_date);
+        report += StringFormat("Set %d: %.2f (% d trades)\n", i, set_profit, set_trades);
+    }
+    
+    // Reentry Performance
+    report += "\nReentry System Performance:\n";
+    for (int action = 1; action <= 6; action++) {
+        double action_profit = GetReentryActionProfit(action, start_date, end_date);
+        int action_count = GetReentryActionCount(action, start_date, end_date);
+        report += StringFormat("Action %d: %.2f (%d executions)\n", 
+                              action, action_profit, action_count);
+    }
+    
+    return report;
+}
+```
+
+---
+
+## Implementation Roadmap
+
+### Phase 1: Core Framework (Week 1-2)
+1. **Core EA Structure**
+   - Implement CTradingEACore class
+   - Create basic signal processing
+   - Setup error handling framework
+   - Implement state management
+
+2. **Parameter Management**
+   - Create CParameterManager class
+   - Implement 10 parameter sets
+   - CSV loading/saving functionality
+   - Parameter validation system
+
+3. **Communication Bridge**
+   - Implement CBridgeInterface class
+   - TCP socket communication
+   - Named pipe fallback
+   - File polling backup method
+
+### Phase 2: Advanced Features (Week 3-4)
+1. **Reentry Logic System**
+   - Implement CReentryLogic class
+   - DIE 1-6 outcome classification
+   - Trade chain tracking
+   - Dynamic position sizing
+
+2. **Risk Management**
+   - Implement CRiskManager class
+   - Watchdog system
+   - Emergency halt procedures
+   - Multi-level risk assessment
+
+3. **Database Integration**
+   - Implement CDatabaseManager class
+   - Create database schema
+   - Performance tracking
+   - Data persistence
+
+### Phase 3: Calendar & Excel Integration (Week 5-6)
+1. **Calendar System**
+   - Implement CCalendarSystem class
+   - Automated CSV import
+   - Event trigger engine
+   - Anticipation event generation
+
+2. **Excel VBA System**
+   - Parameter configuration interface
+   - Real-time dashboards
+   - Validation engine
+   - Code generation
+
+3. **Analytics Engine**
+   - Performance calculations
+   - Report generation
+   - Real-time metrics
+   - Export functionality
+
+### Phase 4: Testing & Optimization (Week 7-8)
+1. **Integration Testing**
+   - Component integration
+   - End-to-end testing
+   - Error scenario testing
+   - Performance optimization
+
+2. **Documentation & Deployment**
+   - User documentation
+   - Installation procedures
+   - Configuration guides
+   - Maintenance procedures
+
+---
+
+## Configuration Files Required
+
+### 1. EA Configuration (ea_config.csv)
+```csv
+Setting,Value,Description
+MagicNumberBase,12345,Base magic number for trades
+MaxConcurrentTrades,10,Maximum concurrent positions
+DefaultParameterSet,3,Default parameter set to use
+EnableReentrySystem,true,Enable reentry logic
+EnableCalendarSystem,true,Enable calendar integration
+EnableRiskManagement,true,Enable risk management
+DatabasePath,trading_system.db,Database file path
+LogLevel,INFO,Logging level (DEBUG/INFO/WARNING/ERROR)
+```
+
+### 2. Communication Configuration (comm_config.csv)
+```csv
+Method,Priority,Endpoint,Timeout,Enabled
+TCP_SOCKET,1,localhost:8888,5000,true
+NAMED_PIPE,2,\\.\pipe\trading_signals,3000,true
+FILE_POLLING,3,signals\current_signal.csv,1000,true
+```
+
+### 3. Risk Management Configuration (risk_config.csv)
+```csv
+Parameter,Value,Description
+MaxDrawdownPercent,15.0,Maximum allowed drawdown
+MaxConsecutiveLosses,5,Maximum consecutive losses
+DailyLossLimitPercent,5.0,Daily loss limit
+RapidLossPercent,3.0,Rapid loss detection threshold
+RapidLossMinutes,30,Rapid loss detection window
+WatchdogEnabled,true,Enable system watchdog
+EmergencyHaltEnabled,true,Enable emergency halt
+```
+
+This comprehensive implementation guide provides all the necessary components, specifications, and code structures needed to build a complete algorithmic trading EA with advanced features including parameter management, reentry logic, calendar integration, risk management, and Excel-based configuration. The modular design allows for independent development and testing of each component while maintaining system cohesion.
