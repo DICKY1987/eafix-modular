@@ -1,0 +1,29 @@
+name: Validate module structure
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "m00*/manifest.json"
+      - "m00*/README.md"
+      - "m00*/AGENTS.md"
+      - "tools/validate_module_structure.py"
+      - ".github/workflows/validate-module-structure.yml"
+  pull_request:
+    paths:
+      - "m00*/manifest.json"
+      - "m00*/README.md"
+      - "m00*/AGENTS.md"
+      - "tools/validate_module_structure.py"
+      - ".github/workflows/validate-module-structure.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run module structure validator
+        run: python tools/validate_module_structure.py

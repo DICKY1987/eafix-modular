@@ -4,7 +4,7 @@
   "packet_type": "atomic_module_manifest",
   "manifest_version": "1.0.0",
   "generated_at_utc": "2026-07-02T15:52:15.513625+00:00",
-  "last_updated_utc": "2026-07-02T15:52:15.513625+00:00",
+  "last_updated_utc": "2026-09-09T07:12:15+00:00",
   "source_authority": {
     "authority_policy": "generated_from_canonical_sources",
     "required_reference_documents": [
@@ -173,7 +173,7 @@
     "atomicity_statement": "SK1_PLUGIN_INTERFACE is represented as a single atomic manifest record."
   },
   "file_ownership": {
-    "module_root": "shared/2099900207260118_plugin_interface.py",
+    "module_root": "m0033-sk1-plugin-interface",
     "manifest_path": null,
     "owned_files": [
       "shared/2099900207260118_plugin_interface.py",
@@ -358,9 +358,10 @@
     "prefix_collision": false,
     "reconciliation_notes": [
       "process_binding:not_applicable",
-      "thin_module:promoted_from_shared_libs"
+      "thin_module:promoted_from_shared_libs",
+      "[governance-remediation 2026-09-09T07:12:15+00:00] module_root was 'shared/2099900207260118_plugin_interface.py' -- a FILE, not a directory, which violates the manifest schema's directory expectation. Reset to the module's own identity folder 'm0033-sk1-plugin-interface'. Two of this module's three owned_files still physically live under shared/ (shared/2099900207260118_plugin_interface.py, shared/2099900208260118_plugin_registry.py); shared/ is NOT set as module_root because it is a general-purpose shared-kernel directory, not this module's exclusive territory. This is a known, documented gap pending physical consolidation."
     ],
-    "last_reconciled_utc": "2026-07-02T15:52:15.513625+00:00"
+    "last_reconciled_utc": "2026-09-09T07:12:15+00:00"
   },
   "staleness_policy": {
     "regenerate_if_changed": [
@@ -401,7 +402,8 @@
     "staleness_status": "fresh"
   },
   "notes": [
-    "Schema-first regenerated manifest from normalized staging tables."
+    "Schema-first regenerated manifest from normalized staging tables.",
+    "Governance remediation 2026-09-09T07:12:15+00:00: module_root corrected from a file path ('shared/2099900207260118_plugin_interface.py') to the module's own directory ('m0033-sk1-plugin-interface')."
   ],
   "migration_traceability": {
     "migration_status": "renamed_from_legacy_alias",

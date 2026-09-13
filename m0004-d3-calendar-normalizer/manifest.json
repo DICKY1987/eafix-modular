@@ -4,7 +4,7 @@
   "packet_type": "atomic_module_manifest",
   "manifest_version": "1.0.0",
   "generated_at_utc": "2026-07-02T15:52:15.513625+00:00",
-  "last_updated_utc": "2026-07-02T15:52:15.513625+00:00",
+  "last_updated_utc": "2026-09-09T07:12:15+00:00",
   "source_authority": {
     "authority_policy": "generated_from_canonical_sources",
     "required_reference_documents": [
@@ -187,19 +187,16 @@
     "atomicity_statement": "D3_CALENDAR_NORMALIZER is represented as a single atomic manifest record."
   },
   "file_ownership": {
-    "module_root": null,
+    "module_root": "m0004-d3-calendar-normalizer",
     "manifest_path": null,
     "owned_files": [],
     "source_files": [
       "services/calendar-ingestor/src/2099900089260118_config.py",
-      "services/calendar-ingestor/src/2099900090260118_ff_auto_downloader.py",
       "services/calendar-ingestor/src/2099900091260118_health.py",
       "services/calendar-ingestor/src/2099900092260118_ingestor.py",
       "services/calendar-ingestor/src/2099900093260118_main.py",
       "services/calendar-ingestor/src/2099900094260118_metrics.py",
       "services/calendar-ingestor/src/2099900095260118_plugin.py",
-      "services/calendar-ingestor/src/2099900096260118_python_calendar_system.py",
-      "services/calendar-ingestor/src/2099900097260118_python_calendar_system_patched.py",
       "services/calendar-ingestor/src/2099900098260118___init__.py"
     ],
     "test_files": [
@@ -215,14 +212,11 @@
     "evidence_files": [],
     "allowed_files": [
       "services/calendar-ingestor/src/2099900089260118_config.py",
-      "services/calendar-ingestor/src/2099900090260118_ff_auto_downloader.py",
       "services/calendar-ingestor/src/2099900091260118_health.py",
       "services/calendar-ingestor/src/2099900092260118_ingestor.py",
       "services/calendar-ingestor/src/2099900093260118_main.py",
       "services/calendar-ingestor/src/2099900094260118_metrics.py",
       "services/calendar-ingestor/src/2099900095260118_plugin.py",
-      "services/calendar-ingestor/src/2099900096260118_python_calendar_system.py",
-      "services/calendar-ingestor/src/2099900097260118_python_calendar_system_patched.py",
       "services/calendar-ingestor/src/2099900098260118___init__.py",
       "services/calendar-ingestor/tests/2099900099260118_test_ingestor.py"
     ],
@@ -274,48 +268,6 @@
         "path": "services/calendar-ingestor/src/2099900098260118___init__.py",
         "service": "calendar-ingestor",
         "role": "package_init",
-        "ownership": "shared",
-        "is_test": false,
-        "canonical_modules": [
-          "D2_CALENDAR_SOURCE_ADAPTER",
-          "D3_CALENDAR_NORMALIZER",
-          "F2_EVENT_LOG",
-          "D4_CALENDAR_TRIGGER_BUILDER"
-        ],
-        "notes": ""
-      },
-      {
-        "path": "services/calendar-ingestor/src/2099900097260118_python_calendar_system_patched.py",
-        "service": "calendar-ingestor",
-        "role": "other",
-        "ownership": "shared",
-        "is_test": false,
-        "canonical_modules": [
-          "D2_CALENDAR_SOURCE_ADAPTER",
-          "D3_CALENDAR_NORMALIZER",
-          "F2_EVENT_LOG",
-          "D4_CALENDAR_TRIGGER_BUILDER"
-        ],
-        "notes": ""
-      },
-      {
-        "path": "services/calendar-ingestor/src/2099900096260118_python_calendar_system.py",
-        "service": "calendar-ingestor",
-        "role": "other",
-        "ownership": "shared",
-        "is_test": false,
-        "canonical_modules": [
-          "D2_CALENDAR_SOURCE_ADAPTER",
-          "D3_CALENDAR_NORMALIZER",
-          "F2_EVENT_LOG",
-          "D4_CALENDAR_TRIGGER_BUILDER"
-        ],
-        "notes": ""
-      },
-      {
-        "path": "services/calendar-ingestor/src/2099900090260118_ff_auto_downloader.py",
-        "service": "calendar-ingestor",
-        "role": "other",
         "ownership": "shared",
         "is_test": false,
         "canonical_modules": [
@@ -397,17 +349,6 @@
         "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
       },
       {
-        "path": "services/calendar-ingestor/src/2099900090260118_ff_auto_downloader.py",
-        "sharing_policy": "needs_refactor",
-        "allowed_modules": [
-          "D2_CALENDAR_SOURCE_ADAPTER",
-          "D3_CALENDAR_NORMALIZER",
-          "D4_CALENDAR_TRIGGER_BUILDER",
-          "F2_EVENT_LOG"
-        ],
-        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
-      },
-      {
         "path": "services/calendar-ingestor/src/2099900091260118_health.py",
         "sharing_policy": "needs_refactor",
         "allowed_modules": [
@@ -453,28 +394,6 @@
       },
       {
         "path": "services/calendar-ingestor/src/2099900095260118_plugin.py",
-        "sharing_policy": "needs_refactor",
-        "allowed_modules": [
-          "D2_CALENDAR_SOURCE_ADAPTER",
-          "D3_CALENDAR_NORMALIZER",
-          "D4_CALENDAR_TRIGGER_BUILDER",
-          "F2_EVENT_LOG"
-        ],
-        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
-      },
-      {
-        "path": "services/calendar-ingestor/src/2099900096260118_python_calendar_system.py",
-        "sharing_policy": "needs_refactor",
-        "allowed_modules": [
-          "D2_CALENDAR_SOURCE_ADAPTER",
-          "D3_CALENDAR_NORMALIZER",
-          "D4_CALENDAR_TRIGGER_BUILDER",
-          "F2_EVENT_LOG"
-        ],
-        "reason": "Shared service file evidence from file_module_mapping.csv; not shared kernel."
-      },
-      {
-        "path": "services/calendar-ingestor/src/2099900097260118_python_calendar_system_patched.py",
         "sharing_policy": "needs_refactor",
         "allowed_modules": [
           "D2_CALENDAR_SOURCE_ADAPTER",
@@ -649,8 +568,10 @@
     "kind_mismatch": false,
     "layer_unassigned": false,
     "prefix_collision": false,
-    "reconciliation_notes": [],
-    "last_reconciled_utc": "2026-07-02T15:52:15.513625+00:00"
+    "reconciliation_notes": [
+      "[governance-remediation 2026-09-09T07:12:15+00:00] module_root backfilled from null to the module's own identity folder ('m0004-d3-calendar-normalizer'). Canonical implementation for this module currently still lives in a shared, not-yet-split service directory (see file_ownership.shared_files / source_files) and has not been physically relocated; that move is tracked separately as the Phase-5 physical migration, not performed in this pass."
+    ],
+    "last_reconciled_utc": "2026-09-09T07:12:15+00:00"
   },
   "staleness_policy": {
     "regenerate_if_changed": [
@@ -691,6 +612,7 @@
     "staleness_status": "fresh"
   },
   "notes": [
-    "Schema-first regenerated manifest from normalized staging tables."
+    "Schema-first regenerated manifest from normalized staging tables.",
+    "Governance remediation 2026-09-09T07:12:15+00:00: module_root backfilled (was null) -> 'm0004-d3-calendar-normalizer'."
   ]
 }

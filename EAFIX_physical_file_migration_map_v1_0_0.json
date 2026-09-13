@@ -78,7 +78,8 @@
       "validation_results",
       "deviations",
       "rollback_performed"
-    ]
+    ],
+    "resume_policy": "Operations whose status is 'completed' MUST be skipped by any executor of this map -- their sources are already gone, so re-attempting git mv will fail closed per missing_source_policy. Only attempt operations still at 'approved_not_executed'."
   },
   "summary": {
     "decision_records": 86,
@@ -1123,7 +1124,7 @@
       "phase": "P10_DIRECT_RELOCATIONS",
       "operation_type": "git_mv",
       "title": "Move 0110000074260118_06_signal_model_mapping.md to its approved location",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "ready_after_preflight",
       "agent_may_execute": true,
       "mechanically_automatable": true,
@@ -1180,14 +1181,16 @@
       "command_templates": [
         "mkdir -p -- \"$(dirname -- 'm0023-e3-matrix-lookup/m0023-docs/architecture/0110000074260118_06_signal_model_mapping.md')\"",
         "git mv -- 'EAFIX_auth_docs/06_strategy_signal_risk_reentry_oms/0110000074260118_06_signal_model_mapping.md' 'm0023-e3-matrix-lookup/m0023-docs/architecture/0110000074260118_06_signal_model_mapping.md'"
-      ]
+      ],
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0002",
       "phase": "P10_DIRECT_RELOCATIONS",
       "operation_type": "git_mv",
       "title": "Move 0110000076260118_07_transport_bridge_contracts.md to its approved location",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "ready_after_preflight",
       "agent_may_execute": true,
       "mechanically_automatable": true,
@@ -1244,14 +1247,16 @@
       "command_templates": [
         "mkdir -p -- \"$(dirname -- 'm0016-b1-mt4-adapter-transport/m0016-docs/architecture/0110000076260118_07_transport_bridge_contracts.md')\"",
         "git mv -- 'EAFIX_auth_docs/09_product_requirements_and_design/0110000076260118_07_transport_bridge_contracts.md' 'm0016-b1-mt4-adapter-transport/m0016-docs/architecture/0110000076260118_07_transport_bridge_contracts.md'"
-      ]
+      ],
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0003",
       "phase": "P10_DIRECT_RELOCATIONS",
       "operation_type": "git_mv_rename",
       "title": "Rename 1199900010260118_hybrid_id.schema.json to remove semantic collision",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "ready_after_preflight",
       "agent_may_execute": true,
       "mechanically_automatable": true,
@@ -1309,14 +1314,16 @@
       "command_templates": [
         "mkdir -p -- \"$(dirname -- 'contracts/schemas/json/1199900010260118_reentry_key.schema.json')\"",
         "git mv -- 'contracts/schemas/json/1199900010260118_hybrid_id.schema.json' 'contracts/schemas/json/1199900010260118_reentry_key.schema.json'"
-      ]
+      ],
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0004",
       "phase": "P10_DIRECT_RELOCATIONS",
       "operation_type": "git_mv",
       "title": "Move 1199900011260118_indicator_record.schema.json to its approved location",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "ready_after_preflight",
       "agent_may_execute": true,
       "mechanically_automatable": true,
@@ -1371,14 +1378,16 @@
       "command_templates": [
         "mkdir -p -- \"$(dirname -- 'm0009-c2-indicator-engine/m0009-schemas/inputs/1199900011260118_indicator_record.schema.json')\"",
         "git mv -- 'contracts/schemas/json/1199900011260118_indicator_record.schema.json' 'm0009-c2-indicator-engine/m0009-schemas/inputs/1199900011260118_indicator_record.schema.json'"
-      ]
+      ],
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0005",
       "phase": "P10_DIRECT_RELOCATIONS",
       "operation_type": "git_mv",
       "title": "Move 1110000004260118_indicator_records_full.json to its approved location",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "ready_after_preflight",
       "agent_may_execute": true,
       "mechanically_automatable": true,
@@ -1433,14 +1442,16 @@
       "command_templates": [
         "mkdir -p -- \"$(dirname -- 'm0009-c2-indicator-engine/m0009-config/indicator_records_full.json')\"",
         "git mv -- 'docs/reference/1110000004260118_indicator_records_full.json' 'm0009-c2-indicator-engine/m0009-config/indicator_records_full.json'"
-      ]
+      ],
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0006",
       "phase": "P10_DIRECT_RELOCATIONS",
       "operation_type": "git_mv",
       "title": "Move 1110000005260118_indicator_records_sample.json to its approved location",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "ready_after_preflight",
       "agent_may_execute": true,
       "mechanically_automatable": true,
@@ -1495,14 +1506,16 @@
       "command_templates": [
         "mkdir -p -- \"$(dirname -- 'm0009-c2-indicator-engine/m0009-schemas/examples/indicator_records_sample.json')\"",
         "git mv -- 'docs/reference/1110000005260118_indicator_records_sample.json' 'm0009-c2-indicator-engine/m0009-schemas/examples/indicator_records_sample.json'"
-      ]
+      ],
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0007",
       "phase": "P10_DIRECT_RELOCATIONS",
       "operation_type": "git_mv",
       "title": "Move 2099900104260118_advanced_indicators.py to its approved location",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "ready_after_preflight",
       "agent_may_execute": true,
       "mechanically_automatable": true,
@@ -1560,14 +1573,16 @@
       "command_templates": [
         "mkdir -p -- \"$(dirname -- 'm0009-c2-indicator-engine/m0009-src/c2_indicator_engine/advanced_indicators.py')\"",
         "git mv -- 'services/dashboard-backend/src/2099900104260118_advanced_indicators.py' 'm0009-c2-indicator-engine/m0009-src/c2_indicator_engine/advanced_indicators.py'"
-      ]
+      ],
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0008",
       "phase": "P10_DIRECT_RELOCATIONS",
       "operation_type": "git_mv",
       "title": "Move 2099900108260118_tkinter_dashboard_gui.py to its approved location",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "ready_after_preflight",
       "agent_may_execute": true,
       "mechanically_automatable": true,
@@ -1623,14 +1638,16 @@
       "command_templates": [
         "mkdir -p -- \"$(dirname -- 'm0031-u4-desktop-operator/m0031-src/frontend/tkinter_dashboard_gui.py')\"",
         "git mv -- 'services/dashboard-backend/src/2099900108260118_tkinter_dashboard_gui.py' 'm0031-u4-desktop-operator/m0031-src/frontend/tkinter_dashboard_gui.py'"
-      ]
+      ],
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0009",
       "phase": "P10_DIRECT_RELOCATIONS",
       "operation_type": "git_mv",
       "title": "Move E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json to its approved location",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "ready_after_preflight",
       "agent_may_execute": true,
       "mechanically_automatable": true,
@@ -1685,14 +1702,16 @@
       "command_templates": [
         "mkdir -p -- \"$(dirname -- 'm0024-e4-reentry-intent-builder/m0024-context/work-cells/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json')\"",
         "git mv -- 'services/reentry-engine/work_cells/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json' 'm0024-e4-reentry-intent-builder/m0024-context/work-cells/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json'"
-      ]
+      ],
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0010",
       "phase": "P10_DIRECT_RELOCATIONS",
       "operation_type": "git_mv",
       "title": "Move 1199900031260118_reentry_vocab.json to its approved location",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "ready_after_preflight",
       "agent_may_execute": true,
       "mechanically_automatable": true,
@@ -1748,14 +1767,16 @@
       "command_templates": [
         "mkdir -p -- \"$(dirname -- 'm0023-e3-matrix-lookup/m0023-config/reentry_vocab.json')\"",
         "git mv -- 'shared/reentry/1199900031260118_reentry_vocab.json' 'm0023-e3-matrix-lookup/m0023-config/reentry_vocab.json'"
-      ]
+      ],
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0011",
       "phase": "P10_DIRECT_RELOCATIONS",
       "operation_type": "git_mv",
       "title": "Move 2099900223260118_test_plugin_system.py to its approved location",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "ready_after_preflight",
       "agent_may_execute": true,
       "mechanically_automatable": true,
@@ -1812,14 +1833,16 @@
       "command_templates": [
         "mkdir -p -- \"$(dirname -- 'm0033-sk1-plugin-interface/m0033-tests/unit/test_plugin_system.py')\"",
         "git mv -- 'tests/2099900223260118_test_plugin_system.py' 'm0033-sk1-plugin-interface/m0033-tests/unit/test_plugin_system.py'"
-      ]
+      ],
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0012",
       "phase": "P10_DIRECT_RELOCATIONS",
       "operation_type": "git_mv",
       "title": "Move 1199900033260118_indicator_record_valid.json to its approved location",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "ready_after_preflight",
       "agent_may_execute": true,
       "mechanically_automatable": true,
@@ -1875,14 +1898,16 @@
       "command_templates": [
         "mkdir -p -- \"$(dirname -- 'm0009-c2-indicator-engine/m0009-tests/contract/fixtures/indicator_record_valid.json')\"",
         "git mv -- 'tests/contracts/fixtures/1199900033260118_indicator_record_valid.json' 'm0009-c2-indicator-engine/m0009-tests/contract/fixtures/indicator_record_valid.json'"
-      ]
+      ],
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0013",
       "phase": "P10_DIRECT_RELOCATIONS",
       "operation_type": "git_mv",
       "title": "Move test_hybrid_id_parity.py to its approved location",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "ready_after_preflight",
       "agent_may_execute": true,
       "mechanically_automatable": true,
@@ -1939,14 +1964,16 @@
       "command_templates": [
         "mkdir -p -- \"$(dirname -- 'm0023-e3-matrix-lookup/m0023-tests/contract/test_hybrid_id_parity.py')\"",
         "git mv -- 'tests/contracts/properties/test_hybrid_id_parity.py' 'm0023-e3-matrix-lookup/m0023-tests/contract/test_hybrid_id_parity.py'"
-      ]
+      ],
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0014",
       "phase": "P20_REGENERATION_AND_RECLASSIFICATION",
       "operation_type": "generate_projection_replace_source",
       "title": "Replace duplicate indicator schema authority with a generated documentation projection",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "requires_generator_update",
       "agent_may_execute": true,
       "mechanically_automatable": false,
@@ -2003,14 +2030,16 @@
       "approval_gate": "required_before_execution",
       "depends_on": [
         "MIG-0004"
-      ]
+      ],
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0015",
       "phase": "P20_REGENERATION_AND_RECLASSIFICATION",
       "operation_type": "regenerate_then_relocate",
       "title": "Regenerate and relocate UI_GATEWAY_REST_API_GATEWAY.json",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "requires_semantic_regeneration",
       "agent_may_execute": true,
       "mechanically_automatable": false,
@@ -2063,14 +2092,16 @@
       "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
       "approval_gate": "required_before_execution",
       "depends_on": [],
-      "notes": "Regenerate source_files; the current dashboard-backend list is over-broad."
+      "notes": "Regenerate source_files; the current dashboard-backend list is over-broad.",
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0016",
       "phase": "P20_REGENERATION_AND_RECLASSIFICATION",
       "operation_type": "regenerate_then_relocate",
       "title": "Regenerate and relocate UI_GATEWAY_WEBSOCKET_GATEWAY.json",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "requires_semantic_regeneration",
       "agent_may_execute": true,
       "mechanically_automatable": false,
@@ -2123,14 +2154,16 @@
       "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
       "approval_gate": "required_before_execution",
       "depends_on": [],
-      "notes": "Regenerate source_files and tests."
+      "notes": "Regenerate source_files and tests.",
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0017",
       "phase": "P20_REGENERATION_AND_RECLASSIFICATION",
       "operation_type": "regenerate_then_relocate",
       "title": "Regenerate and relocate EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT.json",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "requires_semantic_regeneration",
       "agent_may_execute": true,
       "mechanically_automatable": false,
@@ -2183,14 +2216,16 @@
       "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
       "approval_gate": "required_before_execution",
       "depends_on": [],
-      "notes": "Regenerate source_files because the current binding lists only a Python plugin."
+      "notes": "Regenerate source_files because the current binding lists only a Python plugin.",
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0018",
       "phase": "P20_REGENERATION_AND_RECLASSIFICATION",
       "operation_type": "reclassify_then_relocate",
       "title": "Reclassify legacy work cell and relocate R1_4_CORRELATION_GUARDS.json",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "requires_identity_reclassification",
       "agent_may_execute": true,
       "mechanically_automatable": false,
@@ -2243,14 +2278,16 @@
       "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
       "approval_gate": "required_before_execution",
       "depends_on": [],
-      "notes": "Preserve R1_4 as a legacy alias/work-cell ID or rename through governance."
+      "notes": "Preserve R1_4 as a legacy alias/work-cell ID or rename through governance.",
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0019",
       "phase": "P20_REGENERATION_AND_RECLASSIFICATION",
       "operation_type": "reclassify_then_relocate",
       "title": "Reclassify legacy work cell and relocate R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION.json",
-      "status": "approved_not_executed",
+      "status": "completed",
       "execution_readiness": "requires_identity_reclassification",
       "agent_may_execute": true,
       "mechanically_automatable": false,
@@ -2303,7 +2340,9 @@
       "rollback_strategy": "Revert the operation commit or use Git to restore all listed sources and remove all newly created outputs.",
       "approval_gate": "required_before_execution",
       "depends_on": [],
-      "notes": "Preserve R1_7 as legacy identity metadata."
+      "notes": "Preserve R1_7 as legacy identity metadata.",
+      "verification_utc": "2026-09-09T07:16:26+00:00",
+      "verification_method": "filesystem_check:apply_migration_map.py"
     },
     {
       "operation_id": "MIG-0020",

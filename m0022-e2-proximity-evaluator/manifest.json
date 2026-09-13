@@ -4,7 +4,7 @@
   "packet_type": "atomic_module_manifest",
   "manifest_version": "1.0.0",
   "generated_at_utc": "2026-07-02T15:52:15.513625+00:00",
-  "last_updated_utc": "2026-07-02T15:52:15.513625+00:00",
+  "last_updated_utc": "2026-09-09T07:12:15+00:00",
   "source_authority": {
     "authority_policy": "generated_from_canonical_sources",
     "required_reference_documents": [
@@ -198,7 +198,7 @@
     "atomicity_statement": "E2_PROXIMITY_EVALUATOR is represented as a single atomic manifest record."
   },
   "file_ownership": {
-    "module_root": null,
+    "module_root": "m0022-e2-proximity-evaluator",
     "manifest_path": null,
     "owned_files": [],
     "source_files": [
@@ -588,8 +588,10 @@
     "kind_mismatch": false,
     "layer_unassigned": false,
     "prefix_collision": false,
-    "reconciliation_notes": [],
-    "last_reconciled_utc": "2026-07-02T15:52:15.513625+00:00"
+    "reconciliation_notes": [
+      "[governance-remediation 2026-09-09T07:12:15+00:00] module_root backfilled from null to the module's own identity folder ('m0022-e2-proximity-evaluator'). Canonical implementation for this module currently still lives in a shared, not-yet-split service directory (see file_ownership.shared_files / source_files) and has not been physically relocated; that move is tracked separately as the Phase-5 physical migration, not performed in this pass."
+    ],
+    "last_reconciled_utc": "2026-09-09T07:12:15+00:00"
   },
   "staleness_policy": {
     "regenerate_if_changed": [
@@ -630,6 +632,7 @@
     "staleness_status": "fresh"
   },
   "notes": [
-    "Schema-first regenerated manifest from normalized staging tables."
+    "Schema-first regenerated manifest from normalized staging tables.",
+    "Governance remediation 2026-09-09T07:12:15+00:00: module_root backfilled (was null) -> 'm0022-e2-proximity-evaluator'."
   ]
 }

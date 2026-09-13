@@ -4,7 +4,7 @@
   "packet_type": "atomic_module_manifest",
   "manifest_version": "1.0.0",
   "generated_at_utc": "2026-07-02T15:52:15.513625+00:00",
-  "last_updated_utc": "2026-07-02T15:52:15.513625+00:00",
+  "last_updated_utc": "2026-09-09T07:12:15+00:00",
   "source_authority": {
     "authority_policy": "generated_from_canonical_sources",
     "required_reference_documents": [
@@ -107,7 +107,7 @@
     "downstream_modules": [],
     "responsible": "signal_generator.py",
     "entrypoint_files": [
-      "compliance/auto-remediation/2099900012260118_remediation-engine.py"
+      "services/signal-generator/src/2099900187260118_plugin.py"
     ],
     "output_description": "Signal OR SignalSuppressed",
     "loop_behavior": null,
@@ -212,19 +212,32 @@
     "module_root": "services/signal-generator",
     "manifest_path": null,
     "owned_files": [
-      "services/signal-generator/tests/2099900186260118_test_signal_generator_plugin.py"
+      "services/signal-generator/tests/2099900186260118_test_signal_generator_plugin.py",
+      "services/signal-generator/src/2099900185260118_config.py",
+      "services/signal-generator/src/2099900186260118_processor.py",
+      "services/signal-generator/src/2099900187260118_plugin.py"
     ],
-    "source_files": [],
+    "source_files": [
+      "services/signal-generator/src/2099900185260118_config.py",
+      "services/signal-generator/src/2099900186260118_processor.py",
+      "services/signal-generator/src/2099900187260118_plugin.py"
+    ],
     "test_files": [
       "services/signal-generator/tests/2099900186260118_test_signal_generator_plugin.py"
     ],
     "contract_files": [],
     "documentation_files": [],
-    "configuration_files": [],
+    "configuration_files": [
+      "services/signal-generator/src/2099900185260118_config.py"
+    ],
     "schema_files": [],
     "generated_files": [],
     "evidence_files": [],
-    "allowed_files": [],
+    "allowed_files": [
+      "services/signal-generator/src/2099900185260118_config.py",
+      "services/signal-generator/src/2099900186260118_processor.py",
+      "services/signal-generator/src/2099900187260118_plugin.py"
+    ],
     "forbidden_files": [],
     "file_role_index": [
       {
@@ -237,6 +250,39 @@
           "S1_SIGNAL_ENGINE"
         ],
         "notes": ""
+      },
+      {
+        "path": "services/signal-generator/src/2099900185260118_config.py",
+        "service": "signal-generator",
+        "role": "config",
+        "ownership": "owned",
+        "is_test": false,
+        "canonical_modules": [
+          "S1_SIGNAL_ENGINE"
+        ],
+        "notes": "Reclaimed during governance remediation: file existed on disk under module_root but was not listed in any manifest."
+      },
+      {
+        "path": "services/signal-generator/src/2099900186260118_processor.py",
+        "service": "signal-generator",
+        "role": "other",
+        "ownership": "owned",
+        "is_test": false,
+        "canonical_modules": [
+          "S1_SIGNAL_ENGINE"
+        ],
+        "notes": "Reclaimed during governance remediation: file existed on disk under module_root but was not listed in any manifest."
+      },
+      {
+        "path": "services/signal-generator/src/2099900187260118_plugin.py",
+        "service": "signal-generator",
+        "role": "plugin",
+        "ownership": "owned",
+        "is_test": false,
+        "canonical_modules": [
+          "S1_SIGNAL_ENGINE"
+        ],
+        "notes": "Reclaimed during governance remediation: file existed on disk under module_root but was not listed in any manifest."
       }
     ],
     "unassigned_candidate_files": [],
@@ -376,15 +422,17 @@
   "reconciliation_status": {
     "service_binding_status": "bound",
     "submodule_doc_status": "deprecated",
-    "mapped_file_count": 1,
+    "mapped_file_count": 4,
     "owned_channel_ids": [],
     "known_flags": [],
     "stale_symbol_tokens": [],
     "kind_mismatch": false,
     "layer_unassigned": false,
     "prefix_collision": false,
-    "reconciliation_notes": [],
-    "last_reconciled_utc": "2026-07-02T15:52:15.513625+00:00"
+    "reconciliation_notes": [
+      "[governance-remediation 2026-09-09T07:12:15+00:00] Reclaimed 3 orphaned source files physically present under this module's own module_root (services/signal-generator/src/) that no manifest referenced: config.py, processor.py, plugin.py. Root cause: file_module_mapping.csv (the manifest's declared ownership_derivation source) only lists the test file for this service -- the three source files were added to the repository after the CSV/manifest generation pass and were never backfilled. mapped_file_count corrected from 1 to 4."
+    ],
+    "last_reconciled_utc": "2026-09-09T07:12:15+00:00"
   },
   "staleness_policy": {
     "regenerate_if_changed": [
@@ -425,6 +473,7 @@
     "staleness_status": "fresh"
   },
   "notes": [
-    "Schema-first regenerated manifest from normalized staging tables."
+    "Schema-first regenerated manifest from normalized staging tables.",
+    "Governance remediation 2026-09-09T07:12:15+00:00: entrypoint_files corrected from ['compliance/auto-remediation/2099900012260118_remediation-engine.py'] to ['services/signal-generator/src/2099900187260118_plugin.py']; reclaimed 3 orphaned signal-generator source files into owned_files."
   ]
 }
