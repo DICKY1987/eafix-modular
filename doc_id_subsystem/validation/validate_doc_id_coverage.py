@@ -16,6 +16,14 @@ from doc_id_subsystem.core.doc_id_scanner import scan_repository  # noqa: E402
 BASELINE_FILE = Path(__file__).with_name("doc_id_coverage_baseline.json")
 
 
+def _load_coverage_ratio(path: Path) -> float:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        return float(payload["coverage_ratio"])
+    except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
+        raise ValueError(f"invalid coverage baseline: {path}") from exc
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--baseline", type=float, default=0.95)
@@ -27,9 +35,14 @@ def main() -> int:
         print(f"FAIL: committed baseline is missing: {BASELINE_FILE}", file=sys.stderr)
         return 2
 
-    saved = json.loads(BASELINE_FILE.read_text(encoding="utf-8"))
+    try:
+        saved_coverage_ratio = _load_coverage_ratio(BASELINE_FILE)
+    except ValueError as exc:
+        print(f"FAIL: {exc}", file=sys.stderr)
+        return 2
+
     result = scan_repository(args.repo_root)
-    floor = float(saved["coverage_ratio"]) * args.baseline
+    floor = saved_coverage_ratio * args.baseline
     print(
         f"tracked={result.total_files} prefixed={len(result.prefixed_files)} "
         f"coverage={result.coverage_ratio:.6%} floor={floor:.6%}"
