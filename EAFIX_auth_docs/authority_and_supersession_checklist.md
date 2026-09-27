@@ -9,7 +9,7 @@
 2. Apply decision rule exactly: `canonical > supporting_reference > legacy_reference > generated > superseded`.
 3. Regenerate `EAFIX_auth_docs/documentation_triage_matrix.json` with SHA256-based duplicate detection.
 4. For each overlap group, select one active authority document and mark the rest as supporting or superseded.
-5. Move superseded files into `EAFIX_auth_docs/superseded/` only after the authority decision is recorded.
+5. Move superseded files into `Master_Archive/` only after the authority decision is recorded.
 6. Add machine-readable supersession metadata to each moved file (`status`, `superseded_by`, `reason`, `active_authority=false`).
 7. Update `EAFIX_auth_docs/doc_authority.json` and `EAFIX_auth_docs/documentation_cleanup_report.json`.
 8. Validate no active references point to superseded/deleted files.
