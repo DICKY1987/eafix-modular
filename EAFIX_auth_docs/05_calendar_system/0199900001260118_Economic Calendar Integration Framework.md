@@ -1,4 +1,4 @@
-Active authority note: This document is the active authority for calendar integration in EAFIX_auth_docs and supersedes EAFIX_auth_docs/superseded/0199900006260118_Economic Calendar Strategy ID Generation.md.
+Active authority note: This document is the active authority for calendar integration in EAFIX_auth_docs and supersedes Master_Archive/0199900006260118_Economic Calendar Strategy ID Generation.md.
 
 
 Economic Calendar Integration Framework
