@@ -7,5 +7,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: amannn/action-semantic-pull-request@v6
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+            [A-Z][a-zA-Z0-9_-]*
+          headerPattern: '^(\w+)(?:\(([\w$.\-*/ ]*)\))?(?::\s+|\s+)(.+)$'
+          headerPatternCorrespondence: type, scope, subject
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
