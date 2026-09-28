@@ -15,9 +15,11 @@ jobs:
         if: steps.semantic_pr_title.outcome == 'failure'
         run: |
           title="$(jq -r '.pull_request.title' "$GITHUB_EVENT_PATH")"
-          if [[ "$title" =~ ^[A-Z][[:alnum:][:space:][:punct:]]+$ ]] \
+          word_count="$(printf '%s' "$title" | tr -cs '[:alnum:]' ' ' | awk '{print NF}')"
+          if [[ "$title" =~ ^[A-Z] ]] \
             && [[ "$title" =~ [[:space:]]+ ]] \
-            && [[ "$title" != *:* ]]; then
+            && [[ "$title" != *:* ]] \
+            && (( word_count >= 2 )); then
             echo "Accepted sentence-style PR title: $title"
             exit 0
           fi
