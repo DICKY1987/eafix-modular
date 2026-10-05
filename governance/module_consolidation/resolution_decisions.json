@@ -1,0 +1,903 @@
+{
+  "decisions": [
+    {
+      "affected_authorities": [
+        "34 staged module manifests",
+        "canonical process registry referenced without modification"
+      ],
+      "approved_by": "Codex delegated by the repository owner's execution instructions, Sections 9, 11, 38",
+      "decision": "Carry each root's explicit module_io_policy into the candidate trust boundary. For the 26 canonical primary-owner process modules, reference the canonical terminal outcomes as externally visible intended boundary behavior. Preserve unknown payload details, runtime implementation, all other gaps and cutover holds.",
+      "decision_id": "DEC-033",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": "3748539b373b915f01bb982aa515e71756079486",
+      "effective_scope": "validation route / candidate reconciliation only; final authority cutover remains held",
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "11",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "rationale": "Section 11 Rule D keeps process definitions external; Rule E permits reviewed missing module facts. Identical explicit root policies and exact primary-owner process records support these two facts. This does not prove implementation or full source reconciliation.",
+      "status": "approved_for_execution",
+      "title": "Reconcile explicit module boundaries without inventing implementation"
+    },
+    {
+      "affected_authorities": [
+        "ci/2099900300260118_validate_atomic_module_manifests.py",
+        "tests/test_generator_update.py",
+        "tests/test_validator_update.py"
+      ],
+      "approved_by": "Codex delegated by the repository owner's execution instructions, Sections 9, 25, 38",
+      "decision": "Use read-only full active validation by default, followed only by projection parity checking. Explicit progress scope certifies independent work only. Preserve legacy alias and fail-closed regression protection without invoking archived generators.",
+      "decision_id": "DEC-032",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": "3748539b373b915f01bb982aa515e71756079486",
+      "effective_scope": "validation route / candidate reconciliation only; final authority cutover remains held",
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "25",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "rationale": "Section 25 requires working validation; DEC-023 prohibits reverse writers. Retired EA-REG tools are not current authorities. The 85 percent coverage gate is unchanged.",
+      "status": "approved_for_execution",
+      "title": "Redirect obsolete manifest validation callers"
+    },
+    {
+      "affected_authorities": [
+        "execution policy only; final authority and trading constraints preserved"
+      ],
+      "approved_by": "Repository owner through current user request, 2026-10-03",
+      "authorization_text": "resolve or suspend the is BLOCKED under the attached file’s fail-closed rule",
+      "cutover_status": "BLOCKED",
+      "decision": "Permit independent reconciliation while keeping affected facts and final authority cutover fail-closed. No missing protocol fact, failed required validation, unsafe archive, trading change or external publication is approved.",
+      "decision_id": "DEC-031",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": "bd9a2e4110c1c592310e8df83eba082693223e23",
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/SCOPED_SUSPENSION.md",
+          "section": "Owner authorization",
+          "sha256": "e1d2510894f6a20eddc81181c3e25d3710f405949105605845fb95e5221959f7"
+        }
+      ],
+      "execution_status": "ACTIVE_WITH_SCOPED_HOLDS",
+      "policy_reference": "governance/module_consolidation/SCOPED_SUSPENSION.md",
+      "rationale": "The owner explicitly requested resolution or suspension of the blanket stop. Independent reconciliation may proceed while final acceptance stays fail-closed.",
+      "status": "approved_scoped_suspension",
+      "title": "Suspend blanket stop for independent work only"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "Each <module-root>/manifest.json is the authoritative source for module-specific facts after cutover.",
+      "decision_id": "DEC-001",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "34 root manifests are module authorities"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl remains canonical for global process steps/order/topology. Module manifests reference it.",
+      "decision_id": "DEC-002",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Process authority remains external"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "Shared contract/schema/identifier authorities remain global. Module manifests reference, consume, produce, or steward them but do not duplicate them as independent definitions.",
+      "decision_id": "DEC-003",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Shared contracts remain external"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json is authoritative for global shared-file consumer relationships.",
+      "decision_id": "DEC-004",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Create one shared-file registry"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json is generated from the 34 roots and is not permitted to feed root manifests.",
+      "decision_id": "DEC-005",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Combined manifest bundle becomes projection only"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "All 34 active root manifests must use eafix_unified_atomic_module_schema_v2_0_0.json at coordinated cutover.",
+      "decision_id": "DEC-006",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "All 34 migrate to schema v2"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "Existing v1 values remain unless a claim-level reconciliation and approved decision justifies change. Blank fields are not automatic overwrite targets.",
+      "decision_id": "DEC-007",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Preserve existing values by default"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "Modules may reference zero, one, or many process steps. Do not use fake N/A bindings.",
+      "decision_id": "DEC-008",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Process binding becomes zero-to-many"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "not_applicable and unknown are never interchangeable.",
+      "decision_id": "DEC-009",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Applicability and knowledge are separate"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "Accepted meaningful fields require evidence addressable by stable field path/JSON Pointer and source locator.",
+      "decision_id": "DEC-010",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Field-level provenance is mandatory"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "Claims about what code currently does must be grounded in code/tests at a recorded commit. Historical prose does not prove current implementation.",
+      "decision_id": "DEC-011",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Implementation truth is commit-pinned"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "A changed supporting document creates a reconciliation proposal, not an automatic manifest mutation.",
+      "decision_id": "DEC-012",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Supporting sources cannot auto-overwrite authorities"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "Publish the v2 module authorities, authority routing, bundle projection rules, and writer redirection in one guarded authority cutover.",
+      "decision_id": "DEC-013",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Cutover all 34 together"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "Do not leave some modules governed by roots and others by a historical bundle/catalog after cutover.",
+      "decision_id": "DEC-014",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "No mixed authority state"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "Archived originals preserve exact bytes. Notices live in sidecars/README or annotated prose copies.",
+      "decision_id": "DEC-015",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Archive originals are immutable"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "Maintain separate status dimensions for extraction/reconciliation and retention/archive eligibility.",
+      "decision_id": "DEC-016",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Fully scraped is not safe to archive"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "Revalidate EAFIX_86_file_module_location_decisions and action-manifest conclusions against the fresh baseline. Do not discard them, but do not execute them blindly.",
+      "decision_id": "DEC-017",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Historical 86-file decisions are evidence, not commands"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "Context packets, diagrams, matrices, catalogs, and AI summaries are projections generated from canonical authorities after cutover.",
+      "decision_id": "DEC-018",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Context packets and diagrams are generated"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "Module-local step entries list their own shared-file use but do not list all other consumers.",
+      "decision_id": "DEC-019",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Consumer fan-out belongs only in shared-file registry"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "If a real schema cannot be found, mark the contract schema reference unknown/deferred and open a gap. Never invent a schema path.",
+      "decision_id": "DEC-020",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Missing contract schema references stay explicit gaps"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "Use applicability status, knowledge status, and explicit empty semantics instead of fabricated identifiers or placeholder values.",
+      "decision_id": "DEC-021",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "No fake N/A values"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "Once file ownership is reconciled, a module’s declared owned/required file inventory becomes a controlled boundary; undeclared module-owned runtime files are a validation failure or reconciliation gap.",
+      "decision_id": "DEC-022",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Module file scope is closed-world after verification"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "Any script, workflow, editor, importer, or generator that can overwrite root manifests from old sources or the bundle must be redirected or disabled before P6 can pass.",
+      "decision_id": "DEC-023",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Redirect or disable legacy writers before cutover"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "Old module/process catalogs may be demoted or archived only after all unique necessary claims are reconciled. process_registry.jsonl remains active canonical process authority.",
+      "decision_id": "DEC-024",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Retire old catalogs only after reconciliation"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "A source cannot be archived while a relevant claim remains unresolved, conflicted without approved deferment, or actively referenced by required tooling/authority.",
+      "decision_id": "DEC-025",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Archive eligibility requires zero unresolved relevant claims"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests",
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+        "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json"
+      ],
+      "approved_by": "Repository owner through execution instructions 1.0.0",
+      "decision": "The program is complete only when all 34 pass the required v2 checks, in-scope claims have final dispositions, no shadow authority/writer can reverse cutover, archive actions are proven, and rerunning validation is deterministic.",
+      "decision_id": "DEC-026",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "9",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "executed_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "rationale": "Prescribed by the owner in the standalone execution instructions; no reversal is authorized.",
+      "status": "approved_policy_pending_cutover",
+      "title": "Completion is evidence-based, not file-count-based"
+    },
+    {
+      "affected_authorities": [
+        "34 module-root manifests"
+      ],
+      "approved_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "decision": "Do not convert source scanning or structural schema validity into specification readiness. Keep active v1 authorities in place until P5 passes.",
+      "decision_id": "DEC-027",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "21,30,31,35",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "rationale": "Sections 21, 30, 31 and 35 explicitly require fail-closed handling of insufficient evidence.",
+      "status": "approved_for_execution",
+      "title": "No cutover waiver for missing mandatory facts"
+    },
+    {
+      "affected_authorities": [
+        "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "34 v2 candidates"
+      ],
+      "approved_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "decision": "Use owner_module_id and supporting_module_ids from process_registry.jsonl. Empty participation means no authored registry binding at this baseline; it does not mean the module has no runtime behavior.",
+      "decision_id": "DEC-028",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+          "section": "owner_module_id and supporting_module_ids",
+          "sha256": "1723fd52b0b4a9550146bb9b26c781146e57e22be3c829fc19d70819aa4dd49b"
+        }
+      ],
+      "rationale": "The live registry owns process identity and topology. Legacy step 0 / N/A has no valid process identity.",
+      "status": "approved_for_execution",
+      "title": "Confirm process participation by registry identity"
+    },
+    {
+      "affected_authorities": [
+        "contract uses in 34 candidates"
+      ],
+      "approved_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "decision": "A resolved live contract-registry record may be referenced without an invented schema. Mark a missing executable schema as deferred and nonblocking for schema structure only; do not waive an unknown mandatory boundary definition.",
+      "decision_id": "DEC-029",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "8.7,30",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "rationale": "DEC-020 permits explicit schema gaps but does not authorize an invented interface or a specification-readiness waiver.",
+      "status": "approved_for_execution",
+      "title": "Keep unversioned wire references explicit"
+    },
+    {
+      "affected_authorities": [
+        "historical file mappings"
+      ],
+      "approved_by": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "decision": "Account for all 86 historical records against the new baseline, including moved paths. Keep runtime code physically unchanged.",
+      "decision_id": "DEC-030",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/run/historical_86_revalidation.json",
+          "section": "all 86 records",
+          "sha256": "ee7cd7668666e9e2bedc3327f117b409142dacd0b97b083ad68acbbce291cc8b"
+        }
+      ],
+      "rationale": "DEC-017 and section 4 exclude bulk physical source migration.",
+      "status": "approved_for_execution",
+      "title": "Preserve historical location decisions without executing moves"
+    },
+    {
+      "affected_authorities": [
+        "execution baseline",
+        "source ledger",
+        "candidate execution metadata",
+        "tracking projections"
+      ],
+      "approved_by": "Repository owner through continuation request; Codex performed source/hash review",
+      "decision": "Revalidate unchanged authorities and carried evidence at current master. Preserve historical source commits, batches and decisions. Remove owner-deleted zero-claim source versions from the active inventory while retaining their old records. The ZIP is a transport carrier, not a content authority. Existing acceptance holds remain.",
+      "decision_id": "DEC-034",
+      "effective_baseline": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/run/baseline_continuity.json",
+          "section": "reviewed_master_changes"
+        }
+      ],
+      "rationale": "All four changes between baselines reviewed: three owner deletions and one matching package addition; no root, contract, process, runtime or risk changes. User explicitly requested continuation after committing the package.",
+      "status": "approved_for_execution",
+      "title": "Resume verified package against fresh master"
+    },
+    {
+      "affected_authorities": [
+        "m0029 candidate implementation evidence",
+        "m0034 candidate implementation evidence"
+      ],
+      "approved_by": "Codex under owner execution instructions; static observations only",
+      "decision": "Reference eight reviewed observations from current U2 and SK2 code under implementation_evidence. Preserve contradictory/missing implementation details as conformance findings. Do not select an entrypoint, define bridge semantics, change runtime code or mark implementation/specification ready.",
+      "decision_id": "DEC-035",
+      "effective_baseline": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "atomic_claim_extraction_complete": false,
+          "complete_source_read": true,
+          "fully_scraped": false,
+          "read_line_range": [
+            1,
+            48
+          ],
+          "safe_to_archive": false,
+          "source_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+          "source_path": "services/gui-gateway/src/2099900155260118_config.py",
+          "source_sha256": "ced1f89123bec17d5ca6ae72962867d7435fa305189a0d5fc131746c299692ac"
+        },
+        {
+          "atomic_claim_extraction_complete": false,
+          "complete_source_read": true,
+          "fully_scraped": false,
+          "read_line_range": [
+            1,
+            274
+          ],
+          "safe_to_archive": false,
+          "source_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+          "source_path": "services/gui-gateway/src/2099900156260118_main.py",
+          "source_sha256": "34d60de5734b58242a8c39979e361226429b0f4efb8cde193a439cd68fc7fb02"
+        },
+        {
+          "atomic_claim_extraction_complete": false,
+          "complete_source_read": true,
+          "fully_scraped": false,
+          "read_line_range": [
+            1,
+            153
+          ],
+          "safe_to_archive": false,
+          "source_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+          "source_path": "services/gui-gateway/src/2099900157260118_models.py",
+          "source_sha256": "037d8ec97043979a8e56ce6faf627cc741d6145254205094e3c2cc4cff66c465"
+        },
+        {
+          "atomic_claim_extraction_complete": false,
+          "complete_source_read": true,
+          "fully_scraped": false,
+          "read_line_range": [
+            1,
+            120
+          ],
+          "safe_to_archive": false,
+          "source_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+          "source_path": "services/gui-gateway/src/2099900158260118_plugin.py",
+          "source_sha256": "2f000dfc9f700fc4abd57da5cba3d416409a55861b96b2f2886fc2308ef66747"
+        },
+        {
+          "atomic_claim_extraction_complete": false,
+          "complete_source_read": true,
+          "fully_scraped": false,
+          "read_line_range": [
+            1,
+            327
+          ],
+          "safe_to_archive": false,
+          "source_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+          "source_path": "shared/idempotency/models/2099900211260118_idempotency_key.py",
+          "source_sha256": "4f7d67783978d964974a53ef3620afce75cae783189a5852b48ecf181dc50fa9"
+        }
+      ],
+      "rationale": "Section 8.15 and DEC-011 require commit-pinned observation and separation from intended specification. Five files were read completely; source-level claim extraction and the pilot remain incomplete.",
+      "status": "approved_for_execution",
+      "title": "Record pilot implementation observations without promoting them to intended specification"
+    },
+    {
+      "affected_authorities": [
+        "review branch",
+        "draft PR"
+      ],
+      "approved_by": "Repository owner through Create pr and current continuation request",
+      "decision": "Publish the carried package changes and this continuation to a dedicated review branch and draft PR in DICKY1987/eafix-modular. Do not merge master, cut over active authorities or describe consolidation as complete.",
+      "decision_id": "DEC-036",
+      "effective_baseline": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "EAFIX_Consolidation_Review.zip",
+          "sha256": "4590170f18ec65e377063abefe6cd41d29752ca13b9c88c026657bc0b690e055",
+          "source_commit": "296694a3c275dc2227a4da0559e55a0c499944a9"
+        }
+      ],
+      "rationale": "Owner explicitly requested a PR, committed the exact review ZIP to this repository and requested remaining execution. Publication does not supply missing facts or waive acceptance holds.",
+      "status": "approved_for_execution",
+      "title": "Publish requested review branch and draft PR"
+    }
+  ],
+  "schema_version": "1.0.0"
+}

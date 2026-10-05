@@ -1,0 +1,1097 @@
+{
+  "baseline_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+  "new_program_writers": [
+    {
+      "content_sha256": "4895d0cc52bc83b1ad808749c1eff8a80d889a78f520b6a87f07b0e8de809065",
+      "direction": "inventory_only",
+      "path": "governance/module_consolidation/inventory_sources.py",
+      "review_status": "reviewed",
+      "validation_evidence": "run/fixture_validation.json"
+    },
+    {
+      "content_sha256": "83ed63f6d69520014085a952b17c96e41dfb0d1daf1ecb81091f49c9093e88e7",
+      "direction": "baseline_to_candidate_only",
+      "path": "governance/module_consolidation/prepare_candidates.py",
+      "review_status": "reviewed",
+      "validation_evidence": "run/fixture_validation.json"
+    },
+    {
+      "content_sha256": "1dcb035291ed9cfeb5615dc3e1d3ab967470ae0b7816b82aa7dcc4c590a34dc0",
+      "direction": "guarded_root_to_projection",
+      "path": "governance/module_consolidation/generate_projections.py",
+      "review_status": "reviewed",
+      "validation_evidence": "run/fixture_validation.json"
+    },
+    {
+      "content_sha256": "980c5d9d338848163137d9602fac85b14ed72707b26bcab16123775cab9f7286",
+      "direction": "read_only_validation_and_report",
+      "path": "governance/module_consolidation/validate_consolidation.py",
+      "review_status": "reviewed",
+      "validation_evidence": "run/fixture_validation.json"
+    },
+    {
+      "content_sha256": "481fde860b7537174b46e9e3d5ca4eac55fc3dfe3fa1b64632cf1aaa5386d40e",
+      "direction": "governance_report_only",
+      "path": "governance/module_consolidation/record_blocked_execution.py",
+      "review_status": "reviewed",
+      "validation_evidence": "run/fixture_validation.json"
+    },
+    {
+      "content_sha256": "1feab9125731e7555e12e42fdade55d4eff97678d5885c13ad6a7e08484111eb",
+      "direction": "guarded_primitives",
+      "path": "governance/module_consolidation/authority_core.py",
+      "review_status": "reviewed",
+      "validation_evidence": "run/fixture_validation.json"
+    },
+    {
+      "content_sha256": "084824c414d37341d5f4bed232f91de087473c5f3ae463637dec1b5dabeb56fe",
+      "direction": "read_only_validation_and_report",
+      "path": "governance/module_consolidation/progress_gate.py",
+      "review_status": "reviewed",
+      "validation_evidence": "batches/independent-boundary-review/validation_report.json"
+    },
+    {
+      "content_sha256": "c45918f11f25633b170a76101e64fdb7b946a6e6356ac5c81afbfc7486ea7498",
+      "direction": "reviewed_proposals_to_guarded_candidates_only",
+      "path": "governance/module_consolidation/apply_reviewed_candidates.py",
+      "review_status": "reviewed",
+      "validation_evidence": "batches/independent-boundary-review/validation_report.json"
+    }
+  ],
+  "new_program_writers_inventory_required_before_cutover": false,
+  "pending_review_count": 0,
+  "whole_repository_files_scanned": 2158,
+  "writers": [
+    {
+      "content_sha256": "a6f89cf8d25e0d36232c6b963859e5aa46f02bfb42ef43e7404cf571c03791f5",
+      "direction": "read_only_validation_ci",
+      "inputs": [
+        "atomic_module_manifest"
+      ],
+      "matches": [
+        {
+          "excerpt": "run: python ci/2099900300260118_validate_atomic_module_manifests.py",
+          "line": 68
+        }
+      ],
+      "outputs": [],
+      "path": ".github/workflows/1299900007260118_ci.yml",
+      "purpose": "Calls the governed full active validator route; default still blocks unfinished cutover.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": []
+    },
+    {
+      "content_sha256": "806e620d373e8c8e960598b7be8510062691cf41f0daa2adcc1d4c692e36b0ee",
+      "direction": "candidate_registry_to_projection",
+      "inputs": [
+        "build_registries"
+      ],
+      "matches": [
+        {
+          "excerpt": "run: python tools/registries/build_registries.py --check --report-only",
+          "line": 35
+        },
+        {
+          "excerpt": "run: python tools/registries/build_registries.py --report-only",
+          "line": 37
+        }
+      ],
+      "outputs": [
+        "EAFIX_auth_docs/generated/registries/"
+      ],
+      "path": ".github/workflows/registry-validation.yml",
+      "purpose": "Regenerates shadow registry reports; must retain candidate status for non-process registries.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": []
+    },
+    {
+      "content_sha256": "e0d0c27857b265cf5614770fa31329c19c3f4fd901d37a67ecbe6c9125926922",
+      "direction": "validator_workflow",
+      "inputs": [
+        "manifest.json"
+      ],
+      "matches": [
+        {
+          "excerpt": "- \"m00*/manifest.json\"",
+          "line": 7
+        },
+        {
+          "excerpt": "- \"m00*/manifest.json\"",
+          "line": 14
+        }
+      ],
+      "outputs": [],
+      "path": ".github/workflows/validate-module-structure.yml",
+      "purpose": "Calls a read-only v1 structural validator.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": []
+    },
+    {
+      "content_sha256": "67a883f791225c5f6f0b554ed6f00a4933af449b62baaae2ef969275d8668c06",
+      "direction": "legacy_identifier_validator",
+      "inputs": [
+        "module_catalog"
+      ],
+      "matches": [
+        {
+          "excerpt": "# Actually - I just realized: the task says the current module_catalog has 28 modules",
+          "line": 149
+        }
+      ],
+      "outputs": [],
+      "path": "EA-REG/scripts/validate_identifier_map.py",
+      "purpose": "Read-only compatibility validator; does not write module roots.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": [
+        {
+          "call": "open",
+          "line": 28
+        }
+      ]
+    },
+    {
+      "content_sha256": "07f48200e49c7062e6f1ba6bfae5945cbc5769fd9e5ceff9840a044ff7a276aa",
+      "direction": "verification_projection",
+      "inputs": [
+        "manifest.json"
+      ],
+      "matches": [
+        {
+          "excerpt": "evidence_name = \"verification_evidence_manifest.json\"",
+          "line": 633
+        }
+      ],
+      "outputs": [
+        "EAFIX_auth_docs/EAFIX_SSOT_REGISTRY_DELIVERY_OBLIGATION_MATRIX.generated.json",
+        "EAFIX_auth_docs/EAFIX_SSOT_REGISTRY_DELIVERY_CHECKLIST.generated.md",
+        "verification run reports"
+      ],
+      "path": "EAFIX_auth_docs/generate_eafix_ssot_registry_verification_package.py",
+      "purpose": "Reads requirements and writes verification package; no root manifest output.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": [
+        {
+          "call": "(json.dumps(value, indent=2, ensure_ascii=False) + '\\n').encode",
+          "line": 68
+        },
+        {
+          "call": "json.dumps",
+          "line": 74
+        },
+        {
+          "call": "copy.deepcopy",
+          "line": 263
+        },
+        {
+          "call": "evidence_path.write_bytes",
+          "line": 641
+        },
+        {
+          "call": "report_path.write_bytes",
+          "line": 642
+        },
+        {
+          "call": "compare_or_write",
+          "line": 755
+        },
+        {
+          "call": "compare_or_write",
+          "line": 756
+        },
+        {
+          "call": "copy.deepcopy",
+          "line": 167
+        },
+        {
+          "call": "path.write_bytes",
+          "line": 557
+        },
+        {
+          "call": "json.dumps",
+          "line": 768
+        },
+        {
+          "call": "json.dumps",
+          "line": 711
+        },
+        {
+          "call": "json.dumps",
+          "line": 68
+        },
+        {
+          "call": "json.dumps",
+          "line": 136
+        },
+        {
+          "call": "json.dumps",
+          "line": 137
+        },
+        {
+          "call": "json.dumps",
+          "line": 244
+        },
+        {
+          "call": "json.dumps",
+          "line": 245
+        }
+      ]
+    },
+    {
+      "content_sha256": "377e3679d27de23a0c11b0ebc0d9f08241ee2beb1166550f9550bc4778f8577b",
+      "direction": "verification_report",
+      "inputs": [
+        "manifest.json"
+      ],
+      "matches": [
+        {
+          "excerpt": "evidence_path = run_root / \"verification_evidence_manifest.json\"",
+          "line": 685
+        }
+      ],
+      "outputs": [
+        "caller-selected JSON verification report"
+      ],
+      "path": "EAFIX_auth_docs/validate_eafix_ssot_registry_verification_package.py",
+      "purpose": "Validator report output does not feed module roots.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": [
+        {
+          "call": "json.dumps",
+          "line": 1075
+        },
+        {
+          "call": "args.json_output.write_text",
+          "line": 1079
+        }
+      ]
+    },
+    {
+      "content_sha256": "d843e242d25b80a9e6ceba81138b8021b4ca5d1930d6414145cbd62a65e21763",
+      "direction": "historical_inactive",
+      "inputs": [
+        "module_catalog",
+        "module_registry",
+        "process_step_catalog"
+      ],
+      "matches": [
+        {
+          "excerpt": "1. module_catalog.json",
+          "line": 4
+        },
+        {
+          "excerpt": "2. process_step_catalog.json",
+          "line": 5
+        },
+        {
+          "excerpt": "MODULE_CATALOG_PATH = REPO_ROOT / \"module_catalog.json\"",
+          "line": 49
+        },
+        {
+          "excerpt": "PROCESS_STEP_CATALOG_PATH = REPO_ROOT / \"process_step_catalog.json\"",
+          "line": 50
+        },
+        {
+          "excerpt": "def load_existing_module_catalog() -> dict | None:",
+          "line": 355
+        },
+        {
+          "excerpt": "def build_process_step_catalog(",
+          "line": 406
+        },
+        {
+          "excerpt": "\"document_type\": \"process_step_catalog\",",
+          "line": 487
+        },
+        {
+          "excerpt": "def build_module_catalog(",
+          "line": 500
+        },
+        {
+          "excerpt": "\"document_type\": \"module_catalog\",",
+          "line": 662
+        },
+        {
+          "excerpt": "\"module_registry_file\": process_source.name,",
+          "line": 669
+        },
+        {
+          "excerpt": "\"module_registry_file\": process_source.name,",
+          "line": 685
+        },
+        {
+          "excerpt": "existing_catalog = load_existing_module_catalog()",
+          "line": 809
+        },
+        {
+          "excerpt": "process_step_catalog, module_to_steps = build_process_step_catalog(",
+          "line": 821
+        },
+        {
+          "excerpt": "module_catalog = build_module_catalog(",
+          "line": 826
+        },
+        {
+          "excerpt": "write_json(PROCESS_STEP_CATALOG_PATH, process_step_catalog)",
+          "line": 843
+        },
+        {
+          "excerpt": "write_json(MODULE_CATALOG_PATH, module_catalog)",
+          "line": 844
+        },
+        {
+          "excerpt": "print(f\"Process steps written: {len(process_step_catalog['steps'])}\")",
+          "line": 850
+        },
+        {
+          "excerpt": "print(f\"Modules written: {len(module_catalog['modules'])}\")",
+          "line": 851
+        }
+      ],
+      "outputs": [],
+      "path": "Master_Archive/EA-REG/generate_three_artifact_catalogs.py",
+      "purpose": "Archived script; not an approved current writer.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": [
+        {
+          "call": "write_json",
+          "line": 843
+        },
+        {
+          "call": "write_json",
+          "line": 844
+        },
+        {
+          "call": "write_file_registry",
+          "line": 845
+        },
+        {
+          "call": "LEGACY_FILE_REGISTRY_PATH.open",
+          "line": 221
+        },
+        {
+          "call": "IDENTIFIER_MAP_PATH.open",
+          "line": 237
+        },
+        {
+          "call": "PHYSICAL_REGISTRY_PATH.open",
+          "line": 275
+        },
+        {
+          "call": "CLASSIFICATION_RULES_PATH.open",
+          "line": 299
+        },
+        {
+          "call": "MODULE_CATALOG_PATH.open",
+          "line": 359
+        },
+        {
+          "call": "path.open",
+          "line": 793
+        },
+        {
+          "call": "json.dump",
+          "line": 794
+        },
+        {
+          "call": "handle.write",
+          "line": 795
+        },
+        {
+          "call": "path.open",
+          "line": 799
+        },
+        {
+          "call": "writer.writeheader",
+          "line": 801
+        },
+        {
+          "call": "writer.writerow",
+          "line": 803
+        },
+        {
+          "call": "candidate.open",
+          "line": 99
+        }
+      ]
+    },
+    {
+      "content_sha256": "d72dfd81c6581d36188b02cc66ce88d9c583113b5441dedb06463166d3786ca7",
+      "direction": "historical_inactive",
+      "inputs": [
+        "module_catalog",
+        "process_step_catalog"
+      ],
+      "matches": [
+        {
+          "excerpt": "self.module_catalog_path = repo_root / \"module_catalog.json\"",
+          "line": 63
+        },
+        {
+          "excerpt": "self.process_step_catalog_path = repo_root / \"process_step_catalog.json\"",
+          "line": 64
+        },
+        {
+          "excerpt": "self.module_schema_path = repo_root / \"schemas\" / \"module_catalog.schema.json\"",
+          "line": 65
+        },
+        {
+          "excerpt": "module_catalog = self._load_json(self.module_catalog_path, \"module catalog\")",
+          "line": 95
+        },
+        {
+          "excerpt": "process_catalog = self._load_json(self.process_step_catalog_path, \"process step catalog\")",
+          "line": 96
+        },
+        {
+          "excerpt": "if module_catalog:",
+          "line": 102
+        },
+        {
+          "excerpt": "self._validate_module_catalog_schema(module_catalog)",
+          "line": 103
+        },
+        {
+          "excerpt": "self._validate_module_catalog(module_catalog, identifier_map)",
+          "line": 104
+        },
+        {
+          "excerpt": "if file_registry_rows and module_catalog and process_catalog and physical_registry_rows:",
+          "line": 107
+        },
+        {
+          "excerpt": "module_catalog,",
+          "line": 111
+        },
+        {
+          "excerpt": "module_catalog=module_catalog,",
+          "line": 131
+        },
+        {
+          "excerpt": "(\"module catalog\", self.module_catalog_path, True),",
+          "line": 144
+        },
+        {
+          "excerpt": "(\"process step catalog\", self.process_step_catalog_path, True),",
+          "line": 145
+        },
+        {
+          "excerpt": "def _validate_module_catalog_schema(self, module_catalog: dict[str, Any]) -> None:",
+          "line": 259
+        },
+        {
+          "excerpt": "errors = sorted(validator.iter_errors(module_catalog), key=lambda err: list(err.path))",
+          "line": 271
+        },
+        {
+          "excerpt": "def _validate_module_catalog(self, module_catalog: dict[str, Any], identifier_map: dict[str, Any]) -> None:",
+          "line": 282
+        },
+        {
+          "excerpt": "modules = module_catalog.get(\"modules\", [])",
+          "line": 283
+        },
+        {
+          "excerpt": "self.alignment_errors.append(\"module_catalog.json must contain a modules array\")",
+          "line": 285
+        },
+        {
+          "excerpt": "self.alignment_errors.append(f\"Invalid module_catalog.module_id: {module_id!r}\")",
+          "line": 297
+        },
+        {
+          "excerpt": "self.alignment_errors.append(f\"Duplicate module_catalog.module_id: {module_id}\")",
+          "line": 299
+        },
+        {
+          "excerpt": "self.alignment_errors.append(\"module_catalog canonical_symbol may not be blank\")",
+          "line": 303
+        },
+        {
+          "excerpt": "self.alignment_errors.append(f\"Duplicate module_catalog canonical_symbol: {canonical_symbol}\")",
+          "line": 305
+        },
+        {
+          "excerpt": "f\"Alias symbol {canonical_symbol} must not appear as a module_catalog row\"",
+          "line": 310
+        },
+        {
+          "excerpt": "self.alignment_errors.append(f\"module_catalog row {canonical_symbol!r} has blank module_name\")",
+          "line": 313
+        },
+        {
+          "excerpt": "self.alignment_errors.append(f\"Invalid process_step_catalog.module_id: {module_id!r}\")",
+          "line": 352
+        },
+        {
+          "excerpt": "module_catalog: dict[str, Any],",
+          "line": 384
+        },
+        {
+          "excerpt": "module_ids = {str(module.get(\"module_id\", \"\")) for module in module_catalog.get(\"modules\", []) if module.get(\"module_id\")}",
+          "line": 397
+        },
+        {
+          "excerpt": "for module in module_catalog.get(\"modules\", [])",
+          "line": 410
+        },
+        {
+          "excerpt": "f\"file_registry.process_steps entry not found in process_step_catalog for {relative_path}: {step_id}\"",
+          "line": 495
+        },
+        {
+          "excerpt": "f\"module_catalog.process_bindings missing step linkage for {relative_path}\"",
+          "line": 505
+        },
+        {
+          "excerpt": "module_catalog: dict[str, Any],",
+          "line": 531
+        },
+        {
+          "excerpt": "\"module_count\": len(module_catalog.get(\"modules\", [])),",
+          "line": 543
+        },
+        {
+          "excerpt": "\"module_catalog\": str(self.module_catalog_path),",
+          "line": 548
+        },
+        {
+          "excerpt": "\"process_step_catalog\": str(self.process_step_catalog_path),",
+          "line": 549
+        }
+      ],
+      "outputs": [],
+      "path": "Master_Archive/EA-REG/validate_three_artifact_alignment.py",
+      "purpose": "Archived script; not an approved current writer.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": [
+        {
+          "call": "self._write_markdown_report",
+          "line": 135
+        },
+        {
+          "call": "self.markdown_report_path.write_text",
+          "line": 598
+        },
+        {
+          "call": "path.open",
+          "line": 189
+        },
+        {
+          "call": "candidate.open",
+          "line": 205
+        }
+      ]
+    },
+    {
+      "content_sha256": "17a187baacb3d9cd4cfa16e15f6f8d089c4296de00f78781a0f77e239a53a8c5",
+      "direction": "read_only_validation_and_projection_check",
+      "inputs": [
+        "generate_manifests",
+        "manifest_generation"
+      ],
+      "matches": [
+        {
+          "excerpt": "cmd = [sys.executable, \"-m\", \"tools.manifest_generation.generate_manifests\", \"--repo-root\", str(repo_root)]",
+          "line": 35
+        },
+        {
+          "excerpt": "\"Run `python -m tools.manifest_generation.generate_manifests --repo-root .` \"",
+          "line": 54
+        }
+      ],
+      "outputs": [
+        "EAFIX_auth_docs/manifests/"
+      ],
+      "path": "ci/2099900300260118_validate_atomic_module_manifests.py",
+      "purpose": "DEC-032 replacement: full active validation by default; explicit progress scope; no generator or root writes",
+      "required_change_before_cutover": "none for this caller; full active gate still required",
+      "review_status": "reviewed",
+      "validation_evidence": "tests/test_validator_update.py",
+      "write_calls": []
+    },
+    {
+      "content_sha256": "839ea28d8850e1a97836bb7c018612e525c4ef0c4e45a40cf5a29fc8164285bc",
+      "direction": "tracking_projection",
+      "inputs": [
+        "eafix_module_manifests_bundle",
+        "manifest.json"
+      ],
+      "matches": [
+        {
+          "excerpt": "\"One `<existing-module-root>/manifest.json` per module; retain the currently approved filename if different.\",",
+          "line": 92
+        },
+        {
+          "excerpt": "\"Decide the fate of EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json: \"",
+          "line": 110
+        },
+        {
+          "excerpt": "f\"**Target authority:** `{root}/manifest.json` (subject to Decision D1)\",",
+          "line": 249
+        }
+      ],
+      "outputs": [
+        "governance/module_consolidation/tracking/eafix_consolidation_ssot.json"
+      ],
+      "path": "governance/module_consolidation/tracking/build_ssot.py",
+      "purpose": "Replace fixed baseline and read governed decisions/status; never write module facts.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": [
+        {
+          "call": "open",
+          "line": 300
+        },
+        {
+          "call": "json.dump",
+          "line": 301
+        },
+        {
+          "call": "f.write",
+          "line": 302
+        }
+      ]
+    },
+    {
+      "content_sha256": "08820e7b793fab4737cd447e4275dbeab5791ceba45b1a0fb1cfecaca2aaf504",
+      "direction": "test_only",
+      "inputs": [
+        "build_registries",
+        "registry_core"
+      ],
+      "matches": [
+        {
+          "excerpt": "import registry_core as rc",
+          "line": 5
+        },
+        {
+          "excerpt": "import build_registries as cli",
+          "line": 6
+        },
+        {
+          "excerpt": "with mock.patch.object(sys,'argv',['build_registries.py','--check','--report-only']), mock.patch.object(cli,'run',return_value=0) as run:",
+          "line": 15
+        },
+        {
+          "excerpt": "with mock.patch.object(sys,'argv',['build_registries.py']), mock.patch.object(cli,'run',return_value=0) as run:",
+          "line": 19
+        }
+      ],
+      "outputs": [
+        "temporary test directories"
+      ],
+      "path": "tests/registries/test_registry_framework.py",
+      "purpose": "Tests current records and no-write check mode; mocks CLI run calls.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": [
+        {
+          "call": "p.write_text",
+          "line": 60
+        }
+      ]
+    },
+    {
+      "content_sha256": "9a4f302263eba3fd0484e241fa49cd0e71a18e60a9ba3385cb96abe3f5737e7e",
+      "direction": "root_to_projection",
+      "inputs": [
+        "context_packets",
+        "manifest.json"
+      ],
+      "matches": [
+        {
+          "excerpt": "\"manifest\": \"m0029-u2-gui-gateway/manifest.json\",",
+          "line": 18
+        },
+        {
+          "excerpt": "\"manifest\": \"m0029-u2-gui-gateway/manifest.json\",",
+          "line": 26
+        },
+        {
+          "excerpt": "\"manifest\": \"m0017-b2-mt4-ea-executor/manifest.json\",",
+          "line": 34
+        },
+        {
+          "excerpt": "\"manifest\": \"m0027-r3-correlation-guard/manifest.json\",",
+          "line": 42
+        },
+        {
+          "excerpt": "\"manifest\": \"m0034-sk2-idempotency/manifest.json\",",
+          "line": 50
+        },
+        {
+          "excerpt": "f\"context_packets/{identity['module_id']}/{work_cell_id}/\"",
+          "line": 114
+        }
+      ],
+      "outputs": [
+        "m00*/m00*-context/work-cells/*.json",
+        "docs/reference/generated/indicator_record.schema.json"
+      ],
+      "path": "tools/migration/generate_p20_outputs.py",
+      "purpose": "Reads roots and owned schema; writes five work cells and a schema projection only.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": [
+        {
+          "call": "deepcopy",
+          "line": 72
+        },
+        {
+          "call": "json.dumps",
+          "line": 64
+        },
+        {
+          "call": "target.write_text",
+          "line": 156
+        }
+      ]
+    },
+    {
+      "content_sha256": "e52c55a857c03ee6a651c0373176a8a7e6972e701a2d4d68bddcdf59e91c6c26",
+      "direction": "candidate_registry_to_projection",
+      "inputs": [
+        "registry_core"
+      ],
+      "matches": [
+        {
+          "excerpt": "from registry_core import run",
+          "line": 2
+        }
+      ],
+      "outputs": [
+        "EAFIX_auth_docs/generated/registries/"
+      ],
+      "path": "tools/registries/build_registries.py",
+      "purpose": "CLI forwards to registry_core.run; does not write root manifests.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": []
+    },
+    {
+      "content_sha256": "cb6a33de0a7ca66fe4e4f03a07b250a386829808f1bd6efb281064a40a779ad2",
+      "direction": "candidate_registry_to_projection",
+      "inputs": [
+        "registry_core"
+      ],
+      "matches": [
+        {
+          "excerpt": "from registry_core import run",
+          "line": 1
+        }
+      ],
+      "outputs": [
+        "EAFIX_auth_docs/generated/registries/"
+      ],
+      "path": "tools/registries/generate_registry_snapshots.py",
+      "purpose": "Wrapper calls registry_core.run; same one-way output scope.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": []
+    },
+    {
+      "content_sha256": "cb6a33de0a7ca66fe4e4f03a07b250a386829808f1bd6efb281064a40a779ad2",
+      "direction": "candidate_registry_to_projection",
+      "inputs": [
+        "registry_core"
+      ],
+      "matches": [
+        {
+          "excerpt": "from registry_core import run",
+          "line": 1
+        }
+      ],
+      "outputs": [
+        "EAFIX_auth_docs/generated/registries/"
+      ],
+      "path": "tools/registries/generate_registry_views.py",
+      "purpose": "Wrapper calls registry_core.run; same one-way output scope.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": []
+    },
+    {
+      "content_sha256": "d2efec7f8866e256cdf12f4c4f39e3c2d7f76814e715bcc5a5d0dc834d1bc224",
+      "direction": "candidate_registry_to_projection",
+      "inputs": [
+        "manifest.json",
+        "module_catalog",
+        "module_registry",
+        "process_registry",
+        "registry_core"
+      ],
+      "matches": [
+        {
+          "excerpt": "# Calibrated against the current dataset (see registry_core.run) plus the natural",
+          "line": 16
+        },
+        {
+          "excerpt": "docs['module_catalog.generated.md']='---\\ndoc_id: DOC-REG-0001\\n---\\n# Generated Module Catalog\\n\\n> Generated from `module_registry.jsonl`. Do not edit manually.\\n\\n'+ '\\n'.join(f\"- `{r['module_id']}` **{r['canonical_symbol']}** — {r['modu",
+          "line": 170
+        },
+        {
+          "excerpt": "docs['process_catalog.generated.md']='---\\ndoc_id: DOC-REG-0002\\n---\\n# Generated Process Catalog\\n\\n> Generated from `process_registry.jsonl`. Do not edit manually.\\n\\n'+ '\\n'.join(f\"- `{r['step_code']}` {r['step_name']} — owner `{r['owner",
+          "line": 171
+        },
+        {
+          "excerpt": "intro=('This generated view summarizes the registry system. `process_registry.jsonl` is the canonical process authority, while non-process registries remain candidate until their own cutovers are separately approved.'",
+          "line": 176
+        },
+        {
+          "excerpt": "write_json(GEN_ROOT/'registry_build_manifest.json',manifest)",
+          "line": 191
+        }
+      ],
+      "outputs": [
+        "EAFIX_auth_docs/generated/registries/"
+      ],
+      "path": "tools/registries/registry_core.py",
+      "purpose": "Preserve shadow registry output; redirect module projections before cutover.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": [
+        {
+          "call": "json.dumps",
+          "line": 29
+        },
+        {
+          "call": "path.write_text",
+          "line": 42
+        },
+        {
+          "call": "path.write_text",
+          "line": 44
+        },
+        {
+          "call": "write_json",
+          "line": 186
+        },
+        {
+          "call": "write_text",
+          "line": 188
+        },
+        {
+          "call": "write_json",
+          "line": 191
+        },
+        {
+          "call": "json.dumps",
+          "line": 42
+        },
+        {
+          "call": "json.dumps",
+          "line": 122
+        },
+        {
+          "call": "write_text",
+          "line": 125
+        },
+        {
+          "call": "write_json",
+          "line": 187
+        },
+        {
+          "call": "write_text",
+          "line": 189
+        }
+      ]
+    },
+    {
+      "content_sha256": "b82e32cab08a1b7c17a74f1b337d4ea2dad533a4bf8a27c85ae59f224c1af1be",
+      "direction": "verification_projection",
+      "inputs": [
+        "registry_core"
+      ],
+      "matches": [
+        {
+          "excerpt": "from registry_core import run",
+          "line": 1
+        }
+      ],
+      "outputs": [
+        "EAFIX_auth_docs/generated/registries/"
+      ],
+      "path": "tools/registries/report_registry_conflicts.py",
+      "purpose": "Runs registry_core in report-only mode; no root manifest writes.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": []
+    },
+    {
+      "content_sha256": "cc9ffc7a7c50ec1cadf7fbf45d218b41b4623ace213b6407deaac336a10e318f",
+      "direction": "read_only_validator",
+      "inputs": [
+        "registry_core"
+      ],
+      "matches": [
+        {
+          "excerpt": "from registry_core import load_all, validate_schemas",
+          "line": 1
+        }
+      ],
+      "outputs": [],
+      "path": "tools/registries/validate_record_schemas.py",
+      "purpose": "Reads registry records and validates schemas.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": []
+    },
+    {
+      "content_sha256": "4421f891ec0f9c9c12d20a51ce76de965b47b58c30e053c2614db5fe948dfe8c",
+      "direction": "read_only_validator",
+      "inputs": [
+        "registry_core"
+      ],
+      "matches": [
+        {
+          "excerpt": "from registry_core import load_all, validate_authority",
+          "line": 1
+        }
+      ],
+      "outputs": [],
+      "path": "tools/registries/validate_registry_authority.py",
+      "purpose": "Reads registry records and validates authority fields.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": []
+    },
+    {
+      "content_sha256": "866f6a9f96898d7e0e4700110eecef3e6b87a1b15cfba992cec64a3064ff5ee3",
+      "direction": "read_only_validator",
+      "inputs": [
+        "registry_core"
+      ],
+      "matches": [
+        {
+          "excerpt": "from registry_core import load_all, validate_ids",
+          "line": 1
+        }
+      ],
+      "outputs": [],
+      "path": "tools/registries/validate_registry_ids.py",
+      "purpose": "Checks current registry identifiers without writing.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": []
+    },
+    {
+      "content_sha256": "5c5bb86e8764e51b8f64564389ae9f541af4deffac698e4210957ccf8c83f4da",
+      "direction": "read_only_validator",
+      "inputs": [
+        "registry_core"
+      ],
+      "matches": [
+        {
+          "excerpt": "from registry_core import load_all, validate_refs",
+          "line": 1
+        }
+      ],
+      "outputs": [],
+      "path": "tools/registries/validate_registry_references.py",
+      "purpose": "Reads registry records and validates cross references.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": []
+    },
+    {
+      "content_sha256": "7bdbf3196f0f9d60dcad733032f1e3177ce7924fe89f797e413a160e37c81f73",
+      "direction": "process_validator_and_guarded_governance",
+      "inputs": [
+        "build_registries",
+        "manifest.json",
+        "process_registry",
+        "process_step_catalog"
+      ],
+      "matches": [
+        {
+          "excerpt": "REG_JSONL = \"EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl\"",
+          "line": 22
+        },
+        {
+          "excerpt": "STEP_CATALOG = \"EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json\"",
+          "line": 23
+        },
+        {
+          "excerpt": "PROJECTION = \"EAFIX_auth_docs/generated/registries/process_registry.current.json\"",
+          "line": 25
+        },
+        {
+          "excerpt": "BUILD_MANIFEST = \"EAFIX_auth_docs/generated/registries/registry_build_manifest.json\"",
+          "line": 27
+        },
+        {
+          "excerpt": "BUILD_SCRIPT = \"tools/registries/build_registries.py\"",
+          "line": 32
+        },
+        {
+          "excerpt": "header_ok=(\"do not edit\" in md.lower() or \"generated\" in md.lower()) and (\"process_registry.jsonl\" in md or \"source\" in md.lower())",
+          "line": 340
+        }
+      ],
+      "outputs": [
+        "process consolidation verification reports"
+      ],
+      "path": "tools/registries/verify_process_consolidation.py",
+      "purpose": "Process authority has separate governance; no module-root generation.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": [
+        {
+          "call": "open",
+          "line": 72
+        },
+        {
+          "call": "Path(args.json_out).write_text",
+          "line": 376
+        },
+        {
+          "call": "json.dumps",
+          "line": 376
+        },
+        {
+          "call": "removed_present.append",
+          "line": 207
+        }
+      ]
+    },
+    {
+      "content_sha256": "4ad0b57c97d2b4ea997529acd573fc7f7624c9f5e5913cdb7c22ab86fa953a89",
+      "direction": "read_only_validator",
+      "inputs": [
+        "manifest.json"
+      ],
+      "matches": [
+        {
+          "excerpt": "1. Exactly one manifest.json per module folder, and it must parse as JSON.",
+          "line": 12
+        },
+        {
+          "excerpt": "manifest_path = d / \"manifest.json\"",
+          "line": 74
+        },
+        {
+          "excerpt": "errors.append(f\"[{modname}] missing manifest.json\")",
+          "line": 77
+        },
+        {
+          "excerpt": "errors.append(f\"[{modname}] manifest.json is not valid JSON: {e}\")",
+          "line": 83
+        }
+      ],
+      "outputs": [],
+      "path": "tools/validate_module_structure.py",
+      "purpose": "No writes; validates root file ownership.",
+      "required_change_before_cutover": "Resolve unreviewed writers and redirect shadow module projections.",
+      "review_status": "reviewed",
+      "write_calls": []
+    }
+  ]
+}

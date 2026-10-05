@@ -1,0 +1,1107 @@
+{
+  "$defs": {
+    "contract_use": {
+      "additionalProperties": false,
+      "properties": {
+        "authority_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "compatibility": {
+          "$ref": "#/$defs/fact"
+        },
+        "contract_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "gap_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "knowledge": {
+          "enum": [
+            "confirmed",
+            "unknown",
+            "deferred"
+          ]
+        },
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "producer",
+            "consumer",
+            "transformer",
+            "validator",
+            "boundary"
+          ]
+        },
+        "schema_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "step_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "usage_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "usage_id",
+        "name",
+        "contract_id",
+        "version",
+        "authority_path",
+        "schema_path",
+        "role",
+        "step_ids",
+        "compatibility",
+        "knowledge",
+        "gap_ids",
+        "evidence_refs"
+      ],
+      "type": "object"
+    },
+    "evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "approved_value_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "approver": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "claim_disposition": {
+          "enum": [
+            "MIGRATE",
+            "ALREADY_COVERED",
+            "MERGE",
+            "REJECTED",
+            "RETAINED_EXTERNAL"
+          ]
+        },
+        "claim_summary": {
+          "type": "string"
+        },
+        "decision_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "evidence_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_commit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_locator": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "source_path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "target_element_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "target_json_pointer": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "verification_status": {
+          "enum": [
+            "source_verified",
+            "candidate_applied",
+            "authority_applied",
+            "unverified"
+          ]
+        }
+      },
+      "required": [
+        "evidence_id",
+        "target_json_pointer",
+        "target_element_id",
+        "approved_value_sha256",
+        "source_path",
+        "source_commit",
+        "source_sha256",
+        "source_locator",
+        "claim_summary",
+        "claim_disposition",
+        "decision_id",
+        "approver",
+        "verification_status"
+      ],
+      "type": "object"
+    },
+    "fact": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "knowledge": {
+                "const": "confirmed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "evidence_refs": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "applicability": {
+                "const": "not_applicable"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "knowledge": {
+                "const": "confirmed"
+              },
+              "reason": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "value": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "knowledge": {
+                "enum": [
+                  "unknown",
+                  "conflicted",
+                  "deferred"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "gap_ids": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "applicability": {
+          "enum": [
+            "applicable",
+            "not_applicable",
+            "undetermined"
+          ]
+        },
+        "decision_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "evidence_refs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "gap_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "knowledge": {
+          "enum": [
+            "confirmed",
+            "unknown",
+            "conflicted",
+            "deferred"
+          ]
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "value": {}
+      },
+      "required": [
+        "applicability",
+        "knowledge",
+        "value",
+        "reason",
+        "decision_id",
+        "evidence_refs",
+        "gap_ids"
+      ],
+      "type": "object"
+    },
+    "file_definition": {
+      "additionalProperties": false,
+      "properties": {
+        "content_sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contracts_consumed": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "contracts_produced": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "current_or_proposed_location": {
+          "enum": [
+            "current",
+            "proposed"
+          ]
+        },
+        "entrypoint": {
+          "type": "boolean"
+        },
+        "evidence_refs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "file_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "ownership_status": {
+          "enum": [
+            "baseline_declared",
+            "verified",
+            "candidate",
+            "global_shared"
+          ]
+        },
+        "path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "required": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "role": {
+          "enum": [
+            "entrypoint",
+            "library",
+            "schema",
+            "config",
+            "fixture",
+            "test",
+            "doc",
+            "data",
+            "tooling",
+            "runtime_asset"
+          ]
+        },
+        "runtime_relevance": {
+          "enum": [
+            "runtime",
+            "supporting",
+            "undetermined"
+          ]
+        }
+      },
+      "required": [
+        "file_id",
+        "path",
+        "role",
+        "required",
+        "ownership_status",
+        "current_or_proposed_location",
+        "content_sha256",
+        "entrypoint",
+        "runtime_relevance",
+        "contracts_produced",
+        "contracts_consumed",
+        "evidence_refs"
+      ],
+      "type": "object"
+    },
+    "file_use": {
+      "additionalProperties": false,
+      "properties": {
+        "file_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "knowledge": {
+          "enum": [
+            "confirmed",
+            "unknown",
+            "deferred"
+          ]
+        },
+        "path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "required": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "role_in_this_step": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "file_id",
+        "path",
+        "role_in_this_step",
+        "required",
+        "knowledge"
+      ],
+      "type": "object"
+    },
+    "process_step": {
+      "additionalProperties": false,
+      "properties": {
+        "completion_criteria": {
+          "$ref": "#/$defs/fact"
+        },
+        "contract_refs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "decisions": {
+          "$ref": "#/$defs/fact"
+        },
+        "exclusive_files": {
+          "items": {
+            "$ref": "#/$defs/file_use"
+          },
+          "type": "array"
+        },
+        "failure_output": {
+          "$ref": "#/$defs/fact"
+        },
+        "inputs": {
+          "$ref": "#/$defs/fact"
+        },
+        "next_handoff_refs": {
+          "$ref": "#/$defs/fact"
+        },
+        "observability": {
+          "$ref": "#/$defs/fact"
+        },
+        "participation_role": {
+          "enum": [
+            "primary_owner",
+            "supporting"
+          ]
+        },
+        "preconditions": {
+          "$ref": "#/$defs/fact"
+        },
+        "primary_output": {
+          "$ref": "#/$defs/fact"
+        },
+        "process_registry_ref": {
+          "const": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl"
+        },
+        "processing": {
+          "$ref": "#/$defs/fact"
+        },
+        "retry_timeout_recovery": {
+          "$ref": "#/$defs/fact"
+        },
+        "secondary_outputs": {
+          "$ref": "#/$defs/fact"
+        },
+        "shared_files": {
+          "items": {
+            "$ref": "#/$defs/file_use"
+          },
+          "type": "array"
+        },
+        "state_transition_refs": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "step_code": {
+          "pattern": "^S[0-9]{2}$",
+          "type": "string"
+        },
+        "step_id": {
+          "pattern": "^6[0-9]{19}$",
+          "type": "string"
+        },
+        "trigger": {
+          "$ref": "#/$defs/fact"
+        },
+        "validation": {
+          "$ref": "#/$defs/fact"
+        }
+      },
+      "required": [
+        "step_id",
+        "step_code",
+        "process_registry_ref",
+        "participation_role",
+        "trigger",
+        "preconditions",
+        "inputs",
+        "processing",
+        "decisions",
+        "primary_output",
+        "secondary_outputs",
+        "validation",
+        "failure_output",
+        "retry_timeout_recovery",
+        "observability",
+        "completion_criteria",
+        "next_handoff_refs",
+        "exclusive_files",
+        "shared_files",
+        "contract_refs",
+        "state_transition_refs"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:eafix:atomic-module-manifest:2.0.0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Candidate and canonical structure. Specification readiness is enforced separately; unknown is never not-applicable.",
+  "properties": {
+    "authority": {
+      "additionalProperties": false,
+      "properties": {
+        "approval_authority": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "effective_baseline_commit": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        },
+        "policy": {
+          "const": "reviewed_module_root_authority"
+        },
+        "status": {
+          "enum": [
+            "candidate",
+            "canonical"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "policy",
+        "effective_baseline_commit",
+        "approval_authority"
+      ],
+      "type": "object"
+    },
+    "contracts": {
+      "items": {
+        "$ref": "#/$defs/contract_use"
+      },
+      "type": "array"
+    },
+    "document_type": {
+      "const": "atomic_module_manifest"
+    },
+    "evidence": {
+      "items": {
+        "$ref": "#/$defs/evidence"
+      },
+      "type": "array"
+    },
+    "failure_and_safety": {
+      "additionalProperties": false,
+      "properties": {
+        "error_codes": {
+          "$ref": "#/$defs/fact"
+        },
+        "fail_closed": {
+          "$ref": "#/$defs/fact"
+        },
+        "failure_modes": {
+          "$ref": "#/$defs/fact"
+        },
+        "operator_escalation": {
+          "$ref": "#/$defs/fact"
+        },
+        "recovery_quarantine": {
+          "$ref": "#/$defs/fact"
+        },
+        "rejection_outputs": {
+          "$ref": "#/$defs/fact"
+        },
+        "retry_policy": {
+          "$ref": "#/$defs/fact"
+        },
+        "risk_controls": {
+          "$ref": "#/$defs/fact"
+        },
+        "safety_gates": {
+          "$ref": "#/$defs/fact"
+        },
+        "timeout_policy": {
+          "$ref": "#/$defs/fact"
+        },
+        "validation": {
+          "$ref": "#/$defs/fact"
+        }
+      },
+      "required": [
+        "validation",
+        "failure_modes",
+        "rejection_outputs",
+        "retry_policy",
+        "timeout_policy",
+        "fail_closed",
+        "recovery_quarantine",
+        "safety_gates",
+        "risk_controls",
+        "error_codes",
+        "operator_escalation"
+      ],
+      "type": "object"
+    },
+    "files": {
+      "additionalProperties": false,
+      "properties": {
+        "definitions": {
+          "items": {
+            "$ref": "#/$defs/file_definition"
+          },
+          "type": "array"
+        },
+        "required_file_inventory": {
+          "$ref": "#/$defs/fact"
+        },
+        "scope_status": {
+          "enum": [
+            "open",
+            "closed"
+          ]
+        },
+        "shared_uses": {
+          "items": {
+            "$ref": "#/$defs/file_use"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "scope_status",
+        "definitions",
+        "shared_uses",
+        "required_file_inventory"
+      ],
+      "type": "object"
+    },
+    "manifest_version": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "migration": {
+      "additionalProperties": false,
+      "properties": {
+        "migration_map_ref": {
+          "const": "governance/module_consolidation/v1_to_v2_migration_map.json"
+        },
+        "original_content_role": {
+          "const": "immutable_historical_evidence_only"
+        },
+        "original_snapshot_path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "original_v1": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "source_commit": {
+          "type": "string"
+        },
+        "source_manifest_path": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_manifest_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_manifest_path",
+        "source_manifest_sha256",
+        "source_commit",
+        "original_snapshot_path",
+        "original_v1",
+        "original_content_role",
+        "migration_map_ref"
+      ],
+      "type": "object"
+    },
+    "module_identity": {
+      "additionalProperties": false,
+      "properties": {
+        "accountable_owner": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "aliases": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "canonical_root": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "canonical_symbol": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "identity_status": {
+          "const": "canonical"
+        },
+        "lifecycle_status": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "module_id": {
+          "pattern": "^5[0-9]{19}$",
+          "type": "string"
+        },
+        "module_name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "short_id": {
+          "pattern": "^m[0-9]{4}$",
+          "type": "string"
+        },
+        "specification_version": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "module_id",
+        "short_id",
+        "canonical_symbol",
+        "canonical_root",
+        "module_name",
+        "aliases",
+        "identity_status",
+        "lifecycle_status",
+        "specification_version",
+        "accountable_owner"
+      ],
+      "type": "object"
+    },
+    "observability_quality": {
+      "additionalProperties": false,
+      "properties": {
+        "acceptance_criteria": {
+          "$ref": "#/$defs/fact"
+        },
+        "health_checks": {
+          "$ref": "#/$defs/fact"
+        },
+        "implementation_evidence": {
+          "$ref": "#/$defs/fact"
+        },
+        "logs": {
+          "$ref": "#/$defs/fact"
+        },
+        "metrics": {
+          "$ref": "#/$defs/fact"
+        },
+        "performance": {
+          "$ref": "#/$defs/fact"
+        },
+        "slos": {
+          "$ref": "#/$defs/fact"
+        },
+        "test_references": {
+          "$ref": "#/$defs/fact"
+        }
+      },
+      "required": [
+        "logs",
+        "metrics",
+        "health_checks",
+        "slos",
+        "performance",
+        "acceptance_criteria",
+        "test_references",
+        "implementation_evidence"
+      ],
+      "type": "object"
+    },
+    "process_participation": {
+      "$ref": "#/$defs/fact"
+    },
+    "process_steps": {
+      "items": {
+        "$ref": "#/$defs/process_step"
+      },
+      "type": "array"
+    },
+    "profile": {
+      "enum": [
+        "process_service",
+        "mt4_runtime",
+        "operator_ui",
+        "shared_reusable",
+        "cross_cutting"
+      ]
+    },
+    "purpose_and_boundaries": {
+      "additionalProperties": false,
+      "properties": {
+        "exclusions": {
+          "$ref": "#/$defs/fact"
+        },
+        "externally_visible_behavior": {
+          "$ref": "#/$defs/fact"
+        },
+        "owned_capabilities": {
+          "$ref": "#/$defs/fact"
+        },
+        "purpose": {
+          "$ref": "#/$defs/fact"
+        },
+        "responsibilities": {
+          "$ref": "#/$defs/fact"
+        },
+        "side_effects": {
+          "$ref": "#/$defs/fact"
+        },
+        "trust_boundary": {
+          "$ref": "#/$defs/fact"
+        }
+      },
+      "required": [
+        "purpose",
+        "responsibilities",
+        "exclusions",
+        "owned_capabilities",
+        "side_effects",
+        "trust_boundary",
+        "externally_visible_behavior"
+      ],
+      "type": "object"
+    },
+    "reconciliation": {
+      "additionalProperties": false,
+      "properties": {
+        "conflict_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "implementation_conformance": {
+          "enum": [
+            "unverified",
+            "partial",
+            "verified",
+            "diverged"
+          ]
+        },
+        "implementation_verified": {
+          "type": "boolean"
+        },
+        "last_verified_commit": {
+          "type": "string"
+        },
+        "schema_valid": {
+          "type": "boolean"
+        },
+        "specification_ready": {
+          "type": "boolean"
+        },
+        "stale_after": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "candidate",
+            "blocked",
+            "reconciled"
+          ]
+        },
+        "unresolved_gap_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "status",
+        "schema_valid",
+        "specification_ready",
+        "implementation_verified",
+        "implementation_conformance",
+        "unresolved_gap_ids",
+        "conflict_ids",
+        "last_verified_commit",
+        "stale_after"
+      ],
+      "type": "object"
+    },
+    "runtime": {
+      "additionalProperties": false,
+      "properties": {
+        "concurrency_ordering": {
+          "$ref": "#/$defs/fact"
+        },
+        "configuration_sources": {
+          "$ref": "#/$defs/fact"
+        },
+        "deployment_unit": {
+          "$ref": "#/$defs/fact"
+        },
+        "entrypoints": {
+          "$ref": "#/$defs/fact"
+        },
+        "external_dependencies": {
+          "$ref": "#/$defs/fact"
+        },
+        "kind": {
+          "$ref": "#/$defs/fact"
+        },
+        "language_platform": {
+          "$ref": "#/$defs/fact"
+        },
+        "ports_channels": {
+          "$ref": "#/$defs/fact"
+        },
+        "required_files": {
+          "$ref": "#/$defs/fact"
+        },
+        "restart_semantics": {
+          "$ref": "#/$defs/fact"
+        },
+        "startup_shutdown": {
+          "$ref": "#/$defs/fact"
+        }
+      },
+      "required": [
+        "kind",
+        "language_platform",
+        "entrypoints",
+        "ports_channels",
+        "deployment_unit",
+        "external_dependencies",
+        "configuration_sources",
+        "startup_shutdown",
+        "restart_semantics",
+        "concurrency_ordering",
+        "required_files"
+      ],
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "2.0.0"
+    },
+    "state": {
+      "additionalProperties": false,
+      "properties": {
+        "duplicate_handling": {
+          "$ref": "#/$defs/fact"
+        },
+        "idempotency": {
+          "$ref": "#/$defs/fact"
+        },
+        "ordering": {
+          "$ref": "#/$defs/fact"
+        },
+        "owner": {
+          "$ref": "#/$defs/fact"
+        },
+        "persistence": {
+          "$ref": "#/$defs/fact"
+        },
+        "recovery": {
+          "$ref": "#/$defs/fact"
+        },
+        "transitions": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "evidence_refs": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "from_state": {
+                "type": "string"
+              },
+              "to_state": {
+                "type": "string"
+              },
+              "transition_id": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "trigger": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "transition_id",
+              "from_state",
+              "to_state",
+              "trigger",
+              "evidence_refs"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "variables": {
+          "$ref": "#/$defs/fact"
+        }
+      },
+      "required": [
+        "variables",
+        "owner",
+        "persistence",
+        "transitions",
+        "ordering",
+        "idempotency",
+        "duplicate_handling",
+        "recovery"
+      ],
+      "type": "object"
+    },
+    "verification_commands": {
+      "additionalProperties": false,
+      "properties": {
+        "build": {
+          "$ref": "#/$defs/fact"
+        },
+        "lint": {
+          "$ref": "#/$defs/fact"
+        },
+        "local_run": {
+          "$ref": "#/$defs/fact"
+        },
+        "smoke_check": {
+          "$ref": "#/$defs/fact"
+        },
+        "test": {
+          "$ref": "#/$defs/fact"
+        },
+        "typecheck": {
+          "$ref": "#/$defs/fact"
+        }
+      },
+      "required": [
+        "build",
+        "test",
+        "lint",
+        "typecheck",
+        "smoke_check",
+        "local_run"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "document_type",
+    "manifest_version",
+    "authority",
+    "module_identity",
+    "profile",
+    "purpose_and_boundaries",
+    "process_steps",
+    "process_participation",
+    "files",
+    "contracts",
+    "runtime",
+    "state",
+    "failure_and_safety",
+    "observability_quality",
+    "verification_commands",
+    "evidence",
+    "reconciliation",
+    "migration"
+  ],
+  "title": "EAFIX atomic module manifest v2",
+  "type": "object"
+}

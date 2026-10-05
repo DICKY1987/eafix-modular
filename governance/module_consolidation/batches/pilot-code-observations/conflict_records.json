@@ -1,0 +1,88 @@
+{
+  "conflicts": [
+    {
+      "affected_modules": [
+        "m0029"
+      ],
+      "approver": null,
+      "authorities_involved": [
+        "services/gui-gateway/src/2099900156260118_main.py",
+        "services/gui-gateway/src/2099900158260118_plugin.py"
+      ],
+      "claims_involved": [
+        "CL-bbd1fd5ad203e291b0bc",
+        "CL-4bfbe8f8543a0d4944a2",
+        "CL-29eb2109762fbcb66bab",
+        "CL-aeaf639bb2bee26c09de",
+        "CL-7b8b77b0fba8b0edf1d2"
+      ],
+      "conflict_id": "CONF-GUI-ENTRYPOINT",
+      "decision": null,
+      "evidence": [
+        "services/gui-gateway/src/2099900155260118_config.py",
+        "services/gui-gateway/src/2099900156260118_main.py",
+        "services/gui-gateway/src/2099900157260118_models.py",
+        "services/gui-gateway/src/2099900158260118_plugin.py"
+      ],
+      "rationale": "Standalone and plugin entrypoints declare different APIs; deployed/approved path not identified.",
+      "severity": "nonblocking_for_static_observations_blocking_for_conformance",
+      "state": "open"
+    },
+    {
+      "affected_modules": [
+        "m0029"
+      ],
+      "approver": null,
+      "authorities_involved": [
+        "services/gui-gateway/src/2099900156260118_main.py",
+        "services/gui-gateway/src/2099900158260118_plugin.py"
+      ],
+      "claims_involved": [
+        "CL-bbd1fd5ad203e291b0bc",
+        "CL-4bfbe8f8543a0d4944a2",
+        "CL-29eb2109762fbcb66bab",
+        "CL-aeaf639bb2bee26c09de",
+        "CL-7b8b77b0fba8b0edf1d2"
+      ],
+      "conflict_id": "CONF-GUI-MISSING-HELPERS",
+      "decision": null,
+      "evidence": [
+        "services/gui-gateway/src/2099900155260118_config.py",
+        "services/gui-gateway/src/2099900156260118_main.py",
+        "services/gui-gateway/src/2099900157260118_models.py",
+        "services/gui-gateway/src/2099900158260118_plugin.py"
+      ],
+      "rationale": "Standalone code imports aggregator/health helpers absent from current source tree.",
+      "severity": "nonblocking_for_static_observations_blocking_for_conformance",
+      "state": "open"
+    },
+    {
+      "affected_modules": [
+        "m0029"
+      ],
+      "approver": null,
+      "authorities_involved": [
+        "services/gui-gateway/src/2099900156260118_main.py",
+        "services/gui-gateway/src/2099900158260118_plugin.py"
+      ],
+      "claims_involved": [
+        "CL-bbd1fd5ad203e291b0bc",
+        "CL-4bfbe8f8543a0d4944a2",
+        "CL-29eb2109762fbcb66bab",
+        "CL-aeaf639bb2bee26c09de",
+        "CL-7b8b77b0fba8b0edf1d2"
+      ],
+      "conflict_id": "CONF-GUI-WEBSOCKET",
+      "decision": null,
+      "evidence": [
+        "services/gui-gateway/src/2099900155260118_config.py",
+        "services/gui-gateway/src/2099900156260118_main.py",
+        "services/gui-gateway/src/2099900157260118_models.py",
+        "services/gui-gateway/src/2099900158260118_plugin.py"
+      ],
+      "rationale": "Work-cell/docstring describes a WebSocket gateway; reviewed entrypoints declare no WebSocket route.",
+      "severity": "nonblocking_for_static_observations_blocking_for_conformance",
+      "state": "open"
+    }
+  ]
+}
