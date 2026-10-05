@@ -195,6 +195,24 @@
       "resolution_state": "unresolved",
       "responsible_decision_maker": "repository owner or delegated specification reviewer",
       "severity": "blocking"
+    },
+    {
+      "blocker_id": "BLOCK-DOCUMENT-ID-COVERAGE",
+      "decision_id": "DEC-037",
+      "evidence_refs": [
+        {
+          "json_pointer": "/ci_document_id_coverage",
+          "path": "governance/module_consolidation/run/publication_verification.json"
+        }
+      ],
+      "json_pointer": "/verification_commands",
+      "missing_evidence_or_decision": "A reconciled document-ID assignment/applicability policy compatible with the mandated authority/evidence filenames, plus passing coverage and uniqueness checks.",
+      "module": "all",
+      "next_action": "Resolve naming/applicability conflict without changing immutable evidence bytes or lowering the required coverage floor.",
+      "reason": "Published review artifacts reduce tracked-file filename-ID coverage to 16.454690%, below the unchanged 18.206497% floor.",
+      "resolution_state": "unresolved",
+      "responsible_decision_maker": "repository owner or delegated governance reviewer",
+      "severity": "blocking"
     }
   ],
   "instructions": "Sections 30, 35 and 38: do not infer absent mandatory facts or improvise past failed required validation.",

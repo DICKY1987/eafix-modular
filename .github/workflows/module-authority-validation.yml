@@ -27,7 +27,7 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install 'jsonschema>=4.22,<5' pytest pytest-cov
       - run: python governance/module_consolidation/validate_consolidation.py --mode candidate --structural-only
-      - run: python -m pytest -q -o addopts= tests/governance/test_module_authority.py tests/governance/test_scoped_progress.py tests/governance/test_evidence_versions.py tests/test_generator_update.py tests/test_validator_update.py
+      - run: python -m pytest -q -o addopts= tests/governance/test_module_authority.py tests/governance/test_scoped_progress.py tests/governance/test_evidence_versions.py tests/governance/test_reviewed_code_sources.py tests/test_generator_update.py tests/test_validator_update.py
       - run: python ci/2099900300260118_validate_atomic_module_manifests.py --scope progress
       - run: python governance/module_consolidation/generate_projections.py --candidate-preview --check
   active-authority-gate:

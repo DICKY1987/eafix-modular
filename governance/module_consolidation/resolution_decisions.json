@@ -897,6 +897,27 @@
       "rationale": "Owner explicitly requested a PR, committed the exact review ZIP to this repository and requested remaining execution. Publication does not supply missing facts or waive acceptance holds.",
       "status": "approved_for_execution",
       "title": "Publish requested review branch and draft PR"
+    },
+    {
+      "affected_authorities": [
+        "validation holds",
+        "review PR metadata",
+        "CI test routing"
+      ],
+      "approved_by": "Codex under owner execution instructions, sections 25 and 35",
+      "decision": "Keep document-ID coverage/uniqueness acceptance held. Preserve governed authority paths and immutable evidence. Correct PR title metadata, include new regression tests in CI, and record observed hosted checks separately from earlier local reports.",
+      "decision_id": "DEC-037",
+      "effective_baseline": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+      "effective_commit": null,
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/run/publication_verification.json",
+          "section": "ci_document_id_coverage"
+        }
+      ],
+      "rationale": "Section 35 requires a hold on failed required validation. No waiver, baseline reduction or bulk renaming is authorized.",
+      "status": "approved_for_execution",
+      "title": "Record published CI failure without weakening document-ID governance"
     }
   ],
   "schema_version": "1.0.0"

@@ -70,3 +70,21 @@ connected GitHub tools have successfully created the review branch. Publication
 must reproduce the local reviewed tree. `run/final_verification.json` contains
 machine-readable denominators and repeatability checks. Earlier execution reports
 remain historical records of their own baseline; this report is current.
+
+## Publication and hosted CI follow-up — 2026-10-05 UTC
+
+Draft [PR #274](https://github.com/DICKY1987/eafix-modular/pull/274) is published,
+not merged. Git fetch verified the initial remote tree exactly matches the tested
+local snapshot. GitHub's structural/guard job and registry-shadow job pass; the
+active-authority acceptance job correctly fails while cutover remains incomplete.
+The PR title was corrected to Conventional Commits format; a passing rerun is
+not assumed. The six new reviewed-code-source tests are now included in CI.
+
+Hosted document-ID validation also fails: 414/2,516 tracked files have prefixed
+filenames (16.454690%), below the unchanged 18.206497% allowed floor. DEC-037
+records this as BLOCK-DOCUMENT-ID-COVERAGE. There are now 193 unresolved mandatory
+review/blocker records and five critical validation/evidence holds. No baseline,
+threshold or immutable original was altered to hide this failure. Reconcile the
+mandated artifact paths with the approved naming/applicability policy and rerun
+coverage/uniqueness checks before acceptance. Earlier counts above describe the
+initial reviewed snapshot; publication_verification.json records this follow-up.
