@@ -1,0 +1,222 @@
+{
+  "baseline_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+  "blockers": [
+    {
+      "additional_review": "governance/module_consolidation/run/EA_TEXT_REVIEW.md",
+      "blocker_id": "BLOCK-BRIDGE-WIRE-DEFINITION",
+      "classification": "reviewed_evidence_blocker",
+      "decision_id": "DEC-027",
+      "evidence_refs": [
+        {
+          "json_pointer": "/1",
+          "lines": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/contract_registry.jsonl",
+          "sha256": "47226a2355f944ac7f94a522c0a92194e5cab8d876b92590d1eeafa0550c3127",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": "/5",
+          "lines": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/contract_registry.jsonl",
+          "sha256": "47226a2355f944ac7f94a522c0a92194e5cab8d876b92590d1eeafa0550c3127",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": null,
+          "lines": [
+            1957,
+            2049
+          ],
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "sha256": "9410e30662f5eed52ef7c9e2f1b7f912a6d1b1c2537da1cde47eb1cbeda7157c",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": null,
+          "lines": [
+            698,
+            715
+          ],
+          "path": "EAFIX_auth_docs/04_mt4_bridge_and_execution/0199900003260118_HUEY_P_EA_ExecutionEngine_8.txt",
+          "sha256": "7a630e4ff9e537d49e0a03462874329a8ea5c6f4d269d0dbcf0b7dc28c33880d",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        }
+      ],
+      "json_pointer": "/contracts",
+      "missing_evidence_or_decision": "Approved B1/B2 wire protocol: field names/types/units, required versus optional fields, version/compatibility, sequence/hash/idempotency semantics, acknowledgement acceptance and rejection behavior; identify the current EA source or authoritative intended interface.",
+      "module": "m0016,m0017",
+      "next_action": "Supply the approved current protocol or a governed source-grounded contract-design decision, then reconcile it into the external contract authority and local manifest usage. Do not infer payload fields from a contract name.",
+      "reason": "BrokerOrderEnvelope and AdapterAck resolve by name but the live records contain no required/optional fields, schema, examples, versioned payload or compatibility policy. The historical deep inventory also has no schema/model/field/test candidates for either. This is a boundary-definition gap, not merely a missing executable schema.",
+      "resolution_state": "unresolved",
+      "responsible_decision_maker": "repository owner or delegated specification reviewer",
+      "severity": "blocking"
+    },
+    {
+      "blocker_id": "BLOCK-BRIDGE-RETRY-TIMEOUT",
+      "classification": "reviewed_evidence_blocker",
+      "decision_id": "DEC-027",
+      "evidence_refs": [
+        {
+          "json_pointer": "/15",
+          "lines": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/operational_control_registry.jsonl",
+          "sha256": "de1920122dfb01c3886bca8287ba6ba6027c9e90555886447b00d27dde42379d",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": "/41",
+          "lines": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/operational_control_registry.jsonl",
+          "sha256": "de1920122dfb01c3886bca8287ba6ba6027c9e90555886447b00d27dde42379d",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": null,
+          "lines": [
+            6,
+            20
+          ],
+          "path": "m0016-b1-mt4-adapter-transport/m0016-docs/architecture/0110000076260118_07_transport_bridge_contracts.md",
+          "sha256": "e7f96103cd541796b472fb8fadbe6cbc6a86ada1c948d3478c071a697c9b6793",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": null,
+          "lines": [
+            122,
+            162
+          ],
+          "path": "services/transport-router/src/2099900197260118_config.py",
+          "sha256": "0ba898611e527f5d8a8bff714da86a373469fd9ad8df1238290b0dbc189ed06a",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        }
+      ],
+      "json_pointer": "/process_steps/0/retry_timeout_recovery",
+      "missing_evidence_or_decision": "Approved active transport selection, acknowledgement timeout, retry count/backoff, exhaustion output and recovery behavior for the B1-to-EA boundary.",
+      "module": "m0016",
+      "next_action": "Resolve against the actual current adapter/EA implementation or approve intended bridge policy. Keep observed Python service defaults separate from EA protocol facts.",
+      "reason": "The S16 failure rule requires a deterministic retry schedule but gives no numeric schedule or EA acknowledgement timeout. The transport-router defaults of 3 attempts, 2-second delay and 10-second service timeout describe downstream service calls; there is no evidence establishing them as the MT4 acknowledgement protocol. The bridge note says CSV production default and also prefer Socket.",
+      "resolution_state": "unresolved",
+      "responsible_decision_maker": "repository owner or delegated specification reviewer",
+      "severity": "blocking"
+    },
+    {
+      "blocker_id": "BLOCK-LEGACY-VALIDATION-UNAVAILABLE",
+      "classification": "reviewed_evidence_blocker",
+      "components": {
+        "active_authority_acceptance": "unresolved",
+        "full_suite_test_failures": 0,
+        "obsolete_test_imports": "resolved",
+        "required_coverage_gate": "unresolved",
+        "retired_generator_caller": "resolved"
+      },
+      "decision_id": "DEC-027",
+      "evidence_refs": [
+        {
+          "json_pointer": null,
+          "lines": [
+            34,
+            40
+          ],
+          "path": "ci/2099900300260118_validate_atomic_module_manifests.py",
+          "sha256": "c933b0408c76705760d8211cb0edf9889c77f33c4680686deb2bb70b5873c6f3",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": null,
+          "lines": [
+            10,
+            40
+          ],
+          "path": "tests/test_generator_update.py",
+          "sha256": "b50cbe43d485724d7203dd987190a3c61cf03a22131c05e6bfcbe4f570891b3f",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": null,
+          "lines": [
+            8,
+            34
+          ],
+          "path": "tests/test_validator_update.py",
+          "sha256": "3e8b6447a0fd5850e75662f8a7ca7d0c6efe751b9d4e8dec6babf3103fe5e3c6",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        }
+      ],
+      "json_pointer": "/verification_commands",
+      "missing_evidence_or_decision": "Passing required repository coverage/CI at the existing threshold and complete full active authority acceptance.",
+      "module": "all",
+      "next_action": "Add genuine coverage of the measured implementation and complete specification reconciliation. Do not lower or waive the gate.",
+      "reason": "Retired generator/validator callers have been replaced and regression tests pass. The required repository suite has zero test failures, but the unchanged 85% coverage gate fails at 0%. Full active acceptance remains blocked by unfinished specifications.",
+      "resolution_decision_id": "DEC-032",
+      "resolution_state": "partially_resolved",
+      "responsible_decision_maker": "repository owner or delegated specification reviewer",
+      "severity": "blocking"
+    },
+    {
+      "additional_review": "governance/module_consolidation/run/EA_TEXT_REVIEW.md",
+      "blocker_id": "BLOCK-CURRENT-EA-AUTHORITY",
+      "classification": "reviewed_evidence_blocker",
+      "decision_id": "DEC-027",
+      "evidence_refs": [
+        {
+          "json_pointer": "/process_binding/entrypoint_files",
+          "lines": null,
+          "path": "m0017-b2-mt4-ea-executor/manifest.json",
+          "sha256": "b3817c77df9bef1ba38791adf16d53ba120dc086792b8a499ea4cbfc4a4484ab",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": null,
+          "lines": [
+            1,
+            30
+          ],
+          "path": "EAFIX_auth_docs/04_mt4_bridge_and_execution/HUEY_P_EA_ExecutionEngine_8.mql4",
+          "sha256": "64aee55ab39184e4fdc32bd98d4da2fc6f6f15a21d6762495d56f1bb77fc8376",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": null,
+          "lines": [
+            63,
+            72
+          ],
+          "path": "EAFIX_auth_docs/04_mt4_bridge_and_execution/0199900003260118_HUEY_P_EA_ExecutionEngine_8.txt",
+          "sha256": "7a630e4ff9e537d49e0a03462874329a8ea5c6f4d269d0dbcf0b7dc28c33880d",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        }
+      ],
+      "json_pointer": "/runtime/entrypoints",
+      "missing_evidence_or_decision": "Identify the current approved execution EA and its protocol-facing entrypoint, or provide an approved intended execution-only specification. Implementation verification can remain separate.",
+      "module": "m0017",
+      "next_action": "Preserve the original values as historical evidence; review the real EA source and contract. Do not promote the replacement strategy sample to canonical execution behavior.",
+      "reason": "The root's B2 entrypoint points to a Python transport router. The supplied .mql4 example explicitly says the original EA was unavailable and implements a moving-average crossover strategy; it is not evidence of the execution-only intended B2 boundary. Adopting that sample would change the module's trading responsibility.",
+      "resolution_state": "unresolved",
+      "responsible_decision_maker": "repository owner or delegated specification reviewer",
+      "severity": "blocking"
+    },
+    {
+      "blocker_id": "BLOCK-DOCUMENT-ID-COVERAGE",
+      "decision_id": "DEC-037",
+      "evidence_refs": [
+        {
+          "json_pointer": "/ci_document_id_coverage",
+          "path": "governance/module_consolidation/run/publication_verification.json"
+        }
+      ],
+      "json_pointer": "/verification_commands",
+      "missing_evidence_or_decision": "A reconciled document-ID assignment/applicability policy compatible with the mandated authority/evidence filenames, plus passing coverage and uniqueness checks.",
+      "module": "all",
+      "next_action": "Resolve naming/applicability conflict without changing immutable evidence bytes or lowering the required coverage floor.",
+      "reason": "Published review artifacts reduce tracked-file filename-ID coverage to 16.454690%, below the unchanged 18.206497% floor.",
+      "resolution_state": "unresolved",
+      "responsible_decision_maker": "repository owner or delegated governance reviewer",
+      "severity": "blocking"
+    }
+  ],
+  "instructions": "Sections 30, 35 and 38: do not infer absent mandatory facts or improvise past failed required validation.",
+  "revalidated_by": "DEC-034",
+  "review_items_are_not_all_proven_missing": true,
+  "status": "BLOCKED"
+}

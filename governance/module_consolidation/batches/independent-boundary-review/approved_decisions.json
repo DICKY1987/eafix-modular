@@ -1,0 +1,26 @@
+{
+  "decisions": [
+    {
+      "affected_authorities": [
+        "34 staged module manifests",
+        "canonical process registry referenced without modification"
+      ],
+      "approved_by": "Codex delegated by the repository owner's execution instructions, Sections 9, 11, 38",
+      "decision": "Carry each root's explicit module_io_policy into the candidate trust boundary. For the 26 canonical primary-owner process modules, reference the canonical terminal outcomes as externally visible intended boundary behavior. Preserve unknown payload details, runtime implementation, all other gaps and cutover holds.",
+      "decision_id": "DEC-033",
+      "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "effective_commit": "3748539b373b915f01bb982aa515e71756079486",
+      "effective_scope": "validation route / candidate reconciliation only; final authority cutover remains held",
+      "evidence_refs": [
+        {
+          "path": "governance/module_consolidation/inputs/00-execution-instructions.txt",
+          "section": "11",
+          "sha256": "bfd93b69230ab6b4eaa4332bdb6a704cb9caa10a158cb56c9b2d3dd40b297fec"
+        }
+      ],
+      "rationale": "Section 11 Rule D keeps process definitions external; Rule E permits reviewed missing module facts. Identical explicit root policies and exact primary-owner process records support these two facts. This does not prove implementation or full source reconciliation.",
+      "status": "approved_for_execution",
+      "title": "Reconcile explicit module boundaries without inventing implementation"
+    }
+  ]
+}

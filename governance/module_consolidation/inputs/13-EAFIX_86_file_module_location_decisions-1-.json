@@ -1,0 +1,1918 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "file_module_location_resolution",
+  "title": "EAFIX Resolution of 86 Previously Unresolved Files",
+  "repository": "DICKY1987/eafix-modular",
+  "commit_sha": "963ff6df522b3aac421e1b55115548009849141a",
+  "decision_basis": [
+    "Current file content at the pinned commit",
+    "File ownership resolution policy",
+    "Canonical module responsibilities and process-step bindings",
+    "Contract, integration, configuration, and reuse registry evidence",
+    "Existing file-module mapping and service inventory",
+    "Filename and path similarity as supporting evidence only"
+  ],
+  "important_rules": [
+    "A file can have one authoritative module owner, or be explicitly global/shared/tool-scoped/archive.",
+    "Canonical cross-module and external-boundary contracts remain under the global contracts authority.",
+    "Duplicate UI work-cell bindings are merged into one canonical U4 record rather than copied.",
+    "Mixed-responsibility files are split rather than assigned arbitrarily.",
+    "Compatibility wrappers remain temporarily until imports migrate."
+  ],
+  "summary": {
+    "files_reviewed": 86,
+    "owner_type_counts": {
+      "global": 29,
+      "tool": 2,
+      "module": 49,
+      "multi_module": 2,
+      "archive": 4
+    },
+    "disposition_counts": {
+      "retain_global": 24,
+      "retain_tool_scope": 2,
+      "retain_global_supporting_reference": 1,
+      "move": 12,
+      "retain_global_and_rename": 1,
+      "replace_with_generated_projection": 1,
+      "regenerate_then_move": 3,
+      "merge_into_canonical_generated_record": 25,
+      "split": 2,
+      "reclassify_then_move": 2,
+      "consolidate_then_move": 3,
+      "delete_after_validation": 3,
+      "retain_compatibility_layer_then_remove": 2,
+      "merge_into_canonical_module_source": 3,
+      "rewrite_split_then_move": 1,
+      "archive_or_delete_after_validation": 1
+    },
+    "module_owned_record_counts": {
+      "m0009": 7,
+      "m0011": 1,
+      "m0016": 1,
+      "m0017": 1,
+      "m0023": 7,
+      "m0024": 1,
+      "m0027": 1,
+      "m0029": 2,
+      "m0031": 26,
+      "m0033": 1,
+      "m0034": 1
+    },
+    "notes": [
+      "Module-owned record counts include duplicate UI work-cell copies that converge on one canonical U4 work-cell record.",
+      "A module relationship does not require physical movement when the file is a canonical global contract, system runbook, repository tool, generated projection, or archive candidate."
+    ]
+  },
+  "decisions": [
+    {
+      "source_path": ".claude/1199900001260118_settings.local.json",
+      "artifact_type": "repository_tool_configuration",
+      "primary_function": "Configures Claude tool permissions and local development behavior.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [],
+      "ownership_class": "repository_global",
+      "approved_disposition": "retain_global",
+      "target_path": ".claude/1199900001260118_settings.local.json",
+      "confidence": "high",
+      "evidence_summary": "Content configures .claude permissions and tools, not runtime trading configuration.",
+      "migration_notes": "Do not assign to F1 merely because the file contains settings.",
+      "validation_required": [
+        "confirm no module-local assumptions"
+      ],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "CLI_PY_GUI/gui/Operator_Guide.md",
+      "artifact_type": "developer_tool_documentation",
+      "primary_function": "Operator guide for the CLI_PY_GUI developer cockpit and terminal tool.",
+      "approved_owner_type": "tool",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [],
+      "ownership_class": "tool_scoped",
+      "approved_disposition": "retain_tool_scope",
+      "target_path": "CLI_PY_GUI/gui/Operator_Guide.md",
+      "confidence": "high",
+      "evidence_summary": "Document describes PTY terminals, merge queue, developer tabs, and plan visualization.",
+      "migration_notes": "Not the trading-system U4 operator interface.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "CLI_PY_GUI/gui_terminal/src/gui_terminal/config/settings.py",
+      "artifact_type": "developer_tool_configuration_source",
+      "primary_function": "Loads and validates configuration for the CLI_PY_GUI terminal application.",
+      "approved_owner_type": "tool",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [],
+      "ownership_class": "tool_scoped",
+      "approved_disposition": "retain_tool_scope",
+      "target_path": "CLI_PY_GUI/gui_terminal/src/gui_terminal/config/settings.py",
+      "confidence": "high",
+      "evidence_summary": "Settings cover terminal, security, platform integration, UI, plugins, and performance for CLI_PY_GUI.",
+      "migration_notes": "Not F1 trading configuration and not U4 trading UI implementation.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "EAFIX_auth_docs/04_mt4_bridge_and_execution/MT4_Python communication channels.txt",
+      "artifact_type": "cross_module_architecture_document",
+      "primary_function": "Documents MT4-Python channels, protocols, ports, contracts, and fallback paths.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0007",
+        "m0016",
+        "m0017",
+        "m0030",
+        "m0031"
+      ],
+      "ownership_class": "cross_module_global",
+      "approved_disposition": "retain_global",
+      "target_path": "EAFIX_auth_docs/04_mt4_bridge_and_execution/MT4_Python communication channels.txt",
+      "confidence": "high",
+      "evidence_summary": "Covers D1 DDE, B1 transport, B2/MT4 execution, desktop UI, Redis, CSV, JSONL, and sockets.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "EAFIX_auth_docs/05_calendar_system/0110000079260118_econ_spec_standardized.md",
+      "artifact_type": "cross_module_calendar_reentry_specification",
+      "primary_function": "Defines standardized economic-calendar, matrix, reentry, risk, transport, and monitoring behavior.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0003",
+        "m0004",
+        "m0006",
+        "m0013",
+        "m0021",
+        "m0022",
+        "m0023",
+        "m0024"
+      ],
+      "ownership_class": "cross_module_global",
+      "approved_disposition": "retain_global_supporting_reference",
+      "target_path": "EAFIX_auth_docs/05_calendar_system/0110000079260118_econ_spec_standardized.md",
+      "confidence": "high",
+      "evidence_summary": "The document explicitly affects multiple subsystems and is not limited to calendar normalization.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "EAFIX_auth_docs/05_calendar_system/0199900001260118_Economic Calendar Integration Framework.md",
+      "artifact_type": "cross_module_calendar_architecture_document",
+      "primary_function": "Defines the end-to-end economic-calendar integration framework across ingestion, normalization, triggers, storage, risk, and reentry.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0003",
+        "m0004",
+        "m0005",
+        "m0006",
+        "m0021",
+        "m0022",
+        "m0023",
+        "m0024"
+      ],
+      "ownership_class": "cross_module_global",
+      "approved_disposition": "retain_global",
+      "target_path": "EAFIX_auth_docs/05_calendar_system/0199900001260118_Economic Calendar Integration Framework.md",
+      "confidence": "high",
+      "evidence_summary": "Scope spans D2, D3, D4, event persistence, matrix lookup, reentry, and transport.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "EAFIX_auth_docs/06_strategy_signal_risk_reentry_oms/0110000074260118_06_signal_model_mapping.md",
+      "artifact_type": "module_architecture_document",
+      "primary_function": "Defines hybrid-context dimensions and tiered mapping from signal context to parameter-set decisions.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0023",
+      "approved_module_root": "m0023-e3-matrix-lookup",
+      "supporting_modules": [
+        "m0011",
+        "m0021",
+        "m0022",
+        "m0024"
+      ],
+      "ownership_class": "owned",
+      "approved_disposition": "move",
+      "target_path": "m0023-e3-matrix-lookup/m0023-docs/architecture/0110000074260118_06_signal_model_mapping.md",
+      "confidence": "high",
+      "evidence_summary": "The document's core behavior is deterministic matrix lookup and tier resolution, not signal generation.",
+      "migration_notes": "",
+      "validation_required": [
+        "update documentation links",
+        "verify no canonical global authority conflict"
+      ],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "EAFIX_auth_docs/08_operations_runbooks_and_incidents/0110000048260118_market-open-close.md",
+      "artifact_type": "system_operations_runbook",
+      "primary_function": "Coordinates market open/close operations across services, databases, monitoring, risk, and reporting.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0002",
+        "m0013",
+        "m0025",
+        "m0026",
+        "m0032"
+      ],
+      "ownership_class": "cross_module_global",
+      "approved_disposition": "retain_global",
+      "target_path": "EAFIX_auth_docs/08_operations_runbooks_and_incidents/0110000048260118_market-open-close.md",
+      "confidence": "high",
+      "evidence_summary": "Runbook is system-wide and invokes numerous modules; time references do not make it F3-owned.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "EAFIX_auth_docs/08_operations_runbooks_and_incidents/0110000051260118_service-health.md",
+      "artifact_type": "system_operations_runbook",
+      "primary_function": "Defines system-wide service health checks, alerting, diagnosis, and recovery.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0026"
+      ],
+      "ownership_class": "cross_module_global",
+      "approved_disposition": "retain_global",
+      "target_path": "EAFIX_auth_docs/08_operations_runbooks_and_incidents/0110000051260118_service-health.md",
+      "confidence": "high",
+      "evidence_summary": "Covers health of many services; P1 aggregates health but does not exclusively own the operations runbook.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "EAFIX_auth_docs/09_product_requirements_and_design/0110000076260118_07_transport_bridge_contracts.md",
+      "artifact_type": "module_architecture_document",
+      "primary_function": "Defines CSV/socket bridge contracts, failover, timing, and Python-to-MT4 transport behavior.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0016",
+      "approved_module_root": "m0016-b1-mt4-adapter-transport",
+      "supporting_modules": [
+        "m0017"
+      ],
+      "ownership_class": "owned",
+      "approved_disposition": "move",
+      "target_path": "m0016-b1-mt4-adapter-transport/m0016-docs/architecture/0110000076260118_07_transport_bridge_contracts.md",
+      "confidence": "high",
+      "evidence_summary": "Primary subject is the adapter transport boundary and its contracts.",
+      "migration_notes": "",
+      "validation_required": [
+        "update links",
+        "verify contract references remain global"
+      ],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "contracts/events/1199900006260118_OrderIntent@1.2.json",
+      "artifact_type": "canonical_cross_module_event_schema",
+      "primary_function": "Defines the versioned OrderIntent wire contract produced after order-intent compilation.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0014",
+        "m0015",
+        "m0016"
+      ],
+      "ownership_class": "global_contract",
+      "approved_disposition": "retain_global",
+      "target_path": "contracts/events/1199900006260118_OrderIntent@1.2.json",
+      "confidence": "high",
+      "evidence_summary": "Cross-module boundary contract; producer steward is R2 and consumers include O1/B1.",
+      "migration_notes": "Record m0014 as producer/steward in the contract registry; do not duplicate under modules.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "contracts/events/1199900009260118_Signal@1.0.json",
+      "artifact_type": "canonical_cross_module_event_schema",
+      "primary_function": "Defines the versioned Signal wire contract.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0011",
+        "m0012"
+      ],
+      "ownership_class": "global_contract",
+      "approved_disposition": "retain_global",
+      "target_path": "contracts/events/1199900009260118_Signal@1.0.json",
+      "confidence": "high",
+      "evidence_summary": "S1 produces the contract and S2 consumes it; it is a canonical boundary schema.",
+      "migration_notes": "Record m0011 as producer/steward.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "contracts/identifiers/0199900023260118_cal5_legacy.md",
+      "artifact_type": "canonical_cross_module_identifier_spec",
+      "primary_function": "Defines legacy CAL5 calendar identifiers used across calendar and reentry processing.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0004",
+        "m0006",
+        "m0023"
+      ],
+      "ownership_class": "global_contract",
+      "approved_disposition": "retain_global",
+      "target_path": "contracts/identifiers/0199900023260118_cal5_legacy.md",
+      "confidence": "high",
+      "evidence_summary": "Identifier crosses module boundaries; D3 is the semantic producer/steward.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "contracts/identifiers/0199900024260118_cal8.md",
+      "artifact_type": "canonical_cross_module_identifier_spec",
+      "primary_function": "Defines CAL8 high-impact calendar identifiers.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0004",
+        "m0006",
+        "m0023"
+      ],
+      "ownership_class": "global_contract",
+      "approved_disposition": "retain_global",
+      "target_path": "contracts/identifiers/0199900024260118_cal8.md",
+      "confidence": "high",
+      "evidence_summary": "Identifier is generated during calendar normalization and consumed by triggers/reentry; D3 is steward.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "contracts/identifiers/0199900025260118_hybrid_id.md",
+      "artifact_type": "canonical_cross_module_identifier_spec",
+      "primary_function": "Defines the Python hybrid reentry identifier used to combine outcome, duration, proximity, calendar, direction, and generation.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0021",
+        "m0022",
+        "m0023",
+        "m0024"
+      ],
+      "ownership_class": "global_contract",
+      "approved_disposition": "retain_global",
+      "target_path": "contracts/identifiers/0199900025260118_hybrid_id.md",
+      "confidence": "high",
+      "evidence_summary": "The identifier joins outputs from several E-series modules and is used as an E3 lookup key.",
+      "migration_notes": "Use m0023 as contract steward, not exclusive physical owner.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "contracts/identifiers/decision_id.md",
+      "artifact_type": "canonical_cross_module_identifier_spec",
+      "primary_function": "Defines deterministic decision_id generation for the reentry decision produced at step S24.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0024",
+        "m0023"
+      ],
+      "ownership_class": "global_contract",
+      "approved_disposition": "retain_global",
+      "target_path": "contracts/identifiers/decision_id.md",
+      "confidence": "high",
+      "evidence_summary": "E4 produces the identifier, but it is consumed by telemetry/reporting and belongs to the shared contract authority.",
+      "migration_notes": "Record m0024 as producer/steward.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "contracts/identifiers/strategy_id.md",
+      "artifact_type": "canonical_cross_module_identifier_spec",
+      "primary_function": "Defines strategy/calendar identity carried from normalized calendar events through signal, risk, and reentry.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0004",
+        "m0006",
+        "m0011",
+        "m0012",
+        "m0013",
+        "m0024"
+      ],
+      "ownership_class": "global_contract",
+      "approved_disposition": "retain_global",
+      "target_path": "contracts/identifiers/strategy_id.md",
+      "confidence": "high",
+      "evidence_summary": "The identifier is produced by D3 and carried across multiple module boundaries.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "contracts/schemas/csv/0199900027260118_active_calendar_signals.csv.md",
+      "artifact_type": "canonical_cross_module_csv_schema",
+      "primary_function": "Defines persisted active calendar-signal rows produced by trigger construction.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0006",
+        "m0005",
+        "m0011",
+        "m0022"
+      ],
+      "ownership_class": "global_contract",
+      "approved_disposition": "retain_global",
+      "target_path": "contracts/schemas/csv/0199900027260118_active_calendar_signals.csv.md",
+      "confidence": "high",
+      "evidence_summary": "D4 produces the row contract; F2 persists it and signal/reentry modules consume it.",
+      "migration_notes": "Record m0006 as producer/steward.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "contracts/schemas/csv/0199900028260118_health_metrics.csv.md",
+      "artifact_type": "canonical_cross_module_csv_schema",
+      "primary_function": "Defines health metric rows collected and aggregated for observability.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0026"
+      ],
+      "ownership_class": "global_contract",
+      "approved_disposition": "retain_global",
+      "target_path": "contracts/schemas/csv/0199900028260118_health_metrics.csv.md",
+      "confidence": "high",
+      "evidence_summary": "P1 is producer/steward, but the schema is consumed system-wide.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "contracts/schemas/csv/0199900029260118_reentry_decisions.csv.md",
+      "artifact_type": "canonical_cross_module_csv_schema",
+      "primary_function": "Defines reentry decision rows including action, parameter set, tier, chain position, and risk parameters.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0023",
+        "m0024"
+      ],
+      "ownership_class": "global_contract",
+      "approved_disposition": "retain_global",
+      "target_path": "contracts/schemas/csv/0199900029260118_reentry_decisions.csv.md",
+      "confidence": "high",
+      "evidence_summary": "E4 produces the final reentry intent/decision row using E3 output.",
+      "migration_notes": "Record m0024 as producer/steward.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "contracts/schemas/csv/0199900030260118_trade_results.csv.md",
+      "artifact_type": "canonical_cross_module_csv_schema",
+      "primary_function": "Defines completed trade-result rows carrying execution outcome, close reason, and PnL-related data.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0017",
+        "m0018",
+        "m0020",
+        "m0021"
+      ],
+      "ownership_class": "global_contract",
+      "approved_disposition": "retain_global",
+      "target_path": "contracts/schemas/csv/0199900030260118_trade_results.csv.md",
+      "confidence": "medium_high",
+      "evidence_summary": "The contract spans EA execution feedback, normalization, close classification, and outcome bucketing.",
+      "migration_notes": "Use B3 as canonical-normalization steward while retaining B2 as raw producer.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "contracts/schemas/json/1199900010260118_hybrid_id.schema.json",
+      "artifact_type": "canonical_external_boundary_schema",
+      "primary_function": "Defines the MQL4-style reentry_key/comment format, despite being named hybrid_id.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0016",
+        "m0017",
+        "m0023"
+      ],
+      "ownership_class": "global_contract",
+      "approved_disposition": "retain_global_and_rename",
+      "target_path": "contracts/schemas/json/1199900010260118_reentry_key.schema.json",
+      "confidence": "high",
+      "evidence_summary": "Schema fields and separators represent the MT4 reentry key rather than the canonical Python hybrid ID.",
+      "migration_notes": "Rename to prevent semantic collision; B1 is boundary steward.",
+      "validation_required": [
+        "update schema refs",
+        "run contract tests",
+        "verify MQL4 compatibility"
+      ],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "contracts/schemas/json/1199900011260118_indicator_record.schema.json",
+      "artifact_type": "module_private_input_schema",
+      "primary_function": "Defines indicator-definition records consumed by the indicator engine.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0009",
+      "approved_module_root": "m0009-c2-indicator-engine",
+      "supporting_modules": [
+        "m0010"
+      ],
+      "ownership_class": "owned",
+      "approved_disposition": "move",
+      "target_path": "m0009-c2-indicator-engine/m0009-schemas/inputs/1199900011260118_indicator_record.schema.json",
+      "confidence": "high",
+      "evidence_summary": "Fields define indicator computation, signal logic, thresholds, inputs, and output type for C2.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "contracts/schemas/json/1199900012260118_orders_in.schema.json",
+      "artifact_type": "canonical_external_boundary_schema",
+      "primary_function": "Defines execution-result rows entering Python from the EA side.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0017",
+        "m0018"
+      ],
+      "ownership_class": "global_contract",
+      "approved_disposition": "retain_global",
+      "target_path": "contracts/schemas/json/1199900012260118_orders_in.schema.json",
+      "confidence": "high",
+      "evidence_summary": "B2 produces raw execution data and B3 normalizes it; it is an external-boundary contract.",
+      "migration_notes": "Record B3 as canonicalization steward and B2 as producer.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "contracts/schemas/json/1199900013260118_orders_out.schema.json",
+      "artifact_type": "canonical_external_boundary_schema",
+      "primary_function": "Defines order-command rows emitted from Python to the EA bridge.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0016",
+        "m0017"
+      ],
+      "ownership_class": "global_contract",
+      "approved_disposition": "retain_global",
+      "target_path": "contracts/schemas/json/1199900013260118_orders_out.schema.json",
+      "confidence": "high",
+      "evidence_summary": "B1 produces the transport row and B2 consumes it.",
+      "migration_notes": "Record m0016 as producer/steward.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "docs/bridge_contracts.md",
+      "artifact_type": "global_contract_index_document",
+      "primary_function": "Points readers to contracts/events as the contract SSOT.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [],
+      "ownership_class": "repository_global",
+      "approved_disposition": "retain_global",
+      "target_path": "docs/bridge_contracts.md",
+      "confidence": "high",
+      "evidence_summary": "It is a repository-wide contract index, not a B1 module document.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "docs/reference/1110000003260118_indicator_record.schema.json",
+      "artifact_type": "duplicate_schema_projection",
+      "primary_function": "Duplicates the indicator-record schema in documentation reference space.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0009"
+      ],
+      "ownership_class": "generated_projection",
+      "approved_disposition": "replace_with_generated_projection",
+      "target_path": "docs/reference/generated/indicator_record.schema.json",
+      "confidence": "high",
+      "evidence_summary": "Content duplicates the C2 indicator schema and should not remain an independent authority.",
+      "migration_notes": "",
+      "validation_required": [
+        "compare hashes/semantics",
+        "update generator",
+        "remove duplicate authority"
+      ],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "docs/reference/1110000004260118_indicator_records_full.json",
+      "artifact_type": "module_configuration_catalog",
+      "primary_function": "Contains the full catalog of indicator definitions and thresholds.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0009",
+      "approved_module_root": "m0009-c2-indicator-engine",
+      "supporting_modules": [],
+      "ownership_class": "owned",
+      "approved_disposition": "move",
+      "target_path": "m0009-c2-indicator-engine/m0009-config/indicator_records_full.json",
+      "confidence": "high",
+      "evidence_summary": "Records configure C2 indicator computation and validation.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "docs/reference/1110000005260118_indicator_records_sample.json",
+      "artifact_type": "module_schema_example",
+      "primary_function": "Provides sample indicator-definition records.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0009",
+      "approved_module_root": "m0009-c2-indicator-engine",
+      "supporting_modules": [],
+      "ownership_class": "owned",
+      "approved_disposition": "move",
+      "target_path": "m0009-c2-indicator-engine/m0009-schemas/examples/indicator_records_sample.json",
+      "confidence": "high",
+      "evidence_summary": "Sample conforms to the C2 indicator-record input schema.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "services/dashboard-backend/src/2099900104260118_advanced_indicators.py",
+      "artifact_type": "implementation_source",
+      "primary_function": "Implements advanced technical indicators and currency-strength calculations.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0009",
+      "approved_module_root": "m0009-c2-indicator-engine",
+      "supporting_modules": [
+        "m0028"
+      ],
+      "ownership_class": "owned",
+      "approved_disposition": "move",
+      "target_path": "m0009-c2-indicator-engine/m0009-src/c2_indicator_engine/advanced_indicators.py",
+      "confidence": "high",
+      "evidence_summary": "Classes compute indicator values; dashboard code is only a consumer.",
+      "migration_notes": "",
+      "validation_required": [
+        "update imports",
+        "run C2 and dashboard tests"
+      ],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "services/dashboard-backend/src/2099900108260118_tkinter_dashboard_gui.py",
+      "artifact_type": "desktop_ui_source",
+      "primary_function": "Implements Tkinter dashboard widgets, tabs, controls, rendering, and background refresh.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0028"
+      ],
+      "ownership_class": "owned",
+      "approved_disposition": "move",
+      "target_path": "m0031-u4-desktop-operator/m0031-src/frontend/tkinter_dashboard_gui.py",
+      "confidence": "high",
+      "evidence_summary": "Primary responsibility is the desktop operator interface; U1 supplies backend data.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_GATEWAY_REST_API_GATEWAY.json",
+      "artifact_type": "work_cell_binding",
+      "primary_function": "Defines the REST API gateway work-cell boundary.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0029",
+      "approved_module_root": "m0029-u2-gui-gateway",
+      "supporting_modules": [
+        "m0028"
+      ],
+      "ownership_class": "owned_metadata",
+      "approved_disposition": "regenerate_then_move",
+      "target_path": "m0029-u2-gui-gateway/m0029-context/work-cells/UI_GATEWAY_REST_API_GATEWAY.json",
+      "confidence": "high",
+      "evidence_summary": "work_cell_type is ui_gateway; canonical U2 owns REST/WebSocket gateway behavior.",
+      "migration_notes": "Regenerate source_files; the current dashboard-backend list is over-broad.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_GATEWAY_WEBSOCKET_GATEWAY.json",
+      "artifact_type": "work_cell_binding",
+      "primary_function": "Defines the WebSocket gateway work-cell boundary.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0029",
+      "approved_module_root": "m0029-u2-gui-gateway",
+      "supporting_modules": [
+        "m0028"
+      ],
+      "ownership_class": "owned_metadata",
+      "approved_disposition": "regenerate_then_move",
+      "target_path": "m0029-u2-gui-gateway/m0029-context/work-cells/UI_GATEWAY_WEBSOCKET_GATEWAY.json",
+      "confidence": "high",
+      "evidence_summary": "work_cell_type is ui_gateway; U2 is the canonical gateway module.",
+      "migration_notes": "Regenerate source_files and tests.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_ALERTS.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays and handles operator alerts.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0028",
+        "m0029"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_ALERTS.json",
+      "confidence": "high",
+      "evidence_summary": "work_cell_type is ui_screen; the service copy is a manifest-only binding with broad source references.",
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ],
+      "canonicalization_group": "UI_UI_SCREEN_ALERTS"
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_CONFIGURATION.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays and edits operator-facing configuration.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0001"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_CONFIGURATION.json",
+      "confidence": "high",
+      "evidence_summary": "work_cell_type is ui_screen; the service copy is a manifest-only binding with broad source references.",
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ],
+      "canonicalization_group": "UI_UI_SCREEN_CONFIGURATION"
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_DDE_PRICE_FEED.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays DDE/market-feed status and data.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0007"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_DDE_PRICE_FEED.json",
+      "confidence": "high",
+      "evidence_summary": "work_cell_type is ui_screen; the service copy is a manifest-only binding with broad source references.",
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ],
+      "canonicalization_group": "UI_UI_SCREEN_DDE_PRICE_FEED"
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_ECONOMIC_CALENDAR.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays economic-calendar events and states.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0003",
+        "m0004",
+        "m0006"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_ECONOMIC_CALENDAR.json",
+      "confidence": "high",
+      "evidence_summary": "work_cell_type is ui_screen; the service copy is a manifest-only binding with broad source references.",
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ],
+      "canonicalization_group": "UI_UI_SCREEN_ECONOMIC_CALENDAR"
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_EQUITY_RISK.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays risk/equity state and controls.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0013",
+        "m0027"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_EQUITY_RISK.json",
+      "confidence": "high",
+      "evidence_summary": "work_cell_type is ui_screen; the service copy is a manifest-only binding with broad source references.",
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ],
+      "canonicalization_group": "UI_UI_SCREEN_EQUITY_RISK"
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_HISTORY_ANALYTICS.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays historical analytics.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0032"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_HISTORY_ANALYTICS.json",
+      "confidence": "high",
+      "evidence_summary": "work_cell_type is ui_screen; the service copy is a manifest-only binding with broad source references.",
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ],
+      "canonicalization_group": "UI_UI_SCREEN_HISTORY_ANALYTICS"
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_LIVE_TRADING.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays live trading state and operator controls.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0019",
+        "m0020"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_LIVE_TRADING.json",
+      "confidence": "high",
+      "evidence_summary": "work_cell_type is ui_screen; the service copy is a manifest-only binding with broad source references.",
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ],
+      "canonicalization_group": "UI_UI_SCREEN_LIVE_TRADING"
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_REENTRY_MATRIX.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays matrix decisions and reentry state.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0023",
+        "m0024"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_REENTRY_MATRIX.json",
+      "confidence": "high",
+      "evidence_summary": "work_cell_type is ui_screen; the service copy is a manifest-only binding with broad source references.",
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ],
+      "canonicalization_group": "UI_UI_SCREEN_REENTRY_MATRIX"
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_SIGNALS_HISTORY.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays historical signals.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0011"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_SIGNALS_HISTORY.json",
+      "confidence": "high",
+      "evidence_summary": "work_cell_type is ui_screen; the service copy is a manifest-only binding with broad source references.",
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ],
+      "canonicalization_group": "UI_UI_SCREEN_SIGNALS_HISTORY"
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_SYSTEM_STATUS.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays aggregated system health.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0026"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_SYSTEM_STATUS.json",
+      "confidence": "high",
+      "evidence_summary": "work_cell_type is ui_screen; the service copy is a manifest-only binding with broad source references.",
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ],
+      "canonicalization_group": "UI_UI_SCREEN_SYSTEM_STATUS"
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_TRADE_HISTORY.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays historical trade results.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0020",
+        "m0032"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_TRADE_HISTORY.json",
+      "confidence": "high",
+      "evidence_summary": "work_cell_type is ui_screen; the service copy is a manifest-only binding with broad source references.",
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ],
+      "canonicalization_group": "UI_UI_SCREEN_TRADE_HISTORY"
+    },
+    {
+      "source_path": "services/desktop-ui/1199900030260118_settings.friday_move.overlay.json",
+      "artifact_type": "mixed_module_configuration",
+      "primary_function": "Configures the Friday-move indicator and its signal overlay behavior.",
+      "approved_owner_type": "multi_module",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0009",
+        "m0011",
+        "m0013"
+      ],
+      "ownership_class": "cross_module_mixed",
+      "approved_disposition": "split",
+      "target_path": null,
+      "confidence": "high",
+      "evidence_summary": "The file combines indicator/window/threshold settings with signal enablement and a risk-profile reference.",
+      "migration_notes": "Split indicator computation and threshold/window fields to m0009-c2-indicator-engine/m0009-config/indicators/friday_move.json; split signal enablement/overlay fields to m0011-s1-signal-engine/m0011-config/signals/friday_move.json. Retain only a reference to the R1-owned risk profile.",
+      "validation_required": [
+        "define split schema",
+        "update consumers",
+        "validate equivalent behavior"
+      ],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "services/desktop-ui/work_cells/UI_UI_SCREEN_DDE_PRICE_FEED.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays DDE/market-feed status and data.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0007"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_DDE_PRICE_FEED.json",
+      "confidence": "high",
+      "evidence_summary": "The file is a manifest-only ui_screen binding; U4 owns screen behavior.",
+      "migration_notes": "Merge by work_cell_id and remove duplicate service copy.",
+      "validation_required": [],
+      "canonicalization_group": "UI_UI_SCREEN_DDE_PRICE_FEED"
+    },
+    {
+      "source_path": "services/desktop-ui/work_cells/UI_UI_SCREEN_HISTORY_ANALYTICS.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays historical analytics.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0032"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_HISTORY_ANALYTICS.json",
+      "confidence": "high",
+      "evidence_summary": "The file is a manifest-only ui_screen binding; U4 owns screen behavior.",
+      "migration_notes": "Merge by work_cell_id and remove duplicate service copy.",
+      "validation_required": [],
+      "canonicalization_group": "UI_UI_SCREEN_HISTORY_ANALYTICS"
+    },
+    {
+      "source_path": "services/desktop-ui/work_cells/UI_UI_SCREEN_REENTRY_MATRIX.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays matrix decisions and reentry state.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0023",
+        "m0024"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_REENTRY_MATRIX.json",
+      "confidence": "high",
+      "evidence_summary": "The file is a manifest-only ui_screen binding; U4 owns screen behavior.",
+      "migration_notes": "Merge by work_cell_id and remove duplicate service copy.",
+      "validation_required": [],
+      "canonicalization_group": "UI_UI_SCREEN_REENTRY_MATRIX"
+    },
+    {
+      "source_path": "services/execution-engine/work_cells/EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT.json",
+      "artifact_type": "work_cell_binding",
+      "primary_function": "Defines the EA-side MQL4 execution-feedback/order-result work cell.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0017",
+      "approved_module_root": "m0017-b2-mt4-ea-executor",
+      "supporting_modules": [
+        "m0016",
+        "m0018"
+      ],
+      "ownership_class": "owned_metadata",
+      "approved_disposition": "regenerate_then_move",
+      "target_path": "m0017-b2-mt4-ea-executor/m0017-context/work-cells/EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT.json",
+      "confidence": "exact",
+      "evidence_summary": "The record explicitly declares parent_module_symbol B2_MT4_EA_EXECUTOR and module-17 context path.",
+      "migration_notes": "Regenerate source_files because the current binding lists only a Python plugin.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_ALERTS.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays and handles operator alerts.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0029",
+        "m0028"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_ALERTS.json",
+      "confidence": "high",
+      "evidence_summary": "The record type is ui_screen; U2 gateway files are supporting transport, not screen ownership.",
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": [],
+      "canonicalization_group": "UI_UI_SCREEN_ALERTS"
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_CONFIGURATION.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays and edits operator-facing configuration.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0001"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_CONFIGURATION.json",
+      "confidence": "high",
+      "evidence_summary": "The record type is ui_screen; U2 gateway files are supporting transport, not screen ownership.",
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": [],
+      "canonicalization_group": "UI_UI_SCREEN_CONFIGURATION"
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_DDE_PRICE_FEED.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays DDE/market-feed status and data.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0007"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_DDE_PRICE_FEED.json",
+      "confidence": "high",
+      "evidence_summary": "The record type is ui_screen; U2 gateway files are supporting transport, not screen ownership.",
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": [],
+      "canonicalization_group": "UI_UI_SCREEN_DDE_PRICE_FEED"
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_ECONOMIC_CALENDAR.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays economic-calendar events and states.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0003",
+        "m0004",
+        "m0006"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_ECONOMIC_CALENDAR.json",
+      "confidence": "high",
+      "evidence_summary": "The record type is ui_screen; U2 gateway files are supporting transport, not screen ownership.",
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": [],
+      "canonicalization_group": "UI_UI_SCREEN_ECONOMIC_CALENDAR"
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_EQUITY_RISK.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays risk/equity state and controls.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0013",
+        "m0027"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_EQUITY_RISK.json",
+      "confidence": "high",
+      "evidence_summary": "The record type is ui_screen; U2 gateway files are supporting transport, not screen ownership.",
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": [],
+      "canonicalization_group": "UI_UI_SCREEN_EQUITY_RISK"
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_HISTORY_ANALYTICS.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays historical analytics.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0032"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_HISTORY_ANALYTICS.json",
+      "confidence": "high",
+      "evidence_summary": "The record type is ui_screen; U2 gateway files are supporting transport, not screen ownership.",
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": [],
+      "canonicalization_group": "UI_UI_SCREEN_HISTORY_ANALYTICS"
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_LIVE_TRADING.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays live trading state and operator controls.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0019",
+        "m0020"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_LIVE_TRADING.json",
+      "confidence": "high",
+      "evidence_summary": "The record type is ui_screen; U2 gateway files are supporting transport, not screen ownership.",
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": [],
+      "canonicalization_group": "UI_UI_SCREEN_LIVE_TRADING"
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_REENTRY_MATRIX.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays matrix decisions and reentry state.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0023",
+        "m0024"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_REENTRY_MATRIX.json",
+      "confidence": "high",
+      "evidence_summary": "The record type is ui_screen; U2 gateway files are supporting transport, not screen ownership.",
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": [],
+      "canonicalization_group": "UI_UI_SCREEN_REENTRY_MATRIX"
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_SIGNALS_HISTORY.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays historical signals.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0011"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_SIGNALS_HISTORY.json",
+      "confidence": "high",
+      "evidence_summary": "The record type is ui_screen; U2 gateway files are supporting transport, not screen ownership.",
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": [],
+      "canonicalization_group": "UI_UI_SCREEN_SIGNALS_HISTORY"
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_SYSTEM_STATUS.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays aggregated system health.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0026"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_SYSTEM_STATUS.json",
+      "confidence": "high",
+      "evidence_summary": "The record type is ui_screen; U2 gateway files are supporting transport, not screen ownership.",
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": [],
+      "canonicalization_group": "UI_UI_SCREEN_SYSTEM_STATUS"
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_TRADE_HISTORY.json",
+      "artifact_type": "generated_duplicate_work_cell_binding",
+      "primary_function": "Displays historical trade results.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0031",
+      "approved_module_root": "m0031-u4-desktop-operator",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0020",
+        "m0032"
+      ],
+      "ownership_class": "duplicate_projection",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_TRADE_HISTORY.json",
+      "confidence": "high",
+      "evidence_summary": "The record type is ui_screen; U2 gateway files are supporting transport, not screen ownership.",
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": [],
+      "canonicalization_group": "UI_UI_SCREEN_TRADE_HISTORY"
+    },
+    {
+      "source_path": "services/reentry-engine/work_cells/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json",
+      "artifact_type": "work_cell_binding",
+      "primary_function": "Defines E4 chain-limit and suppression behavior for building a reentry intent.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0024",
+      "approved_module_root": "m0024-e4-reentry-intent-builder",
+      "supporting_modules": [
+        "m0023"
+      ],
+      "ownership_class": "owned_metadata",
+      "approved_disposition": "move",
+      "target_path": "m0024-e4-reentry-intent-builder/m0024-context/work-cells/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json",
+      "confidence": "exact",
+      "evidence_summary": "Explicit parent_module_symbol and context packet identify E4; S2 filename similarity is false.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "services/risk-manager/work_cells/R1_4_CORRELATION_GUARDS.json",
+      "artifact_type": "work_cell_binding",
+      "primary_function": "Defines correlation guard checks formerly nested as R1_4.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0027",
+      "approved_module_root": "m0027-r3-correlation-guard",
+      "supporting_modules": [
+        "m0013"
+      ],
+      "ownership_class": "owned_metadata",
+      "approved_disposition": "reclassify_then_move",
+      "target_path": "m0027-r3-correlation-guard/m0027-context/work-cells/R1_4_CORRELATION_GUARDS.json",
+      "confidence": "high",
+      "evidence_summary": "The 34-module decomposition promoted correlation guard to canonical R3; R1 consumes its result.",
+      "migration_notes": "Preserve R1_4 as a legacy alias/work-cell ID or rename through governance.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "services/risk-manager/work_cells/R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION.json",
+      "artifact_type": "work_cell_binding",
+      "primary_function": "Defines duplicate-order prevention and idempotency checks formerly nested as R1_7.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0034",
+      "approved_module_root": "m0034-sk2-idempotency",
+      "supporting_modules": [
+        "m0013",
+        "m0014",
+        "m0016"
+      ],
+      "ownership_class": "owned_metadata",
+      "approved_disposition": "reclassify_then_move",
+      "target_path": "m0034-sk2-idempotency/m0034-context/work-cells/R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION.json",
+      "confidence": "high",
+      "evidence_summary": "Idempotency was promoted to canonical shared-kernel module SK2; R1 is a consumer.",
+      "migration_notes": "Preserve R1_7 as legacy identity metadata.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "shared/reentry/1199900031260118_reentry_vocab.json",
+      "artifact_type": "module_configuration",
+      "primary_function": "Defines canonical outcome, duration, proximity, direction, and generation vocabulary for hybrid reentry keys.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0023",
+      "approved_module_root": "m0023-e3-matrix-lookup",
+      "supporting_modules": [
+        "m0021",
+        "m0022",
+        "m0024"
+      ],
+      "ownership_class": "owned",
+      "approved_disposition": "move",
+      "target_path": "m0023-e3-matrix-lookup/m0023-config/reentry_vocab.json",
+      "confidence": "medium_high",
+      "evidence_summary": "Vocabulary defines the composite lookup-key domain used by E3; E1/E2/E4 produce or consume components.",
+      "migration_notes": "Expose it as a versioned E3 public contract/configuration and reference it from other E modules.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "shared/reentry/2099900218260118_hybrid_id.py",
+      "artifact_type": "implementation_source",
+      "primary_function": "Composes, parses, validates, hashes, and abbreviates hybrid reentry IDs.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0023",
+      "approved_module_root": "m0023-e3-matrix-lookup",
+      "supporting_modules": [
+        "m0021",
+        "m0022",
+        "m0024",
+        "m0016",
+        "m0017"
+      ],
+      "ownership_class": "owned",
+      "approved_disposition": "consolidate_then_move",
+      "target_path": "m0023-e3-matrix-lookup/m0023-src/e3_matrix_lookup/hybrid_id.py",
+      "confidence": "high",
+      "evidence_summary": "Hybrid ID is the deterministic composite key used for E3 matrix lookup.",
+      "migration_notes": "Merge behavior with the clean wrapper before moving; retain an old-path compatibility shim temporarily.",
+      "validation_required": [
+        "round-trip tests",
+        "cross-language parity tests",
+        "import scan"
+      ],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "shared/reentry/2099900219260118_indicator_validator.py",
+      "artifact_type": "implementation_source",
+      "primary_function": "Validates indicator-definition records against schema and business rules.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0009",
+      "approved_module_root": "m0009-c2-indicator-engine",
+      "supporting_modules": [
+        "m0023"
+      ],
+      "ownership_class": "owned",
+      "approved_disposition": "consolidate_then_move",
+      "target_path": "m0009-c2-indicator-engine/m0009-src/c2_indicator_engine/indicator_validator.py",
+      "confidence": "high",
+      "evidence_summary": "The validator operates on IndicatorID, computation, output types, thresholds, time windows, and C2 inputs.",
+      "migration_notes": "It is misplaced in shared/reentry; update default schema path to the C2 module-local schema.",
+      "validation_required": [
+        "C2 schema tests",
+        "import scan"
+      ],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "shared/reentry/2099900220260118_reentry_helpers_cli.py",
+      "artifact_type": "mixed_module_cli_script",
+      "primary_function": "CLI for hybrid/reentry key operations plus indicator-record validation.",
+      "approved_owner_type": "multi_module",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0023",
+        "m0009"
+      ],
+      "ownership_class": "cross_module_mixed",
+      "approved_disposition": "split",
+      "target_path": null,
+      "confidence": "high",
+      "evidence_summary": "make/parse/validate-key commands serve E3, while validate-indicators serves C2.",
+      "migration_notes": "Move key commands to m0023-e3-matrix-lookup/m0023-scripts/reentry_key_cli.py; move indicator validation command to m0009-c2-indicator-engine/m0009-scripts/validate_indicator_records.py.",
+      "validation_required": [
+        "CLI command compatibility",
+        "update documentation",
+        "remove stale reentry_helpers imports"
+      ],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "shared/reentry/2099900221260118_vocab.py",
+      "artifact_type": "implementation_source",
+      "primary_function": "Loads and validates the vocabulary used by hybrid reentry identifiers.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0023",
+      "approved_module_root": "m0023-e3-matrix-lookup",
+      "supporting_modules": [
+        "m0021",
+        "m0022",
+        "m0024"
+      ],
+      "ownership_class": "owned",
+      "approved_disposition": "consolidate_then_move",
+      "target_path": "m0023-e3-matrix-lookup/m0023-src/e3_matrix_lookup/vocab.py",
+      "confidence": "high",
+      "evidence_summary": "Provides the vocabulary API required by E3 hybrid-key composition and parsing.",
+      "migration_notes": "Merge wrapper path handling before migration.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "shared/reentry/2099900222260118___init__.py",
+      "artifact_type": "inactive_duplicate_package_initializer",
+      "primary_function": "Reexports hybrid ID, vocabulary, and indicator validator symbols from the ID-prefixed package.",
+      "approved_owner_type": "archive",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0023",
+        "m0009"
+      ],
+      "ownership_class": "duplicate_candidate",
+      "approved_disposition": "delete_after_validation",
+      "target_path": null,
+      "confidence": "high",
+      "evidence_summary": "Python imports the clean __init__.py, not this ID-prefixed filename; content duplicates the active facade.",
+      "migration_notes": "",
+      "validation_required": [
+        "repository reference search",
+        "document-ID registry update",
+        "import tests"
+      ],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "shared/reentry/__init__.py",
+      "artifact_type": "compatibility_package_facade",
+      "primary_function": "Provides the stable shared.reentry import facade.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0023",
+        "m0009"
+      ],
+      "ownership_class": "compatibility_layer",
+      "approved_disposition": "retain_compatibility_layer_then_remove",
+      "target_path": "shared/reentry/__init__.py",
+      "confidence": "high",
+      "evidence_summary": "Current tests and consumers import shared.reentry; it reexports both E3 and C2 functionality.",
+      "migration_notes": "After moving implementations, reexport from module packages during a deprecation window, then remove.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "shared/reentry/_id_loader.py",
+      "artifact_type": "compatibility_loader",
+      "primary_function": "Dynamically loads ID-prefixed reentry implementation modules.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0023",
+        "m0009"
+      ],
+      "ownership_class": "compatibility_layer",
+      "approved_disposition": "retain_compatibility_layer_then_remove",
+      "target_path": "shared/reentry/_id_loader.py",
+      "confidence": "high",
+      "evidence_summary": "Loader exists only to support ID-prefixed implementation files.",
+      "migration_notes": "Remove after imports migrate and canonical module files no longer require dynamic loading.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "shared/reentry/hybrid_id.py",
+      "artifact_type": "compatibility_wrapper_source",
+      "primary_function": "Provides the corrected stable hybrid-ID API over the ID-prefixed implementation.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0023",
+      "approved_module_root": "m0023-e3-matrix-lookup",
+      "supporting_modules": [
+        "m0021",
+        "m0022",
+        "m0024"
+      ],
+      "ownership_class": "owned",
+      "approved_disposition": "merge_into_canonical_module_source",
+      "target_path": "m0023-e3-matrix-lookup/m0023-src/e3_matrix_lookup/hybrid_id.py",
+      "confidence": "high",
+      "evidence_summary": "Wrapper fixes parsing of underscore-bearing proximity/calendar IDs and is the active public API.",
+      "migration_notes": "Merge with the ID-prefixed implementation; leave a thin old-path reexport temporarily.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "shared/reentry/indicator_validator.py",
+      "artifact_type": "compatibility_wrapper_source",
+      "primary_function": "Provides a stable import name for the indicator validator.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0009",
+      "approved_module_root": "m0009-c2-indicator-engine",
+      "supporting_modules": [
+        "m0023"
+      ],
+      "ownership_class": "owned",
+      "approved_disposition": "merge_into_canonical_module_source",
+      "target_path": "m0009-c2-indicator-engine/m0009-src/c2_indicator_engine/indicator_validator.py",
+      "confidence": "high",
+      "evidence_summary": "The wrapped implementation validates C2 indicator-definition records.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "shared/reentry/vocab.py",
+      "artifact_type": "compatibility_wrapper_source",
+      "primary_function": "Provides stable vocabulary loading and locates the ID-prefixed vocabulary JSON.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0023",
+      "approved_module_root": "m0023-e3-matrix-lookup",
+      "supporting_modules": [
+        "m0021",
+        "m0022",
+        "m0024"
+      ],
+      "ownership_class": "owned",
+      "approved_disposition": "merge_into_canonical_module_source",
+      "target_path": "m0023-e3-matrix-lookup/m0023-src/e3_matrix_lookup/vocab.py",
+      "confidence": "high",
+      "evidence_summary": "Wrapper supplies the active E3 vocabulary API and correct data-file path.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "src/contracts/models/Orderintent.py",
+      "artifact_type": "generated_empty_model_stub",
+      "primary_function": "Fieldless generated Pydantic placeholder named after the OrderIntent schema.",
+      "approved_owner_type": "archive",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0014"
+      ],
+      "ownership_class": "dead_generated_artifact",
+      "approved_disposition": "delete_after_validation",
+      "target_path": null,
+      "confidence": "high",
+      "evidence_summary": "Class contains only pass, has no package facade, and duplicates the real contracts model by name only.",
+      "migration_notes": "",
+      "validation_required": [
+        "confirm no dynamic loaders or packaging inclusion",
+        "disable obsolete generator"
+      ],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "src/contracts/models/Signal.py",
+      "artifact_type": "generated_empty_model_stub",
+      "primary_function": "Fieldless generated Pydantic placeholder named after the Signal schema.",
+      "approved_owner_type": "archive",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0011"
+      ],
+      "ownership_class": "dead_generated_artifact",
+      "approved_disposition": "delete_after_validation",
+      "target_path": null,
+      "confidence": "high",
+      "evidence_summary": "Class contains only pass and is not a functional contract implementation.",
+      "migration_notes": "",
+      "validation_required": [
+        "confirm no dynamic loaders or packaging inclusion",
+        "disable obsolete generator"
+      ],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "tests/2099900223260118_test_plugin_system.py",
+      "artifact_type": "module_test",
+      "primary_function": "Tests plugin interface, lifecycle, context, registry, dependency ordering, health, and inter-plugin communication.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0033",
+      "approved_module_root": "m0033-sk1-plugin-interface",
+      "supporting_modules": [],
+      "ownership_class": "owned",
+      "approved_disposition": "move",
+      "target_path": "m0033-sk1-plugin-interface/m0033-tests/unit/test_plugin_system.py",
+      "confidence": "high",
+      "evidence_summary": "System under test is shared.plugin_interface and PluginRegistry, matching SK1 Plugin Interface.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "tests/contracts/consumer/2099900229260118_test_signal_generator_contracts.py",
+      "artifact_type": "legacy_cross_module_contract_test",
+      "primary_function": "Tests signal-generator contracts with risk, indicator, calendar, and message-bus services.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0011",
+      "approved_module_root": "m0011-s1-signal-engine",
+      "supporting_modules": [
+        "m0009",
+        "m0003",
+        "m0004",
+        "m0012",
+        "m0013"
+      ],
+      "ownership_class": "owned_but_stale",
+      "approved_disposition": "rewrite_split_then_move",
+      "target_path": "m0011-s1-signal-engine/m0011-tests/contract/test_signal_engine_contracts.py",
+      "confidence": "high",
+      "evidence_summary": "The test perspective is signal-generator/S1, but direct signal-to-risk calls conflict with the canonical S1\u2192S2\u2192R1 flow.",
+      "migration_notes": "Rewrite S1 provider/consumer contracts; move intent/risk boundary cases to S2 contract tests.",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "tests/contracts/fixtures/1099900002260118_active_calendar_signals_valid.csv",
+      "artifact_type": "global_contract_test_fixture",
+      "primary_function": "Provides valid ActiveCalendarSignal CSV rows for shared contract validation.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0006",
+        "m0005",
+        "m0011"
+      ],
+      "ownership_class": "global_contract_fixture",
+      "approved_disposition": "retain_global",
+      "target_path": "tests/contracts/fixtures/1099900002260118_active_calendar_signals_valid.csv",
+      "confidence": "high",
+      "evidence_summary": "Fixture validates a cross-module canonical CSV contract.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "tests/contracts/fixtures/1099900003260118_reentry_decisions_valid.csv",
+      "artifact_type": "global_contract_test_fixture",
+      "primary_function": "Provides valid reentry-decision CSV rows for shared contract validation.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0023",
+        "m0024"
+      ],
+      "ownership_class": "global_contract_fixture",
+      "approved_disposition": "retain_global",
+      "target_path": "tests/contracts/fixtures/1099900003260118_reentry_decisions_valid.csv",
+      "confidence": "high",
+      "evidence_summary": "Fixture validates the global E3/E4 boundary contract.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "tests/contracts/fixtures/1199900032260118_hybrid_id_valid.json",
+      "artifact_type": "global_contract_test_fixture",
+      "primary_function": "Provides a valid canonical Python hybrid-ID component record.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0021",
+        "m0022",
+        "m0023",
+        "m0024"
+      ],
+      "ownership_class": "global_contract_fixture",
+      "approved_disposition": "retain_global",
+      "target_path": "tests/contracts/fixtures/1199900032260118_hybrid_id_valid.json",
+      "confidence": "high",
+      "evidence_summary": "Fixture validates a cross-module identifier contract.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "tests/contracts/fixtures/1199900033260118_indicator_record_valid.json",
+      "artifact_type": "module_contract_test_fixture",
+      "primary_function": "Provides a valid indicator-definition record for C2 schema and validator tests.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0009",
+      "approved_module_root": "m0009-c2-indicator-engine",
+      "supporting_modules": [],
+      "ownership_class": "owned",
+      "approved_disposition": "move",
+      "target_path": "m0009-c2-indicator-engine/m0009-tests/contract/fixtures/indicator_record_valid.json",
+      "confidence": "high",
+      "evidence_summary": "Fixture exercises the C2 indicator-record schema and IndicatorValidator.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "tests/contracts/fixtures/1199900034260118_orders_in_valid.json",
+      "artifact_type": "global_contract_test_fixture",
+      "primary_function": "Provides a valid EA-to-Python execution-result row for the orders_in boundary.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0017",
+        "m0018"
+      ],
+      "ownership_class": "global_contract_fixture",
+      "approved_disposition": "retain_global",
+      "target_path": "tests/contracts/fixtures/1199900034260118_orders_in_valid.json",
+      "confidence": "high",
+      "evidence_summary": "Fixture validates the B2\u2192B3 external boundary contract.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "tests/contracts/fixtures/1199900035260118_orders_out_valid.json",
+      "artifact_type": "global_contract_test_fixture",
+      "primary_function": "Provides a valid Python-to-EA order-command row for the orders_out boundary.",
+      "approved_owner_type": "global",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0016",
+        "m0017"
+      ],
+      "ownership_class": "global_contract_fixture",
+      "approved_disposition": "retain_global",
+      "target_path": "tests/contracts/fixtures/1199900035260118_orders_out_valid.json",
+      "confidence": "high",
+      "evidence_summary": "Fixture validates the B1\u2192B2 external boundary contract.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "tests/contracts/properties/test_hybrid_id_parity.py",
+      "artifact_type": "module_contract_test",
+      "primary_function": "Tests hybrid-ID round-trip, determinism, and Python/MQL4 field-order mapping.",
+      "approved_owner_type": "module",
+      "approved_module_short_id": "m0023",
+      "approved_module_root": "m0023-e3-matrix-lookup",
+      "supporting_modules": [
+        "m0016",
+        "m0017",
+        "m0021",
+        "m0022",
+        "m0024"
+      ],
+      "ownership_class": "owned",
+      "approved_disposition": "move",
+      "target_path": "m0023-e3-matrix-lookup/m0023-tests/contract/test_hybrid_id_parity.py",
+      "confidence": "high",
+      "evidence_summary": "Primary system under test is the E3-owned hybrid-ID implementation; MT4 modules are compatibility participants.",
+      "migration_notes": "",
+      "validation_required": [],
+      "canonicalization_group": null
+    },
+    {
+      "source_path": "tests/legacy/contracts/golden_fixtures/1199900036260118_price_ticks.json",
+      "artifact_type": "malformed_legacy_contract_fixture",
+      "primary_function": "Intended to provide legacy PriceTick golden examples, but the JSON structure is invalid.",
+      "approved_owner_type": "archive",
+      "approved_module_short_id": null,
+      "approved_module_root": null,
+      "supporting_modules": [
+        "m0007"
+      ],
+      "ownership_class": "legacy_invalid_artifact",
+      "approved_disposition": "archive_or_delete_after_validation",
+      "target_path": null,
+      "confidence": "high",
+      "evidence_summary": "File is under tests/legacy and contains malformed JSON with an unmatched object/array structure.",
+      "migration_notes": "Do not move into D1 as active evidence. Repair only if an active legacy-compatibility test still requires it.",
+      "validation_required": [
+        "search test references",
+        "confirm replacement fixture",
+        "remove or archive"
+      ],
+      "canonicalization_group": null
+    }
+  ]
+}

@@ -1,0 +1,167 @@
+{
+  "archive_test_location": "disposable temporary directory",
+  "checks": [
+    {
+      "fixture": "all_34_structural",
+      "passed": true
+    },
+    {
+      "fixture": "m0009.json",
+      "passed": true,
+      "scope": "structural_only"
+    },
+    {
+      "fixture": "m0016.json",
+      "passed": true,
+      "scope": "structural_only"
+    },
+    {
+      "fixture": "m0017.json",
+      "passed": true,
+      "scope": "structural_only"
+    },
+    {
+      "fixture": "m0029.json",
+      "passed": true,
+      "scope": "structural_only"
+    },
+    {
+      "fixture": "m0034.json",
+      "passed": true,
+      "scope": "structural_only"
+    },
+    {
+      "expected_check": "bundle_derived_only",
+      "fixture": "bundle_canonical.json",
+      "observed_failures": [
+        "bundle_derived_only"
+      ],
+      "passed": true
+    },
+    {
+      "expected_check": ":closed_file_scope",
+      "fixture": "closed_scope_undeclared_runtime.json",
+      "observed_failures": [
+        "m0009:approved_value:EV-5e676034a3a8af9a380e",
+        "m0009:approved_value:EV-87e315fe8795ed727d1a",
+        "m0009:approved_value:EV-cbc5ace55f955ea04f51",
+        "m0009:approved_value:EV-499134de3ccf0f36dc58",
+        "m0009:approved_value:EV-e175c356532ffee16ec1",
+        "m0009:closed_file_scope"
+      ],
+      "passed": true
+    },
+    {
+      "expected_check": "no_shadow_module_authority",
+      "fixture": "duplicate_authority.json",
+      "observed_failures": [
+        "no_shadow_module_authority"
+      ],
+      "passed": true
+    },
+    {
+      "expected_check": "unique_permanent_ids",
+      "fixture": "duplicate_permanent_id.json",
+      "observed_failures": [
+        "unique_permanent_ids",
+        "canonical_universe",
+        "m0009:identity",
+        "m0009:module_id_marker",
+        "m0009:approved_value:EV-e745575afa7a0f7cfb6e",
+        "m0009:process_owner:60000000000000000009"
+      ],
+      "passed": true
+    },
+    {
+      "expected_check": ":contract_authority:",
+      "fixture": "fake_external_path.json",
+      "observed_failures": [
+        "m0009:approved_value:EV-db211ae49a91e9a3a96d",
+        "m0009:contract_authority:USE-2822cf13cbc59704b6ee"
+      ],
+      "passed": true
+    },
+    {
+      "expected_check": ":schema",
+      "fixture": "fake_na_step.json",
+      "observed_failures": [
+        "m0009:schema"
+      ],
+      "passed": true
+    },
+    {
+      "expected_check": ":schema",
+      "fixture": "invalid_applicability_knowledge.json",
+      "observed_failures": [
+        "m0009:schema"
+      ],
+      "passed": true
+    },
+    {
+      "expected_check": ":approved_value:",
+      "fixture": "missing_evidence.json",
+      "observed_failures": [
+        "m0009:approved_value:EV-d698116004c87c8ee4c3"
+      ],
+      "passed": true
+    },
+    {
+      "expected_check": ":file_use:",
+      "fixture": "missing_global_shared_file.json",
+      "observed_failures": [
+        "m0001:file_use:FILE-f323e26231b803965a0d",
+        "m0001:file_use:60000000000000000001FILE-f323e26231b803965a0d",
+        "m0002:file_use:FILE-f323e26231b803965a0d",
+        "m0002:file_use:60000000000000000002FILE-f323e26231b803965a0d",
+        "m0003:file_use:FILE-f323e26231b803965a0d",
+        "m0003:file_use:60000000000000000003FILE-f323e26231b803965a0d",
+        "m0004:file_use:FILE-f323e26231b803965a0d",
+        "m0004:file_use:60000000000000000004FILE-f323e26231b803965a0d",
+        "m0005:file_use:FILE-f323e26231b803965a0d",
+        "m0005:file_use:60000000000000000005FILE-f323e26231b803965a0d",
+        "m0006:file_use:FILE-f323e26231b803965a0d",
+        "m0006:file_use:60000000000000000006FILE-f323e26231b803965a0d"
+      ],
+      "passed": true
+    },
+    {
+      "expected_check": ":baseline_commit",
+      "fixture": "stale_baseline.json",
+      "observed_failures": [
+        "m0009:baseline_commit",
+        "m0009:approved_value:EV-d919811c776b8ab30727"
+      ],
+      "passed": true
+    },
+    {
+      "fixture": "stale_patch_rejected_without_write",
+      "passed": true
+    },
+    {
+      "fixture": "byte_identical_archive_restore",
+      "passed": true
+    },
+    {
+      "fixture": "fully_scraped_does_not_authorize_archive",
+      "passed": true
+    },
+    {
+      "fixture": "live_required_input_cannot_archive",
+      "passed": true
+    },
+    {
+      "fixture": "projection_idempotence_and_no_root_writes",
+      "output_count": 70,
+      "passed": true
+    },
+    {
+      "fixture": "json_pointer_empty_escaped_and_trailing_keys",
+      "passed": true
+    }
+  ],
+  "fixture_count": 22,
+  "passed_count": 22,
+  "scope": "offline_structural_and_guard_fixtures",
+  "specification_readiness_waived": false,
+  "status": "PASS"
+}
