@@ -36,7 +36,7 @@ files under `tests/contracts/` and `tests/legacy/`. Adding a directory to
 | GUI parity checks | `tests/test_gui_parity_optional.py`, `tests/test_gui_parity_extended_optional.py`, `tests/test_gui_parity_exit_optional.py` | The GUI Terminal workflow explicitly invokes these optional tests on Windows and Ubuntu; they are also root-discoverable. Their optional nature means a normal run may skip GUI-specific checks depending on environment. |
 | Registry unit test | `tests/registries/test_registry_framework.py` | Active via `registry-validation.yml`, which uses `python -m unittest discover -s tests/registries -p 'test_*.py'`; also discoverable by root pytest. |
 | Doc-ID validation | `doc_id_subsystem/validation/validate_doc_id_coverage.py` and `validate_doc_id_uniqueness.py` | Active CI validation scripts, not pytest tests. The workflow runs both and checks committed JSON baselines. |
-| Re-entry library checks | `shared/reentry/tests/` in `1299900009260118_contracts-ci.yml` | Registered with `continue-on-error`; the workflow itself notes tests may not exist yet. Confirm that this directory contains tests before treating the job as a gate. |
+| Re-entry library checks | `shared/reentry/tests/` in `1299900009260118_contracts-ci.yml` | Registered with `continue-on-error`; the directory is absent in this checkout, and the workflow itself notes tests may not exist yet. This job currently runs no repository test files. |
 
 The root-level pytest command is used by `.github/workflows/ci.yml`,
 `.github/workflows/1299900013260118_reentry_ci.yml`,
