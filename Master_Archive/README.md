@@ -1,10 +1,10 @@
-# 99_archive_superseded_do_not_route
+# Master_Archive
 
 ## ⛔ NOT DEFAULT AI ROUTING MATERIAL — DO NOT ROUTE HERE
 
-This folder is **explicitly excluded from default AI routing**.
+This folder is the central archive and is **explicitly excluded from default AI routing**.
 
-AI agents and tools **must not** open files from this folder during normal project work
+AI agents and tools **must not** open archived files from this folder during normal project work
 unless the user explicitly requests:
 - archive audit
 - supersession review
@@ -15,6 +15,7 @@ unless the user explicitly requests:
 
 Holds confirmed superseded files, stale working artifacts, obsolete drafts, and duplicate copies
 retained only for historical traceability. All active content has been replaced.
+All archived files should be stored here rather than in other archive folders.
 
 ## Authority guardrail
 
@@ -23,7 +24,7 @@ authority documents, or any live subject-folder document.
 
 ## Archive manifest
 
-See `archive_manifest.json` for the complete list of archived files, their SHA256 hashes,
+See `archive_manifest.json` for the list of registered archived files, their SHA256 hashes,
 their replacements, and the reason for archival.
 
 ## To access this folder intentionally:
