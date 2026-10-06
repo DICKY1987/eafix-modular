@@ -1,6 +1,6 @@
 # GitHub Actions and merge protection: what they are
 
-**Repository:** `DICKY1987/eafix-modular`  
+**Repository:** `DICKY1987/eafix-modular`
 **Inventory checked:** 2026-10-06
 
 This report explains the difference between GitHub Actions workflows and
