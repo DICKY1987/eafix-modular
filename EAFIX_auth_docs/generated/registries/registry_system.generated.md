@@ -14,4 +14,4 @@ This generated view summarizes the registry system. `process_registry.jsonl` is 
 - operational_control: 52 records
 - operator: 7 records
 - reuse: 12 records
-- decision: 11 records
+- decision: 12 records

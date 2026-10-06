@@ -126,7 +126,8 @@
         "DOC_PROCESS_STEP_CATALOG",
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_MAP",
-        "DOC_FILE_MODULE_MAPPING"
+        "DOC_FILE_MODULE_MAPPING",
+        "DOC_AUTHORITY_NAVIGATION"
       ],
       "sha256": "7eda7e5843a8ca56f3d6af21456bfa6e5e5344ceab56a39ec47a31da51d9cb6f",
       "exists_in_current_project_files": true
@@ -208,7 +209,8 @@
       "companion_documents": [
         "DOC_ALIGNED_PROCESS",
         "DOC_MODULE_CATALOG",
-        "DOC_ATOMIC_LIFECYCLE_MD"
+        "DOC_ATOMIC_LIFECYCLE_MD",
+        "DOC_AUTHORITY_NAVIGATION"
       ],
       "sha256": "b02b1b1f7f4ee5461c2d8d085c3b961e9aa627eca68b5be49cd8b3d6eb01b464",
       "exists_in_current_project_files": true
@@ -390,7 +392,8 @@
       "companion_documents": [
         "DOC_MODULE_CATALOG",
         "DOC_SERVICES_AI_REFERENCE",
-        "DOC_MODULE_MAP"
+        "DOC_MODULE_MAP",
+        "DOC_AUTHORITY_NAVIGATION"
       ],
       "sha256": "7441ba8a0e25db2f8a28b58d96ea462208bd0959e8c99db9e33488c45a1e2b7d",
       "exists_in_current_project_files": true
@@ -1277,6 +1280,23 @@
       ],
       "sha256": "4ed5933311738f0c76710beae7a8db74af30dfeb96580210daf585292768b058",
       "exists_in_current_project_files": true
+    },
+    "DOC_AUTHORITY_NAVIGATION": {
+      "path": "EAFIX_auth_docs/generated/authority_graph/README.md",
+      "format": "markdown",
+      "authority_level": "generated",
+      "authority_scope": [
+        "derived module/process/file/contract/work-cell navigation only"
+      ],
+      "conflict_role": "Does not override authored manifests or canonical registries. Unverified links and candidate contract facts remain explicitly marked.",
+      "primary_subjects": [
+        "module navigation",
+        "process-to-entrypoint traceability",
+        "file ownership findings"
+      ],
+      "must_reference_when": [
+        "Use as a supplemental index when navigating module/process/file relationships."
+      ]
     }
   },
   "subject_routes": [

@@ -9683,6 +9683,79 @@
     ],
     "decision": [
       {
+        "affected_registry_records": [
+          "50000000000000000001",
+          "50000000000000000002",
+          "50000000000000000003",
+          "50000000000000000004",
+          "50000000000000000005",
+          "50000000000000000006",
+          "50000000000000000007",
+          "50000000000000000008",
+          "50000000000000000009",
+          "50000000000000000010",
+          "50000000000000000011",
+          "50000000000000000012",
+          "50000000000000000013",
+          "50000000000000000014",
+          "50000000000000000015",
+          "50000000000000000016",
+          "50000000000000000017",
+          "50000000000000000018",
+          "50000000000000000019",
+          "50000000000000000020",
+          "50000000000000000021",
+          "50000000000000000022",
+          "50000000000000000023",
+          "50000000000000000024",
+          "50000000000000000025",
+          "50000000000000000026",
+          "50000000000000000027",
+          "50000000000000000028",
+          "50000000000000000029",
+          "50000000000000000030",
+          "50000000000000000031",
+          "50000000000000000032",
+          "50000000000000000033",
+          "50000000000000000034"
+        ],
+        "approval": null,
+        "authority_status": "supporting_evidence",
+        "change_request_refs": [],
+        "compatibility_impact": "Adds navigation and validation only; no trading runtime or authority promotion.",
+        "confidence": "high",
+        "decision": "Reconcile module paths and derive all graph/context/diagram outputs from existing sources; preserve candidate statuses and scoped holds.",
+        "decision_id": "DEC-AUTHORITY-GRAPH-20261006",
+        "decision_record_type": "architecture_decision",
+        "decision_status": "accepted_for_navigation_implementation",
+        "effective_date": "2026-10-06",
+        "effective_from_utc": null,
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "migration_required": false,
+        "options": [
+          "Create another authored mapping database",
+          "Derive navigation from existing authorities and preserve gaps"
+        ],
+        "problem": "Module/process/file/work-cell navigation drifts across incomplete candidate registries and active manifests.",
+        "rationale": "Prevents duplicate ownership authorities and unsupported claims of executable integration.",
+        "record_id": "DEC-AUTHORITY-GRAPH-20261006",
+        "record_type": "decision",
+        "record_version": "1.0.0",
+        "schema_version": "1.0.0",
+        "source_hashes": [],
+        "source_refs": [
+          {
+            "commit_sha": null,
+            "note": "Implements the user-requested derived authority graph; does not approve a registry or module cutover.",
+            "path": "governance/authority_graph/IMPLEMENTATION_REPORT.md",
+            "role": "implementation_decisions"
+          }
+        ],
+        "status": "active",
+        "superseded_by": [],
+        "supersedes": []
+      },
+      {
         "affected_registry_records": [],
         "approval": {
           "approval_scope": "candidate implementation and branch execution; not registry-by-registry canonical cutover",
@@ -10813,20 +10886,16 @@
         "domain_group": "foundation",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0001-f1-config-preferences/manifest.json",
         "module_id": "50000000000000000001",
         "module_kind": "INFRA_PLATFORM_MODULE",
-        "module_locator": null,
+        "module_locator": "M0001",
         "module_name": "Configuration Service",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0001-f1-config-preferences",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000001"
         ],
@@ -10865,6 +10934,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0001-f1-config-preferences/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -10882,20 +10957,16 @@
         "domain_group": "foundation",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0002-f3-clock-scheduler/manifest.json",
         "module_id": "50000000000000000002",
         "module_kind": "INFRA_PLATFORM_MODULE",
-        "module_locator": null,
+        "module_locator": "M0002",
         "module_name": "Clock Scheduler",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0002-f3-clock-scheduler",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000002"
         ],
@@ -10934,6 +11005,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0002-f3-clock-scheduler/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -10951,20 +11028,16 @@
         "domain_group": "data_integration",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0003-d2-calendar-source-adapter/manifest.json",
         "module_id": "50000000000000000003",
         "module_kind": "INTEGRATION_BRIDGE_MODULE",
-        "module_locator": null,
+        "module_locator": "M0003",
         "module_name": "Calendar Source Adapter",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0003-d2-calendar-source-adapter",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000003"
         ],
@@ -11005,6 +11078,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0003-d2-calendar-source-adapter/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -11023,20 +11102,16 @@
         "domain_group": "data_integration",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0004-d3-calendar-normalizer/manifest.json",
         "module_id": "50000000000000000004",
         "module_kind": "INTEGRATION_BRIDGE_MODULE",
-        "module_locator": null,
+        "module_locator": "M0004",
         "module_name": "Calendar Normalizer",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0004-d3-calendar-normalizer",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000004"
         ],
@@ -11077,6 +11152,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0004-d3-calendar-normalizer/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -11094,20 +11175,16 @@
         "domain_group": "foundation",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0005-f2-event-log/manifest.json",
         "module_id": "50000000000000000005",
         "module_kind": "INFRA_PLATFORM_MODULE",
-        "module_locator": null,
+        "module_locator": "M0005",
         "module_name": "Event Log",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0005-f2-event-log",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000005"
         ],
@@ -11146,6 +11223,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0005-f2-event-log/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -11165,20 +11248,16 @@
         "domain_group": "data_integration",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0006-d4-calendar-trigger-builder/manifest.json",
         "module_id": "50000000000000000006",
         "module_kind": "INTEGRATION_BRIDGE_MODULE",
-        "module_locator": null,
+        "module_locator": "M0006",
         "module_name": "Calendar Trigger Builder",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0006-d4-calendar-trigger-builder",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000006"
         ],
@@ -11221,6 +11300,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0006-d4-calendar-trigger-builder/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -11238,20 +11323,16 @@
         "domain_group": "data_integration",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0007-d1-market-feed-adapter/manifest.json",
         "module_id": "50000000000000000007",
         "module_kind": "INTEGRATION_BRIDGE_MODULE",
-        "module_locator": null,
+        "module_locator": "M0007",
         "module_name": "Market Feed Adapter",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0007-d1-market-feed-adapter",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000007"
         ],
@@ -11292,6 +11373,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0007-d1-market-feed-adapter/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -11310,20 +11397,16 @@
         "domain_group": "core_processing",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0008-c1-bar-builder/manifest.json",
         "module_id": "50000000000000000008",
         "module_kind": "CORE_PROCESSING_MODULE",
-        "module_locator": null,
+        "module_locator": "M0008",
         "module_name": "Bar Builder",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0008-c1-bar-builder",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000008"
         ],
@@ -11364,6 +11447,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0008-c1-bar-builder/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -11382,20 +11471,16 @@
         "domain_group": "core_processing",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0009-c2-indicator-engine/manifest.json",
         "module_id": "50000000000000000009",
         "module_kind": "CORE_PROCESSING_MODULE",
-        "module_locator": null,
+        "module_locator": "M0009",
         "module_name": "Indicator Engine",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0009-c2-indicator-engine",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000009"
         ],
@@ -11436,6 +11521,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0009-c2-indicator-engine/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -11455,20 +11546,16 @@
         "domain_group": "core_processing",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0010-c3-feature-packager/manifest.json",
         "module_id": "50000000000000000010",
         "module_kind": "CORE_PROCESSING_MODULE",
-        "module_locator": null,
+        "module_locator": "M0010",
         "module_name": "Feature Packager",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0010-c3-feature-packager",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000010"
         ],
@@ -11511,6 +11598,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0010-c3-feature-packager/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -11529,20 +11622,16 @@
         "domain_group": "signal_intent",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0011-s1-signal-engine/manifest.json",
         "module_id": "50000000000000000011",
         "module_kind": "DECISION_MODULE",
-        "module_locator": null,
+        "module_locator": "M0011",
         "module_name": "Signal Engine",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0011-s1-signal-engine",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000011"
         ],
@@ -11587,6 +11676,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0011-s1-signal-engine/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -11605,20 +11700,16 @@
         "domain_group": "signal_intent",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0012-s2-intent-builder/manifest.json",
         "module_id": "50000000000000000012",
         "module_kind": "DECISION_MODULE",
-        "module_locator": null,
+        "module_locator": "M0012",
         "module_name": "Intent Builder",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0012-s2-intent-builder",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000012"
         ],
@@ -11659,6 +11750,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0012-s2-intent-builder/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -11677,20 +11774,16 @@
         "domain_group": "risk",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0013-r1-risk-evaluator/manifest.json",
         "module_id": "50000000000000000013",
         "module_kind": "RISK_CONTROL_MODULE",
-        "module_locator": null,
+        "module_locator": "M0013",
         "module_name": "Risk Evaluator",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0013-r1-risk-evaluator",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000013"
         ],
@@ -11735,6 +11828,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0013-r1-risk-evaluator/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -11753,20 +11852,16 @@
         "domain_group": "risk",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0014-r2-order-intent-compiler/manifest.json",
         "module_id": "50000000000000000014",
         "module_kind": "RISK_CONTROL_MODULE",
-        "module_locator": null,
+        "module_locator": "M0014",
         "module_name": "Order Intent Compiler",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0014-r2-order-intent-compiler",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000014"
         ],
@@ -11807,6 +11902,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0014-r2-order-intent-compiler/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -11825,20 +11926,16 @@
         "domain_group": "order_management",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0015-o1-order-router/manifest.json",
         "module_id": "50000000000000000015",
         "module_kind": "ORDER_LIFECYCLE_MODULE",
-        "module_locator": null,
+        "module_locator": "M0015",
         "module_name": "Order Router",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0015-o1-order-router",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000015"
         ],
@@ -11881,6 +11978,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0015-o1-order-router/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -11899,20 +12002,16 @@
         "domain_group": "broker_execution",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0016-b1-mt4-adapter-transport/manifest.json",
         "module_id": "50000000000000000016",
         "module_kind": "MT4_BRIDGE_MODULE",
-        "module_locator": null,
+        "module_locator": "M0016",
         "module_name": "MT4 Adapter Transport",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0016-b1-mt4-adapter-transport",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000016"
         ],
@@ -11955,6 +12054,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0016-b1-mt4-adapter-transport/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -11972,20 +12077,16 @@
         "domain_group": "broker_execution",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0017-b2-mt4-ea-executor/manifest.json",
         "module_id": "50000000000000000017",
         "module_kind": "MT4_BRIDGE_MODULE",
-        "module_locator": null,
+        "module_locator": "M0017",
         "module_name": "MT4 EA Executor",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0017-b2-mt4-ea-executor",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000017"
         ],
@@ -12026,6 +12127,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0017-b2-mt4-ea-executor/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -12044,20 +12151,16 @@
         "domain_group": "broker_execution",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0018-b3-exec-event-normalizer/manifest.json",
         "module_id": "50000000000000000018",
         "module_kind": "MT4_BRIDGE_MODULE",
-        "module_locator": null,
+        "module_locator": "M0018",
         "module_name": "Execution Event Normalizer",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0018-b3-exec-event-normalizer",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000018"
         ],
@@ -12100,6 +12203,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0018-b3-exec-event-normalizer/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -12119,20 +12228,16 @@
         "domain_group": "order_management",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0019-o2-oms-state-machine/manifest.json",
         "module_id": "50000000000000000019",
         "module_kind": "ORDER_LIFECYCLE_MODULE",
-        "module_locator": null,
+        "module_locator": "M0019",
         "module_name": "OMS State Machine",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0019-o2-oms-state-machine",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000019"
         ],
@@ -12181,6 +12286,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0019-o2-oms-state-machine/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -12199,20 +12310,16 @@
         "domain_group": "order_management",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0020-o3-trade-close-classifier/manifest.json",
         "module_id": "50000000000000000020",
         "module_kind": "ORDER_LIFECYCLE_MODULE",
-        "module_locator": null,
+        "module_locator": "M0020",
         "module_name": "Trade Close Classifier",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0020-o3-trade-close-classifier",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000020"
         ],
@@ -12253,6 +12360,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0020-o3-trade-close-classifier/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -12271,20 +12384,16 @@
         "domain_group": "reentry",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0021-e1-outcome-bucketizer/manifest.json",
         "module_id": "50000000000000000021",
         "module_kind": "REENTRY_MODULE",
-        "module_locator": null,
+        "module_locator": "M0021",
         "module_name": "Outcome Bucketizer",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0021-e1-outcome-bucketizer",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000021"
         ],
@@ -12325,6 +12434,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0021-e1-outcome-bucketizer/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -12343,20 +12458,16 @@
         "domain_group": "reentry",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0022-e2-proximity-evaluator/manifest.json",
         "module_id": "50000000000000000022",
         "module_kind": "REENTRY_MODULE",
-        "module_locator": null,
+        "module_locator": "M0022",
         "module_name": "Proximity Evaluator",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0022-e2-proximity-evaluator",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000022"
         ],
@@ -12399,6 +12510,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0022-e2-proximity-evaluator/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -12418,20 +12535,16 @@
         "domain_group": "reentry",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0023-e3-matrix-lookup/manifest.json",
         "module_id": "50000000000000000023",
         "module_kind": "REENTRY_MODULE",
-        "module_locator": null,
+        "module_locator": "M0023",
         "module_name": "Matrix Lookup",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0023-e3-matrix-lookup",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000023"
         ],
@@ -12478,6 +12591,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0023-e3-matrix-lookup/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -12496,20 +12615,16 @@
         "domain_group": "reentry",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0024-e4-reentry-intent-builder/manifest.json",
         "module_id": "50000000000000000024",
         "module_kind": "REENTRY_MODULE",
-        "module_locator": null,
+        "module_locator": "M0024",
         "module_name": "Reentry Intent Builder",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0024-e4-reentry-intent-builder",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000024"
         ],
@@ -12554,6 +12669,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0024-e4-reentry-intent-builder/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -12572,22 +12693,18 @@
         "domain_group": "foundation",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [
           "F1_FLOW_ORCHESTRATOR"
         ],
-        "manifest_path": null,
+        "manifest_path": "m0025-f4-flow-orchestrator/manifest.json",
         "module_id": "50000000000000000025",
         "module_kind": "INFRA_PLATFORM_MODULE",
-        "module_locator": null,
+        "module_locator": "M0025",
         "module_name": "Flow Orchestrator",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0025-f4-flow-orchestrator",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000025"
         ],
@@ -12630,6 +12747,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0025-f4-flow-orchestrator/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -12647,20 +12770,16 @@
         "domain_group": "operations",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0026-p1-health-aggregator/manifest.json",
         "module_id": "50000000000000000026",
         "module_kind": "OBSERVABILITY_MODULE",
-        "module_locator": null,
+        "module_locator": "M0026",
         "module_name": "Health Aggregator",
-        "module_root": null,
-        "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root"
-        ],
+        "module_root": "m0026-p1-health-aggregator",
+        "needs_review_fields": [],
         "process_step_ids": [
           "60000000000000000026"
         ],
@@ -12703,6 +12822,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0026-p1-health-aggregator/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -12718,19 +12843,16 @@
         "domain_group": "risk",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0027-r3-correlation-guard/manifest.json",
         "module_id": "50000000000000000027",
         "module_kind": "RISK_CONTROL_MODULE",
-        "module_locator": null,
+        "module_locator": "M0027",
         "module_name": "Correlation Guard",
-        "module_root": null,
+        "module_root": "m0027-r3-correlation-guard",
         "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root",
           "purpose",
           "scope_in",
           "scope_out",
@@ -12764,6 +12886,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0027-r3-correlation-guard/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -12779,19 +12907,16 @@
         "domain_group": "operator_ui",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0028-u1-dashboard-backend/manifest.json",
         "module_id": "50000000000000000028",
         "module_kind": "UI_MODULE",
-        "module_locator": null,
+        "module_locator": "M0028",
         "module_name": "Dashboard Backend",
-        "module_root": null,
+        "module_root": "m0028-u1-dashboard-backend",
         "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root",
           "purpose",
           "scope_in",
           "scope_out",
@@ -12825,6 +12950,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0028-u1-dashboard-backend/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -12840,19 +12971,16 @@
         "domain_group": "operator_ui",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0029-u2-gui-gateway/manifest.json",
         "module_id": "50000000000000000029",
         "module_kind": "UI_MODULE",
-        "module_locator": null,
+        "module_locator": "M0029",
         "module_name": "GUI Gateway",
-        "module_root": null,
+        "module_root": "m0029-u2-gui-gateway",
         "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root",
           "purpose",
           "scope_in",
           "scope_out",
@@ -12886,6 +13014,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0029-u2-gui-gateway/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -12901,19 +13035,16 @@
         "domain_group": "operator_ui",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0030-u3-mt4-expiry-overlay/manifest.json",
         "module_id": "50000000000000000030",
         "module_kind": "UI_MODULE",
-        "module_locator": null,
+        "module_locator": "M0030",
         "module_name": "MT4 Expiry Overlay",
-        "module_root": null,
+        "module_root": "m0030-u3-mt4-expiry-overlay",
         "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root",
           "purpose",
           "scope_in",
           "scope_out",
@@ -12947,6 +13078,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0030-u3-mt4-expiry-overlay/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -12962,19 +13099,16 @@
         "domain_group": "operator_ui",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0031-u4-desktop-operator/manifest.json",
         "module_id": "50000000000000000031",
         "module_kind": "UI_MODULE",
-        "module_locator": null,
+        "module_locator": "M0031",
         "module_name": "Desktop Operator",
-        "module_root": null,
+        "module_root": "m0031-u4-desktop-operator",
         "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root",
           "purpose",
           "scope_in",
           "scope_out",
@@ -13008,6 +13142,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0031-u4-desktop-operator/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -13023,19 +13163,16 @@
         "domain_group": "operations",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0032-p2-reporter/manifest.json",
         "module_id": "50000000000000000032",
         "module_kind": "OBSERVABILITY_MODULE",
-        "module_locator": null,
+        "module_locator": "M0032",
         "module_name": "Reporter",
-        "module_root": null,
+        "module_root": "m0032-p2-reporter",
         "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root",
           "purpose",
           "scope_in",
           "scope_out",
@@ -13069,6 +13206,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0032-p2-reporter/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -13084,19 +13227,16 @@
         "domain_group": "shared_kernel",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0033-sk1-plugin-interface/manifest.json",
         "module_id": "50000000000000000033",
         "module_kind": "SHARED_KERNEL_MODULE",
-        "module_locator": null,
+        "module_locator": "M0033",
         "module_name": "Plugin Interface",
-        "module_root": null,
+        "module_root": "m0033-sk1-plugin-interface",
         "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root",
           "purpose",
           "scope_in",
           "scope_out",
@@ -13130,6 +13270,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0033-sk1-plugin-interface/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",
@@ -13145,19 +13291,16 @@
         "domain_group": "shared_kernel",
         "effective_from_utc": null,
         "forbidden_responsibilities": [],
-        "last_verified_commit": "32694cacd212b7615af83555f8ac7e64397376f1",
+        "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
         "layer": null,
         "legacy_aliases": [],
-        "manifest_path": null,
+        "manifest_path": "m0034-sk2-idempotency/manifest.json",
         "module_id": "50000000000000000034",
         "module_kind": "SHARED_KERNEL_MODULE",
-        "module_locator": null,
+        "module_locator": "M0034",
         "module_name": "Idempotency",
-        "module_root": null,
+        "module_root": "m0034-sk2-idempotency",
         "needs_review_fields": [
-          "module_locator",
-          "manifest_path",
-          "module_root",
           "purpose",
           "scope_in",
           "scope_out",
@@ -13191,6 +13334,12 @@
             "note": null,
             "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
             "role": "independent_evidence_inventory"
+          },
+          {
+            "commit_sha": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+            "note": "Physical locator reconciliation only; authority status remains candidate.",
+            "path": "m0034-sk2-idempotency/manifest.json",
+            "role": "verified_manifest_location"
           }
         ],
         "status": "candidate",

@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "authority_navigation_policy",
+  "authority_status": "supporting_evidence",
+  "baseline_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+  "generator": "tools/registries/build_authority_graph.py",
+  "source_precedence": {
+    "module_identity_and_boundaries": "34 root module manifest.json files; module registry locators are reconciled projections",
+    "process_behavior": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+    "file_ownership": "module manifest file_ownership.owned_files; artifact registry identity is supporting evidence until cutover",
+    "shared_contracts": "EAFIX_auth_docs/01_canonical_registries/contract_registry.jsonl; candidate statuses remain explicit",
+    "work_cell_relationships": "explicit parent_module_symbol plus attached approved location decisions; service path alone is insufficient"
+  },
+  "derived_only": [
+    "authority graph",
+    "module context navigation",
+    "boundary diagrams",
+    "work-cell index",
+    "file-to-step references"
+  ],
+  "contract_stewards": {
+    "OrderIntent": "50000000000000000014",
+    "Signal": "50000000000000000011"
+  },
+  "scope": "Navigation implementation against active v1 manifests; no v2 cutover, archival, live trading, or execution certification.",
+  "pending_authority_branch": "ai/module-authority-resume-20261004",
+  "pending_authority_branch_status": "ACTIVE_WITH_SCOPED_HOLDS / BLOCKED; not merged or superseded by this work"
+}

@@ -1,0 +1,40 @@
+name: Authority Graph Validation
+
+on:
+  push:
+    branches: [master, develop]
+    paths:
+      - 'm*/manifest.json'
+      - 'services/**/work_cells/**'
+      - 'm*/m*-context/work-cells/**'
+      - 'EAFIX_auth_docs/01_canonical_registries/**'
+      - 'EAFIX_auth_docs/generated/authority_graph/**'
+      - 'governance/authority_graph/**'
+      - 'tools/registries/**'
+      - 'tests/registries/**'
+      - '.github/workflows/authority-graph-validation.yml'
+  pull_request:
+    paths:
+      - 'm*/manifest.json'
+      - 'services/**/work_cells/**'
+      - 'm*/m*-context/work-cells/**'
+      - 'EAFIX_auth_docs/01_canonical_registries/**'
+      - 'EAFIX_auth_docs/generated/authority_graph/**'
+      - 'governance/authority_graph/**'
+      - 'tools/registries/**'
+      - 'tests/registries/**'
+      - '.github/workflows/authority-graph-validation.yml'
+
+jobs:
+  authority-graph-validation:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - run: python -m pip install jsonschema
+      - run: python -m unittest discover -s tests/registries -p 'test_*.py'
+      - run: python tools/validate_module_structure.py
+      - run: python tools/registries/build_registries.py --check
+      - run: python tools/registries/build_authority_graph.py --check
