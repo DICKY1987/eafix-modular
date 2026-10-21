@@ -1,0 +1,541 @@
+{
+  "reviewed_blockers": [
+    {
+      "blocker_id": "BLOCK-LEGACY-VALIDATION-UNAVAILABLE",
+      "classification": "reviewed_evidence_blocker",
+      "decision_id": "DEC-027",
+      "evidence_refs": [
+        {
+          "json_pointer": null,
+          "lines": [
+            34,
+            40
+          ],
+          "path": "ci/2099900300260118_validate_atomic_module_manifests.py",
+          "sha256": "c933b0408c76705760d8211cb0edf9889c77f33c4680686deb2bb70b5873c6f3",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": null,
+          "lines": [
+            10,
+            40
+          ],
+          "path": "tests/test_generator_update.py",
+          "sha256": "b50cbe43d485724d7203dd987190a3c61cf03a22131c05e6bfcbe4f570891b3f",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": null,
+          "lines": [
+            8,
+            34
+          ],
+          "path": "tests/test_validator_update.py",
+          "sha256": "3e8b6447a0fd5850e75662f8a7ca7d0c6efe751b9d4e8dec6babf3103fe5e3c6",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        }
+      ],
+      "json_pointer": "/verification_commands",
+      "missing_evidence_or_decision": "A working, reviewed replacement validation route for v2, retirement/redirect of old generator and validator callers, and passing required CI checks. New offline structural checks do not waive the existing failures.",
+      "module": "all",
+      "next_action": "After specification reconciliation, replace legacy generation callers with read-only authority validation and one-way projection checks; update obsolete tests through a governed retirement decision; rerun the required suite without lowering its gate.",
+      "reason": "The existing atomic-manifest CI command fails because tools.manifest_generation.generate_manifests is absent. Repository-wide pytest also has three failing tests that import absent EA-REG generator/validator files. Its existing 85% coverage gate fails. These checks cannot certify a coordinated cutover.",
+      "resolution_state": "unresolved",
+      "responsible_decision_maker": "repository owner or delegated specification reviewer",
+      "severity": "blocking"
+    }
+  ],
+  "root_bundle_drift": [
+    {
+      "decision_id": "DEC-007",
+      "difference_count": 11,
+      "differences": [
+        {
+          "bundle_present": true,
+          "bundle_value": [],
+          "json_pointer": "/file_ownership/allowed_files",
+          "root_present": true,
+          "root_value": [
+            "services/signal-generator/src/2099900185260118_config.py",
+            "services/signal-generator/src/2099900186260118_processor.py",
+            "services/signal-generator/src/2099900187260118_plugin.py"
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [],
+          "json_pointer": "/file_ownership/configuration_files",
+          "root_present": true,
+          "root_value": [
+            "services/signal-generator/src/2099900185260118_config.py"
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            {
+              "canonical_modules": [
+                "S1_SIGNAL_ENGINE"
+              ],
+              "is_test": true,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/signal-generator/tests/2099900186260118_test_signal_generator_plugin.py",
+              "role": "test",
+              "service": "signal-generator"
+            }
+          ],
+          "json_pointer": "/file_ownership/file_role_index",
+          "root_present": true,
+          "root_value": [
+            {
+              "canonical_modules": [
+                "S1_SIGNAL_ENGINE"
+              ],
+              "is_test": true,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/signal-generator/tests/2099900186260118_test_signal_generator_plugin.py",
+              "role": "test",
+              "service": "signal-generator"
+            },
+            {
+              "canonical_modules": [
+                "S1_SIGNAL_ENGINE"
+              ],
+              "is_test": false,
+              "notes": "Reclaimed during governance remediation: file existed on disk under module_root but was not listed in any manifest.",
+              "ownership": "owned",
+              "path": "services/signal-generator/src/2099900185260118_config.py",
+              "role": "config",
+              "service": "signal-generator"
+            },
+            {
+              "canonical_modules": [
+                "S1_SIGNAL_ENGINE"
+              ],
+              "is_test": false,
+              "notes": "Reclaimed during governance remediation: file existed on disk under module_root but was not listed in any manifest.",
+              "ownership": "owned",
+              "path": "services/signal-generator/src/2099900186260118_processor.py",
+              "role": "other",
+              "service": "signal-generator"
+            },
+            {
+              "canonical_modules": [
+                "S1_SIGNAL_ENGINE"
+              ],
+              "is_test": false,
+              "notes": "Reclaimed during governance remediation: file existed on disk under module_root but was not listed in any manifest.",
+              "ownership": "owned",
+              "path": "services/signal-generator/src/2099900187260118_plugin.py",
+              "role": "plugin",
+              "service": "signal-generator"
+            }
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            "services/signal-generator/tests/2099900186260118_test_signal_generator_plugin.py"
+          ],
+          "json_pointer": "/file_ownership/owned_files",
+          "root_present": true,
+          "root_value": [
+            "services/signal-generator/tests/2099900186260118_test_signal_generator_plugin.py",
+            "services/signal-generator/src/2099900185260118_config.py",
+            "services/signal-generator/src/2099900186260118_processor.py",
+            "services/signal-generator/src/2099900187260118_plugin.py"
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [],
+          "json_pointer": "/file_ownership/source_files",
+          "root_present": true,
+          "root_value": [
+            "services/signal-generator/src/2099900185260118_config.py",
+            "services/signal-generator/src/2099900186260118_processor.py",
+            "services/signal-generator/src/2099900187260118_plugin.py"
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": "2026-07-02T15:52:15.513625+00:00",
+          "json_pointer": "/last_updated_utc",
+          "root_present": true,
+          "root_value": "2026-09-09T07:12:15+00:00"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            "Schema-first regenerated manifest from normalized staging tables."
+          ],
+          "json_pointer": "/notes",
+          "root_present": true,
+          "root_value": [
+            "Schema-first regenerated manifest from normalized staging tables.",
+            "Governance remediation 2026-09-09T07:12:15+00:00: entrypoint_files corrected from ['compliance/auto-remediation/2099900012260118_remediation-engine.py'] to ['services/signal-generator/src/2099900187260118_plugin.py']; reclaimed 3 orphaned signal-generator source files into owned_files."
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            "compliance/auto-remediation/2099900012260118_remediation-engine.py"
+          ],
+          "json_pointer": "/process_binding/entrypoint_files",
+          "root_present": true,
+          "root_value": [
+            "services/signal-generator/src/2099900187260118_plugin.py"
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": "2026-07-02T15:52:15.513625+00:00",
+          "json_pointer": "/reconciliation_status/last_reconciled_utc",
+          "root_present": true,
+          "root_value": "2026-09-09T07:12:15+00:00"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": 1,
+          "json_pointer": "/reconciliation_status/mapped_file_count",
+          "root_present": true,
+          "root_value": 4
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [],
+          "json_pointer": "/reconciliation_status/reconciliation_notes",
+          "root_present": true,
+          "root_value": [
+            "[governance-remediation 2026-09-09T07:12:15+00:00] Reclaimed 3 orphaned source files physically present under this module's own module_root (services/signal-generator/src/) that no manifest referenced: config.py, processor.py, plugin.py. Root cause: file_module_mapping.csv (the manifest's declared ownership_derivation source) only lists the test file for this service -- the three source files were added to the repository after the CSV/manifest generation pass and were never backfilled. mapped_file_count corrected from 1 to 4."
+          ]
+        }
+      ],
+      "disposition": "preserve_root_default_pending_unique_claim_review",
+      "module_id": "50000000000000000011",
+      "module_short_id": "m0011"
+    },
+    {
+      "decision_id": "DEC-007",
+      "difference_count": 5,
+      "differences": [
+        {
+          "bundle_present": true,
+          "bundle_value": null,
+          "json_pointer": "/file_ownership/module_root",
+          "root_present": true,
+          "root_value": "m0012-s2-intent-builder"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": "2026-07-02T15:52:15.513625+00:00",
+          "json_pointer": "/last_updated_utc",
+          "root_present": true,
+          "root_value": "2026-09-09T07:12:15+00:00"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            "Schema-first regenerated manifest from normalized staging tables."
+          ],
+          "json_pointer": "/notes",
+          "root_present": true,
+          "root_value": [
+            "Schema-first regenerated manifest from normalized staging tables.",
+            "Governance remediation 2026-09-09T07:12:15+00:00: module_root backfilled (was null) -> 'm0012-s2-intent-builder'."
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": "2026-07-02T15:52:15.513625+00:00",
+          "json_pointer": "/reconciliation_status/last_reconciled_utc",
+          "root_present": true,
+          "root_value": "2026-09-09T07:12:15+00:00"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [],
+          "json_pointer": "/reconciliation_status/reconciliation_notes",
+          "root_present": true,
+          "root_value": [
+            "[governance-remediation 2026-09-09T07:12:15+00:00] module_root backfilled from null to the module's own identity folder ('m0012-s2-intent-builder'). Canonical implementation for this module currently still lives in a shared, not-yet-split service directory (see file_ownership.shared_files / source_files) and has not been physically relocated; that move is tracked separately as the Phase-5 physical migration, not performed in this pass."
+          ]
+        }
+      ],
+      "disposition": "preserve_root_default_pending_unique_claim_review",
+      "module_id": "50000000000000000012",
+      "module_short_id": "m0012"
+    },
+    {
+      "decision_id": "DEC-007",
+      "difference_count": 5,
+      "differences": [
+        {
+          "bundle_present": true,
+          "bundle_value": null,
+          "json_pointer": "/file_ownership/module_root",
+          "root_present": true,
+          "root_value": "m0014-r2-order-intent-compiler"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": "2026-07-02T15:52:15.513625+00:00",
+          "json_pointer": "/last_updated_utc",
+          "root_present": true,
+          "root_value": "2026-09-09T07:12:15+00:00"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            "Schema-first regenerated manifest from normalized staging tables."
+          ],
+          "json_pointer": "/notes",
+          "root_present": true,
+          "root_value": [
+            "Schema-first regenerated manifest from normalized staging tables.",
+            "Governance remediation 2026-09-09T07:12:15+00:00: module_root backfilled (was null) -> 'm0014-r2-order-intent-compiler'."
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": "2026-07-02T15:52:15.513625+00:00",
+          "json_pointer": "/reconciliation_status/last_reconciled_utc",
+          "root_present": true,
+          "root_value": "2026-09-09T07:12:15+00:00"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [],
+          "json_pointer": "/reconciliation_status/reconciliation_notes",
+          "root_present": true,
+          "root_value": [
+            "[governance-remediation 2026-09-09T07:12:15+00:00] module_root backfilled from null to the module's own identity folder ('m0014-r2-order-intent-compiler'). Canonical implementation for this module currently still lives in a shared, not-yet-split service directory (see file_ownership.shared_files / source_files) and has not been physically relocated; that move is tracked separately as the Phase-5 physical migration, not performed in this pass."
+          ]
+        }
+      ],
+      "disposition": "preserve_root_default_pending_unique_claim_review",
+      "module_id": "50000000000000000014",
+      "module_short_id": "m0014"
+    },
+    {
+      "decision_id": "DEC-007",
+      "difference_count": 3,
+      "differences": [
+        {
+          "bundle_present": true,
+          "bundle_value": [],
+          "json_pointer": "/file_ownership/configuration_files",
+          "root_present": true,
+          "root_value": [
+            "m0027-r3-correlation-guard/m0027-context/work-cells/R1_4_CORRELATION_GUARDS.json"
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            {
+              "canonical_modules": [
+                "R3_CORRELATION_GUARD"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "shared/reentry/2099900220260118_reentry_helpers_cli.py",
+              "role": "cli",
+              "service": null
+            },
+            {
+              "canonical_modules": [
+                "R3_CORRELATION_GUARD"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "shared/reentry/2099900222260118___init__.py",
+              "role": "package_init",
+              "service": null
+            },
+            {
+              "canonical_modules": [
+                "R3_CORRELATION_GUARD"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "shared/positioning/2099900216260118_positioning_ratio_index.py",
+              "role": "other",
+              "service": null
+            },
+            {
+              "canonical_modules": [
+                "R3_CORRELATION_GUARD"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "shared/reentry/2099900221260118_vocab.py",
+              "role": "other",
+              "service": null
+            },
+            {
+              "canonical_modules": [
+                "R3_CORRELATION_GUARD"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "shared/positioning/2099900217260118___init__.py",
+              "role": "package_init",
+              "service": null
+            },
+            {
+              "canonical_modules": [
+                "R3_CORRELATION_GUARD"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "shared/reentry/2099900219260118_indicator_validator.py",
+              "role": "validator",
+              "service": null
+            },
+            {
+              "canonical_modules": [
+                "R3_CORRELATION_GUARD"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "shared/reentry/2099900218260118_hybrid_id.py",
+              "role": "other",
+              "service": null
+            }
+          ],
+          "json_pointer": "/file_ownership/file_role_index",
+          "root_present": true,
+          "root_value": [
+            {
+              "canonical_modules": [
+                "R3_CORRELATION_GUARD"
+              ],
+              "is_test": false,
+              "notes": "Legacy R1_4 identity reclassified by MIG-0018",
+              "ownership": "owned",
+              "path": "m0027-r3-correlation-guard/m0027-context/work-cells/R1_4_CORRELATION_GUARDS.json",
+              "role": "work_cell_binding",
+              "service": "correlation-guard"
+            },
+            {
+              "canonical_modules": [
+                "R3_CORRELATION_GUARD"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "shared/reentry/2099900220260118_reentry_helpers_cli.py",
+              "role": "cli",
+              "service": null
+            },
+            {
+              "canonical_modules": [
+                "R3_CORRELATION_GUARD"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "shared/reentry/2099900222260118___init__.py",
+              "role": "package_init",
+              "service": null
+            },
+            {
+              "canonical_modules": [
+                "R3_CORRELATION_GUARD"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "shared/positioning/2099900216260118_positioning_ratio_index.py",
+              "role": "other",
+              "service": null
+            },
+            {
+              "canonical_modules": [
+                "R3_CORRELATION_GUARD"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "shared/reentry/2099900221260118_vocab.py",
+              "role": "other",
+              "service": null
+            },
+            {
+              "canonical_modules": [
+                "R3_CORRELATION_GUARD"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "shared/positioning/2099900217260118___init__.py",
+              "role": "package_init",
+              "service": null
+            },
+            {
+              "canonical_modules": [
+                "R3_CORRELATION_GUARD"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "shared/reentry/2099900219260118_indicator_validator.py",
+              "role": "validator",
+              "service": null
+            },
+            {
+              "canonical_modules": [
+                "R3_CORRELATION_GUARD"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "shared/reentry/2099900218260118_hybrid_id.py",
+              "role": "other",
+              "service": null
+            }
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            "shared/positioning/2099900216260118_positioning_ratio_index.py",
+            "shared/positioning/2099900217260118___init__.py",
+            "shared/reentry/2099900218260118_hybrid_id.py",
+            "shared/reentry/2099900219260118_indicator_validator.py",
+            "shared/reentry/2099900220260118_reentry_helpers_cli.py",
+            "shared/reentry/2099900221260118_vocab.py",
+            "shared/reentry/2099900222260118___init__.py"
+          ],
+          "json_pointer": "/file_ownership/owned_files",
+          "root_present": true,
+          "root_value": [
+            "shared/positioning/2099900216260118_positioning_ratio_index.py",
+            "shared/positioning/2099900217260118___init__.py",
+            "shared/reentry/2099900218260118_hybrid_id.py",
+            "shared/reentry/2099900219260118_indicator_validator.py",
+            "shared/reentry/2099900220260118_reentry_helpers_cli.py",
+            "shared/reentry/2099900221260118_vocab.py",
+            "shared/reentry/2099900222260118___init__.py",
+            "m0027-r3-correlation-guard/m0027-context/work-cells/R1_4_CORRELATION_GUARDS.json"
+          ]
+        }
+      ],
+      "disposition": "preserve_root_default_pending_unique_claim_review",
+      "module_id": "50000000000000000027",
+      "module_short_id": "m0027"
+    }
+  ],
+  "state": "unresolved"
+}

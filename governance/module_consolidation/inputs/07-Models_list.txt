@@ -1,0 +1,43 @@
+src/contracts/models/ — Full Breakdown
+This is a much smaller, structurally different folder from the contracts/models/ I covered earlier — and what’s in it is significant for your SSOT work.
+src/contracts/models/
+├── Calendarevent.py
+├── Executionreport.py
+├── Indicatorvector.py
+├── Orderintent.py
+├── Pricetick.py
+├── Reentrydecision.py
+└── Signal.py
+7 files, 32K total (mostly empty). There is no __init__.py anywhere in src/contracts/ or src/contracts/models/ — this is not a valid importable Python package as it currently sits.
+What’s actually in each file
+Every single file has identical structure — a bare Pydantic model with no fields, no validation, nothing:
+from __future__ import annotations
+
+from pydantic import BaseModel
+
+class Calendarevent(BaseModel):
+    pass
+(Same pattern for Executionreport, Indicatorvector, Orderintent, Pricetick, Reentrydecision, Signal — just the class name changes.)
+What this actually is (traced via evidence, not assumed)
+I traced this rather than guessing. Here’s what the evidence shows:
+	1.	Git history: the only commit touching this path is c399439 (2025-09-12): “feat(workflows): add template engine and codegen stubs; complete Phase 2”.
+	2.	The generator is branch-archive/main/workflows/orchestrator.py, specifically execute_codegen_action(): async def execute_codegen_action(self, action):
+	3.	    """Execute simple codegen: JSON schemas -> stub Pydantic models."""
+	4.	    to = action.get("to", "src/contracts/models/")
+	5.	    ...
+	6.	    for src_path in glob(...):
+	7.	        name = p.stem.split("@")[0]
+	8.	        class_name = "".join(part.capitalize() for part in name.replace("-", "_").split("_"))
+	9.	 This confirms: these 7 files are auto-generated stub placeholders, mechanically produced by globbing contracts/events/*.json (the real event schemas — CalendarEvent@1.0.json, ExecutionReport@1.0.json, IndicatorVector@1.1.json, OrderIntent@1.2.json, PriceTick@1.0.json, ReentryDecision@1.0.json, Signal@1.0.json), stripping the @version suffix, and title-casing the name into a class name. The generator only produces the class skeleton — it never populated fields from the actual schema’s properties.
+	10.	Nothing imports from this path. I grepped the whole repo for src.contracts.models / src/contracts/models imports — zero hits in live service code. Every real consumer (services/reentry-engine, services/transport-router, services/telemetry-daemon, etc.) imports the real, fully-fielded models instead: from contracts.models import TradeResult, ReentryDecision — i.e., the contracts/models/ package I broke down for you last time.
+Bottom line
+src/contracts/models/ is a dead codegen artifact from an abandoned Phase 2 workflow experiment — a one-time run of a template-engine stub generator that was never wired up to actually pull field definitions from the JSON schemas, and never adopted by any real service. It duplicates (in name only, not content) 7 of the 11 event/model concepts that already exist properly implemented in contracts/:
+src/contracts/models/ stub	Real implementation
+Calendarevent	contracts/events/...CalendarEvent@1.0.json + contracts.models.event_models.CalendarEvent
+Executionreport	same pattern → ExecutionReport
+Indicatorvector	same pattern → IndicatorVector
+Orderintent	same pattern → OrderIntent
+Pricetick	same pattern → PriceTick
+Reentrydecision	same pattern → ReentryDecision
+Signal	same pattern → Signal
+Recommendation for your ownership/registry work: this whole folder is a strong candidate for retain_empty_scaffold or outright deletion, not migration — it has zero real ownership claims, zero imports, zero functional content, and its origin (branch-archive/, a “Phase 2” experiment) suggests it predates the current 34-module architecture entirely. Given branch-archive/ is itself an archived branch snapshot living in the tree, I’d flag both src/contracts/ and the generator that produced it as candidates for the same cleanup pass that’s already trimming EAFIX_auth_docs/ from 57→42 files.

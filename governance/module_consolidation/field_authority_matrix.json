@@ -1,0 +1,150 @@
+{
+  "effective_baseline": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+  "rows": [
+    {
+      "active_authority_after_cutover": "<canonical-module-root>/manifest.json",
+      "conflict_rule": "Pinned .module-id and the exact 34-module universe must agree.",
+      "duplication_policy": "single_authority",
+      "fact_class": "module identity",
+      "mode": "authored",
+      "permitted_evidence_sources": [
+        "commit-pinned current authorities",
+        "complete reviewed sources",
+        "current code/tests for observations"
+      ]
+    },
+    {
+      "active_authority_after_cutover": "<canonical-module-root>/manifest.json",
+      "conflict_rule": "Preserve valid existing facts unless an evidenced decision changes them.",
+      "duplication_policy": "single_authority",
+      "fact_class": "module purpose",
+      "mode": "authored",
+      "permitted_evidence_sources": [
+        "commit-pinned current authorities",
+        "complete reviewed sources",
+        "current code/tests for observations"
+      ]
+    },
+    {
+      "active_authority_after_cutover": "<canonical-module-root>/manifest.json",
+      "conflict_rule": "Private cross-module access remains forbidden.",
+      "duplication_policy": "single_authority",
+      "fact_class": "module boundaries",
+      "mode": "authored",
+      "permitted_evidence_sources": [
+        "commit-pinned current authorities",
+        "complete reviewed sources",
+        "current code/tests for observations"
+      ]
+    },
+    {
+      "active_authority_after_cutover": "<canonical-module-root>/manifest.json",
+      "conflict_rule": "Do not turn observed implementation divergence into an intended behavior change.",
+      "duplication_policy": "single_authority",
+      "fact_class": "module behavior",
+      "mode": "authored",
+      "permitted_evidence_sources": [
+        "commit-pinned current authorities",
+        "complete reviewed sources",
+        "current code/tests for observations"
+      ]
+    },
+    {
+      "active_authority_after_cutover": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+      "conflict_rule": "Module entries cannot reauthor global topology.",
+      "duplication_policy": "prohibited",
+      "fact_class": "process step identity/order",
+      "mode": "referenced",
+      "permitted_evidence_sources": [
+        "commit-pinned current authorities",
+        "complete reviewed sources",
+        "current code/tests for observations"
+      ]
+    },
+    {
+      "active_authority_after_cutover": "contracts/ and specialized contract authorities",
+      "conflict_rule": "No invented schemas; resolve exact live references.",
+      "duplication_policy": "prohibited",
+      "fact_class": "shared contract schema",
+      "mode": "referenced",
+      "permitted_evidence_sources": [
+        "commit-pinned current authorities",
+        "complete reviewed sources",
+        "current code/tests for observations"
+      ]
+    },
+    {
+      "active_authority_after_cutover": "contracts/identifiers/ and active naming governance",
+      "conflict_rule": "No new permanent IDs or aliases without a governed decision.",
+      "duplication_policy": "prohibited",
+      "fact_class": "global identifier rules",
+      "mode": "referenced",
+      "permitted_evidence_sources": [
+        "commit-pinned current authorities",
+        "complete reviewed sources",
+        "current code/tests for observations"
+      ]
+    },
+    {
+      "active_authority_after_cutover": "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json",
+      "conflict_rule": "Local usage is declared in manifests; global fan-out only in the registry.",
+      "duplication_policy": "single_authority",
+      "fact_class": "shared-file consumer topology",
+      "mode": "authored",
+      "permitted_evidence_sources": [
+        "commit-pinned current authorities",
+        "complete reviewed sources",
+        "current code/tests for observations"
+      ]
+    },
+    {
+      "active_authority_after_cutover": "source code and tests at 2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "conflict_rule": "Commit-pinned evidence only; runtime verification remains separate.",
+      "duplication_policy": "single_authority",
+      "fact_class": "current implementation",
+      "mode": "observed",
+      "permitted_evidence_sources": [
+        "commit-pinned current authorities",
+        "complete reviewed sources",
+        "current code/tests for observations"
+      ]
+    },
+    {
+      "active_authority_after_cutover": "governance/module_consolidation/resolution_decisions.json",
+      "conflict_rule": "Every accepted change needs a decision and provenance.",
+      "duplication_policy": "single_authority",
+      "fact_class": "reconciliation decisions",
+      "mode": "authored",
+      "permitted_evidence_sources": [
+        "commit-pinned current authorities",
+        "complete reviewed sources",
+        "current code/tests for observations"
+      ]
+    },
+    {
+      "active_authority_after_cutover": "governance/module_consolidation/run/source_processing_ledger.jsonl",
+      "conflict_rule": "Fully scraped and safe-to-archive are independent.",
+      "duplication_policy": "single_authority",
+      "fact_class": "archive status",
+      "mode": "authored",
+      "permitted_evidence_sources": [
+        "commit-pinned current authorities",
+        "complete reviewed sources",
+        "current code/tests for observations"
+      ]
+    },
+    {
+      "active_authority_after_cutover": "root manifests plus global authorities",
+      "conflict_rule": "Never read back to overwrite a module authority.",
+      "duplication_policy": "one_way",
+      "fact_class": "generated projections",
+      "mode": "derived",
+      "permitted_evidence_sources": [
+        "commit-pinned current authorities",
+        "complete reviewed sources",
+        "current code/tests for observations"
+      ]
+    }
+  ],
+  "status": "approved_policy_pending_cutover"
+}

@@ -1,0 +1,62 @@
+.
+contracts/ — Full Breakdown
+This folder is the shared contract layer for the whole system: schemas, models, and validators that define the wire formats every module must speak. It’s referenced by nearly every one of the 34 module manifests (as "shared", not owned), which is consistent with what you’ve already found about the 19 modules claiming zero unique ownership.
+42 files, ~308K total. Structure:
+contracts/
+├── __init__.py
+├── 2099900014260118_validate_csv_artifacts.py   (impl, 20K)
+├── validate_csv_artifacts.py                     (ID-stripped shim)
+├── 2099900015260118_validate_json_schemas.py    (impl, 12K)
+├── validate_json_schemas.py                      (ID-stripped shim)
+├── events/          (7 files — event schema JSON)
+├── identifiers/     (5 files — ID format specs, markdown)
+├── models/          (9 files — Pydantic model impls + shims)
+├── policies/        (1 file — atomic write policy)
+├── schemas/
+│   ├── csv/         (4 files — CSV schema docs)
+│   └── json/        (4 files — JSON Schema files)
+└── triggers/         (8 files — ALVT automation-trigger contracts)
+1. Top-level validators (2099900014..., 2099900015... + shims)
+	•	CSVArtifactValidator (2099900014260118_validate_csv_artifacts.py): validates CSV artifacts against the 4 schema models (ActiveCalendarSignal, ReentryDecision, TradeResult, HealthMetric), checking headers, file_seq monotonicity, and checksum_sha256 integrity.
+	•	JSONSchemaValidator (2099900015260118_validate_json_schemas.py): validates JSON against schema files + Pydantic models using jsonschema.Draft202012Validator.
+	•	The clean-named validate_csv_artifacts.py / validate_json_schemas.py are ID-loader shims — they use importlib.util.spec_from_file_location to dynamically load the ID-prefixed implementation file and re-export it under a clean import name, then subclass it to add ID-prefix-aware filename parsing (e.g. detect_csv_type strips a leading \d+_ before matching). This is the exact same shim pattern flagged in your memory as the highest-risk migration dependency (services _id_loader.py pattern) — just implemented inline here rather than via a shared loader module.
+2. events/ — 7 event schema JSONs (Draft-07)
+Each is a versioned event contract with doc_id/_doc_id tags:
+	•	CalendarEvent@1.0, ExecutionReport@1.0, IndicatorVector@1.1, OrderIntent@1.2, PriceTick@1.0, ReentryDecision@1.0, Signal@1.0 All use additionalProperties: false and strict enums/patterns (e.g. symbol must match ^[A-Z]{6}$).
+3. identifiers/ — ID format specifications (markdown)
+	•	cal5_legacy.md — 5-char codes for medium-impact calendar events
+	•	cal8.md — CAL8_{CURRENCY}_{EVENT}_{IMPACT} format for high-impact events
+	•	hybrid_id.md — the reentry hybrid ID format ({OUTCOME}_{DURATION}_{PROXIMITY}_{CALENDAR_IMPACT}_{DIRECTION}_{SUFFIX}), with outcome/duration/proximity bucket tables
+	•	decision_id.md — defines decision_id as a 16-hex-char SHA-256 truncation of hybrid_id:timestamp, generated at step S24 (closes GAP-49)
+	•	strategy_id.md — clarifies strategy_id ≡ calendar_id (not a separate field), traces its carry-through across steps S4→S24 (closes GAP-48)
+4. models/ — Pydantic runtime models
+	•	2099900016260118_csv_models.py: BaseCSVModel, ActiveCalendarSignal, ReentryDecision, TradeResult, HealthMetric
+	•	2099900017260118_event_models.py: TradingSide, PriceTick, IndicatorVector, Signal, OrderSide, OrderIntent, ExecutionStatus, ExecutionReport, CalendarImpact, CalendarEvent, ReentryDecision
+	•	2099900018260118_json_models.py: threshold models (ZScoreThreshold, BandThreshold, PercentChangeThreshold), IndicatorRecord, OrderStatus, CloseReason, OrderIn, OrderOut, HybridId
+	•	csv_models.py / event_models.py / json_models.py: ID-loader shims for the above three
+	•	__init__.py: current package init, re-exports everything under stable names (aliases event-layer ReentryDecision as EventReentryDecision to avoid collision with the CSV-layer class of the same name)
+	•	2099900019260118___init__.py: an orphaned duplicate of __init__.py — same re-export logic, tagged DOC-MODEL-0007/DOC-CONTRACT-0007, but not actually used since Python only loads __init__.py. This looks like a leftover from the ID-prefixing migration that never got cleaned up — worth flagging as a candidate for removal in your dedup pass.
+5. policies/ — 1 file
+	•	csv_atomic_write.md: the full atomic-write spec (temp file → fsync() → atomic rename), file_seq/checksum_sha256 requirements, checksum algorithm, recovery procedures, and naming convention ({base_name}_YYYYMMDD_HHMMSS.csv).
+6. schemas/csv/ — 4 CSV schema docs (markdown)
+active_calendar_signals, health_metrics, reentry_decisions, trade_results — each documents required columns, constraints, and repeats the atomic write policy.
+7. schemas/json/ — 4 JSON Schema files (mixed draft versions)
+	•	hybrid_id.schema.json (Draft-07) — validates the hybrid ID structure/regexes
+	•	indicator_record.schema.json (2020-12) — the indicator definition schema with oneOf threshold kinds (zscore/band/percent_change)
+	•	orders_in.schema.json, orders_out.schema.json — EA↔Python bridge CSV row schemas (note: no $schema field declared, unlike the others — a minor inconsistency)
+8. triggers/ — ALVT (Automation Lifecycle Verification Tooling) contracts
+This is a distinct sub-system for verifying automation completeness, separate from the trading data contracts above:
+	•	automation_verification_architecture.md — defines Layer 0 (static integrity) / Layer 1 (graph connectivity) verification model
+	•	trigger_contract_template.yaml — reusable YAML template for defining new triggers
+	•	trigger.FILE_IDENTITY_CREATE.yaml — the concrete contract for the FILE_IDENTITY_CREATE trigger (owned by repo-autoops) — this is what assigns the 16-digit ID prefixes you see throughout the whole repo
+	•	run_alvt_pilot.md — runbook with exact commands/expected outputs
+	•	new_trigger_checklist.md — process for adding triggers after the pilot
+	•	pilot_baseline_locked.md — freezes FILE_IDENTITY_CREATE as the reference baseline (Layer 0+1 complete)
+	•	layer2_plus_backlog.md — backlog for Layer 2 (plan determinism) and beyond, not yet implemented
+	•	pilot_trigger_selection.md — original rationale for picking FILE_IDENTITY_CREATE as the pilot
+
+Notable findings for your governance work:
+	1.	models/2099900019260118___init__.py is a dead duplicate of models/__init__.py — safe removal candidate.
+	2.	The contracts/ folder is claimed as shared by essentially every module manifest, confirming it’s infrastructure, not owned by any single module — it probably belongs in your artifact/reuse registry rather than the module registry.
+	3.	The ID-loader shim pattern here (inline spec_from_file_location per shim) differs from the services/_id_loader.py centralized pattern noted in your memory — two different implementations of the same idea across the repo, which is itself worth a DEC-REG entry if you want one canonical pattern.
+	4.	orders_in.schema.json / orders_out.schema.json are missing $schema declarations that the other two JSON schemas have — small SSOT consistency gap.

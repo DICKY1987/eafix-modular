@@ -1,0 +1,605 @@
+{
+  "reviewed_blockers": [
+    {
+      "blocker_id": "BLOCK-LEGACY-VALIDATION-UNAVAILABLE",
+      "classification": "reviewed_evidence_blocker",
+      "decision_id": "DEC-027",
+      "evidence_refs": [
+        {
+          "json_pointer": null,
+          "lines": [
+            34,
+            40
+          ],
+          "path": "ci/2099900300260118_validate_atomic_module_manifests.py",
+          "sha256": "c933b0408c76705760d8211cb0edf9889c77f33c4680686deb2bb70b5873c6f3",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": null,
+          "lines": [
+            10,
+            40
+          ],
+          "path": "tests/test_generator_update.py",
+          "sha256": "b50cbe43d485724d7203dd987190a3c61cf03a22131c05e6bfcbe4f570891b3f",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": null,
+          "lines": [
+            8,
+            34
+          ],
+          "path": "tests/test_validator_update.py",
+          "sha256": "3e8b6447a0fd5850e75662f8a7ca7d0c6efe751b9d4e8dec6babf3103fe5e3c6",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        }
+      ],
+      "json_pointer": "/verification_commands",
+      "missing_evidence_or_decision": "A working, reviewed replacement validation route for v2, retirement/redirect of old generator and validator callers, and passing required CI checks. New offline structural checks do not waive the existing failures.",
+      "module": "all",
+      "next_action": "After specification reconciliation, replace legacy generation callers with read-only authority validation and one-way projection checks; update obsolete tests through a governed retirement decision; rerun the required suite without lowering its gate.",
+      "reason": "The existing atomic-manifest CI command fails because tools.manifest_generation.generate_manifests is absent. Repository-wide pytest also has three failing tests that import absent EA-REG generator/validator files. Its existing 85% coverage gate fails. These checks cannot certify a coordinated cutover.",
+      "resolution_state": "unresolved",
+      "responsible_decision_maker": "repository owner or delegated specification reviewer",
+      "severity": "blocking"
+    }
+  ],
+  "root_bundle_drift": [
+    {
+      "decision_id": "DEC-007",
+      "difference_count": 3,
+      "differences": [
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            {
+              "canonical_modules": [
+                "U1_DASHBOARD_BACKEND"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/dashboard-backend/src/2099900107260118_plugin.py",
+              "role": "plugin",
+              "service": "dashboard-backend"
+            },
+            {
+              "canonical_modules": [
+                "U1_DASHBOARD_BACKEND"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/dashboard-backend/src/2099900106260118_main.py",
+              "role": "entrypoint",
+              "service": "dashboard-backend"
+            },
+            {
+              "canonical_modules": [
+                "U1_DASHBOARD_BACKEND"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/dashboard-backend/src/2099900105260118_dashboard_backend.py",
+              "role": "other",
+              "service": "dashboard-backend"
+            },
+            {
+              "canonical_modules": [
+                "U1_DASHBOARD_BACKEND"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/dashboard-backend/src/2099900104260118_advanced_indicators.py",
+              "role": "other",
+              "service": "dashboard-backend"
+            },
+            {
+              "canonical_modules": [
+                "U1_DASHBOARD_BACKEND"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/dashboard-backend/src/2099900108260118_tkinter_dashboard_gui.py",
+              "role": "other",
+              "service": "dashboard-backend"
+            }
+          ],
+          "json_pointer": "/file_ownership/file_role_index",
+          "root_present": true,
+          "root_value": [
+            {
+              "canonical_modules": [
+                "U1_DASHBOARD_BACKEND"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/dashboard-backend/src/2099900107260118_plugin.py",
+              "role": "plugin",
+              "service": "dashboard-backend"
+            },
+            {
+              "canonical_modules": [
+                "U1_DASHBOARD_BACKEND"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/dashboard-backend/src/2099900106260118_main.py",
+              "role": "entrypoint",
+              "service": "dashboard-backend"
+            },
+            {
+              "canonical_modules": [
+                "U1_DASHBOARD_BACKEND"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/dashboard-backend/src/2099900105260118_dashboard_backend.py",
+              "role": "other",
+              "service": "dashboard-backend"
+            }
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            "services/dashboard-backend/src/2099900104260118_advanced_indicators.py",
+            "services/dashboard-backend/src/2099900105260118_dashboard_backend.py",
+            "services/dashboard-backend/src/2099900106260118_main.py",
+            "services/dashboard-backend/src/2099900107260118_plugin.py",
+            "services/dashboard-backend/src/2099900108260118_tkinter_dashboard_gui.py"
+          ],
+          "json_pointer": "/file_ownership/owned_files",
+          "root_present": true,
+          "root_value": [
+            "services/dashboard-backend/src/2099900105260118_dashboard_backend.py",
+            "services/dashboard-backend/src/2099900106260118_main.py",
+            "services/dashboard-backend/src/2099900107260118_plugin.py"
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            "services/dashboard-backend/src/2099900104260118_advanced_indicators.py",
+            "services/dashboard-backend/src/2099900105260118_dashboard_backend.py",
+            "services/dashboard-backend/src/2099900106260118_main.py",
+            "services/dashboard-backend/src/2099900107260118_plugin.py",
+            "services/dashboard-backend/src/2099900108260118_tkinter_dashboard_gui.py"
+          ],
+          "json_pointer": "/file_ownership/source_files",
+          "root_present": true,
+          "root_value": [
+            "services/dashboard-backend/src/2099900105260118_dashboard_backend.py",
+            "services/dashboard-backend/src/2099900106260118_main.py",
+            "services/dashboard-backend/src/2099900107260118_plugin.py"
+          ]
+        }
+      ],
+      "disposition": "preserve_root_default_pending_unique_claim_review",
+      "module_id": "50000000000000000028",
+      "module_short_id": "m0028"
+    },
+    {
+      "decision_id": "DEC-007",
+      "difference_count": 3,
+      "differences": [
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            "services/gui-gateway/src/2099900155260118_config.py"
+          ],
+          "json_pointer": "/file_ownership/configuration_files",
+          "root_present": true,
+          "root_value": [
+            "services/gui-gateway/src/2099900155260118_config.py",
+            "m0029-u2-gui-gateway/m0029-context/work-cells/UI_GATEWAY_REST_API_GATEWAY.json",
+            "m0029-u2-gui-gateway/m0029-context/work-cells/UI_GATEWAY_WEBSOCKET_GATEWAY.json"
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            {
+              "canonical_modules": [
+                "U2_GUI_GATEWAY"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/gui-gateway/src/2099900156260118_main.py",
+              "role": "entrypoint",
+              "service": "gui-gateway"
+            },
+            {
+              "canonical_modules": [
+                "U2_GUI_GATEWAY"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/gui-gateway/src/2099900158260118_plugin.py",
+              "role": "plugin",
+              "service": "gui-gateway"
+            },
+            {
+              "canonical_modules": [
+                "U2_GUI_GATEWAY"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/gui-gateway/src/2099900157260118_models.py",
+              "role": "models",
+              "service": "gui-gateway"
+            },
+            {
+              "canonical_modules": [
+                "U2_GUI_GATEWAY"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/gui-gateway/src/2099900155260118_config.py",
+              "role": "config",
+              "service": "gui-gateway"
+            }
+          ],
+          "json_pointer": "/file_ownership/file_role_index",
+          "root_present": true,
+          "root_value": [
+            {
+              "canonical_modules": [
+                "U2_GUI_GATEWAY"
+              ],
+              "is_test": false,
+              "notes": "Regenerated by MIG-0015",
+              "ownership": "owned",
+              "path": "m0029-u2-gui-gateway/m0029-context/work-cells/UI_GATEWAY_REST_API_GATEWAY.json",
+              "role": "work_cell_binding",
+              "service": "gui-gateway"
+            },
+            {
+              "canonical_modules": [
+                "U2_GUI_GATEWAY"
+              ],
+              "is_test": false,
+              "notes": "Regenerated by MIG-0016",
+              "ownership": "owned",
+              "path": "m0029-u2-gui-gateway/m0029-context/work-cells/UI_GATEWAY_WEBSOCKET_GATEWAY.json",
+              "role": "work_cell_binding",
+              "service": "gui-gateway"
+            },
+            {
+              "canonical_modules": [
+                "U2_GUI_GATEWAY"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/gui-gateway/src/2099900156260118_main.py",
+              "role": "entrypoint",
+              "service": "gui-gateway"
+            },
+            {
+              "canonical_modules": [
+                "U2_GUI_GATEWAY"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/gui-gateway/src/2099900158260118_plugin.py",
+              "role": "plugin",
+              "service": "gui-gateway"
+            },
+            {
+              "canonical_modules": [
+                "U2_GUI_GATEWAY"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/gui-gateway/src/2099900157260118_models.py",
+              "role": "models",
+              "service": "gui-gateway"
+            },
+            {
+              "canonical_modules": [
+                "U2_GUI_GATEWAY"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/gui-gateway/src/2099900155260118_config.py",
+              "role": "config",
+              "service": "gui-gateway"
+            }
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            "services/gui-gateway/src/2099900155260118_config.py",
+            "services/gui-gateway/src/2099900156260118_main.py",
+            "services/gui-gateway/src/2099900157260118_models.py",
+            "services/gui-gateway/src/2099900158260118_plugin.py"
+          ],
+          "json_pointer": "/file_ownership/owned_files",
+          "root_present": true,
+          "root_value": [
+            "services/gui-gateway/src/2099900155260118_config.py",
+            "services/gui-gateway/src/2099900156260118_main.py",
+            "services/gui-gateway/src/2099900157260118_models.py",
+            "services/gui-gateway/src/2099900158260118_plugin.py",
+            "m0029-u2-gui-gateway/m0029-context/work-cells/UI_GATEWAY_REST_API_GATEWAY.json",
+            "m0029-u2-gui-gateway/m0029-context/work-cells/UI_GATEWAY_WEBSOCKET_GATEWAY.json"
+          ]
+        }
+      ],
+      "disposition": "preserve_root_default_pending_unique_claim_review",
+      "module_id": "50000000000000000029",
+      "module_short_id": "m0029"
+    },
+    {
+      "decision_id": "DEC-007",
+      "difference_count": 4,
+      "differences": [
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            {
+              "canonical_modules": [
+                "U4_DESKTOP_OPERATOR"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/desktop-ui/2099900130260118_friday_vol_indicator.py",
+              "role": "other",
+              "service": "desktop-ui"
+            },
+            {
+              "canonical_modules": [
+                "U4_DESKTOP_OPERATOR"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/desktop-ui/2099900135260118_tkinter_dashboard_gui.py",
+              "role": "other",
+              "service": "desktop-ui"
+            },
+            {
+              "canonical_modules": [
+                "U4_DESKTOP_OPERATOR"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/desktop-ui/2099900131260118_friday_vol_signal.py",
+              "role": "other",
+              "service": "desktop-ui"
+            },
+            {
+              "canonical_modules": [
+                "U4_DESKTOP_OPERATOR"
+              ],
+              "is_test": true,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/desktop-ui/2099900134260118_test_friday_vol_signal.py",
+              "role": "test",
+              "service": "desktop-ui"
+            },
+            {
+              "canonical_modules": [
+                "U4_DESKTOP_OPERATOR"
+              ],
+              "is_test": true,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/desktop-ui/2099900133260118_test_friday_vol_indicator.py",
+              "role": "test",
+              "service": "desktop-ui"
+            },
+            {
+              "canonical_modules": [
+                "U4_DESKTOP_OPERATOR"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/desktop-ui/2099900132260118_outbound.py",
+              "role": "other",
+              "service": "desktop-ui"
+            },
+            {
+              "canonical_modules": [
+                "U4_DESKTOP_OPERATOR"
+              ],
+              "is_test": true,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/desktop-ui/testing/2099900137260118_manual_testing_control_panel.py",
+              "role": "test",
+              "service": "desktop-ui"
+            },
+            {
+              "canonical_modules": [
+                "U4_DESKTOP_OPERATOR"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/desktop-ui/dashboard/2099900136260118_tkinter_dashboard_gui.py",
+              "role": "other",
+              "service": "desktop-ui"
+            }
+          ],
+          "json_pointer": "/file_ownership/file_role_index",
+          "root_present": true,
+          "root_value": [
+            {
+              "canonical_modules": [
+                "U4_DESKTOP_OPERATOR"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/desktop-ui/2099900130260118_friday_vol_indicator.py",
+              "role": "other",
+              "service": "desktop-ui"
+            },
+            {
+              "canonical_modules": [
+                "U4_DESKTOP_OPERATOR"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/desktop-ui/2099900135260118_tkinter_dashboard_gui.py",
+              "role": "other",
+              "service": "desktop-ui"
+            },
+            {
+              "canonical_modules": [
+                "U4_DESKTOP_OPERATOR"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/desktop-ui/2099900131260118_friday_vol_signal.py",
+              "role": "other",
+              "service": "desktop-ui"
+            },
+            {
+              "canonical_modules": [
+                "U4_DESKTOP_OPERATOR"
+              ],
+              "is_test": true,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/desktop-ui/2099900134260118_test_friday_vol_signal.py",
+              "role": "test",
+              "service": "desktop-ui"
+            },
+            {
+              "canonical_modules": [
+                "U4_DESKTOP_OPERATOR"
+              ],
+              "is_test": true,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/desktop-ui/2099900133260118_test_friday_vol_indicator.py",
+              "role": "test",
+              "service": "desktop-ui"
+            },
+            {
+              "canonical_modules": [
+                "U4_DESKTOP_OPERATOR"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/desktop-ui/2099900132260118_outbound.py",
+              "role": "other",
+              "service": "desktop-ui"
+            },
+            {
+              "canonical_modules": [
+                "U4_DESKTOP_OPERATOR"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/desktop-ui/dashboard/2099900136260118_tkinter_dashboard_gui.py",
+              "role": "other",
+              "service": "desktop-ui"
+            },
+            {
+              "canonical_modules": [
+                "DESKTOP_OPERATOR"
+              ],
+              "is_test": false,
+              "notes": "Relocated by MIG-0008",
+              "ownership": "owned",
+              "path": "m0031-u4-desktop-operator/m0031-src/frontend/tkinter_dashboard_gui.py",
+              "role": "source",
+              "service": "m0031-u4-desktop-operator"
+            }
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            "services/desktop-ui/2099900130260118_friday_vol_indicator.py",
+            "services/desktop-ui/2099900131260118_friday_vol_signal.py",
+            "services/desktop-ui/2099900132260118_outbound.py",
+            "services/desktop-ui/2099900133260118_test_friday_vol_indicator.py",
+            "services/desktop-ui/2099900134260118_test_friday_vol_signal.py",
+            "services/desktop-ui/2099900135260118_tkinter_dashboard_gui.py",
+            "services/desktop-ui/dashboard/2099900136260118_tkinter_dashboard_gui.py",
+            "services/desktop-ui/testing/2099900137260118_manual_testing_control_panel.py"
+          ],
+          "json_pointer": "/file_ownership/owned_files",
+          "root_present": true,
+          "root_value": [
+            "services/desktop-ui/2099900130260118_friday_vol_indicator.py",
+            "services/desktop-ui/2099900131260118_friday_vol_signal.py",
+            "services/desktop-ui/2099900132260118_outbound.py",
+            "services/desktop-ui/2099900133260118_test_friday_vol_indicator.py",
+            "services/desktop-ui/2099900134260118_test_friday_vol_signal.py",
+            "services/desktop-ui/2099900135260118_tkinter_dashboard_gui.py",
+            "services/desktop-ui/dashboard/2099900136260118_tkinter_dashboard_gui.py",
+            "m0031-u4-desktop-operator/m0031-src/frontend/tkinter_dashboard_gui.py"
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            "services/desktop-ui/2099900130260118_friday_vol_indicator.py",
+            "services/desktop-ui/2099900131260118_friday_vol_signal.py",
+            "services/desktop-ui/2099900132260118_outbound.py",
+            "services/desktop-ui/2099900135260118_tkinter_dashboard_gui.py",
+            "services/desktop-ui/dashboard/2099900136260118_tkinter_dashboard_gui.py"
+          ],
+          "json_pointer": "/file_ownership/source_files",
+          "root_present": true,
+          "root_value": [
+            "services/desktop-ui/2099900130260118_friday_vol_indicator.py",
+            "services/desktop-ui/2099900131260118_friday_vol_signal.py",
+            "services/desktop-ui/2099900132260118_outbound.py",
+            "services/desktop-ui/2099900135260118_tkinter_dashboard_gui.py",
+            "services/desktop-ui/dashboard/2099900136260118_tkinter_dashboard_gui.py",
+            "m0031-u4-desktop-operator/m0031-src/frontend/tkinter_dashboard_gui.py"
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            "services/desktop-ui/2099900133260118_test_friday_vol_indicator.py",
+            "services/desktop-ui/2099900134260118_test_friday_vol_signal.py",
+            "services/desktop-ui/testing/2099900137260118_manual_testing_control_panel.py"
+          ],
+          "json_pointer": "/file_ownership/test_files",
+          "root_present": true,
+          "root_value": [
+            "services/desktop-ui/2099900133260118_test_friday_vol_indicator.py",
+            "services/desktop-ui/2099900134260118_test_friday_vol_signal.py"
+          ]
+        }
+      ],
+      "disposition": "preserve_root_default_pending_unique_claim_review",
+      "module_id": "50000000000000000031",
+      "module_short_id": "m0031"
+    }
+  ],
+  "state": "unresolved"
+}

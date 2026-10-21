@@ -1,0 +1,1170 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "module_location_action_manifest",
+  "repository": "DICKY1987/eafix-modular",
+  "commit_sha": "963ff6df522b3aac421e1b55115548009849141a",
+  "record_count": 86,
+  "actions": [
+    {
+      "source_path": ".claude/1199900001260118_settings.local.json",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": ".claude/1199900001260118_settings.local.json",
+      "supporting_modules": [],
+      "migration_notes": "Do not assign to F1 merely because the file contains settings.",
+      "validation_required": [
+        "confirm no module-local assumptions"
+      ]
+    },
+    {
+      "source_path": "CLI_PY_GUI/gui/Operator_Guide.md",
+      "approved_disposition": "retain_tool_scope",
+      "approved_module_short_id": null,
+      "target_path": "CLI_PY_GUI/gui/Operator_Guide.md",
+      "supporting_modules": [],
+      "migration_notes": "Not the trading-system U4 operator interface.",
+      "validation_required": []
+    },
+    {
+      "source_path": "CLI_PY_GUI/gui_terminal/src/gui_terminal/config/settings.py",
+      "approved_disposition": "retain_tool_scope",
+      "approved_module_short_id": null,
+      "target_path": "CLI_PY_GUI/gui_terminal/src/gui_terminal/config/settings.py",
+      "supporting_modules": [],
+      "migration_notes": "Not F1 trading configuration and not U4 trading UI implementation.",
+      "validation_required": []
+    },
+    {
+      "source_path": "EAFIX_auth_docs/04_mt4_bridge_and_execution/MT4_Python communication channels.txt",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "EAFIX_auth_docs/04_mt4_bridge_and_execution/MT4_Python communication channels.txt",
+      "supporting_modules": [
+        "m0007",
+        "m0016",
+        "m0017",
+        "m0030",
+        "m0031"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "EAFIX_auth_docs/05_calendar_system/0110000079260118_econ_spec_standardized.md",
+      "approved_disposition": "retain_global_supporting_reference",
+      "approved_module_short_id": null,
+      "target_path": "EAFIX_auth_docs/05_calendar_system/0110000079260118_econ_spec_standardized.md",
+      "supporting_modules": [
+        "m0003",
+        "m0004",
+        "m0006",
+        "m0013",
+        "m0021",
+        "m0022",
+        "m0023",
+        "m0024"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "EAFIX_auth_docs/05_calendar_system/0199900001260118_Economic Calendar Integration Framework.md",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "EAFIX_auth_docs/05_calendar_system/0199900001260118_Economic Calendar Integration Framework.md",
+      "supporting_modules": [
+        "m0003",
+        "m0004",
+        "m0005",
+        "m0006",
+        "m0021",
+        "m0022",
+        "m0023",
+        "m0024"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "EAFIX_auth_docs/06_strategy_signal_risk_reentry_oms/0110000074260118_06_signal_model_mapping.md",
+      "approved_disposition": "move",
+      "approved_module_short_id": "m0023",
+      "target_path": "m0023-e3-matrix-lookup/m0023-docs/architecture/0110000074260118_06_signal_model_mapping.md",
+      "supporting_modules": [
+        "m0011",
+        "m0021",
+        "m0022",
+        "m0024"
+      ],
+      "migration_notes": "",
+      "validation_required": [
+        "update documentation links",
+        "verify no canonical global authority conflict"
+      ]
+    },
+    {
+      "source_path": "EAFIX_auth_docs/08_operations_runbooks_and_incidents/0110000048260118_market-open-close.md",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "EAFIX_auth_docs/08_operations_runbooks_and_incidents/0110000048260118_market-open-close.md",
+      "supporting_modules": [
+        "m0002",
+        "m0013",
+        "m0025",
+        "m0026",
+        "m0032"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "EAFIX_auth_docs/08_operations_runbooks_and_incidents/0110000051260118_service-health.md",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "EAFIX_auth_docs/08_operations_runbooks_and_incidents/0110000051260118_service-health.md",
+      "supporting_modules": [
+        "m0026"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "EAFIX_auth_docs/09_product_requirements_and_design/0110000076260118_07_transport_bridge_contracts.md",
+      "approved_disposition": "move",
+      "approved_module_short_id": "m0016",
+      "target_path": "m0016-b1-mt4-adapter-transport/m0016-docs/architecture/0110000076260118_07_transport_bridge_contracts.md",
+      "supporting_modules": [
+        "m0017"
+      ],
+      "migration_notes": "",
+      "validation_required": [
+        "update links",
+        "verify contract references remain global"
+      ]
+    },
+    {
+      "source_path": "contracts/events/1199900006260118_OrderIntent@1.2.json",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "contracts/events/1199900006260118_OrderIntent@1.2.json",
+      "supporting_modules": [
+        "m0014",
+        "m0015",
+        "m0016"
+      ],
+      "migration_notes": "Record m0014 as producer/steward in the contract registry; do not duplicate under modules.",
+      "validation_required": []
+    },
+    {
+      "source_path": "contracts/events/1199900009260118_Signal@1.0.json",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "contracts/events/1199900009260118_Signal@1.0.json",
+      "supporting_modules": [
+        "m0011",
+        "m0012"
+      ],
+      "migration_notes": "Record m0011 as producer/steward.",
+      "validation_required": []
+    },
+    {
+      "source_path": "contracts/identifiers/0199900023260118_cal5_legacy.md",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "contracts/identifiers/0199900023260118_cal5_legacy.md",
+      "supporting_modules": [
+        "m0004",
+        "m0006",
+        "m0023"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "contracts/identifiers/0199900024260118_cal8.md",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "contracts/identifiers/0199900024260118_cal8.md",
+      "supporting_modules": [
+        "m0004",
+        "m0006",
+        "m0023"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "contracts/identifiers/0199900025260118_hybrid_id.md",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "contracts/identifiers/0199900025260118_hybrid_id.md",
+      "supporting_modules": [
+        "m0021",
+        "m0022",
+        "m0023",
+        "m0024"
+      ],
+      "migration_notes": "Use m0023 as contract steward, not exclusive physical owner.",
+      "validation_required": []
+    },
+    {
+      "source_path": "contracts/identifiers/decision_id.md",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "contracts/identifiers/decision_id.md",
+      "supporting_modules": [
+        "m0024",
+        "m0023"
+      ],
+      "migration_notes": "Record m0024 as producer/steward.",
+      "validation_required": []
+    },
+    {
+      "source_path": "contracts/identifiers/strategy_id.md",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "contracts/identifiers/strategy_id.md",
+      "supporting_modules": [
+        "m0004",
+        "m0006",
+        "m0011",
+        "m0012",
+        "m0013",
+        "m0024"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "contracts/schemas/csv/0199900027260118_active_calendar_signals.csv.md",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "contracts/schemas/csv/0199900027260118_active_calendar_signals.csv.md",
+      "supporting_modules": [
+        "m0006",
+        "m0005",
+        "m0011",
+        "m0022"
+      ],
+      "migration_notes": "Record m0006 as producer/steward.",
+      "validation_required": []
+    },
+    {
+      "source_path": "contracts/schemas/csv/0199900028260118_health_metrics.csv.md",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "contracts/schemas/csv/0199900028260118_health_metrics.csv.md",
+      "supporting_modules": [
+        "m0026"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "contracts/schemas/csv/0199900029260118_reentry_decisions.csv.md",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "contracts/schemas/csv/0199900029260118_reentry_decisions.csv.md",
+      "supporting_modules": [
+        "m0023",
+        "m0024"
+      ],
+      "migration_notes": "Record m0024 as producer/steward.",
+      "validation_required": []
+    },
+    {
+      "source_path": "contracts/schemas/csv/0199900030260118_trade_results.csv.md",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "contracts/schemas/csv/0199900030260118_trade_results.csv.md",
+      "supporting_modules": [
+        "m0017",
+        "m0018",
+        "m0020",
+        "m0021"
+      ],
+      "migration_notes": "Use B3 as canonical-normalization steward while retaining B2 as raw producer.",
+      "validation_required": []
+    },
+    {
+      "source_path": "contracts/schemas/json/1199900010260118_hybrid_id.schema.json",
+      "approved_disposition": "retain_global_and_rename",
+      "approved_module_short_id": null,
+      "target_path": "contracts/schemas/json/1199900010260118_reentry_key.schema.json",
+      "supporting_modules": [
+        "m0016",
+        "m0017",
+        "m0023"
+      ],
+      "migration_notes": "Rename to prevent semantic collision; B1 is boundary steward.",
+      "validation_required": [
+        "update schema refs",
+        "run contract tests",
+        "verify MQL4 compatibility"
+      ]
+    },
+    {
+      "source_path": "contracts/schemas/json/1199900011260118_indicator_record.schema.json",
+      "approved_disposition": "move",
+      "approved_module_short_id": "m0009",
+      "target_path": "m0009-c2-indicator-engine/m0009-schemas/inputs/1199900011260118_indicator_record.schema.json",
+      "supporting_modules": [
+        "m0010"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "contracts/schemas/json/1199900012260118_orders_in.schema.json",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "contracts/schemas/json/1199900012260118_orders_in.schema.json",
+      "supporting_modules": [
+        "m0017",
+        "m0018"
+      ],
+      "migration_notes": "Record B3 as canonicalization steward and B2 as producer.",
+      "validation_required": []
+    },
+    {
+      "source_path": "contracts/schemas/json/1199900013260118_orders_out.schema.json",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "contracts/schemas/json/1199900013260118_orders_out.schema.json",
+      "supporting_modules": [
+        "m0016",
+        "m0017"
+      ],
+      "migration_notes": "Record m0016 as producer/steward.",
+      "validation_required": []
+    },
+    {
+      "source_path": "docs/bridge_contracts.md",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "docs/bridge_contracts.md",
+      "supporting_modules": [],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "docs/reference/1110000003260118_indicator_record.schema.json",
+      "approved_disposition": "replace_with_generated_projection",
+      "approved_module_short_id": null,
+      "target_path": "docs/reference/generated/indicator_record.schema.json",
+      "supporting_modules": [
+        "m0009"
+      ],
+      "migration_notes": "",
+      "validation_required": [
+        "compare hashes/semantics",
+        "update generator",
+        "remove duplicate authority"
+      ]
+    },
+    {
+      "source_path": "docs/reference/1110000004260118_indicator_records_full.json",
+      "approved_disposition": "move",
+      "approved_module_short_id": "m0009",
+      "target_path": "m0009-c2-indicator-engine/m0009-config/indicator_records_full.json",
+      "supporting_modules": [],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "docs/reference/1110000005260118_indicator_records_sample.json",
+      "approved_disposition": "move",
+      "approved_module_short_id": "m0009",
+      "target_path": "m0009-c2-indicator-engine/m0009-schemas/examples/indicator_records_sample.json",
+      "supporting_modules": [],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/dashboard-backend/src/2099900104260118_advanced_indicators.py",
+      "approved_disposition": "move",
+      "approved_module_short_id": "m0009",
+      "target_path": "m0009-c2-indicator-engine/m0009-src/c2_indicator_engine/advanced_indicators.py",
+      "supporting_modules": [
+        "m0028"
+      ],
+      "migration_notes": "",
+      "validation_required": [
+        "update imports",
+        "run C2 and dashboard tests"
+      ]
+    },
+    {
+      "source_path": "services/dashboard-backend/src/2099900108260118_tkinter_dashboard_gui.py",
+      "approved_disposition": "move",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-src/frontend/tkinter_dashboard_gui.py",
+      "supporting_modules": [
+        "m0028"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_GATEWAY_REST_API_GATEWAY.json",
+      "approved_disposition": "regenerate_then_move",
+      "approved_module_short_id": "m0029",
+      "target_path": "m0029-u2-gui-gateway/m0029-context/work-cells/UI_GATEWAY_REST_API_GATEWAY.json",
+      "supporting_modules": [
+        "m0028"
+      ],
+      "migration_notes": "Regenerate source_files; the current dashboard-backend list is over-broad.",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_GATEWAY_WEBSOCKET_GATEWAY.json",
+      "approved_disposition": "regenerate_then_move",
+      "approved_module_short_id": "m0029",
+      "target_path": "m0029-u2-gui-gateway/m0029-context/work-cells/UI_GATEWAY_WEBSOCKET_GATEWAY.json",
+      "supporting_modules": [
+        "m0028"
+      ],
+      "migration_notes": "Regenerate source_files and tests.",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_ALERTS.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_ALERTS.json",
+      "supporting_modules": [
+        "m0028",
+        "m0029"
+      ],
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ]
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_CONFIGURATION.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_CONFIGURATION.json",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0001"
+      ],
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ]
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_DDE_PRICE_FEED.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_DDE_PRICE_FEED.json",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0007"
+      ],
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ]
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_ECONOMIC_CALENDAR.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_ECONOMIC_CALENDAR.json",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0003",
+        "m0004",
+        "m0006"
+      ],
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ]
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_EQUITY_RISK.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_EQUITY_RISK.json",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0013",
+        "m0027"
+      ],
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ]
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_HISTORY_ANALYTICS.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_HISTORY_ANALYTICS.json",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0032"
+      ],
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ]
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_LIVE_TRADING.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_LIVE_TRADING.json",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0019",
+        "m0020"
+      ],
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ]
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_REENTRY_MATRIX.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_REENTRY_MATRIX.json",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0023",
+        "m0024"
+      ],
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ]
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_SIGNALS_HISTORY.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_SIGNALS_HISTORY.json",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0011"
+      ],
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ]
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_SYSTEM_STATUS.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_SYSTEM_STATUS.json",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0026"
+      ],
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ]
+    },
+    {
+      "source_path": "services/dashboard-backend/work_cells/UI_UI_SCREEN_TRADE_HISTORY.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_TRADE_HISTORY.json",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0020",
+        "m0032"
+      ],
+      "migration_notes": "Create one canonical U4 record per work_cell_id and remove service-folder duplicates.",
+      "validation_required": [
+        "rebuild source/test references",
+        "validate UI catalog linkage"
+      ]
+    },
+    {
+      "source_path": "services/desktop-ui/1199900030260118_settings.friday_move.overlay.json",
+      "approved_disposition": "split",
+      "approved_module_short_id": null,
+      "target_path": null,
+      "supporting_modules": [
+        "m0009",
+        "m0011",
+        "m0013"
+      ],
+      "migration_notes": "Split indicator computation and threshold/window fields to m0009-c2-indicator-engine/m0009-config/indicators/friday_move.json; split signal enablement/overlay fields to m0011-s1-signal-engine/m0011-config/signals/friday_move.json. Retain only a reference to the R1-owned risk profile.",
+      "validation_required": [
+        "define split schema",
+        "update consumers",
+        "validate equivalent behavior"
+      ]
+    },
+    {
+      "source_path": "services/desktop-ui/work_cells/UI_UI_SCREEN_DDE_PRICE_FEED.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_DDE_PRICE_FEED.json",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0007"
+      ],
+      "migration_notes": "Merge by work_cell_id and remove duplicate service copy.",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/desktop-ui/work_cells/UI_UI_SCREEN_HISTORY_ANALYTICS.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_HISTORY_ANALYTICS.json",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0032"
+      ],
+      "migration_notes": "Merge by work_cell_id and remove duplicate service copy.",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/desktop-ui/work_cells/UI_UI_SCREEN_REENTRY_MATRIX.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_REENTRY_MATRIX.json",
+      "supporting_modules": [
+        "m0028",
+        "m0029",
+        "m0023",
+        "m0024"
+      ],
+      "migration_notes": "Merge by work_cell_id and remove duplicate service copy.",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/execution-engine/work_cells/EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT.json",
+      "approved_disposition": "regenerate_then_move",
+      "approved_module_short_id": "m0017",
+      "target_path": "m0017-b2-mt4-ea-executor/m0017-context/work-cells/EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT.json",
+      "supporting_modules": [
+        "m0016",
+        "m0018"
+      ],
+      "migration_notes": "Regenerate source_files because the current binding lists only a Python plugin.",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_ALERTS.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_ALERTS.json",
+      "supporting_modules": [
+        "m0029",
+        "m0028"
+      ],
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_CONFIGURATION.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_CONFIGURATION.json",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0001"
+      ],
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_DDE_PRICE_FEED.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_DDE_PRICE_FEED.json",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0007"
+      ],
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_ECONOMIC_CALENDAR.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_ECONOMIC_CALENDAR.json",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0003",
+        "m0004",
+        "m0006"
+      ],
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_EQUITY_RISK.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_EQUITY_RISK.json",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0013",
+        "m0027"
+      ],
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_HISTORY_ANALYTICS.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_HISTORY_ANALYTICS.json",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0032"
+      ],
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_LIVE_TRADING.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_LIVE_TRADING.json",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0019",
+        "m0020"
+      ],
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_REENTRY_MATRIX.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_REENTRY_MATRIX.json",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0023",
+        "m0024"
+      ],
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_SIGNALS_HISTORY.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_SIGNALS_HISTORY.json",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0011"
+      ],
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_SYSTEM_STATUS.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_SYSTEM_STATUS.json",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0026"
+      ],
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/gui-gateway/work_cells/UI_UI_SCREEN_TRADE_HISTORY.json",
+      "approved_disposition": "merge_into_canonical_generated_record",
+      "approved_module_short_id": "m0031",
+      "target_path": "m0031-u4-desktop-operator/m0031-context/work-cells/UI_UI_SCREEN_TRADE_HISTORY.json",
+      "supporting_modules": [
+        "m0029",
+        "m0028",
+        "m0020",
+        "m0032"
+      ],
+      "migration_notes": "Create one canonical U4 record and remove this GUI-gateway duplicate.",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/reentry-engine/work_cells/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json",
+      "approved_disposition": "move",
+      "approved_module_short_id": "m0024",
+      "target_path": "m0024-e4-reentry-intent-builder/m0024-context/work-cells/E4_REENTRY_INTENT_BUILDER__CHAIN_LIMITS_AND_SUPPRESSION.json",
+      "supporting_modules": [
+        "m0023"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/risk-manager/work_cells/R1_4_CORRELATION_GUARDS.json",
+      "approved_disposition": "reclassify_then_move",
+      "approved_module_short_id": "m0027",
+      "target_path": "m0027-r3-correlation-guard/m0027-context/work-cells/R1_4_CORRELATION_GUARDS.json",
+      "supporting_modules": [
+        "m0013"
+      ],
+      "migration_notes": "Preserve R1_4 as a legacy alias/work-cell ID or rename through governance.",
+      "validation_required": []
+    },
+    {
+      "source_path": "services/risk-manager/work_cells/R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION.json",
+      "approved_disposition": "reclassify_then_move",
+      "approved_module_short_id": "m0034",
+      "target_path": "m0034-sk2-idempotency/m0034-context/work-cells/R1_7_IDEMPOTENCY_DUPLICATE_ORDER_PREVENTION.json",
+      "supporting_modules": [
+        "m0013",
+        "m0014",
+        "m0016"
+      ],
+      "migration_notes": "Preserve R1_7 as legacy identity metadata.",
+      "validation_required": []
+    },
+    {
+      "source_path": "shared/reentry/1199900031260118_reentry_vocab.json",
+      "approved_disposition": "move",
+      "approved_module_short_id": "m0023",
+      "target_path": "m0023-e3-matrix-lookup/m0023-config/reentry_vocab.json",
+      "supporting_modules": [
+        "m0021",
+        "m0022",
+        "m0024"
+      ],
+      "migration_notes": "Expose it as a versioned E3 public contract/configuration and reference it from other E modules.",
+      "validation_required": []
+    },
+    {
+      "source_path": "shared/reentry/2099900218260118_hybrid_id.py",
+      "approved_disposition": "consolidate_then_move",
+      "approved_module_short_id": "m0023",
+      "target_path": "m0023-e3-matrix-lookup/m0023-src/e3_matrix_lookup/hybrid_id.py",
+      "supporting_modules": [
+        "m0021",
+        "m0022",
+        "m0024",
+        "m0016",
+        "m0017"
+      ],
+      "migration_notes": "Merge behavior with the clean wrapper before moving; retain an old-path compatibility shim temporarily.",
+      "validation_required": [
+        "round-trip tests",
+        "cross-language parity tests",
+        "import scan"
+      ]
+    },
+    {
+      "source_path": "shared/reentry/2099900219260118_indicator_validator.py",
+      "approved_disposition": "consolidate_then_move",
+      "approved_module_short_id": "m0009",
+      "target_path": "m0009-c2-indicator-engine/m0009-src/c2_indicator_engine/indicator_validator.py",
+      "supporting_modules": [
+        "m0023"
+      ],
+      "migration_notes": "It is misplaced in shared/reentry; update default schema path to the C2 module-local schema.",
+      "validation_required": [
+        "C2 schema tests",
+        "import scan"
+      ]
+    },
+    {
+      "source_path": "shared/reentry/2099900220260118_reentry_helpers_cli.py",
+      "approved_disposition": "split",
+      "approved_module_short_id": null,
+      "target_path": null,
+      "supporting_modules": [
+        "m0023",
+        "m0009"
+      ],
+      "migration_notes": "Move key commands to m0023-e3-matrix-lookup/m0023-scripts/reentry_key_cli.py; move indicator validation command to m0009-c2-indicator-engine/m0009-scripts/validate_indicator_records.py.",
+      "validation_required": [
+        "CLI command compatibility",
+        "update documentation",
+        "remove stale reentry_helpers imports"
+      ]
+    },
+    {
+      "source_path": "shared/reentry/2099900221260118_vocab.py",
+      "approved_disposition": "consolidate_then_move",
+      "approved_module_short_id": "m0023",
+      "target_path": "m0023-e3-matrix-lookup/m0023-src/e3_matrix_lookup/vocab.py",
+      "supporting_modules": [
+        "m0021",
+        "m0022",
+        "m0024"
+      ],
+      "migration_notes": "Merge wrapper path handling before migration.",
+      "validation_required": []
+    },
+    {
+      "source_path": "shared/reentry/2099900222260118___init__.py",
+      "approved_disposition": "delete_after_validation",
+      "approved_module_short_id": null,
+      "target_path": null,
+      "supporting_modules": [
+        "m0023",
+        "m0009"
+      ],
+      "migration_notes": "",
+      "validation_required": [
+        "repository reference search",
+        "document-ID registry update",
+        "import tests"
+      ]
+    },
+    {
+      "source_path": "shared/reentry/__init__.py",
+      "approved_disposition": "retain_compatibility_layer_then_remove",
+      "approved_module_short_id": null,
+      "target_path": "shared/reentry/__init__.py",
+      "supporting_modules": [
+        "m0023",
+        "m0009"
+      ],
+      "migration_notes": "After moving implementations, reexport from module packages during a deprecation window, then remove.",
+      "validation_required": []
+    },
+    {
+      "source_path": "shared/reentry/_id_loader.py",
+      "approved_disposition": "retain_compatibility_layer_then_remove",
+      "approved_module_short_id": null,
+      "target_path": "shared/reentry/_id_loader.py",
+      "supporting_modules": [
+        "m0023",
+        "m0009"
+      ],
+      "migration_notes": "Remove after imports migrate and canonical module files no longer require dynamic loading.",
+      "validation_required": []
+    },
+    {
+      "source_path": "shared/reentry/hybrid_id.py",
+      "approved_disposition": "merge_into_canonical_module_source",
+      "approved_module_short_id": "m0023",
+      "target_path": "m0023-e3-matrix-lookup/m0023-src/e3_matrix_lookup/hybrid_id.py",
+      "supporting_modules": [
+        "m0021",
+        "m0022",
+        "m0024"
+      ],
+      "migration_notes": "Merge with the ID-prefixed implementation; leave a thin old-path reexport temporarily.",
+      "validation_required": []
+    },
+    {
+      "source_path": "shared/reentry/indicator_validator.py",
+      "approved_disposition": "merge_into_canonical_module_source",
+      "approved_module_short_id": "m0009",
+      "target_path": "m0009-c2-indicator-engine/m0009-src/c2_indicator_engine/indicator_validator.py",
+      "supporting_modules": [
+        "m0023"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "shared/reentry/vocab.py",
+      "approved_disposition": "merge_into_canonical_module_source",
+      "approved_module_short_id": "m0023",
+      "target_path": "m0023-e3-matrix-lookup/m0023-src/e3_matrix_lookup/vocab.py",
+      "supporting_modules": [
+        "m0021",
+        "m0022",
+        "m0024"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "src/contracts/models/Orderintent.py",
+      "approved_disposition": "delete_after_validation",
+      "approved_module_short_id": null,
+      "target_path": null,
+      "supporting_modules": [
+        "m0014"
+      ],
+      "migration_notes": "",
+      "validation_required": [
+        "confirm no dynamic loaders or packaging inclusion",
+        "disable obsolete generator"
+      ]
+    },
+    {
+      "source_path": "src/contracts/models/Signal.py",
+      "approved_disposition": "delete_after_validation",
+      "approved_module_short_id": null,
+      "target_path": null,
+      "supporting_modules": [
+        "m0011"
+      ],
+      "migration_notes": "",
+      "validation_required": [
+        "confirm no dynamic loaders or packaging inclusion",
+        "disable obsolete generator"
+      ]
+    },
+    {
+      "source_path": "tests/2099900223260118_test_plugin_system.py",
+      "approved_disposition": "move",
+      "approved_module_short_id": "m0033",
+      "target_path": "m0033-sk1-plugin-interface/m0033-tests/unit/test_plugin_system.py",
+      "supporting_modules": [],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "tests/contracts/consumer/2099900229260118_test_signal_generator_contracts.py",
+      "approved_disposition": "rewrite_split_then_move",
+      "approved_module_short_id": "m0011",
+      "target_path": "m0011-s1-signal-engine/m0011-tests/contract/test_signal_engine_contracts.py",
+      "supporting_modules": [
+        "m0009",
+        "m0003",
+        "m0004",
+        "m0012",
+        "m0013"
+      ],
+      "migration_notes": "Rewrite S1 provider/consumer contracts; move intent/risk boundary cases to S2 contract tests.",
+      "validation_required": []
+    },
+    {
+      "source_path": "tests/contracts/fixtures/1099900002260118_active_calendar_signals_valid.csv",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "tests/contracts/fixtures/1099900002260118_active_calendar_signals_valid.csv",
+      "supporting_modules": [
+        "m0006",
+        "m0005",
+        "m0011"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "tests/contracts/fixtures/1099900003260118_reentry_decisions_valid.csv",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "tests/contracts/fixtures/1099900003260118_reentry_decisions_valid.csv",
+      "supporting_modules": [
+        "m0023",
+        "m0024"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "tests/contracts/fixtures/1199900032260118_hybrid_id_valid.json",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "tests/contracts/fixtures/1199900032260118_hybrid_id_valid.json",
+      "supporting_modules": [
+        "m0021",
+        "m0022",
+        "m0023",
+        "m0024"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "tests/contracts/fixtures/1199900033260118_indicator_record_valid.json",
+      "approved_disposition": "move",
+      "approved_module_short_id": "m0009",
+      "target_path": "m0009-c2-indicator-engine/m0009-tests/contract/fixtures/indicator_record_valid.json",
+      "supporting_modules": [],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "tests/contracts/fixtures/1199900034260118_orders_in_valid.json",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "tests/contracts/fixtures/1199900034260118_orders_in_valid.json",
+      "supporting_modules": [
+        "m0017",
+        "m0018"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "tests/contracts/fixtures/1199900035260118_orders_out_valid.json",
+      "approved_disposition": "retain_global",
+      "approved_module_short_id": null,
+      "target_path": "tests/contracts/fixtures/1199900035260118_orders_out_valid.json",
+      "supporting_modules": [
+        "m0016",
+        "m0017"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "tests/contracts/properties/test_hybrid_id_parity.py",
+      "approved_disposition": "move",
+      "approved_module_short_id": "m0023",
+      "target_path": "m0023-e3-matrix-lookup/m0023-tests/contract/test_hybrid_id_parity.py",
+      "supporting_modules": [
+        "m0016",
+        "m0017",
+        "m0021",
+        "m0022",
+        "m0024"
+      ],
+      "migration_notes": "",
+      "validation_required": []
+    },
+    {
+      "source_path": "tests/legacy/contracts/golden_fixtures/1199900036260118_price_ticks.json",
+      "approved_disposition": "archive_or_delete_after_validation",
+      "approved_module_short_id": null,
+      "target_path": null,
+      "supporting_modules": [
+        "m0007"
+      ],
+      "migration_notes": "Do not move into D1 as active evidence. Repair only if an active legacy-compatibility test still requires it.",
+      "validation_required": [
+        "search test references",
+        "confirm replacement fixture",
+        "remove or archive"
+      ]
+    }
+  ]
+}

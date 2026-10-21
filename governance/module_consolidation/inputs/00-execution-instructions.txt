@@ -1,0 +1,2284 @@
+EAFIX 34-Module Authority Consolidation
+
+Standalone execution instructions for an AI program with no prior context
+
+Instruction version: 1.0.0
+Repository: DICKY1987/eafix-modular
+Default branch: master
+Primary documentation tree: EAFIX_auth_docs/
+Mission: Complete the 34-module documentation consolidation and blocker-resolution program end to end. Do not stop after building planning machinery, a pilot, or a staging area. The required final state is 34 individually authoritative, reconciled, evidence-backed module manifests plus the global/shared authorities needed to prevent duplication and drift.
+
+These instructions are self-contained. Do not assume access to any earlier chat, plan, review, or human explanation.
+
+
+
+1. Required final state
+
+Deliver all of the following:
+
+	1.	Exactly 34 active module authorities, one at each existing module root:
+<module-root>/manifest.json.
+
+	2.	Every one of those 34 manifests migrated to the approved v2 schema and populated as completely as available evidence supports.
+	3.	One global process authority remains:
+EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl.
+
+	4.	Shared contracts remain in their designated global contract authorities and are referenced from manifests rather than duplicated.
+	5.	Create one canonical shared-file relationship registry:
+EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json.
+
+	6.	Convert the existing 34-manifest bundle into a generated projection only. It must never be an independent source capable of overwriting module-root manifests.
+	7.	Reconcile every in-scope supporting source at claim level.
+	8.	Resolve or explicitly classify every blocker. Do not silently guess.
+	9.	Archive only source versions that are both:
+	●	fully reconciled, and
+	●	independently determined safe to archive.
+	10.	Preserve archived originals byte-for-byte.
+	11.	Update authority routing so no legacy catalog, bundle, generator, source document, or tracking board can silently become a second module authority.
+	12.	Regenerate derived artifacts from the authorities after cutover.
+	13.	Produce a final closeout report proving the result.
+
+The governing execution sequence is:
+
+SCRAPE -> CLASSIFY -> RECONCILE -> DECIDE -> PATCH -> VALIDATE -> CUT OVER -> PROVE -> ARCHIVE
+
+Do not reorder this into “copy everything first and sort it out later.”
+
+
+
+2. Canonical 34-module universe
+
+The only module universe for this work is the following list. Do not substitute an older 26-module or 27-module catalog.
+
+|Short ID|Canonical module root              |Canonical symbol             |
+|--------|-----------------------------------|-----------------------------|
+|m0001   |`m0001-f1-config-preferences`      |`F1_CONFIG_PREFERENCES`      |
+|m0002   |`m0002-f3-clock-scheduler`         |`F3_CLOCK_SCHEDULER`         |
+|m0003   |`m0003-d2-calendar-source-adapter` |`D2_CALENDAR_SOURCE_ADAPTER` |
+|m0004   |`m0004-d3-calendar-normalizer`     |`D3_CALENDAR_NORMALIZER`     |
+|m0005   |`m0005-f2-event-log`               |`F2_EVENT_LOG`               |
+|m0006   |`m0006-d4-calendar-trigger-builder`|`D4_CALENDAR_TRIGGER_BUILDER`|
+|m0007   |`m0007-d1-market-feed-adapter`     |`D1_MARKET_FEED_ADAPTER`     |
+|m0008   |`m0008-c1-bar-builder`             |`C1_BAR_BUILDER`             |
+|m0009   |`m0009-c2-indicator-engine`        |`C2_INDICATOR_ENGINE`        |
+|m0010   |`m0010-c3-feature-packager`        |`C3_FEATURE_PACKAGER`        |
+|m0011   |`m0011-s1-signal-engine`           |`S1_SIGNAL_ENGINE`           |
+|m0012   |`m0012-s2-intent-builder`          |`S2_INTENT_BUILDER`          |
+|m0013   |`m0013-r1-risk-evaluator`          |`R1_RISK_EVALUATOR`          |
+|m0014   |`m0014-r2-order-intent-compiler`   |`R2_ORDER_INTENT_COMPILER`   |
+|m0015   |`m0015-o1-order-router`            |`O1_ORDER_ROUTER`            |
+|m0016   |`m0016-b1-mt4-adapter-transport`   |`B1_MT4_ADAPTER_TRANSPORT`   |
+|m0017   |`m0017-b2-mt4-ea-executor`         |`B2_MT4_EA_EXECUTOR`         |
+|m0018   |`m0018-b3-exec-event-normalizer`   |`B3_EXEC_EVENT_NORMALIZER`   |
+|m0019   |`m0019-o2-oms-state-machine`       |`O2_OMS_STATE_MACHINE`       |
+|m0020   |`m0020-o3-trade-close-classifier`  |`O3_TRADE_CLOSE_CLASSIFIER`  |
+|m0021   |`m0021-e1-outcome-bucketizer`      |`E1_OUTCOME_BUCKETIZER`      |
+|m0022   |`m0022-e2-proximity-evaluator`     |`E2_PROXIMITY_EVALUATOR`     |
+|m0023   |`m0023-e3-matrix-lookup`           |`E3_MATRIX_LOOKUP`           |
+|m0024   |`m0024-e4-reentry-intent-builder`  |`E4_REENTRY_INTENT_BUILDER`  |
+|m0025   |`m0025-f4-flow-orchestrator`       |`F4_FLOW_ORCHESTRATOR`       |
+|m0026   |`m0026-p1-health-aggregator`       |`P1_HEALTH_AGGREGATOR`       |
+|m0027   |`m0027-r3-correlation-guard`       |`R3_CORRELATION_GUARD`       |
+|m0028   |`m0028-u1-dashboard-backend`       |`U1_DASHBOARD_BACKEND`       |
+|m0029   |`m0029-u2-gui-gateway`             |`U2_GUI_GATEWAY`             |
+|m0030   |`m0030-u3-mt4-expiry-overlay`      |`U3_MT4_EXPIRY_OVERLAY`      |
+|m0031   |`m0031-u4-desktop-operator`        |`U4_DESKTOP_OPERATOR`        |
+|m0032   |`m0032-p2-reporter`                |`P2_REPORTER`                |
+|m0033   |`m0033-sk1-plugin-interface`       |`SK1_PLUGIN_INTERFACE`       |
+|m0034   |`m0034-sk2-idempotency`            |`SK2_IDEMPOTENCY`            |
+
+Each root already contains or is expected to contain manifest.json. These 34 files are the target module-specific authorities.
+
+
+
+3. Authority architecture that must exist after cutover
+
+Use this exact logical model:
+
+EAFIX AUTHORITIES
+
+|
+
++-- 34 module-root manifest.json files
+
+|   +-- authoritative for module-specific purpose
+
+|   +-- boundaries and responsibilities
+
+|   +-- module-local behavior
+
+|   +-- module process-step participation
+
+|   +-- module-owned file definitions
+
+|   +-- module-local use of shared files
+
+|   +-- module contract obligations
+
+|   +-- module runtime/operations/safety details
+
+|   +-- field-level provenance and reconciliation status
+
+|
+
++-- EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl
+
+|   +-- authoritative for global process step identity, order, global process behavior,
+
+|       and cross-module process topology
+
+|
+
++-- global contracts/identifier/schema authorities
+
+|   +-- authoritative for shared payload structure and compatibility
+
+|
+
++-- EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json
+
+|   +-- authoritative for global shared-file consumer topology
+
+|
+
++-- repository-wide governance authorities
+
+    +-- naming, lifecycle, safety, document authority, etc.
+
+Derived outputs may exist, but they are one-way projections:
+
+34 module manifests + global authorities
+
+        |
+
+        +--> generated 34-manifest bundle
+
+        +--> generated context packets
+
+        +--> generated module catalog/index
+
+        +--> generated diagrams
+
+        +--> generated AI references
+
+        +--> generated reports
+
+        +--> GitHub Project tracking views
+
+Never create a bidirectional authority loop.
+
+Wrong:
+
+root manifest <--> bundle <--> old catalog <--> context packet
+
+Correct:
+
+reviewed evidence -> reconciliation -> approved module manifest -> projections
+
+
+
+4. Non-negotiable safety and scope rules
+
+	1.	Do not edit master directly. Work on a dedicated branch.
+	2.	Do not use a historical commit as the current baseline. Pin current master at execution time.
+	3.	Do not execute the historical 86-file location/action manifest as a bulk migration command. It is evidence that must be revalidated against the fresh baseline.
+	4.	Do not move runtime implementation files merely because a historical mapping suggested a destination. Physical source-code migration is outside this documentation-authority consolidation unless explicitly approved as a separate change.
+	5.	Do not change trading behavior, strategy logic, risk limits, order execution behavior, broker behavior, or live deployment behavior during this task.
+	6.	Do not run live trading.
+	7.	Do not treat a filename match as ownership proof.
+	8.	Do not treat the newest document as automatically correct.
+	9.	Do not treat a blank field as permission to invent a value.
+	10.	Do not use fake placeholders such as "N/A", fake process step 0, or PHASE_NOT_APPLICABLE to satisfy schema cardinality.
+	11.	Do not collapse unknown into not_applicable.
+	12.	Do not modify archived originals.
+	13.	Do not mark a source fully_scraped merely because it was scanned.
+	14.	Do not mark a source safe_to_archive merely because it is fully scraped.
+	15.	Do not let a generated bundle, catalog, context packet, GitHub issue, Project board, diagram, or report become an independent authority.
+	16.	Do not silently resolve contradictions. Record the conflict and the decision.
+	17.	Do not overwrite a manifest if the baseline value or file hash changed after reconciliation began. Fail closed and rebase/reconcile.
+	18.	Do not claim a validation passed if the required validator or runtime was unavailable.
+	19.	Never store credentials, tokens, passwords, or secrets in manifests, evidence records, logs, receipts, or generated documentation.
+
+
+
+5. Current repository facts to verify, not blindly assume
+
+At the time these instructions were written, the repository had these important conditions. Reverify all of them against the fresh baseline:
+
+	●	Default branch is master.
+	●	A recent observed master SHA was 2e029a6b59c7dd14655f778cd06c0e9e526168cb.
+	●	All 34 module roots exist at repository top level.
+	●	Root manifests are currently v1.0.0.
+	●	The active v1 schema is:
+EAFIX_auth_docs/01_canonical_registries/eafix_unified_atomic_module_schema_v1_0_0.json.
+
+	●	A competing 34-manifest bundle exists:
+EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json.
+
+	●	EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl is the canonical authored process authority.
+	●	EAFIX_auth_docs/00_doc_control_and_authority/doc_authority.json still contains older authority declarations, including a 27-module module_catalog.json entry that must be reconciled during the module cutover.
+	●	Work tracking exists at:
+governance/module_consolidation/tracking/.
+
+	●	The work-tracking SSOT is:
+governance/module_consolidation/tracking/eafix_consolidation_ssot.json.
+It is not a module-content authority.
+
+	●	governance/module_consolidation/tracking/build_ssot.py historically hard-coded an older baseline commit. Update it after pinning the new baseline.
+	●	A canonical shared-file registry does not currently appear to exist under that name and therefore must be created.
+	●	Historical analysis found duplicate/shadow representations, incomplete context-packet coverage, stale aliases, shared contracts, duplicate UI work-cell files, and legacy composite service folders.
+
+Treat all counts from old reports as historical until recomputed.
+
+
+
+6. Exact files to create
+
+Create these files and directories unless an equivalent governed file already exists. If an equivalent exists, reconcile and extend it rather than creating a competing authority.
+
+6.1 Governance and execution control
+
+Create:
+
+governance/module_consolidation/REMAINING_BLOCKERS_RESOLUTION_PLAN.md
+
+Purpose:
+
+	●	human-readable governing execution plan;
+	●	records scope, authority model, phases, gates, and completion definition;
+	●	points to the machine-readable decisions and ledgers.
+
+Create:
+
+governance/module_consolidation/resolution_decisions.json
+
+Purpose:
+
+	●	machine-readable decisions listed in Section 9 of these instructions;
+	●	every decision has decision_id, status, decision, rationale,
+affected_authorities, effective_baseline, evidence_refs, and approved_by.
+
+Create directory:
+
+governance/module_consolidation/run/
+
+Create:
+
+	●	governance/module_consolidation/run/baseline.json
+	●	governance/module_consolidation/run/source_processing_ledger.jsonl
+	●	governance/module_consolidation/run/claim_ledger.jsonl
+	●	governance/module_consolidation/run/blocker_resolution_queue.jsonl
+	●	governance/module_consolidation/run/writer_inventory.json
+	●	governance/module_consolidation/run/root_bundle_drift_report.json
+	●	governance/module_consolidation/run/final_verification.json
+
+Create:
+
+governance/module_consolidation/field_authority_matrix.json
+
+Create:
+
+governance/module_consolidation/v1_to_v2_migration_map.json
+
+Create validation directories:
+
+	●	governance/module_consolidation/validation/positive/
+	●	governance/module_consolidation/validation/negative/
+
+Create:
+
+governance/module_consolidation/validate_consolidation.py
+
+Create:
+
+governance/module_consolidation/generate_projections.py
+
+Create:
+
+governance/module_consolidation/CLOSEOUT_REPORT.md
+
+6.2 New canonical schema and shared-file authority
+
+Leave this existing v1 file immutable:
+
+EAFIX_auth_docs/01_canonical_registries/eafix_unified_atomic_module_schema_v1_0_0.json
+
+Create:
+
+EAFIX_auth_docs/01_canonical_registries/eafix_unified_atomic_module_schema_v2_0_0.json
+
+Create:
+
+EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json
+
+6.3 Batch workspace
+
+Create:
+
+governance/module_consolidation/batches/<batch-id>/
+
+Each completed batch must contain:
+
+	●	batch_manifest.json
+	●	extracted_claims.jsonl
+	●	module_reconciliation.json
+	●	conflict_records.json
+	●	approved_decisions.json
+	●	proposed_module_patches.json
+	●	validation_report.json
+	●	source_extraction_receipts.json
+	●	archive_action_manifest.json
+	●	batch_completion_report.json
+
+Do not omit these artifacts merely to make the process look simpler. They separate evidence extraction from authority mutation.
+
+6.4 Archive
+
+Use this exact top-level pattern for documentation retired by this program:
+
+archive/module-supporting-docs/<source-id>/<hash-prefix>/
+
+Each archived source directory contains:
+
+	●	original.<ext>: byte-identical source copy;
+	●	receipt.json: provenance and restoration record;
+	●	README.md: notice that the source is historical and not active authority;
+	●	optionally annotated.<ext> only for editable prose formats when a human-readable archival notice is useful.
+
+Never inject an archival header into the original JSON, CSV, PDF, image, code file, or other evidence object.
+
+
+
+7. Exact existing files to modify
+
+7.1 All 34 module manifests
+
+Modify all of these:
+
+	●	m0001-f1-config-preferences/manifest.json
+	●	m0002-f3-clock-scheduler/manifest.json
+	●	m0003-d2-calendar-source-adapter/manifest.json
+	●	m0004-d3-calendar-normalizer/manifest.json
+	●	m0005-f2-event-log/manifest.json
+	●	m0006-d4-calendar-trigger-builder/manifest.json
+	●	m0007-d1-market-feed-adapter/manifest.json
+	●	m0008-c1-bar-builder/manifest.json
+	●	m0009-c2-indicator-engine/manifest.json
+	●	m0010-c3-feature-packager/manifest.json
+	●	m0011-s1-signal-engine/manifest.json
+	●	m0012-s2-intent-builder/manifest.json
+	●	m0013-r1-risk-evaluator/manifest.json
+	●	m0014-r2-order-intent-compiler/manifest.json
+	●	m0015-o1-order-router/manifest.json
+	●	m0016-b1-mt4-adapter-transport/manifest.json
+	●	m0017-b2-mt4-ea-executor/manifest.json
+	●	m0018-b3-exec-event-normalizer/manifest.json
+	●	m0019-o2-oms-state-machine/manifest.json
+	●	m0020-o3-trade-close-classifier/manifest.json
+	●	m0021-e1-outcome-bucketizer/manifest.json
+	●	m0022-e2-proximity-evaluator/manifest.json
+	●	m0023-e3-matrix-lookup/manifest.json
+	●	m0024-e4-reentry-intent-builder/manifest.json
+	●	m0025-f4-flow-orchestrator/manifest.json
+	●	m0026-p1-health-aggregator/manifest.json
+	●	m0027-r3-correlation-guard/manifest.json
+	●	m0028-u1-dashboard-backend/manifest.json
+	●	m0029-u2-gui-gateway/manifest.json
+	●	m0030-u3-mt4-expiry-overlay/manifest.json
+	●	m0031-u4-desktop-operator/manifest.json
+	●	m0032-p2-reporter/manifest.json
+	●	m0033-sk1-plugin-interface/manifest.json
+	●	m0034-sk2-idempotency/manifest.json
+
+Required modification:
+
+	●	migrate each from v1 to v2 through the migration map;
+	●	preserve existing valid values unless evidence and an approved decision justify a change;
+	●	add the new structured information in Section 8;
+	●	never silently discard a v1 field;
+	●	every accepted changed value must have evidence and a decision trail.
+
+7.2 Document authority map
+
+Modify only during coordinated cutover:
+
+EAFIX_auth_docs/00_doc_control_and_authority/doc_authority.json
+
+Required changes:
+
+	●	keep process_registry.jsonl canonical for process authority;
+	●	register the 34 module-root manifests as the module-specific authorities;
+	●	register eafix_unified_atomic_module_schema_v2_0_0.json as the active module-manifest schema;
+	●	register shared_file_registry.json as canonical for shared-file consumer topology;
+	●	change the old 27-module module_catalog.json from a competing canonical module-definition authority to an explicitly limited compatibility/supporting/historical role after all needed information has been reconciled;
+	●	classify the combined manifest bundle as generated projection, not canonical content authority;
+	●	do not demote a live specialized authority until all its information has been reconciled and all active consumers have been accounted for.
+
+7.3 Combined manifest bundle
+
+Existing file:
+
+EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json
+
+Required disposition:
+
+	●	retain its path for compatibility if active tooling still expects it;
+	●	regenerate its contents deterministically from the 34 root manifests after cutover;
+	●	set metadata that makes its derived status explicit, for example:
+authority_policy: "generated_from_module_manifests";
+
+	●	record all 34 source manifest paths and hashes used to generate it;
+	●	prohibit the bundle from being used as input to overwrite root manifests;
+	●	add a parity validator that proves the bundle is exactly a projection of the roots.
+
+If no consumer requires the legacy path, a later approved cleanup may replace it with a clearly named generated v2 projection. Do not break consumers simply to obtain prettier filenames.
+
+7.4 Consolidation tracking files
+
+Modify:
+
+governance/module_consolidation/tracking/build_ssot.py
+
+Required change:
+
+	●	replace its historical BASELINE_COMMIT with the newly pinned execution baseline;
+	●	update D1-D7 wording/status only from the governed resolution_decisions.json;
+	●	do not turn this script into a module-content authority.
+
+Regenerate:
+
+governance/module_consolidation/tracking/eafix_consolidation_ssot.json
+
+Modify:
+
+governance/module_consolidation/tracking/README.md
+
+Required changes:
+
+	●	record the fresh baseline;
+	●	explain that module content authority is the 34 v2 manifests;
+	●	explain that shared-file topology authority is shared_file_registry.json;
+	●	keep the GitHub Project explicitly derived and one-way.
+
+Do not manually edit Project-board fields as a substitute for updating repository-controlled status.
+
+7.5 CI
+
+Create:
+
+.github/workflows/module-authority-validation.yml
+
+It must verify:
+
+	●	exactly 34 canonical module roots and exactly 34 canonical root manifests;
+	●	all 34 conform to the v2 schema;
+	●	all approved permanent IDs are unique;
+	●	process references resolve to process_registry.jsonl;
+	●	contract refs resolve to live contract authorities or carry a tracked unresolved status;
+	●	shared-file refs resolve to shared_file_registry.json;
+	●	root manifests and generated bundle are in parity;
+	●	no derived file is declared canonical for module facts;
+	●	no active writer is configured to generate root manifests from retired supporting docs or the bundle;
+	●	source ledger state transitions are valid;
+	●	archive receipts point to byte-matching originals;
+	●	unresolved blocking conflicts prevent a successful authority cutover.
+
+
+
+8. Required v2 manifest information model
+
+The v2 schema must be expressive enough that one module manifest can serve as a complete AI context package for that module without reproducing system-wide facts unnecessarily.
+
+At minimum provide structured sections for:
+
+8.1 Identity and lifecycle
+
+	●	permanent 20-digit module ID;
+	●	short ID m####;
+	●	canonical symbol;
+	●	canonical root;
+	●	canonical human-readable name;
+	●	aliases and legacy names;
+	●	identity status;
+	●	lifecycle status;
+	●	manifest/specification version;
+	●	schema version;
+	●	effective baseline commit;
+	●	accountable owner or approval authority.
+
+8.2 Purpose and boundaries
+
+	●	purpose;
+	●	responsibilities;
+	●	explicit exclusions;
+	●	owned capabilities;
+	●	side effects;
+	●	trust boundary;
+	●	externally visible behavior where applicable.
+
+8.3 Process participation
+
+Change the v1 compulsory single binding into zero-to-many process-step references.
+
+A reusable/shared module such as SK1 or SK2 must not be forced to invent a fake step.
+
+Each process-step entry must reference a real process record when one exists and contain only the module-local context needed to execute or understand that step:
+
+	●	step_id
+	●	step_code
+	●	process_registry_ref
+	●	trigger
+	●	preconditions
+	●	inputs
+	●	processing
+	●	decisions
+	●	primary_output
+	●	secondary_outputs
+	●	validation
+	●	failure_output
+	●	retry_timeout_recovery
+	●	observability
+	●	exclusive_files
+	●	shared_files
+	●	contract_refs
+	●	state_transition_refs
+	●	completion_criteria
+	●	next_handoff_refs
+
+Do not independently redefine the global process order inside every module manifest.
+
+8.4 Module-owned file definitions
+
+Define each module-owned file once at module level.
+
+Recommended fields:
+
+	●	file_id
+	●	path
+	●	role
+	●	required
+	●	ownership_status
+	●	current_or_proposed_location
+	●	content_sha256 where practical
+	●	entrypoint
+	●	runtime_relevance
+	●	contracts_produced
+	●	contracts_consumed
+	●	evidence_refs
+
+Roles should be controlled values such as:
+
+	●	entrypoint
+	●	library
+	●	schema
+	●	config
+	●	fixture
+	●	test
+	●	doc
+	●	data
+	●	tooling
+	●	runtime_asset
+	●	other:<controlled-token>
+
+Do not claim a proposed physical path is current.
+
+8.5 Step-specific file usage
+
+For every process step, list all files required by that step in exactly two logical groups:
+
+exclusive_files
+
+Files used only by that step within the module.
+
+shared_files
+
+Files also used by another step or module.
+
+A local shared-file reference contains only what the current step needs:
+
+{
+
+  "file_id": "FILE-X",
+
+  "path": "relative/path/to/file.ext",
+
+  "role_in_this_step": "validation_helper",
+
+  "required": true
+
+}
+
+Do not put the complete consumer genealogy in the module manifest.
+
+8.6 Shared-file registry
+
+Create global consumer topology in:
+
+EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json
+
+Recommended record shape:
+
+{
+
+  "file_id": "stable-id",
+
+  "path": "repository/relative/path",
+
+  "content_sha256": "sha256-if-applicable",
+
+  "file_role": "library",
+
+  "ownership_class": "global_shared|module_owned_shared_use",
+
+  "steward": "module-or-global-authority",
+
+  "status": "active",
+
+  "consumers": [
+
+    {
+
+      "module_id": "50000000000000000001",
+
+      "module_short_id": "m0001",
+
+      "step_id": "60000000000000000001",
+
+      "usage_role": "configuration_source",
+
+      "required": true
+
+    }
+
+  ],
+
+  "provenance": []
+
+}
+
+This registry is authoritative for the question:
+“Who else consumes this shared file?”
+
+Each module manifest remains authoritative for:
+“What files does this module/step require?”
+
+8.7 Contracts and interfaces
+
+Shared payload definitions remain in global contract authorities.
+
+Manifest entries must reference:
+
+	●	contract ID/name;
+	●	version;
+	●	schema path or authoritative contract path;
+	●	role: producer, consumer, transformer, validator, boundary;
+	●	compatibility requirements;
+	●	relevant process step.
+
+Do not duplicate the full shared schema into 34 manifests.
+
+Historical analysis showed many schema_ref values were blank/null. For each:
+
+	●	locate a real current schema if one exists;
+	●	record exact version/path;
+	●	if no schema exists, record knowledge status unknown or deferred and create a gap;
+	●	do not invent a path simply to make validation green.
+
+8.8 Runtime and deployment
+
+Where applicable:
+
+	●	runtime kind;
+	●	language/platform constraints;
+	●	executable entrypoints;
+	●	ports/channels;
+	●	deployment unit;
+	●	external dependencies;
+	●	configuration sources;
+	●	startup/shutdown behavior;
+	●	runtime-required files;
+	●	restart semantics;
+	●	concurrency and ordering.
+
+A UI module, shared library, Python service, and MT4 executor need not populate identical irrelevant fields. Use applicability profiles.
+
+8.9 State, concurrency, and idempotency
+
+Where applicable:
+
+	●	state variables;
+	●	owner of state;
+	●	persistence;
+	●	allowed transitions;
+	●	transition IDs;
+	●	ordering;
+	●	idempotency;
+	●	duplicate handling;
+	●	concurrency limits;
+	●	restart/recovery semantics.
+
+Define module-owned state transitions once and let process steps reference transition IDs.
+
+8.10 Failure and safety
+
+Where applicable:
+
+	●	enumerated failure modes;
+	●	rejection outputs;
+	●	retry policy;
+	●	timeout policy;
+	●	fail-open/fail-closed behavior;
+	●	recovery/quarantine;
+	●	safety gates;
+	●	risk-control interactions;
+	●	error/event codes;
+	●	operator escalation.
+
+Do not change existing trading safety behavior as part of documentation consolidation.
+
+8.11 Observability and quality
+
+Where applicable:
+
+	●	logs;
+	●	metrics;
+	●	health checks;
+	●	SLOs;
+	●	performance requirements;
+	●	acceptance criteria;
+	●	test references;
+	●	verification commands;
+	●	implementation evidence.
+
+8.12 Verification commands
+
+Where applicable, record executable verification commands under controlled fields:
+
+	●	build
+	●	test
+	●	lint
+	●	typecheck
+	●	smoke_check
+	●	local_run
+
+Use actual repository-supported commands. Do not invent a command that has never been demonstrated to work.
+
+8.13 Applicability and knowledge state
+
+These are separate dimensions.
+
+Applicability values:
+
+	●	applicable
+	●	not_applicable
+	●	undetermined
+
+Knowledge values:
+
+	●	confirmed
+	●	unknown
+	●	conflicted
+	●	deferred
+
+not_applicable requires a reason and an approved rule/decision.
+
+Missing, blank, null, or empty arrays must not silently mean “none.”
+
+8.14 Evidence and provenance
+
+Every accepted nontrivial specification value must be traceable.
+
+Use JSON Pointer or an equivalent stable field path.
+
+Evidence record should contain:
+
+	●	target JSON pointer;
+	●	source path;
+	●	source version/commit;
+	●	source SHA-256 where practical;
+	●	page/line/section/record locator;
+	●	raw or summarized claim;
+	●	claim disposition;
+	●	decision reference;
+	●	approver/policy;
+	●	verification status.
+
+Array-index-only provenance is insufficient if array order can change. Give important collection elements stable IDs.
+
+8.15 Reconciliation and conflicts
+
+Include:
+
+	●	reconciliation status;
+	●	unresolved gap IDs;
+	●	conflict IDs;
+	●	evidence coverage;
+	●	implementation conformance status;
+	●	last verified commit;
+	●	stale-after policy.
+
+Keep intended specification separate from observed implementation. Code divergence is a conformance finding, not automatic permission to rewrite the specification.
+
+
+
+9. Canonical resolution decisions to record
+
+Create governance/module_consolidation/resolution_decisions.json with these 26 decisions. The execution AI may add further decisions, but it must not reverse these without an explicit superseding decision.
+
+DEC-001: 34 root manifests are module authorities
+
+Decision: Each <module-root>/manifest.json is the authoritative source for module-specific facts after cutover.
+
+DEC-002: Process authority remains external
+
+Decision: EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl remains canonical for global process steps/order/topology. Module manifests reference it.
+
+DEC-003: Shared contracts remain external
+
+Decision: Shared contract/schema/identifier authorities remain global. Module manifests reference, consume, produce, or steward them but do not duplicate them as independent definitions.
+
+DEC-004: Create one shared-file registry
+
+Decision: EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json is authoritative for global shared-file consumer relationships.
+
+DEC-005: Combined manifest bundle becomes projection only
+
+Decision: EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json is generated from the 34 roots and is not permitted to feed root manifests.
+
+DEC-006: All 34 migrate to schema v2
+
+Decision: All 34 active root manifests must use eafix_unified_atomic_module_schema_v2_0_0.json at coordinated cutover.
+
+DEC-007: Preserve existing values by default
+
+Decision: Existing v1 values remain unless a claim-level reconciliation and approved decision justifies change. Blank fields are not automatic overwrite targets.
+
+DEC-008: Process binding becomes zero-to-many
+
+Decision: Modules may reference zero, one, or many process steps. Do not use fake N/A bindings.
+
+DEC-009: Applicability and knowledge are separate
+
+Decision: not_applicable and unknown are never interchangeable.
+
+DEC-010: Field-level provenance is mandatory
+
+Decision: Accepted meaningful fields require evidence addressable by stable field path/JSON Pointer and source locator.
+
+DEC-011: Implementation truth is commit-pinned
+
+Decision: Claims about what code currently does must be grounded in code/tests at a recorded commit. Historical prose does not prove current implementation.
+
+DEC-012: Supporting sources cannot auto-overwrite authorities
+
+Decision: A changed supporting document creates a reconciliation proposal, not an automatic manifest mutation.
+
+DEC-013: Cutover all 34 together
+
+Decision: Publish the v2 module authorities, authority routing, bundle projection rules, and writer redirection in one guarded authority cutover.
+
+DEC-014: No mixed authority state
+
+Decision: Do not leave some modules governed by roots and others by a historical bundle/catalog after cutover.
+
+DEC-015: Archive originals are immutable
+
+Decision: Archived originals preserve exact bytes. Notices live in sidecars/README or annotated prose copies.
+
+DEC-016: Fully scraped is not safe to archive
+
+Decision: Maintain separate status dimensions for extraction/reconciliation and retention/archive eligibility.
+
+DEC-017: Historical 86-file decisions are evidence, not commands
+
+Decision: Revalidate EAFIX_86_file_module_location_decisions and action-manifest conclusions against the fresh baseline. Do not discard them, but do not execute them blindly.
+
+DEC-018: Context packets and diagrams are generated
+
+Decision: Context packets, diagrams, matrices, catalogs, and AI summaries are projections generated from canonical authorities after cutover.
+
+DEC-019: Consumer fan-out belongs only in shared-file registry
+
+Decision: Module-local step entries list their own shared-file use but do not list all other consumers.
+
+DEC-020: Missing contract schema references stay explicit gaps
+
+Decision: If a real schema cannot be found, mark the contract schema reference unknown/deferred and open a gap. Never invent a schema path.
+
+DEC-021: No fake N/A values
+
+Decision: Use applicability status, knowledge status, and explicit empty semantics instead of fabricated identifiers or placeholder values.
+
+DEC-022: Module file scope is closed-world after verification
+
+Decision: Once file ownership is reconciled, a module’s declared owned/required file inventory becomes a controlled boundary; undeclared module-owned runtime files are a validation failure or reconciliation gap.
+
+DEC-023: Redirect or disable legacy writers before cutover
+
+Decision: Any script, workflow, editor, importer, or generator that can overwrite root manifests from old sources or the bundle must be redirected or disabled before P6 can pass.
+
+DEC-024: Retire old catalogs only after reconciliation
+
+Decision: Old module/process catalogs may be demoted or archived only after all unique necessary claims are reconciled. process_registry.jsonl remains active canonical process authority.
+
+DEC-025: Archive eligibility requires zero unresolved relevant claims
+
+Decision: A source cannot be archived while a relevant claim remains unresolved, conflicted without approved deferment, or actively referenced by required tooling/authority.
+
+DEC-026: Completion is evidence-based, not file-count-based
+
+Decision: The program is complete only when all 34 pass the required v2 checks, in-scope claims have final dispositions, no shadow authority/writer can reverse cutover, archive actions are proven, and rerunning validation is deterministic.
+
+Record the actual approving actor and effective commit when these become active governance decisions.
+
+
+
+10. Claim-level reconciliation model
+
+Do not compare documents as giant blobs. Break them into atomic claims.
+
+Each claim record in claim_ledger.jsonl must contain at least:
+
+{
+
+  "claim_id": "stable-id",
+
+  "source_id": "source-version-id",
+
+  "source_path": "path",
+
+  "source_commit": "sha-or-null",
+
+  "source_sha256": "hash",
+
+  "source_locator": {
+
+    "page": null,
+
+    "line_start": null,
+
+    "line_end": null,
+
+    "section": null,
+
+    "json_pointer": null
+
+  },
+
+  "claim_type": "module_fact|process_fact|contract_fact|file_fact|governance_fact|implementation_observation",
+
+  "target_module": "m0009-or-null",
+
+  "target_json_pointer": "/process_steps/...",
+
+  "current_authoritative_value": null,
+
+  "candidate_value": null,
+
+  "disposition": "UNRESOLVED",
+
+  "conflict_type": null,
+
+  "decision_id": null,
+
+  "rationale": null,
+
+  "evidence_strength": "direct|derived|historical|implementation",
+
+  "status": "open"
+
+}
+
+Allowed final dispositions:
+
+	●	MIGRATE
+	●	ALREADY_COVERED
+	●	MERGE
+	●	REJECTED
+	●	RETAINED_EXTERNAL
+
+Temporary only:
+
+	●	UNRESOLVED
+
+A source cannot be fully_scraped while any relevant claim remains UNRESOLVED.
+
+
+
+11. Blocker-resolution algorithm
+
+Historical work once produced a queue with thousands of open records. Do not trust the historical count as current. Rebuild the queue from the fresh baseline.
+
+For every open record:
+
+	1.	Resolve the target fact class:
+	●	module-specific;
+	●	process-global;
+	●	contract-global;
+	●	shared-file-global;
+	●	governance-global;
+	●	implementation observation;
+	●	derived/projection-only.
+	2.	Locate the correct active authority for that fact class.
+	3.	Compare the candidate claim against the current authority.
+	4.	Apply these deterministic rules:
+
+Rule A: already identical
+
+If the candidate claim is semantically identical to the authority:
+
+	●	disposition = ALREADY_COVERED;
+	●	record evidence;
+	●	no manifest mutation.
+
+Rule B: duplicate historical wording
+
+If multiple sources express the same fact:
+
+	●	designate the stronger/active evidence;
+	●	disposition duplicates as MERGE or ALREADY_COVERED;
+	●	do not create duplicate fields.
+
+Rule C: old source conflicts with stronger active authority
+
+If an older source conflicts with the canonical process, contract, governance, or approved module decision:
+
+	●	disposition = REJECTED;
+	●	cite the active authority and decision;
+	●	do not change the authority merely because the source is older or more verbose.
+
+Rule D: fact belongs to external authority
+
+If a module-supporting document contains a global process/contract/governance fact:
+
+	●	disposition = RETAINED_EXTERNAL;
+	●	manifest gets a stable reference where needed;
+	●	do not copy the global definition into every module.
+
+Rule E: supported module fact is missing
+
+If direct evidence supports a module-specific fact that is missing:
+
+	●	disposition = MIGRATE;
+	●	generate a guarded patch;
+	●	do not apply before semantic review/approval.
+
+Rule F: current value and candidate both contain useful non-conflicting information
+
+	●	disposition = MERGE;
+	●	produce the exact merged result;
+	●	preserve provenance from both.
+
+Rule G: genuine ambiguity
+
+If two plausible meanings remain:
+
+	●	mark knowledge = conflicted or deferred;
+	●	create conflict record;
+	●	keep the blocker visible;
+	●	do not guess.
+
+Rule H: apparent N/A
+
+Only use not_applicable after proving the field genuinely does not apply under the module’s profile and recording the governing rule.
+
+
+
+12. Source-processing ledger
+
+source_processing_ledger.jsonl must track each source version independently.
+
+Minimum fields:
+
+	●	source ID;
+	●	path;
+	●	repository/external source class;
+	●	commit or acquisition timestamp;
+	●	SHA-256;
+	●	MIME/type;
+	●	authority classification;
+	●	source status;
+	●	extraction status;
+	●	reconciliation status;
+	●	relevant claim count;
+	●	unresolved claim count;
+	●	accepted claim count;
+	●	rejected claim count;
+	●	retained-external count;
+	●	fully_scraped;
+	●	safe_to_archive;
+	●	retention reason;
+	●	archive destination;
+	●	archive verification hash;
+	●	superseded-by or retained-active authority reference.
+
+Use separate state axes. Do not compress them into one “processed” boolean.
+
+Recommended values:
+
+Extraction:
+
+	●	not_started
+	●	in_progress
+	●	complete
+	●	unreadable
+	●	out_of_scope
+
+Reconciliation:
+
+	●	not_started
+	●	in_progress
+	●	complete
+	●	blocked
+
+Retention:
+
+	●	retain_active_authority
+	●	retain_active_supporting_document
+	●	archive_fully_scraped
+	●	archive_superseded
+	●	archive_historical
+	●	blocked_from_archival
+
+
+
+13. Fresh baseline procedure, P0
+
+Perform this before changing an authority.
+
+13.1 Repository setup
+
+Equivalent Git commands:
+
+git checkout master
+
+git pull --ff-only
+
+git rev-parse HEAD
+
+git status --porcelain
+
+If the worktree is not clean, do not destroy or reset unrelated work. Use a clean clone/worktree or explicitly isolate the task.
+
+Create a branch, for example:
+
+git checkout -b ai/module-authority-v2-consolidation
+
+Write the pinned SHA, date, branch, repository URL, and environment details to:
+
+governance/module_consolidation/run/baseline.json
+
+13.2 Inventory the 34 roots
+
+Verify:
+
+	●	exactly the 34 roots in Section 2;
+	●	each has .module-id;
+	●	each has manifest.json;
+	●	the permanent ID in .module-id agrees with manifest identity;
+	●	no extra active root claims to be a 35th module.
+
+Fail if the universe does not match without a governed decision.
+
+13.3 Inventory all supporting sources
+
+Recursively inventory all files under:
+
+	●	EAFIX_auth_docs/;
+	●	contracts/;
+	●	context_packets/;
+	●	the 34 module roots;
+	●	governance/;
+	●	relevant services/, mt4/, tests/, docs/, and other paths referenced by module/process/contract evidence.
+
+Do not restrict discovery to files whose names contain “module.”
+
+Record source path, SHA-256, size, type, commit state, and classification.
+
+13.4 Inventory every writer
+
+Search the entire current repository for code/workflows that:
+
+	●	write manifest.json;
+	●	generate atomic_module_manifest;
+	●	read/write the bundle filename;
+	●	write module_catalog.json;
+	●	write context packets;
+	●	regenerate registries;
+	●	copy module fields between representations.
+
+Search both filenames and content. Example search terms:
+
+	●	atomic_module_manifest
+	●	manifest.json
+	●	eafix_module_manifests_bundle
+	●	module_catalog
+	●	process_step_catalog
+	●	context_packets
+	●	eafix_unified_atomic_module_schema
+	●	generated_from_canonical_sources
+	●	write_text
+	●	JSON dump/write calls near manifest paths
+
+Record every writer in:
+
+governance/module_consolidation/run/writer_inventory.json
+
+For each:
+
+	●	path;
+	●	purpose;
+	●	inputs;
+	●	outputs;
+	●	whether it writes an authority or projection;
+	●	required change before cutover;
+	●	validation evidence.
+
+Do not assume historical filenames such as generate_manifests.py still exist.
+
+13.5 Root-vs-bundle diff
+
+Programmatically compare:
+
+	●	each root manifest;
+	●	its corresponding entry in
+EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json.
+
+Normalize only harmless formatting. Do not erase semantic differences before comparison.
+
+Write:
+governance/module_consolidation/run/root_bundle_drift_report.json
+
+For every differing module list exact JSON pointers and both values.
+
+13.6 Historical decision revalidation
+
+Use historical ownership/mapping artifacts as evidence, including the prior 86-file decisions/action manifest, but check every referenced source and target against the new baseline.
+
+Mark:
+
+	●	still valid;
+	●	superseded;
+	●	path changed;
+	●	content changed;
+	●	no longer applicable;
+	●	requires new decision.
+
+Do not execute physical moves from the old manifest during this program.
+
+13.7 Update tracking baseline
+
+After the fresh baseline is frozen:
+
+	●	edit governance/module_consolidation/tracking/build_ssot.py;
+	●	set BASELINE_COMMIT to the fresh SHA;
+	●	regenerate governance/module_consolidation/tracking/eafix_consolidation_ssot.json;
+	●	update the tracking README.
+
+This is tracking only, not content mutation.
+
+P0 gate
+
+P0 passes only when:
+
+	●	baseline is reproducible;
+	●	34-root universe verified;
+	●	source inventory created;
+	●	writer inventory complete enough to prevent silent overwrite;
+	●	root-vs-bundle drift recorded;
+	●	historical decisions classified;
+	●	all authority conflicts are explicitly listed.
+
+
+
+14. P1: policy, schema, and validation contract
+
+14.1 Write resolution decisions
+
+Create resolution_decisions.json with DEC-001 through DEC-026.
+
+14.2 Create the field-authority matrix
+
+Create:
+governance/module_consolidation/field_authority_matrix.json
+
+It must map each fact class to:
+
+	●	active authority;
+	●	permitted evidence sources;
+	●	conflict rule;
+	●	whether it is copied, referenced, derived, or prohibited from duplication.
+
+Minimum rows:
+
+	●	module identity;
+	●	module purpose;
+	●	module boundaries;
+	●	module behavior;
+	●	process step identity/order;
+	●	shared contract schema;
+	●	global identifier rules;
+	●	shared-file global consumer topology;
+	●	current implementation;
+	●	reconciliation decisions;
+	●	archive status;
+	●	generated projections.
+
+14.3 Build schema v2
+
+Create:
+EAFIX_auth_docs/01_canonical_registries/eafix_unified_atomic_module_schema_v2_0_0.json
+
+Requirements:
+
+	●	Draft 2020-12 if consistent with repository tooling;
+	●	zero-to-many process references;
+	●	applicability profile support;
+	●	knowledge state;
+	●	process-step local details;
+	●	exclusive/shared file groups;
+	●	module file definitions;
+	●	external contract references;
+	●	state transitions;
+	●	behavior/failure/safety/observability;
+	●	field evidence;
+	●	conflicts and gaps;
+	●	implementation-conformance status;
+	●	source/reconciliation metadata;
+	●	explicit additionalProperties policy;
+	●	stable IDs for repeated structured entries.
+
+14.4 Create v1-to-v2 migration map
+
+Create:
+governance/module_consolidation/v1_to_v2_migration_map.json
+
+For every v1 JSON pointer specify:
+
+	●	v2 target;
+	●	transformation;
+	●	retain/transform/retire;
+	●	reason if retired;
+	●	data-loss check.
+
+No v1 field may simply disappear without an entry.
+
+14.5 Validation fixtures
+
+Create positive fixtures covering at least:
+
+	●	service/process module;
+	●	MT4/runtime module;
+	●	UI module;
+	●	shared reusable module with zero process steps.
+
+Use the pilot modules:
+
+	●	m0009 C2
+	●	m0016 B1
+	●	m0029 U2
+	●	m0034 SK2
+
+Create negative fixtures for:
+
+	●	fake N/A process step;
+	●	duplicate permanent ID;
+	●	unresolved external reference represented as fake path;
+	●	missing evidence for approved changed value;
+	●	shared file referenced locally but absent globally;
+	●	bundle marked canonical;
+	●	stale baseline hash;
+	●	invalid applicability/knowledge combination;
+	●	duplicate authority;
+	●	undeclared module-owned runtime file after scope closure.
+
+P1 gate
+
+Pass only when:
+
+	●	decisions are recorded;
+	●	schema validates itself;
+	●	all positive fixtures pass;
+	●	all negative fixtures fail for the expected reason;
+	●	migration map accounts for every v1 field;
+	●	authority matrix is internally consistent.
+
+
+
+15. P2: seed all 34 v2 candidates
+
+Do not edit active root manifests yet.
+
+Create a staging representation for each of the 34, under for example:
+
+governance/module_consolidation/staging/<module-short-id>/manifest.v2.candidate.json
+
+Generate each candidate only through the v1-to-v2 migration map.
+
+Rules:
+
+	●	preserve all old information;
+	●	convert fake single process bindings to real zero-to-many references;
+	●	do not infer missing behavior;
+	●	mark unknowns explicitly;
+	●	preserve original source-authority references as historical provenance, not necessarily as active authority;
+	●	record original manifest SHA;
+	●	record candidate SHA.
+
+Exactly 34 candidates must exist.
+
+P2 gate
+
+Pass only when:
+
+	●	34 candidates exist;
+	●	identity matches the 34-module universe;
+	●	all candidates are structurally v2-valid;
+	●	every v1 field is accounted for;
+	●	no candidate is yet treated as active authority.
+
+
+
+16. P3: four-module pilot
+
+Pilot modules:
+
+	●	m0009-c2-indicator-engine
+	●	m0016-b1-mt4-adapter-transport
+	●	m0029-u2-gui-gateway
+	●	m0034-sk2-idempotency
+
+These deliberately exercise different profiles.
+
+For each pilot:
+
+	1.	Inventory all relevant evidence sources.
+	2.	Extract atomic claims.
+	3.	Classify each claim by fact authority.
+	4.	Reconcile against candidate manifest and external authorities.
+	5.	Resolve conflicts.
+	6.	Create proposed guarded patches.
+	7.	Review every semantic change.
+	8.	Validate candidate.
+	9.	Validate process/contract/file references.
+	10.	Build shared-file registry records for files shared by pilot steps/modules.
+	11.	Test stale-hash rejection.
+	12.	Test rerun idempotence.
+	13.	Test archive workflow in a disposable copy only.
+	14.	Test restoration from receipt.
+	15.	Confirm bundle generator can project from roots without reverse-writing.
+
+Do not archive active real sources in the pilot merely to test code.
+
+P3 gate
+
+Pass only when:
+
+	●	all four can complete end-to-end;
+	●	SK2 proves zero-process-step modules are valid;
+	●	evidence and conflict records are sufficient to explain each accepted change;
+	●	guarded patching rejects stale inputs;
+	●	repeated extraction/reconciliation produces semantic no-op when nothing changed;
+	●	archive restore test works;
+	●	no legacy writer can overwrite an approved candidate.
+
+
+
+17. P4: controlled full reconciliation
+
+Process all 34 modules in controlled waves. Recommended grouping:
+
+W1 Foundation
+
+	●	m0001
+	●	m0002
+	●	m0005
+
+W2 Data acquisition
+
+	●	m0003
+	●	m0004
+	●	m0006
+	●	m0007
+
+W3 Computation
+
+	●	m0008
+	●	m0009
+	●	m0010
+
+W4 Signals and risk
+
+	●	m0011
+	●	m0012
+	●	m0013
+	●	m0014
+
+W5 Orders and execution
+
+	●	m0015
+	●	m0016
+	●	m0017
+	●	m0018
+	●	m0019
+	●	m0020
+
+W6 Re-entry/orchestration
+
+	●	m0021
+	●	m0022
+	●	m0023
+	●	m0024
+	●	m0025
+
+W7 Operator, monitoring, and controls
+
+	●	m0026
+	●	m0027
+	●	m0028
+	●	m0029
+	●	m0030
+	●	m0031
+	●	m0032
+
+W8 Shared kernels
+
+	●	m0033
+	●	m0034
+
+For each source batch:
+
+	●	freeze source hashes before extraction;
+	●	produce all ten batch artifacts;
+	●	never mix evidence from a changed source version without creating a new source-version record;
+	●	never mutate candidate manifests directly from raw extraction;
+	●	apply only approved patches;
+	●	rerun validation after every batch.
+
+
+
+18. Important historical defects that must be explicitly checked
+
+Do not assume these still exist. Verify and resolve them if present.
+
+18.1 Context packets stop at m0026
+
+Historical evidence found canonical packets only through m0026.
+
+If still true:
+
+	●	generate packets for m0027 through m0034 after the manifests become authoritative;
+	●	do not author new module facts inside packets;
+	●	every packet must carry source manifest version/hash.
+
+18.2 Flow-orchestrator stale alias
+
+Historical context packet used F1_FLOW_ORCHESTRATOR while canonical m0025 is F4_FLOW_ORCHESTRATOR.
+
+If still present:
+
+	●	correct generated projection to F4;
+	●	register F1 only as legacy alias if historical evidence requires it;
+	●	do not let F1 remain an active canonical symbol.
+
+18.3 Legacy packet 99
+
+Historical context_packets/50000000000000000099 grouped UI/shared material outside the 34 canonical module IDs.
+
+If still present:
+
+	●	either split its content into generated canonical module packets based on reconciled ownership,
+	●	or classify packet 99 as a generated legacy/shared projection with explicit non-authority status.
+
+18.4 Duplicate UI work cells
+
+Historical work-cell names appeared under dashboard-backend, desktop-ui, and gui-gateway.
+
+Do not copy all duplicates into manifests as separate truths.
+
+	●	resolve one canonical owned record or generated projection;
+	●	record other occurrences as aliases/duplicates/consumers;
+	●	use shared-file registry if the same physical/shared artifact is genuinely consumed by multiple steps/modules.
+
+18.5 Legacy R1 names
+
+Historical R1 work-cell names concealed newer atomic modules:
+
+	●	correlation guard belongs conceptually to R3/m0027;
+	●	idempotency belongs conceptually to SK2/m0034.
+
+Use semantic ownership, not legacy filename prefix, after evidence review.
+
+18.6 Composite legacy service folders
+
+Legacy service directories may contain multiple atomic modules.
+Do not move or assign an entire service directory to one module based on directory name.
+
+18.7 Shared contracts
+
+contracts/ is a system-wide shared contract layer.
+Do not physically assign all of contracts/ to a single module.
+
+18.8 Dead generated contract stubs
+
+Historical analysis found src/contracts/models/ contained empty generated Pydantic stubs while real models live under contracts/models/.
+
+Treat this as an implementation-cleanup candidate, not module authority evidence.
+Do not delete code during this documentation consolidation unless separately approved.
+
+
+
+19. Per-source reconciliation procedure
+
+For every source version:
+
+	1.	Hash it.
+	2.	Assign stable source ID.
+	3.	Classify authority type.
+	4.	Read the complete source, not just matching snippets.
+	5.	Extract all relevant atomic claims.
+	6.	Map each claim to a fact class.
+	7.	Map module-specific claims to target module and JSON Pointer.
+	8.	Compare against the active/candidate authority.
+	9.	Assign a disposition.
+	10.	Create conflict record when needed.
+	11.	Record decision and rationale.
+	12.	Generate guarded patch for accepted module changes.
+	13.	Apply only after approval.
+	14.	Revalidate affected manifest and all cross-references.
+	15.	Re-scan the source to prove no relevant claim remains unclassified.
+	16.	Only then set fully_scraped = true.
+	17.	Independently evaluate active references/retention.
+	18.	Only then set safe_to_archive = true if allowed.
+	19.	If archived, verify destination hash and restoration mapping.
+
+A source may be:
+
+	●	fully scraped but retained active;
+	●	fully scraped and archived;
+	●	extraction complete but reconciliation blocked;
+	●	out of scope with reason;
+	●	unreadable with explicit blocker.
+
+
+
+20. Guarded patch rules
+
+Every proposed module patch must include:
+
+	●	target path;
+	●	target baseline file SHA-256;
+	●	target baseline commit;
+	●	JSON pointer;
+	●	old value hash/value;
+	●	new value;
+	●	claim IDs;
+	●	decision IDs;
+	●	approver;
+	●	expected post-patch hash where practical.
+
+Before applying:
+
+	●	recompute current file hash;
+	●	verify baseline commit relationship;
+	●	verify old value matches;
+	●	reject if stale.
+
+Never perform blind string replacement across all 34 manifests for semantic fields.
+
+Schema-wide mechanical changes are permitted only when:
+
+	●	the v1-to-v2 migration map explicitly defines them;
+	●	fixtures prove them;
+	●	the transformation is deterministic and lossless.
+
+
+
+21. P5: system-wide validation
+
+Validate all 34 candidates together.
+
+Required checks:
+
+Structure
+
+	●	valid JSON;
+	●	valid v2 schema;
+	●	profile/applicability rules valid;
+	●	v1 migration accounted.
+
+Identity
+
+	●	exactly 34 active module records;
+	●	34 unique permanent IDs;
+	●	unique canonical symbols;
+	●	roots and .module-id agree.
+
+Evidence
+
+	●	accepted meaningful changes have source evidence;
+	●	evidence locators resolve;
+	●	hashes/commit refs are recorded;
+	●	inference is marked as inference.
+
+Process
+
+	●	every referenced step exists in process_registry.jsonl;
+	●	no fake process step exists;
+	●	module-local step details do not redefine contradictory global order;
+	●	modules with zero process steps remain valid.
+
+Contracts
+
+	●	contract refs resolve;
+	●	producer/consumer roles are coherent;
+	●	versions/schema refs are exact when known;
+	●	unknown refs are tracked gaps, not fake success.
+
+Files
+
+	●	module-owned files are defined once;
+	●	step-local exclusive/shared references resolve;
+	●	shared files resolve in the global shared-file registry;
+	●	current vs proposed paths are not conflated;
+	●	only verified ownership becomes closed-world.
+
+Behavior
+
+	●	trigger/input/processing/decisions/output/failure/recovery are represented where applicable;
+	●	completion criteria are explicit;
+	●	relevant state transitions resolve.
+
+Safety
+
+	●	no documentation migration changed trading/risk behavior;
+	●	safety-related facts retain evidence;
+	●	unavailable MQL4/Windows validation is reported as unverified.
+
+Authority
+
+	●	no second module authority remains;
+	●	old catalogs/bundle/context packets are classified correctly;
+	●	writers cannot reverse the direction of authority.
+
+Repeatability
+
+	●	rerun on unchanged baseline produces no semantic changes;
+	●	stale batch is rejected;
+	●	generated projections are reproducible.
+
+P5 gate
+
+No unresolved mandatory specification blocker may remain for P6.
+
+“All 34 JSON files parse” is not enough.
+
+
+
+22. P6: coordinated authority cutover
+
+Before cutover:
+
+	1.	Create a rollback tag, for example:
+rollback-module-authority-v2-pre-cutover-YYYYMMDD.
+
+	2.	Save final pre-cutover hashes.
+	3.	Confirm CI on the staged set.
+	4.	Confirm writer inventory contains no unhandled reverse-writer.
+	5.	Confirm all 34 v2 candidates are approved.
+
+Then in one coordinated change set:
+
+	1.	Replace all 34 root manifest.json files with approved v2 versions.
+	2.	Add the v2 schema.
+	3.	Add shared_file_registry.json.
+	4.	Update doc_authority.json.
+	5.	Redirect/disable legacy manifest writers.
+	6.	Update projection generator.
+	7.	Regenerate the combined manifest bundle from the roots.
+	8.	Regenerate module catalogs/indexes that are intended as projections.
+	9.	Regenerate context packets from authorities, including missing m0027-m0034 if still absent.
+	10.	Correct stale generated aliases such as F1/F4 if still present.
+	11.	Update tracking SSOT/README to the effective cutover commit.
+	12.	Run full CI/validation.
+
+Do not perform a partial root-by-root authority cutover over several unrelated commits if that leaves the repository in a mixed authority state.
+
+P6 gate
+
+Must prove:
+
+	●	one active module authority per module;
+	●	one active authority per fact class;
+	●	all derived projections identify their source authority/version;
+	●	all relevant writers point in the correct direction;
+	●	CI passes or unavailable checks are explicitly blocking.
+
+
+
+23. P7: retire eligible supporting documents
+
+Only after authority cutover.
+
+For every source:
+
+	●	confirm all relevant claims final;
+	●	confirm accepted claims are present in active authorities;
+	●	scan repository for active references;
+	●	verify no generator/tool requires the old path/content as authoritative input;
+	●	preserve original bytes;
+	●	write receipt;
+	●	move approved historical source with Git history when possible;
+	●	update references;
+	●	exclude archived docs from normal authority routing;
+	●	retain provenance lookup.
+
+Do not archive:
+
+	●	active global process authority;
+	●	active contract authorities;
+	●	active governance authorities;
+	●	any source with unresolved relevant claims;
+	●	any source still required by a live tool unless the tool is changed in the same guarded operation.
+
+Archive receipt minimum fields
+
+	●	source ID;
+	●	original path;
+	●	source commit;
+	●	original SHA-256;
+	●	archive path;
+	●	archived SHA-256;
+	●	fully-scraped decision;
+	●	safe-to-archive decision;
+	●	decision refs;
+	●	claims summary;
+	●	manifest fields affected;
+	●	restoration instructions;
+	●	timestamp;
+	●	actor.
+
+
+
+24. P8: closeout
+
+Produce:
+
+governance/module_consolidation/CLOSEOUT_REPORT.md
+
+and
+
+governance/module_consolidation/run/final_verification.json
+
+The closeout report must show explicit denominators.
+
+Module readiness
+
+	●	schema-valid / 34
+	●	specification-ready / 34
+	●	implementation-verified / applicable modules
+
+Source states
+
+Count:
+
+	●	inventoried
+	●	extraction complete
+	●	fully scraped
+	●	retained active
+	●	archive eligible
+	●	archived and verified
+	●	blocked
+	●	out of scope
+	●	unreadable
+
+Claims
+
+Count:
+
+	●	MIGRATE
+	●	ALREADY_COVERED
+	●	MERGE
+	●	REJECTED
+	●	RETAINED_EXTERNAL
+	●	unresolved, which must be zero for in-scope relevant claims unless the overall result is explicitly blocked/incomplete
+
+Authority audit
+
+List:
+
+	●	all 34 root authorities;
+	●	process authority;
+	●	contract authorities;
+	●	shared-file authority;
+	●	governance authorities;
+	●	every generated projection;
+	●	every disabled/redirected writer.
+
+Remaining gaps
+
+For every remaining gap:
+
+	●	module;
+	●	JSON pointer/fact;
+	●	reason;
+	●	missing evidence/decision;
+	●	responsible decision maker;
+	●	exact next action.
+
+Never report “complete” simply because 34 manifests exist.
+
+
+
+25. Validation implementation requirements
+
+Implement governance/module_consolidation/validate_consolidation.py so one command can produce a deterministic machine-readable validation report.
+
+It must return nonzero on blocking validation failure.
+
+It must check at least:
+
+	●	root count;
+	●	manifest count;
+	●	schema validity;
+	●	ID uniqueness;
+	●	.module-id agreement;
+	●	process refs;
+	●	shared-file refs;
+	●	contract refs;
+	●	bundle parity;
+	●	authority-map contradictions;
+	●	unresolved blockers;
+	●	stale source hashes;
+	●	archive receipt integrity;
+	●	writer direction.
+
+If jsonschema, pytest, or another required dependency is unavailable:
+
+	●	first use the repository’s existing dependency installation method when permitted;
+	●	otherwise mark that check UNAVAILABLE;
+	●	do not convert unavailable to PASS.
+
+Run repository tests relevant to changed governance/validation/projection code.
+
+Do not run production/live-trading workflows.
+
+
+
+26. Projection generator requirements
+
+Implement governance/module_consolidation/generate_projections.py.
+
+It may read:
+
+	●	34 root manifests;
+	●	process registry;
+	●	shared-file registry;
+	●	contract authorities;
+	●	governance authorities as necessary.
+
+It may generate:
+
+	●	manifest bundle;
+	●	module index/catalog;
+	●	context packets;
+	●	diagrams/source data;
+	●	AI reference summaries.
+
+It must not:
+
+	●	write semantic facts back into the root manifests;
+	●	read a historical source and overwrite an authority;
+	●	treat a generated file as superior evidence to its inputs.
+
+Generated outputs should include:
+
+	●	generator version;
+	●	generation timestamp;
+	●	source paths;
+	●	source content hashes;
+	●	source commit;
+	●	authority policy = generated/derived.
+
+
+
+27. File and process relationship rules
+
+Use these rules consistently:
+
+	1.	Every process step has one primary owner module.
+	2.	Primary owner is the module responsible for the step’s primary output boundary.
+	3.	Cross-cutting logging/health/audit outputs do not steal primary ownership.
+	4.	Every module-owned file has one canonical owner, except intentionally global/shared assets.
+	5.	Shared files are referenced locally and have global consumer topology in shared_file_registry.json.
+	6.	File-to-step mapping is an execution traceability relation, not an excuse to map every helper to every step.
+	7.	Entrypoint files are the default candidates for direct step execution mapping.
+	8.	Libraries, configs, schemas, tests, and docs remain supporting assets unless a governed reason says otherwise.
+	9.	Global process definitions are referenced, not independently recreated in module manifests.
+	10.	Generated graphs/matrices are derived from these ownership/ref relationships.
+
+
+
+28. How to treat older catalogs and registries
+
+Important known artifacts include:
+
+	●	EAFIX_auth_docs/01_canonical_registries/module_catalog.json
+	●	EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json
+	●	EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json
+	●	older module bundles/catalogs under EAFIX_auth_docs/02_module_architecture_and_atomic_migration/
+	●	context packets;
+	●	manifest bundles.
+
+Rules:
+
+	●	do not delete them at the start;
+	●	mine/reconcile any unique valid information;
+	●	after cutover, narrow each to its legitimate specialized role or classify historical;
+	●	process_registry.jsonl remains process authority;
+	●	the 27-module module_catalog.json must not remain a competing definition of the active 34-module universe;
+	●	if a compatibility catalog is still needed, generate it from the 34 manifests or label it strictly as legacy compatibility view.
+
+
+
+29. Expected conflict categories
+
+Use controlled conflict types, for example:
+
+	●	AUTHORITY_CONFLICT
+	●	VALUE_CONFLICT
+	●	IDENTITY_CONFLICT
+	●	PROCESS_BINDING_CONFLICT
+	●	CONTRACT_CONFLICT
+	●	FILE_OWNERSHIP_CONFLICT
+	●	CURRENT_VS_PROPOSED_LOCATION_CONFLICT
+	●	DUPLICATE_REPRESENTATION
+	●	STALE_SOURCE
+	●	IMPLEMENTATION_SPEC_MISMATCH
+	●	MISSING_EVIDENCE
+	●	AMBIGUOUS_APPLICABILITY
+	●	WRITER_DIRECTION_CONFLICT
+	●	ARCHIVE_RETENTION_CONFLICT
+
+Every conflict record contains:
+
+	●	conflict ID;
+	●	claims involved;
+	●	authorities involved;
+	●	affected modules;
+	●	severity;
+	●	decision;
+	●	rationale;
+	●	approver;
+	●	evidence;
+	●	state.
+
+
+
+30. Definition of specification-ready
+
+A module is specification_ready = true only if:
+
+	●	it validates against v2;
+	●	its identity is approved;
+	●	every applicable mandatory field is confirmed;
+	●	unknown mandatory facts are resolved;
+	●	conflicts are resolved or an approved policy explicitly allows deferral without claiming readiness;
+	●	process refs resolve;
+	●	contract refs are exact or tracked as permitted non-blocking external gaps;
+	●	required file inventory is reconciled;
+	●	module-local behavior and failure semantics are sufficient for its profile;
+	●	provenance is complete for accepted changed values;
+	●	no shadow module authority contradicts it.
+
+A module can be specification-ready even if implementation work remains. Keep implementation_verified separate.
+
+
+
+31. Definition of fully scraped
+
+A source version is fully scraped only when:
+
+	●	every relevant section was reviewed;
+	●	every relevant atomic claim was extracted;
+	●	every claim has a final disposition;
+	●	accepted claims are applied and verified;
+	●	rejected claims have reasons;
+	●	retained-external claims point to the live authority;
+	●	conflicts are resolved or explicitly governed as deferred;
+	●	no extraction row remains unprocessed;
+	●	affected authorities validate.
+
+Scanning/OCR/indexing is not equivalent to fully scraped.
+
+
+
+32. Definition of safe to archive
+
+A fully scraped source is safe to archive only when:
+
+	●	it is not an active authority;
+	●	it is not a required live input to tooling;
+	●	no unresolved relevant claim depends on it;
+	●	all active references are updated or intentionally historical;
+	●	the archive destination/receipt is prepared;
+	●	restoration is possible;
+	●	the approved retention policy permits archival.
+
+
+
+33. Git and change-management discipline
+
+Use small, reviewable commits by phase/batch.
+
+Recommended pattern:
+
+	●	P0 inventory/control artifacts;
+	●	P1 schema/policy/fixtures;
+	●	P2 staging candidates;
+	●	P3 pilot;
+	●	P4 wave/batch reconciliations;
+	●	P5 validation fixes;
+	●	P6 authority cutover;
+	●	P7 archival;
+	●	P8 closeout.
+
+Do not reset unrelated repository changes.
+Do not force-push over unrelated work.
+Do not hide generated files in the same commit as semantic decisions without clear commit message.
+
+Record commit SHAs in ledgers and evidence.
+
+
+
+34. Required status report after every phase
+
+After each phase produce a concise machine-readable and human-readable status containing:
+
+	●	phase;
+	●	baseline commit;
+	●	current branch/commit;
+	●	files added;
+	●	files modified;
+	●	manifests affected;
+	●	source versions processed;
+	●	claims processed;
+	●	blockers opened;
+	●	blockers resolved;
+	●	unresolved blockers;
+	●	validation commands run;
+	●	validation results;
+	●	unavailable validations;
+	●	next gate;
+	●	whether phase gate passed.
+
+Never report a phase passed without evidence.
+
+
+
+35. Stop/fail-closed conditions
+
+Stop semantic mutation and report BLOCKED if any of these occurs:
+
+	●	module universe does not equal 34 and no approved identity decision exists;
+	●	baseline changed unexpectedly;
+	●	root manifest changed after claim reconciliation started;
+	●	writer inventory reveals an uncontrolled process that can overwrite root authorities;
+	●	two active authorities claim the same module-specific fact after proposed cutover;
+	●	migration map loses a v1 field without a decision;
+	●	a required contract/process reference cannot be resolved and policy says it is blocking;
+	●	an archive candidate is still actively referenced as required authority/tool input;
+	●	hash verification fails;
+	●	a requested mutation would alter trading behavior rather than documentation/governance;
+	●	required validation cannot be executed and the missing check affects cutover safety.
+
+Do not improvise past these conditions.
+
+
+
+36. Final acceptance checklist
+
+Do not declare the task finished until all applicable items are true:
+
+		Fresh baseline recorded.
+		34 canonical roots verified.
+		34 root manifests verified.
+		Writer inventory complete.
+		Root/bundle drift reconciled.
+		26 canonical decisions recorded.
+		Field-authority matrix approved.
+		v2 schema exists and validates.
+		v1-to-v2 migration map accounts for every old field.
+		Positive and negative validation fixtures pass as intended.
+		Exactly 34 v2 candidates created.
+		Pilot completed successfully.
+		All source batches processed.
+		All relevant claims have final dispositions.
+		All 34 active manifests are v2.
+		Process refs resolve.
+		Shared contracts remain external and referenced correctly.
+		shared_file_registry.json exists and validates.
+		Exclusive/shared file usages are separated at step level.
+		No fake N/A process bindings remain.
+		Applicability and knowledge state are separate.
+		All meaningful changed fields have provenance.
+		Combined bundle is generated only from root manifests.
+		Old 27-module catalog is no longer competing authority.
+		Context packets/derived projections are regenerated from authorities.
+		Legacy reverse-writers are redirected or disabled.
+		CI enforces the authority direction.
+		Archive originals are immutable and receipts verify hashes.
+		fully_scraped and safe_to_archive remain separate.
+		Rollback tag exists and restoration was tested.
+		Final verification is reproducible.
+		Closeout report gives explicit denominators.
+		No unresolved mandatory blocker is hidden.
+		No live trading behavior was changed.
+
+
+
+37. Required final deliverables
+
+The execution AI must leave the repository with, at minimum:
+
+	1.	34 updated root manifest.json files.
+	2.	EAFIX_auth_docs/01_canonical_registries/eafix_unified_atomic_module_schema_v2_0_0.json.
+	3.	EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json.
+	4.	Updated EAFIX_auth_docs/00_doc_control_and_authority/doc_authority.json.
+	5.	Regenerated EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json as a derived projection.
+	6.	governance/module_consolidation/REMAINING_BLOCKERS_RESOLUTION_PLAN.md.
+	7.	governance/module_consolidation/resolution_decisions.json.
+	8.	governance/module_consolidation/field_authority_matrix.json.
+	9.	governance/module_consolidation/v1_to_v2_migration_map.json.
+	10.	governance/module_consolidation/run/baseline.json.
+	11.	governance/module_consolidation/run/source_processing_ledger.jsonl.
+	12.	governance/module_consolidation/run/claim_ledger.jsonl.
+	13.	governance/module_consolidation/run/blocker_resolution_queue.jsonl.
+	14.	governance/module_consolidation/run/writer_inventory.json.
+	15.	governance/module_consolidation/run/root_bundle_drift_report.json.
+	16.	governance/module_consolidation/run/final_verification.json.
+	17.	All batch reconciliation packages.
+	18.	governance/module_consolidation/validate_consolidation.py.
+	19.	governance/module_consolidation/generate_projections.py.
+	20.	.github/workflows/module-authority-validation.yml.
+	21.	Updated consolidation tracking files.
+	22.	Verified archive receipts for all retired sources.
+	23.	governance/module_consolidation/CLOSEOUT_REPORT.md.
+
+
+
+38. Final instruction to the executing AI
+
+Do not reinterpret this as a request to merely plan the work.
+
+Execute the work through the final authority state.
+
+The purpose of the governance machinery is to make it safe to populate and establish all 34 authoritative module manifests, not to become an elaborate substitute for doing so.
+
+When evidence is sufficient, decide and apply the result according to the authority model.
+
+When evidence is insufficient, preserve the uncertainty explicitly and report the exact missing evidence or approval required. Never fill the gap by invention.
+
+The end product must let another AI open one module root and understand that atomic module’s purpose, boundaries, process participation, files, contracts, runtime behavior, failures, safety constraints, verification, and provenance without needing to reconstruct the module from a half-dozen competing legacy sources. Global facts remain referenced from their correct global authorities, and global sharing relationships remain in the shared-file registry.
+
+That is the target architecture and the completion standard.

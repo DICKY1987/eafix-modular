@@ -1,35 +1,22 @@
-from __future__ import annotations
-
-import importlib.util
+"""Preserve alias protection after retirement of the historical generator."""
+import json
 from pathlib import Path
 
-import pytest
+ROOT = Path(__file__).resolve().parents[1]
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-GENERATOR_PATH = REPO_ROOT / "EA-REG" / "generate_three_artifact_catalogs.py"
+def test_aliases_resolve_to_canonical_root_symbols():
+    identities = [json.loads(p.read_text())["module_identity"]
+                  for p in ROOT.glob("m00*/manifest.json")]
+    aliases = {alias: item["canonical_symbol"] for item in identities
+               for alias in item["legacy_aliases"]}
+    assert aliases["O2_OMS"] == "O2_OMS_STATE_MACHINE"
+    assert aliases["O3_PNL_CLASSIFIER"] == "O3_TRADE_CLOSE_CLASSIFIER"
 
 
-def load_generator_module():
-    spec = importlib.util.spec_from_file_location("ea_reg_generator", GENERATOR_PATH)
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
-def test_resolve_module_symbol_maps_aliases_to_canonical_symbols():
-    generator = load_generator_module()
-    identifier_context = generator.load_identifier_context()
-
-    assert generator.resolve_module_symbol("O2_OMS", identifier_context) == "O2_OMS_STATE_MACHINE"
-    assert generator.resolve_module_symbol("O3_PNL_CLASSIFIER", identifier_context) == "O3_TRADE_CLOSE_CLASSIFIER"
-
-
-def test_legacy_generator_fails_explicitly_when_retired_inputs_are_absent():
-    generator = load_generator_module()
-
-    with pytest.raises(FileNotFoundError, match="physical registry not found"):
-        generator.load_physical_registry_rows()
-    with pytest.raises(FileNotFoundError, match="classification rules not found"):
-        generator.load_classification_rules()
+def test_retired_generator_is_not_restored_as_authority():
+    assert not (ROOT / "EA-REG/generate_three_artifact_catalogs.py").exists()
+    assert (ROOT / "Master_Archive/EA-REG/generate_three_artifact_catalogs.py").is_file()
+    caller = (ROOT / "ci/2099900300260118_validate_atomic_module_manifests.py").read_text()
+    assert "generate_three_artifact_catalogs" not in caller
+    assert "tools.manifest_generation" not in caller

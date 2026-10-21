@@ -1,32 +1,48 @@
-from __future__ import annotations
-
+"""The replacement route propagates failures and cannot write authorities."""
 import importlib.util
 from pathlib import Path
+from types import SimpleNamespace
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-VALIDATOR_PATH = REPO_ROOT / "EA-REG" / "validate_three_artifact_alignment.py"
-
-
-def load_validator_module():
-    spec = importlib.util.spec_from_file_location("ea_reg_validator", VALIDATOR_PATH)
-    assert spec is not None and spec.loader is not None
+def caller():
+    spec = importlib.util.spec_from_file_location("authority_ci", ROOT / "ci/2099900300260118_validate_atomic_module_manifests.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
 
 
-def test_legacy_validator_reports_missing_authorities_without_false_pass(tmp_path: Path):
-    validator_module = load_validator_module()
-    legacy_root = tmp_path / "EA-REG"
-    legacy_root.mkdir()
-    validator = validator_module.ArtifactValidator(legacy_root)
+def test_default_gate_propagates_block_without_running_projection(monkeypatch):
+    module = caller()
+    calls = []
+    def run(command, **kwargs):
+        calls.append(command)
+        return SimpleNamespace(returncode=1)
+    monkeypatch.setattr(module.subprocess, "run", run)
+    assert module.main([]) == 1
+    assert len(calls) == 1
+    assert calls[0][-2:] == ["--mode", "active"]
 
-    success, report = validator.validate_all()
 
-    assert success is False
-    assert report["physical_status"] == "FAIL"
-    assert report["alignment_status"] == "FAIL"
-    assert report["readiness_status"] == "FAIL"
-    assert report["physical_errors"]
-    assert report["alignment_errors"]
+def test_progress_requires_explicit_scope_and_does_not_certify_projections(monkeypatch):
+    module = caller()
+    calls = []
+    def run(command, **kwargs):
+        calls.append(command)
+        return SimpleNamespace(returncode=0)
+    monkeypatch.setattr(module.subprocess, "run", run)
+    assert module.main(["--scope", "progress"]) == 0
+    assert len(calls) == 1
+    assert calls[0][-1].endswith("progress_gate.py")
+
+
+def test_projection_is_checked_only_after_full_acceptance(monkeypatch):
+    module = caller()
+    calls = []
+    def run(command, **kwargs):
+        calls.append(command)
+        return SimpleNamespace(returncode=0 if len(calls) == 1 else 2)
+    monkeypatch.setattr(module.subprocess, "run", run)
+    assert module.main([]) == 2
+    assert calls[1][-2:] == ["governance/module_consolidation/generate_projections.py", "--check"]

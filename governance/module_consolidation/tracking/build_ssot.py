@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 Build the SSOT work plan for the EAFIX 34-module documentation consolidation.
 
@@ -7,10 +7,15 @@ Nothing in this file is a status the UI may overwrite: sync is one-way
 (repo -> GitHub) and project_sync.py reports drift rather than absorbing it.
 """
 import json
-from datetime import date
+from pathlib import Path
 
-PLAN_VERSION = "1.0.0"
-BASELINE_COMMIT = "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+PLAN_VERSION = "2.0.0"
+BASELINE_COMMIT = "f37f8ca8bd966031fb243a9cd9401b065c29135a"
+CONTROL = Path(__file__).resolve().parents[1]
+
+
+def read_governance(name):
+    return json.loads((CONTROL / name).read_text(encoding="utf-8-sig"))
 
 MODULES = [
     ("m0001", "m0001-f1-config-preferences",       "F1_CONFIG_PREFERENCES",      "W1"),
@@ -272,18 +277,55 @@ def build():
             "labels": ["consolidation", "module"] + (["pilot"] if is_pilot else []),
         })
 
+    baseline = read_governance("run/baseline.json")
+    if baseline["baseline_commit"] != BASELINE_COMMIT:
+        raise ValueError("Tracking baseline must match the frozen execution baseline")
+    governed = {d["decision_id"]: d for d in read_governance("resolution_decisions.json")["decisions"]}
+    phase_status = read_governance("run/phase_status.json")
+    execution_policy = read_governance("execution_policy.json")
+    independent_work = execution_policy["status"] == "approved_scoped_suspension"
+    legacy_mapping = {"D1": "DEC-001", "D2": "DEC-002", "D3": "DEC-006", "D4": "DEC-010",
+                      "D5": "DEC-012", "D6": "DEC-015", "D7": "DEC-005"}
+    for item in items:
+        fields = item["fields"]
+        if item["item_type"] in {"Phase", "Gate"}:
+            result = phase_status[fields["Phase"]]
+            fields["Status"] = "Done" if result["status"] == "PASS" else "Blocked"
+            if independent_work and item["item_type"] == "Phase" and fields["Phase"] in {"P0", "P1", "P3", "P4", "P5"}:
+                fields["Status"] = "In Progress"
+            fields["Blocked Reason"] = result["reason"]
+            item["body"] = result["reason"] + "\n\nEvidence: governance/module_consolidation/run/phase_status.json"
+        elif item["item_type"] == "Decision":
+            decision = governed[legacy_mapping[item["ssot_id"].removeprefix("DEC-")]]
+            fields["Status"] = "Done"
+            fields["Evidence Ref"] = decision["decision_id"]
+            fields["Approver"] = decision["approved_by"]
+            item["body"] = decision["decision"] + "\n\nPolicy approved; authority cutover remains blocked. See resolution_decisions.json."
+        elif item["item_type"] == "Module":
+            short = item["ssot_id"].removeprefix("MOD-")
+            candidate = read_governance(f"staging/{short}/manifest.v2.candidate.json")
+            fields.update({"Status": "In Progress" if independent_work else "Blocked", "Schema Valid": "Yes" if candidate["reconciliation"]["schema_valid"] else "No",
+                           "Spec Ready": "No", "Impl Verified": "No", "Evidence Ref": f"staging/{short}/manifest.v2.candidate.json",
+                           "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."})
+            item["body"] = f"Root: {fields['Module Root']}/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent."
+        elif item["item_type"] in {"Wave", "Deliverable"}:
+            fields["Status"] = "In Progress" if independent_work and item["item_type"] == "Wave" else "Blocked"
+            fields["Blocked Reason"] = "Consult execution reports for partial artifacts; final authority state has not passed."
+    source_count = sum(1 for line in (CONTROL / "run/source_processing_ledger.jsonl").read_text().splitlines() if line.strip())
     return {
         "ssot_version": PLAN_VERSION,
-        "generated_on": date.today().isoformat(),
+        "generated_on": baseline["pinned_at_utc"].split("T")[0],
         "baseline_commit": BASELINE_COMMIT,
+        "execution_status": execution_policy["execution_status"],
+        "cutover_status": "BLOCKED",
         "repository": "DICKY1987/eafix-modular",
         "authority_note": (
             "This file is the SSOT for consolidation WORK TRACKING only. It is not a module authority and not "
-            "a claim ledger. Sources (269) and claims (thousands) are tracked in the repo ledger, never as "
+            f"a claim ledger. Source versions ({source_count}) and claims are tracked in the repo ledger, never as "
             "project items."
         ),
         "not_tracked_in_github": [
-            "Individual source documents (269) - source-processing ledger owns their state",
+            f"Individual source versions ({source_count}) - source-processing ledger owns their state",
             "Extracted claims and dispositions - claim ledger owns these",
             "Field-level evidence - module manifests own this",
             "Gate approval evidence - consolidation policy and ledger own this",
@@ -297,7 +339,7 @@ def build_items_sorted(items):
 
 if __name__ == "__main__":
     doc = build()
-    with open("eafix_consolidation_ssot.json", "w") as f:
+    with (Path(__file__).resolve().parent / "eafix_consolidation_ssot.json").open("w", encoding="utf-8") as f:
         json.dump(doc, f, indent=2)
         f.write("\n")
     counts = {}

@@ -1,11 +1,13 @@
 {
-  "ssot_version": "1.0.0",
-  "generated_on": "2026-09-26",
-  "baseline_commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f",
+  "ssot_version": "2.0.0",
+  "generated_on": "2026-10-04",
+  "baseline_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+  "execution_status": "ACTIVE_WITH_SCOPED_HOLDS",
+  "cutover_status": "BLOCKED",
   "repository": "DICKY1987/eafix-modular",
-  "authority_note": "This file is the SSOT for consolidation WORK TRACKING only. It is not a module authority and not a claim ledger. Sources (269) and claims (thousands) are tracked in the repo ledger, never as project items.",
+  "authority_note": "This file is the SSOT for consolidation WORK TRACKING only. It is not a module authority and not a claim ledger. Source versions (2174) and claims are tracked in the repo ledger, never as project items.",
   "not_tracked_in_github": [
-    "Individual source documents (269) - source-processing ledger owns their state",
+    "Individual source versions (2174) - source-processing ledger owns their state",
     "Extracted claims and dispositions - claim ledger owns these",
     "Field-level evidence - module manifests own this",
     "Gate approval evidence - consolidation policy and ledger own this"
@@ -15,13 +17,14 @@
       "ssot_id": "PHASE-P0",
       "item_type": "Phase",
       "title": "P0 - Baseline",
-      "body": "**Phase P0: Baseline**\n\n### Work\nPin commit; inspect local changes; inventory sources, roots, authorities, references, and all generators/writers.\n\n### Gate to proceed\nReproducible inventory and agreed scope; unresolved identity/authority conflicts explicitly listed.\n\n---\nProjected from the consolidation SSOT. Status is owned by the repo ledger, not this issue.",
+      "body": "Fresh master f37f8ca verified under DEC-034. ZIP CRC and 15 checksums pass. All 34 roots unchanged; carried source inventory and historical evidence retained. Remaining scope/reconciliation holds stay visible.\n\nEvidence: governance/module_consolidation/run/phase_status.json",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Phase",
         "Phase": "P0",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Fresh master f37f8ca verified under DEC-034. ZIP CRC and 15 checksums pass. All 34 roots unchanged; carried source inventory and historical evidence retained. Remaining scope/reconciliation holds stay visible."
       },
       "parent": null,
       "labels": [
@@ -33,13 +36,14 @@
       "ssot_id": "PHASE-P1",
       "item_type": "Phase",
       "title": "P1 - Policy and schema",
-      "body": "**Phase P1: Policy and schema**\n\n### Work\nApprove Section 2 decisions; build field-authority matrix, new schema, migration map, and validation fixtures.\n\n### Gate to proceed\nOwner approval; representative positive/negative schema tests pass.\n\n---\nProjected from the consolidation SSOT. Status is owned by the repo ledger, not this issue.",
+      "body": "Prescribed decisions and draft v2 schema exist; offline fixtures pass; schema completeness remains subject to full pilot reconciliation.\n\nEvidence: governance/module_consolidation/run/phase_status.json",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Phase",
         "Phase": "P1",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Prescribed decisions and draft v2 schema exist; offline fixtures pass; schema completeness remains subject to full pilot reconciliation."
       },
       "parent": null,
       "labels": [
@@ -51,13 +55,14 @@
       "ssot_id": "PHASE-P2",
       "item_type": "Phase",
       "title": "P2 - Seed all 34 candidates",
-      "body": "**Phase P2: Seed all 34 candidates**\n\n### Work\nCopy existing module information into staging through the migration map; retain lineage and unknowns.\n\n### Gate to proceed\nExactly 34 correctly identified candidates; no unaccounted v1 field loss.\n\n---\nProjected from the consolidation SSOT. Status is owned by the repo ledger, not this issue.",
+      "body": "34 candidates created; all 13,702 original v1 leaves preserved with a migration-map entry; active roots unchanged.\n\nEvidence: governance/module_consolidation/run/phase_status.json",
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Item Type": "Phase",
         "Phase": "P2",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "34 candidates created; all 13,702 original v1 leaves preserved with a migration-map entry; active roots unchanged."
       },
       "parent": null,
       "labels": [
@@ -69,13 +74,14 @@
       "ssot_id": "PHASE-P3",
       "item_type": "Phase",
       "title": "P3 - Pilot",
-      "body": "**Phase P3: Pilot**\n\n### Work\nRun full reconciliation on representative modules and document formats; exercise archival in a disposable copy only.\n\n### Gate to proceed\nEnd-to-end evidence, conflict handling, repeatability, and restoration checks pass.\n\n---\nProjected from the consolidation SSOT. Status is owned by the repo ledger, not this issue.",
+      "body": "22 offline fixtures and 42 focused tests pass. Five pilot code sources read completely; eight observations applied and three GUI conformance findings open. Pilot source reconciliation/mandatory B1 evidence incomplete.\n\nEvidence: governance/module_consolidation/run/phase_status.json",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Phase",
         "Phase": "P3",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "22 offline fixtures and 42 focused tests pass. Five pilot code sources read completely; eight observations applied and three GUI conformance findings open. Pilot source reconciliation/mandatory B1 evidence incomplete."
       },
       "parent": null,
       "labels": [
@@ -87,13 +93,14 @@
       "ssot_id": "PHASE-P4",
       "item_type": "Phase",
       "title": "P4 - Controlled batches",
-      "body": "**Phase P4: Controlled batches**\n\n### Work\nProcess pinned source batches and complete module coverage waves; stage only approved changes.\n\n### Gate to proceed\nEvery batch passes its own gates; unresolved matters remain visible.\n\n---\nProjected from the consolidation SSOT. Status is owned by the repo ledger, not this issue.",
+      "body": "Eleven partial batch packages, including current pilot-code observations. No source fully scraped; source-wide reconciliation remains incomplete.\n\nEvidence: governance/module_consolidation/run/phase_status.json",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Phase",
         "Phase": "P4",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Eleven partial batch packages, including current pilot-code observations. No source fully scraped; source-wide reconciliation remains incomplete."
       },
       "parent": null,
       "labels": [
@@ -105,13 +112,14 @@
       "ssot_id": "PHASE-P5",
       "item_type": "Phase",
       "title": "P5 - System validation",
-      "body": "**Phase P5: System validation**\n\n### Work\nValidate all 34 together, references, contracts, process bindings, ownership, behavior completeness, and coverage.\n\n### Gate to proceed\nApproved specifications ready for cutover; no unresolved mandatory specification blockers.\n\n---\nProjected from the consolidation SSOT. Status is owned by the repo ledger, not this issue.",
+      "body": "34 structurally valid candidates; 0 specification-ready. Four critical holds, mandatory review queue and coverage gate remain. Repository tests: 126 passed, 7 skipped, zero errors/failures; 0% coverage vs 85%.\n\nEvidence: governance/module_consolidation/run/phase_status.json",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Phase",
         "Phase": "P5",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "34 structurally valid candidates; 0 specification-ready. Four critical holds, mandatory review queue and coverage gate remain. Repository tests: 126 passed, 7 skipped, zero errors/failures; 0% coverage vs 85%."
       },
       "parent": null,
       "labels": [
@@ -123,13 +131,14 @@
       "ssot_id": "PHASE-P6",
       "item_type": "Phase",
       "title": "P6 - Authority cutover",
-      "body": "**Phase P6: Authority cutover**\n\n### Work\nPublish the 34 manifests and authority routing together; redirect legacy writers; regenerate designated projections.\n\n### Gate to proceed\nOne active authority per fact class; CI and regenerated projections agree.\n\n---\nProjected from the consolidation SSOT. Status is owned by the repo ledger, not this issue.",
+      "body": "No cutover: P5 has not passed. All active roots, authority routing and old projections remain at baseline.\n\nEvidence: governance/module_consolidation/run/phase_status.json",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Phase",
         "Phase": "P6",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "No cutover: P5 has not passed. All active roots, authority routing and old projections remain at baseline."
       },
       "parent": null,
       "labels": [
@@ -141,13 +150,14 @@
       "ssot_id": "PHASE-P7",
       "item_type": "Phase",
       "title": "P7 - Retire eligible documents",
-      "body": "**Phase P7: Retire eligible documents**\n\n### Work\nVerify committed target values; mark fully scraped; check retention/references; archive approved sources.\n\n### Gate to proceed\nEach source independently meets reconciliation and archive gates.\n\n---\nProjected from the consolidation SSOT. Status is owned by the repo ledger, not this issue.",
+      "body": "No source meets both reconciliation and retention gates. No real source archived.\n\nEvidence: governance/module_consolidation/run/phase_status.json",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Phase",
         "Phase": "P7",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "No source meets both reconciliation and retention gates. No real source archived."
       },
       "parent": null,
       "labels": [
@@ -159,13 +169,14 @@
       "ssot_id": "PHASE-P8",
       "item_type": "Phase",
       "title": "P8 - Closeout and maintenance",
-      "body": "**Phase P8: Closeout and maintenance**\n\n### Work\nDeliver verification summary, remaining live references, archive index, gaps, and future-change rules.\n\n### Gate to proceed\nOwner accepts results against Section 13, not merely a file-count target.\n\n---\nProjected from the consolidation SSOT. Status is owned by the repo ledger, not this issue.",
+      "body": "Blocked execution report prepared; final program acceptance is not met.\n\nEvidence: governance/module_consolidation/run/phase_status.json",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Phase",
         "Phase": "P8",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Blocked execution report prepared; final program acceptance is not met."
       },
       "parent": null,
       "labels": [
@@ -177,13 +188,14 @@
       "ssot_id": "GATE-P0",
       "item_type": "Gate",
       "title": "GATE P0 - Baseline",
-      "body": "**Gate for phase P0.** Close only when the criterion below is met and evidence is recorded.\n\n### Criterion\nReproducible inventory and agreed scope; unresolved identity/authority conflicts explicitly listed.\n\n### Required before close\n- [ ] Evidence recorded in the ledger (not in this issue)\n- [ ] Named approver recorded\n- [ ] No unresolved blocking items in this phase\n\n---\nA gate is an approval record. GitHub is not the authority for it; the repo ledger is.",
+      "body": "Fresh master f37f8ca verified under DEC-034. ZIP CRC and 15 checksums pass. All 34 roots unchanged; carried source inventory and historical evidence retained. Remaining scope/reconciliation holds stay visible.\n\nEvidence: governance/module_consolidation/run/phase_status.json",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Gate",
         "Phase": "P0",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Fresh master f37f8ca verified under DEC-034. ZIP CRC and 15 checksums pass. All 34 roots unchanged; carried source inventory and historical evidence retained. Remaining scope/reconciliation holds stay visible."
       },
       "parent": "PHASE-P0",
       "labels": [
@@ -195,13 +207,14 @@
       "ssot_id": "GATE-P1",
       "item_type": "Gate",
       "title": "GATE P1 - Policy and schema",
-      "body": "**Gate for phase P1.** Close only when the criterion below is met and evidence is recorded.\n\n### Criterion\nOwner approval; representative positive/negative schema tests pass.\n\n### Required before close\n- [ ] Evidence recorded in the ledger (not in this issue)\n- [ ] Named approver recorded\n- [ ] No unresolved blocking items in this phase\n\n---\nA gate is an approval record. GitHub is not the authority for it; the repo ledger is.",
+      "body": "Prescribed decisions and draft v2 schema exist; offline fixtures pass; schema completeness remains subject to full pilot reconciliation.\n\nEvidence: governance/module_consolidation/run/phase_status.json",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Gate",
         "Phase": "P1",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Prescribed decisions and draft v2 schema exist; offline fixtures pass; schema completeness remains subject to full pilot reconciliation."
       },
       "parent": "PHASE-P1",
       "labels": [
@@ -213,13 +226,14 @@
       "ssot_id": "GATE-P2",
       "item_type": "Gate",
       "title": "GATE P2 - Seed all 34 candidates",
-      "body": "**Gate for phase P2.** Close only when the criterion below is met and evidence is recorded.\n\n### Criterion\nExactly 34 correctly identified candidates; no unaccounted v1 field loss.\n\n### Required before close\n- [ ] Evidence recorded in the ledger (not in this issue)\n- [ ] Named approver recorded\n- [ ] No unresolved blocking items in this phase\n\n---\nA gate is an approval record. GitHub is not the authority for it; the repo ledger is.",
+      "body": "34 candidates created; all 13,702 original v1 leaves preserved with a migration-map entry; active roots unchanged.\n\nEvidence: governance/module_consolidation/run/phase_status.json",
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Item Type": "Gate",
         "Phase": "P2",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "34 candidates created; all 13,702 original v1 leaves preserved with a migration-map entry; active roots unchanged."
       },
       "parent": "PHASE-P2",
       "labels": [
@@ -231,13 +245,14 @@
       "ssot_id": "GATE-P3",
       "item_type": "Gate",
       "title": "GATE P3 - Pilot",
-      "body": "**Gate for phase P3.** Close only when the criterion below is met and evidence is recorded.\n\n### Criterion\nEnd-to-end evidence, conflict handling, repeatability, and restoration checks pass.\n\n### Required before close\n- [ ] Evidence recorded in the ledger (not in this issue)\n- [ ] Named approver recorded\n- [ ] No unresolved blocking items in this phase\n\n---\nA gate is an approval record. GitHub is not the authority for it; the repo ledger is.",
+      "body": "22 offline fixtures and 42 focused tests pass. Five pilot code sources read completely; eight observations applied and three GUI conformance findings open. Pilot source reconciliation/mandatory B1 evidence incomplete.\n\nEvidence: governance/module_consolidation/run/phase_status.json",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Gate",
         "Phase": "P3",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "22 offline fixtures and 42 focused tests pass. Five pilot code sources read completely; eight observations applied and three GUI conformance findings open. Pilot source reconciliation/mandatory B1 evidence incomplete."
       },
       "parent": "PHASE-P3",
       "labels": [
@@ -249,13 +264,14 @@
       "ssot_id": "GATE-P4",
       "item_type": "Gate",
       "title": "GATE P4 - Controlled batches",
-      "body": "**Gate for phase P4.** Close only when the criterion below is met and evidence is recorded.\n\n### Criterion\nEvery batch passes its own gates; unresolved matters remain visible.\n\n### Required before close\n- [ ] Evidence recorded in the ledger (not in this issue)\n- [ ] Named approver recorded\n- [ ] No unresolved blocking items in this phase\n\n---\nA gate is an approval record. GitHub is not the authority for it; the repo ledger is.",
+      "body": "Eleven partial batch packages, including current pilot-code observations. No source fully scraped; source-wide reconciliation remains incomplete.\n\nEvidence: governance/module_consolidation/run/phase_status.json",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Gate",
         "Phase": "P4",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Eleven partial batch packages, including current pilot-code observations. No source fully scraped; source-wide reconciliation remains incomplete."
       },
       "parent": "PHASE-P4",
       "labels": [
@@ -267,13 +283,14 @@
       "ssot_id": "GATE-P5",
       "item_type": "Gate",
       "title": "GATE P5 - System validation",
-      "body": "**Gate for phase P5.** Close only when the criterion below is met and evidence is recorded.\n\n### Criterion\nApproved specifications ready for cutover; no unresolved mandatory specification blockers.\n\n### Required before close\n- [ ] Evidence recorded in the ledger (not in this issue)\n- [ ] Named approver recorded\n- [ ] No unresolved blocking items in this phase\n\n---\nA gate is an approval record. GitHub is not the authority for it; the repo ledger is.",
+      "body": "34 structurally valid candidates; 0 specification-ready. Four critical holds, mandatory review queue and coverage gate remain. Repository tests: 126 passed, 7 skipped, zero errors/failures; 0% coverage vs 85%.\n\nEvidence: governance/module_consolidation/run/phase_status.json",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Gate",
         "Phase": "P5",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "34 structurally valid candidates; 0 specification-ready. Four critical holds, mandatory review queue and coverage gate remain. Repository tests: 126 passed, 7 skipped, zero errors/failures; 0% coverage vs 85%."
       },
       "parent": "PHASE-P5",
       "labels": [
@@ -285,13 +302,14 @@
       "ssot_id": "GATE-P6",
       "item_type": "Gate",
       "title": "GATE P6 - Authority cutover",
-      "body": "**Gate for phase P6.** Close only when the criterion below is met and evidence is recorded.\n\n### Criterion\nOne active authority per fact class; CI and regenerated projections agree.\n\n### Required before close\n- [ ] Evidence recorded in the ledger (not in this issue)\n- [ ] Named approver recorded\n- [ ] No unresolved blocking items in this phase\n\n---\nA gate is an approval record. GitHub is not the authority for it; the repo ledger is.",
+      "body": "No cutover: P5 has not passed. All active roots, authority routing and old projections remain at baseline.\n\nEvidence: governance/module_consolidation/run/phase_status.json",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Gate",
         "Phase": "P6",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "No cutover: P5 has not passed. All active roots, authority routing and old projections remain at baseline."
       },
       "parent": "PHASE-P6",
       "labels": [
@@ -303,13 +321,14 @@
       "ssot_id": "GATE-P7",
       "item_type": "Gate",
       "title": "GATE P7 - Retire eligible documents",
-      "body": "**Gate for phase P7.** Close only when the criterion below is met and evidence is recorded.\n\n### Criterion\nEach source independently meets reconciliation and archive gates.\n\n### Required before close\n- [ ] Evidence recorded in the ledger (not in this issue)\n- [ ] Named approver recorded\n- [ ] No unresolved blocking items in this phase\n\n---\nA gate is an approval record. GitHub is not the authority for it; the repo ledger is.",
+      "body": "No source meets both reconciliation and retention gates. No real source archived.\n\nEvidence: governance/module_consolidation/run/phase_status.json",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Gate",
         "Phase": "P7",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "No source meets both reconciliation and retention gates. No real source archived."
       },
       "parent": "PHASE-P7",
       "labels": [
@@ -321,13 +340,14 @@
       "ssot_id": "GATE-P8",
       "item_type": "Gate",
       "title": "GATE P8 - Closeout and maintenance",
-      "body": "**Gate for phase P8.** Close only when the criterion below is met and evidence is recorded.\n\n### Criterion\nOwner accepts results against Section 13, not merely a file-count target.\n\n### Required before close\n- [ ] Evidence recorded in the ledger (not in this issue)\n- [ ] Named approver recorded\n- [ ] No unresolved blocking items in this phase\n\n---\nA gate is an approval record. GitHub is not the authority for it; the repo ledger is.",
+      "body": "Blocked execution report prepared; final program acceptance is not met.\n\nEvidence: governance/module_consolidation/run/phase_status.json",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Gate",
         "Phase": "P8",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Blocked execution report prepared; final program acceptance is not met."
       },
       "parent": "PHASE-P8",
       "labels": [
@@ -339,13 +359,15 @@
       "ssot_id": "DEC-D1",
       "item_type": "Decision",
       "title": "DECISION D1 - Module authority location",
-      "body": "**Module authority location**\n\n### Recommended default\nOne `<existing-module-root>/manifest.json` per module; retain the currently approved filename if different.\n\n### Why it matters\nAvoid introducing a second module authority or coupling this work to folder migration.\n\n### Close criteria\n- [ ] Owner decision recorded in the consolidation policy\n- [ ] Who may approve exceptions is named\n\n---\nBlocks P1. Execution must not begin while this is open.",
+      "body": "Each <module-root>/manifest.json is the authoritative source for module-specific facts after cutover.\n\nPolicy approved; authority cutover remains blocked. See resolution_decisions.json.",
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Item Type": "Decision",
         "Phase": "P1",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "DEC-001",
+        "Approver": "Repository owner through execution instructions 1.0.0"
       },
       "parent": "PHASE-P1",
       "labels": [
@@ -358,13 +380,15 @@
       "ssot_id": "DEC-D2",
       "item_type": "Decision",
       "title": "DECISION D2 - Meaning of single authority",
-      "body": "**Meaning of single authority**\n\n### Recommended default\nModule JSON owns module-specific specs; shared contracts and global process definitions retain their own authorities.\n\n### Why it matters\nPrevent conflicting copies of shared facts inside 34 files.\n\n### Close criteria\n- [ ] Owner decision recorded in the consolidation policy\n- [ ] Who may approve exceptions is named\n\n---\nBlocks P1. Execution must not begin while this is open.",
+      "body": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl remains canonical for global process steps/order/topology. Module manifests reference it.\n\nPolicy approved; authority cutover remains blocked. See resolution_decisions.json.",
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Item Type": "Decision",
         "Phase": "P1",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "DEC-002",
+        "Approver": "Repository owner through execution instructions 1.0.0"
       },
       "parent": "PHASE-P1",
       "labels": [
@@ -377,13 +401,15 @@
       "ssot_id": "DEC-D3",
       "item_type": "Decision",
       "title": "DECISION D3 - Schema evolution",
-      "body": "**Schema evolution**\n\n### Recommended default\nPublish a new major schema version for breaking changes; keep the supplied v1 schema immutable.\n\n### Why it matters\nChanging process cardinality and provenance requires an explicit migration.\n\n### Close criteria\n- [ ] Owner decision recorded in the consolidation policy\n- [ ] Who may approve exceptions is named\n\n---\nBlocks P1. Execution must not begin while this is open.",
+      "body": "All 34 active root manifests must use eafix_unified_atomic_module_schema_v2_0_0.json at coordinated cutover.\n\nPolicy approved; authority cutover remains blocked. See resolution_decisions.json.",
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Item Type": "Decision",
         "Phase": "P1",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "DEC-006",
+        "Approver": "Repository owner through execution instructions 1.0.0"
       },
       "parent": "PHASE-P1",
       "labels": [
@@ -396,13 +422,15 @@
       "ssot_id": "DEC-D4",
       "item_type": "Decision",
       "title": "DECISION D4 - Decision authority",
-      "body": "**Decision authority**\n\n### Recommended default\nRepository owner, or explicitly delegated reviewer, approves semantic resolutions; automation may propose.\n\n### Why it matters\nA confidence score or historical document label is not approval.\n\n### Close criteria\n- [ ] Owner decision recorded in the consolidation policy\n- [ ] Who may approve exceptions is named\n\n---\nBlocks P1. Execution must not begin while this is open.",
+      "body": "Accepted meaningful fields require evidence addressable by stable field path/JSON Pointer and source locator.\n\nPolicy approved; authority cutover remains blocked. See resolution_decisions.json.",
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Item Type": "Decision",
         "Phase": "P1",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "DEC-010",
+        "Approver": "Repository owner through execution instructions 1.0.0"
       },
       "parent": "PHASE-P1",
       "labels": [
@@ -415,13 +443,15 @@
       "ssot_id": "DEC-D5",
       "item_type": "Decision",
       "title": "DECISION D5 - Automation boundary",
-      "body": "**Automation boundary**\n\n### Recommended default\nPilot requires review of every change; later permit only expressly approved low-risk rules.\n\n### Why it matters\nBlank fields can still receive wrong information.\n\n### Close criteria\n- [ ] Owner decision recorded in the consolidation policy\n- [ ] Who may approve exceptions is named\n\n---\nBlocks P1. Execution must not begin while this is open.",
+      "body": "A changed supporting document creates a reconciliation proposal, not an automatic manifest mutation.\n\nPolicy approved; authority cutover remains blocked. See resolution_decisions.json.",
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Item Type": "Decision",
         "Phase": "P1",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "DEC-012",
+        "Approver": "Repository owner through execution instructions 1.0.0"
       },
       "parent": "PHASE-P1",
       "labels": [
@@ -434,13 +464,15 @@
       "ssot_id": "DEC-D6",
       "item_type": "Decision",
       "title": "DECISION D6 - Header and archive policy",
-      "body": "**Header and archive policy**\n\n### Recommended default\nPreserve original bytes; annotate an archived prose copy; use a standard sidecar and notice for every format.\n\n### Why it matters\nMeet the notice requirement without corrupting JSON, CSV, PDFs, or evidence.\n\n### Close criteria\n- [ ] Owner decision recorded in the consolidation policy\n- [ ] Who may approve exceptions is named\n\n---\nBlocks P1. Execution must not begin while this is open.",
+      "body": "Archived originals preserve exact bytes. Notices live in sidecars/README or annotated prose copies.\n\nPolicy approved; authority cutover remains blocked. See resolution_decisions.json.",
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Item Type": "Decision",
         "Phase": "P1",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "DEC-015",
+        "Approver": "Repository owner through execution instructions 1.0.0"
       },
       "parent": "PHASE-P1",
       "labels": [
@@ -453,13 +485,15 @@
       "ssot_id": "DEC-D7",
       "item_type": "Decision",
       "title": "DECISION D7 - Disposition of the competing manifest bundle",
-      "body": "**Disposition of the competing manifest bundle**\n\n### Recommended default\nDecide the fate of EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json: regenerate-from-roots, or archive. VERIFIED 2026-09-22: it holds all 34 manifests in the identical v1 shape and already disagrees with the module roots on 28 of 34 (file_ownership, reconciliation_status, last_updated_utc, notes).\n\n### Why it matters\nA live second authority can silently reverse the P6 cutover. Not in the original Section 2 list; added from baseline verification.\n\n### Close criteria\n- [ ] Owner decision recorded in the consolidation policy\n- [ ] Who may approve exceptions is named\n\n---\nBlocks P1. Execution must not begin while this is open.",
+      "body": "EAFIX_auth_docs/manifests/eafix_module_manifests_bundle.vNext.schema_valid.json is generated from the 34 roots and is not permitted to feed root manifests.\n\nPolicy approved; authority cutover remains blocked. See resolution_decisions.json.",
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Item Type": "Decision",
         "Phase": "P1",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "DEC-005",
+        "Approver": "Repository owner through execution instructions 1.0.0"
       },
       "parent": "PHASE-P1",
       "labels": [
@@ -474,11 +508,12 @@
       "title": "DL1 - Consolidation policy",
       "body": "**Consolidation policy**\n\nField ownership, approval rules, profiles, migration map, and completeness rules.\n\n---\nDeliverable of phase P1.",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Deliverable",
         "Phase": "P1",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Consult execution reports for partial artifacts; final authority state has not passed."
       },
       "parent": "PHASE-P1",
       "labels": [
@@ -492,11 +527,12 @@
       "title": "DL2 - Atomic module schema v2",
       "body": "**Atomic module schema v2**\n\nAdds behavior, applicability, field evidence, conflicts, verification, and source-extraction sections. VERIFIED: 0 of 34 current manifests carry any of these; all are schema_version 1.0.0.\n\n---\nDeliverable of phase P1.",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Deliverable",
         "Phase": "P1",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Consult execution reports for partial artifacts; final authority state has not passed."
       },
       "parent": "PHASE-P1",
       "labels": [
@@ -510,11 +546,12 @@
       "title": "DL3 - v1 to v2 migration map",
       "body": "**v1 to v2 migration map**\n\nEvery old field retained, transformed, or retired with a recorded reason. No silent field loss.\n\n---\nDeliverable of phase P1.",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Deliverable",
         "Phase": "P1",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Consult execution reports for partial artifacts; final authority state has not passed."
       },
       "parent": "PHASE-P1",
       "labels": [
@@ -528,11 +565,12 @@
       "title": "DL4 - Validation fixtures",
       "body": "**Validation fixtures**\n\nRepresentative positive and negative schema tests.\n\n---\nDeliverable of phase P1.",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Deliverable",
         "Phase": "P1",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Consult execution reports for partial artifacts; final authority state has not passed."
       },
       "parent": "PHASE-P1",
       "labels": [
@@ -546,11 +584,12 @@
       "title": "DL5 - Source-processing ledger",
       "body": "**Source-processing ledger**\n\nInventory, source versions, coverage, state transitions, retention, archive locations. VERIFIED: 269 files in EAFIX_auth_docs; only 37 match on filename.\n\n---\nDeliverable of phase P0.",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Deliverable",
         "Phase": "P0",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Consult execution reports for partial artifacts; final authority state has not passed."
       },
       "parent": "PHASE-P0",
       "labels": [
@@ -564,11 +603,12 @@
       "title": "DL6 - Writer and generator inventory",
       "body": "**Writer and generator inventory**\n\nEvery script, CI job, editor and importer that can rewrite manifests, registries, bundles or context packets.\n\n---\nDeliverable of phase P0.",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Deliverable",
         "Phase": "P0",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Consult execution reports for partial artifacts; final authority state has not passed."
       },
       "parent": "PHASE-P0",
       "labels": [
@@ -582,11 +622,12 @@
       "title": "DL7 - Batch reconciliation record set",
       "body": "**Batch reconciliation record set**\n\nExtracted claims, proposed mappings, baseline values, decisions, candidate patches.\n\n---\nDeliverable of phase P4.",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Deliverable",
         "Phase": "P4",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Consult execution reports for partial artifacts; final authority state has not passed."
       },
       "parent": "PHASE-P4",
       "labels": [
@@ -600,11 +641,12 @@
       "title": "DL8 - Archive tree and receipts",
       "body": "**Archive tree and receipts**\n\narchive/module-supporting-docs/<source-id>/<hash-prefix>/ with original, receipt.json, README notice. VERIFIED: no top-level archive/ exists yet.\n\n---\nDeliverable of phase P7.",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Deliverable",
         "Phase": "P7",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Consult execution reports for partial artifacts; final authority state has not passed."
       },
       "parent": "PHASE-P7",
       "labels": [
@@ -618,11 +660,12 @@
       "title": "DL9 - Closeout report",
       "body": "**Closeout report**\n\nExplicit denominators; files, source versions, claims and module relationships counted separately.\n\n---\nDeliverable of phase P8.",
       "fields": {
-        "Status": "Todo",
+        "Status": "Blocked",
         "Item Type": "Deliverable",
         "Phase": "P8",
         "Wave": "Not Applicable",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Consult execution reports for partial artifacts; final authority state has not passed."
       },
       "parent": "PHASE-P8",
       "labels": [
@@ -636,11 +679,12 @@
       "title": "W1 Foundation - 4 modules",
       "body": "**Coverage wave W1: Foundation**\n\n4 modules.\n\nWaves are work organization, not runtime execution order. Source dependencies and conflicts may require reviewing several waves together.\n\nA shared source document must not be skimmed for one module and then declared complete.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Wave",
         "Phase": "P4",
         "Wave": "W1",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Consult execution reports for partial artifacts; final authority state has not passed."
       },
       "parent": "PHASE-P4",
       "labels": [
@@ -654,11 +698,12 @@
       "title": "W2 Data acquisition - 4 modules",
       "body": "**Coverage wave W2: Data acquisition**\n\n4 modules.\n\nWaves are work organization, not runtime execution order. Source dependencies and conflicts may require reviewing several waves together.\n\nA shared source document must not be skimmed for one module and then declared complete.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Wave",
         "Phase": "P4",
         "Wave": "W2",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Consult execution reports for partial artifacts; final authority state has not passed."
       },
       "parent": "PHASE-P4",
       "labels": [
@@ -672,11 +717,12 @@
       "title": "W3 Computation - 3 modules",
       "body": "**Coverage wave W3: Computation**\n\n3 modules.\n\nWaves are work organization, not runtime execution order. Source dependencies and conflicts may require reviewing several waves together.\n\nA shared source document must not be skimmed for one module and then declared complete.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Wave",
         "Phase": "P4",
         "Wave": "W3",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Consult execution reports for partial artifacts; final authority state has not passed."
       },
       "parent": "PHASE-P4",
       "labels": [
@@ -690,11 +736,12 @@
       "title": "W4 Signals and risk - 5 modules",
       "body": "**Coverage wave W4: Signals and risk**\n\n5 modules.\n\nWaves are work organization, not runtime execution order. Source dependencies and conflicts may require reviewing several waves together.\n\nA shared source document must not be skimmed for one module and then declared complete.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Wave",
         "Phase": "P4",
         "Wave": "W4",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Consult execution reports for partial artifacts; final authority state has not passed."
       },
       "parent": "PHASE-P4",
       "labels": [
@@ -708,11 +755,12 @@
       "title": "W5 Orders and execution - 6 modules",
       "body": "**Coverage wave W5: Orders and execution**\n\n6 modules.\n\nWaves are work organization, not runtime execution order. Source dependencies and conflicts may require reviewing several waves together.\n\nA shared source document must not be skimmed for one module and then declared complete.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Wave",
         "Phase": "P4",
         "Wave": "W5",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Consult execution reports for partial artifacts; final authority state has not passed."
       },
       "parent": "PHASE-P4",
       "labels": [
@@ -726,11 +774,12 @@
       "title": "W6 Re-entry - 4 modules",
       "body": "**Coverage wave W6: Re-entry**\n\n4 modules.\n\nWaves are work organization, not runtime execution order. Source dependencies and conflicts may require reviewing several waves together.\n\nA shared source document must not be skimmed for one module and then declared complete.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Wave",
         "Phase": "P4",
         "Wave": "W6",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Consult execution reports for partial artifacts; final authority state has not passed."
       },
       "parent": "PHASE-P4",
       "labels": [
@@ -744,11 +793,12 @@
       "title": "W7 Operator and observability - 6 modules",
       "body": "**Coverage wave W7: Operator and observability**\n\n6 modules.\n\nWaves are work organization, not runtime execution order. Source dependencies and conflicts may require reviewing several waves together.\n\nA shared source document must not be skimmed for one module and then declared complete.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Wave",
         "Phase": "P4",
         "Wave": "W7",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Consult execution reports for partial artifacts; final authority state has not passed."
       },
       "parent": "PHASE-P4",
       "labels": [
@@ -762,11 +812,12 @@
       "title": "W8 Shared kernels - 2 modules",
       "body": "**Coverage wave W8: Shared kernels**\n\n2 modules.\n\nWaves are work organization, not runtime execution order. Source dependencies and conflicts may require reviewing several waves together.\n\nA shared source document must not be skimmed for one module and then declared complete.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Wave",
         "Phase": "P4",
         "Wave": "W8",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Blocked Reason": "Consult execution reports for partial artifacts; final authority state has not passed."
       },
       "parent": "PHASE-P4",
       "labels": [
@@ -778,18 +829,20 @@
       "ssot_id": "MOD-m0001",
       "item_type": "Module",
       "title": "m0001 F1_CONFIG_PREFERENCES",
-      "body": "**Module root:** `m0001-f1-config-preferences`\n**Canonical symbol:** `F1_CONFIG_PREFERENCES`\n**Target authority:** `m0001-f1-config-preferences/manifest.json` (subject to Decision D1)\n**Coverage wave:** W1\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0001-f1-config-preferences/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W1",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0001-f1-config-preferences",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0001/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W1",
       "labels": [
@@ -801,18 +854,20 @@
       "ssot_id": "MOD-m0002",
       "item_type": "Module",
       "title": "m0002 F3_CLOCK_SCHEDULER",
-      "body": "**Module root:** `m0002-f3-clock-scheduler`\n**Canonical symbol:** `F3_CLOCK_SCHEDULER`\n**Target authority:** `m0002-f3-clock-scheduler/manifest.json` (subject to Decision D1)\n**Coverage wave:** W1\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0002-f3-clock-scheduler/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W1",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0002-f3-clock-scheduler",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0002/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W1",
       "labels": [
@@ -824,18 +879,20 @@
       "ssot_id": "MOD-m0003",
       "item_type": "Module",
       "title": "m0003 D2_CALENDAR_SOURCE_ADAPTER",
-      "body": "**Module root:** `m0003-d2-calendar-source-adapter`\n**Canonical symbol:** `D2_CALENDAR_SOURCE_ADAPTER`\n**Target authority:** `m0003-d2-calendar-source-adapter/manifest.json` (subject to Decision D1)\n**Coverage wave:** W2\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0003-d2-calendar-source-adapter/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W2",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0003-d2-calendar-source-adapter",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0003/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W2",
       "labels": [
@@ -847,18 +904,20 @@
       "ssot_id": "MOD-m0004",
       "item_type": "Module",
       "title": "m0004 D3_CALENDAR_NORMALIZER",
-      "body": "**Module root:** `m0004-d3-calendar-normalizer`\n**Canonical symbol:** `D3_CALENDAR_NORMALIZER`\n**Target authority:** `m0004-d3-calendar-normalizer/manifest.json` (subject to Decision D1)\n**Coverage wave:** W2\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0004-d3-calendar-normalizer/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W2",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0004-d3-calendar-normalizer",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0004/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W2",
       "labels": [
@@ -870,18 +929,20 @@
       "ssot_id": "MOD-m0005",
       "item_type": "Module",
       "title": "m0005 F2_EVENT_LOG",
-      "body": "**Module root:** `m0005-f2-event-log`\n**Canonical symbol:** `F2_EVENT_LOG`\n**Target authority:** `m0005-f2-event-log/manifest.json` (subject to Decision D1)\n**Coverage wave:** W1\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0005-f2-event-log/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W1",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0005-f2-event-log",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0005/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W1",
       "labels": [
@@ -893,18 +954,20 @@
       "ssot_id": "MOD-m0006",
       "item_type": "Module",
       "title": "m0006 D4_CALENDAR_TRIGGER_BUILDER",
-      "body": "**Module root:** `m0006-d4-calendar-trigger-builder`\n**Canonical symbol:** `D4_CALENDAR_TRIGGER_BUILDER`\n**Target authority:** `m0006-d4-calendar-trigger-builder/manifest.json` (subject to Decision D1)\n**Coverage wave:** W2\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0006-d4-calendar-trigger-builder/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W2",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0006-d4-calendar-trigger-builder",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0006/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W2",
       "labels": [
@@ -916,18 +979,20 @@
       "ssot_id": "MOD-m0007",
       "item_type": "Module",
       "title": "m0007 D1_MARKET_FEED_ADAPTER",
-      "body": "**Module root:** `m0007-d1-market-feed-adapter`\n**Canonical symbol:** `D1_MARKET_FEED_ADAPTER`\n**Target authority:** `m0007-d1-market-feed-adapter/manifest.json` (subject to Decision D1)\n**Coverage wave:** W2\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0007-d1-market-feed-adapter/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W2",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0007-d1-market-feed-adapter",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0007/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W2",
       "labels": [
@@ -939,18 +1004,20 @@
       "ssot_id": "MOD-m0008",
       "item_type": "Module",
       "title": "m0008 C1_BAR_BUILDER",
-      "body": "**Module root:** `m0008-c1-bar-builder`\n**Canonical symbol:** `C1_BAR_BUILDER`\n**Target authority:** `m0008-c1-bar-builder/manifest.json` (subject to Decision D1)\n**Coverage wave:** W3\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0008-c1-bar-builder/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W3",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0008-c1-bar-builder",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0008/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W3",
       "labels": [
@@ -962,18 +1029,20 @@
       "ssot_id": "MOD-m0009",
       "item_type": "Module",
       "title": "m0009 C2_INDICATOR_ENGINE  [PILOT]",
-      "body": "**Module root:** `m0009-c2-indicator-engine`\n**Canonical symbol:** `C2_INDICATOR_ENGINE`\n**Target authority:** `m0009-c2-indicator-engine/manifest.json` (subject to Decision D1)\n**Coverage wave:** W3\n**Pilot module:** yes\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0009-c2-indicator-engine/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W3",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "Yes",
         "Module Root": "m0009-c2-indicator-engine",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0009/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W3",
       "labels": [
@@ -986,18 +1055,20 @@
       "ssot_id": "MOD-m0010",
       "item_type": "Module",
       "title": "m0010 C3_FEATURE_PACKAGER",
-      "body": "**Module root:** `m0010-c3-feature-packager`\n**Canonical symbol:** `C3_FEATURE_PACKAGER`\n**Target authority:** `m0010-c3-feature-packager/manifest.json` (subject to Decision D1)\n**Coverage wave:** W3\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0010-c3-feature-packager/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W3",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0010-c3-feature-packager",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0010/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W3",
       "labels": [
@@ -1009,18 +1080,20 @@
       "ssot_id": "MOD-m0011",
       "item_type": "Module",
       "title": "m0011 S1_SIGNAL_ENGINE",
-      "body": "**Module root:** `m0011-s1-signal-engine`\n**Canonical symbol:** `S1_SIGNAL_ENGINE`\n**Target authority:** `m0011-s1-signal-engine/manifest.json` (subject to Decision D1)\n**Coverage wave:** W4\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0011-s1-signal-engine/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W4",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0011-s1-signal-engine",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0011/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W4",
       "labels": [
@@ -1032,18 +1105,20 @@
       "ssot_id": "MOD-m0012",
       "item_type": "Module",
       "title": "m0012 S2_INTENT_BUILDER",
-      "body": "**Module root:** `m0012-s2-intent-builder`\n**Canonical symbol:** `S2_INTENT_BUILDER`\n**Target authority:** `m0012-s2-intent-builder/manifest.json` (subject to Decision D1)\n**Coverage wave:** W4\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0012-s2-intent-builder/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W4",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0012-s2-intent-builder",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0012/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W4",
       "labels": [
@@ -1055,18 +1130,20 @@
       "ssot_id": "MOD-m0013",
       "item_type": "Module",
       "title": "m0013 R1_RISK_EVALUATOR",
-      "body": "**Module root:** `m0013-r1-risk-evaluator`\n**Canonical symbol:** `R1_RISK_EVALUATOR`\n**Target authority:** `m0013-r1-risk-evaluator/manifest.json` (subject to Decision D1)\n**Coverage wave:** W4\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0013-r1-risk-evaluator/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W4",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0013-r1-risk-evaluator",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0013/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W4",
       "labels": [
@@ -1078,18 +1155,20 @@
       "ssot_id": "MOD-m0014",
       "item_type": "Module",
       "title": "m0014 R2_ORDER_INTENT_COMPILER",
-      "body": "**Module root:** `m0014-r2-order-intent-compiler`\n**Canonical symbol:** `R2_ORDER_INTENT_COMPILER`\n**Target authority:** `m0014-r2-order-intent-compiler/manifest.json` (subject to Decision D1)\n**Coverage wave:** W4\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0014-r2-order-intent-compiler/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W4",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0014-r2-order-intent-compiler",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0014/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W4",
       "labels": [
@@ -1101,18 +1180,20 @@
       "ssot_id": "MOD-m0015",
       "item_type": "Module",
       "title": "m0015 O1_ORDER_ROUTER",
-      "body": "**Module root:** `m0015-o1-order-router`\n**Canonical symbol:** `O1_ORDER_ROUTER`\n**Target authority:** `m0015-o1-order-router/manifest.json` (subject to Decision D1)\n**Coverage wave:** W5\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0015-o1-order-router/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W5",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0015-o1-order-router",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0015/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W5",
       "labels": [
@@ -1124,18 +1205,20 @@
       "ssot_id": "MOD-m0016",
       "item_type": "Module",
       "title": "m0016 B1_MT4_ADAPTER_TRANSPORT  [PILOT]",
-      "body": "**Module root:** `m0016-b1-mt4-adapter-transport`\n**Canonical symbol:** `B1_MT4_ADAPTER_TRANSPORT`\n**Target authority:** `m0016-b1-mt4-adapter-transport/manifest.json` (subject to Decision D1)\n**Coverage wave:** W5\n**Pilot module:** yes\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0016-b1-mt4-adapter-transport/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W5",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "Yes",
         "Module Root": "m0016-b1-mt4-adapter-transport",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0016/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W5",
       "labels": [
@@ -1148,18 +1231,20 @@
       "ssot_id": "MOD-m0017",
       "item_type": "Module",
       "title": "m0017 B2_MT4_EA_EXECUTOR",
-      "body": "**Module root:** `m0017-b2-mt4-ea-executor`\n**Canonical symbol:** `B2_MT4_EA_EXECUTOR`\n**Target authority:** `m0017-b2-mt4-ea-executor/manifest.json` (subject to Decision D1)\n**Coverage wave:** W5\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0017-b2-mt4-ea-executor/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W5",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0017-b2-mt4-ea-executor",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0017/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W5",
       "labels": [
@@ -1171,18 +1256,20 @@
       "ssot_id": "MOD-m0018",
       "item_type": "Module",
       "title": "m0018 B3_EXEC_EVENT_NORMALIZER",
-      "body": "**Module root:** `m0018-b3-exec-event-normalizer`\n**Canonical symbol:** `B3_EXEC_EVENT_NORMALIZER`\n**Target authority:** `m0018-b3-exec-event-normalizer/manifest.json` (subject to Decision D1)\n**Coverage wave:** W5\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0018-b3-exec-event-normalizer/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W5",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0018-b3-exec-event-normalizer",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0018/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W5",
       "labels": [
@@ -1194,18 +1281,20 @@
       "ssot_id": "MOD-m0019",
       "item_type": "Module",
       "title": "m0019 O2_OMS_STATE_MACHINE",
-      "body": "**Module root:** `m0019-o2-oms-state-machine`\n**Canonical symbol:** `O2_OMS_STATE_MACHINE`\n**Target authority:** `m0019-o2-oms-state-machine/manifest.json` (subject to Decision D1)\n**Coverage wave:** W5\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0019-o2-oms-state-machine/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W5",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0019-o2-oms-state-machine",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0019/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W5",
       "labels": [
@@ -1217,18 +1306,20 @@
       "ssot_id": "MOD-m0020",
       "item_type": "Module",
       "title": "m0020 O3_TRADE_CLOSE_CLASSIFIER",
-      "body": "**Module root:** `m0020-o3-trade-close-classifier`\n**Canonical symbol:** `O3_TRADE_CLOSE_CLASSIFIER`\n**Target authority:** `m0020-o3-trade-close-classifier/manifest.json` (subject to Decision D1)\n**Coverage wave:** W5\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0020-o3-trade-close-classifier/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W5",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0020-o3-trade-close-classifier",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0020/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W5",
       "labels": [
@@ -1240,18 +1331,20 @@
       "ssot_id": "MOD-m0021",
       "item_type": "Module",
       "title": "m0021 E1_OUTCOME_BUCKETIZER",
-      "body": "**Module root:** `m0021-e1-outcome-bucketizer`\n**Canonical symbol:** `E1_OUTCOME_BUCKETIZER`\n**Target authority:** `m0021-e1-outcome-bucketizer/manifest.json` (subject to Decision D1)\n**Coverage wave:** W6\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0021-e1-outcome-bucketizer/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W6",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0021-e1-outcome-bucketizer",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0021/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W6",
       "labels": [
@@ -1263,18 +1356,20 @@
       "ssot_id": "MOD-m0022",
       "item_type": "Module",
       "title": "m0022 E2_PROXIMITY_EVALUATOR",
-      "body": "**Module root:** `m0022-e2-proximity-evaluator`\n**Canonical symbol:** `E2_PROXIMITY_EVALUATOR`\n**Target authority:** `m0022-e2-proximity-evaluator/manifest.json` (subject to Decision D1)\n**Coverage wave:** W6\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0022-e2-proximity-evaluator/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W6",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0022-e2-proximity-evaluator",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0022/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W6",
       "labels": [
@@ -1286,18 +1381,20 @@
       "ssot_id": "MOD-m0023",
       "item_type": "Module",
       "title": "m0023 E3_MATRIX_LOOKUP",
-      "body": "**Module root:** `m0023-e3-matrix-lookup`\n**Canonical symbol:** `E3_MATRIX_LOOKUP`\n**Target authority:** `m0023-e3-matrix-lookup/manifest.json` (subject to Decision D1)\n**Coverage wave:** W6\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0023-e3-matrix-lookup/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W6",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0023-e3-matrix-lookup",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0023/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W6",
       "labels": [
@@ -1309,18 +1406,20 @@
       "ssot_id": "MOD-m0024",
       "item_type": "Module",
       "title": "m0024 E4_REENTRY_INTENT_BUILDER",
-      "body": "**Module root:** `m0024-e4-reentry-intent-builder`\n**Canonical symbol:** `E4_REENTRY_INTENT_BUILDER`\n**Target authority:** `m0024-e4-reentry-intent-builder/manifest.json` (subject to Decision D1)\n**Coverage wave:** W6\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0024-e4-reentry-intent-builder/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W6",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0024-e4-reentry-intent-builder",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0024/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W6",
       "labels": [
@@ -1332,18 +1431,20 @@
       "ssot_id": "MOD-m0025",
       "item_type": "Module",
       "title": "m0025 F4_FLOW_ORCHESTRATOR",
-      "body": "**Module root:** `m0025-f4-flow-orchestrator`\n**Canonical symbol:** `F4_FLOW_ORCHESTRATOR`\n**Target authority:** `m0025-f4-flow-orchestrator/manifest.json` (subject to Decision D1)\n**Coverage wave:** W1\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0025-f4-flow-orchestrator/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W1",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0025-f4-flow-orchestrator",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0025/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W1",
       "labels": [
@@ -1355,18 +1456,20 @@
       "ssot_id": "MOD-m0026",
       "item_type": "Module",
       "title": "m0026 P1_HEALTH_AGGREGATOR",
-      "body": "**Module root:** `m0026-p1-health-aggregator`\n**Canonical symbol:** `P1_HEALTH_AGGREGATOR`\n**Target authority:** `m0026-p1-health-aggregator/manifest.json` (subject to Decision D1)\n**Coverage wave:** W7\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0026-p1-health-aggregator/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W7",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0026-p1-health-aggregator",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0026/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W7",
       "labels": [
@@ -1378,18 +1481,20 @@
       "ssot_id": "MOD-m0027",
       "item_type": "Module",
       "title": "m0027 R3_CORRELATION_GUARD",
-      "body": "**Module root:** `m0027-r3-correlation-guard`\n**Canonical symbol:** `R3_CORRELATION_GUARD`\n**Target authority:** `m0027-r3-correlation-guard/manifest.json` (subject to Decision D1)\n**Coverage wave:** W4\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0027-r3-correlation-guard/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W4",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0027-r3-correlation-guard",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0027/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W4",
       "labels": [
@@ -1401,18 +1506,20 @@
       "ssot_id": "MOD-m0028",
       "item_type": "Module",
       "title": "m0028 U1_DASHBOARD_BACKEND",
-      "body": "**Module root:** `m0028-u1-dashboard-backend`\n**Canonical symbol:** `U1_DASHBOARD_BACKEND`\n**Target authority:** `m0028-u1-dashboard-backend/manifest.json` (subject to Decision D1)\n**Coverage wave:** W7\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0028-u1-dashboard-backend/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W7",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0028-u1-dashboard-backend",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0028/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W7",
       "labels": [
@@ -1424,18 +1531,20 @@
       "ssot_id": "MOD-m0029",
       "item_type": "Module",
       "title": "m0029 U2_GUI_GATEWAY  [PILOT]",
-      "body": "**Module root:** `m0029-u2-gui-gateway`\n**Canonical symbol:** `U2_GUI_GATEWAY`\n**Target authority:** `m0029-u2-gui-gateway/manifest.json` (subject to Decision D1)\n**Coverage wave:** W7\n**Pilot module:** yes\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0029-u2-gui-gateway/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W7",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "Yes",
         "Module Root": "m0029-u2-gui-gateway",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0029/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W7",
       "labels": [
@@ -1448,18 +1557,20 @@
       "ssot_id": "MOD-m0030",
       "item_type": "Module",
       "title": "m0030 U3_MT4_EXPIRY_OVERLAY",
-      "body": "**Module root:** `m0030-u3-mt4-expiry-overlay`\n**Canonical symbol:** `U3_MT4_EXPIRY_OVERLAY`\n**Target authority:** `m0030-u3-mt4-expiry-overlay/manifest.json` (subject to Decision D1)\n**Coverage wave:** W7\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0030-u3-mt4-expiry-overlay/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W7",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0030-u3-mt4-expiry-overlay",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0030/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W7",
       "labels": [
@@ -1471,18 +1582,20 @@
       "ssot_id": "MOD-m0031",
       "item_type": "Module",
       "title": "m0031 U4_DESKTOP_OPERATOR",
-      "body": "**Module root:** `m0031-u4-desktop-operator`\n**Canonical symbol:** `U4_DESKTOP_OPERATOR`\n**Target authority:** `m0031-u4-desktop-operator/manifest.json` (subject to Decision D1)\n**Coverage wave:** W7\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0031-u4-desktop-operator/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W7",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0031-u4-desktop-operator",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0031/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W7",
       "labels": [
@@ -1494,18 +1607,20 @@
       "ssot_id": "MOD-m0032",
       "item_type": "Module",
       "title": "m0032 P2_REPORTER",
-      "body": "**Module root:** `m0032-p2-reporter`\n**Canonical symbol:** `P2_REPORTER`\n**Target authority:** `m0032-p2-reporter/manifest.json` (subject to Decision D1)\n**Coverage wave:** W7\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0032-p2-reporter/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W7",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0032-p2-reporter",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0032/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W7",
       "labels": [
@@ -1517,18 +1632,20 @@
       "ssot_id": "MOD-m0033",
       "item_type": "Module",
       "title": "m0033 SK1_PLUGIN_INTERFACE",
-      "body": "**Module root:** `m0033-sk1-plugin-interface`\n**Canonical symbol:** `SK1_PLUGIN_INTERFACE`\n**Target authority:** `m0033-sk1-plugin-interface/manifest.json` (subject to Decision D1)\n**Coverage wave:** W8\n**Pilot module:** no\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0033-sk1-plugin-interface/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W8",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "No",
         "Module Root": "m0033-sk1-plugin-interface",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0033/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W8",
       "labels": [
@@ -1540,18 +1657,20 @@
       "ssot_id": "MOD-m0034",
       "item_type": "Module",
       "title": "m0034 SK2_IDEMPOTENCY  [PILOT]",
-      "body": "**Module root:** `m0034-sk2-idempotency`\n**Canonical symbol:** `SK2_IDEMPOTENCY`\n**Target authority:** `m0034-sk2-idempotency/manifest.json` (subject to Decision D1)\n**Coverage wave:** W8\n**Pilot module:** yes\n\n### Readiness (tracked as independent fields - never collapse them)\n- `Schema Valid` - parses and validates against schema v2\n- `Spec Ready` - all applicable mandatory fields confirmed; no unknowns blocking\n- `Impl Verified` - observed conformance at a recorded commit\n\n### Close criteria\n- [ ] One designated active JSON authority, approved identity\n- [ ] Passes schema and applicable profile completeness rules\n- [ ] Every accepted claim traces to evidence and a decision\n- [ ] Contracts, process bindings and ownership consistent with the full set\n\n---\nVERIFIED 2026-09-22: manifest exists at schema_version 1.0.0 with no behavior, applicability or field_evidence sections, and null contract schema_refs.",
+      "body": "Root: m0034-sk2-idempotency/manifest.json\n\nSchema status describes the v2 candidate. The active root remains v1. Specification readiness and implementation verification are independent.",
       "fields": {
-        "Status": "Todo",
+        "Status": "In Progress",
         "Item Type": "Module",
         "Phase": "P4",
         "Wave": "W8",
-        "Schema Valid": "Unknown",
-        "Spec Ready": "Unknown",
-        "Impl Verified": "Unknown",
+        "Schema Valid": "Yes",
+        "Spec Ready": "No",
+        "Impl Verified": "No",
         "Pilot": "Yes",
         "Module Root": "m0034-sk2-idempotency",
-        "Baseline Commit": "b2b03563209f3ebbc8951be82f40869e26b7cc3f"
+        "Baseline Commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+        "Evidence Ref": "staging/m0034/manifest.v2.candidate.json",
+        "Blocked Reason": "Candidate only; mandatory reconciliation remains; active root is v1."
       },
       "parent": "WAVE-W8",
       "labels": [

@@ -1,0 +1,815 @@
+{
+  "reviewed_blockers": [
+    {
+      "blocker_id": "BLOCK-BRIDGE-WIRE-DEFINITION",
+      "classification": "reviewed_evidence_blocker",
+      "decision_id": "DEC-027",
+      "evidence_refs": [
+        {
+          "json_pointer": "/1",
+          "lines": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/contract_registry.jsonl",
+          "sha256": "47226a2355f944ac7f94a522c0a92194e5cab8d876b92590d1eeafa0550c3127",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": "/5",
+          "lines": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/contract_registry.jsonl",
+          "sha256": "47226a2355f944ac7f94a522c0a92194e5cab8d876b92590d1eeafa0550c3127",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": null,
+          "lines": [
+            1957,
+            2049
+          ],
+          "path": "EAFIX_auth_docs/contracts_registry/deep_contract_evidence_inventory.json",
+          "sha256": "9410e30662f5eed52ef7c9e2f1b7f912a6d1b1c2537da1cde47eb1cbeda7157c",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        }
+      ],
+      "json_pointer": "/contracts",
+      "missing_evidence_or_decision": "Approved B1/B2 wire protocol: field names/types/units, required versus optional fields, version/compatibility, sequence/hash/idempotency semantics, acknowledgement acceptance and rejection behavior; identify the current EA source or authoritative intended interface.",
+      "module": "m0016,m0017",
+      "next_action": "Supply the approved current protocol or a governed source-grounded contract-design decision, then reconcile it into the external contract authority and local manifest usage. Do not infer payload fields from a contract name.",
+      "reason": "BrokerOrderEnvelope and AdapterAck resolve by name but the live records contain no required/optional fields, schema, examples, versioned payload or compatibility policy. The historical deep inventory also has no schema/model/field/test candidates for either. This is a boundary-definition gap, not merely a missing executable schema.",
+      "resolution_state": "unresolved",
+      "responsible_decision_maker": "repository owner or delegated specification reviewer",
+      "severity": "blocking"
+    },
+    {
+      "blocker_id": "BLOCK-BRIDGE-RETRY-TIMEOUT",
+      "classification": "reviewed_evidence_blocker",
+      "decision_id": "DEC-027",
+      "evidence_refs": [
+        {
+          "json_pointer": "/15",
+          "lines": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/operational_control_registry.jsonl",
+          "sha256": "de1920122dfb01c3886bca8287ba6ba6027c9e90555886447b00d27dde42379d",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": "/41",
+          "lines": null,
+          "path": "EAFIX_auth_docs/01_canonical_registries/operational_control_registry.jsonl",
+          "sha256": "de1920122dfb01c3886bca8287ba6ba6027c9e90555886447b00d27dde42379d",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": null,
+          "lines": [
+            6,
+            20
+          ],
+          "path": "m0016-b1-mt4-adapter-transport/m0016-docs/architecture/0110000076260118_07_transport_bridge_contracts.md",
+          "sha256": "e7f96103cd541796b472fb8fadbe6cbc6a86ada1c948d3478c071a697c9b6793",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": null,
+          "lines": [
+            122,
+            162
+          ],
+          "path": "services/transport-router/src/2099900197260118_config.py",
+          "sha256": "0ba898611e527f5d8a8bff714da86a373469fd9ad8df1238290b0dbc189ed06a",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        }
+      ],
+      "json_pointer": "/process_steps/0/retry_timeout_recovery",
+      "missing_evidence_or_decision": "Approved active transport selection, acknowledgement timeout, retry count/backoff, exhaustion output and recovery behavior for the B1-to-EA boundary.",
+      "module": "m0016",
+      "next_action": "Resolve against the actual current adapter/EA implementation or approve intended bridge policy. Keep observed Python service defaults separate from EA protocol facts.",
+      "reason": "The S16 failure rule requires a deterministic retry schedule but gives no numeric schedule or EA acknowledgement timeout. The transport-router defaults of 3 attempts, 2-second delay and 10-second service timeout describe downstream service calls; there is no evidence establishing them as the MT4 acknowledgement protocol. The bridge note says CSV production default and also prefer Socket.",
+      "resolution_state": "unresolved",
+      "responsible_decision_maker": "repository owner or delegated specification reviewer",
+      "severity": "blocking"
+    },
+    {
+      "blocker_id": "BLOCK-LEGACY-VALIDATION-UNAVAILABLE",
+      "classification": "reviewed_evidence_blocker",
+      "decision_id": "DEC-027",
+      "evidence_refs": [
+        {
+          "json_pointer": null,
+          "lines": [
+            34,
+            40
+          ],
+          "path": "ci/2099900300260118_validate_atomic_module_manifests.py",
+          "sha256": "c933b0408c76705760d8211cb0edf9889c77f33c4680686deb2bb70b5873c6f3",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": null,
+          "lines": [
+            10,
+            40
+          ],
+          "path": "tests/test_generator_update.py",
+          "sha256": "b50cbe43d485724d7203dd987190a3c61cf03a22131c05e6bfcbe4f570891b3f",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": null,
+          "lines": [
+            8,
+            34
+          ],
+          "path": "tests/test_validator_update.py",
+          "sha256": "3e8b6447a0fd5850e75662f8a7ca7d0c6efe751b9d4e8dec6babf3103fe5e3c6",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        }
+      ],
+      "json_pointer": "/verification_commands",
+      "missing_evidence_or_decision": "A working, reviewed replacement validation route for v2, retirement/redirect of old generator and validator callers, and passing required CI checks. New offline structural checks do not waive the existing failures.",
+      "module": "all",
+      "next_action": "After specification reconciliation, replace legacy generation callers with read-only authority validation and one-way projection checks; update obsolete tests through a governed retirement decision; rerun the required suite without lowering its gate.",
+      "reason": "The existing atomic-manifest CI command fails because tools.manifest_generation.generate_manifests is absent. Repository-wide pytest also has three failing tests that import absent EA-REG generator/validator files. Its existing 85% coverage gate fails. These checks cannot certify a coordinated cutover.",
+      "resolution_state": "unresolved",
+      "responsible_decision_maker": "repository owner or delegated specification reviewer",
+      "severity": "blocking"
+    },
+    {
+      "blocker_id": "BLOCK-CURRENT-EA-AUTHORITY",
+      "classification": "reviewed_evidence_blocker",
+      "decision_id": "DEC-027",
+      "evidence_refs": [
+        {
+          "json_pointer": "/process_binding/entrypoint_files",
+          "lines": null,
+          "path": "m0017-b2-mt4-ea-executor/manifest.json",
+          "sha256": "b3817c77df9bef1ba38791adf16d53ba120dc086792b8a499ea4cbfc4a4484ab",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        },
+        {
+          "json_pointer": null,
+          "lines": [
+            1,
+            30
+          ],
+          "path": "EAFIX_auth_docs/04_mt4_bridge_and_execution/HUEY_P_EA_ExecutionEngine_8.mql4",
+          "sha256": "64aee55ab39184e4fdc32bd98d4da2fc6f6f15a21d6762495d56f1bb77fc8376",
+          "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb"
+        }
+      ],
+      "json_pointer": "/runtime/entrypoints",
+      "missing_evidence_or_decision": "Identify the current approved execution EA and its protocol-facing entrypoint, or provide an approved intended execution-only specification. Implementation verification can remain separate.",
+      "module": "m0017",
+      "next_action": "Preserve the original values as historical evidence; review the real EA source and contract. Do not promote the replacement strategy sample to canonical execution behavior.",
+      "reason": "The root's B2 entrypoint points to a Python transport router. The supplied .mql4 example explicitly says the original EA was unavailable and implements a moving-average crossover strategy; it is not evidence of the execution-only intended B2 boundary. Adopting that sample would change the module's trading responsibility.",
+      "resolution_state": "unresolved",
+      "responsible_decision_maker": "repository owner or delegated specification reviewer",
+      "severity": "blocking"
+    }
+  ],
+  "root_bundle_drift": [
+    {
+      "decision_id": "DEC-007",
+      "difference_count": 5,
+      "differences": [
+        {
+          "bundle_present": true,
+          "bundle_value": null,
+          "json_pointer": "/file_ownership/module_root",
+          "root_present": true,
+          "root_value": "m0015-o1-order-router"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": "2026-07-02T15:52:15.513625+00:00",
+          "json_pointer": "/last_updated_utc",
+          "root_present": true,
+          "root_value": "2026-09-09T07:12:15+00:00"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            "Schema-first regenerated manifest from normalized staging tables."
+          ],
+          "json_pointer": "/notes",
+          "root_present": true,
+          "root_value": [
+            "Schema-first regenerated manifest from normalized staging tables.",
+            "Governance remediation 2026-09-09T07:12:15+00:00: module_root backfilled (was null) -> 'm0015-o1-order-router'."
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": "2026-07-02T15:52:15.513625+00:00",
+          "json_pointer": "/reconciliation_status/last_reconciled_utc",
+          "root_present": true,
+          "root_value": "2026-09-09T07:12:15+00:00"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [],
+          "json_pointer": "/reconciliation_status/reconciliation_notes",
+          "root_present": true,
+          "root_value": [
+            "[governance-remediation 2026-09-09T07:12:15+00:00] module_root backfilled from null to the module's own identity folder ('m0015-o1-order-router'). Canonical implementation for this module currently still lives in a shared, not-yet-split service directory (see file_ownership.shared_files / source_files) and has not been physically relocated; that move is tracked separately as the Phase-5 physical migration, not performed in this pass."
+          ]
+        }
+      ],
+      "disposition": "preserve_root_default_pending_unique_claim_review",
+      "module_id": "50000000000000000015",
+      "module_short_id": "m0015"
+    },
+    {
+      "decision_id": "DEC-007",
+      "difference_count": 8,
+      "differences": [
+        {
+          "bundle_present": true,
+          "bundle_value": [],
+          "json_pointer": "/file_ownership/documentation_files",
+          "root_present": true,
+          "root_value": [
+            "m0016-b1-mt4-adapter-transport/m0016-docs/architecture/0110000076260118_07_transport_bridge_contracts.md"
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/src/2099900200260118_metrics.py",
+              "role": "metrics",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/src/2099900204260118_watcher.py",
+              "role": "watcher",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/src/2099900202260118_router.py",
+              "role": "router",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/src/2099900203260118_validator.py",
+              "role": "validator",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": true,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/tests/2099900206260118_test_integration.py",
+              "role": "test",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/src/2099900205260118___init__.py",
+              "role": "package_init",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/src/2099900198260118_health.py",
+              "role": "health",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/src/2099900197260118_config.py",
+              "role": "config",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/src/2099900201260118_plugin.py",
+              "role": "plugin",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/src/2099900199260118_main.py",
+              "role": "entrypoint",
+              "service": "transport-router"
+            }
+          ],
+          "json_pointer": "/file_ownership/file_role_index",
+          "root_present": true,
+          "root_value": [
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/src/2099900200260118_metrics.py",
+              "role": "metrics",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/src/2099900204260118_watcher.py",
+              "role": "watcher",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/src/2099900202260118_router.py",
+              "role": "router",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/src/2099900203260118_validator.py",
+              "role": "validator",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": true,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/tests/2099900206260118_test_integration.py",
+              "role": "test",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/src/2099900205260118___init__.py",
+              "role": "package_init",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/src/2099900198260118_health.py",
+              "role": "health",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/src/2099900197260118_config.py",
+              "role": "config",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/src/2099900201260118_plugin.py",
+              "role": "plugin",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "R2_ORDER_INTENT_COMPILER",
+                "O1_ORDER_ROUTER",
+                "B1_MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/transport-router/src/2099900199260118_main.py",
+              "role": "entrypoint",
+              "service": "transport-router"
+            },
+            {
+              "canonical_modules": [
+                "MT4_ADAPTER_TRANSPORT"
+              ],
+              "is_test": false,
+              "notes": "Relocated by MIG-0002",
+              "ownership": "owned",
+              "path": "m0016-b1-mt4-adapter-transport/m0016-docs/architecture/0110000076260118_07_transport_bridge_contracts.md",
+              "role": "documentation",
+              "service": "m0016-b1-mt4-adapter-transport"
+            }
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": null,
+          "json_pointer": "/file_ownership/module_root",
+          "root_present": true,
+          "root_value": "m0016-b1-mt4-adapter-transport"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [],
+          "json_pointer": "/file_ownership/owned_files",
+          "root_present": true,
+          "root_value": [
+            "m0016-b1-mt4-adapter-transport/m0016-docs/architecture/0110000076260118_07_transport_bridge_contracts.md"
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": "2026-07-02T15:52:15.513625+00:00",
+          "json_pointer": "/last_updated_utc",
+          "root_present": true,
+          "root_value": "2026-09-09T07:12:15+00:00"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            "Schema-first regenerated manifest from normalized staging tables."
+          ],
+          "json_pointer": "/notes",
+          "root_present": true,
+          "root_value": [
+            "Schema-first regenerated manifest from normalized staging tables.",
+            "Governance remediation 2026-09-09T07:12:15+00:00: module_root backfilled (was null) -> 'm0016-b1-mt4-adapter-transport'."
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": "2026-07-02T15:52:15.513625+00:00",
+          "json_pointer": "/reconciliation_status/last_reconciled_utc",
+          "root_present": true,
+          "root_value": "2026-09-09T07:12:15+00:00"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [],
+          "json_pointer": "/reconciliation_status/reconciliation_notes",
+          "root_present": true,
+          "root_value": [
+            "[governance-remediation 2026-09-09T07:12:15+00:00] module_root backfilled from null to the module's own identity folder ('m0016-b1-mt4-adapter-transport'). Canonical implementation for this module currently still lives in a shared, not-yet-split service directory (see file_ownership.shared_files / source_files) and has not been physically relocated; that move is tracked separately as the Phase-5 physical migration, not performed in this pass."
+          ]
+        }
+      ],
+      "disposition": "preserve_root_default_pending_unique_claim_review",
+      "module_id": "50000000000000000016",
+      "module_short_id": "m0016"
+    },
+    {
+      "decision_id": "DEC-007",
+      "difference_count": 8,
+      "differences": [
+        {
+          "bundle_present": true,
+          "bundle_value": [],
+          "json_pointer": "/file_ownership/configuration_files",
+          "root_present": true,
+          "root_value": [
+            "m0017-b2-mt4-ea-executor/m0017-context/work-cells/EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT.json"
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            {
+              "canonical_modules": [
+                "B2_MT4_EA_EXECUTOR",
+                "O2_OMS_STATE_MACHINE",
+                "O3_TRADE_CLOSE_CLASSIFIER"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/execution-engine/src/2099900144260118_plugin.py",
+              "role": "plugin",
+              "service": "execution-engine"
+            },
+            {
+              "canonical_modules": [
+                "B2_MT4_EA_EXECUTOR",
+                "O2_OMS_STATE_MACHINE",
+                "O3_TRADE_CLOSE_CLASSIFIER"
+              ],
+              "is_test": true,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/execution-engine/tests/2099900145260118_test_execution_engine_plugin.py",
+              "role": "test",
+              "service": "execution-engine"
+            }
+          ],
+          "json_pointer": "/file_ownership/file_role_index",
+          "root_present": true,
+          "root_value": [
+            {
+              "canonical_modules": [
+                "B2_MT4_EA_EXECUTOR"
+              ],
+              "is_test": false,
+              "notes": "Regenerated by MIG-0017",
+              "ownership": "owned",
+              "path": "m0017-b2-mt4-ea-executor/m0017-context/work-cells/EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT.json",
+              "role": "work_cell_binding",
+              "service": "execution-engine"
+            },
+            {
+              "canonical_modules": [
+                "B2_MT4_EA_EXECUTOR",
+                "O2_OMS_STATE_MACHINE",
+                "O3_TRADE_CLOSE_CLASSIFIER"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/execution-engine/src/2099900144260118_plugin.py",
+              "role": "plugin",
+              "service": "execution-engine"
+            },
+            {
+              "canonical_modules": [
+                "B2_MT4_EA_EXECUTOR",
+                "O2_OMS_STATE_MACHINE",
+                "O3_TRADE_CLOSE_CLASSIFIER"
+              ],
+              "is_test": true,
+              "notes": "",
+              "ownership": "shared",
+              "path": "services/execution-engine/tests/2099900145260118_test_execution_engine_plugin.py",
+              "role": "test",
+              "service": "execution-engine"
+            }
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": null,
+          "json_pointer": "/file_ownership/module_root",
+          "root_present": true,
+          "root_value": "m0017-b2-mt4-ea-executor"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [],
+          "json_pointer": "/file_ownership/owned_files",
+          "root_present": true,
+          "root_value": [
+            "m0017-b2-mt4-ea-executor/m0017-context/work-cells/EA_SYSTEM_D_EXECUTION_FEEDBACK__MQL4_ORDER_RESULT.json"
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": "2026-07-02T15:52:15.513625+00:00",
+          "json_pointer": "/last_updated_utc",
+          "root_present": true,
+          "root_value": "2026-09-09T07:12:15+00:00"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            "Schema-first regenerated manifest from normalized staging tables."
+          ],
+          "json_pointer": "/notes",
+          "root_present": true,
+          "root_value": [
+            "Schema-first regenerated manifest from normalized staging tables.",
+            "Governance remediation 2026-09-09T07:12:15+00:00: module_root backfilled (was null) -> 'm0017-b2-mt4-ea-executor'."
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": "2026-07-02T15:52:15.513625+00:00",
+          "json_pointer": "/reconciliation_status/last_reconciled_utc",
+          "root_present": true,
+          "root_value": "2026-09-09T07:12:15+00:00"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [],
+          "json_pointer": "/reconciliation_status/reconciliation_notes",
+          "root_present": true,
+          "root_value": [
+            "[governance-remediation 2026-09-09T07:12:15+00:00] module_root backfilled from null to the module's own identity folder ('m0017-b2-mt4-ea-executor'). Canonical implementation for this module currently still lives in a shared, not-yet-split service directory (see file_ownership.shared_files / source_files) and has not been physically relocated; that move is tracked separately as the Phase-5 physical migration, not performed in this pass."
+          ]
+        }
+      ],
+      "disposition": "preserve_root_default_pending_unique_claim_review",
+      "module_id": "50000000000000000017",
+      "module_short_id": "m0017"
+    },
+    {
+      "decision_id": "DEC-007",
+      "difference_count": 5,
+      "differences": [
+        {
+          "bundle_present": true,
+          "bundle_value": null,
+          "json_pointer": "/file_ownership/module_root",
+          "root_present": true,
+          "root_value": "m0019-o2-oms-state-machine"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": "2026-07-02T15:52:15.513625+00:00",
+          "json_pointer": "/last_updated_utc",
+          "root_present": true,
+          "root_value": "2026-09-09T07:12:15+00:00"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            "Schema-first regenerated manifest from normalized staging tables."
+          ],
+          "json_pointer": "/notes",
+          "root_present": true,
+          "root_value": [
+            "Schema-first regenerated manifest from normalized staging tables.",
+            "Governance remediation 2026-09-09T07:12:15+00:00: module_root backfilled (was null) -> 'm0019-o2-oms-state-machine'."
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": "2026-07-02T15:52:15.513625+00:00",
+          "json_pointer": "/reconciliation_status/last_reconciled_utc",
+          "root_present": true,
+          "root_value": "2026-09-09T07:12:15+00:00"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [],
+          "json_pointer": "/reconciliation_status/reconciliation_notes",
+          "root_present": true,
+          "root_value": [
+            "[governance-remediation 2026-09-09T07:12:15+00:00] module_root backfilled from null to the module's own identity folder ('m0019-o2-oms-state-machine'). Canonical implementation for this module currently still lives in a shared, not-yet-split service directory (see file_ownership.shared_files / source_files) and has not been physically relocated; that move is tracked separately as the Phase-5 physical migration, not performed in this pass."
+          ]
+        }
+      ],
+      "disposition": "preserve_root_default_pending_unique_claim_review",
+      "module_id": "50000000000000000019",
+      "module_short_id": "m0019"
+    },
+    {
+      "decision_id": "DEC-007",
+      "difference_count": 5,
+      "differences": [
+        {
+          "bundle_present": true,
+          "bundle_value": null,
+          "json_pointer": "/file_ownership/module_root",
+          "root_present": true,
+          "root_value": "m0020-o3-trade-close-classifier"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": "2026-07-02T15:52:15.513625+00:00",
+          "json_pointer": "/last_updated_utc",
+          "root_present": true,
+          "root_value": "2026-09-09T07:12:15+00:00"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [
+            "Schema-first regenerated manifest from normalized staging tables."
+          ],
+          "json_pointer": "/notes",
+          "root_present": true,
+          "root_value": [
+            "Schema-first regenerated manifest from normalized staging tables.",
+            "Governance remediation 2026-09-09T07:12:15+00:00: module_root backfilled (was null) -> 'm0020-o3-trade-close-classifier'."
+          ]
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": "2026-07-02T15:52:15.513625+00:00",
+          "json_pointer": "/reconciliation_status/last_reconciled_utc",
+          "root_present": true,
+          "root_value": "2026-09-09T07:12:15+00:00"
+        },
+        {
+          "bundle_present": true,
+          "bundle_value": [],
+          "json_pointer": "/reconciliation_status/reconciliation_notes",
+          "root_present": true,
+          "root_value": [
+            "[governance-remediation 2026-09-09T07:12:15+00:00] module_root backfilled from null to the module's own identity folder ('m0020-o3-trade-close-classifier'). Canonical implementation for this module currently still lives in a shared, not-yet-split service directory (see file_ownership.shared_files / source_files) and has not been physically relocated; that move is tracked separately as the Phase-5 physical migration, not performed in this pass."
+          ]
+        }
+      ],
+      "disposition": "preserve_root_default_pending_unique_claim_review",
+      "module_id": "50000000000000000020",
+      "module_short_id": "m0020"
+    }
+  ],
+  "state": "unresolved"
+}

@@ -16,3 +16,9 @@
 *.db binary
 *.db-shm binary
 *.db-wal binary
+
+# Evidence bytes must survive Git checkout unchanged; receipts hash originals.
+governance/module_consolidation/inputs/** -text -eol
+governance/module_consolidation/staging/*/manifest.v1.original.json -text -eol
+governance/module_consolidation/run/baseline_tracking/** -text -eol
+archive/module-supporting-docs/**/original.* -text -eol

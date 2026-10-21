@@ -1,0 +1,1738 @@
+{
+  "authority_policy": "generated_from_module_manifests",
+  "document_type": "generated_module_context_packet",
+  "generated_at_utc": "2026-10-04T20:02:40.548949+00:00",
+  "generator": "governance/module_consolidation/generate_projections.py",
+  "generator_version": "1.0.0",
+  "global_authority_refs": [
+    "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+    "EAFIX_auth_docs/01_canonical_registries/shared_file_registry.json"
+  ],
+  "global_sources": [
+    {
+      "path": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+      "sha256": "1723fd52b0b4a9550146bb9b26c781146e57e22be3c829fc19d70819aa4dd49b"
+    },
+    {
+      "path": "governance/module_consolidation/staging/shared_file_registry.candidate.json",
+      "sha256": "06b1ee63f8bc1da5797da89a51dba86c2f4fd7480c55f451273611a84213faaf"
+    }
+  ],
+  "module_context": {
+    "authority": {
+      "approval_authority": "Codex acting under the repository owner's execution instructions v1.0.0",
+      "effective_baseline_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+      "policy": "reviewed_module_root_authority",
+      "status": "candidate"
+    },
+    "contracts": [
+      {
+        "authority_path": null,
+        "compatibility": {
+          "applicability": "applicable",
+          "decision_id": "DEC-007",
+          "evidence_refs": [
+            "EV-803f065f3cb047393fb0"
+          ],
+          "gap_ids": [],
+          "knowledge": "confirmed",
+          "reason": null,
+          "value": "versioned_contracts_required"
+        },
+        "contract_id": null,
+        "evidence_refs": [
+          "EV-cde0a1bb28961d49586f"
+        ],
+        "gap_ids": [
+          "GAP-m0030-d71f7767bc30"
+        ],
+        "knowledge": "unknown",
+        "name": "MT4_Expiry_Zones_Overlay_ClientRequest",
+        "role": "consumer",
+        "schema_path": null,
+        "step_ids": [],
+        "usage_id": "USE-69b8ff667225bd7a1520",
+        "version": null
+      },
+      {
+        "authority_path": "EAFIX_auth_docs/01_canonical_registries/contract_registry.jsonl",
+        "compatibility": {
+          "applicability": "applicable",
+          "decision_id": "DEC-007",
+          "evidence_refs": [
+            "EV-23d2a0553c160a0e7cf9"
+          ],
+          "gap_ids": [],
+          "knowledge": "confirmed",
+          "reason": null,
+          "value": "versioned_contracts_required"
+        },
+        "contract_id": "CONTRACT::MT4_EXPIRY_ZONES_OVERLAY_RESPONSE::UNVERSIONED",
+        "evidence_refs": [
+          "EV-2bc19758e98ca20eada1"
+        ],
+        "gap_ids": [
+          "GAP-m0030-31c6b2d2bd55"
+        ],
+        "knowledge": "confirmed",
+        "name": "MT4_Expiry_Zones_Overlay_Response",
+        "role": "producer",
+        "schema_path": null,
+        "step_ids": [],
+        "usage_id": "USE-f7c78478e80de5232122",
+        "version": "UNVERSIONED"
+      }
+    ],
+    "document_type": "atomic_module_manifest",
+    "evidence": [
+      {
+        "approved_value_sha256": "165f5de06d5f79d458ccb318da5702598eb8fefe69c44b09cddea97e71a470cf",
+        "approver": "Codex acting under the repository owner's execution instructions v1.0.0",
+        "claim_disposition": "MIGRATE",
+        "claim_summary": "Preserved or referenced commit-pinned source value.",
+        "decision_id": "DEC-007",
+        "evidence_id": "EV-6748d97649ed7c0ea9c9",
+        "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+        "source_locator": {
+          "json_pointer": "/purpose"
+        },
+        "source_path": "m0030-u3-mt4-expiry-overlay/manifest.json",
+        "source_sha256": "393fb1e29ba85b24baa5d90118269c6a0b82467c1e7670b4f24aa71b5630cd27",
+        "target_element_id": null,
+        "target_json_pointer": "/purpose_and_boundaries/purpose",
+        "verification_status": "candidate_applied"
+      },
+      {
+        "approved_value_sha256": "7e7f28005db4ef5d4ceb52664c75c42b3bf1b7a9b27b96a7b4a42f6214f91920",
+        "approver": "Codex acting under the repository owner's execution instructions v1.0.0",
+        "claim_disposition": "MIGRATE",
+        "claim_summary": "Preserved or referenced commit-pinned source value.",
+        "decision_id": "DEC-007",
+        "evidence_id": "EV-867df9278f7204221542",
+        "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+        "source_locator": {
+          "json_pointer": "/module_scope/responsibilities"
+        },
+        "source_path": "m0030-u3-mt4-expiry-overlay/manifest.json",
+        "source_sha256": "393fb1e29ba85b24baa5d90118269c6a0b82467c1e7670b4f24aa71b5630cd27",
+        "target_element_id": null,
+        "target_json_pointer": "/purpose_and_boundaries/responsibilities",
+        "verification_status": "candidate_applied"
+      },
+      {
+        "approved_value_sha256": "89764decfd281259f6989429eefd40622ce09cb00cdd46faa7db471a1c948ad2",
+        "approver": "Codex acting under the repository owner's execution instructions v1.0.0",
+        "claim_disposition": "MIGRATE",
+        "claim_summary": "Preserved or referenced commit-pinned source value.",
+        "decision_id": "DEC-007",
+        "evidence_id": "EV-9e2c1e0c6a014aacd106",
+        "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+        "source_locator": {
+          "json_pointer": "/module_scope/forbidden_responsibilities"
+        },
+        "source_path": "m0030-u3-mt4-expiry-overlay/manifest.json",
+        "source_sha256": "393fb1e29ba85b24baa5d90118269c6a0b82467c1e7670b4f24aa71b5630cd27",
+        "target_element_id": null,
+        "target_json_pointer": "/purpose_and_boundaries/exclusions",
+        "verification_status": "candidate_applied"
+      },
+      {
+        "approved_value_sha256": "c5805071f696430d486c8fdb30b0f2b991f7f5cf1b31f6905c20124a2ab85297",
+        "approver": "Codex acting under the repository owner's execution instructions v1.0.0",
+        "claim_disposition": "MIGRATE",
+        "claim_summary": "Baseline-declared ownership; file exists at the pinned commit.",
+        "decision_id": "DEC-007",
+        "evidence_id": "EV-a9a7037941a4bd228de7",
+        "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+        "source_locator": {
+          "element_key": "services/desktop-ui/2099900128260118_expiry_indicator_service.py",
+          "json_pointer": "/file_ownership/owned_files/0"
+        },
+        "source_path": "m0030-u3-mt4-expiry-overlay/manifest.json",
+        "source_sha256": "393fb1e29ba85b24baa5d90118269c6a0b82467c1e7670b4f24aa71b5630cd27",
+        "target_element_id": "FILE-7cfa2f46e37a1cf3d83e",
+        "target_json_pointer": "/files/definitions",
+        "verification_status": "candidate_applied"
+      },
+      {
+        "approved_value_sha256": "2bf6d4e69deadd93f5a5171dfc8c2857a5f7993fea7de2bb932509f81ae6076c",
+        "approver": "Codex acting under the repository owner's execution instructions v1.0.0",
+        "claim_disposition": "MIGRATE",
+        "claim_summary": "Baseline-declared ownership; file exists at the pinned commit.",
+        "decision_id": "DEC-007",
+        "evidence_id": "EV-8209708fcccb9d46330c",
+        "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+        "source_locator": {
+          "element_key": "services/desktop-ui/2099900129260118_expiry_service.py",
+          "json_pointer": "/file_ownership/owned_files/1"
+        },
+        "source_path": "m0030-u3-mt4-expiry-overlay/manifest.json",
+        "source_sha256": "393fb1e29ba85b24baa5d90118269c6a0b82467c1e7670b4f24aa71b5630cd27",
+        "target_element_id": "FILE-d1f3d33c9e2b6d1f37e1",
+        "target_json_pointer": "/files/definitions",
+        "verification_status": "candidate_applied"
+      },
+      {
+        "approved_value_sha256": "b268d4df4e0f58f7ad5a297907a6a1b4b9ffa26f531d739769e79d438bd22814",
+        "approver": "Codex acting under the repository owner's execution instructions v1.0.0",
+        "claim_disposition": "MIGRATE",
+        "claim_summary": "Participation derived by permanent owner/supporting identity; zero is confirmed only for this authored registry.",
+        "decision_id": "DEC-028",
+        "evidence_id": "EV-8b95697421af39bea0aa",
+        "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+        "source_locator": {
+          "json_pointer": ""
+        },
+        "source_path": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "source_sha256": "1723fd52b0b4a9550146bb9b26c781146e57e22be3c829fc19d70819aa4dd49b",
+        "target_element_id": null,
+        "target_json_pointer": "/process_participation",
+        "verification_status": "candidate_applied"
+      },
+      {
+        "approved_value_sha256": "95ff36423024b2af9fbb1eea93b81d293e50e28b0e3d1e8b65c60f00c53b33b9",
+        "approver": "Codex acting under the repository owner's execution instructions v1.0.0",
+        "claim_disposition": "MIGRATE",
+        "claim_summary": "Declared module boundary contract use.",
+        "decision_id": "DEC-007",
+        "evidence_id": "EV-cde0a1bb28961d49586f",
+        "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+        "source_locator": {
+          "element_key": "MT4_Expiry_Zones_Overlay_ClientRequest",
+          "json_pointer": "/contracts/input_contracts/0"
+        },
+        "source_path": "m0030-u3-mt4-expiry-overlay/manifest.json",
+        "source_sha256": "393fb1e29ba85b24baa5d90118269c6a0b82467c1e7670b4f24aa71b5630cd27",
+        "target_element_id": "USE-69b8ff667225bd7a1520",
+        "target_json_pointer": "/contracts",
+        "verification_status": "candidate_applied"
+      },
+      {
+        "approved_value_sha256": "3c1e984ba2fce2ac93146a9926eb70ff94a8623ae7d78796ede109134bb94f9d",
+        "approver": "Codex acting under the repository owner's execution instructions v1.0.0",
+        "claim_disposition": "MIGRATE",
+        "claim_summary": "Preserved or referenced commit-pinned source value.",
+        "decision_id": "DEC-007",
+        "evidence_id": "EV-803f065f3cb047393fb0",
+        "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+        "source_locator": {
+          "json_pointer": "/contracts/contract_version_policy"
+        },
+        "source_path": "m0030-u3-mt4-expiry-overlay/manifest.json",
+        "source_sha256": "393fb1e29ba85b24baa5d90118269c6a0b82467c1e7670b4f24aa71b5630cd27",
+        "target_element_id": null,
+        "target_json_pointer": "/contracts/0/compatibility",
+        "verification_status": "candidate_applied"
+      },
+      {
+        "approved_value_sha256": "dfe6cc10eed87da0508284087a7d44693566188e37c1d1440333aadd78330a04",
+        "approver": "Codex acting under the repository owner's execution instructions v1.0.0",
+        "claim_disposition": "MIGRATE",
+        "claim_summary": "Declared module boundary contract use.",
+        "decision_id": "DEC-007",
+        "evidence_id": "EV-2bc19758e98ca20eada1",
+        "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+        "source_locator": {
+          "element_key": "MT4_Expiry_Zones_Overlay_Response",
+          "json_pointer": "/contracts/output_contracts/0"
+        },
+        "source_path": "m0030-u3-mt4-expiry-overlay/manifest.json",
+        "source_sha256": "393fb1e29ba85b24baa5d90118269c6a0b82467c1e7670b4f24aa71b5630cd27",
+        "target_element_id": "USE-f7c78478e80de5232122",
+        "target_json_pointer": "/contracts",
+        "verification_status": "candidate_applied"
+      },
+      {
+        "approved_value_sha256": "7d9cacfa5188821c60ceb6671de37af1f7b4159f9e830a5b3d339488c650ef00",
+        "approver": "Codex acting under the repository owner's execution instructions v1.0.0",
+        "claim_disposition": "MIGRATE",
+        "claim_summary": "Preserved or referenced commit-pinned source value.",
+        "decision_id": "DEC-007",
+        "evidence_id": "EV-23d2a0553c160a0e7cf9",
+        "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+        "source_locator": {
+          "json_pointer": "/contracts/contract_version_policy"
+        },
+        "source_path": "m0030-u3-mt4-expiry-overlay/manifest.json",
+        "source_sha256": "393fb1e29ba85b24baa5d90118269c6a0b82467c1e7670b4f24aa71b5630cd27",
+        "target_element_id": null,
+        "target_json_pointer": "/contracts/1/compatibility",
+        "verification_status": "candidate_applied"
+      },
+      {
+        "approved_value_sha256": "111aab63882c59649be1f1fee0513e11914ec27b0f1236e89c36aa0e4f93e6af",
+        "approver": "Codex acting under the repository owner's execution instructions v1.0.0",
+        "claim_disposition": "MIGRATE",
+        "claim_summary": "Preserved or referenced commit-pinned source value.",
+        "decision_id": "DEC-007",
+        "evidence_id": "EV-b44c6ad27b71d7c8bca8",
+        "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+        "source_locator": {
+          "json_pointer": "/service_runtime/runtime_kind"
+        },
+        "source_path": "m0030-u3-mt4-expiry-overlay/manifest.json",
+        "source_sha256": "393fb1e29ba85b24baa5d90118269c6a0b82467c1e7670b4f24aa71b5630cd27",
+        "target_element_id": null,
+        "target_json_pointer": "/runtime/kind",
+        "verification_status": "candidate_applied"
+      },
+      {
+        "approved_value_sha256": "228b5baf74f4bc972e1c7be219bda0c6d12c4ae8dad7a399e038244a449ff29c",
+        "approver": "Codex acting under the repository owner's execution instructions v1.0.0",
+        "claim_disposition": "MIGRATE",
+        "claim_summary": "Preserved or referenced commit-pinned source value.",
+        "decision_id": "DEC-007",
+        "evidence_id": "EV-da3c0d72edfd41e2577d",
+        "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+        "source_locator": {
+          "json_pointer": "/service_runtime/language"
+        },
+        "source_path": "m0030-u3-mt4-expiry-overlay/manifest.json",
+        "source_sha256": "393fb1e29ba85b24baa5d90118269c6a0b82467c1e7670b4f24aa71b5630cd27",
+        "target_element_id": null,
+        "target_json_pointer": "/runtime/language_platform",
+        "verification_status": "candidate_applied"
+      },
+      {
+        "approved_value_sha256": "b549a14ce308e91d7ddbc3183aba3a0e168a964a26aa5f8de3b0fe3f31f5b514",
+        "approver": "Codex acting under the repository owner's execution instructions v1.0.0",
+        "claim_disposition": "MIGRATE",
+        "claim_summary": "Preserved or referenced commit-pinned source value.",
+        "decision_id": "DEC-007",
+        "evidence_id": "EV-92ecb6f2c8b46e2aac6e",
+        "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+        "source_locator": {
+          "json_pointer": "/service_runtime/deployment_unit"
+        },
+        "source_path": "m0030-u3-mt4-expiry-overlay/manifest.json",
+        "source_sha256": "393fb1e29ba85b24baa5d90118269c6a0b82467c1e7670b4f24aa71b5630cd27",
+        "target_element_id": null,
+        "target_json_pointer": "/runtime/deployment_unit",
+        "verification_status": "candidate_applied"
+      },
+      {
+        "approved_value_sha256": "6c19d582b31cbaa9de149533d6aab666d9a966a5c640b3eee5f0ce6a567fa9ec",
+        "approver": "Codex acting under the repository owner's execution instructions v1.0.0",
+        "claim_disposition": "MIGRATE",
+        "claim_summary": "Preserved or referenced commit-pinned source value.",
+        "decision_id": "DEC-007",
+        "evidence_id": "EV-efc22ac5d78d14282e0f",
+        "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+        "source_locator": {
+          "json_pointer": "/service_runtime"
+        },
+        "source_path": "m0030-u3-mt4-expiry-overlay/manifest.json",
+        "source_sha256": "393fb1e29ba85b24baa5d90118269c6a0b82467c1e7670b4f24aa71b5630cd27",
+        "target_element_id": null,
+        "target_json_pointer": "/runtime/ports_channels",
+        "verification_status": "candidate_applied"
+      },
+      {
+        "approved_value_sha256": "3278d58c3c7fb5e9b631e450cfa615865b797be5c5c33ada411ec0eaacc74700",
+        "approver": "Codex acting under the repository owner's execution instructions v1.0.0",
+        "claim_disposition": "MIGRATE",
+        "claim_summary": "Mechanical identity/profile migration; authority remains candidate until P6.",
+        "decision_id": "DEC-006",
+        "evidence_id": "EV-f74763d80f5576d8a895",
+        "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+        "source_locator": {
+          "json_pointer": "/module_identity"
+        },
+        "source_path": "m0030-u3-mt4-expiry-overlay/manifest.json",
+        "source_sha256": "393fb1e29ba85b24baa5d90118269c6a0b82467c1e7670b4f24aa71b5630cd27",
+        "target_element_id": null,
+        "target_json_pointer": "/module_identity",
+        "verification_status": "candidate_applied"
+      },
+      {
+        "approved_value_sha256": "c8553a8fe1af96edad3d12282425542e531342c45b52a511b652e311b816f63b",
+        "approver": "Codex acting under the repository owner's execution instructions v1.0.0",
+        "claim_disposition": "MIGRATE",
+        "claim_summary": "Mechanical identity/profile migration; authority remains candidate until P6.",
+        "decision_id": "DEC-006",
+        "evidence_id": "EV-cdebf2defbde7a01293b",
+        "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+        "source_locator": {
+          "json_pointer": "/module_classification"
+        },
+        "source_path": "m0030-u3-mt4-expiry-overlay/manifest.json",
+        "source_sha256": "393fb1e29ba85b24baa5d90118269c6a0b82467c1e7670b4f24aa71b5630cd27",
+        "target_element_id": null,
+        "target_json_pointer": "/profile",
+        "verification_status": "candidate_applied"
+      },
+      {
+        "approved_value_sha256": "64aebec843c3382c80f2e01d8fcd12b152c72db3328d7e66bdbb832adb9fc315",
+        "approver": "Codex delegated under execution instructions sections 9, 11, 38",
+        "claim_disposition": "MIGRATE",
+        "claim_summary": "Explicit declared module IO boundary",
+        "decision_id": "DEC-033",
+        "evidence_id": "EV-REVIEW-0055a0d9103a4f1de801",
+        "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+        "source_locator": {
+          "json_pointer": "/contracts/module_io_policy"
+        },
+        "source_path": "m0030-u3-mt4-expiry-overlay/manifest.json",
+        "source_sha256": "393fb1e29ba85b24baa5d90118269c6a0b82467c1e7670b4f24aa71b5630cd27",
+        "target_element_id": null,
+        "target_json_pointer": "/purpose_and_boundaries/trust_boundary",
+        "verification_status": "candidate_applied"
+      },
+      {
+        "approved_value_sha256": "1c8fe16a53bf165d04cf2baa83186e0ec6415167d7974fea94faa6d8baf7ca53",
+        "approver": "Codex under owner continuation request",
+        "claim_disposition": "MIGRATE",
+        "claim_summary": "Reviewed fresh-baseline continuity without modifying historical evidence commits or granting cutover.",
+        "decision_id": "DEC-034",
+        "evidence_id": "EV-16c7b87496f6b268e909",
+        "source_commit": null,
+        "source_locator": {
+          "json_pointer": "/fresh_baseline"
+        },
+        "source_path": "governance/module_consolidation/run/baseline_continuity.json",
+        "source_sha256": "536c35515204ae98f13cd7a33b0754f44a1fc081fb9ba78f5c7fe7f4eadb11bc",
+        "target_element_id": null,
+        "target_json_pointer": "/authority",
+        "verification_status": "candidate_applied"
+      }
+    ],
+    "failure_and_safety": {
+      "error_codes": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-ed0c4295f19d"
+        ],
+        "knowledge": "unknown",
+        "reason": "Require explicit applicability and evidence before approving error_codes.",
+        "value": null
+      },
+      "fail_closed": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-88ebfed26f19"
+        ],
+        "knowledge": "unknown",
+        "reason": "Require explicit applicability and evidence before approving fail_closed.",
+        "value": null
+      },
+      "failure_modes": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-cb9a7048b6ea"
+        ],
+        "knowledge": "unknown",
+        "reason": "Mandatory failure_modes semantics are still needs_review in the v1 source.",
+        "value": null
+      },
+      "operator_escalation": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-c02e420b4e63"
+        ],
+        "knowledge": "unknown",
+        "reason": "Require explicit applicability and evidence before approving operator_escalation.",
+        "value": null
+      },
+      "recovery_quarantine": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-2b2490cdc8ce"
+        ],
+        "knowledge": "unknown",
+        "reason": "Existing v1 source does not establish an approved value for /state_and_failure_behavior/quarantine_policy",
+        "value": null
+      },
+      "rejection_outputs": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-322d168fd510"
+        ],
+        "knowledge": "unknown",
+        "reason": "Require explicit applicability and evidence before approving rejection_outputs.",
+        "value": null
+      },
+      "retry_policy": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-9badb18cfb8e"
+        ],
+        "knowledge": "unknown",
+        "reason": "Existing v1 source does not establish an approved value for /state_and_failure_behavior/retry_policy",
+        "value": null
+      },
+      "risk_controls": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-a8eb4a792cda"
+        ],
+        "knowledge": "unknown",
+        "reason": "Require explicit applicability and evidence before approving risk_controls.",
+        "value": null
+      },
+      "safety_gates": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-60461c6dbb76"
+        ],
+        "knowledge": "unknown",
+        "reason": "Require explicit applicability and evidence before approving safety_gates.",
+        "value": null
+      },
+      "timeout_policy": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-d1dd9900af6e"
+        ],
+        "knowledge": "unknown",
+        "reason": "Existing v1 source does not establish an approved value for /state_and_failure_behavior/timeout_policy",
+        "value": null
+      },
+      "validation": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-f6ef834a3bec"
+        ],
+        "knowledge": "unknown",
+        "reason": "Mandatory validation semantics are still needs_review in the v1 source.",
+        "value": null
+      }
+    },
+    "files": {
+      "definitions": [
+        {
+          "content_sha256": "d3347269e2b9e406ce841e11ef0acc2b596ce6f48cc54447ad34a2c1a13d5b7b",
+          "contracts_consumed": [],
+          "contracts_produced": [],
+          "current_or_proposed_location": "current",
+          "entrypoint": false,
+          "evidence_refs": [
+            "EV-a9a7037941a4bd228de7"
+          ],
+          "file_id": "FILE-7cfa2f46e37a1cf3d83e",
+          "ownership_status": "baseline_declared",
+          "path": "services/desktop-ui/2099900128260118_expiry_indicator_service.py",
+          "required": null,
+          "role": "library",
+          "runtime_relevance": "undetermined"
+        },
+        {
+          "content_sha256": "df006f8cd23fc93f7b1bfe847ac3fa2879bdb0e0c7023ded8f36cbc08f2a9b62",
+          "contracts_consumed": [],
+          "contracts_produced": [],
+          "current_or_proposed_location": "current",
+          "entrypoint": false,
+          "evidence_refs": [
+            "EV-8209708fcccb9d46330c"
+          ],
+          "file_id": "FILE-d1f3d33c9e2b6d1f37e1",
+          "ownership_status": "baseline_declared",
+          "path": "services/desktop-ui/2099900129260118_expiry_service.py",
+          "required": null,
+          "role": "library",
+          "runtime_relevance": "undetermined"
+        }
+      ],
+      "required_file_inventory": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-fb337411924a"
+        ],
+        "knowledge": "unknown",
+        "reason": "Baseline file inventory does not establish required status or step-local usage for all runtime assets; semantic/import review is required before closed-world enforcement.",
+        "value": null
+      },
+      "scope_status": "open",
+      "shared_uses": []
+    },
+    "manifest_version": "2.0.0",
+    "migration": {
+      "migration_map_ref": "governance/module_consolidation/v1_to_v2_migration_map.json",
+      "original_content_role": "immutable_historical_evidence_only",
+      "original_snapshot_path": "governance/module_consolidation/staging/m0030/manifest.v1.original.json",
+      "original_v1": {
+        "ai_context": {
+          "ai_usage_guidance": {
+            "do_not_use_when": "non-UI module updates",
+            "lookup_keys": [
+              "U3_MT4_EXPIRY_OVERLAY",
+              "UI-PRODUCT-MT4-OVERLAY"
+            ],
+            "must_remember": [
+              "UI product mapping: UI-PRODUCT-MT4-OVERLAY"
+            ],
+            "use_when": "updating UI module metadata"
+          },
+          "common_failure_patterns": [],
+          "context_priority": "canonical",
+          "forbidden_assumptions": [],
+          "plain_language_summary": "UI catalog mapping for UI-PRODUCT-MT4-OVERLAY",
+          "safe_edit_boundary": "ui_catalog_authority_only"
+        },
+        "contracts": {
+          "contract_files": [],
+          "contract_schema_refs": [],
+          "contract_version_policy": "versioned_contracts_required",
+          "hash_or_checksum_required": false,
+          "hash_policy": null,
+          "idempotency_key_policy": null,
+          "input_contracts": [
+            {
+              "consumed_by_modules": [],
+              "description": "",
+              "direction": "input",
+              "name": "MT4_Expiry_Zones_Overlay_ClientRequest",
+              "produced_by_module": null,
+              "required": true,
+              "schema_ref": null,
+              "version": null
+            }
+          ],
+          "module_io_policy": {
+            "allowed_external_inputs": [],
+            "forbidden_ingestion_sources": [],
+            "may_ingest_only_declared_outputs": true,
+            "private_cross_module_access_allowed": false,
+            "shared_kernel_access_policy": "stable_domain_neutral_primitives_only"
+          },
+          "output_contracts": [
+            {
+              "consumed_by_modules": [],
+              "description": "",
+              "direction": "output",
+              "name": "MT4_Expiry_Zones_Overlay_Response",
+              "produced_by_module": null,
+              "required": true,
+              "schema_ref": null,
+              "version": null
+            }
+          ],
+          "output_description": "",
+          "schema_validation_required": true
+        },
+        "dependencies": [],
+        "document_type": "atomic_module_manifest_schema_instance",
+        "documentation_set": {
+          "api_interfaces_ref": null,
+          "contracts_ref": null,
+          "deprecated_submodule_docs": [],
+          "documentation_completeness": "partial",
+          "generated_readme_ref": null,
+          "implementation_map_ref": null,
+          "missing_documents": [
+            "README.md",
+            "contracts.md"
+          ],
+          "plain_language_summary_ref": null,
+          "required_documents": [
+            {
+              "authority_level": null,
+              "document_name": "manifest.json",
+              "notes": "",
+              "path": null,
+              "required": true,
+              "status": "generated"
+            },
+            {
+              "authority_level": null,
+              "document_name": "README.md",
+              "notes": "",
+              "path": null,
+              "required": true,
+              "status": "missing"
+            },
+            {
+              "authority_level": null,
+              "document_name": "contracts.md",
+              "notes": "",
+              "path": null,
+              "required": true,
+              "status": "missing"
+            }
+          ],
+          "state_machine_ref": null,
+          "verification_matrix_ref": null
+        },
+        "file_ownership": {
+          "allowed_files": [],
+          "configuration_files": [],
+          "contract_files": [],
+          "documentation_files": [],
+          "evidence_files": [],
+          "file_assignment_policy_ref": "module_assignment_policy",
+          "file_assignment_status": "complete",
+          "file_role_index": [
+            {
+              "canonical_modules": [
+                "U3_MT4_EXPIRY_OVERLAY"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/desktop-ui/2099900128260118_expiry_indicator_service.py",
+              "role": "service",
+              "service": "desktop-ui"
+            },
+            {
+              "canonical_modules": [
+                "U3_MT4_EXPIRY_OVERLAY"
+              ],
+              "is_test": false,
+              "notes": "",
+              "ownership": "owned",
+              "path": "services/desktop-ui/2099900129260118_expiry_service.py",
+              "role": "service",
+              "service": "desktop-ui"
+            }
+          ],
+          "forbidden_files": [],
+          "generated_files": [],
+          "manifest_path": null,
+          "module_root": "services/desktop-ui",
+          "owned_files": [
+            "services/desktop-ui/2099900128260118_expiry_indicator_service.py",
+            "services/desktop-ui/2099900129260118_expiry_service.py"
+          ],
+          "ownership_derivation": "file_module_mapping",
+          "schema_files": [],
+          "shared_files": [],
+          "source_files": [
+            "services/desktop-ui/2099900128260118_expiry_indicator_service.py",
+            "services/desktop-ui/2099900129260118_expiry_service.py"
+          ],
+          "test_files": [],
+          "unassigned_candidate_files": []
+        },
+        "generated_at_utc": "2026-07-02T15:52:15.513625+00:00",
+        "last_updated_utc": "2026-07-02T15:52:15.513625+00:00",
+        "manifest_version": "1.0.0",
+        "module_classification": {
+          "deployable_scope": "desktop_ui",
+          "domain_group_id": "G8",
+          "domain_group_name": "UI Gateway",
+          "layer": 5,
+          "module_kind": "UI_MODULE",
+          "module_role": "ui_module",
+          "phase_id": "PHASE_NOT_APPLICABLE",
+          "tags": [
+            "vNext"
+          ]
+        },
+        "module_identity": {
+          "canonical_symbol": "U3_MT4_EXPIRY_OVERLAY",
+          "identity_model": "numeric_20_digit",
+          "identity_status": "canonical",
+          "legacy_aliases": [],
+          "module_id": "50000000000000000030",
+          "module_name": "MT4 Expiry Zones Overlay",
+          "numeric_module_id": "50000000000000000030",
+          "status": "canonical",
+          "superseded_by": [],
+          "supersedes": [],
+          "version": "1.0.0"
+        },
+        "module_scope": {
+          "atomicity_statement": "U3_MT4_EXPIRY_OVERLAY is represented as a single atomic manifest record.",
+          "forbidden_responsibilities": [
+            "cross_module_private_state_access"
+          ],
+          "internal_only_objects": [],
+          "key_functions": [],
+          "public_api_surface": [],
+          "responsibilities": [
+            "Display expiry zones, indicator summaries, spot data, and MT4-facing UI data served over local HTTP."
+          ],
+          "scope_in": [
+            "MT4_Expiry_Zones_Overlay_ClientRequest"
+          ],
+          "scope_out": [
+            "MT4_Expiry_Zones_Overlay_Response"
+          ],
+          "shared_kernel_usage": []
+        },
+        "notes": [
+          "Schema-first regenerated manifest from normalized staging tables."
+        ],
+        "packet_type": "atomic_module_manifest",
+        "plain_language_summary": "Display expiry zones, indicator summaries, spot data, and MT4-facing UI data served over local HTTP.",
+        "platform_constraints": {
+          "broker_variability": true,
+          "custom_vs_native_policy": "reuse_native_or_export_native_data",
+          "dll_imports_required": false,
+          "known_limitation_refs": [
+            "no_public_retail_mt4_rest_api"
+          ],
+          "mt4_terminal_must_be_open": true,
+          "native_capability_refs": [
+            "MT4-AI-RULE-004",
+            "MT4-AI-RULE-006"
+          ],
+          "platform": "MT4",
+          "required_operator_settings": [
+            "desktop_terminal_connected"
+          ],
+          "web_terminal_supported": false,
+          "webrequest_required": false
+        },
+        "process_binding": {
+          "dependency_step_ids": [],
+          "downstream_modules": [],
+          "entrypoint_files": [],
+          "loop_behavior": null,
+          "output_description": "",
+          "phase_id": "PHASE_NOT_APPLICABLE",
+          "phase_name": "not_applicable",
+          "process_binding_source": "manual_atomic_split",
+          "process_id": "HUEY_P_EAFIX_END_TO_END",
+          "process_order": 0,
+          "process_version": "2.0.0",
+          "responsible": "needs_review",
+          "step_code": "NA",
+          "step_id": "N/A",
+          "step_name": "not_applicable",
+          "step_number": 0,
+          "upstream_modules": []
+        },
+        "purpose": "Display expiry zones, indicator summaries, spot data, and MT4-facing UI data served over local HTTP.",
+        "reconciliation_status": {
+          "kind_mismatch": false,
+          "known_flags": [
+            "PROCESS_BINDING",
+            "THIN_MODULE"
+          ],
+          "last_reconciled_utc": "2026-07-02T15:52:15.513625+00:00",
+          "layer_unassigned": true,
+          "mapped_file_count": 2,
+          "owned_channel_ids": [],
+          "prefix_collision": false,
+          "reconciliation_notes": [
+            "process_binding:not_applicable",
+            "thin_module:ui_module"
+          ],
+          "service_binding_status": "bound",
+          "stale_symbol_tokens": [],
+          "submodule_doc_status": "deprecated"
+        },
+        "schema_version": "1.0.0",
+        "service_runtime": {
+          "candidate_service_home": null,
+          "deployment_unit": "desktop_ui",
+          "external_systems": [],
+          "health_endpoint": null,
+          "host": null,
+          "language": "python",
+          "metrics_endpoint": null,
+          "microservice_port": null,
+          "operator_settings_required": [],
+          "runtime_kind": "python_service",
+          "runtime_status": "unknown",
+          "service_home": "services/desktop-ui",
+          "startup_entrypoints": []
+        },
+        "source_authority": {
+          "authority_notes": [
+            "thin_module:ui_module"
+          ],
+          "authority_policy": "generated_from_canonical_sources",
+          "companion_documents": [
+            "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+            "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/EAFIX module reconciliation worksheet.md"
+          ],
+          "conflict_resolution_order": [
+            "eafix_project_knowledge_reference_routing_instructions.json",
+            "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json",
+            "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+            "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+            "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+            "EAFIX_auth_docs/01_canonical_registries/communication_channels.json",
+            "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+            "EAFIX_auth_docs/01_canonical_registries/mt4 authoritative reference for ai.json",
+            "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv"
+          ],
+          "generated_from_documents": [
+            "eafix_project_knowledge_reference_routing_instructions.json",
+            "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json",
+            "EAFIX_auth_docs/01_canonical_registries/eafix_unified_atomic_module_schema_v1_0_0.json",
+            "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix_unified_atomic_module_manifest_ai_fill_instructions_v1_0_0.md",
+            "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+            "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+            "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+            "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+            "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv",
+            "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_services_ai_reference_20260510.json",
+            "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/EAFIX-Modular — End-to-End Module Map.txt",
+            "EAFIX_auth_docs/01_canonical_registries/communication_channels.json",
+            "EAFIX_auth_docs/MT4_Python communication channels.txt",
+            "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+            "EAFIX_auth_docs/01_canonical_registries/mt4 authoritative reference for ai.json",
+            "EAFIX_auth_docs/01_canonical_registries/converted_capability_registry.json",
+            "EAFIX_auth_docs/dependency_layers_parsed.json"
+          ],
+          "required_reference_documents": [
+            "eafix_project_knowledge_reference_routing_instructions.json",
+            "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json",
+            "EAFIX_auth_docs/01_canonical_registries/eafix_unified_atomic_module_schema_v1_0_0.json",
+            "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix_unified_atomic_module_manifest_ai_fill_instructions_v1_0_0.md",
+            "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json",
+            "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+            "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+            "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+            "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv",
+            "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_services_ai_reference_20260510.json",
+            "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/EAFIX-Modular — End-to-End Module Map.txt",
+            "EAFIX_auth_docs/01_canonical_registries/communication_channels.json",
+            "EAFIX_auth_docs/MT4_Python communication channels.txt",
+            "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json",
+            "EAFIX_auth_docs/01_canonical_registries/mt4 authoritative reference for ai.json",
+            "EAFIX_auth_docs/01_canonical_registries/converted_capability_registry.json",
+            "EAFIX_auth_docs/dependency_layers_parsed.json"
+          ]
+        },
+        "staleness_policy": {
+          "last_generated_from": [
+            "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json",
+            "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+            "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+            "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+            "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv",
+            "EAFIX_auth_docs/01_canonical_registries/communication_channels.json",
+            "EAFIX_auth_docs/01_canonical_registries/ui_catalog.json"
+          ],
+          "regenerate_if_changed": [
+            "EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json",
+            "EAFIX_auth_docs/01_canonical_registries/module_catalog.json",
+            "EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json",
+            "EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json",
+            "EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv"
+          ],
+          "source_hashes": {
+            "aligned_process:EAFIX_auth_docs/01_canonical_registries/updated_trading_process_aligned.json": "f794a0814e2699ac633e7ec1d4c9a1c0a8d5dccec3f466989c5264b577c77097",
+            "capability_registry:EAFIX_auth_docs/01_canonical_registries/converted_capability_registry.json": "2e4631bb9b8fff95a5f1f23e9943dafc064b3895bf24ef4182247ed812691ca4",
+            "communication_channels:EAFIX_auth_docs/01_canonical_registries/communication_channels.json": "b65fc3ff84b7f89cd5eab499842e86a97dc99e0d4d26f839dd983948161ded14",
+            "dependency_layers_pdf:EAFIX_auth_docs/dependency_layers_parsed.json": "6e6285d64252df96587ad9e378e2ab7da2c01aaa98e0f63f2dbe30664d66e917",
+            "existing_draft_bundle:EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix module manifests bundle.json": "84b24cc2d3a1c417e3021352c8ca8a29f8226c1a5a499d4f3d8540b36cdf4260",
+            "file_mapping:EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/file_module_mapping.csv": "7441ba8a0e25db2f8a28b58d96ea462208bd0959e8c99db9e33488c45a1e2b7d",
+            "fill_doctrine:EAFIX_auth_docs/02_module_architecture_and_atomic_migration/eafix_unified_atomic_module_manifest_ai_fill_instructions_v1_0_0.md": "1608e704b309c253af0fe11e28fef8ed31f9001893868ebcc07488cc289dcc81",
+            "manifest_schema:EAFIX_auth_docs/01_canonical_registries/eafix_unified_atomic_module_schema_v1_0_0.json": "6c88f94dcc92f5c2f66d1858bb7e3e3477216f66a3a3286399cafa55d8305cff",
+            "module_catalog_enrichment:EAFIX_auth_docs/01_canonical_registries/module_catalog.json": "1cdd67b6a0485f65d4c9f9617984a7c54e1f1a397e946a87beb04c15cc066288",
+            "module_map:EAFIX_auth_docs/02_module_architecture_and_atomic_migration/EAFIX-Modular — End-to-End Module Map.txt": "518fd9cc1999378165f80c55083618e9e0b05a9094e9fb419b31bc14107d04b8",
+            "module_universe_vnext:EAFIX_auth_docs/02_module_architecture_and_atomic_migration/Claude_gen_atomic_module_catalog_vNext.json": "476e5e65b903f263791d2188817e591b5fbdcec02e16749155747f4d331ca47c",
+            "mt4_authoritative:EAFIX_auth_docs/01_canonical_registries/mt4 authoritative reference for ai.json": "195b93c2d6ece47dc336a183cb1312f3d183069cefdbecf0b7d50ba6536f2296",
+            "process_step_catalog:EAFIX_auth_docs/01_canonical_registries/process_step_catalog.json": "3695f03160d6827ad889724d32923b175112706d4c163ad52eb382a82443b9f5",
+            "routing_authority:eafix_project_knowledge_reference_routing_instructions.json": "428865665cff9768558d1496cbd54f5ba1757cdcc9727853cbf9d3739f451844",
+            "service_runtime:EAFIX_auth_docs/10_services_source_inventory_and_file_mapping/eafix_services_ai_reference_20260510.json": "b99c1011451b699c3eb4368567c973df1af25e15deea931130eb629f058bcd1c",
+            "ui_catalog:EAFIX_auth_docs/01_canonical_registries/ui_catalog.json": "6114655ad63cd6d25d5ea06b90c089cd4ce2bb8a30ec7dba605563ce2c9be074"
+          },
+          "staleness_check_command": "python -m tools.manifest_generation.generate_manifests --repo-root . --validate-only",
+          "staleness_status": "fresh"
+        },
+        "standards_and_gates": {
+          "applicable_gate_ids": [
+            "GATE-U3_MT4_EXPIRY_OVERLAY"
+          ],
+          "applicable_rule_ids": [
+            "VAL-U3_MT4_EXPIRY_OVERLAY-NEEDS_REVIEW"
+          ],
+          "blocking_gate_policy": "only_block_when_gate_has_pass_fail_and_evidence",
+          "contract_validation_required": true,
+          "evidence_paths": [],
+          "evidence_required": true,
+          "invariants": [],
+          "required_gate_commands": [],
+          "required_validators": [
+            "jsonschema"
+          ],
+          "security_scan_required": true,
+          "source_traceability_required": true,
+          "standards_domains": [
+            "module_manifest"
+          ],
+          "test_coverage_minimum": null
+        },
+        "state_and_failure_behavior": {
+          "fail_closed_default": false,
+          "failure_contract": {
+            "default_behavior": "CONTINUE",
+            "evidence_required": true,
+            "failure_mode_id": "FAIL-U3_MT4_EXPIRY_OVERLAY-NEEDS_REVIEW",
+            "operator_alert_required": false,
+            "rule": "needs_review"
+          },
+          "fallback_policy": null,
+          "idempotency_policy": null,
+          "quarantine_policy": null,
+          "retry_policy": null,
+          "risk_off_default": false,
+          "state_machine_ref": null,
+          "state_machine_states": [],
+          "time_standard_policy": null,
+          "timeout_policy": null,
+          "validation_contract": {
+            "evidence_required": true,
+            "pass_fail_criteria": [],
+            "rule": "needs_review",
+            "validation_id": "VAL-U3_MT4_EXPIRY_OVERLAY-NEEDS_REVIEW"
+          }
+        }
+      },
+      "source_commit": "2e029a6b59c7dd14655f778cd06c0e9e526168cb",
+      "source_manifest_path": "m0030-u3-mt4-expiry-overlay/manifest.json",
+      "source_manifest_sha256": "393fb1e29ba85b24baa5d90118269c6a0b82467c1e7670b4f24aa71b5630cd27"
+    },
+    "module_identity": {
+      "accountable_owner": "DICKY1987",
+      "aliases": [],
+      "canonical_root": "m0030-u3-mt4-expiry-overlay",
+      "canonical_symbol": "U3_MT4_EXPIRY_OVERLAY",
+      "identity_status": "canonical",
+      "lifecycle_status": "active",
+      "module_id": "50000000000000000030",
+      "module_name": "MT4 Expiry Zones Overlay",
+      "short_id": "m0030",
+      "specification_version": "2.0.0"
+    },
+    "observability_quality": {
+      "acceptance_criteria": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-674c0f19150e"
+        ],
+        "knowledge": "unknown",
+        "reason": "Review source evidence for acceptance_criteria; a blank v1 collection does not mean none.",
+        "value": null
+      },
+      "health_checks": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-4b9cd1ce5169"
+        ],
+        "knowledge": "unknown",
+        "reason": "Review source evidence for health_checks; a blank v1 collection does not mean none.",
+        "value": null
+      },
+      "implementation_evidence": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-2b013161a7c8"
+        ],
+        "knowledge": "unknown",
+        "reason": "Review source evidence for implementation_evidence; a blank v1 collection does not mean none.",
+        "value": null
+      },
+      "logs": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-5f43ee85318a"
+        ],
+        "knowledge": "unknown",
+        "reason": "Review source evidence for logs; a blank v1 collection does not mean none.",
+        "value": null
+      },
+      "metrics": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-ec4ee9828804"
+        ],
+        "knowledge": "unknown",
+        "reason": "Review source evidence for metrics; a blank v1 collection does not mean none.",
+        "value": null
+      },
+      "performance": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-33ea5d3659b3"
+        ],
+        "knowledge": "unknown",
+        "reason": "Review source evidence for performance; a blank v1 collection does not mean none.",
+        "value": null
+      },
+      "slos": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-7799656fb36d"
+        ],
+        "knowledge": "unknown",
+        "reason": "Review source evidence for slos; a blank v1 collection does not mean none.",
+        "value": null
+      },
+      "test_references": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-d0fd0bb27034"
+        ],
+        "knowledge": "unknown",
+        "reason": "Review source evidence for test_references; a blank v1 collection does not mean none.",
+        "value": null
+      }
+    },
+    "process_participation": {
+      "applicability": "applicable",
+      "decision_id": "DEC-028",
+      "evidence_refs": [
+        "EV-8b95697421af39bea0aa"
+      ],
+      "gap_ids": [],
+      "knowledge": "confirmed",
+      "reason": null,
+      "value": {
+        "process_registry_ref": "EAFIX_auth_docs/01_canonical_registries/process_registry.jsonl",
+        "step_ids": []
+      }
+    },
+    "process_steps": [],
+    "profile": "operator_ui",
+    "purpose_and_boundaries": {
+      "exclusions": {
+        "applicability": "applicable",
+        "decision_id": "DEC-007",
+        "evidence_refs": [
+          "EV-9e2c1e0c6a014aacd106"
+        ],
+        "gap_ids": [],
+        "knowledge": "confirmed",
+        "reason": null,
+        "value": [
+          "cross_module_private_state_access"
+        ]
+      },
+      "externally_visible_behavior": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-ae685d4b0659"
+        ],
+        "knowledge": "unknown",
+        "reason": "No reviewed module-local externally_visible_behavior specification established during lossless migration.",
+        "value": null
+      },
+      "owned_capabilities": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-3f9804b65441"
+        ],
+        "knowledge": "unknown",
+        "reason": "Existing v1 source does not establish an approved value for /module_scope/key_functions",
+        "value": null
+      },
+      "purpose": {
+        "applicability": "applicable",
+        "decision_id": "DEC-007",
+        "evidence_refs": [
+          "EV-6748d97649ed7c0ea9c9"
+        ],
+        "gap_ids": [],
+        "knowledge": "confirmed",
+        "reason": null,
+        "value": "Display expiry zones, indicator summaries, spot data, and MT4-facing UI data served over local HTTP."
+      },
+      "responsibilities": {
+        "applicability": "applicable",
+        "decision_id": "DEC-007",
+        "evidence_refs": [
+          "EV-867df9278f7204221542"
+        ],
+        "gap_ids": [],
+        "knowledge": "confirmed",
+        "reason": null,
+        "value": [
+          "Display expiry zones, indicator summaries, spot data, and MT4-facing UI data served over local HTTP."
+        ]
+      },
+      "side_effects": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-25547152c8cf"
+        ],
+        "knowledge": "unknown",
+        "reason": "No reviewed module-local side_effects specification established during lossless migration.",
+        "value": null
+      },
+      "trust_boundary": {
+        "applicability": "applicable",
+        "decision_id": "DEC-033",
+        "evidence_refs": [
+          "EV-REVIEW-0055a0d9103a4f1de801"
+        ],
+        "gap_ids": [],
+        "knowledge": "confirmed",
+        "reason": null,
+        "value": {
+          "allowed_external_inputs": [],
+          "forbidden_ingestion_sources": [],
+          "may_ingest_only_declared_outputs": true,
+          "private_cross_module_access_allowed": false,
+          "shared_kernel_access_policy": "stable_domain_neutral_primitives_only"
+        }
+      }
+    },
+    "reconciliation": {
+      "conflict_ids": [],
+      "implementation_conformance": "unverified",
+      "implementation_verified": false,
+      "last_verified_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+      "schema_valid": true,
+      "specification_ready": false,
+      "stale_after": "Any source or baseline hash change requires reconciliation; supporting sources cannot auto-overwrite authorities.",
+      "status": "blocked",
+      "unresolved_gap_ids": [
+        "GAP-m0030-3f9804b65441",
+        "GAP-m0030-25547152c8cf",
+        "GAP-m0030-ae685d4b0659",
+        "GAP-m0030-fb337411924a",
+        "GAP-m0030-d71f7767bc30",
+        "GAP-m0030-31c6b2d2bd55",
+        "GAP-m0030-3324ad149b1c",
+        "GAP-m0030-c95f6a8c9ef4",
+        "GAP-m0030-2d6d6cd9823e",
+        "GAP-m0030-a70716787873",
+        "GAP-m0030-2a47e4b36114",
+        "GAP-m0030-0dc2802c9774",
+        "GAP-m0030-fa7fcd885b12",
+        "GAP-m0030-88533c3715b0",
+        "GAP-m0030-e24f02cbf39d",
+        "GAP-m0030-2db8f246d4db",
+        "GAP-m0030-e60ede7d4d6c",
+        "GAP-m0030-23e6917cde91",
+        "GAP-m0030-3e7561bf1204",
+        "GAP-m0030-882098e01317",
+        "GAP-m0030-f6ef834a3bec",
+        "GAP-m0030-cb9a7048b6ea",
+        "GAP-m0030-9badb18cfb8e",
+        "GAP-m0030-d1dd9900af6e",
+        "GAP-m0030-2b2490cdc8ce",
+        "GAP-m0030-322d168fd510",
+        "GAP-m0030-88ebfed26f19",
+        "GAP-m0030-60461c6dbb76",
+        "GAP-m0030-a8eb4a792cda",
+        "GAP-m0030-ed0c4295f19d",
+        "GAP-m0030-c02e420b4e63",
+        "GAP-m0030-5f43ee85318a",
+        "GAP-m0030-ec4ee9828804",
+        "GAP-m0030-4b9cd1ce5169",
+        "GAP-m0030-7799656fb36d",
+        "GAP-m0030-33ea5d3659b3",
+        "GAP-m0030-674c0f19150e",
+        "GAP-m0030-d0fd0bb27034",
+        "GAP-m0030-2b013161a7c8",
+        "GAP-m0030-d355b669544f",
+        "GAP-m0030-5f1ab2eaa808",
+        "GAP-m0030-644f2ec14e64",
+        "GAP-m0030-9e08f21718e5",
+        "GAP-m0030-0c6b2e894be4",
+        "GAP-m0030-118bed1b5dd8"
+      ]
+    },
+    "runtime": {
+      "concurrency_ordering": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-0dc2802c9774"
+        ],
+        "knowledge": "unknown",
+        "reason": "Review runtime specification and distinguish intended behavior from commit-pinned implementation for concurrency_ordering.",
+        "value": null
+      },
+      "configuration_sources": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-2d6d6cd9823e"
+        ],
+        "knowledge": "unknown",
+        "reason": "Review runtime specification and distinguish intended behavior from commit-pinned implementation for configuration_sources.",
+        "value": null
+      },
+      "deployment_unit": {
+        "applicability": "applicable",
+        "decision_id": "DEC-007",
+        "evidence_refs": [
+          "EV-92ecb6f2c8b46e2aac6e"
+        ],
+        "gap_ids": [],
+        "knowledge": "confirmed",
+        "reason": null,
+        "value": "desktop_ui"
+      },
+      "entrypoints": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-3324ad149b1c"
+        ],
+        "knowledge": "unknown",
+        "reason": "Existing v1 source does not establish an approved value for /service_runtime/startup_entrypoints",
+        "value": null
+      },
+      "external_dependencies": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-c95f6a8c9ef4"
+        ],
+        "knowledge": "unknown",
+        "reason": "Existing v1 source does not establish an approved value for /service_runtime/external_systems",
+        "value": null
+      },
+      "kind": {
+        "applicability": "applicable",
+        "decision_id": "DEC-007",
+        "evidence_refs": [
+          "EV-b44c6ad27b71d7c8bca8"
+        ],
+        "gap_ids": [],
+        "knowledge": "confirmed",
+        "reason": null,
+        "value": "python_service"
+      },
+      "language_platform": {
+        "applicability": "applicable",
+        "decision_id": "DEC-007",
+        "evidence_refs": [
+          "EV-da3c0d72edfd41e2577d"
+        ],
+        "gap_ids": [],
+        "knowledge": "confirmed",
+        "reason": null,
+        "value": "python"
+      },
+      "ports_channels": {
+        "applicability": "applicable",
+        "decision_id": "DEC-007",
+        "evidence_refs": [
+          "EV-efc22ac5d78d14282e0f"
+        ],
+        "gap_ids": [],
+        "knowledge": "confirmed",
+        "reason": null,
+        "value": {
+          "channel_ids": [],
+          "port": null
+        }
+      },
+      "required_files": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-fa7fcd885b12"
+        ],
+        "knowledge": "unknown",
+        "reason": "Review runtime specification and distinguish intended behavior from commit-pinned implementation for required_files.",
+        "value": null
+      },
+      "restart_semantics": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-2a47e4b36114"
+        ],
+        "knowledge": "unknown",
+        "reason": "Review runtime specification and distinguish intended behavior from commit-pinned implementation for restart_semantics.",
+        "value": null
+      },
+      "startup_shutdown": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-a70716787873"
+        ],
+        "knowledge": "unknown",
+        "reason": "Review runtime specification and distinguish intended behavior from commit-pinned implementation for startup_shutdown.",
+        "value": null
+      }
+    },
+    "schema_version": "2.0.0",
+    "state": {
+      "duplicate_handling": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-3e7561bf1204"
+        ],
+        "knowledge": "unknown",
+        "reason": "No reviewed module-owned state specification for duplicate_handling.",
+        "value": null
+      },
+      "idempotency": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-23e6917cde91"
+        ],
+        "knowledge": "unknown",
+        "reason": "No reviewed module-owned state specification for idempotency.",
+        "value": null
+      },
+      "ordering": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-e60ede7d4d6c"
+        ],
+        "knowledge": "unknown",
+        "reason": "No reviewed module-owned state specification for ordering.",
+        "value": null
+      },
+      "owner": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-e24f02cbf39d"
+        ],
+        "knowledge": "unknown",
+        "reason": "No reviewed module-owned state specification for owner.",
+        "value": null
+      },
+      "persistence": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-2db8f246d4db"
+        ],
+        "knowledge": "unknown",
+        "reason": "No reviewed module-owned state specification for persistence.",
+        "value": null
+      },
+      "recovery": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-882098e01317"
+        ],
+        "knowledge": "unknown",
+        "reason": "No reviewed module-owned state specification for recovery.",
+        "value": null
+      },
+      "transitions": [],
+      "variables": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-88533c3715b0"
+        ],
+        "knowledge": "unknown",
+        "reason": "No reviewed module-owned state specification for variables.",
+        "value": null
+      }
+    },
+    "verification_commands": {
+      "build": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-d355b669544f"
+        ],
+        "knowledge": "unknown",
+        "reason": "A repository-supported module-specific command has not been demonstrated during migration.",
+        "value": null
+      },
+      "lint": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-644f2ec14e64"
+        ],
+        "knowledge": "unknown",
+        "reason": "A repository-supported module-specific command has not been demonstrated during migration.",
+        "value": null
+      },
+      "local_run": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-118bed1b5dd8"
+        ],
+        "knowledge": "unknown",
+        "reason": "A repository-supported module-specific command has not been demonstrated during migration.",
+        "value": null
+      },
+      "smoke_check": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-0c6b2e894be4"
+        ],
+        "knowledge": "unknown",
+        "reason": "A repository-supported module-specific command has not been demonstrated during migration.",
+        "value": null
+      },
+      "test": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-5f1ab2eaa808"
+        ],
+        "knowledge": "unknown",
+        "reason": "A repository-supported module-specific command has not been demonstrated during migration.",
+        "value": null
+      },
+      "typecheck": {
+        "applicability": "applicable",
+        "decision_id": "DEC-027",
+        "evidence_refs": [],
+        "gap_ids": [
+          "GAP-m0030-9e08f21718e5"
+        ],
+        "knowledge": "unknown",
+        "reason": "A repository-supported module-specific command has not been demonstrated during migration.",
+        "value": null
+      }
+    }
+  },
+  "module_identity": {
+    "accountable_owner": "DICKY1987",
+    "aliases": [],
+    "canonical_root": "m0030-u3-mt4-expiry-overlay",
+    "canonical_symbol": "U3_MT4_EXPIRY_OVERLAY",
+    "identity_status": "canonical",
+    "lifecycle_status": "active",
+    "module_id": "50000000000000000030",
+    "module_name": "MT4 Expiry Zones Overlay",
+    "short_id": "m0030",
+    "specification_version": "2.0.0"
+  },
+  "projection_status": "candidate_preview",
+  "schema_version": "2.0.0",
+  "source_commit": "f37f8ca8bd966031fb243a9cd9401b065c29135a",
+  "source_manifest": {
+    "path": "governance/module_consolidation/staging/m0030/manifest.v2.candidate.json",
+    "sha256": "aa093b579f6867d21363b12a577d862fcd7bcae7f95105e119268b10749d86d5",
+    "version": "2.0.0"
+  },
+  "source_manifests": [
+    {
+      "path": "governance/module_consolidation/staging/m0001/manifest.v2.candidate.json",
+      "sha256": "2e6e9786ad451978bc276b466b9aa28ba1e7d70e64ed07a1fb96e48b1bf5435f",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0002/manifest.v2.candidate.json",
+      "sha256": "b34390303a13c81c2f099dd5fad7fa79885f71308876c20ae6e113373f922c11",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0003/manifest.v2.candidate.json",
+      "sha256": "86fabaec76ef705a7b3d22607d86e11650e87fee682fd9e0dac9d2c812eb2319",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0004/manifest.v2.candidate.json",
+      "sha256": "20724adfcab1fb14fd30334b5f513d275bc01cbd60f8e56ae6e365a096a341bc",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0005/manifest.v2.candidate.json",
+      "sha256": "8367a7a27dc88c66f66d03fb947db09747e8dc136228b15fdec4c5de9d17db1f",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0006/manifest.v2.candidate.json",
+      "sha256": "8212bad589dabd9740fbba1ba040b66de7140af7fb9b42bc1a344324cb250ccc",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0007/manifest.v2.candidate.json",
+      "sha256": "354beca376f9badde5555488fa5b5b7645ff880781928ba96e70691f63d81bb2",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0008/manifest.v2.candidate.json",
+      "sha256": "91420097cf37687009d6e501fb140e76c8b3e96eaa4cdf24e6e19a69d3cddcec",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0009/manifest.v2.candidate.json",
+      "sha256": "cbf4709839148f34081f5da483fb799ce7210e444ffae1be03fe0b3802f8e9d9",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0010/manifest.v2.candidate.json",
+      "sha256": "47518ed204d1549ca0e8c1af23738e681dec2dc852f05910923b153674a63f8a",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0011/manifest.v2.candidate.json",
+      "sha256": "5785373938aafe4a13cc3f63b918788c9c560dea9ef690ece0de80ddd13e6ccc",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0012/manifest.v2.candidate.json",
+      "sha256": "860bd6a93aff2ce760b55d8c4cb682d8b820dcadc71a856eed7f71e71ea2fea6",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0013/manifest.v2.candidate.json",
+      "sha256": "3636ab4817d3ec0c624ac483118f1d199079f96369c59ee49f90d215d46b033e",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0014/manifest.v2.candidate.json",
+      "sha256": "49267f31c6a91c375271d1ae429af18d5ad6e4af8d0a1badfeea7392ca83a057",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0015/manifest.v2.candidate.json",
+      "sha256": "ed99faf8ae2e9cb6b5b4f16d5092b33b4b250966f4271d7d6ef2b41989473ad0",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0016/manifest.v2.candidate.json",
+      "sha256": "cd5ebefbfed574f829c334fec6771aee6f3f7045527171f731e1d7d0e0064ece",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0017/manifest.v2.candidate.json",
+      "sha256": "8bfb9855177d4bbde68195eb1b26eb47eea74ad08bccf7b35c11294ac8ec0106",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0018/manifest.v2.candidate.json",
+      "sha256": "11f21272ab7f2dfbe7c9715282ce0c3ee4651424e516ba16b35fda226f358cf6",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0019/manifest.v2.candidate.json",
+      "sha256": "bc6d915fc43eb751f7d568aaca6d927e3d4ccc95b5fd5b72258e4a8d74b18955",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0020/manifest.v2.candidate.json",
+      "sha256": "6c190029ce5c81acc0b543e448204790dfe95f0f510007c43d6b8c0edda22747",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0021/manifest.v2.candidate.json",
+      "sha256": "77c905f296768fd67fd1e54c05af29ae3f56788b187ad6ef999e9dfed525fd32",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0022/manifest.v2.candidate.json",
+      "sha256": "b57fc617e72507f0f82e1d874779a1c952dfae70963a91685deeaf3cf21062b2",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0023/manifest.v2.candidate.json",
+      "sha256": "a3ed11c64b602b4e6b46646c7638da019d5baceba376b6186c8697a4197ae630",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0024/manifest.v2.candidate.json",
+      "sha256": "3f593818586e07194e87ab3c6ae248782eb766f4aa6e50a3d3849e0a5c1dbbbe",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0025/manifest.v2.candidate.json",
+      "sha256": "cfa178797b88a04e86fbadb2f3d083c57d17bb72a89001b100aaa2981f8b7878",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0026/manifest.v2.candidate.json",
+      "sha256": "6f48374d0a6b9cf2bd7522eec1b4de4e1e10221f638b39bbbb5e114cb6ff3561",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0027/manifest.v2.candidate.json",
+      "sha256": "0c0ed95ec10e3b75042f101c32b70608e4540ecfdd61133853444a48ee58ef3b",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0028/manifest.v2.candidate.json",
+      "sha256": "7eb662626ea33eaa67d9b71b7dade87a1ab461b83349026415b81a48ab07f74e",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0029/manifest.v2.candidate.json",
+      "sha256": "ffe778cede93fa263a989c4bbfcfc4ba997ef15fa0175c16a0663e7bc9bb6c14",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0030/manifest.v2.candidate.json",
+      "sha256": "aa093b579f6867d21363b12a577d862fcd7bcae7f95105e119268b10749d86d5",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0031/manifest.v2.candidate.json",
+      "sha256": "07860d4d212e0e6d38b21acb196b4e772aa171558a82d12d2aef97aefdcd7612",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0032/manifest.v2.candidate.json",
+      "sha256": "bb1bfadeedbb40fd4606da079849d7bd91bef3c19e510e9d57261906148b925e",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0033/manifest.v2.candidate.json",
+      "sha256": "ca3e06cbddf4135ac62733497a3fa48629b9853095924e00f78bcb15be4b9bec",
+      "version": "2.0.0"
+    },
+    {
+      "path": "governance/module_consolidation/staging/m0034/manifest.v2.candidate.json",
+      "sha256": "0a1fd3cfd6982ad8ea83d2715314d1915832fc55a0cdec5d6690f18192d2f806",
+      "version": "2.0.0"
+    }
+  ],
+  "use_policy": "Load the module manifest for editable facts; this packet is read-only derived context."
+}
