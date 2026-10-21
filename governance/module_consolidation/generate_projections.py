@@ -24,7 +24,7 @@ def projection_outputs(repo: Path, *, candidate: bool = False) -> dict[str, dict
         inputs.append({"path": path.relative_to(repo).as_posix(), "sha256": file_sha(path),
                        "version": m["manifest_version"]})
     shared = control / "staging/shared_file_registry.candidate.json" if candidate else repo / SHARED
-    global_inputs = [{"path": str(p.relative_to(repo)), "sha256": file_sha(p)} for p in [repo / PROCESS, shared]]
+    global_inputs = [{"path": p.relative_to(repo).as_posix(), "sha256": file_sha(p)} for p in [repo / PROCESS, shared]]
     metadata = {"generator": "governance/module_consolidation/generate_projections.py", "generator_version": "1.0.0",
                 "generated_at_utc": baseline["pinned_at_utc"], "source_commit": baseline["baseline_commit"],
                 "authority_policy": "generated_from_module_manifests", "source_manifests": inputs, "global_sources": global_inputs,
