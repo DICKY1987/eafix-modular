@@ -4,14 +4,14 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from authority_core import REPO, file_sha, guarded_replace, jsonl, load, pointer
+from authority_core import REPO, file_sha, guarded_replace, jsonl, load, pointer, safe_relative
 from progress_gate import validate_progress
 from validate_consolidation import validate_manifests
 
 
 def verify_reviewed_source(change: dict, repo: Path) -> None:
     """Check frozen JSON values or exact line ranges in reviewed text/code."""
-    source = repo / change["source_path"]
+    source = repo / safe_relative(change["source_path"])
     if file_sha(source) != change["source_sha256"]:
         raise ValueError("Stale reviewed source")
     if "source_json_pointer" in change:
