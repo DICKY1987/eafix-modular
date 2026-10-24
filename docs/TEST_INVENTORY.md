@@ -100,7 +100,7 @@ configured test roots, or do not match the active filename pattern:
   `tests/contracts/` and `tests/legacy/`. Contract workflow references to
   consumer/provider files also do not match the filenames currently checked
   in.
-- **Other root test trees:** `tests/comms_test/python_comms_test.py` does not
+- **Other non-discoverable test utilities:** `m0016-b1-mt4-adapter-transport/m0016-tests/comms_test/python_comms_test.py` does not
   match `test_*.py`; files under `tests/integration/`, `tests/e2e/`,
   `tests/infrastructure/`, and `tests/signal_flow_testing/` are helpers or
   timestamp-prefixed modules rather than discoverable test modules.
