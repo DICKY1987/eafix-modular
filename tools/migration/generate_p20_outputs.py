@@ -111,8 +111,8 @@ def work_cell(repo: Path, target: str, spec: dict[str, str]) -> dict[str, Any]:
         "legacy_parent_module_symbol": spec["legacy_parent"],
         "requires_agent_capability": [spec["capability"]],
         "context_packet_path": (
-            f"context_packets/{identity['module_id']}/{work_cell_id}/"
-            "work_cell_context.json"
+            f"{Path(target).parts[0]}/{Path(target).parts[1]}/"
+            f"packets/work-cells/{work_cell_id}/work_cell_context.json"
         ),
         "service": spec["service"],
         "source_files": ownership.get("source_files", []),
