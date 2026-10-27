@@ -30,3 +30,6 @@ their replacements, and the reason for archival.
 ## To access this folder intentionally:
 Ask explicitly for "archive review", "superseded files", "prior glossary versions",
 or reference a specific archived filename.
+
+## Index of migrations
+- `migrations/2026-10-26_owner_inventory/` - owner-inventory archival (64 entries, 123 files). Per-file original-to-archive mapping and SHA-256 are in `migration_manifest.json`; summary and exceptions in `MIGRATION_REPORT.md`.
