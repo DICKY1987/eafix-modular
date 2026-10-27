@@ -46,5 +46,23 @@ Root items go to `Master_Archive/<name>`; `docs/...` items go to `Master_Archive
 ## Secrets
 Pattern scan of moved text files found only documentation/code-sample strings (a secret-scanner description and examples); no credential values. Nothing was printed.
 
+## Owner decisions needed before merge
+
+1. **Consolidation retention hold (affects all 121 ledger-tracked moved files).** `governance/module_consolidation/run/source_processing_ledger.jsonl` (and `previous_baseline/`) mark essentially every inventoried source `retention: blocked_from_archival`, `safe_to_archive: false` (2173 of 2174 rows; none has an `archive_destination`). This is a blanket hold from the unfinished consolidation review, not a per-file finding, and the first pass did not surface it. The owner inventory is treated here as the explicit archival decision. If the hold should win instead, do not merge. The ledgers were not edited, so their `path` values for the moved files are now stale.
+2. **`0110000015260118_slo-definitions.md`** has no directory in the inventory. The only repo match is `docs/observability/0110000015260118_slo-definitions.md`, so that file was moved. It sits next to the `docs/on-call/` lines in the inventory; confirm the intent.
+3. **The five BLOCKED entries** above each need a decision (see table).
+
 ## Validation
-See PR description for results of the checks that were run.
+Run on the branch at the commit that precedes this report update:
+
+| Check | Result |
+|---|---|
+| Inventory re-parsed independently: 70 entries, 69 unique, 1 duplicate | PASS |
+| All 123 renames are byte-identical to base (git blob IDs compared) | PASS (0 mismatches) |
+| No pre-existing archive file modified or deleted (only `README.md` and `archive_manifest.json` appended to) | PASS |
+| Every moved file has an `archive_manifest.json` entry with matching SHA-256 | PASS (123/123) |
+| No moved source path remains at its original location | PASS |
+| ZIP `atomic_two_id_tooling_bundle_glossary.zip` opens, `testzip()` clean, 17 entries | PASS |
+| Active code/CI/config references to moved paths | PASS (6 name matches inspected; all false positives, none broken) |
+| `pytest` (coverage flags overridden): `tests/test_generator_update.py`, `tests/migration/test_p20_regeneration.py`, `tests/doc_id_subsystem`, `tests/contracts` | PASS (10 passed) |
+| Full test suite, pre-commit, markdownlint/yamllint, CI workflows | NOT RUN (coverage plugin and CI environment unavailable here) |
