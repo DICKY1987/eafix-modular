@@ -1,0 +1,1318 @@
+{
+  "schema_version": "1.0.0",
+  "document_type": "archive_migration_manifest",
+  "run_date": "2026-10-26",
+  "base_branch": "master",
+  "base_commit": "1fc267b958188e10e4b895b15197a44851a96566",
+  "inventory_source": "Files to be archived .txt (owner-supplied)",
+  "notes": [
+    "docs/adr/0110000001260118_ADR-0001- resolved to docs/adr/0110000001260118_ADR-0001-service-decomposition.md (sole candidate)",
+    "0110000015260118_slo-definitions.md had no directory; resolved to docs/observability/0110000015260118_slo-definitions.md (sole candidate in repo)",
+    "branch-archive (54) = 54 files recursively (2 top-level entries); backups (7) = 7 files",
+    "langgraph_cli.py and langgraph_git_integration.py are byte-identical to copies in branch-archive/main; kept as separate paths"
+  ],
+  "counts": {
+    "inventory_entries": 70,
+    "unique_paths": 69,
+    "duplicate_entries": 1,
+    "file_entries": 63,
+    "directory_entries": 6,
+    "file_entries_moved": 61,
+    "directory_entries_moved": 3,
+    "files_moved_total": 123,
+    "already_archived": 0,
+    "blocked": 5,
+    "out_of_scope": 0,
+    "missing": 0,
+    "reference_updates": 0
+  },
+  "entries": [
+    {
+      "source": "COPILOT ISSUE manifest population pass 2.md",
+      "type": "file",
+      "destination": "Master_Archive/COPILOT ISSUE manifest population pass 2.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "consistency_subsystems_docs.md",
+      "type": "file",
+      "destination": "Master_Archive/consistency_subsystems_docs.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "PATTERN_INDEX.yaml",
+      "type": "file",
+      "destination": "Master_Archive/PATTERN_INDEX.yaml",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "COUNTER_STORE.json",
+      "type": "file",
+      "destination": "Master_Archive/COUNTER_STORE.json",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "routing_rules.json",
+      "type": "file",
+      "destination": "Master_Archive/routing_rules.json",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "routing_rules_schema.json",
+      "type": "file",
+      "destination": "Master_Archive/routing_rules_schema.json",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "submodule_catalog_schema.json",
+      "type": "file",
+      "destination": "Master_Archive/submodule_catalog_schema.json",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "submodule_context_catalog.json",
+      "type": "file",
+      "destination": "Master_Archive/submodule_context_catalog.json",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "atomic_two_id_tooling_bundle_glossary.zip",
+      "type": "file",
+      "destination": "Master_Archive/atomic_two_id_tooling_bundle_glossary.zip",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "EAFIX_Consolidation_Review.zip",
+      "type": "file",
+      "destination": "Master_Archive/EAFIX_Consolidation_Review.zip",
+      "status": "BLOCKED",
+      "reason": "Cited by path and sha256 as evidence in governance/module_consolidation/resolution_decisions.json (DEC-036) and run/baseline_continuity.json; consolidation holds still open. Needs owner decision."
+    },
+    {
+      "source": "langgraph_cli.py",
+      "type": "file",
+      "destination": "Master_Archive/langgraph_cli.py",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "langgraph_git_integration.py",
+      "type": "file",
+      "destination": "Master_Archive/langgraph_git_integration.py",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "doc_id_subsystem",
+      "type": "directory",
+      "destination": "Master_Archive/doc_id_subsystem",
+      "status": "BLOCKED",
+      "reason": "Active consumers: .github/workflows/1299900011260118_doc_id_validation.yml, Makefile doc-id targets, tests/doc_id_subsystem imports (doc_id_subsystem.core...). Move would break CI and imports."
+    },
+    {
+      "source": "The_Process",
+      "type": "directory",
+      "destination": "Master_Archive/The_Process",
+      "status": "BLOCKED",
+      "reason": "Holds EAFIX_PROCESS_AUTHORITY_REPAIR_AND_REGISTRY_CONSOLIDATION_PLAN_v1_1_0.json, named as the live replacement in Master_Archive/archive_manifest.json; archiving would demote a current authority. Needs owner decision."
+    },
+    {
+      "source": "scenarios",
+      "type": "directory",
+      "destination": "Master_Archive/scenarios",
+      "status": "BLOCKED",
+      "reason": "tests/contracts/2099900225260118_conftest.py imports scenarios.test_trading_flow_scenarios; the file is an import shim for tests/contracts/scenarios."
+    },
+    {
+      "source": "branch-archive",
+      "type": "directory",
+      "destination": "Master_Archive/branch-archive",
+      "status": "READY",
+      "verified": true,
+      "file_count": 54
+    },
+    {
+      "source": "backups",
+      "type": "directory",
+      "destination": "Master_Archive/backups",
+      "status": "READY",
+      "verified": true,
+      "file_count": 7
+    },
+    {
+      "source": "docs/0199900073260118_CLAUDE.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/0199900073260118_CLAUDE.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/3099900001260118_README.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/3099900001260118_README.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/adr/0110000001260118_ADR-0001-service-decomposition.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/adr/0110000001260118_ADR-0001-service-decomposition.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/ai-tools-guide.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/ai-tools-guide.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/api",
+      "type": "directory",
+      "destination": "Master_Archive/docs/api",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/archive/actual implementation work remains.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/archive/actual implementation work remains.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/archive/agent-file-drop-readme.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/archive/agent-file-drop-readme.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/archive/Agentic_CLI_Tools_Overview_v2.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/archive/Agentic_CLI_Tools_Overview_v2.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/archive/agentic_framework_changes.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/archive/agentic_framework_changes.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/archive/autonomous_cli_workflow.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/archive/autonomous_cli_workflow.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/archive/cli workflow.txt",
+      "type": "file",
+      "destination": "Master_Archive/docs/archive/cli workflow.txt",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/archive/constraint_config.txt",
+      "type": "file",
+      "destination": "Master_Archive/docs/archive/constraint_config.txt",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/archive/constraint_engine.txt",
+      "type": "file",
+      "destination": "Master_Archive/docs/archive/constraint_engine.txt",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/archive/free_tier_orchestrator.txt",
+      "type": "file",
+      "destination": "Master_Archive/docs/archive/free_tier_orchestrator.txt",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/archive/granular_workflow_doc.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/archive/granular_workflow_doc.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/archive/multi_cli_orchestrator.txt",
+      "type": "file",
+      "destination": "Master_Archive/docs/archive/multi_cli_orchestrator.txt",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/archive/routing_engine_code.txt",
+      "type": "file",
+      "destination": "Master_Archive/docs/archive/routing_engine_code.txt",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/archive/vs_code_triage_pack_repo_drop_in.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/archive/vs_code_triage_pack_repo_drop_in.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/archive/workflow_schema.txt",
+      "type": "file",
+      "destination": "Master_Archive/docs/archive/workflow_schema.txt",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/archive/zero_touch_setup.txt",
+      "type": "file",
+      "destination": "Master_Archive/docs/archive/zero_touch_setup.txt",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/audit_schema.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/audit_schema.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/COMPLETE_IMPLEMENTATION_PLAN.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/COMPLETE_IMPLEMENTATION_PLAN.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/GETTING_STARTED_INDEX.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/GETTING_STARTED_INDEX.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/GIT_OPS_RUNBOOK.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/GIT_OPS_RUNBOOK.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/GIT_OPS_VISUAL_DIAGRAMS.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/GIT_OPS_VISUAL_DIAGRAMS.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/GITHUB_ACTIONS_AND_MERGE_PROTECTION.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/GITHUB_ACTIONS_AND_MERGE_PROTECTION.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/observability/0110000015260118_slo-definitions.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/observability/0110000015260118_slo-definitions.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/on-call/0110000016260118_kt-checklist.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/on-call/0110000016260118_kt-checklist.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/on-call/0110000017260118_README.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/on-call/0110000017260118_README.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/on-call/0110000018260118_training.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/on-call/0110000018260118_training.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/project_board.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/project_board.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/README.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/README.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/reference/0110000021260118_apf_monorepo_build_order_deep_descriptions.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/reference/0110000021260118_apf_monorepo_build_order_deep_descriptions.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/reference/0110000024260118_bootstrap_contracts.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/reference/0110000024260118_bootstrap_contracts.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/reference/0110000026260118_diagnostics_schema.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/reference/0110000026260118_diagnostics_schema.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/reference/1210000001260118_CR-EXAMPLE.yaml",
+      "type": "file",
+      "destination": "Master_Archive/docs/reference/1210000001260118_CR-EXAMPLE.yaml",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/reference/1210000002260118_pre-commit-config.yaml",
+      "type": "file",
+      "destination": "Master_Archive/docs/reference/1210000002260118_pre-commit-config.yaml",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/reference/2010000001260118_apf_apply_stub.py",
+      "type": "file",
+      "destination": "Master_Archive/docs/reference/2010000001260118_apf_apply_stub.py",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/reference/generated/indicator_record.schema.json",
+      "type": "file",
+      "destination": "Master_Archive/docs/reference/generated/indicator_record.schema.json",
+      "status": "BLOCKED",
+      "reason": "Generated output asserted by tests/migration/test_p20_regeneration.py at this path; moving would fail the regeneration test."
+    },
+    {
+      "source": "docs/release_notes.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/release_notes.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/release/0110000038260118_change-management.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/release/0110000038260118_change-management.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/release/0110000039260118_release-checklist.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/release/0110000039260118_release-checklist.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/release/0110000040260118_ROADMAP.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/release/0110000040260118_ROADMAP.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/RELEASING.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/RELEASING.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/roadmap.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/roadmap.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/security/0110000057260118_image-digest-policy.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/security/0110000057260118_image-digest-policy.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/security/0110000058260118_scorecards-policy.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/security/0110000058260118_scorecards-policy.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/STRUCTURE.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/STRUCTURE.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/TEST_INVENTORY.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/TEST_INVENTORY.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/tool_registry.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/tool_registry.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/WORKFLOW_INTEGRATION_STRATEGY.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/WORKFLOW_INTEGRATION_STRATEGY.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    },
+    {
+      "source": "docs/workflow-guide.md",
+      "type": "file",
+      "destination": "Master_Archive/docs/workflow-guide.md",
+      "status": "READY",
+      "verified": true,
+      "file_count": 1
+    }
+  ],
+  "files": [
+    {
+      "source": "COPILOT ISSUE manifest population pass 2.md",
+      "destination": "Master_Archive/COPILOT ISSUE manifest population pass 2.md",
+      "sha256": "300c0e4092ed4af5c82740ea94088256a6db2c33df836010392f94f0dcafe11b",
+      "entry": "COPILOT ISSUE manifest population pass 2.md"
+    },
+    {
+      "source": "consistency_subsystems_docs.md",
+      "destination": "Master_Archive/consistency_subsystems_docs.md",
+      "sha256": "b49a049cf8f70fa3394f93d7bebbf1f00e3475747975fb5675764d994f4f4620",
+      "entry": "consistency_subsystems_docs.md"
+    },
+    {
+      "source": "PATTERN_INDEX.yaml",
+      "destination": "Master_Archive/PATTERN_INDEX.yaml",
+      "sha256": "3577de9911e7e8f7ccc058b3efb726a6fbe42d5029008227129b365b0f37e22d",
+      "entry": "PATTERN_INDEX.yaml"
+    },
+    {
+      "source": "COUNTER_STORE.json",
+      "destination": "Master_Archive/COUNTER_STORE.json",
+      "sha256": "285a7db22ed9ad00ed5933d111e46b685b8d835d36a4233145cf43b2dd579c07",
+      "entry": "COUNTER_STORE.json"
+    },
+    {
+      "source": "routing_rules.json",
+      "destination": "Master_Archive/routing_rules.json",
+      "sha256": "b41f1b2e4d21b2b24a2e3719d542f5789ec0793ee97374ea2663210dce56fa2a",
+      "entry": "routing_rules.json"
+    },
+    {
+      "source": "routing_rules_schema.json",
+      "destination": "Master_Archive/routing_rules_schema.json",
+      "sha256": "db9917e7c686ea8bce825b18d304222afed6f4796a27bd444dce3d95abe8e414",
+      "entry": "routing_rules_schema.json"
+    },
+    {
+      "source": "submodule_catalog_schema.json",
+      "destination": "Master_Archive/submodule_catalog_schema.json",
+      "sha256": "aacae3b2a5a972e3af4ee9652c2f2ad240635089dc0281317b343b526ba8637d",
+      "entry": "submodule_catalog_schema.json"
+    },
+    {
+      "source": "submodule_context_catalog.json",
+      "destination": "Master_Archive/submodule_context_catalog.json",
+      "sha256": "c6e2cb414976ee3e2512c6a0bdab925d5457a3fea13385d8c8cff3c62eb7bb4e",
+      "entry": "submodule_context_catalog.json"
+    },
+    {
+      "source": "atomic_two_id_tooling_bundle_glossary.zip",
+      "destination": "Master_Archive/atomic_two_id_tooling_bundle_glossary.zip",
+      "sha256": "dd14951e49392a1d4cde6509b1a61eefba2d48a11c7f81782c9a3483501475e0",
+      "entry": "atomic_two_id_tooling_bundle_glossary.zip"
+    },
+    {
+      "source": "langgraph_cli.py",
+      "destination": "Master_Archive/langgraph_cli.py",
+      "sha256": "dfe8d873a7a0ce3750d147e4abf861783c52db27ae7ea2ebedf87704bd8471d2",
+      "entry": "langgraph_cli.py"
+    },
+    {
+      "source": "langgraph_git_integration.py",
+      "destination": "Master_Archive/langgraph_git_integration.py",
+      "sha256": "ad36e767259f9aa84ba132d67c80b30c52467a9ab3e30b030aab4442ebfb0d3f",
+      "entry": "langgraph_git_integration.py"
+    },
+    {
+      "source": "branch-archive/main-salvage-manifest-20250920.md",
+      "destination": "Master_Archive/branch-archive/main-salvage-manifest-20250920.md",
+      "sha256": "5dd399699ba245e0f0d31c4903e97a4b75a6ddbe1a01f71dd64c36341df5fe13",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/.ai/scripts/orchestrate.ps1",
+      "destination": "Master_Archive/branch-archive/main/.ai/scripts/orchestrate.ps1",
+      "sha256": "9347bcc60d703b35f1b9a25fc3c0224f6de5f07eb10950b85689bafd42c9152a",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/.ai/scripts/run-triage.ps1",
+      "destination": "Master_Archive/branch-archive/main/.ai/scripts/run-triage.ps1",
+      "sha256": "07f90de8a3259f9d4dc93f995ae4d42bb75f83116bf6d55079ca59df72f20a5e",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/.ai/workflows/agent_jobs.yaml",
+      "destination": "Master_Archive/branch-archive/main/.ai/workflows/agent_jobs.yaml",
+      "sha256": "da78eccb8fb7de3b58b37735dc0685f9f4056ed3764f3367700b5ef266a737e2",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/CODEX_IMPLEMENTATION/README_CODEX_INSTRUCTIONS.md",
+      "destination": "Master_Archive/branch-archive/main/CODEX_IMPLEMENTATION/README_CODEX_INSTRUCTIONS.md",
+      "sha256": "bf285c7b22180f908441aecc16469d0fd6c6ee1b316d9da50c18539226fa5303",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/CODEX_IMPLEMENTATION/implementation_plans/phase1_recovery_integration.md",
+      "destination": "Master_Archive/branch-archive/main/CODEX_IMPLEMENTATION/implementation_plans/phase1_recovery_integration.md",
+      "sha256": "537b4d00c93dc9f36659da02444f589ebf5357375e293cd94cf46144d3305e7a",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/CODEX_IMPLEMENTATION/integration_specs/guardian_system_integration.md",
+      "destination": "Master_Archive/branch-archive/main/CODEX_IMPLEMENTATION/integration_specs/guardian_system_integration.md",
+      "sha256": "bae948079da1258668522dd543e85ec119d0139f3f1b07750f3ba146d7e3f14f",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/CODEX_IMPLEMENTATION/integration_specs/vscode_workflow_integration.md",
+      "destination": "Master_Archive/branch-archive/main/CODEX_IMPLEMENTATION/integration_specs/vscode_workflow_integration.md",
+      "sha256": "bcdc970c778050e8bb78f2d6a3f3138fd89a35dc3d12ac6da6695cb61e39817a",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/CODEX_IMPLEMENTATION/source_files/automated_recovery_system.py",
+      "destination": "Master_Archive/branch-archive/main/CODEX_IMPLEMENTATION/source_files/automated_recovery_system.py",
+      "sha256": "b6e09ff8dcf7caf121228f2d4b163671efac905d2bdbd364f01dc9a2316a1e86",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/CODEX_IMPLEMENTATION/source_files/predictive_failure_detector.py",
+      "destination": "Master_Archive/branch-archive/main/CODEX_IMPLEMENTATION/source_files/predictive_failure_detector.py",
+      "sha256": "61c83fdf7890a904eaf972c120cc7fe9d2f082b90937bb91b4a7459816e5be48",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/CODEX_IMPLEMENTATION/source_files/self_healing_service_manager.py",
+      "destination": "Master_Archive/branch-archive/main/CODEX_IMPLEMENTATION/source_files/self_healing_service_manager.py",
+      "sha256": "0b9b583a48ca6502f218d141606704cef4d336c6bb06cd69552299b45879a935",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/CODEX_IMPLEMENTATION/source_files/updatesfor_CLITOOL.json",
+      "destination": "Master_Archive/branch-archive/main/CODEX_IMPLEMENTATION/source_files/updatesfor_CLITOOL.json",
+      "sha256": "459ed46ebc8083efdb217991d713099e1db2f99680a758929d95de2b26862337",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/CODEX_IMPLEMENTATION/vscode_configuration/README_VSCODE_SETUP.md",
+      "destination": "Master_Archive/branch-archive/main/CODEX_IMPLEMENTATION/vscode_configuration/README_VSCODE_SETUP.md",
+      "sha256": "d099859eac3ef0f95ee531269879f53ddf125defa8250cab1151fec6349417e8",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/CODEX_IMPLEMENTATION/vscode_configuration/launch.json",
+      "destination": "Master_Archive/branch-archive/main/CODEX_IMPLEMENTATION/vscode_configuration/launch.json",
+      "sha256": "44b2f78ce77d4e4442e3138ceb4c9e3361d648bbf0cf2054cd2ee95e9aeb0120",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/CODEX_IMPLEMENTATION/vscode_configuration/settings.json",
+      "destination": "Master_Archive/branch-archive/main/CODEX_IMPLEMENTATION/vscode_configuration/settings.json",
+      "sha256": "2c2e068176f72047969d580fab875c8d7ec03487d6915df59ec63a0c6a712e8f",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/CODEX_IMPLEMENTATION/vscode_configuration/tasks.json",
+      "destination": "Master_Archive/branch-archive/main/CODEX_IMPLEMENTATION/vscode_configuration/tasks.json",
+      "sha256": "4ba65e34cceb76aff6d32610f26534925159dbf6ba2d9b4280d12f1f4cce9deb",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/capabilities/capability_bindings.yaml",
+      "destination": "Master_Archive/branch-archive/main/capabilities/capability_bindings.yaml",
+      "sha256": "95d5f98c985ffd0329d66e392d8a0a8c833d77a8c8ace16b74fd94bf624b4882",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/capabilities/cost_limits.yaml",
+      "destination": "Master_Archive/branch-archive/main/capabilities/cost_limits.yaml",
+      "sha256": "49efdcbc6f1dd4b2ce223869d64aa99c2a510cd4647fccb5068be7d3436c204f",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/capabilities/tool_registry.yaml",
+      "destination": "Master_Archive/branch-archive/main/capabilities/tool_registry.yaml",
+      "sha256": "a929045829066acc07d1ece0e4c7c82eaef447622547084e2833fe769d73ea1a",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/catalog/domains/build.json",
+      "destination": "Master_Archive/branch-archive/main/catalog/domains/build.json",
+      "sha256": "93a15f3094ce1fe200ffb347575e28c5f05402053e52fae6af2fab958c17836a",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/catalog/domains/git.json",
+      "destination": "Master_Archive/branch-archive/main/catalog/domains/git.json",
+      "sha256": "ff2db2a6673bc8d4bef297cea60ffb61615274d86e882726b6cb904a4bd569e1",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/catalog/domains/k8s.json",
+      "destination": "Master_Archive/branch-archive/main/catalog/domains/k8s.json",
+      "sha256": "d1d28597a36fc8f24e0f32896519a40f5f5b8b96ca6c7f9252ed9c75bfbe208c",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/catalog/domains/security.json",
+      "destination": "Master_Archive/branch-archive/main/catalog/domains/security.json",
+      "sha256": "acd536cc31b43c4b8f48398e40faefa088a6c285d584d3b4a893dcde9e5a3f96",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/catalog/domains/versioning.json",
+      "destination": "Master_Archive/branch-archive/main/catalog/domains/versioning.json",
+      "sha256": "d3c10e4a3cb03d5591fe75078976e30623b1b6e4497e1f743350cc3724880bb0",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/catalog/index.json",
+      "destination": "Master_Archive/branch-archive/main/catalog/index.json",
+      "sha256": "979492d5f0bbf3d45449cbd93cf6d04c58db29e6315e1859f41b985cfc29c089",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/catalog/maturity/validated.json",
+      "destination": "Master_Archive/branch-archive/main/catalog/maturity/validated.json",
+      "sha256": "8e62866a2044f7dcc1e7516defbee37b82841f7dd6ab237409be4823410ee256",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/langgraph_cli.py",
+      "destination": "Master_Archive/branch-archive/main/langgraph_cli.py",
+      "sha256": "dfe8d873a7a0ce3750d147e4abf861783c52db27ae7ea2ebedf87704bd8471d2",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/langgraph_git_integration.py",
+      "destination": "Master_Archive/branch-archive/main/langgraph_git_integration.py",
+      "sha256": "ad36e767259f9aa84ba132d67c80b30c52467a9ab3e30b030aab4442ebfb0d3f",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/ps/TradingOps/TradingOps.psd1",
+      "destination": "Master_Archive/branch-archive/main/ps/TradingOps/TradingOps.psd1",
+      "sha256": "b3ec2c0bf3f8a7e82e89729ec689a4b9ef95580ad2d7132510a6474cb49d0e2a",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/ps/TradingOps/TradingOps.psm1",
+      "destination": "Master_Archive/branch-archive/main/ps/TradingOps/TradingOps.psm1",
+      "sha256": "508abc81eda49a743799647da1da57e43c69fa2027b12ab105b523225f35fc19",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/ps/install_codex_vscode_profile.ps1",
+      "destination": "Master_Archive/branch-archive/main/ps/install_codex_vscode_profile.ps1",
+      "sha256": "9e5e27fab3f3db6a8afa408a17202d3018fb2dc909628061ae354098528b592d",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/specs/fixtures/enhanced_dashboard.sample.json",
+      "destination": "Master_Archive/branch-archive/main/specs/fixtures/enhanced_dashboard.sample.json",
+      "sha256": "30a52987bd31cc625fda582860306616cc1713bdc4290392a2e6eb774c104a25",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/specs/openapi/orchestrator-enhanced.yml",
+      "destination": "Master_Archive/branch-archive/main/specs/openapi/orchestrator-enhanced.yml",
+      "sha256": "5a35d1453275c0569744415205a94159d953e8869e29ff9e1d4ec6df0d3984b6",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/specs/schemas/context_analysis.json",
+      "destination": "Master_Archive/branch-archive/main/specs/schemas/context_analysis.json",
+      "sha256": "21a8823be2ff55259efc9ecb50919ac84c636fa78bab5b066cb09e1085725d16",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/specs/schemas/live_update.json",
+      "destination": "Master_Archive/branch-archive/main/specs/schemas/live_update.json",
+      "sha256": "e0d8996df6a7221858162652ab0e7d6f886a78544f3e2ce980add980f6951cbd",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/specs/schemas/notification_rule.json",
+      "destination": "Master_Archive/branch-archive/main/specs/schemas/notification_rule.json",
+      "sha256": "bf365fe2a042e3556364e6eec7a8108edfbdc2b07223fdee69f583ae004e0d60",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/specs/schemas/workflow_template.json",
+      "destination": "Master_Archive/branch-archive/main/specs/schemas/workflow_template.json",
+      "sha256": "eee68f571beef7b6ac95e12f6c936ec2a302672581e585a697e42760ffc56836",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/specs/websocket/events.yml",
+      "destination": "Master_Archive/branch-archive/main/specs/websocket/events.yml",
+      "sha256": "4b597838653a96fb5557322cba10968dadf8c51dbc53b37d1b1820aad5fbb6ac",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/verify.d/pytest.py",
+      "destination": "Master_Archive/branch-archive/main/verify.d/pytest.py",
+      "sha256": "20c8af4cb0390a68797fcdc7bbbd74f1a5f7b52205bf39d6e7894c601d8fe634",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/verify.d/ruff_semgrep.py",
+      "destination": "Master_Archive/branch-archive/main/verify.d/ruff_semgrep.py",
+      "sha256": "1b5be1f36bab6819e03ecd1f072952144c494b6b9ffc5931f4e1bb6ae1deb169",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/verify.d/schema_validate.py",
+      "destination": "Master_Archive/branch-archive/main/verify.d/schema_validate.py",
+      "sha256": "b1a5d5294590328d568b7facef7ed63ce2336f4f5af49ed41742ae0bfac76776",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/workflows/__init__.py",
+      "destination": "Master_Archive/branch-archive/main/workflows/__init__.py",
+      "sha256": "a55939982681795622d9bb18fb14104a2354c514d9b0115ba3d0628c4ecc029b",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/workflows/execution_roadmap.py",
+      "destination": "Master_Archive/branch-archive/main/workflows/execution_roadmap.py",
+      "sha256": "f8cdb922644f01268dc07bc16e598149158a08c57ebd493432301b73700d98bb",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/workflows/hello_world/steps/00_validate_inputs.ps1",
+      "destination": "Master_Archive/branch-archive/main/workflows/hello_world/steps/00_validate_inputs.ps1",
+      "sha256": "7725dae2be5ca9c5b30ef5e5842949af632d8482b6f4dccf0b44705d0d8f19ed",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/workflows/hello_world/steps/10_run_task.ps1",
+      "destination": "Master_Archive/branch-archive/main/workflows/hello_world/steps/10_run_task.ps1",
+      "sha256": "cde8dcf4c98aeb637a4a542d82205f75422a33096e5eed429c4cdd2548d5931a",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/workflows/hello_world/steps/90_publish_artifacts.ps1",
+      "destination": "Master_Archive/branch-archive/main/workflows/hello_world/steps/90_publish_artifacts.ps1",
+      "sha256": "e7506ef55bb651506745cc2aba2630fd3064ba1d2af43fc56736b856c0061bcd",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/workflows/hello_world/workflow.yaml",
+      "destination": "Master_Archive/branch-archive/main/workflows/hello_world/workflow.yaml",
+      "sha256": "6ed336b5f67a57987d6c555df546dc8275c2c755ea8391d8ced28474b9a34e97",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/workflows/orchestrator.py",
+      "destination": "Master_Archive/branch-archive/main/workflows/orchestrator.py",
+      "sha256": "9aa479eb94118a78451282ed1f957cda736e0553bd111d45438232c468fe89c9",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/workflows/phase_definitions/complete_implementation.yaml",
+      "destination": "Master_Archive/branch-archive/main/workflows/phase_definitions/complete_implementation.yaml",
+      "sha256": "3a81e211c217a3ed877a93eecf2e96df3061f23e240c07d39f403fd15e3165ae",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/workflows/phase_definitions/multi_stream.yaml",
+      "destination": "Master_Archive/branch-archive/main/workflows/phase_definitions/multi_stream.yaml",
+      "sha256": "29601ffb0cb66f05464e52a9b8c719e38c1d8f3e78ee55a629225a13eee9f4c4",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/workflows/phase_definitions/phase_plan_task.yaml",
+      "destination": "Master_Archive/branch-archive/main/workflows/phase_definitions/phase_plan_task.yaml",
+      "sha256": "6a0c755777ac19eb976e02dfa222a52a24e447959b11ac13631f914f020cf867",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/workflows/plans/enhanced_workflow_plan.json",
+      "destination": "Master_Archive/branch-archive/main/workflows/plans/enhanced_workflow_plan.json",
+      "sha256": "f1f82119748070e903afbc0886339ae2703a34808fb9d8e111c206547889ab78",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/workflows/roadmap_state.json",
+      "destination": "Master_Archive/branch-archive/main/workflows/roadmap_state.json",
+      "sha256": "5a0ef59b1420ecea442e6bb311103101090ba4f143ba1117ab826b9802ba6042",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "branch-archive/main/workflows/templates/engine.py",
+      "destination": "Master_Archive/branch-archive/main/workflows/templates/engine.py",
+      "sha256": "54cdbe912afa958371dc25ef3376db302989a795490807af75f5b0a3596bdcec",
+      "entry": "branch-archive"
+    },
+    {
+      "source": "backups/bidirectional_validation_report.json",
+      "destination": "Master_Archive/backups/bidirectional_validation_report.json",
+      "sha256": "fc33928d1f29b8f0210d3e08dfde33fac1b76a1af0de9dd8b5fe8628b3b981a6",
+      "entry": "backups"
+    },
+    {
+      "source": "backups/file_registry_summary.json",
+      "destination": "Master_Archive/backups/file_registry_summary.json",
+      "sha256": "bdff41d4dab01f9dc688c01d3124680f03599f401af78644ae36efdf5c248fd8",
+      "entry": "backups"
+    },
+    {
+      "source": "backups/file_rename_log.json",
+      "destination": "Master_Archive/backups/file_rename_log.json",
+      "sha256": "e34917aab3ec9aba527661e2d70681ac03e2d86ebff412549e3f9db93e197d15",
+      "entry": "backups"
+    },
+    {
+      "source": "backups/phase_a_pre_validation_report.json",
+      "destination": "Master_Archive/backups/phase_a_pre_validation_report.json",
+      "sha256": "1396cee9cb29f6cf7dfd6d263b8e7aaded2dcf9e16934350bfb886790b7ab8dd",
+      "entry": "backups"
+    },
+    {
+      "source": "backups/step_entrypoint_mappings.json",
+      "destination": "Master_Archive/backups/step_entrypoint_mappings.json",
+      "sha256": "55141350c9c2cb794421536d0e9a680dfc839eeffd258f3bbb6b73090803771b",
+      "entry": "backups"
+    },
+    {
+      "source": "backups/traceability_matrix.json",
+      "destination": "Master_Archive/backups/traceability_matrix.json",
+      "sha256": "b9ce4bf85d1da85909b70148cfb74c042b34d2ac5c004654d47a0e672c752b00",
+      "entry": "backups"
+    },
+    {
+      "source": "backups/validation_report.json",
+      "destination": "Master_Archive/backups/validation_report.json",
+      "sha256": "7c627893c2f2158fe5b45532e2f9cb22276dad9c6ece6846952b3b4cd4dd2ecc",
+      "entry": "backups"
+    },
+    {
+      "source": "docs/0199900073260118_CLAUDE.md",
+      "destination": "Master_Archive/docs/0199900073260118_CLAUDE.md",
+      "sha256": "b9b384d9c91a4e790d07a1641f2eb0557534a8c5e04e9baeafc3aafd353b9a80",
+      "entry": "docs/0199900073260118_CLAUDE.md"
+    },
+    {
+      "source": "docs/3099900001260118_README.md",
+      "destination": "Master_Archive/docs/3099900001260118_README.md",
+      "sha256": "f1efa33b8eae3c6779120c1a3d0d223dc2badaecb892a35ec702dbb755f5d16a",
+      "entry": "docs/3099900001260118_README.md"
+    },
+    {
+      "source": "docs/adr/0110000001260118_ADR-0001-service-decomposition.md",
+      "destination": "Master_Archive/docs/adr/0110000001260118_ADR-0001-service-decomposition.md",
+      "sha256": "65bf7c6a6651b58d8f90f031a80495a46d733f3e0197de3d1b3244c09675b421",
+      "entry": "docs/adr/0110000001260118_ADR-0001-service-decomposition.md"
+    },
+    {
+      "source": "docs/ai-tools-guide.md",
+      "destination": "Master_Archive/docs/ai-tools-guide.md",
+      "sha256": "3531de13fb395bd909a08538c527e955f7b27c202cd47235c0e2ba79a8acdf6e",
+      "entry": "docs/ai-tools-guide.md"
+    },
+    {
+      "source": "docs/api/0210000001260118_api_documentation.txt",
+      "destination": "Master_Archive/docs/api/0210000001260118_api_documentation.txt",
+      "sha256": "03cbbc376539502e85fdd32ba3b1cdf52881d583f6a38f373bc0e90cc4978e03",
+      "entry": "docs/api"
+    },
+    {
+      "source": "docs/archive/actual implementation work remains.md",
+      "destination": "Master_Archive/docs/archive/actual implementation work remains.md",
+      "sha256": "923efc374421928660f1fe22b79c4f3771b3cf87fabc8203fa67168bc46cd894",
+      "entry": "docs/archive/actual implementation work remains.md"
+    },
+    {
+      "source": "docs/archive/agent-file-drop-readme.md",
+      "destination": "Master_Archive/docs/archive/agent-file-drop-readme.md",
+      "sha256": "e7d0e622188366a1c345e679231ccf859a7a1de28bac8537225c697d13f66642",
+      "entry": "docs/archive/agent-file-drop-readme.md"
+    },
+    {
+      "source": "docs/archive/Agentic_CLI_Tools_Overview_v2.md",
+      "destination": "Master_Archive/docs/archive/Agentic_CLI_Tools_Overview_v2.md",
+      "sha256": "5800195dd2140a9a9d10ef786ee347922328085b95434771dda773f77aeb62fb",
+      "entry": "docs/archive/Agentic_CLI_Tools_Overview_v2.md"
+    },
+    {
+      "source": "docs/archive/agentic_framework_changes.md",
+      "destination": "Master_Archive/docs/archive/agentic_framework_changes.md",
+      "sha256": "09ffe3487af32a61741ec924540ebd00c4403529e9bce1cbdf3c37817bdb0ebe",
+      "entry": "docs/archive/agentic_framework_changes.md"
+    },
+    {
+      "source": "docs/archive/autonomous_cli_workflow.md",
+      "destination": "Master_Archive/docs/archive/autonomous_cli_workflow.md",
+      "sha256": "9fe53fa9e957feb1bb7daff57217a59cf0029496ea986629bc12b3668bcd3d11",
+      "entry": "docs/archive/autonomous_cli_workflow.md"
+    },
+    {
+      "source": "docs/archive/cli workflow.txt",
+      "destination": "Master_Archive/docs/archive/cli workflow.txt",
+      "sha256": "4c013b8ae5c6b18f5a697c415ebf22d68feb0db299754a0ffe9e5202d4de485e",
+      "entry": "docs/archive/cli workflow.txt"
+    },
+    {
+      "source": "docs/archive/constraint_config.txt",
+      "destination": "Master_Archive/docs/archive/constraint_config.txt",
+      "sha256": "994011568b4a4cc93844a2fbe2ed3411fcb49f3a3547eca1b13139305f98f1fa",
+      "entry": "docs/archive/constraint_config.txt"
+    },
+    {
+      "source": "docs/archive/constraint_engine.txt",
+      "destination": "Master_Archive/docs/archive/constraint_engine.txt",
+      "sha256": "0d703c3dcb660787787f591eacc23c66e51aa9397f3bd9a85bacc332cd4cad45",
+      "entry": "docs/archive/constraint_engine.txt"
+    },
+    {
+      "source": "docs/archive/free_tier_orchestrator.txt",
+      "destination": "Master_Archive/docs/archive/free_tier_orchestrator.txt",
+      "sha256": "66a95ccd453b8c11fd58b606137a4cb210673d3f36d9dd5fd2e2c98f4bcdab13",
+      "entry": "docs/archive/free_tier_orchestrator.txt"
+    },
+    {
+      "source": "docs/archive/granular_workflow_doc.md",
+      "destination": "Master_Archive/docs/archive/granular_workflow_doc.md",
+      "sha256": "08a27c74942384cb4b09bb7ada7259c0f3685cd83564714755d67630b967ae96",
+      "entry": "docs/archive/granular_workflow_doc.md"
+    },
+    {
+      "source": "docs/archive/multi_cli_orchestrator.txt",
+      "destination": "Master_Archive/docs/archive/multi_cli_orchestrator.txt",
+      "sha256": "26ecf415800e7404dab0dbc4903b7a60bf6e28eb775cd672fc760f293093eb42",
+      "entry": "docs/archive/multi_cli_orchestrator.txt"
+    },
+    {
+      "source": "docs/archive/routing_engine_code.txt",
+      "destination": "Master_Archive/docs/archive/routing_engine_code.txt",
+      "sha256": "fabb2c06b7f88f3ead1cabf875654873c5e16e7995d8ff8aa4f2004eb42b178e",
+      "entry": "docs/archive/routing_engine_code.txt"
+    },
+    {
+      "source": "docs/archive/vs_code_triage_pack_repo_drop_in.md",
+      "destination": "Master_Archive/docs/archive/vs_code_triage_pack_repo_drop_in.md",
+      "sha256": "c379e28065372f7545ae62fc887fdb8c9723c8ebeec037fe4ead75154239a054",
+      "entry": "docs/archive/vs_code_triage_pack_repo_drop_in.md"
+    },
+    {
+      "source": "docs/archive/workflow_schema.txt",
+      "destination": "Master_Archive/docs/archive/workflow_schema.txt",
+      "sha256": "cfcbd33345aa6adcad2c0616839761111c16bec9dc0226cb29cd87c8203bf21e",
+      "entry": "docs/archive/workflow_schema.txt"
+    },
+    {
+      "source": "docs/archive/zero_touch_setup.txt",
+      "destination": "Master_Archive/docs/archive/zero_touch_setup.txt",
+      "sha256": "50a5f8c080ad1b49f0c6aa86d48c94955af4f4663e1d5d66b387eae90f8009f6",
+      "entry": "docs/archive/zero_touch_setup.txt"
+    },
+    {
+      "source": "docs/audit_schema.md",
+      "destination": "Master_Archive/docs/audit_schema.md",
+      "sha256": "09f3b5d2fd98b8812161df69e0c0674ad308dbf2fd9874f467a145ffdb19e588",
+      "entry": "docs/audit_schema.md"
+    },
+    {
+      "source": "docs/COMPLETE_IMPLEMENTATION_PLAN.md",
+      "destination": "Master_Archive/docs/COMPLETE_IMPLEMENTATION_PLAN.md",
+      "sha256": "7d480c3a52f1768dbad2506c655e2b8f245250370f5f3c89cce5b4e864d02f78",
+      "entry": "docs/COMPLETE_IMPLEMENTATION_PLAN.md"
+    },
+    {
+      "source": "docs/GETTING_STARTED_INDEX.md",
+      "destination": "Master_Archive/docs/GETTING_STARTED_INDEX.md",
+      "sha256": "d3654867b3e6f60e2c792687bd4065b95775e654203e3dec39ab325965d37dd4",
+      "entry": "docs/GETTING_STARTED_INDEX.md"
+    },
+    {
+      "source": "docs/GIT_OPS_RUNBOOK.md",
+      "destination": "Master_Archive/docs/GIT_OPS_RUNBOOK.md",
+      "sha256": "b72f8808203cc2da200ab7101b91a1b9aac40de0e1bbed627ed9c6a855d37d18",
+      "entry": "docs/GIT_OPS_RUNBOOK.md"
+    },
+    {
+      "source": "docs/GIT_OPS_VISUAL_DIAGRAMS.md",
+      "destination": "Master_Archive/docs/GIT_OPS_VISUAL_DIAGRAMS.md",
+      "sha256": "8f16923af6a4c9853d40ce85fe08512dae8988846b2cfd8caf819c9e2b1a0c1b",
+      "entry": "docs/GIT_OPS_VISUAL_DIAGRAMS.md"
+    },
+    {
+      "source": "docs/GITHUB_ACTIONS_AND_MERGE_PROTECTION.md",
+      "destination": "Master_Archive/docs/GITHUB_ACTIONS_AND_MERGE_PROTECTION.md",
+      "sha256": "f5cfde87e83bb4743ebb01eed4baf4c75f8da5edbe6ac81920a034d7e02b7bf1",
+      "entry": "docs/GITHUB_ACTIONS_AND_MERGE_PROTECTION.md"
+    },
+    {
+      "source": "docs/observability/0110000015260118_slo-definitions.md",
+      "destination": "Master_Archive/docs/observability/0110000015260118_slo-definitions.md",
+      "sha256": "756fcf26b52a5221f323315e3afcf6b06ffbdf98a511db7e2658e10317d10fe0",
+      "entry": "docs/observability/0110000015260118_slo-definitions.md"
+    },
+    {
+      "source": "docs/on-call/0110000016260118_kt-checklist.md",
+      "destination": "Master_Archive/docs/on-call/0110000016260118_kt-checklist.md",
+      "sha256": "00004625f36c1082a391dcdb9f2ca18b181bf3ad345185b9b5aa2bd149e1455c",
+      "entry": "docs/on-call/0110000016260118_kt-checklist.md"
+    },
+    {
+      "source": "docs/on-call/0110000017260118_README.md",
+      "destination": "Master_Archive/docs/on-call/0110000017260118_README.md",
+      "sha256": "268c7b90a5114af4ce3e03e581190824fd941f3f54010781be90b03744d254ff",
+      "entry": "docs/on-call/0110000017260118_README.md"
+    },
+    {
+      "source": "docs/on-call/0110000018260118_training.md",
+      "destination": "Master_Archive/docs/on-call/0110000018260118_training.md",
+      "sha256": "bb642cd0f3e20d8366d0bfba81bbc04406cadff26a8c4ebd682ab80e5d553c9c",
+      "entry": "docs/on-call/0110000018260118_training.md"
+    },
+    {
+      "source": "docs/project_board.md",
+      "destination": "Master_Archive/docs/project_board.md",
+      "sha256": "6808170e01cfad4f7edda4831f64f7616deaa680cadd079b7494e0ca28f17073",
+      "entry": "docs/project_board.md"
+    },
+    {
+      "source": "docs/README.md",
+      "destination": "Master_Archive/docs/README.md",
+      "sha256": "4be1fde1c5bcc5cd617efbfd3c8dce1ee2994d1cdda42fc9ba5a714a0a3f47a3",
+      "entry": "docs/README.md"
+    },
+    {
+      "source": "docs/reference/0110000021260118_apf_monorepo_build_order_deep_descriptions.md",
+      "destination": "Master_Archive/docs/reference/0110000021260118_apf_monorepo_build_order_deep_descriptions.md",
+      "sha256": "3d50d114fe2c87e9d9336d0ef362799a2f9fd5ee5774b9d201bd8029abb5a987",
+      "entry": "docs/reference/0110000021260118_apf_monorepo_build_order_deep_descriptions.md"
+    },
+    {
+      "source": "docs/reference/0110000024260118_bootstrap_contracts.md",
+      "destination": "Master_Archive/docs/reference/0110000024260118_bootstrap_contracts.md",
+      "sha256": "e2580803061e6cc5a59e854f56bc767e9c8e53abcfc1e3f5de857e8d31a28903",
+      "entry": "docs/reference/0110000024260118_bootstrap_contracts.md"
+    },
+    {
+      "source": "docs/reference/0110000026260118_diagnostics_schema.md",
+      "destination": "Master_Archive/docs/reference/0110000026260118_diagnostics_schema.md",
+      "sha256": "01fcfd6863c3f1841d8b2f9b5bc7f258c5ed0fe0e01fc1ccd9d134cc22c5f196",
+      "entry": "docs/reference/0110000026260118_diagnostics_schema.md"
+    },
+    {
+      "source": "docs/reference/1210000001260118_CR-EXAMPLE.yaml",
+      "destination": "Master_Archive/docs/reference/1210000001260118_CR-EXAMPLE.yaml",
+      "sha256": "6f803874d53239c4baffda9d4451904ce3edf017802faa1b83597787d83119a3",
+      "entry": "docs/reference/1210000001260118_CR-EXAMPLE.yaml"
+    },
+    {
+      "source": "docs/reference/1210000002260118_pre-commit-config.yaml",
+      "destination": "Master_Archive/docs/reference/1210000002260118_pre-commit-config.yaml",
+      "sha256": "4ac5fc4e61280c96428c9bdd0f14ec9cd90b6b627d922312c1c53f206d8a1024",
+      "entry": "docs/reference/1210000002260118_pre-commit-config.yaml"
+    },
+    {
+      "source": "docs/reference/2010000001260118_apf_apply_stub.py",
+      "destination": "Master_Archive/docs/reference/2010000001260118_apf_apply_stub.py",
+      "sha256": "143e9f3c9fe7df67c0c260705dc57b05ff9f9a3bc7c3ab02e1ab4a459bf8b22a",
+      "entry": "docs/reference/2010000001260118_apf_apply_stub.py"
+    },
+    {
+      "source": "docs/release_notes.md",
+      "destination": "Master_Archive/docs/release_notes.md",
+      "sha256": "a612750b4b1219266fc56a35af58c85d841d1a006a39d7d11df73b94af5a9ab6",
+      "entry": "docs/release_notes.md"
+    },
+    {
+      "source": "docs/release/0110000038260118_change-management.md",
+      "destination": "Master_Archive/docs/release/0110000038260118_change-management.md",
+      "sha256": "39429fc0bc7ccfa7c028ec4b8fb5b106141aeb17a3364fe1b245e968d812c23d",
+      "entry": "docs/release/0110000038260118_change-management.md"
+    },
+    {
+      "source": "docs/release/0110000039260118_release-checklist.md",
+      "destination": "Master_Archive/docs/release/0110000039260118_release-checklist.md",
+      "sha256": "8fa41b283e6dfa35bd6842a51bccc18d0fe4d6e8132f015b694b5936285b7da2",
+      "entry": "docs/release/0110000039260118_release-checklist.md"
+    },
+    {
+      "source": "docs/release/0110000040260118_ROADMAP.md",
+      "destination": "Master_Archive/docs/release/0110000040260118_ROADMAP.md",
+      "sha256": "371a812a96be9f0ee3a31c7a7d4fb19d1d7a2a0e34d789d524b13a20ce97e6b1",
+      "entry": "docs/release/0110000040260118_ROADMAP.md"
+    },
+    {
+      "source": "docs/RELEASING.md",
+      "destination": "Master_Archive/docs/RELEASING.md",
+      "sha256": "8fd5f76d710a9c8c4cec5132d43f5578d3202e8bae08bc0812a2f4998801a4d9",
+      "entry": "docs/RELEASING.md"
+    },
+    {
+      "source": "docs/roadmap.md",
+      "destination": "Master_Archive/docs/roadmap.md",
+      "sha256": "0f4943ab94d338a79c66a0a904f5f707e966544f13d16d741481d4ed5c7a5711",
+      "entry": "docs/roadmap.md"
+    },
+    {
+      "source": "docs/security/0110000057260118_image-digest-policy.md",
+      "destination": "Master_Archive/docs/security/0110000057260118_image-digest-policy.md",
+      "sha256": "db86ff7f53a7f4bbdfe682dc459e6b66ae11831514b6f79568247c85d0b52694",
+      "entry": "docs/security/0110000057260118_image-digest-policy.md"
+    },
+    {
+      "source": "docs/security/0110000058260118_scorecards-policy.md",
+      "destination": "Master_Archive/docs/security/0110000058260118_scorecards-policy.md",
+      "sha256": "6e2d1c70fd4e808108ef79f90680ddffaf1f552438a38999b0f43ffb096b8c31",
+      "entry": "docs/security/0110000058260118_scorecards-policy.md"
+    },
+    {
+      "source": "docs/STRUCTURE.md",
+      "destination": "Master_Archive/docs/STRUCTURE.md",
+      "sha256": "1d7847ed22fa53fc6c18d13f6ff10b27d863462a15588af31c874712b34e6717",
+      "entry": "docs/STRUCTURE.md"
+    },
+    {
+      "source": "docs/TEST_INVENTORY.md",
+      "destination": "Master_Archive/docs/TEST_INVENTORY.md",
+      "sha256": "b57b7f2757f14167f84ae108333a831a56cc8df377cfb95ed6c658545f4e9074",
+      "entry": "docs/TEST_INVENTORY.md"
+    },
+    {
+      "source": "docs/tool_registry.md",
+      "destination": "Master_Archive/docs/tool_registry.md",
+      "sha256": "f7e829f7082140408f02bcfe19f70070f44469dc63fc42651dd2b6631ef34e68",
+      "entry": "docs/tool_registry.md"
+    },
+    {
+      "source": "docs/WORKFLOW_INTEGRATION_STRATEGY.md",
+      "destination": "Master_Archive/docs/WORKFLOW_INTEGRATION_STRATEGY.md",
+      "sha256": "e8c2e7920736ba63f5870a2c8884910c620c58f5543ea7c290e16b33788ae9d5",
+      "entry": "docs/WORKFLOW_INTEGRATION_STRATEGY.md"
+    },
+    {
+      "source": "docs/workflow-guide.md",
+      "destination": "Master_Archive/docs/workflow-guide.md",
+      "sha256": "c46a300950a6950dc9dfd609865adf625f52cdab5b6a72cddb51ff432f96f9c0",
+      "entry": "docs/workflow-guide.md"
+    }
+  ]
+}
